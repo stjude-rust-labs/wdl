@@ -46,7 +46,7 @@ impl std::fmt::Display for Error {
             Error::RuleMismatch(path) => {
                 write!(f, "cannot match rule from file: {}", path.display())
             }
-            Error::PestError(err) => write!(f, "pest error:\n{err}")
+            Error::PestError(err) => write!(f, "pest error:\n{err}"),
         }
     }
 }
@@ -93,7 +93,8 @@ fn inner() -> Result<()> {
     match args.command {
         Command::Parse(args) => {
             let (contents, rule) = parse_from_path(&args.rule, &args.path)?;
-            let mut parse_tree = wdl::Parser::parse(rule, &contents).map_err(|err| Error::PestError(Box::new(err)))?;
+            let mut parse_tree = wdl::Parser::parse(rule, &contents)
+                .map_err(|err| Error::PestError(Box::new(err)))?;
 
             // For documents, we don't care about the parent element: it is much
             // more informative to see the children of the document split by
@@ -114,10 +115,7 @@ fn inner() -> Result<()> {
     Ok(())
 }
 
-fn parse_from_path(
-    rule: impl AsRef<str>,
-    path: impl AsRef<Path>,
-) -> Result<(String, wdl::Rule)> {
+fn parse_from_path(rule: impl AsRef<str>, path: impl AsRef<Path>) -> Result<(String, wdl::Rule)> {
     let rule = rule.as_ref();
     let path = path.as_ref();
 
@@ -127,10 +125,7 @@ fn parse_from_path(
 
     let contents = fs::read_to_string(path).map_err(Error::IoError)?;
 
-    Ok((
-        contents,
-        rule,
-    ))
+    Ok((contents, rule))
 }
 
 fn map_rule(rule: &str) -> Option<wdl::Rule> {

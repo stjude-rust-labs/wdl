@@ -13,7 +13,7 @@ mod suffix;
 fn it_parses_an_extremely_complicated_expression() {
     parses_to! {
         parser: WdlParser,
-        input: "if 
+        input: "if
     if true == false && 2 != 1 then
         (
             object {a: true}.a ||

@@ -99,6 +99,7 @@ string = { (double_quoted_string | single_quoted_string) }
 
 // Identifier.
 identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+qualified_identifier = ${ identifier ~ ("." ~ identifier)+ }
 
 // Literal.
 literal = { boolean | number | string | none | identifier }
@@ -188,7 +189,6 @@ core = {
 //
 // As such, you will see that none of the permutations of the rule below end in
 // an optional token. That is by design to avoid the problem above.
-
 expression = ${ 
     prefix? ~ WHITESPACE* ~ core ~ WHITESPACE* ~ postfix? ~ 
     (
@@ -420,6 +420,52 @@ workflow_output = { common_output }
 // Workflow private declarations.
 workflow_private_declarations = { common_private_declarations }
 
+// Workflow call
+workflow_call_input = {
+    (identifier ~ "=" ~ expression)
+    | (identifier ~ "=" ~ identifier)
+    | identifier
+}
+// DIVERGE: spec is ambiguous about whether whitespace is
+// allowed between the opening and closing brackers ({})
+// when the call body is empty. We have opted to allow whitespace.
+workflow_call_body = { "{"
+    ~ ("input:" ~ workflow_call_input ~ ("," ~ workflow_call_input)*)?
+    ~ "}"
+}
+workflow_call_as = ${ "as" ~ WHITESPACE+ ~ identifier }
+workflow_call_after = ${ "after" ~ WHITESPACE+ ~ identifier }
+workflow_call = ${
+    ("call"
+        ~ WHITESPACE+ ~ (qualified_identifier | identifier)
+        ~ (WHITESPACE+ ~ workflow_call_as)?
+        ~ (WHITESPACE+ ~ workflow_call_after)*
+        ~ (WHITESPACE* ~ workflow_call_body)
+    )
+    | ("call"
+        ~ WHITESPACE+ ~ (qualified_identifier | identifier)
+        ~ (WHITESPACE+ ~ workflow_call_as)?
+        ~ (WHITESPACE+ ~ workflow_call_after)+
+    )
+    | ("call"
+        ~ WHITESPACE+ ~ (qualified_identifier | identifier)
+        ~ WHITESPACE+ ~ workflow_call_as
+    )
+    | ("call"
+        ~ WHITESPACE+ ~ (qualified_identifier | identifier)
+    )
+}
+
+// Workflow scatter
+workflow_scatter_iteration_stmnt = { "(" ~ identifier ~ "in" ~ expression ~ ")" }
+workflow_scatter = { "scatter" ~ workflow_scatter_iteration_stmnt ~ "{" ~ workflow_execution_stmnt+ ~ "}" }
+
+// Workflow conditional
+workflow_conditional = { "if" ~ "(" ~ expression ~ ")" ~ "{" ~ workflow_execution_stmnt+ ~ "}" }
+
+// Workflow execution statements
+workflow_execution_stmnt = { (workflow_conditional | workflow_scatter | workflow_call | workflow_private_declarations) }
+
 // Workflow metadata and parameter metadata.
 workflow_metadata_kv = { identifier ~ ":" ~ workflow_metadata_value }
 
@@ -463,7 +509,7 @@ workflow_parameter_metadata = { "parameter_meta" ~ "{" ~ workflow_metadata_kv? ~
 workflow_element = _{
     workflow_input |
     workflow_output |
-    workflow_private_declarations |
+    workflow_execution_stmnt |
     workflow_parameter_metadata |
     workflow_metadata
 }
@@ -487,5 +533,5 @@ version         =  { "version" ~ version_release }
 
 // Document.
 document = {
-    SOI ~ (version) ~ (document_element)* ~ (workflow ~ document_element*)?
+    SOI ~ (version) ~ (document_element)* ~ (workflow ~ document_element*)? ~ EOI
 }
