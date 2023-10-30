@@ -1,0 +1,412 @@
+INDENT = { " " | "\t" }
+WHITESPACE = { (INDENT | NEWLINE)+ }
+COMMENT    = { "#" ~ (!NEWLINE ~ ANY)* }
+
+// Atoms.
+OPTION = { "?" }
+ZERO_OR_MORE = { "*" }
+ONE_OR_MORE = { "+" }
+
+//==========//
+// Literals //
+//==========//
+
+// None.
+none = { "None" }
+
+// Boolean.
+boolean = { "true" | "false" }
+
+// Integers.
+integer_decimal = @{ "0" ~ !ASCII_ALPHANUMERIC | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT* }
+integer_hex     = @{ "0" ~ ("x" | "X") ~ ASCII_HEX_DIGIT+ }
+integer_octal   = @{ "0" ~ ASCII_OCT_DIGIT+ }
+integer         = ${ (integer_decimal | integer_hex | integer_octal) }
+
+// Float.
+float_e               = @{ ("e" | "E") ~ ("-" | "+")? ~ ASCII_DIGIT+ }
+float_with_decimal    = @{ ASCII_DIGIT+? ~ "." ~ ASCII_DIGIT+ ~ float_e? }
+float_without_decimal = @{ ASCII_DIGIT+ ~ "." ~ !ASCII_DIGIT ~ float_e? }
+float_simple          = @{ ASCII_DIGIT+ ~ float_e }
+float                 = ${ float_with_decimal | float_without_decimal | float_simple }
+
+// Number.
+// 
+// NOTE: all rules included in `number` must be marked as atomic (`@`) or
+// compound-atomic (`$`). This is not checked by the compiler, so you must
+// ensure it remains true.
+number = _{ float | integer }
+
+// Character.
+//
+// DIVERGE: the specification states lists a tab (`\t`) within the table of
+// characters that it states *must* be escaped when included in a string. This
+// seems non-sensical to me, and I see no other implementations that enforce
+// this check. Thus, I am not including a tab in that list.
+char_escaped            = @{ "\\" ~ ("\\" | "\"" | "\'" | "n" | "r" | "b" | "t" | "f" | "a" | "v" | "?") }
+char_octal              = @{ "\\" ~ ASCII_OCT_DIGIT{1, 3} ~ !ASCII_OCT_DIGIT }
+char_hex                = @{ "\\x" ~ ASCII_HEX_DIGIT+ }
+char_unicode_four       = @{ "\\" ~ ("u" | "U") ~ ASCII_HEX_DIGIT{4} ~ !ASCII_HEX_DIGIT }
+char_unicode_eight      = @{ "\\" ~ ("u" | "U") ~ ASCII_HEX_DIGIT{8} ~ !ASCII_HEX_DIGIT }
+char_unicode            = @{ char_unicode_four | char_unicode_eight }
+char_special            = _{ char_escaped | char_hex | char_unicode | char_octal }
+char_other_double_quote = @{ !("\\" | "\"" | "\n") ~ ANY }
+char_other_single_quote = @{ !("\\" | "\'" | "\n") ~ ANY }
+
+// String.
+double_quoted_string = @{
+    "\"" ~ (char_special | char_other_double_quote)* ~ "\""
+}
+single_quoted_string = @{
+    "\'" ~ (char_special | char_other_single_quote)* ~ "\'"
+}
+
+// For strings, whether the string is double-quoted or single-quote is not
+// important context when parsing. HOWEVER, we would like to return whether the
+// strings are single or double quoted for linting purposes. Thus, the type of
+// quoting is retained.
+// 
+// NOTE: all rules included in `string` must be marked as atomic (`@`) or
+// compound-atomic (`$`). This is not checked by the compiler, so you must
+// ensure it remains true.
+string = { (double_quoted_string | single_quoted_string) }
+
+// Identifier.
+identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+
+// Literal.
+literal = { boolean | number | string | none | identifier }
+
+//=============//
+// Expressions //
+//=============//
+
+// Prefix.
+or        = { "||" } 
+and       = { "&&" } 
+add       = { "+" } 
+sub       = { "-" } 
+mul       = { "*" } 
+div       = { "/" }
+remainder = { "%" } 
+eq        = { "==" } 
+neq       = { "!=" } 
+lte       = { "<=" } 
+gte       = { ">=" } 
+lt        = { "<" } 
+gt        = { ">" } 
+
+infix = { or | and | add | sub | mul | div | remainder | eq | neq | lte | gte | lt | gt }
+
+// Prefix.
+negation     = { "!" }
+unary_signed = { "+" | "-" }
+
+prefix = { negation | unary_signed }
+
+// Postfix.
+//
+// NOTE: access is not marked as non-atomic (`!`) because there cannot be a
+// space between the period (`.`) and the field to access (`identifer` in this
+// case).
+access        =  { "." ~ identifier }
+index         = !{ "[" ~ expression ~ "]" }
+function_call = !{ "(" ~ expression ~ ")" }
+
+postfix = { access | index | function_call }
+
+// Core elements.
+group          = !{ "(" ~ expression ~ ")" }
+if             = !{ "if" ~ expression ~ "then" ~ expression ~ "else" ~ expression }
+struct_literal = !{ identifier ~ "{" ~ (identifier ~ ":" ~ expression ~ ("," ~ identifier ~ ":" ~ expression)* ~ ","?)* ~ "}" }
+object_literal = !{ "object" ~ "{" ~ (identifier ~ ":" ~ expression ~ ("," ~ identifier ~ ":" ~ expression)* ~ ","?)* ~ "}" }
+map_literal    = !{"{" ~ (expression ~ ":" ~ expression ~ ("," ~ expression ~ ":" ~ expression)* ~ ","?)* ~ "}" }
+array_literal  = !{ "[" ~ (expression ~ ("," ~ expression)* ~ ","?) ~ "]" }
+pair_literal   = !{ "(" ~ expression ~ "," ~ expression ~ ")" }
+
+core = { 
+    group |
+    if |
+    struct_literal |
+    object_literal |
+    map_literal |
+    array_literal |
+    pair_literal |
+    literal |
+    identifier
+}
+
+// Expression.
+//
+// NOTE: this rule is defined as compound-atomic (`$`) for the following reason:
+//
+// Whitespace is a problem when your rule ends with an optional element. Many of
+// these expressions do, which means, when the element is not there, the
+// expression consumes all of the whitespace that falls of the end of the
+// statement. This is not a good practice, so we manually define where the
+// whitespace can be in these cases.
+//
+// As such, you will see that none of the permutations of the rule below end in
+// an optional token. That is by design to avoid the problem above.
+expression = ${ 
+    prefix? ~ WHITESPACE* ~ core ~ WHITESPACE* ~ postfix? ~ 
+    (
+        WHITESPACE* ~ infix ~ WHITESPACE* ~ prefix? ~ WHITESPACE* ~ core ~ WHITESPACE* ~ postfix |
+        WHITESPACE* ~ infix ~ WHITESPACE* ~ prefix? ~ WHITESPACE* ~ core
+    )+ |
+    prefix? ~ WHITESPACE* ~ core ~ WHITESPACE* ~ postfix |
+    prefix? ~ WHITESPACE* ~ core 
+}
+
+// Types.
+//
+// NOTE: techically the spec calls the optional `+` the "non-empty" operator.
+// Since we have already defined this as the "one or more" operator and they
+// mean effectively the same thing, I've just kept this nomeclature.
+array_type = { "Array" ~ "[" ~ wdl_type ~ "]" ~ ONE_OR_MORE? }
+map_type   = { "Map" ~ "[" ~ wdl_type ~ "," ~ wdl_type ~ "]" }
+pair_type  = { "Pair" ~ "[" ~ wdl_type ~ "," ~ wdl_type ~ "]" }
+
+type_base = _{
+    map_type
+  | array_type
+  | pair_type
+  | "String"
+  | "File"
+  | "Boolean"
+  | "Int"
+  | "Float"
+  | "Object"
+  | identifier
+}
+
+wdl_type = _{
+    type_base ~ OPTION?
+  | type_base
+}
+
+unbound_declaration = {
+    wdl_type ~ identifier
+}
+
+bound_declaration = {
+    wdl_type ~ identifier ~ "=" ~ expression
+}
+
+declaration = _{
+    bound_declaration
+  | unbound_declaration
+}
+
+struct = {"struct" ~ identifier ~ "{" ~ (unbound_declaration)* ~ "}" }
+
+// Imports.
+import_as    = @{ "as" ~ WHITESPACE+ ~ identifier }
+import_alias = @{
+    "alias" ~ WHITESPACE+ ~ identifier ~ WHITESPACE+ ~ "as" ~ WHITESPACE+ ~ identifier
+}
+import       = ${
+    "import" ~ WHITESPACE+ ~ string ~ (WHITESPACE+ ~ import_as)? ~ (WHITESPACE+ ~ import_alias)*
+}
+
+//================================//
+// Common Workflow/Tasks Elements //
+//================================//
+
+// NOTE: the specification states the following in the workflow section:
+//
+//   Tasks and workflows have several elements in common. These sections have
+//   nearly the same usage in workflows as they do in tasks, so we just link to
+//   their earlier descriptions.
+//
+//     - Input section.
+//     - Private declarations.
+//     - Output section.
+//     - Metadata section.
+//     - Parameter metadata section.
+//
+// As such, I will use a common set of silent rules to define these elements
+// while wrapping them in context-specific rules depending on whether we are
+// currently in a workflow or a task.
+
+// Common input declaration.
+common_input = _{ "input" ~ "{" ~ (declaration)* ~ "}" }
+
+// Common output declaration.
+common_output = _{ "output" ~ "{" ~ (bound_declaration)* ~ "}" }
+
+// Common private declarations.
+common_private_declarations = _{ (bound_declaration)+ }
+
+// Common metadata elements.
+//
+// DIVERGE: the specification says that this is equal sign (`=`) delimited, but
+// the examples show it actually being colon (`:`) delimited. As such, I've used
+// colon here.
+common_metadata_kv = _{ identifier ~ ":" ~ common_metadata_value }
+
+common_metadata_value = _{
+    string | number | boolean | "null" | common_metadata_object | common_metadata_array
+}
+
+common_metadata_object = _{ "{}" | "{" ~ common_metadata_kv ~ ("," ~ common_metadata_kv)* ~ "}" }
+common_metadata_array = _{ "[]" | "[" ~ common_metadata_value ~ ("," ~ common_metadata_value)* ~ "]" }
+
+common_metadata = _{ "meta" ~ "{" ~ common_metadata_kv* ~ "}" }
+common_parameter_metadata = _{ "parameter_meta" ~ "{" ~ common_metadata_kv* ~ "}" }
+
+//=======//
+// Tasks //
+//=======//
+
+// Task runtimes.
+task_runtime_mapping = { identifier ~ ":" ~ expression }
+task_runtime = { "runtime" ~ "{" ~ (task_runtime_mapping)* ~ "}" }
+
+// Task input.
+task_input = { common_input }
+
+// Task output.
+task_output = { common_output }
+
+// Task commands.
+command_heredoc_begin = { "<<<" }
+command_heredoc_end = { ">>>" }
+command_heredoc_interpolation_start = _{ "~{" }
+command_heredoc_interpolation_end = _{ "}" }
+command_heredoc_token = _{
+    (
+        !command_heredoc_begin ~
+        !command_heredoc_end ~
+        !command_heredoc_interpolation_start ~
+        ANY
+    )+
+}
+
+command_heredoc_literal_contents = { command_heredoc_token }
+
+command_heredoc_interpolated_token = {
+    (
+        !command_heredoc_begin ~
+        !command_heredoc_end ~
+        !command_heredoc_interpolation_start ~
+        !command_heredoc_interpolation_end ~
+        ANY
+    )+
+}
+
+command_heredoc_interpolated_contents = {
+    command_heredoc_interpolation_start ~
+    command_heredoc_interpolated_token ~
+    command_heredoc_interpolation_end
+}
+
+command_heredoc = {
+    command_heredoc_begin ~
+    (
+        command_heredoc_interpolated_contents |
+        command_heredoc_literal_contents 
+    )+ ~
+    command_heredoc_end
+}
+
+task_command = { "command" ~ command_heredoc }
+
+// Task private declarations.
+task_private_declarations = { common_private_declarations }
+
+// Task metadata and parameter metadata.
+task_metadata_kv = { identifier ~ ":" ~ task_metadata_value }
+
+task_metadata_value = {
+    string | number | boolean | "null" | task_metadata_object | task_metadata_array
+}
+
+// DIVERGE: the specification indicates that the members of both objects and
+// arrays should have the same delimiter. From the spec, they specify `,` as the
+// delimiter with no quotes—this leads to ambiguity as to whether a literal
+// comma is needed to delimit these items.
+//
+// In the case of an array, it seems obvious that a comma is needed to delimit
+// items. In the case of an object, a comma is not needed elsewhere in the spec,
+// so I will not require those here.
+task_metadata_object = { "{}" | "{" ~ task_metadata_kv ~ (task_metadata_kv)* ~ "}" }
+task_metadata_array = { "[]" | "[" ~ task_metadata_value ~ ("," ~ task_metadata_value)* ~ "]" }
+
+task_metadata = { "meta" ~ "{" ~ task_metadata_kv* ~ "}" }
+task_parameter_metadata = { "parameter_meta" ~ "{" ~ task_metadata_kv* ~ "}" }
+
+// Task elements.
+task_element = {
+    task_input |
+    task_output |
+    task_command |
+    task_runtime |
+    task_private_declarations |
+    task_parameter_metadata |
+    task_metadata
+}
+
+task = {"task" ~ identifier ~ "{" ~ task_element+ ~ "}" }
+
+// Workflows.
+
+// Workflow input.
+workflow_input = { common_input }
+
+// Workflow output.
+workflow_output = { common_output }
+
+// Workflow private declarations.
+workflow_private_declarations = { common_private_declarations }
+
+// Workflow metadata and parameter metadata.
+workflow_metadata_kv = { identifier ~ ":" ~ workflow_metadata_value }
+
+workflow_metadata_value = {
+    string | number | boolean | "null" | workflow_metadata_object | workflow_metadata_array
+}
+
+// DIVERGE: the specification indicates that the members of both objects and
+// arrays should have the same delimiter. From the spec, they specify `,` as the
+// delimiter with no quotes—this leads to ambiguity as to whether a literal
+// comma is needed to delimit these items.
+//
+// In the case of an array, it seems obvious that a comma is needed to delimit
+// items. In the case of an object, a comma is not needed elsewhere in the spec,
+// so I will not require those here.
+workflow_metadata_object = { "{}" | "{" ~ workflow_metadata_kv ~ (workflow_metadata_kv)* ~ "}" }
+workflow_metadata_array = { "[]" | "[" ~ workflow_metadata_value ~ ("," ~ workflow_metadata_value)* ~ "]" }
+
+workflow_metadata = { "meta" ~ "{" ~ workflow_metadata_kv* ~ "}" }
+workflow_parameter_metadata = { "parameter_meta" ~ "{" ~ workflow_metadata_kv* ~ "}" }
+
+workflow_element = _{
+    workflow_input |
+    workflow_output |
+    workflow_private_declarations |
+    workflow_parameter_metadata |
+    workflow_metadata
+}
+
+workflow = { "workflow" ~ identifier ~ "{" ~ workflow_element* ~ "}" }
+
+// Document elements.
+// 
+// The element rule is marked as silent, as one typically only cares about the
+// underlying statement (and not the fact that this was wrapped in a document
+// element).
+document_element = _{
+    import
+  | struct
+  | task
+}
+
+// Document version.
+version_release = @{ (ASCII_ALPHANUMERIC | "." | "-")+ }
+version         =  { "version" ~ version_release }
+
+// Document.
+document = {
+    SOI ~ (version) ~ (document_element)* ~ (workflow ~ document_element*)?
+}
