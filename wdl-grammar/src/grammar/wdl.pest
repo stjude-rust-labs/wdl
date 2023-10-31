@@ -360,6 +360,23 @@ workflow_output = { common_output }
 // Workflow private declarations.
 workflow_private_declarations = { common_private_declarations }
 
+// Workflow call
+workflow_call_input = { identifier ~ ("=" ~ (identifier | expression))? }
+workflow_call_body = { "{" ~ ("input:" ~ WHITESPACE+ ~ workflow_call_input ~ ("," ~ workflow_call_input)*)? ~ "}" }
+workflow_call_wo_as = { "call" ~ WHITESPACE+ ~ identifier ~ workflow_call_body? }
+workflow_call_as = { workflow_call_wo_as ~ WHITESPACE+ ~ "as" ~ WHITESPACE+ ~ identifier } 
+workflow_call = { workflow_call_as | workflow_call_wo_as }
+
+// Workflow scatter
+workflow_scatter_iteration_stmnt = { "(" ~ identifier ~ "in" ~ expression ~ ")" }
+workflow_scatter = { "scatter" ~ workflow_scatter_iteration_stmnt ~ "{" ~ workflow_execution_stmnt* ~ "}" }
+
+// Workflow conditional
+workflow_conditional = { "if" ~ "(" ~ expression ~ ")" ~ "{" ~ workflow_execution_stmnt* ~ "}" }
+
+// Workflow execution statements
+workflow_execution_stmnt = { (workflow_conditional | workflow_scatter | workflow_call | workflow_private_declarations) }
+
 // Workflow metadata and parameter metadata.
 workflow_metadata_kv = { identifier ~ ":" ~ workflow_metadata_value }
 
@@ -384,7 +401,7 @@ workflow_parameter_metadata = { "parameter_meta" ~ "{" ~ workflow_metadata_kv* ~
 workflow_element = _{
     workflow_input |
     workflow_output |
-    workflow_private_declarations |
+    workflow_execution_stmnt |
     workflow_parameter_metadata |
     workflow_metadata
 }
@@ -408,5 +425,5 @@ version         =  { "version" ~ version_release }
 
 // Document.
 document = {
-    SOI ~ (version) ~ (document_element)* ~ (workflow ~ document_element*)?
+    SOI ~ (version) ~ (document_element)* ~ (workflow ~ document_element*)? ~ EOI
 }
