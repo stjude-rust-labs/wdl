@@ -362,9 +362,10 @@ workflow_private_declarations = { common_private_declarations }
 
 // Workflow call
 workflow_call_input = { identifier ~ ("=" ~ (identifier | expression))? }
-workflow_call_body = { "{" ~ ("input:" ~ WHITESPACE+ ~ workflow_call_input ~ ("," ~ workflow_call_input)*)? ~ "}" }
+workflow_call_body = { "{" ~ ("input:" ~ workflow_call_input ~ ("," ~ workflow_call_input)*)? ~ "}" }
 workflow_call_as = { "as" ~ WHITESPACE+ ~ identifier }
-workflow_call = { "call" ~ WHITESPACE+ ~ identifier ~ workflow_call_as? ~ workflow_call_body? }
+workflow_call_after = { "after" ~ WHITESPACE+ ~ identifier }
+workflow_call = { "call" ~ WHITESPACE+ ~ identifier ~ workflow_call_as? ~ workflow_call_after* ~ workflow_call_body? }
 
 // Workflow scatter
 workflow_scatter_iteration_stmnt = { "(" ~ identifier ~ "in" ~ expression ~ ")" }
