@@ -369,10 +369,10 @@ workflow_call = { "call" ~ WHITESPACE+ ~ identifier ~ workflow_call_as? ~ workfl
 
 // Workflow scatter
 workflow_scatter_iteration_stmnt = { "(" ~ identifier ~ "in" ~ expression ~ ")" }
-workflow_scatter = { "scatter" ~ workflow_scatter_iteration_stmnt ~ "{" ~ workflow_execution_stmnt* ~ "}" }
+workflow_scatter = { "scatter" ~ workflow_scatter_iteration_stmnt ~ "{" ~ workflow_execution_stmnt+ ~ "}" }
 
 // Workflow conditional
-workflow_conditional = { "if" ~ "(" ~ expression ~ ")" ~ "{" ~ workflow_execution_stmnt* ~ "}" }
+workflow_conditional = { "if" ~ "(" ~ expression ~ ")" ~ "{" ~ workflow_execution_stmnt+ ~ "}" }
 
 // Workflow execution statements
 workflow_execution_stmnt = { (workflow_conditional | workflow_scatter | workflow_call | workflow_private_declarations) }
