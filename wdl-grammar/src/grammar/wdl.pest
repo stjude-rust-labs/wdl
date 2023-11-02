@@ -99,10 +99,9 @@ string = { (double_quoted_string | single_quoted_string) }
 
 // Identifier.
 identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
-qualified_identifier = ${ identifier ~ ("." ~ identifier)+ }
 
 // Literal.
-literal = { boolean | number | string | none | identifier }
+literal = _{ boolean | number | string | none | identifier }
 
 //=============//
 // Expressions //
@@ -123,13 +122,13 @@ gte       = { ">=" }
 lt        = { "<" } 
 gt        = { ">" } 
 
-infix = { or | and | add | sub | mul | div | remainder | eq | neq | lte | gte | lt | gt }
+infix = _{ or | and | add | sub | mul | div | remainder | eq | neq | lte | gte | lt | gt }
 
 // Prefix.
 negation     = { "!" }
 unary_signed = { "+" | "-" }
 
-prefix = { negation | unary_signed }
+prefix = _{ negation | unary_signed }
 
 // Postfix.
 //
@@ -140,7 +139,7 @@ member =  { "." ~ identifier }
 index  = !{ "[" ~ expression ~ "]" }
 apply =  !{ "(" ~ expression ~ (COMMA ~ expression)* ~ COMMA? ~ ")" }
 
-postfix = { member | index | apply }
+postfix = _{ member | index | apply }
 
 // Core elements.
 //
@@ -165,7 +164,7 @@ map_literal    = !{ "{" ~ (expression_based_kv_pair ~ (COMMA? ~ expression_based
 array_literal  = !{ "[" ~ (expression ~ ("," ~ expression)* ~ COMMA?) ~ "]" }
 pair_literal   = !{ "(" ~ expression ~ "," ~ expression ~ ")" }
 
-core = { 
+core = _{ 
     group |
     if |
     object_literal |
@@ -421,15 +420,16 @@ workflow_output = { common_output }
 workflow_private_declarations = { common_private_declarations }
 
 // Workflow call
+qualified_identifier = ${ identifier ~ ("." ~ identifier)+ }
 workflow_call_input = {
     (identifier ~ "=" ~ expression)
     | (identifier ~ "=" ~ identifier)
     | identifier
 }
 // DIVERGE: spec is ambiguous about whether whitespace is
-// allowed between the opening and closing brackers ({})
+// allowed between the opening and closing brackets (`{}`)
 // when the call body is empty. We have opted to allow whitespace.
-workflow_call_body = { "{"
+workflow_call_body = !{ "{"
     ~ ("input:" ~ workflow_call_input ~ ("," ~ workflow_call_input)*)?
     ~ "}"
 }
@@ -458,13 +458,24 @@ workflow_call = ${
 
 // Workflow scatter
 workflow_scatter_iteration_stmnt = { "(" ~ identifier ~ "in" ~ expression ~ ")" }
-workflow_scatter = { "scatter" ~ workflow_scatter_iteration_stmnt ~ "{" ~ workflow_execution_stmnt+ ~ "}" }
+workflow_scatter = {
+    "scatter"
+    ~ workflow_scatter_iteration_stmnt
+    ~ "{"
+    ~ workflow_execution_stmnt+
+    ~ "}"
+}
 
 // Workflow conditional
 workflow_conditional = { "if" ~ "(" ~ expression ~ ")" ~ "{" ~ workflow_execution_stmnt+ ~ "}" }
 
 // Workflow execution statements
-workflow_execution_stmnt = { (workflow_conditional | workflow_scatter | workflow_call | workflow_private_declarations) }
+workflow_execution_stmnt = { (
+    workflow_conditional
+    | workflow_scatter
+    | workflow_call
+    | workflow_private_declarations
+) }
 
 // Workflow metadata and parameter metadata.
 workflow_metadata_kv = { identifier ~ ":" ~ workflow_metadata_value }
