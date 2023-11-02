@@ -59,7 +59,26 @@ fn it_fails_to_parse_an_if_statement_with_no_spaces_between_the_expression_and_t
         parser: WdlParser,
         input: "if true then aelse b",
         rule: Rule::r#if,
-        positives: vec![Rule::WHITESPACE, Rule::COMMENT, Rule::infix, Rule::postfix],
+        positives: vec![
+            Rule::WHITESPACE,
+            Rule::COMMENT,
+            Rule::or,
+            Rule::and,
+            Rule::add,
+            Rule::sub,
+            Rule::mul,
+            Rule::div,
+            Rule::remainder,
+            Rule::eq,
+            Rule::neq,
+            Rule::lte,
+            Rule::gte,
+            Rule::lt,
+            Rule::gt,
+            Rule::member,
+            Rule::index,
+            Rule::apply,
+        ],
         negatives: vec![],
         pos: 19
     }
@@ -99,29 +118,17 @@ fn it_successfully_parses_an_if_statement() {
             r#if(0, 21, [
                 WHITESPACE(2, 3, [INDENT(2, 3, [SPACE(2, 3)])]),
                 expression(3, 7, [
-                    core(3, 7, [
-                        literal(3, 7, [
-                            boolean(3, 7)
-                        ])
-                    ])
+                    boolean(3, 7)
                 ]),
                 WHITESPACE(7, 8, [INDENT(7, 8, [SPACE(7, 8)])]),
                 WHITESPACE(12, 13, [INDENT(12, 13, [SPACE(12, 13)])]),
                 expression(13, 14, [
-                    core(13, 14, [
-                        literal(13, 14, [
-                            identifier(13, 14)
-                        ])
-                    ])
+                    identifier(13, 14)
                 ]),
                 WHITESPACE(14, 15, [INDENT(14, 15, [SPACE(14, 15)])]),
                 WHITESPACE(19, 20, [INDENT(19, 20, [SPACE(19, 20)])]),
                 expression(20, 21, [
-                    core(20, 21, [
-                        literal(20, 21, [
-                            identifier(20, 21)
-                        ])
-                    ])
+                    identifier(20, 21)
                 ]),
             ])
         ]
@@ -138,29 +145,17 @@ fn it_successfully_parses_an_if_statement_without_including_the_trailing_space()
             r#if(0, 21, [
                 WHITESPACE(2, 3, [INDENT(2, 3, [SPACE(2, 3)])]),
                 expression(3, 7, [
-                    core(3, 7, [
-                        literal(3, 7, [
-                            boolean(3, 7)
-                        ])
-                    ])
+                    boolean(3, 7)
                 ]),
                 WHITESPACE(7, 8, [INDENT(7, 8, [SPACE(7, 8)])]),
                 WHITESPACE(12, 13, [INDENT(12, 13, [SPACE(12, 13)])]),
                 expression(13, 14, [
-                    core(13, 14, [
-                        literal(13, 14, [
-                            identifier(13, 14)
-                        ])
-                    ])
+                    identifier(13, 14)
                 ]),
                 WHITESPACE(14, 15, [INDENT(14, 15, [SPACE(14, 15)])]),
                 WHITESPACE(19, 20, [INDENT(19, 20, [SPACE(19, 20)])]),
                 expression(20, 21, [
-                    core(20, 21, [
-                        literal(20, 21, [
-                            identifier(20, 21)
-                        ])
-                    ])
+                    identifier(20, 21)
                 ]),
             ])
         ]

@@ -44,11 +44,7 @@ fn it_successfully_parses_a_struct_literal() {
                     ]),
                     kv_value(13, 17, [
                         expression(13, 17, [
-                            core(13, 17, [
-                                literal(13, 17, [
-                                    boolean(13, 17)
-                                ])
-                            ])
+                            boolean(13, 17)
                         ]),
                     ])
                 ])
@@ -72,11 +68,7 @@ fn it_successfully_parses_a_struct_literal_with_a_comma() {
                     ]),
                     kv_value(13, 17, [
                         expression(13, 17, [
-                            core(13, 17, [
-                                literal(13, 17, [
-                                    boolean(13, 17)
-                                ])
-                            ])
+                            boolean(13, 17)
                         ]),
                     ])
                 ]),
@@ -101,11 +93,7 @@ fn it_successfully_parses_a_struct_literal_without_the_trailing_space() {
                     ]),
                     kv_value(13, 17, [
                         expression(13, 17, [
-                            core(13, 17, [
-                                literal(13, 17, [
-                                    boolean(13, 17)
-                                ])
-                            ])
+                            boolean(13, 17)
                         ]),
                     ])
                 ])
@@ -133,11 +121,7 @@ fn it_successfully_parses_a_struct_literal_with_spaces_inside() {
                     WHITESPACE(16, 17, [INDENT(16, 17, [SPACE(16, 17)])]),
                     kv_value(17, 21, [
                         expression(17, 21, [
-                            core(17, 21, [
-                                literal(17, 21, [
-                                    boolean(17, 21)
-                                ])
-                            ])
+                            boolean(17, 21)
                         ]),
                     ]),
                 ]),
@@ -166,11 +150,7 @@ fn it_successfully_parses_a_struct_literal_with_spaces_inside_and_a_comma() {
                     WHITESPACE(16, 17, [INDENT(16, 17, [SPACE(16, 17)])]),
                     kv_value(17, 21, [
                         expression(17, 21, [
-                            core(17, 21, [
-                                literal(17, 21, [
-                                    boolean(17, 21)
-                                ])
-                            ])
+                            boolean(17, 21)
                         ]),
                     ]),
                 ]),
