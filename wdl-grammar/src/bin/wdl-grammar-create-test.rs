@@ -145,6 +145,8 @@ fn map_rule(rule: &str) -> Option<wdl::Rule> {
         "command_heredoc_interpolated_contents" => {
             Some(wdl::Rule::command_heredoc_interpolated_contents)
         }
+        "workflow_scatter" => Some(wdl::Rule::workflow_scatter),
+        "workflow_conditional" => Some(wdl::Rule::workflow_conditional),
         _ => todo!("must implement mapping for rule: {rule}"),
     }
 }

@@ -140,7 +140,7 @@ fn it_successfully_parses_a_pair_literal_with_spaces_inside() {
                 expression(1, 2, [
                     identifier(1, 2)
                 ]),
-                WHITESPACE(3, 4, [INDENT(3, 4, [SPACE(3, 4)])]),
+                WHITESPACE(3, 4, [SPACE(3, 4)]),
                 expression(4, 5, [
                     identifier(4, 5)
                 ]),

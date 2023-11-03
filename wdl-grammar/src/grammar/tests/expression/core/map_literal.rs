@@ -113,22 +113,22 @@ fn it_successfully_parses_a_map_literal_with_spaces_inside() {
         rule: Rule::map_literal,
         tokens: [
             map_literal(0, 16, [
-                WHITESPACE(1, 2, [INDENT(1, 2, [SPACE(1, 2)])]),
+                WHITESPACE(1, 2, [SPACE(1, 2)]),
                 expression_based_kv_pair(2, 14, [
                     expression_based_kv_key(2, 7, [
                         expression(2, 7, [
                             identifier(2, 7)
                         ])
                     ]),
-                    WHITESPACE(7, 8, [INDENT(7, 8, [SPACE(7, 8)])]),
-                    WHITESPACE(9, 10, [INDENT(9, 10, [SPACE(9, 10)])]),
+                    WHITESPACE(7, 8, [SPACE(7, 8)]),
+                    WHITESPACE(9, 10, [SPACE(9, 10)]),
                     kv_value(10, 14, [
                         expression(10, 14, [
                             boolean(10, 14)
                         ])
                     ])
                 ]),
-                WHITESPACE(14, 15, [INDENT(14, 15, [SPACE(14, 15)])]),
+                WHITESPACE(14, 15, [SPACE(14, 15)]),
             ])
         ]
     }
@@ -142,15 +142,15 @@ fn it_successfully_parses_a_map_literal_with_spaces_inside_and_a_comma() {
         rule: Rule::map_literal,
         tokens: [
             map_literal(0, 17, [
-                WHITESPACE(1, 2, [INDENT(1, 2, [SPACE(1, 2)])]),
+                WHITESPACE(1, 2, [SPACE(1, 2)]),
                 expression_based_kv_pair(2, 14, [
                     expression_based_kv_key(2, 7, [
                         expression(2, 7, [
                             identifier(2, 7)
                         ])
                     ]),
-                    WHITESPACE(7, 8, [INDENT(7, 8, [SPACE(7, 8)])]),
-                    WHITESPACE(9, 10, [INDENT(9, 10, [SPACE(9, 10)])]),
+                    WHITESPACE(7, 8, [SPACE(7, 8)]),
+                    WHITESPACE(9, 10, [SPACE(9, 10)]),
                     kv_value(10, 14, [
                         expression(10, 14, [
                             boolean(10, 14)
@@ -158,7 +158,7 @@ fn it_successfully_parses_a_map_literal_with_spaces_inside_and_a_comma() {
                     ])
                 ]),
                 COMMA(14, 15),
-                WHITESPACE(15, 16, [INDENT(15, 16, [SPACE(15, 16)])]),
+                WHITESPACE(15, 16, [SPACE(15, 16)]),
             ])
         ]
     }
@@ -172,37 +172,37 @@ fn it_successfully_parses_an_expression_as_the_key() {
         rule: Rule::map_literal,
         tokens: [
             map_literal(0, 29, [
-                WHITESPACE(1, 2, [INDENT(1, 2, [SPACE(1, 2)])]),
+                WHITESPACE(1, 2, [SPACE(1, 2)]),
                 expression_based_kv_pair(2, 27, [
                     expression_based_kv_key(2, 20, [
                         expression(2, 20, [
                             r#if(2, 20, [
-                                WHITESPACE(4, 5, [INDENT(4, 5, [SPACE(4, 5)])]),
+                                WHITESPACE(4, 5, [SPACE(4, 5)]),
                                 expression(5, 6, [
                                     identifier(5, 6)
                                 ]),
-                                WHITESPACE(6, 7, [INDENT(6, 7, [SPACE(6, 7)])]),
-                                WHITESPACE(11, 12, [INDENT(11, 12, [SPACE(11, 12)])]),
+                                WHITESPACE(6, 7, [SPACE(6, 7)]),
+                                WHITESPACE(11, 12, [SPACE(11, 12)]),
                                 expression(12, 13, [
                                     identifier(12, 13)
                                 ]),
-                                WHITESPACE(13, 14, [INDENT(13, 14, [SPACE(13, 14)])]),
-                                WHITESPACE(18, 19, [INDENT(18, 19, [SPACE(18, 19)])]),
+                                WHITESPACE(13, 14, [SPACE(13, 14)]),
+                                WHITESPACE(18, 19, [SPACE(18, 19)]),
                                 expression(19, 20, [
                                     identifier(19, 20)
                                 ]),
                             ])
                         ])
                     ]),
-                    WHITESPACE(20, 21, [INDENT(20, 21, [SPACE(20, 21)])]),
-                    WHITESPACE(22, 23, [INDENT(22, 23, [SPACE(22, 23)])]),
+                    WHITESPACE(20, 21, [SPACE(20, 21)]),
+                    WHITESPACE(22, 23, [SPACE(22, 23)]),
                     kv_value(23, 27, [
                         expression(23, 27, [
                             boolean(23, 27)
                         ])
                     ])
                 ]),
-                WHITESPACE(27, 28, [INDENT(27, 28, [SPACE(27, 28)])]),
+                WHITESPACE(27, 28, [SPACE(27, 28)]),
             ])
         ]
     }

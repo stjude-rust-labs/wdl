@@ -116,17 +116,17 @@ fn it_successfully_parses_an_if_statement() {
         rule: Rule::r#if,
         tokens: [
             r#if(0, 21, [
-                WHITESPACE(2, 3, [INDENT(2, 3, [SPACE(2, 3)])]),
+                WHITESPACE(2, 3, [SPACE(2, 3)]),
                 expression(3, 7, [
                     boolean(3, 7)
                 ]),
-                WHITESPACE(7, 8, [INDENT(7, 8, [SPACE(7, 8)])]),
-                WHITESPACE(12, 13, [INDENT(12, 13, [SPACE(12, 13)])]),
+                WHITESPACE(7, 8, [SPACE(7, 8)]),
+                WHITESPACE(12, 13, [SPACE(12, 13)]),
                 expression(13, 14, [
                     identifier(13, 14)
                 ]),
-                WHITESPACE(14, 15, [INDENT(14, 15, [SPACE(14, 15)])]),
-                WHITESPACE(19, 20, [INDENT(19, 20, [SPACE(19, 20)])]),
+                WHITESPACE(14, 15, [SPACE(14, 15)]),
+                WHITESPACE(19, 20, [SPACE(19, 20)]),
                 expression(20, 21, [
                     identifier(20, 21)
                 ]),
@@ -143,17 +143,17 @@ fn it_successfully_parses_an_if_statement_without_including_the_trailing_space()
         rule: Rule::r#if,
         tokens: [
             r#if(0, 21, [
-                WHITESPACE(2, 3, [INDENT(2, 3, [SPACE(2, 3)])]),
+                WHITESPACE(2, 3, [SPACE(2, 3)]),
                 expression(3, 7, [
                     boolean(3, 7)
                 ]),
-                WHITESPACE(7, 8, [INDENT(7, 8, [SPACE(7, 8)])]),
-                WHITESPACE(12, 13, [INDENT(12, 13, [SPACE(12, 13)])]),
+                WHITESPACE(7, 8, [SPACE(7, 8)]),
+                WHITESPACE(12, 13, [SPACE(12, 13)]),
                 expression(13, 14, [
                     identifier(13, 14)
                 ]),
-                WHITESPACE(14, 15, [INDENT(14, 15, [SPACE(14, 15)])]),
-                WHITESPACE(19, 20, [INDENT(19, 20, [SPACE(19, 20)])]),
+                WHITESPACE(14, 15, [SPACE(14, 15)]),
+                WHITESPACE(19, 20, [SPACE(19, 20)]),
                 expression(20, 21, [
                     identifier(20, 21)
                 ]),

@@ -9,7 +9,7 @@
 // examine the parse tree when writing our linter.
 SPACE = { " " }
 TAB = { "\t" }
-INDENT = { SPACE | TAB }
+INDENT = _{ SPACE | TAB }
 
 NEWLINE = { "\n" }
 CARRIAGE_RETURN_NEWLINE = { "\r\n" }
@@ -203,21 +203,29 @@ expression = ${
 // NOTE: techically the spec calls the optional `+` the "non-empty" operator.
 // Since we have already defined this as the "one or more" operator and they
 // mean effectively the same thing, I've just kept this nomeclature.
-array_type = { "Array" ~ "[" ~ wdl_type ~ "]" ~ ONE_OR_MORE? }
+array_type = { "Array" ~ (
+    ("[" ~ wdl_type ~ "]" ~ ONE_OR_MORE)
+    | ("[" ~ wdl_type ~ "]")
+ ) }
 map_type   = { "Map" ~ "[" ~ wdl_type ~ "," ~ wdl_type ~ "]" }
 pair_type  = { "Pair" ~ "[" ~ wdl_type ~ "," ~ wdl_type ~ "]" }
+string_type = { "String" }
+file_type = { "File" }
+bool_type = { "Boolean " }
+int_type = { "Int" }
+float_type = { "Float" }
+object_type = { "Object" }
 
 type_base = _{
     map_type
   | array_type
   | pair_type
-  | "String"
-  | "File"
-  | "Boolean"
-  | "Int"
-  | "Float"
-  | "Object"
-  | identifier
+  | string_type
+  | file_type
+  | bool_type
+  | int_type
+  | float_type
+  | object_type
 }
 
 wdl_type = _{
