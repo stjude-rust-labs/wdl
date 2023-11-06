@@ -160,8 +160,8 @@ if = ${ "if" ~ (WHITESPACE | COMMENT)+ ~ expression ~ (WHITESPACE | COMMENT)+
 object_literal = !{ "object" ~ "{" ~ (identifier_based_kv_pair ~ (COMMA? ~ identifier_based_kv_pair)* ~ COMMA?)* ~ "}" }
 struct_literal = !{ identifier ~ "{" ~ (identifier_based_kv_pair ~ (COMMA? ~ identifier_based_kv_pair)* ~ COMMA?)* ~ "}" }
 map_literal    = !{ "{" ~ (expression_based_kv_pair ~ (COMMA? ~ expression_based_kv_pair)* ~ COMMA?)* ~ "}" }
-array_literal  = !{ "[" ~ (expression ~ ("," ~ expression)* ~ COMMA?) ~ "]" }
-pair_literal   = !{ "(" ~ expression ~ "," ~ expression ~ ")" }
+array_literal  = !{ "[" ~ (expression ~ (COMMA ~ expression)* ~ COMMA?) ~ "]" }
+pair_literal   = !{ "(" ~ expression ~ COMMA ~ expression ~ ")" }
 
 core = _{ 
     group |
@@ -207,12 +207,12 @@ expression = ${
 // NOTE: techically the spec calls the optional `+` the "non-empty" operator.
 // Since we have already defined this as the "one or more" operator and they
 // mean effectively the same thing, I've just kept this nomeclature.
-array_type = { "Array" ~ (
+array_type = { "Array" ~
     ("[" ~ wdl_type ~ "]" ~ ONE_OR_MORE)
     | ("[" ~ wdl_type ~ "]")
- ) }
-map_type   = { "Map" ~ "[" ~ wdl_type ~ "," ~ wdl_type ~ "]" }
-pair_type  = { "Pair" ~ "[" ~ wdl_type ~ "," ~ wdl_type ~ "]" }
+}
+map_type   = { "Map" ~ "[" ~ wdl_type ~ COMMA ~ wdl_type ~ "]" }
+pair_type  = { "Pair" ~ "[" ~ wdl_type ~ COMMA ~ wdl_type ~ "]" }
 string_type = { "String" }
 file_type = { "File" }
 bool_type = { "Boolean " }
@@ -303,8 +303,8 @@ common_metadata_value = _{
     string | number | boolean | "null" | common_metadata_object | common_metadata_array
 }
 
-common_metadata_object = _{ "{}" | "{" ~ common_metadata_kv ~ ("," ~ common_metadata_kv)* ~ "}" }
-common_metadata_array = _{ "[]" | "[" ~ common_metadata_value ~ ("," ~ common_metadata_value)* ~ "]" }
+common_metadata_object = _{ "{}" | "{" ~ common_metadata_kv ~ (COMMA ~ common_metadata_kv)* ~ "}" }
+common_metadata_array = _{ "[]" | "[" ~ common_metadata_value ~ (COMMA ~ common_metadata_value)* ~ "]" }
 
 common_metadata = _{ "meta" ~ "{" ~ common_metadata_kv* ~ "}" }
 common_parameter_metadata = _{ "parameter_meta" ~ "{" ~ common_metadata_kv* ~ "}" }
@@ -444,7 +444,7 @@ workflow_call_input = {
 // allowed between the opening and closing brackets (`{}`)
 // when the call body is empty. We have opted to allow whitespace.
 workflow_call_body = !{ "{"
-    ~ ("input:" ~ workflow_call_input ~ ("," ~ workflow_call_input)*)?
+    ~ ("input:" ~ workflow_call_input ~ (COMMA ~ workflow_call_input)*)?
     ~ "}"
 }
 workflow_call_as = ${ "as" ~ (WHITESPACE | COMMENT)+ ~ identifier }
@@ -516,7 +516,7 @@ workflow_metadata_value = {
 // delimiters optional when parsing and enforce style rules via a linter built
 // on top of this parser.
 workflow_metadata_object = { "{}" | "{" ~ workflow_metadata_kv ~ (COMMA? ~ workflow_metadata_kv)* ~ "}" }
-workflow_metadata_array = { "[]" | "[" ~ workflow_metadata_value ~ ("," ~ workflow_metadata_value)* ~ "]" }
+workflow_metadata_array = { "[]" | "[" ~ workflow_metadata_value ~ (COMMA ~ workflow_metadata_value)* ~ "]" }
 
 // DIVERGE: given the above logic concerning optional commas to delimit members
 // of `workflow_metadata_object`s, we determined it would be strange to not also

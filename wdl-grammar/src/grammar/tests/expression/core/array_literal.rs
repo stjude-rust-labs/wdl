@@ -64,6 +64,7 @@ fn it_successfully_parses_an_array_literal() {
                 ]),
               ]),
             ]),
+            COMMA(19, 20),
             expression(20, 35, [
               string(20, 35, [
                 double_quoted_string(20, 35),
@@ -109,6 +110,7 @@ fn it_successfully_parses_an_array_literal_without_the_trailing_space() {
                 ]),
               ]),
             ]),
+            COMMA(19, 20),
             WHITESPACE(20, 21, [
               SPACE(20, 21),
             ]),
@@ -157,6 +159,7 @@ fn it_successfully_parses_an_array_literal_with_spaces_inside() {
                 ]),
               ]),
             ]),
+            COMMA(19, 20),
             WHITESPACE(20, 21, [
               SPACE(20, 21),
             ]),

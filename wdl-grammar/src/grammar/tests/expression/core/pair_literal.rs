@@ -38,6 +38,7 @@ fn it_fails_to_parse_a_pair_literal_with_one_member() {
         positives: vec![
             Rule::WHITESPACE,
             Rule::COMMENT,
+            Rule::COMMA,
             Rule::or,
             Rule::and,
             Rule::add,
@@ -102,6 +103,7 @@ fn it_successfully_parses_a_pair_literal() {
                 expression(1, 2, [
                     identifier(1, 2)
                 ]),
+                COMMA(2, 3),
                 expression(3, 4, [
                     identifier(3, 4)
                 ]),
@@ -121,6 +123,7 @@ fn it_successfully_parses_a_pair_literal_without_the_trailing_space() {
                 expression(1, 2, [
                     identifier(1, 2)
                 ]),
+                COMMA(2, 3),
                 expression(3, 4, [
                     identifier(3, 4)
                 ]),
@@ -140,6 +143,7 @@ fn it_successfully_parses_a_pair_literal_with_spaces_inside() {
                 expression(1, 2, [
                     identifier(1, 2)
                 ]),
+                COMMA(2, 3),
                 WHITESPACE(3, 4, [SPACE(3, 4)]),
                 expression(4, 5, [
                     identifier(4, 5)

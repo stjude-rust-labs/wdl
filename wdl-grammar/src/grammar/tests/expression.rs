@@ -230,6 +230,7 @@ else
                         expression(97, 101, [
                           boolean(97, 101),
                         ]),
+                        COMMA(101, 102),
                         WHITESPACE(102, 103, [
                           SPACE(102, 103),
                         ]),
@@ -380,6 +381,7 @@ else
                     integer_decimal(168, 169),
                   ]),
                 ]),
+                COMMA(169, 170),
                 WHITESPACE(170, 171, [
                   SPACE(170, 171),
                 ]),
@@ -388,6 +390,7 @@ else
                     integer_decimal(171, 172),
                   ]),
                 ]),
+                COMMA(172, 173),
                 WHITESPACE(173, 174, [
                   SPACE(173, 174),
                 ]),
@@ -396,6 +399,7 @@ else
                     integer_decimal(174, 175),
                   ]),
                 ]),
+                COMMA(175, 176),
                 WHITESPACE(176, 177, [
                   SPACE(176, 177),
                 ]),
@@ -466,6 +470,7 @@ else
                     integer_decimal(214, 215),
                   ]),
                 ]),
+                COMMA(215, 216),
                 WHITESPACE(216, 217, [
                   SPACE(216, 217),
                 ]),
@@ -474,6 +479,7 @@ else
                     integer_octal(217, 221),
                   ]),
                 ]),
+                COMMA(221, 222),
                 WHITESPACE(222, 223, [
                   SPACE(222, 223),
                 ]),
@@ -482,6 +488,7 @@ else
                     integer_hex(223, 227),
                   ]),
                 ]),
+                COMMA(227, 228),
                 WHITESPACE(228, 229, [
                   SPACE(228, 229),
                 ]),

@@ -70,9 +70,11 @@ fn it_successfully_parses_call_with_multiple_inputs() {
             identifier(5, 12),
             workflow_call_body(12, 29, [
                 workflow_call_input(19, 20, [identifier(19, 20)]),
+                COMMA(20, 21),
                 workflow_call_input(21, 24, [identifier(21, 22), expression(23, 24, [
                     identifier(23, 24)
                 ])]),
+                COMMA(24, 25),
                 workflow_call_input(25, 28, [identifier(25, 26), expression(27, 28, [
                     identifier(27, 28)
                 ])]),
@@ -147,6 +149,7 @@ fn it_successfully_parses_call_with_all_options() {
                 WHITESPACE(62, 63, [SPACE(62, 63)]),
                 WHITESPACE(69, 70, [SPACE(69, 70)]),
                 workflow_call_input(70, 71, [identifier(70, 71)]),
+                COMMA(71, 72),
                 WHITESPACE(72, 73, [SPACE(72, 73)]),
                 workflow_call_input(73, 78, [
                     identifier(73, 74),
@@ -154,6 +157,7 @@ fn it_successfully_parses_call_with_all_options() {
                     WHITESPACE(76, 77, [SPACE(76, 77)]),
                     expression(77, 78, [identifier(77, 78)])
                 ]),
+                COMMA(78, 79),
                 WHITESPACE(79, 80, [SPACE(79, 80)]),
                 workflow_call_input(80, 83, [
                     identifier(80, 81),
