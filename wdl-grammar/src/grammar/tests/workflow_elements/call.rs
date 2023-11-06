@@ -88,10 +88,110 @@ fn it_successfully_parses_call_with_implicitly_declared_input() {
 }
 
 #[test]
+fn it_successfully_parses_call_with_implicitly_declared_input_without_trailing_whitespace() {
+    parses_to! {
+        parser: WdlParser,
+        input: "call my_task{input:a} ",
+        rule: Rule::workflow_call,
+        tokens: [workflow_call(0, 21, [
+            WHITESPACE(4, 5, [SPACE(4, 5)]),
+            identifier(5, 12),
+            workflow_call_body(12, 21, [
+                workflow_call_input(19, 20, [identifier(19, 20)])
+            ])
+        ])]
+    }
+}
+
+#[test]
+fn it_successfully_parses_call_with_explicitly_declared_input() {
+    parses_to! {
+        parser: WdlParser,
+        input: "call my_task{input:a=b}",
+        rule: Rule::workflow_call,
+        tokens: [
+            // `call my_task{input:a=b}`
+            workflow_call(0, 23, [
+                WHITESPACE(4, 5, [SPACE(4, 5)]),
+                // `my_task`
+                identifier(5, 12),
+                // `{input:a=b}`
+                workflow_call_body(12, 23, [
+                    // `a=b`
+                    workflow_call_input(19, 22, [
+                        // `a`
+                        identifier(19, 20),
+                        // `b`
+                        expression(21, 22, [
+                            // `b`
+                            identifier(21, 22),
+                        ]),
+                    ]),
+                ]),
+            ])
+        ]
+    }
+}
+
+#[test]
+fn it_successfully_parses_call_with_explicitly_declared_input_without_trailing_whitespace() {
+    parses_to! {
+        parser: WdlParser,
+        input: "call my_task{input:a=b} ",
+        rule: Rule::workflow_call,
+        tokens: [
+            // `call my_task{input:a=b}`
+            workflow_call(0, 23, [
+                WHITESPACE(4, 5, [SPACE(4, 5)]),
+                // `my_task`
+                identifier(5, 12),
+                // `{input:a=b}`
+                workflow_call_body(12, 23, [
+                    // `a=b`
+                    workflow_call_input(19, 22, [
+                        // `a`
+                        identifier(19, 20),
+                        // `b`
+                        expression(21, 22, [
+                            // `b`
+                            identifier(21, 22),
+                        ]),
+                    ]),
+                ]),
+            ])
+        ]
+    }
+}
+
+#[test]
 fn it_successfully_parses_call_with_multiple_inputs() {
     parses_to! {
         parser: WdlParser,
         input: "call my_task{input:a,b=b,c=z}",
+        rule: Rule::workflow_call,
+        tokens: [workflow_call(0, 29, [
+            WHITESPACE(4, 5, [SPACE(4, 5)]),
+            identifier(5, 12),
+            workflow_call_body(12, 29, [
+                workflow_call_input(19, 20, [identifier(19, 20)]),
+                COMMA(20, 21),
+                workflow_call_input(21, 24, [identifier(21, 22), expression(23, 24, [
+                    identifier(23, 24)
+                ])]),
+                COMMA(24, 25),
+                workflow_call_input(25, 28, [identifier(25, 26), expression(27, 28, [
+                    identifier(27, 28)
+                ])]),
+            ])
+        ])]
+    }
+}
+
+#[test]
+fn it_successfully_parses_call_with_multiple_inputs_without_trailing_whitespace() {
+    parses_to! {
+        parser: WdlParser,
+        input: "call my_task{input:a,b=b,c=z} ",
         rule: Rule::workflow_call,
         tokens: [workflow_call(0, 29, [
             WHITESPACE(4, 5, [SPACE(4, 5)]),
@@ -151,12 +251,33 @@ fn it_successfully_parses_call_with_after() {
 }
 
 #[test]
+fn it_successfully_parses_call_with_after_without_trailing_whitespace() {
+    parses_to! {
+        parser: WdlParser,
+        input: "call imported_doc.my_task after different_task ",
+        rule: Rule::workflow_call,
+        tokens: [workflow_call(0, 46, [
+            WHITESPACE(4, 5, [SPACE(4, 5)]),
+            qualified_identifier(5, 25, [
+                identifier(5, 17),
+                identifier(18, 25)
+            ]),
+            WHITESPACE(25, 26, [SPACE(25, 26)]),
+            workflow_call_after(26, 46, [
+                WHITESPACE(31, 32, [SPACE(31, 32)]),
+                identifier(32, 46)
+            ])
+        ])]
+    }
+}
+
+#[test]
 fn it_successfully_parses_call_with_all_options() {
     parses_to! {
         parser: WdlParser,
-        input: "call imported_doc.my_task as their_task after different_task { input: a, b = b, c=z }",
+        input: "call imported_doc.my_task as their_task after different_task { input: a, b = b, c=z, }",
         rule: Rule::workflow_call,
-        tokens: [workflow_call(0, 85, [
+        tokens: [workflow_call(0, 86, [
             WHITESPACE(4, 5, [SPACE(4, 5)]),
             qualified_identifier(5, 25, [
                 identifier(5, 17),
@@ -173,7 +294,7 @@ fn it_successfully_parses_call_with_all_options() {
                 identifier(46, 60)
             ]),
             WHITESPACE(60, 61, [SPACE(60, 61)]),
-            workflow_call_body(61, 85, [
+            workflow_call_body(61, 86, [
                 WHITESPACE(62, 63, [SPACE(62, 63)]),
                 WHITESPACE(69, 70, [SPACE(69, 70)]),
                 workflow_call_input(70, 71, [identifier(70, 71)]),
@@ -191,7 +312,56 @@ fn it_successfully_parses_call_with_all_options() {
                     identifier(80, 81),
                     expression(82, 83, [identifier(82, 83)])
                 ]),
-                WHITESPACE(83, 84, [SPACE(83, 84)]),
+                COMMA(83, 84),
+                WHITESPACE(84, 85, [SPACE(84, 85)]),
+            ]),
+        ])]
+    }
+}
+
+#[test]
+fn it_successfully_parses_call_with_all_options_without_trailing_whitespace() {
+    parses_to! {
+        parser: WdlParser,
+        input: "call imported_doc.my_task as their_task after different_task { input: a, b = b, c=z, } ",
+        rule: Rule::workflow_call,
+        tokens: [workflow_call(0, 86, [
+            WHITESPACE(4, 5, [SPACE(4, 5)]),
+            qualified_identifier(5, 25, [
+                identifier(5, 17),
+                identifier(18, 25)
+            ]),
+            WHITESPACE(25, 26, [SPACE(25, 26)]),
+            workflow_call_as(26, 39, [
+                WHITESPACE(28, 29, [SPACE(28, 29)]),
+                identifier(29, 39)
+            ]),
+            WHITESPACE(39, 40, [SPACE(39, 40)]),
+            workflow_call_after(40, 60, [
+                WHITESPACE(45, 46, [SPACE(45, 46)]),
+                identifier(46, 60)
+            ]),
+            WHITESPACE(60, 61, [SPACE(60, 61)]),
+            workflow_call_body(61, 86, [
+                WHITESPACE(62, 63, [SPACE(62, 63)]),
+                WHITESPACE(69, 70, [SPACE(69, 70)]),
+                workflow_call_input(70, 71, [identifier(70, 71)]),
+                COMMA(71, 72),
+                WHITESPACE(72, 73, [SPACE(72, 73)]),
+                workflow_call_input(73, 78, [
+                    identifier(73, 74),
+                    WHITESPACE(74, 75, [SPACE(74, 75)]),
+                    WHITESPACE(76, 77, [SPACE(76, 77)]),
+                    expression(77, 78, [identifier(77, 78)])
+                ]),
+                COMMA(78, 79),
+                WHITESPACE(79, 80, [SPACE(79, 80)]),
+                workflow_call_input(80, 83, [
+                    identifier(80, 81),
+                    expression(82, 83, [identifier(82, 83)])
+                ]),
+                COMMA(83, 84),
+                WHITESPACE(84, 85, [SPACE(84, 85)]),
             ]),
         ])]
     }

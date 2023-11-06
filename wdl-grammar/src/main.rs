@@ -124,14 +124,14 @@ fn parse_from_path(rule: impl AsRef<str>, path: impl AsRef<Path>) -> Result<(Str
         .unwrap_or_else(|| Err(Error::RuleMismatch(path.to_path_buf())))?;
 
     let contents = fs::read_to_string(path).map_err(Error::IoError)?;
-
-    Ok((contents, rule))
+Ok((contents, rule))
 }
 
 fn map_rule(rule: &str) -> Option<wdl::Rule> {
     match rule {
         "document" => Some(wdl::Rule::document),
         "task" => Some(wdl::Rule::task),
+        "core" => Some(wdl::Rule::core),
         "expression" => Some(wdl::Rule::expression),
         "object_literal" => Some(wdl::Rule::object_literal),
         "task_metadata_object" => Some(wdl::Rule::task_metadata_object),

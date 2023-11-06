@@ -445,7 +445,7 @@ workflow_call_input = {
 // when the call body is empty. We have opted to allow whitespace.
 workflow_call_body = !{ "{"
     ~ ("input:" ~ workflow_call_input ~ (COMMA ~ workflow_call_input)*)?
-    ~ "}"
+    ~ COMMA? ~ "}"
 }
 workflow_call_as = ${ "as" ~ (WHITESPACE | COMMENT)+ ~ identifier }
 workflow_call_after = ${ "after" ~ (WHITESPACE | COMMENT)+ ~ identifier }

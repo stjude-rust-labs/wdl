@@ -1,8 +1,8 @@
 //! A command-line tool to automatically generate tests for WDL syntax.
-//! 
+//!
 //! This tool is only intended to be used in the development of the
 //! `wdl-grammar` package.
-//! 
+//!
 //! This tool is written very sloppily—please keep that in mind.
 
 #![warn(missing_docs)]
@@ -47,7 +47,7 @@ impl std::fmt::Display for Error {
             Error::RuleMismatch(path) => {
                 write!(f, "cannot match rule from file: {}", path.display())
             }
-            Error::PestError(err) => write!(f, "pest error:\n{err}")
+            Error::PestError(err) => write!(f, "pest error:\n{err}"),
         }
     }
 }
@@ -67,7 +67,6 @@ pub struct Args {
     rule: String,
 }
 
-
 fn inner() -> Result<()> {
     let args = Args::parse();
 
@@ -76,7 +75,8 @@ fn inner() -> Result<()> {
         .init();
 
     let (contents, rule) = parse_from_path(&args.rule, &args.path)?;
-    let parse_tree: pest::iterators::Pairs<'_, wdl::Rule> = wdl::Parser::parse(rule, &contents).map_err(|err| Error::PestError(Box::new(err)))?;
+    let parse_tree: pest::iterators::Pairs<'_, wdl::Rule> =
+        wdl::Parser::parse(rule, &contents).map_err(|err| Error::PestError(Box::new(err)))?;
 
     for pair in parse_tree {
         print_create_test_recursive(pair, 0);
@@ -87,13 +87,24 @@ fn inner() -> Result<()> {
 
 fn print_create_test_recursive(pair: Pair<'_, wdl::Rule>, indent: usize) {
     let span = pair.as_span();
-    let lines = pair.as_str().lines().filter(|s| s.is_empty()).collect::<Vec<_>>();
+    let comment = pair
+        .as_str()
+        .lines()
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+        .collect::<Vec<_>>()
+        .join(" ");
 
-    if lines.len() == 1 {
-        println!("{}// `{}`", " ".repeat(indent), lines.into_iter().next().unwrap())
+    if !comment.is_empty() {
+        println!("{}// `{}`", " ".repeat(indent), comment);
     }
-
-    print!("{}{:?}({}, {}", " ".repeat(indent), pair.as_rule(), span.start(), span.end());
+    print!(
+        "{}{:?}({}, {}",
+        " ".repeat(indent),
+        pair.as_rule(),
+        span.start(),
+        span.end()
+    );
 
     let inner = pair.into_inner();
 
@@ -109,13 +120,9 @@ fn print_create_test_recursive(pair: Pair<'_, wdl::Rule>, indent: usize) {
     }
 
     print!(")");
-
 }
 
-fn parse_from_path(
-    rule: impl AsRef<str>,
-    path: impl AsRef<Path>,
-) -> Result<(String, wdl::Rule)> {
+fn parse_from_path(rule: impl AsRef<str>, path: impl AsRef<Path>) -> Result<(String, wdl::Rule)> {
     let rule = rule.as_ref();
     let path = path.as_ref();
 
@@ -125,10 +132,7 @@ fn parse_from_path(
 
     let contents = fs::read_to_string(path).map_err(Error::IoError)?;
 
-    Ok((
-        contents,
-        rule,
-    ))
+    Ok((contents, rule))
 }
 
 fn map_rule(rule: &str) -> Option<wdl::Rule> {
@@ -146,6 +150,7 @@ fn map_rule(rule: &str) -> Option<wdl::Rule> {
             Some(wdl::Rule::command_heredoc_interpolated_contents)
         }
         "workflow_scatter" => Some(wdl::Rule::workflow_scatter),
+        "workflow_call" => Some(wdl::Rule::workflow_call),
         "workflow_conditional" => Some(wdl::Rule::workflow_conditional),
         "postfix" => Some(wdl::Rule::postfix),
         _ => todo!("must implement mapping for rule: {rule}"),
