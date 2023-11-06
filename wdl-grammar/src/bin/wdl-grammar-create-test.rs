@@ -147,6 +147,7 @@ fn map_rule(rule: &str) -> Option<wdl::Rule> {
         }
         "workflow_scatter" => Some(wdl::Rule::workflow_scatter),
         "workflow_conditional" => Some(wdl::Rule::workflow_conditional),
+        "postfix" => Some(wdl::Rule::postfix),
         _ => todo!("must implement mapping for rule: {rule}"),
     }
 }

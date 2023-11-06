@@ -27,7 +27,7 @@ fn it_successfully_parses_conditional_without_space() {
             expression(3, 7, [
                 boolean(3, 7)
             ]),
-            workflow_execution_stmnt(9, 17, [
+            workflow_execution_statement(9, 17, [
                 workflow_private_declarations(9, 17, [
                     bound_declaration(9, 17, [
                         int_type(9, 12),

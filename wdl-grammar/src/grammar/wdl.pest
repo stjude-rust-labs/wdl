@@ -14,7 +14,7 @@ INDENT = _{ SPACE | TAB }
 NEWLINE = { "\n" }
 CARRIAGE_RETURN_NEWLINE = { "\r\n" }
 CARRIAGE_RETURN = { "\r" }
-LINE_ENDING = { NEWLINE | CARRIAGE_RETURN_NEWLINE | CARRIAGE_RETURN }
+LINE_ENDING = _{ NEWLINE | CARRIAGE_RETURN_NEWLINE | CARRIAGE_RETURN }
 
 WHITESPACE = ${ LINE_ENDING | INDENT }
 
@@ -47,7 +47,7 @@ boolean = { "true" | "false" }
 integer_decimal = @{ "0" ~ !ASCII_ALPHANUMERIC | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT* }
 integer_hex     = @{ "0" ~ ("x" | "X") ~ ASCII_HEX_DIGIT+ }
 integer_octal   = @{ "0" ~ ASCII_OCT_DIGIT+ }
-integer         = ${ (integer_decimal | integer_hex | integer_octal) }
+integer         = ${ integer_decimal | integer_hex | integer_octal }
 
 // Float.
 float_e               = @{ ("e" | "E") ~ ("-" | "+")? ~ ASCII_DIGIT+ }
@@ -131,11 +131,7 @@ unary_signed = { "+" | "-" }
 prefix = _{ negation | unary_signed }
 
 // Postfix.
-//
-// NOTE: `member` is not marked as non-atomic (`!`) because there cannot
-// be a space between the period (`.`) and the field to access (`identifer` in
-// this case).
-member =  { "." ~ identifier }
+member =  ${ "." ~ identifier }
 index  = !{ "[" ~ expression ~ "]" }
 apply =  !{ "(" ~ expression ~ (COMMA ~ expression)* ~ COMMA? ~ ")" }
 
@@ -157,7 +153,10 @@ identifier_based_kv_pair = { identifier_based_kv_key ~ ":" ~ kv_value }
 expression_based_kv_pair = { expression_based_kv_key ~ ":" ~ kv_value }
 
 group          = !{ "(" ~ expression ~ ")" }
-if             = ${ "if" ~ WHITESPACE+ ~ expression ~ WHITESPACE+ ~ "then" ~ WHITESPACE+ ~ expression ~ WHITESPACE+ ~ "else" ~ WHITESPACE+ ~ expression }
+if = ${ "if" ~ (WHITESPACE | COMMENT)+ ~ expression ~ (WHITESPACE | COMMENT)+
+    ~ "then" ~ (WHITESPACE | COMMENT)+ ~ expression ~ (WHITESPACE | COMMENT)+
+    ~ "else" ~ (WHITESPACE | COMMENT)+ ~ expression
+}
 object_literal = !{ "object" ~ "{" ~ (identifier_based_kv_pair ~ (COMMA? ~ identifier_based_kv_pair)* ~ COMMA?)* ~ "}" }
 struct_literal = !{ identifier ~ "{" ~ (identifier_based_kv_pair ~ (COMMA? ~ identifier_based_kv_pair)* ~ COMMA?)* ~ "}" }
 map_literal    = !{ "{" ~ (expression_based_kv_pair ~ (COMMA? ~ expression_based_kv_pair)* ~ COMMA?)* ~ "}" }
@@ -189,13 +188,18 @@ core = _{
 // As such, you will see that none of the permutations of the rule below end in
 // an optional token. That is by design to avoid the problem above.
 expression = ${ 
-    prefix? ~ WHITESPACE* ~ core ~ WHITESPACE* ~ postfix? ~ 
+    prefix? ~ (WHITESPACE | COMMENT)* ~ core ~ (WHITESPACE | COMMENT)* ~ postfix? ~ 
     (
-        WHITESPACE* ~ infix ~ WHITESPACE* ~ prefix? ~ WHITESPACE* ~ core ~ WHITESPACE* ~ postfix |
-        WHITESPACE* ~ infix ~ WHITESPACE* ~ prefix? ~ WHITESPACE* ~ core
+        (WHITESPACE | COMMENT)* ~ infix ~
+            (WHITESPACE | COMMENT)* ~ prefix?
+            ~ (WHITESPACE | COMMENT)* ~ core
+            ~ (WHITESPACE | COMMENT)* ~ postfix
+        | (WHITESPACE | COMMENT)* ~ infix
+            ~ (WHITESPACE | COMMENT)* ~ prefix?
+            ~ (WHITESPACE | COMMENT)* ~ core
     )+ |
-    prefix? ~ WHITESPACE* ~ core ~ WHITESPACE* ~ postfix |
-    prefix? ~ WHITESPACE* ~ core 
+    prefix? ~ (WHITESPACE | COMMENT)* ~ core ~ (WHITESPACE | COMMENT)* ~ postfix |
+    prefix? ~ (WHITESPACE | COMMENT)* ~ core 
 }
 
 // Types.
@@ -249,12 +253,14 @@ declaration = _{
 struct = {"struct" ~ identifier ~ "{" ~ (unbound_declaration)* ~ "}" }
 
 // Imports.
-import_as    = @{ "as" ~ WHITESPACE+ ~ identifier }
+import_as    = @{ "as" ~ (WHITESPACE | COMMENT)+ ~ identifier }
 import_alias = @{
-    "alias" ~ WHITESPACE+ ~ identifier ~ WHITESPACE+ ~ "as" ~ WHITESPACE+ ~ identifier
+    "alias" ~ (WHITESPACE | COMMENT)+ ~ identifier ~ (WHITESPACE | COMMENT)+
+    ~ "as" ~ (WHITESPACE | COMMENT)+ ~ identifier
 }
 import       = ${
-    "import" ~ WHITESPACE+ ~ string ~ (WHITESPACE+ ~ import_as)? ~ (WHITESPACE+ ~ import_alias)*
+    "import" ~ (WHITESPACE | COMMENT)+ ~ string ~ ((WHITESPACE | COMMENT)+ ~ import_as)?
+    ~ ((WHITESPACE | COMMENT)+ ~ import_alias)*
 }
 
 //================================//
@@ -441,44 +447,44 @@ workflow_call_body = !{ "{"
     ~ ("input:" ~ workflow_call_input ~ ("," ~ workflow_call_input)*)?
     ~ "}"
 }
-workflow_call_as = ${ "as" ~ WHITESPACE+ ~ identifier }
-workflow_call_after = ${ "after" ~ WHITESPACE+ ~ identifier }
+workflow_call_as = ${ "as" ~ (WHITESPACE | COMMENT)+ ~ identifier }
+workflow_call_after = ${ "after" ~ (WHITESPACE | COMMENT)+ ~ identifier }
 workflow_call = ${
     ("call"
-        ~ WHITESPACE+ ~ (qualified_identifier | identifier)
-        ~ (WHITESPACE+ ~ workflow_call_as)?
-        ~ (WHITESPACE+ ~ workflow_call_after)*
-        ~ (WHITESPACE* ~ workflow_call_body)
+        ~ (WHITESPACE | COMMENT)+ ~ (qualified_identifier | identifier)
+        ~ ((WHITESPACE | COMMENT)+ ~ workflow_call_as)?
+        ~ ((WHITESPACE | COMMENT)+ ~ workflow_call_after)*
+        ~ ((WHITESPACE | COMMENT)* ~ workflow_call_body)
     )
     | ("call"
-        ~ WHITESPACE+ ~ (qualified_identifier | identifier)
-        ~ (WHITESPACE+ ~ workflow_call_as)?
-        ~ (WHITESPACE+ ~ workflow_call_after)+
+        ~ (WHITESPACE | COMMENT)+ ~ (qualified_identifier | identifier)
+        ~ ((WHITESPACE | COMMENT)+ ~ workflow_call_as)?
+        ~ ((WHITESPACE | COMMENT)+ ~ workflow_call_after)+
     )
     | ("call"
-        ~ WHITESPACE+ ~ (qualified_identifier | identifier)
-        ~ WHITESPACE+ ~ workflow_call_as
+        ~ (WHITESPACE | COMMENT)+ ~ (qualified_identifier | identifier)
+        ~ (WHITESPACE | COMMENT)+ ~ workflow_call_as
     )
     | ("call"
-        ~ WHITESPACE+ ~ (qualified_identifier | identifier)
+        ~ (WHITESPACE | COMMENT)+ ~ (qualified_identifier | identifier)
     )
 }
 
 // Workflow scatter
-workflow_scatter_iteration_stmnt = { "(" ~ identifier ~ "in" ~ expression ~ ")" }
+workflow_scatter_iteration_statement = { "(" ~ identifier ~ "in" ~ expression ~ ")" }
 workflow_scatter = {
     "scatter"
-    ~ workflow_scatter_iteration_stmnt
+    ~ workflow_scatter_iteration_statement
     ~ "{"
-    ~ workflow_execution_stmnt+
+    ~ workflow_execution_statement*
     ~ "}"
 }
 
 // Workflow conditional
-workflow_conditional = { "if" ~ "(" ~ expression ~ ")" ~ "{" ~ workflow_execution_stmnt+ ~ "}" }
+workflow_conditional = { "if" ~ "(" ~ expression ~ ")" ~ "{" ~ workflow_execution_statement* ~ "}" }
 
 // Workflow execution statements
-workflow_execution_stmnt = { (
+workflow_execution_statement = { (
     workflow_conditional
     | workflow_scatter
     | workflow_call
@@ -528,7 +534,7 @@ workflow_parameter_metadata = { "parameter_meta" ~ "{" ~ workflow_metadata_kv? ~
 workflow_element = _{
     workflow_input |
     workflow_output |
-    workflow_execution_stmnt |
+    workflow_execution_statement |
     workflow_parameter_metadata |
     workflow_metadata
 }

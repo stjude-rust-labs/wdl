@@ -23,7 +23,7 @@ fn it_fails_to_parse_an_if_statement_with_no_spaces_between_the_if_and_the_ident
         parser: WdlParser,
         input: "iftrue then a else b",
         rule: Rule::r#if,
-        positives: vec![Rule::WHITESPACE],
+        positives: vec![Rule::WHITESPACE, Rule::COMMENT],
         negatives: vec![],
         pos: 2
     }
@@ -47,7 +47,7 @@ fn it_fails_to_parse_an_if_statement_with_no_spaces_between_the_then_and_the_exp
         parser: WdlParser,
         input: "if true thena else b",
         rule: Rule::r#if,
-        positives: vec![Rule::WHITESPACE],
+        positives: vec![Rule::WHITESPACE, Rule::COMMENT],
         negatives: vec![],
         pos: 12
     }
@@ -90,7 +90,7 @@ fn it_fails_to_parse_an_if_statement_with_no_spaces_between_the_else_and_the_exp
         parser: WdlParser,
         input: "if true then a elseb",
         rule: Rule::r#if,
-        positives: vec![Rule::WHITESPACE],
+        positives: vec![Rule::WHITESPACE, Rule::COMMENT],
         negatives: vec![],
         pos: 19
     }

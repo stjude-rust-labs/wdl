@@ -24,7 +24,7 @@ fn it_successfully_parses_scatter_without_spaces() {
         input: "scatter(i in range(10)){call my_task}",
         rule: Rule::workflow_scatter,
         tokens: [workflow_scatter(0, 37, [
-            workflow_scatter_iteration_stmnt(7, 23, [
+            workflow_scatter_iteration_statement(7, 23, [
                 identifier(8, 9),
                 WHITESPACE(9, 10, [SPACE(9, 10)]),
                 WHITESPACE(12, 13, [SPACE(12, 13)]),
@@ -39,7 +39,7 @@ fn it_successfully_parses_scatter_without_spaces() {
                     ])
                 ]),
             ]),
-            workflow_execution_stmnt(24, 36, [
+            workflow_execution_statement(24, 36, [
                 workflow_call(24, 36, [
                     WHITESPACE(28, 29, [SPACE(28, 29)]),
                     identifier(29, 36)
@@ -57,7 +57,7 @@ fn it_successfully_parses_scatter_with_spaces() {
         rule: Rule::workflow_scatter,
         tokens: [workflow_scatter(0, 45, [
             WHITESPACE(7, 8, [SPACE(7, 8)]),
-            workflow_scatter_iteration_stmnt(8, 28, [
+            workflow_scatter_iteration_statement(8, 28, [
                 WHITESPACE(9, 10, [SPACE(9, 10)]),
                 identifier(10, 11),
                 WHITESPACE(11, 12, [SPACE(11, 12)]),
@@ -78,7 +78,7 @@ fn it_successfully_parses_scatter_with_spaces() {
             ]),
             WHITESPACE(28, 29, [SPACE(28, 29)]),
             WHITESPACE(30, 31, [SPACE(30, 31)]),
-            workflow_execution_stmnt(31, 43, [
+            workflow_execution_statement(31, 43, [
                 workflow_call(31, 43, [
                     WHITESPACE(35, 36, [SPACE(35, 36)]),
                     identifier(36, 43)
@@ -99,169 +99,160 @@ fn it_successfully_parses_scatter_with_multiple_calls() {
         }",
         rule: Rule::workflow_scatter,
         tokens: [workflow_scatter(0, 91, [
-            WHITESPACE(7, 8, [
-              SPACE(7, 8),
+          WHITESPACE(7, 8, [
+            SPACE(7, 8),
+          ]),
+          workflow_scatter_iteration_statement(8, 24, [
+            identifier(9, 10),
+            WHITESPACE(10, 11, [
+              SPACE(10, 11),
             ]),
-            workflow_scatter_iteration_stmnt(8, 24, [
-              identifier(9, 10),
-              WHITESPACE(10, 11, [
-                SPACE(10, 11),
-              ]),
-              WHITESPACE(13, 14, [
-                SPACE(13, 14),
-              ]),
-              expression(14, 23, [
-                identifier(14, 19),
-                apply(19, 23, [
-                  expression(20, 22, [
-                    integer(20, 22, [
-                      integer_decimal(20, 22),
-                    ]),
+            WHITESPACE(13, 14, [
+              SPACE(13, 14),
+            ]),
+            expression(14, 23, [
+              identifier(14, 19),
+              apply(19, 23, [
+                expression(20, 22, [
+                  integer(20, 22, [
+                    integer_decimal(20, 22),
                   ]),
                 ]),
               ]),
             ]),
+          ]),
+          // ``
+          WHITESPACE(25, 26, [
             // ``
-            WHITESPACE(25, 26, [
-              // ``
-              LINE_ENDING(25, 26, [
-                // ``
-                NEWLINE(25, 26),
+            NEWLINE(25, 26),
+          ]),
+          WHITESPACE(26, 27, [
+            SPACE(26, 27),
+          ]),
+          WHITESPACE(27, 28, [
+            SPACE(27, 28),
+          ]),
+          WHITESPACE(28, 29, [
+            SPACE(28, 29),
+          ]),
+          WHITESPACE(29, 30, [
+            SPACE(29, 30),
+          ]),
+          WHITESPACE(30, 31, [
+            SPACE(30, 31),
+          ]),
+          WHITESPACE(31, 32, [
+            SPACE(31, 32),
+          ]),
+          WHITESPACE(32, 33, [
+            SPACE(32, 33),
+          ]),
+          WHITESPACE(33, 34, [
+            SPACE(33, 34),
+          ]),
+          WHITESPACE(34, 35, [
+            SPACE(34, 35),
+          ]),
+          WHITESPACE(35, 36, [
+            SPACE(35, 36),
+          ]),
+          WHITESPACE(36, 37, [
+            SPACE(36, 37),
+          ]),
+          WHITESPACE(37, 38, [
+            SPACE(37, 38),
+          ]),
+          workflow_execution_statement(38, 50, [
+            workflow_call(38, 50, [
+              WHITESPACE(42, 43, [
+                SPACE(42, 43),
               ]),
+              identifier(43, 50),
             ]),
-            WHITESPACE(26, 27, [
-              SPACE(26, 27),
-            ]),
-            WHITESPACE(27, 28, [
-              SPACE(27, 28),
-            ]),
-            WHITESPACE(28, 29, [
-              SPACE(28, 29),
-            ]),
-            WHITESPACE(29, 30, [
-              SPACE(29, 30),
-            ]),
-            WHITESPACE(30, 31, [
-              SPACE(30, 31),
-            ]),
-            WHITESPACE(31, 32, [
-              SPACE(31, 32),
-            ]),
-            WHITESPACE(32, 33, [
-              SPACE(32, 33),
-            ]),
-            WHITESPACE(33, 34, [
-              SPACE(33, 34),
-            ]),
-            WHITESPACE(34, 35, [
-              SPACE(34, 35),
-            ]),
-            WHITESPACE(35, 36, [
-              SPACE(35, 36),
-            ]),
-            WHITESPACE(36, 37, [
-              SPACE(36, 37),
-            ]),
-            WHITESPACE(37, 38, [
-              SPACE(37, 38),
-            ]),
-            workflow_execution_stmnt(38, 50, [
-              workflow_call(38, 50, [
-                WHITESPACE(42, 43, [
-                  SPACE(42, 43),
-                ]),
-                identifier(43, 50),
-              ]),
-            ]),
+          ]),
+          // ``
+          WHITESPACE(50, 51, [
             // ``
-            WHITESPACE(50, 51, [
-              // ``
-              LINE_ENDING(50, 51, [
-                // ``
-                NEWLINE(50, 51),
+            NEWLINE(50, 51),
+          ]),
+          WHITESPACE(51, 52, [
+            SPACE(51, 52),
+          ]),
+          WHITESPACE(52, 53, [
+            SPACE(52, 53),
+          ]),
+          WHITESPACE(53, 54, [
+            SPACE(53, 54),
+          ]),
+          WHITESPACE(54, 55, [
+            SPACE(54, 55),
+          ]),
+          WHITESPACE(55, 56, [
+            SPACE(55, 56),
+          ]),
+          WHITESPACE(56, 57, [
+            SPACE(56, 57),
+          ]),
+          WHITESPACE(57, 58, [
+            SPACE(57, 58),
+          ]),
+          WHITESPACE(58, 59, [
+            SPACE(58, 59),
+          ]),
+          WHITESPACE(59, 60, [
+            SPACE(59, 60),
+          ]),
+          WHITESPACE(60, 61, [
+            SPACE(60, 61),
+          ]),
+          WHITESPACE(61, 62, [
+            SPACE(61, 62),
+          ]),
+          WHITESPACE(62, 63, [
+            SPACE(62, 63),
+          ]),
+          workflow_execution_statement(63, 81, [
+            workflow_call(63, 81, [
+              WHITESPACE(67, 68, [
+                SPACE(67, 68),
               ]),
-            ]),
-            WHITESPACE(51, 52, [
-              SPACE(51, 52),
-            ]),
-            WHITESPACE(52, 53, [
-              SPACE(52, 53),
-            ]),
-            WHITESPACE(53, 54, [
-              SPACE(53, 54),
-            ]),
-            WHITESPACE(54, 55, [
-              SPACE(54, 55),
-            ]),
-            WHITESPACE(55, 56, [
-              SPACE(55, 56),
-            ]),
-            WHITESPACE(56, 57, [
-              SPACE(56, 57),
-            ]),
-            WHITESPACE(57, 58, [
-              SPACE(57, 58),
-            ]),
-            WHITESPACE(58, 59, [
-              SPACE(58, 59),
-            ]),
-            WHITESPACE(59, 60, [
-              SPACE(59, 60),
-            ]),
-            WHITESPACE(60, 61, [
-              SPACE(60, 61),
-            ]),
-            WHITESPACE(61, 62, [
-              SPACE(61, 62),
-            ]),
-            WHITESPACE(62, 63, [
-              SPACE(62, 63),
-            ]),
-            workflow_execution_stmnt(63, 81, [
-              workflow_call(63, 81, [
-                WHITESPACE(67, 68, [
-                  SPACE(67, 68),
-                ]),
-                identifier(68, 78),
-                WHITESPACE(78, 79, [
-                  SPACE(78, 79),
-                ]),
-                workflow_call_body(79, 81),
+              identifier(68, 78),
+              WHITESPACE(78, 79, [
+                SPACE(78, 79),
               ]),
+              workflow_call_body(79, 81),
             ]),
+          ]),
+          // ``
+          WHITESPACE(81, 82, [
             // ``
-            WHITESPACE(81, 82, [
-              // ``
-              LINE_ENDING(81, 82, [
-                // ``
-                NEWLINE(81, 82),
-              ]),
-            ]),
-            WHITESPACE(82, 83, [
-              SPACE(82, 83),
-            ]),
-            WHITESPACE(83, 84, [
-              SPACE(83, 84),
-            ]),
-            WHITESPACE(84, 85, [
-              SPACE(84, 85),
-            ]),
-            WHITESPACE(85, 86, [
-              SPACE(85, 86),
-            ]),
-            WHITESPACE(86, 87, [
-              SPACE(86, 87),
-            ]),
-            WHITESPACE(87, 88, [
-              SPACE(87, 88),
-            ]),
-            WHITESPACE(88, 89, [
-              SPACE(88, 89),
-            ]),
-            WHITESPACE(89, 90, [
-              SPACE(89, 90),
-            ]),
-          ])
+            NEWLINE(81, 82),
+          ]),
+          WHITESPACE(82, 83, [
+            SPACE(82, 83),
+          ]),
+          WHITESPACE(83, 84, [
+            SPACE(83, 84),
+          ]),
+          WHITESPACE(84, 85, [
+            SPACE(84, 85),
+          ]),
+          WHITESPACE(85, 86, [
+            SPACE(85, 86),
+          ]),
+          WHITESPACE(86, 87, [
+            SPACE(86, 87),
+          ]),
+          WHITESPACE(87, 88, [
+            SPACE(87, 88),
+          ]),
+          WHITESPACE(88, 89, [
+            SPACE(88, 89),
+          ]),
+          WHITESPACE(89, 90, [
+            SPACE(89, 90),
+          ]),
+        ])
         ]
     }
 }

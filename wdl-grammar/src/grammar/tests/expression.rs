@@ -33,10 +33,7 @@ else
             // ``
             WHITESPACE(2, 3, [
               // ``
-              LINE_ENDING(2, 3, [
-                // ``
-                NEWLINE(2, 3),
-              ]),
+              NEWLINE(2, 3),
             ]),
             WHITESPACE(3, 4, [
               SPACE(3, 4),
@@ -92,10 +89,7 @@ else
                 // ``
                 WHITESPACE(38, 39, [
                   // ``
-                  LINE_ENDING(38, 39, [
-                    // ``
-                    NEWLINE(38, 39),
-                  ]),
+                  NEWLINE(38, 39),
                 ]),
                 WHITESPACE(39, 40, [
                   SPACE(39, 40),
@@ -126,10 +120,7 @@ else
                     // ``
                     WHITESPACE(48, 49, [
                       // ``
-                      LINE_ENDING(48, 49, [
-                        // ``
-                        NEWLINE(48, 49),
-                      ]),
+                      NEWLINE(48, 49),
                     ]),
                     WHITESPACE(49, 50, [
                       SPACE(49, 50),
@@ -196,10 +187,7 @@ else
                       // ``
                       WHITESPACE(82, 83, [
                         // ``
-                        LINE_ENDING(82, 83, [
-                          // ``
-                          NEWLINE(82, 83),
-                        ]),
+                        NEWLINE(82, 83),
                       ]),
                       WHITESPACE(83, 84, [
                         SPACE(83, 84),
@@ -260,10 +248,7 @@ else
                     // ``
                     WHITESPACE(112, 113, [
                       // ``
-                      LINE_ENDING(112, 113, [
-                        // ``
-                        NEWLINE(112, 113),
-                      ]),
+                      NEWLINE(112, 113),
                     ]),
                     WHITESPACE(113, 114, [
                       SPACE(113, 114),
@@ -294,10 +279,7 @@ else
                 // ``
                 WHITESPACE(122, 123, [
                   // ``
-                  LINE_ENDING(122, 123, [
-                    // ``
-                    NEWLINE(122, 123),
-                  ]),
+                  NEWLINE(122, 123),
                 ]),
                 WHITESPACE(123, 124, [
                   SPACE(123, 124),
@@ -314,10 +296,7 @@ else
                 // ``
                 WHITESPACE(131, 132, [
                   // ``
-                  LINE_ENDING(131, 132, [
-                    // ``
-                    NEWLINE(131, 132),
-                  ]),
+                  NEWLINE(131, 132),
                 ]),
                 WHITESPACE(132, 133, [
                   SPACE(132, 133),
@@ -375,18 +354,12 @@ else
             // ``
             WHITESPACE(157, 158, [
               // ``
-              LINE_ENDING(157, 158, [
-                // ``
-                NEWLINE(157, 158),
-              ]),
+              NEWLINE(157, 158),
             ]),
             // ``
             WHITESPACE(162, 163, [
               // ``
-              LINE_ENDING(162, 163, [
-                // ``
-                NEWLINE(162, 163),
-              ]),
+              NEWLINE(162, 163),
             ]),
             WHITESPACE(163, 164, [
               SPACE(163, 164),
@@ -473,10 +446,7 @@ else
               // ``
               WHITESPACE(208, 209, [
                 // ``
-                LINE_ENDING(208, 209, [
-                  // ``
-                  NEWLINE(208, 209),
-                ]),
+                NEWLINE(208, 209),
               ]),
               WHITESPACE(209, 210, [
                 SPACE(209, 210),
@@ -531,18 +501,12 @@ else
             // ``
             WHITESPACE(242, 243, [
               // ``
-              LINE_ENDING(242, 243, [
-                // ``
-                NEWLINE(242, 243),
-              ]),
+              NEWLINE(242, 243),
             ]),
             // ``
             WHITESPACE(247, 248, [
               // ``
-              LINE_ENDING(247, 248, [
-                // ``
-                NEWLINE(247, 248),
-              ]),
+              NEWLINE(247, 248),
             ]),
             WHITESPACE(248, 249, [
               SPACE(248, 249),
