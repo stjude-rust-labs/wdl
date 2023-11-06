@@ -18,10 +18,38 @@ fn it_fails_to_parse_an_empty_call() {
 }
 
 #[test]
+fn it_fails_to_parse_just_call() {
+    fails_with! {
+        parser: WdlParser,
+        input: "call ",
+        rule: Rule::workflow_call,
+        positives: vec![
+            Rule::WHITESPACE,
+            Rule::COMMENT,
+            Rule::identifier,
+        ],
+        negatives: vec![],
+        pos: 5
+    }
+}
+
+#[test]
 fn it_successfully_parses_plain_call() {
     parses_to! {
         parser: WdlParser,
         input: "call my_task",
+        rule: Rule::workflow_call,
+        tokens: [workflow_call(0, 12, [
+            WHITESPACE(4, 5, [SPACE(4, 5)]), identifier(5, 12)
+        ])]
+    }
+}
+
+#[test]
+fn it_successfully_excludes_trailing_whitespace() {
+    parses_to! {
+        parser: WdlParser,
+        input: "call my_task   ",
         rule: Rule::workflow_call,
         tokens: [workflow_call(0, 12, [
             WHITESPACE(4, 5, [SPACE(4, 5)]), identifier(5, 12)
