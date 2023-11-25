@@ -3,6 +3,7 @@
 use clap::Parser;
 use log::warn;
 
+use wdl_core as core;
 use wdl_grammar as grammar;
 
 use crate::commands::get_contents_stdin;
@@ -25,7 +26,7 @@ pub enum Error {
         name: String,
 
         /// The grammar being used.
-        grammar: grammar::Version,
+        grammar: core::Version,
     },
 }
 
@@ -58,7 +59,7 @@ pub struct Args {
 
     /// The Workflow Description Language (WDL) specification version to use.
     #[arg(value_name = "VERSION", short = 's', long, default_value_t, value_enum)]
-    specification_version: grammar::Version,
+    specification_version: core::Version,
 
     /// The parser rule to evaluate.
     #[arg(value_name = "RULE", short = 'r', long, default_value = "document")]
@@ -72,7 +73,7 @@ pub struct Args {
 /// Main function for this subcommand.
 pub fn parse(args: Args) -> Result<()> {
     let rule = match args.specification_version {
-        grammar::Version::V1 => grammar::v1::get_rule(&args.rule)
+        core::Version::V1 => grammar::v1::get_rule(&args.rule)
             .map(Ok)
             .unwrap_or_else(|| {
                 Err(Error::UnknownRule {
@@ -87,8 +88,8 @@ pub fn parse(args: Args) -> Result<()> {
         .map(Ok)
         .unwrap_or_else(|| get_contents_stdin().map_err(Error::Common))?;
 
-    let mut parse_tree = match args.specification_version {
-        grammar::Version::V1 => grammar::v1::parse(rule, &input).map_err(Error::GrammarV1)?,
+    let parse_tree = match args.specification_version {
+        core::Version::V1 => grammar::v1::parse_rule(rule, &input).map_err(Error::GrammarV1)?,
     };
 
     if let Some(warnings) = parse_tree.warnings() {
@@ -98,15 +99,19 @@ pub fn parse(args: Args) -> Result<()> {
     }
 
     if args.children_only {
+        let mut parse_tree = parse_tree.into_inner().into_inner();
+
         let children = match parse_tree.next() {
             Some(root) => root.into_inner(),
             None => return Err(Error::ChildrenOnlyWithEmptyParseTree),
         };
 
+        // Note: this `dbg!()` statement is intended to be permanent.
         for child in children {
             dbg!(child);
         }
     } else {
+        // Note: this `dbg!()` statement is intended to be permanent.
         dbg!(parse_tree);
     };
 

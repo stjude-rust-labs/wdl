@@ -11,11 +11,10 @@
 
 use pest::RuleType;
 
-pub mod core;
-pub mod v1;
-mod version;
+use wdl_core as core;
 
-pub use version::Version;
+pub mod common;
+pub mod v1;
 
 /// An error that can occur when parsing.
 ///
@@ -25,6 +24,9 @@ pub use version::Version;
 #[derive(Debug)]
 pub enum Error<R: RuleType> {
     /// An error occurred while linting a parse tree.
+    ///
+    /// **Note:** this is not a lint _warning_! A lint error is an unrecoverable
+    /// error that occurs during the process of linting.
     Lint(Box<dyn std::error::Error>),
 
     /// An error occurred while Pest was parsing the parse tree.

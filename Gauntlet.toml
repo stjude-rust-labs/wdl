@@ -1,20 +1,20 @@
 version = "v1"
 
 [[repositories]]
-organization = "stjudecloud"
-name = "workflows"
-
-[[repositories]]
 organization = "PacificBiosciences"
 name = "HiFi-human-WGS-WDL"
+
+[[repositories]]
+organization = "biowdl"
+name = "tasks"
 
 [[repositories]]
 organization = "chanzuckerberg"
 name = "czid-workflows"
 
 [[repositories]]
-organization = "biowdl"
-name = "tasks"
+organization = "stjudecloud"
+name = "workflows"
 
 [[ignored_errors]]
 document = "biowdl/tasks:bcftools.wdl"
@@ -86,16 +86,16 @@ parse error:
 
 [[ignored_errors]]
 document = "stjudecloud/workflows:tools/bwa.wdl"
-error = '''validation error: [v1::001] invalid escape character '\.' in string at line 34:17'''
+error = '''validation error: [v1::001] invalid escape character '\.' in string at line 41:17'''
 
 [[ignored_errors]]
 document = "stjudecloud/workflows:tools/fq.wdl"
-error = '''validation error: [v1::001] invalid escape character '\.' in string at line 123:17'''
+error = '''validation error: [v1::001] invalid escape character '\.' in string at line 128:17'''
 
 [[ignored_errors]]
 document = "stjudecloud/workflows:tools/kraken2.wdl"
-error = '''validation error: [v1::001] invalid escape character '\.' in string at line 335:17'''
+error = '''validation error: [v1::001] invalid escape character '\.' in string at line 336:17'''
 
 [[ignored_errors]]
 document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-error = '''validation error: [v1::001] invalid escape character '\*' in string at line 55:241'''
+error = '''validation error: [v1::001] invalid escape character '\*' in string at line 56:241'''
