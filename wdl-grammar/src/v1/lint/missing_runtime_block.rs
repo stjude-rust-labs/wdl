@@ -38,7 +38,7 @@ impl<'a> MissingRuntimeBlock {
 impl<'a> Rule<&'a Pair<'a, v1::Rule>> for MissingRuntimeBlock {
 
     fn code(&self) -> Code {
-        Code::try_new(code::Kind::Warning, Version::V1, 1).unwrap()
+        Code::try_new(code::Kind::Warning, Version::V1, 5).unwrap()
     }
 
     fn group(&self) -> Group {
@@ -112,7 +112,7 @@ task hello_task {
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W001::Completeness/Medium] missing runtime block (3:1-16:2)"
+            "[v1::W005::Completeness/Medium] missing runtime block (3:1-16:2)"
         );
 
         Ok(())
@@ -197,11 +197,11 @@ task subsitute {
         assert_eq!(warnings.len(), 2);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W001::Completeness/Medium] missing runtime block (3:1-16:2)"
+            "[v1::W005::Completeness/Medium] missing runtime block (3:1-16:2)"
         );
         assert_eq!(
             warnings.get(1).unwrap().to_string(),
-            "[v1::W001::Completeness/Medium] missing runtime block (18:1-31:2)"
+            "[v1::W005::Completeness/Medium] missing runtime block (18:1-31:2)"
         );
         Ok(())
     }
@@ -256,7 +256,7 @@ task subsitute {
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W001::Completeness/Medium] missing runtime block (22:1-35:2)"
+            "[v1::W005::Completeness/Medium] missing runtime block (22:1-35:2)"
         );
         Ok(())
     }

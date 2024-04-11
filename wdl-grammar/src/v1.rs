@@ -15,11 +15,12 @@
 //!
 //! The following parse tree linting rules are supported for WDL 1.x:
 //!
-//! | Name                | Code       | Group    | Documentation                  |
-//! |:--------------------|:-----------|:---------|:------------------------------:|
-//! | `whitespace`        | `v1::W001` | Style    | [Link](lint::Whitespace)       |
-//! | `no_curly_commands` | `v1::W002` | Pedantic | [Link](lint::NoCurlyCommands)  |
-//! | `mixed_indentation` | `v1::W004` | Style    | [Link](lint::MixedIndentation) |
+//! | Name                    | Code       | Group       | Documentation                     |
+//! |:------------------------|:-----------|:------------|:---------------------------------:|
+//! | `whitespace`            | `v1::W001` | Style       | [Link](lint::Whitespace)          |
+//! | `no_curly_commands`     | `v1::W002` | Pedantic    | [Link](lint::NoCurlyCommands)     |
+//! | `mixed_indentation`     | `v1::W004` | Style       | [Link](lint::MixedIndentation)    |
+//! | `missing_runtime_block` | `v1::W005` |Completeness | [Link](lint::MissingRuntimeBlock) |
 
 use pest::iterators::Pair;
 use pest::Parser as _;
