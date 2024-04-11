@@ -10,6 +10,7 @@ mod missing_runtime_block;
 pub use mixed_indentation::MixedIndentation;
 pub use no_curly_commands::NoCurlyCommands;
 pub use whitespace::Whitespace;
+pub use missing_runtime_block::MissingRuntimeBlock;
 
 /// Gets all WDL v1.x parse tree lint rules.
 pub fn rules<'a>() -> Vec<Box<dyn wdl_core::concern::lint::Rule<&'a Pair<'a, crate::v1::Rule>>>> {
@@ -20,5 +21,7 @@ pub fn rules<'a>() -> Vec<Box<dyn wdl_core::concern::lint::Rule<&'a Pair<'a, cra
         Box::new(NoCurlyCommands),
         // v1::W004
         Box::new(MixedIndentation),
+        // v1::W005
+        Box::new(MissingRuntimeBlock),
     ]
 }
