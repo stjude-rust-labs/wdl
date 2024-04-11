@@ -111,12 +111,16 @@ pub type Result<'a> = wdl_core::parse::Result<Pair<'a, crate::v1::Rule>>;
 ///
 /// let result = grammar::v1::parse_rule(
 ///     Rule::document,
-///     "version 1.1
+///     r#"version 1.1
 /// task test {
 ///     output {
-///         String hello = \"\\.\"
+///         String hello = "\."
 ///     }
-/// }",
+///     runtime {
+///         cpu: 1
+///         memory: "2GiB"
+///     }
+/// }"#,
 /// )
 /// .unwrap();
 ///
