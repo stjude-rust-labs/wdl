@@ -5,6 +5,7 @@ use pest::iterators::Pair;
 mod mixed_indentation;
 mod no_curly_commands;
 mod whitespace;
+mod missing_runtime_block;
 
 pub use mixed_indentation::MixedIndentation;
 pub use no_curly_commands::NoCurlyCommands;
