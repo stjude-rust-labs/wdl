@@ -2,15 +2,15 @@
 
 use pest::iterators::Pair;
 
+mod missing_runtime_block;
 mod mixed_indentation;
 mod no_curly_commands;
 mod whitespace;
-mod missing_runtime_block;
 
+pub use missing_runtime_block::MissingRuntimeBlock;
 pub use mixed_indentation::MixedIndentation;
 pub use no_curly_commands::NoCurlyCommands;
 pub use whitespace::Whitespace;
-pub use missing_runtime_block::MissingRuntimeBlock;
 
 /// Gets all WDL v1.x parse tree lint rules.
 pub fn rules<'a>() -> Vec<Box<dyn wdl_core::concern::lint::Rule<&'a Pair<'a, crate::v1::Rule>>>> {
