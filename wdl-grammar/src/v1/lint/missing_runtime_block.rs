@@ -19,7 +19,7 @@ use crate::v1;
 pub struct MissingRuntimeBlock;
 
 impl<'a> MissingRuntimeBlock {
-    /// Creates an error corresponding to the task with a missing `runtime`
+    /// Creates a warning corresponding to the task with the missing `runtime`
     /// block.
     fn missing_runtime_block(&self, location: Location) -> lint::Warning
     where
