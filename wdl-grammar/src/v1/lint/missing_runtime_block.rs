@@ -1,4 +1,4 @@
-//! workflow tasks _must_ have a `runtime` block to ensure portability.
+//! Tasks should have a `runtime` block to ensure portability.
 
 use std::collections::VecDeque;
 
