@@ -1863,17 +1863,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: v
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:ncbi.wdl"
-message = "[v1::W005::Completeness/Medium] missing runtime block (23:1-92:3)"
+message = "[v1::W005::Completeness/Medium] missing runtime block within a task (23:1-92:3)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:ncbi.wdl"
-message = "[v1::W005::Completeness/Medium] missing runtime block (95:1-124:2)"
+message = "[v1::W005::Completeness/Medium] missing runtime block within a task (95:1-124:2)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:ncbi.wdl"
-message = "[v1::W005::Completeness/Medium] missing runtime block (126:1-152:2)"
+message = "[v1::W005::Completeness/Medium] missing runtime block within a task (126:1-152:2)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -2278,7 +2278,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: z
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:seqtk.wdl"
-message = "[v1::W005::Completeness/Medium] missing runtime block (23:1-51:2)"
+message = "[v1::W005::Completeness/Medium] missing runtime block within a task (23:1-51:2)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -2703,7 +2703,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:star.wdl"
-message = "[v1::W005::Completeness/Medium] missing runtime block (209:1-224:2)"
+message = "[v1::W005::Completeness/Medium] missing runtime block within a task (209:1-224:2)"
 
 [[concerns]]
 kind = "LintWarning"

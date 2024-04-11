@@ -31,7 +31,7 @@ impl<'a> MissingRuntimeBlock {
             .level(lint::Level::Medium)
             .group(self.group())
             .push_location(location)
-            .subject("missing runtime block")
+            .subject("missing runtime block within a task")
             .body("Tasks that don't declare runtime blocks are unlikely to be portable")
             .fix(
                 "Add a runtime block to the task with desired cpu, memory and container/ docker \
@@ -120,7 +120,7 @@ task hello_task {
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W005::Completeness/Medium] missing runtime block (3:1-16:2)"
+            "[v1::W005::Completeness/Medium] missing runtime block within a task (3:1-16:2)"
         );
 
         Ok(())
@@ -205,11 +205,11 @@ task subsitute {
         assert_eq!(warnings.len(), 2);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W005::Completeness/Medium] missing runtime block (3:1-16:2)"
+            "[v1::W005::Completeness/Medium] missing runtime block within a task (3:1-16:2)"
         );
         assert_eq!(
             warnings.get(1).unwrap().to_string(),
-            "[v1::W005::Completeness/Medium] missing runtime block (18:1-31:2)"
+            "[v1::W005::Completeness/Medium] missing runtime block within a task (18:1-31:2)"
         );
         Ok(())
     }
@@ -263,7 +263,7 @@ task subsitute {
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W005::Completeness/Medium] missing runtime block (22:1-35:2)"
+            "[v1::W005::Completeness/Medium] missing runtime block within a task (22:1-35:2)"
         );
         Ok(())
     }
