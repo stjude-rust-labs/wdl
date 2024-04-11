@@ -14,7 +14,7 @@ use wdl_core::Version;
 
 use crate::v1;
 
-/// Every task _must_ have a `runtime` block.
+/// Detects missing `runtime` blocks for tasks.
 #[derive(Debug)]
 pub struct MissingRuntimeBlock;
 
