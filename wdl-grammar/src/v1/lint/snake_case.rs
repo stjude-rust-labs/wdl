@@ -107,9 +107,9 @@ mod tests {
     fn it_catches_wrong_task_name() -> Result<(), Box<dyn std::error::Error>> {
         let tree = Parser::parse(
             Rule::task,
-            "task thisBad {
+            r#"task thisBad {
             command <<< >>>
-        }",
+        }"#,
         )?
         .next()
         .unwrap();
@@ -120,6 +120,63 @@ mod tests {
             warnings.first().to_string(),
             "[v1::W006::Naming/Low] missing snake case (1:6-1:13)"
         );
+        Ok(())
+    }
+
+    #[test]
+    fn it_catches_wrong_workflow_name() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(
+            Rule::workflow,
+            r#"workflow thisBadWorkflow {
+                Int variable = 1
+            }"#,
+        )?
+        .next()
+        .unwrap();
+        let warnings = SnakeCase.check(&tree)?.unwrap();
+
+        assert_eq!(warnings.len(), 1);
+        assert_eq!(
+            warnings.first().to_string(),
+            "[v1::W006::Naming/Low] missing snake case (1:10-1:25)"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn it_catches_wrong_variable_name() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(
+            Rule::workflow,
+            r#"workflow this_workflow {
+                Int wrongVariable = 1
+            }"#,
+        )?
+        .next()
+        .unwrap();
+        let warnings = SnakeCase.check(&tree)?.unwrap();
+
+        assert_eq!(warnings.len(), 1);
+        assert_eq!(
+            warnings.first().to_string(),
+            "[v1::W006::Naming/Low] missing snake case (2:21-2:34)"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn it_does_not_catch_struct_name() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(
+            Rule::document,
+            r#"version 1.0
+            struct myStruct {
+                String my_string
+                Int my_int
+            }"#,
+        )?
+        .next()
+        .unwrap();
+        let warnings = SnakeCase.check(&tree)?;
+        assert!(warnings.is_none());
         Ok(())
     }
 }
