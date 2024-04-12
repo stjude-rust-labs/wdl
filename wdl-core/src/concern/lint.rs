@@ -2,7 +2,8 @@
 
 use std::collections::VecDeque;
 
-use convert_case::{Case, Casing};
+use convert_case::Case;
+use convert_case::Casing;
 use nonempty::NonEmpty;
 
 use crate::concern::Code;

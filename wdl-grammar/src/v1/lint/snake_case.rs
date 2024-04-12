@@ -1,3 +1,5 @@
+//! Workflows, tasks and variables should be in lowered snake case.
+
 use std::collections::VecDeque;
 
 use convert_case::Case;
@@ -22,6 +24,7 @@ use crate::v1;
 pub struct SnakeCase;
 
 impl<'a> SnakeCase {
+    /// Creates a warning for identifiers that are not proper snake case.
     fn not_snake_case(&self, warning: SnakeCaseWarning<'_>) -> lint::Warning
     where
         Self: Rule<&'a Pair<'a, v1::Rule>>,
@@ -31,21 +34,27 @@ impl<'a> SnakeCase {
             .level(lint::Level::Low)
             .group(self.group())
             .subject("missing snake case")
-            .body("Declaration must be formatted using snake case.")
+            .body("Identifier must be formatted using snake case.")
             .push_location(warning.location)
             .fix(format!(
                 "Replace {0} by {1}",
-                warning.declaration, warning.cased_declaration
+                warning.identifier, warning.cased_identifier
             ))
             .try_build()
             .unwrap()
     }
 }
 
+/// Arguments for the `not_snake_case` function.
 struct SnakeCaseWarning<'a> {
+    /// Location of the warning.
     location: Location,
-    declaration: &'a str,
-    cased_declaration: &'a str,
+
+    /// Original identifier
+    identifier: &'a str,
+
+    /// Properly cased identifier
+    cased_identifier: &'a str,
 }
 
 impl Rule<&Pair<'_, v1::Rule>> for SnakeCase {
@@ -69,14 +78,14 @@ impl Rule<&Pair<'_, v1::Rule>> for SnakeCase {
             ]
             .contains(&node.as_rule())
             {
-                let declaration: &str = node.as_span().as_str();
-                let cased_declaration: &str = &node.as_span().as_str().to_case(Case::Snake);
-                if declaration != cased_declaration {
+                let identifier: &str = node.as_span().as_str();
+                let cased_identifier: &str = &node.as_span().as_str().to_case(Case::Snake);
+                if identifier != cased_identifier {
                     let warning = SnakeCaseWarning {
                         location: Location::try_from(node.as_span())
                             .map_err(lint::Error::Location)?,
-                        declaration,
-                        cased_declaration,
+                        identifier,
+                        cased_identifier,
                     };
                     warnings.push_back(SnakeCase.not_snake_case(warning));
                 }
