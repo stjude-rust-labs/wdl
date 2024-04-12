@@ -14,6 +14,10 @@ use wdl_core::Version;
 
 use crate::v1;
 
+/// Detects names that should use snake case.
+///
+/// Workflows, tasks and variables should be declared
+/// using snake case.
 #[derive(Debug)]
 pub struct SnakeCase;
 
@@ -46,7 +50,7 @@ struct SnakeCaseWarning<'a> {
 
 impl Rule<&Pair<'_, v1::Rule>> for SnakeCase {
     fn code(&self) -> Code {
-        Code::try_new(code::Kind::Warning, Version::V1, 5).unwrap()
+        Code::try_new(code::Kind::Warning, Version::V1, 6).unwrap()
     }
 
     fn group(&self) -> lint::Group {
