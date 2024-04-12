@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 
-use convert_case::{Case, Casing};
+use convert_case::Case;
+use convert_case::Casing;
 use nonempty::NonEmpty;
 use pest::iterators::Pair;
 use wdl_core::concern::code;
@@ -14,9 +15,9 @@ use wdl_core::Version;
 use crate::v1;
 
 #[derive(Debug)]
-pub struct NotSnakeCase;
+pub struct SnakeCase;
 
-impl<'a> NotSnakeCase {
+impl<'a> SnakeCase {
     fn not_snake_case(&self, warning: SnakeCaseWarning<'_>) -> lint::Warning
     where
         Self: Rule<&'a Pair<'a, v1::Rule>>,
@@ -43,7 +44,7 @@ struct SnakeCaseWarning<'a> {
     cased_declaration: &'a str,
 }
 
-impl Rule<&Pair<'_, v1::Rule>> for NotSnakeCase {
+impl Rule<&Pair<'_, v1::Rule>> for SnakeCase {
     fn code(&self) -> Code {
         Code::try_new(code::Kind::Warning, Version::V1, 5).unwrap()
     }
@@ -73,7 +74,7 @@ impl Rule<&Pair<'_, v1::Rule>> for NotSnakeCase {
                         declaration,
                         cased_declaration,
                     };
-                    warnings.push_back(NotSnakeCase.not_snake_case(warning));
+                    warnings.push_back(SnakeCase.not_snake_case(warning));
                 }
             }
         }
@@ -108,12 +109,12 @@ mod tests {
         )?
         .next()
         .unwrap();
-        let warnings = NotSnakeCase.check(&tree)?.unwrap();
+        let warnings = SnakeCase.check(&tree)?.unwrap();
 
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W005::Naming/Low] missing snake case (1:6-1:13)"
+            "[v1::W006::Naming/Low] missing snake case (1:6-1:13)"
         );
         Ok(())
     }

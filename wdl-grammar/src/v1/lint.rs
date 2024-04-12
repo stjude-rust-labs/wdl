@@ -11,7 +11,7 @@ mod whitespace;
 pub use missing_runtime_block::MissingRuntimeBlock;
 pub use mixed_indentation::MixedIndentation;
 pub use no_curly_commands::NoCurlyCommands;
-pub use snake_case::NotSnakeCase;
+pub use snake_case::SnakeCase;
 pub use whitespace::Whitespace;
 
 /// Gets all WDL v1.x parse tree lint rules.
@@ -26,6 +26,6 @@ pub fn rules<'a>() -> Vec<Box<dyn wdl_core::concern::lint::Rule<&'a Pair<'a, cra
         // v1::W005
         Box::new(MissingRuntimeBlock),
         // v1::W006
-        Box::new(NotSnakeCase),
+        Box::new(SnakeCase),
     ]
 }
