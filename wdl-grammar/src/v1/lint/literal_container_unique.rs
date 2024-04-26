@@ -13,13 +13,14 @@ use wdl_core::Version;
 use crate::v1;
 
 /// Detects literal containers with multiple tag versions.
-/// 
+///
 /// Containers declared as literal strings should only use a single tag.
 /// Multiple tasks should not use different versions of a single container.
 #[derive(Debug)]
 pub struct LiteralContainerUnique;
 
 impl<'a> LiteralContainerUnique {
+    /// Creates a warning if the same base image has multiple tags.
     fn literal_container_unique(&self, location: Location) -> lint::Warning
     where
         Self: Rule<&'a Pair<'a, v1::Rule>>,
@@ -30,8 +31,8 @@ impl<'a> LiteralContainerUnique {
             .group(self.group())
             .subject("duplicate literal container")
             .body(
-                "Literal containers should be unique within a task. This is because \
-                the same container can be used in multiple tasks.",
+                "Literal containers should be unique within a task. This is because the same \
+                 container can be used in multiple tasks.",
             )
             .push_location(location)
             .fix("Use one tag per container name.")
@@ -39,9 +40,9 @@ impl<'a> LiteralContainerUnique {
             .unwrap()
     }
 
-    // Separate a docker image and its tag from a string
+    /// Separate a docker image and its tag from a string
     fn separate_docker_image_tag(&self, container: &str) -> (String, String) {
-        let mut split = container.split(":");
+        let mut split = container.split(':');
         let image = split.next().unwrap();
         let tag = split.next().unwrap_or("latest");
         (image.to_string(), tag.to_string())
@@ -71,40 +72,73 @@ impl<'a> Rule<&'a Pair<'a, crate::v1::Rule>> for LiteralContainerUnique {
                                 let mut is_container = false;
                                 for element_node in runtime_node.clone().into_inner().flatten() {
                                     // Each element_node is a pair in the runtime block
-                                    if element_node.as_rule() == crate::v1::Rule::task_runtime_mapping_key {
+                                    if element_node.as_rule()
+                                        == crate::v1::Rule::task_runtime_mapping_key
+                                    {
                                         // Check to see if this is a `container` or `docker` key
                                         let field = element_node.as_str();
                                         if field == "container" || field == "docker" {
                                             is_container = true;
                                         }
                                     }
-                                    if element_node.as_rule() == crate::v1::Rule::task_runtime_mapping_value {
+                                    if element_node.as_rule()
+                                        == crate::v1::Rule::task_runtime_mapping_value
+                                    {
                                         // Check to see if this is a literal container
                                         if is_container {
-                                            for node in element_node.clone().into_inner().flatten() {
-                                                if node.as_rule() == crate::v1::Rule::string_literal_contents {
-                                                    let start = node.as_span().start_pos().line_col().1 - 1;
-                                                    let end = node.as_span().end_pos().line_col().1 + 1;
-                                                    let container_start = element_node.as_span().start_pos().line_col().1;
-                                                    let container_end = element_node.as_span().end_pos().line_col().1;
+                                            for node in element_node.clone().into_inner().flatten()
+                                            {
+                                                if node.as_rule()
+                                                    == crate::v1::Rule::string_literal_contents
+                                                {
+                                                    let start =
+                                                        node.as_span().start_pos().line_col().1 - 1;
+                                                    let end =
+                                                        node.as_span().end_pos().line_col().1 + 1;
+                                                    let container_start = element_node
+                                                        .as_span()
+                                                        .start_pos()
+                                                        .line_col()
+                                                        .1;
+                                                    let container_end = element_node
+                                                        .as_span()
+                                                        .end_pos()
+                                                        .line_col()
+                                                        .1;
 
-                                                    if container_start == start && container_end == end {
+                                                    if container_start == start
+                                                        && container_end == end
+                                                    {
                                                         let mut was_seen = false;
                                                         let container = node.as_span().as_str();
-                                                        let (image, tag) = self.separate_docker_image_tag(container);
+                                                        let (image, tag) = self
+                                                            .separate_docker_image_tag(container);
                                                         for seen in container_names.iter() {
-                                                            let (seen_image, seen_tag) = self.separate_docker_image_tag(seen);
-                                                            if image == seen_image && tag != seen_tag {
-                                                                let location = Location::try_from(element_node.as_span()).map_err(lint::Error::Location)?;
-                                                                warnings.push_back(self.literal_container_unique(location));
+                                                            let (seen_image, seen_tag) = self
+                                                                .separate_docker_image_tag(seen);
+                                                            if image == seen_image
+                                                                && tag != seen_tag
+                                                            {
+                                                                let location = Location::try_from(
+                                                                    element_node.as_span(),
+                                                                )
+                                                                .map_err(lint::Error::Location)?;
+                                                                warnings.push_back(
+                                                                    self.literal_container_unique(
+                                                                        location,
+                                                                    ),
+                                                                );
                                                             }
-                                                            if image == seen_image && tag == seen_tag {
+                                                            if image == seen_image
+                                                                && tag == seen_tag
+                                                            {
                                                                 was_seen = true;
                                                                 break;
                                                             }
                                                         }
                                                         if !was_seen {
-                                                            container_names.push(container.to_string());
+                                                            container_names
+                                                                .push(container.to_string());
                                                         }
                                                     }
                                                 }
