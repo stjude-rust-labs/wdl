@@ -14,6 +14,9 @@ pub enum Group {
 
     /// Rules associated with the whitespace in a document.
     Spacing,
+    
+    /// Rules associated with container declarations.
+    Container,
 
     /// Rules associated with the style of a document.
     Style,
@@ -30,6 +33,7 @@ impl std::fmt::Display for Group {
             Group::Completeness => write!(f, "Completeness"),
             Group::Naming => write!(f, "Naming"),
             Group::Spacing => write!(f, "Spacing"),
+            Group::Container => write!(f, "Container"),
             Group::Style => write!(f, "Style"),
             Group::Pedantic => write!(f, "Pedantic"),
         }

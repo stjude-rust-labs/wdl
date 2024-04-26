@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Adds the `snake_case` rule that ensures all tasks, workflows, and variables
   are snakecase (#13, contributed by @simojoe).
 * Adds the `newline_eof` rule for tasks (#18, contributed by @simojoe).
+* Adds the `literal_container_unique` rule for tasks (#22, contributed
+  by @adthrasher).
 
 ## 0.2.0 - 12-17-2023
 

@@ -15,14 +15,15 @@
 //!
 //! The following parse tree linting rules are supported for WDL 1.x:
 //!
-//! | Name                    | Code       | Group        | Documentation                     |
-//! |:------------------------|:-----------|:-------------|:---------------------------------:|
-//! | `whitespace`            | `v1::W001` | Style        | [Link](lint::Whitespace)          |
-//! | `no_curly_commands`     | `v1::W002` | Pedantic     | [Link](lint::NoCurlyCommands)     |
-//! | `mixed_indentation`     | `v1::W004` | Style        | [Link](lint::MixedIndentation)    |
-//! | `missing_runtime_block` | `v1::W005` | Completeness | [Link](lint::MissingRuntimeBlock) |
-//! | `snake_case`            | `v1::W006` | Naming       | [Link](lint::SnakeCase)           |
-//! | `newline_eof`           | `v1::W007` | Spacing      | [Link](lint::NewlineEOF)          |
+//! | Name                       | Code       | Group        | Documentation                     |
+//! |:---------------------------|:-----------|:-------------|:---------------------------------:|
+//! | `whitespace`               | `v1::W001` | Style        | [Link](lint::Whitespace)          |
+//! | `no_curly_commands`        | `v1::W002` | Pedantic     | [Link](lint::NoCurlyCommands)     |
+//! | `mixed_indentation`        | `v1::W004` | Style        | [Link](lint::MixedIndentation)    |
+//! | `missing_runtime_block`    | `v1::W005` | Completeness | [Link](lint::MissingRuntimeBlock) |
+//! | `snake_case`               | `v1::W006` | Naming       | [Link](lint::SnakeCase)           |
+//! | `newline_eof`              | `v1::W007` | Spacing      | [Link](lint::NewlineEOF)          |
+//! | `literal_container_unique` | `v1::W008` | Container    | [Link](lint::LiteralContainerUnique) |
 
 use pest::iterators::Pair;
 use pest::Parser as _;
