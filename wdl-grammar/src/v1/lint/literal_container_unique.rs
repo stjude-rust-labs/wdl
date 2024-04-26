@@ -1,3 +1,5 @@
+//! Detects literal containers with multiple tag versions.
+
 use std::collections::VecDeque;
 
 use nonempty::NonEmpty;
