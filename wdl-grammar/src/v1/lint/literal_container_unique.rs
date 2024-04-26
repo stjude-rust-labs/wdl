@@ -51,7 +51,7 @@ impl<'a> LiteralContainerUnique {
 
 impl<'a> Rule<&'a Pair<'a, crate::v1::Rule>> for LiteralContainerUnique {
     fn code(&self) -> Code {
-        Code::try_new(code::Kind::Warning, Version::V1, 6).unwrap()
+        Code::try_new(code::Kind::Warning, Version::V1, 8).unwrap()
     }
 
     fn group(&self) -> Group {
