@@ -15,15 +15,16 @@ repository. Note that the information may be out of sync with released packages.
 
 # Lint Warnings
 
-| Name                      | Code       | Group        | Package                            |
-|:--------------------------|:-----------|:-------------|:-----------------------------------|
-| `whitespace`              | `v1::W001` | Style        | [`wdl-grammar`][wdl-grammar-lints] |
-| `no_curly_commands`       | `v1::W002` | Pedantic     | [`wdl-grammar`][wdl-grammar-lints] |
-| `matching_parameter_meta` | `v1::W003` | Completeness | [`wdl-ast`][wdl-ast-lints]         |
-| `mixed_indentation`       | `v1::W004` | Style        | [`wdl-grammar`][wdl-grammar-lints] |
-| `missing_runtime_block`   | `v1::W005` | Completeness | [`wdl-grammar`][wdl-grammar-lints] |
-| `snake_case`              | `v1::W006` | Naming       | [`wdl-grammar`][wdl-grammar-lints] |
-| `newline_eof`             | `v1::W007` | Spacing      | [`wdl-grammar`][wdl-grammar-lints] |
+| Name                       | Code       | Group        | Package                            |
+|:---------------------------|:-----------|:-------------|:-----------------------------------|
+| `whitespace`               | `v1::W001` | Style        | [`wdl-grammar`][wdl-grammar-lints] |
+| `no_curly_commands`        | `v1::W002` | Pedantic     | [`wdl-grammar`][wdl-grammar-lints] |
+| `matching_parameter_meta`  | `v1::W003` | Completeness | [`wdl-ast`][wdl-ast-lints]         |
+| `mixed_indentation`        | `v1::W004` | Style        | [`wdl-grammar`][wdl-grammar-lints] |
+| `missing_runtime_block`    | `v1::W005` | Completeness | [`wdl-grammar`][wdl-grammar-lints] |
+| `snake_case`               | `v1::W006` | Naming       | [`wdl-grammar`][wdl-grammar-lints] |
+| `newline_eof`              | `v1::W007` | Spacing      | [`wdl-grammar`][wdl-grammar-lints] |
+| `literal_container_unique` | `v1::W008` | Container    | ['wdl-grammar'][wdl-grammar-lints] |
 
 [wdl-ast-lints]: https://docs.rs/wdl-ast/latest/wdl_ast/v1/index.html#lint-rules
 [wdl-ast-validation]: https://docs.rs/wdl-ast/latest/wdl_ast/v1/index.html#validation-rules
