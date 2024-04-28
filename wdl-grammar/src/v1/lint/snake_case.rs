@@ -1,4 +1,4 @@
-//! Workflows, tasks and variables should be in lowered snake case.
+//! Workflows, tasks, and variables should be in snake case.
 
 use std::collections::VecDeque;
 
@@ -18,8 +18,7 @@ use crate::v1;
 
 /// Detects names that should use snake case.
 ///
-/// Workflows, tasks and variables should be declared
-/// using snake case.
+/// Workflows, tasks and variables should be declared using snake case.
 #[derive(Debug)]
 pub struct SnakeCase;
 
@@ -33,12 +32,12 @@ impl<'a> SnakeCase {
             .code(self.code())
             .level(lint::Level::Low)
             .group(self.group())
-            .subject("missing snake case")
+            .subject("identifier must be snake case")
             .body("Identifier must be formatted using snake case.")
             .push_location(warning.location)
             .fix(format!(
                 "Replace {0} by {1}",
-                warning.identifier, warning.cased_identifier
+                warning.identifier, warning.properly_cased_identifier
             ))
             .try_build()
             .unwrap()
@@ -54,7 +53,7 @@ struct SnakeCaseWarning<'a> {
     identifier: &'a str,
 
     /// Properly cased identifier
-    cased_identifier: &'a str,
+    properly_cased_identifier: &'a str,
 }
 
 impl Rule<&Pair<'_, v1::Rule>> for SnakeCase {
@@ -79,15 +78,14 @@ impl Rule<&Pair<'_, v1::Rule>> for SnakeCase {
             .contains(&node.as_rule())
             {
                 let identifier: &str = node.as_span().as_str();
-                let cased_identifier: &str = &node.as_span().as_str().to_case(Case::Snake);
-                if identifier != cased_identifier {
-                    let warning = SnakeCaseWarning {
-                        location: Location::try_from(node.as_span())
-                            .map_err(lint::Error::Location)?,
+                let properly_cased_identifier: &str = &node.as_span().as_str().to_case(Case::Snake);
+                if identifier != properly_cased_identifier {
+                    warnings.push_back(SnakeCase.not_snake_case(SnakeCaseWarning {
+                        location:
+                            Location::try_from(node.as_span()).map_err(lint::Error::Location)?,
                         identifier,
-                        cased_identifier,
-                    };
-                    warnings.push_back(SnakeCase.not_snake_case(warning));
+                        properly_cased_identifier,
+                    }));
                 }
             }
         }
@@ -116,7 +114,7 @@ mod tests {
     fn it_catches_wrong_task_name() -> Result<(), Box<dyn std::error::Error>> {
         let tree = Parser::parse(
             Rule::task,
-            r#"task thisBad {
+            r#"task wrongName {
             command <<< >>>
         }"#,
         )?
@@ -127,8 +125,23 @@ mod tests {
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W006::Naming/Low] missing snake case (1:6-1:13)"
+            "[v1::W006::Naming/Low] identifier must be snake case (1:6-1:15)"
         );
+        Ok(())
+    }
+
+    #[test]
+    fn it_ignores_a_properly_cased_task_name() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(
+            Rule::task,
+            r#"task good_name {
+            command <<< >>>
+        }"#,
+        )?
+        .next()
+        .unwrap();
+        let warnings = SnakeCase.check(&tree)?;
+        assert!(warnings.is_none());
         Ok(())
     }
 
@@ -136,7 +149,7 @@ mod tests {
     fn it_catches_wrong_workflow_name() -> Result<(), Box<dyn std::error::Error>> {
         let tree = Parser::parse(
             Rule::workflow,
-            r#"workflow thisBadWorkflow {
+            r#"workflow wrongWorkflow {
                 Int variable = 1
             }"#,
         )?
@@ -147,28 +160,73 @@ mod tests {
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W006::Naming/Low] missing snake case (1:10-1:25)"
+            "[v1::W006::Naming/Low] identifier must be snake case (1:10-1:23)"
         );
         Ok(())
     }
 
     #[test]
-    fn it_catches_wrong_variable_name() -> Result<(), Box<dyn std::error::Error>> {
+    fn it_ignores_a_properly_cased_workflow_name() -> Result<(), Box<dyn std::error::Error>> {
         let tree = Parser::parse(
             Rule::workflow,
-            r#"workflow this_workflow {
-                Int wrongVariable = 1
+            r#"workflow good_workflow {
+                Int variable = 1
             }"#,
         )?
         .next()
         .unwrap();
+        let warnings = SnakeCase.check(&tree)?;
+        assert!(warnings.is_none());
+        Ok(())
+    }
+
+    #[test]
+    fn it_catches_wrong_bound_declaration() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(Rule::bound_declaration, r#"Int wrongVariable = 1"#)?
+            .next()
+            .unwrap();
         let warnings = SnakeCase.check(&tree)?.unwrap();
 
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W006::Naming/Low] missing snake case (2:21-2:34)"
+            "[v1::W006::Naming/Low] identifier must be snake case (1:5-1:18)"
         );
+        Ok(())
+    }
+
+    #[test]
+    fn it_ignores_a_properly_cased_bound_declaration() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(Rule::bound_declaration, r#"Int good_bound = 1"#)?
+            .next()
+            .unwrap();
+        let warnings = SnakeCase.check(&tree)?;
+        assert!(warnings.is_none());
+        Ok(())
+    }
+
+    #[test]
+    fn it_catches_wrong_unbound_declaration() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(Rule::unbound_declaration, r#"Int wrongVariable"#)?
+            .next()
+            .unwrap();
+        let warnings = SnakeCase.check(&tree)?.unwrap();
+
+        assert_eq!(warnings.len(), 1);
+        assert_eq!(
+            warnings.first().to_string(),
+            "[v1::W006::Naming/Low] identifier must be snake case (1:5-1:18)"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn it_ignores_a_properly_cased_unbound_declaration() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(Rule::unbound_declaration, r#"Int good_unbound"#)?
+            .next()
+            .unwrap();
+        let warnings = SnakeCase.check(&tree)?;
+        assert!(warnings.is_none());
         Ok(())
     }
 

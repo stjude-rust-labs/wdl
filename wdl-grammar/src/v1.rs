@@ -21,7 +21,7 @@
 //! | `no_curly_commands`     | `v1::W002` | Pedantic    | [Link](lint::NoCurlyCommands)     |
 //! | `mixed_indentation`     | `v1::W004` | Style       | [Link](lint::MixedIndentation)    |
 //! | `missing_runtime_block` | `v1::W005` |Completeness | [Link](lint::MissingRuntimeBlock) |
-//! | `snake_case`            | `v1::W006` | Naming      | [Link](lint::SnakeCase)        |
+//! | `snake_case`            | `v1::W006` | Naming      | [Link](lint::SnakeCase)           |
 
 use pest::iterators::Pair;
 use pest::Parser as _;
