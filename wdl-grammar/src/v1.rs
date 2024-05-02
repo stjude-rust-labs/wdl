@@ -23,6 +23,7 @@
 //! | `missing_runtime_block` | `v1::W005` | Completeness | [Link](lint::MissingRuntimeBlock) |
 //! | `snake_case`            | `v1::W006` | Naming       | [Link](lint::SnakeCase)           |
 //! | `newline_eof`           | `v1::W007` | Spacing      | [Link](lint::NewlineEOF)          |
+//! | `document_preamble`             | `v1::W009` | Spacing      | [Link](lint::VersionDeclarationPlacement) |
 //! | `preamble_comment`      | `v1::W010` | Style        | [Link](lint::PreambleComment)     |
 //! | `one_empty_line`        | `v1::W011` | Spacing      | [Link](lint::OneEmptyLine)        |
 
