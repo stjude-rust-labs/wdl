@@ -28,7 +28,7 @@ impl<'a> VersionDeclarationPlacement {
         // SAFETY: this error is written so that it will always unwrap.
         lint::warning::Builder::default()
             .code(self.code())
-            .level(lint::Level::Medium)
+            .level(lint::Level::Low)
             .group(lint::Group::Spacing)
             .subject("Improperly placed version declaration")
             .body(
@@ -73,7 +73,7 @@ impl<'a> Rule<&Pair<'a, v1::Rule>> for VersionDeclarationPlacement {
                     comment += 1;
                 }
                 v1::Rule::WHITESPACE => {
-                    if node.as_str() == "\n" {
+                    if node.as_str() == "\n" && comment > 0 {
                         newline += 1;
                     } else {
                         anything_else += 1;
@@ -84,7 +84,7 @@ impl<'a> Rule<&Pair<'a, v1::Rule>> for VersionDeclarationPlacement {
                     break;
                 }
                 _ => {
-                    anything_else += 1;
+                    unreachable!("Only comments and whitespace should precede version declaration.");
                 }
             }
         }
@@ -134,7 +134,7 @@ version 1.0"#,
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::E009::Spacing/Medium] Improperly placed version declaration (2:1-2:12)"
+            "[v1::E009::Spacing/Low] Improperly placed version declaration (2:1-2:12)"
         );
         Ok(())
     }
@@ -145,7 +145,6 @@ version 1.0"#,
             Rule::document,
             r#"
 ## Header comment
-
 version 1.0"#,
         )?
         .next()
@@ -156,7 +155,7 @@ version 1.0"#,
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::E009::Spacing/Medium] Improperly placed version declaration (4:1-4:12)"
+            "[v1::E009::Spacing/Low] Improperly placed version declaration (3:1-3:12)"
         );
         Ok(())
     }
@@ -176,7 +175,7 @@ version 1.0"#,
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::E009::Spacing/Medium] Improperly placed version declaration (2:1-2:12)"
+            "[v1::E009::Spacing/Low] Improperly placed version declaration (2:1-2:12)"
         );
         Ok(())
     }
