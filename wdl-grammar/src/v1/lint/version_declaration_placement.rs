@@ -84,7 +84,9 @@ impl<'a> Rule<&Pair<'a, v1::Rule>> for VersionDeclarationPlacement {
                     break;
                 }
                 _ => {
-                    unreachable!("Only comments and whitespace should precede version declaration.");
+                    unreachable!(
+                        "Only comments and whitespace should precede version declaration."
+                    );
                 }
             }
         }
