@@ -51293,66 +51293,6 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (35:6-35:24)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W001::Style/Low] line contains only whitespace (138:1-138:8)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W001::Style/Low] line contains only whitespace (72:1-72:4)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W001::Style/Low] trailing space (418:15)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W001::Style/Low] trailing space (88:10)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (107:19-107:33)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (10:17-10:23)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (111:6-111:16)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (130:6-130:16)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (150:6-150:29)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (164:19-164:34)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (172:6-172:21)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (191:6-191:29)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (193:14-193:38)"
 
 [[concerns]]
@@ -51373,11 +51313,6 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (196:14-196:34)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (196:19-196:34)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (200:20-200:34)"
 
 [[concerns]]
@@ -51388,32 +51323,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (213:14-213:32)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (216:14-216:32)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (217:6-217:22)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (224:6-224:18)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (243:6-243:15)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (244:6-244:18)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (263:6-263:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51434,11 +51349,6 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (271:21-271:42)"
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (27:16-27:49)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (284:6-284:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51473,22 +51383,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (329:6-329:26)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (346:6-346:23)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (350:17-350:23)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (367:6-367:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (429:6-429:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51498,17 +51393,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (430:6-430:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (434:16-434:17)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (435:16-435:17)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (459:19-459:33)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51554,11 +51439,6 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (65:10-65:38)"
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (66:10-66:39)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (95:14-95:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53878,27 +53758,12 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: c
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contig_coverage_json (162:5-162:40)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contig_stats_json (127:5-127:37)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contig_stats_json (163:5-163:37)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contigs_fasta (128:5-128:33)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contigs_fasta (164:5-164:33)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53909,11 +53774,6 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (157:5-157:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (193:5-193:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53938,37 +53798,12 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: duplicate_clusters_csv (197:5-197:32)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: fastqs (123:5-123:23)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: fastqs (159:5-159:23)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: fastqs (195:5-195:23)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: file_ext (124:5-124:20)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: gsnap_m8_gsnap_deduped_m8 (129:5-129:35)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: gsnap_m8_gsnap_deduped_m8 (165:5-165:35)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53988,22 +53823,12 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nonhost_fasta_refined_taxid_annot_fasta (196:5-196:49)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_db (92:5-92:17)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_info_db (130:5-130:20)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_info_db (166:5-166:20)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54018,37 +53843,12 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: r
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: refined_gsnap_in_gsnap_blast_top_m8 (161:5-161:45)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: refined_gsnap_in_gsnap_hitsummary2_tab (124:5-124:48)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: refined_gsnap_in_gsnap_hitsummary2_tab (160:5-160:48)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: refined_gsnap_in_gsnap_reassigned_m8 (123:5-123:46)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: refined_gsnap_in_gsnap_reassigned_m8 (159:5-159:46)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: resist_genome_bed (126:5-126:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: resist_genome_db (125:5-125:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54059,11 +53859,6 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s3_wd_uri (158:5-158:21)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s3_wd_uri (194:5-194:21)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54173,17 +53968,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: u
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_taxon_whitelist (198:5-198:32)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: contig_in_contig_coverage_json (198:5-198:40)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: contig_in_contig_coverage_json (234:5-234:40)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54193,17 +53978,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: contig_in_contig_stats_json (235:5-235:37)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: contig_in_contigs_fasta (200:5-200:33)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: contig_in_contigs_fasta (236:5-236:33)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54213,17 +53988,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: docker_image_id (225:5-225:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: duplicate_clusters_csv (204:5-204:32)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: duplicate_clusters_csv (240:5-240:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54233,17 +53998,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: fastqs_0 (237:5-237:18)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: fastqs_1 (202:5-202:19)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: fastqs_1 (238:5-238:19)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54253,17 +54008,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: file_ext (241:5-241:30)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: gsnap_m8_gsnap_deduped_m8 (194:5-194:35)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: gsnap_m8_gsnap_deduped_m8 (230:5-230:35)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54273,17 +54018,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: lineage_db (245:5-245:90)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nonhost_fasta_refined_taxid_annot_fasta (203:5-203:49)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nonhost_fasta_refined_taxid_annot_fasta (239:5-239:49)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54293,17 +54028,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nt_db (242:5-242:76)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nt_info_db (208:5-208:89)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nt_info_db (244:5-244:89)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54313,17 +54038,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nt_loc_db (243:5-243:87)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: refined_gsnap_in_gsnap_blast_top_m8 (197:5-197:45)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: refined_gsnap_in_gsnap_blast_top_m8 (233:5-233:45)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54333,17 +54048,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: refined_gsnap_in_gsnap_hitsummary2_tab (232:5-232:48)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: refined_gsnap_in_gsnap_reassigned_m8 (195:5-195:46)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: refined_gsnap_in_gsnap_reassigned_m8 (231:5-231:46)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54353,17 +54058,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: resist_genome_bed (247:5-247:83)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: resist_genome_db (210:5-210:80)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: resist_genome_db (246:5-246:80)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54373,17 +54068,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: s3_wd_uri (226:5-226:21)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxid_fasta_in_annotated_merged_fa (191:5-191:44)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxid_fasta_in_annotated_merged_fa (227:5-227:44)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54393,32 +54078,12 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxid_fasta_in_gsnap_hitsummary_tab (228:5-228:45)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxid_fasta_in_rapsearch2_hitsummary_tab (193:5-193:50)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxid_fasta_in_rapsearch2_hitsummary_tab (229:5-229:50)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: use_taxon_whitelist (212:5-212:40)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: use_taxon_whitelist (248:5-248:40)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (119:6-119:14)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54453,52 +54118,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (129:10-129:35)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (143:10-143:46)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (144:10-144:50)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (147:10-147:41)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (155:6-155:18)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (155:6-155:25)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (158:12-158:21)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (159:10-159:46)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (160:10-160:48)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (161:10-161:45)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (165:10-165:35)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54518,22 +54143,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (190:12-190:21)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (191:6-191:18)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (193:10-193:50)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (194:10-194:35)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (194:12-194:21)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54553,46 +54168,6 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (197:10-197:45)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (214:10-214:26)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (215:11-215:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (226:12-226:21)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (229:10-229:50)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (230:10-230:35)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (231:10-231:46)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (232:10-232:48)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (233:10-233:45)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (299:10-299:44)"
 
 [[concerns]]
@@ -54603,52 +54178,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (300:11-300:45)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (343:10-343:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (344:10-344:56)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (345:10-345:60)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (346:10-346:45)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (347:10-347:43)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (348:10-348:51)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (349:11-349:26)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (34:6-34:26)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (352:10-352:44)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (353:11-353:45)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -57628,32 +57158,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (140:11-140:21)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/fq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (141:11-141:21)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/fq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (142:11-142:21)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/fq.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (149:12-149:18)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/fq.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (150:12-150:18)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/fq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (151:12-151:18)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/fq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (152:12-152:18)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -57668,32 +57178,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (167:15-167:31)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/fq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (168:14-168:30)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/fq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (169:15-169:31)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/fq.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (71:11-71:21)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/fq.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (72:11-72:21)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/fq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (73:11-73:21)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/fq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (74:11-74:21)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -57737,16 +57227,6 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (348:11-348:21)"
 
 [[concerns]]
 kind = "LintWarning"
-document = "stjudecloud/workflows:tools/kraken2.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (349:11-349:21)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/kraken2.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (350:11-350:21)"
-
-[[concerns]]
-kind = "LintWarning"
 document = "stjudecloud/workflows:tools/librarian.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (30:11-30:21)"
 
@@ -57757,23 +57237,8 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (36:14-36:20)"
 
 [[concerns]]
 kind = "LintWarning"
-document = "stjudecloud/workflows:tools/md5sum.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (38:14-38:20)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/picard.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (119:15-119:39)"
-
-[[concerns]]
-kind = "LintWarning"
 document = "stjudecloud/workflows:tools/picard.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (121:15-121:39)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/picard.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (325:14-325:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -57783,17 +57248,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (327:14-327:28)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/picard.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (420:14-420:28)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/picard.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (422:14-422:28)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/picard.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (481:14-481:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -57828,22 +57283,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (479:19-479:41)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (480:20-480:47)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (481:19-481:41)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (485:19-485:44)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (487:19-487:44)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -57853,27 +57293,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (491:19-491:43)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (493:19-493:43)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (497:19-497:46)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (499:19-499:46)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (503:19-503:44)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (505:19-505:44)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -57893,27 +57318,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (511:27-511:44)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (511:30-511:46)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (512:24-512:36)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (512:28-512:44)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (513:24-513:48)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (513:27-513:44)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -57928,27 +57338,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (515:16-515:33)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (515:24-515:48)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (516:16-516:31)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (516:24-516:36)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (517:16-517:33)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (518:16-518:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -57963,17 +57358,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (519:16-519:30)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (519:16-519:33)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (520:16-520:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (520:16-520:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -57983,22 +57368,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (521:16-521:28)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (521:16-521:30)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (522:16-522:26)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (522:16-522:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (523:16-523:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58008,17 +57378,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (523:16-523:29)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (524:16-524:26)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (524:16-524:37)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (525:16-525:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58033,32 +57393,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (526:16-526:32)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (526:16-526:37)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (527:16-527:29)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (527:16-527:38)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (528:16-528:32)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (528:16-528:44)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (529:16-529:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58073,22 +57413,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (530:16-530:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (530:16-530:44)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (531:16-531:26)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (531:16-531:35)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (532:16-532:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58098,27 +57423,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (532:16-532:37)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (533:16-533:26)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (533:16-533:27)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (534:16-534:37)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (535:15-535:41)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (535:16-535:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58138,16 +57448,6 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (538:15-538:42)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (538:15-538:45)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (539:15-539:41)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (539:15-539:42)"
 
 [[concerns]]
@@ -58158,17 +57458,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (53:16-53:32)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (540:15-540:42)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (540:15-540:43)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (541:15-541:42)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58183,17 +57473,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (542:15-542:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (542:15-542:43)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (543:13-543:23)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (543:15-543:47)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58203,32 +57483,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (544:13-544:22)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (544:15-544:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (545:13-545:23)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (545:13-545:26)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (546:13-546:22)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (546:13-546:33)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (547:13-547:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58239,16 +57499,6 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (547:13-547:30)"
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (548:13-548:32)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (548:13-548:33)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (549:13-549:30)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58268,17 +57518,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (550:13-550:31)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (550:13-550:32)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (551:13-551:30)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (551:13-551:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58288,17 +57528,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (552:13-552:29)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (552:13-552:31)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (553:13-553:25)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (553:13-553:30)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58308,22 +57538,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (554:13-554:26)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (554:13-554:29)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (555:13-555:25)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (555:13-555:40)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (556:13-556:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58338,32 +57553,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (557:13-557:34)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (557:13-557:40)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (558:13-558:30)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (558:13-558:34)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (559:13-559:31)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (559:13-559:34)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (55:16-55:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58378,22 +57573,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (560:13-560:21)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (560:13-560:30)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (561:13-561:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (561:13-561:31)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (562:13-562:21)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58404,11 +57584,6 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (562:13-562:25)"
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (563:13-563:25)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (563:13-563:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58433,27 +57608,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (567:13-567:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (568:13-568:25)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (568:13-568:31)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (569:13-569:25)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (569:13-569:32)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (56:16-56:34)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58468,22 +57628,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (570:13-570:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (570:13-570:31)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (571:13-571:29)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (571:13-571:32)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (572:13-572:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58493,17 +57638,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (572:13-572:28)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (573:13-573:29)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (573:13-573:30)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (574:13-574:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58518,22 +57653,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (575:13-575:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (575:13-575:30)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (576:13-576:23)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (576:13-576:34)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (577:13-577:25)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58543,17 +57663,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (577:13-577:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (578:13-578:23)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (578:13-578:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (579:13-579:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58568,22 +57678,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (57:16-57:44)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (57:16-57:46)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (580:13-580:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (580:13-580:31)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (581:13-581:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58593,17 +57688,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (581:13-581:33)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (582:13-582:31)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (582:13-582:36)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (583:13-583:33)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58613,17 +57698,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (583:13-583:36)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (584:13-584:36)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (584:13-584:42)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (585:13-585:36)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58638,17 +57713,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (586:13-586:31)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (586:13-586:42)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (587:13-587:34)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (587:13-587:40)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58658,32 +57723,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (588:13-588:24)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (588:13-588:31)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (589:13-589:31)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (589:13-589:34)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (58:16-58:40)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (58:16-58:44)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (590:13-590:24)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58698,22 +57743,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (591:13-591:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (591:13-591:31)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (592:13-592:25)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (592:13-592:26)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (593:13-593:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58723,27 +57753,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (593:13-593:29)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (594:13-594:25)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (594:13-594:32)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (595:13-595:29)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (595:13-595:37)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (596:13-596:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58758,11 +57773,6 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (597:13-597:34)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (597:13-597:37)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (598:13-598:36)"
 
 [[concerns]]
@@ -58773,27 +57783,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (599:13-599:29)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (599:13-599:34)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (59:16-59:44)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (600:13-600:35)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (600:13-600:36)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (601:13-601:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58808,27 +57798,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (602:13-602:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (602:13-602:35)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (603:13-603:36)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (604:13-604:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (60:13-60:30)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (60:16-60:44)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58843,37 +57813,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (62:13-62:28)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (62:13-62:30)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (63:13-63:32)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (63:13-63:34)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (64:13-64:25)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (64:13-64:28)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (65:13-65:34)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (66:13-66:25)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58892,33 +57837,13 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (818:9-818:30)"
 
 [[concerns]]
 kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (819:9-819:30)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/star.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (820:9-820:30)"
-
-[[concerns]]
-kind = "LintWarning"
 document = "stjudecloud/workflows:tools/util.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (24:17-24:23)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/util.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (26:17-26:23)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/util.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (413:14-413:21)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:tools/util.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (415:14-415:21)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -58932,33 +57857,13 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (50:22-50:28)"
 
 [[concerns]]
 kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/general/bam-to-fastqs.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (51:21-51:27)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/general/bam-to-fastqs.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (52:22-52:28)"
-
-[[concerns]]
-kind = "LintWarning"
 document = "stjudecloud/workflows:workflows/qc/quality-check-standard.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (570:11-570:35)"
 
 [[concerns]]
 kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/qc/quality-check-standard.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (572:11-572:35)"
-
-[[concerns]]
-kind = "LintWarning"
 document = "stjudecloud/workflows:workflows/reference/bwa-db-build.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (26:17-26:33)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/reference/bwa-db-build.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (28:17-28:33)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -59032,11 +57937,6 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (125:14-125:21)"
 
 [[concerns]]
 kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/reference/make-qc-reference.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (127:14-127:21)"
-
-[[concerns]]
-kind = "LintWarning"
 document = "stjudecloud/workflows:workflows/reference/star-db-build.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (33:17-33:33)"
 
@@ -59044,16 +57944,6 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (33:17-33:33)"
 kind = "LintWarning"
 document = "stjudecloud/workflows:workflows/reference/star-db-build.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (34:17-34:24)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/reference/star-db-build.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (35:17-35:33)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/reference/star-db-build.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (36:17-36:24)"
 
 [[concerns]]
 kind = "LintWarning"
