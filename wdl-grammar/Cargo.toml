@@ -44,6 +44,7 @@ binaries = [
     "dep:tokio",
     "dep:toml",
 ]
+experimental = []
 
 [[bin]]
 name = "wdl-grammar"
