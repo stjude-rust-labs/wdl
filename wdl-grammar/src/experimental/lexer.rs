@@ -218,6 +218,10 @@ version 1.1",
     #[test]
     fn test_version_draft3() {
         use VersionToken::*;
+        // Note: draft-3 documents aren't supported by `wdl`, but
+        // the lexer needs to ensure it can lex any valid version
+        // token so that the parser may gracefully reject parsing
+        // the document.
         let lexer = Lexer::<VersionToken>::new(
             "
 # Test for draft-3 documents
