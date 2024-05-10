@@ -190,6 +190,9 @@ impl Task {
     /// ```
     /// use std::collections::BTreeMap;
     ///
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::metadata::Value;
     /// use ast::v1::document::task;
@@ -198,14 +201,16 @@ impl Task {
     /// use wdl_ast as ast;
     /// use wdl_core::file::location::Located;
     ///
-    /// let name = Identifier::try_from(String::from("name"))?;
+    /// let name = Identifier::try_from(std::string::String::from("name"))?;
     /// let contents = "echo 'Hello, world!'".parse::<task::command::Contents>()?;
     /// let command = Command::HereDoc(contents);
     ///
     /// let mut map = BTreeMap::new();
     /// map.insert(
     ///     Located::unplaced(Identifier::try_from("hello")?),
-    ///     Located::unplaced(Value::String(String::from("world"))),
+    ///     Located::unplaced(Value::String(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("world")),
+    ///     ])))),
     /// );
     /// map.insert(
     ///     Located::unplaced(Identifier::try_from("foo")?),
@@ -312,6 +317,9 @@ impl Task {
     /// ```
     /// use std::collections::BTreeMap;
     ///
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::metadata::Value;
     /// use ast::v1::document::task;
@@ -320,7 +328,7 @@ impl Task {
     /// use wdl_ast as ast;
     /// use wdl_core::file::location::Located;
     ///
-    /// let name = Identifier::try_from(String::from("name"))?;
+    /// let name = Identifier::try_from(std::string::String::from("name"))?;
     /// let contents = "echo 'Hello, world!'"
     ///     .parse::<task::command::Contents>()
     ///     .unwrap();
@@ -329,7 +337,9 @@ impl Task {
     /// let mut map = BTreeMap::new();
     /// map.insert(
     ///     Located::unplaced(Identifier::try_from("hello").unwrap()),
-    ///     Located::unplaced(Value::String(String::from("world"))),
+    ///     Located::unplaced(Value::String(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("world")),
+    ///     ])))),
     /// );
     /// map.insert(
     ///     Located::unplaced(Identifier::try_from("foo").unwrap()),
@@ -407,6 +417,9 @@ impl Task {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::expression::Literal;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::task;
@@ -416,14 +429,16 @@ impl Task {
     /// use ast::v1::document::Expression;
     /// use wdl_ast as ast;
     ///
-    /// let container = Value::try_from(Expression::Literal(Literal::String(String::from(
-    ///     "ubuntu:latest",
+    /// let container = Value::try_from(Expression::Literal(Literal::String(String::DoubleQuoted(
+    ///     Inner::new(vec![Component::LiteralContents(std::string::String::from(
+    ///         "ubuntu:latest",
+    ///     ))]),
     /// ))))?;
     /// let runtime = Builder::default()
     ///     .container(container.clone())?
     ///     .try_build()?;
     ///
-    /// let name = Identifier::try_from(String::from("name"))?;
+    /// let name = Identifier::try_from(std::string::String::from("name"))?;
     /// let command = Command::HereDoc("echo 'Hello, world!'".parse::<task::command::Contents>()?);
     ///
     /// let task = task::Builder::default()
@@ -513,13 +528,16 @@ mod tests {
     use crate::v1::document::declaration::bound;
     use crate::v1::document::declaration::r#type::Kind;
     use crate::v1::document::declaration::Type;
+    use crate::v1::document::expression::literal::string::inner::Component;
+    use crate::v1::document::expression::literal::string::Inner;
+    use crate::v1::document::expression::literal::String;
     use crate::v1::document::expression::Literal;
     use crate::v1::document::task;
     use crate::v1::document::Expression;
 
     #[test]
     fn multiple_private_declarations_are_squashed() -> Result<(), Box<dyn std::error::Error>> {
-        let name = Identifier::try_from(String::from("name"))?;
+        let name = Identifier::try_from(std::string::String::from("name"))?;
         let contents = "echo 'Hello, world!'"
             .parse::<task::command::Contents>()
             .unwrap();
@@ -534,7 +552,11 @@ mod tests {
         let two = bound::Builder::default()
             .name(Identifier::try_from("foo")?)?
             .r#type(Type::new(Kind::String, false))?
-            .value(Expression::Literal(Literal::String(String::from("baz"))))?
+            .value(Expression::Literal(Literal::String(String::DoubleQuoted(
+                Inner::new(vec![Component::LiteralContents(std::string::String::from(
+                    "baz",
+                ))]),
+            ))))?
             .try_build()?;
 
         let task = task::Builder::default()

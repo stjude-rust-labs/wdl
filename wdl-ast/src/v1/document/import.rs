@@ -12,6 +12,7 @@ pub use builder::Builder;
 use wdl_macros::check_node;
 use wdl_macros::dive_one;
 
+use crate::v1::document::expression::literal::String;
 use crate::v1::document::identifier::singular;
 use crate::v1::document::identifier::singular::Identifier;
 
@@ -58,6 +59,9 @@ impl Import {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::import::Builder;
     /// use wdl_ast as ast;
@@ -68,7 +72,9 @@ impl Import {
     ///         Identifier::try_from("foo_bar").unwrap(),
     ///     )
     ///     .r#as(Identifier::try_from("baz_quux").unwrap())?
-    ///     .uri(String::from("../mapping.wdl"))?
+    ///     .uri(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("../mapping.wdl")),
+    ///     ])))?
     ///     .try_build()?;
     ///
     /// assert_eq!(
@@ -87,6 +93,9 @@ impl Import {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::import::Builder;
     /// use wdl_ast as ast;
@@ -97,7 +106,9 @@ impl Import {
     ///         Identifier::try_from("foo_bar").unwrap(),
     ///     )
     ///     .r#as(Identifier::try_from("baz_quux").unwrap())?
-    ///     .uri(String::from("../mapping.wdl"))?
+    ///     .uri(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("../mapping.wdl")),
+    ///     ])))?
     ///     .try_build()?;
     ///
     /// assert_eq!(
@@ -116,6 +127,9 @@ impl Import {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::import::Builder;
     /// use wdl_ast as ast;
@@ -126,15 +140,22 @@ impl Import {
     ///         Identifier::try_from("foo_bar").unwrap(),
     ///     )
     ///     .r#as(Identifier::try_from("baz_quux").unwrap())?
-    ///     .uri(String::from("../mapping.wdl"))?
+    ///     .uri(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("../mapping.wdl")),
+    ///     ])))?
     ///     .try_build()?;
     ///
-    /// assert_eq!(import.uri(), "../mapping.wdl");
+    /// assert_eq!(
+    ///     import.uri(),
+    ///     &String::DoubleQuoted(Inner::new(vec![Component::LiteralContents(
+    ///         std::string::String::from("../mapping.wdl")
+    ///     ),]))
+    /// );
     ///
     /// # Ok::<(), Box<dyn std::error::Error>>(())
     /// ```
-    pub fn uri(&self) -> &str {
-        self.uri.as_str()
+    pub fn uri(&self) -> &String {
+        &self.uri
     }
 }
 
@@ -148,9 +169,9 @@ impl TryFrom<Pair<'_, grammar::v1::Rule>> for Import {
         for node in node.into_inner() {
             match node.as_rule() {
                 Rule::import_uri => {
-                    let uri = dive_one!(node, string_literal_contents, import_uri);
+                    let uri_string = dive_one!(node, string, import_uri);
                     builder = builder
-                        .uri(uri.as_str().to_owned())
+                        .uri(String::from(uri_string))
                         .map_err(Error::Builder)?;
                 }
                 Rule::import_as => {
@@ -187,6 +208,8 @@ impl TryFrom<Pair<'_, grammar::v1::Rule>> for Import {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::v1::document::expression::literal::string::inner::Component;
+    use crate::v1::document::expression::literal::string::Inner;
 
     #[test]
     fn it_parses_a_complicated_import_correctly()
@@ -200,7 +223,12 @@ mod tests {
         .unwrap();
 
         let import = Import::try_from(import).unwrap();
-        assert_eq!(import.uri(), "hello.wdl");
+        assert_eq!(
+            import.uri(),
+            &String::DoubleQuoted(Inner::new(vec![Component::LiteralContents(
+                std::string::String::from("hello.wdl")
+            )]))
+        );
         assert_eq!(import.r#as().map(|x| x.as_str()), Some("hello"));
 
         let aliases = import.aliases().unwrap();

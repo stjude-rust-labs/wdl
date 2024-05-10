@@ -84,14 +84,19 @@ impl Runtime {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::expression::Literal;
     /// use ast::v1::document::task::runtime::Builder;
     /// use ast::v1::document::task::runtime::Value;
     /// use ast::v1::document::Expression;
     /// use wdl_ast as ast;
     ///
-    /// let container = Value::try_from(Expression::Literal(Literal::String(String::from(
-    ///     "ubuntu:latest",
+    /// let container = Value::try_from(Expression::Literal(Literal::String(String::DoubleQuoted(
+    ///     Inner::new(vec![Component::LiteralContents(std::string::String::from(
+    ///         "ubuntu:latest",
+    ///     ))]),
     /// ))))?;
     /// let runtime = Builder::default()
     ///     .container(container.clone())?
@@ -133,13 +138,20 @@ impl Runtime {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::expression::Literal;
     /// use ast::v1::document::task::runtime::Builder;
     /// use ast::v1::document::task::runtime::Value;
     /// use ast::v1::document::Expression;
     /// use wdl_ast as ast;
     ///
-    /// let memory = Value::try_from(Expression::Literal(Literal::String(String::from("2 GiB"))))?;
+    /// let memory = Value::try_from(Expression::Literal(Literal::String(String::DoubleQuoted(
+    ///     Inner::new(vec![Component::LiteralContents(std::string::String::from(
+    ///         "2 GiB",
+    ///     ))]),
+    /// ))))?;
     /// let runtime = Builder::default().memory(memory.clone())?.try_build()?;
     ///
     /// assert_eq!(runtime.memory(), Some(&memory));
@@ -177,13 +189,20 @@ impl Runtime {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::expression::Literal;
     /// use ast::v1::document::task::runtime::Builder;
     /// use ast::v1::document::task::runtime::Value;
     /// use ast::v1::document::Expression;
     /// use wdl_ast as ast;
     ///
-    /// let disks = Value::try_from(Expression::Literal(Literal::String(String::from("1 GiB"))))?;
+    /// let disks = Value::try_from(Expression::Literal(Literal::String(String::DoubleQuoted(
+    ///     Inner::new(vec![Component::LiteralContents(std::string::String::from(
+    ///         "1 GiB",
+    ///     ))]),
+    /// ))))?;
     /// let runtime = Builder::default().disks(disks.clone())?.try_build()?;
     ///
     /// assert_eq!(runtime.disks(), Some(&disks));
@@ -285,9 +304,9 @@ impl TryFrom<Pair<'_, Rule>> for Runtime {
             match node.as_rule() {
                 Rule::task_runtime_mapping => {
                     let key_node =
-                        extract_one!(node.clone(), task_runtime_mapping_key, task_runtime_mapping)?;
+                        extract_one!(node.clone(), task_runtime_mapping_key, task_runtime_mapping);
                     let value_node =
-                        extract_one!(node, task_runtime_mapping_value, task_runtime_mapping)?;
+                        extract_one!(node, task_runtime_mapping_value, task_runtime_mapping);
 
                     match key_node.as_str() {
                         "container" | "docker" => {
@@ -347,6 +366,9 @@ impl TryFrom<Pair<'_, Rule>> for Runtime {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::v1::document::expression::literal::string::inner::Component;
+    use crate::v1::document::expression::literal::string::Inner;
+    use crate::v1::document::expression::literal::String;
     use crate::v1::document::expression::Literal;
 
     #[test]
@@ -382,8 +404,10 @@ task foo {
         let runtime = task.runtime().unwrap();
         assert_eq!(
             runtime.container().unwrap(),
-            &Value::try_from(Expression::Literal(Literal::String(String::from(
-                "ubuntu:latest"
+            &Value::try_from(Expression::Literal(Literal::String(String::DoubleQuoted(
+                Inner::new(vec![Component::LiteralContents(std::string::String::from(
+                    "ubuntu:latest"
+                ))])
             ))))
             .unwrap()
         );
@@ -393,7 +417,12 @@ task foo {
         );
         assert_eq!(
             runtime.memory().unwrap(),
-            &Value::try_from(Expression::Literal(Literal::String(String::from("2 GiB")))).unwrap()
+            &Value::try_from(Expression::Literal(Literal::String(String::DoubleQuoted(
+                Inner::new(vec![Component::LiteralContents(std::string::String::from(
+                    "2 GiB"
+                ))])
+            ))))
+            .unwrap()
         );
         assert_eq!(
             runtime.gpu().unwrap(),
@@ -401,7 +430,12 @@ task foo {
         );
         assert_eq!(
             runtime.disks().unwrap(),
-            &Value::try_from(Expression::Literal(Literal::String(String::from("1 GiB")))).unwrap()
+            &Value::try_from(Expression::Literal(Literal::String(String::DoubleQuoted(
+                Inner::new(vec![Component::LiteralContents(std::string::String::from(
+                    "1 GiB"
+                ))])
+            ))))
+            .unwrap()
         );
         assert_eq!(
             runtime.max_retries().unwrap(),
@@ -409,7 +443,12 @@ task foo {
         );
         assert_eq!(
             runtime.return_codes().unwrap(),
-            &Value::try_from(Expression::Literal(Literal::String(String::from("*")))).unwrap()
+            &Value::try_from(Expression::Literal(Literal::String(String::DoubleQuoted(
+                Inner::new(vec![Component::LiteralContents(std::string::String::from(
+                    "*"
+                ))])
+            ))))
+            .unwrap()
         );
 
         Ok(())

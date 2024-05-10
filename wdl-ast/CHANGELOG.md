@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* String literals are properly parsed
+  ([#34](https://github.com/stjude-rust-labs/wdl/pull/34)).
+
+### Fixed
+
 * Fix ignoring comments in expressions ([#23](https://github.com/stjude-rust-labs/wdl/pull/23)).
 
 ## 0.1.0 — 12-17-2023

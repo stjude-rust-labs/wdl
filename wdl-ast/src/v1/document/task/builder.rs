@@ -296,6 +296,9 @@ impl Builder {
     /// ```
     /// use std::collections::BTreeMap;
     ///
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::metadata::Value;
     /// use ast::v1::document::task;
@@ -307,8 +310,10 @@ impl Builder {
     ///
     /// let mut map = BTreeMap::new();
     /// map.insert(
-    ///     Located::unplaced(Identifier::try_from(String::from("foo"))?),
-    ///     Located::unplaced(Value::String(String::from("bar"))),
+    ///     Located::unplaced(Identifier::try_from(std::string::String::from("foo"))?),
+    ///     Located::unplaced(Value::String(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("bar")),
+    ///     ])))),
     /// );
     ///
     /// let metadata = Metadata::from(map);
@@ -331,7 +336,9 @@ impl Builder {
     ///         .get(&Identifier::try_from("foo").unwrap())
     ///         .unwrap()
     ///         .inner(),
-    ///     &Value::String(String::from("bar"))
+    ///     &Value::String(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("bar")),
+    ///     ])))
     /// );
     /// assert_eq!(metadata.get(&Identifier::try_from("baz").unwrap()), None);
     ///
@@ -353,6 +360,9 @@ impl Builder {
     /// ```
     /// use std::collections::BTreeMap;
     ///
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::metadata::Value;
     /// use ast::v1::document::task;
@@ -364,8 +374,10 @@ impl Builder {
     ///
     /// let mut map = BTreeMap::new();
     /// map.insert(
-    ///     Located::unplaced(Identifier::try_from(String::from("baz"))?),
-    ///     Located::unplaced(Value::String(String::from("quux"))),
+    ///     Located::unplaced(Identifier::try_from(std::string::String::from("baz"))?),
+    ///     Located::unplaced(Value::String(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("quux")),
+    ///     ])))),
     /// );
     ///
     /// let parameter_metadata = Metadata::from(map);
@@ -388,7 +400,9 @@ impl Builder {
     ///         .get(&Identifier::try_from("baz").unwrap())
     ///         .unwrap()
     ///         .inner(),
-    ///     &Value::String(String::from("quux"))
+    ///     &Value::String(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("quux")),
+    ///     ])))
     /// );
     /// assert_eq!(
     ///     parameter_metadata.get(&Identifier::try_from("foo").unwrap()),
@@ -470,6 +484,9 @@ impl Builder {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::expression::Literal;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::task;
@@ -479,14 +496,16 @@ impl Builder {
     /// use ast::v1::document::Expression;
     /// use wdl_ast as ast;
     ///
-    /// let container = Value::try_from(Expression::Literal(Literal::String(String::from(
-    ///     "ubuntu:latest",
+    /// let container = Value::try_from(Expression::Literal(Literal::String(String::DoubleQuoted(
+    ///     Inner::new(vec![Component::LiteralContents(std::string::String::from(
+    ///         "ubuntu-latest",
+    ///     ))]),
     /// ))))?;
     /// let runtime = Builder::default()
     ///     .container(container.clone())?
     ///     .try_build()?;
     ///
-    /// let name = Identifier::try_from(String::from("name"))?;
+    /// let name = Identifier::try_from(std::string::String::from("name"))?;
     /// let command = Command::HereDoc("echo 'Hello, world!'".parse::<task::command::Contents>()?);
     ///
     /// let task = task::Builder::default()

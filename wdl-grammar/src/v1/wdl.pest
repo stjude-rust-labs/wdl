@@ -101,7 +101,7 @@ string_literal_contents = @{
 string_expression_placeholder_expression = { string_placeholder | expression }
 
 string_placeholder = ${
-    string_expression_placeholder_start ~ placeholder_options* ~ string_expression_placeholder_expression ~ string_expression_placeholder_end
+    string_expression_placeholder_start ~ placeholder_options? ~ string_expression_placeholder_expression ~ string_expression_placeholder_end
 }
 
 // NOTE: all rules included in `string` must be marked as atomic (`@`) or
@@ -416,7 +416,7 @@ command_curly_literal_contents = _{
 command_curly_expression_placeholder_expression = { command_curly_placeholder | expression }
 
 command_curly_placeholder = !{
-    command_curly_expression_placeholder_start ~ placeholder_options* ~ command_curly_expression_placeholder_expression ~ command_curly_expression_placeholder_end
+    command_curly_expression_placeholder_start ~ placeholder_options? ~ command_curly_expression_placeholder_expression ~ command_curly_expression_placeholder_end
 }
 
 command_curly_contents = {
@@ -440,7 +440,7 @@ command_heredoc_literal_contents = _{
 command_heredoc_expression_placeholder_expression = { command_heredoc_placeholder | expression }
 
 command_heredoc_placeholder = !{
-    command_heredoc_expression_placeholder_start ~ placeholder_options* ~ command_heredoc_expression_placeholder_expression ~ command_heredoc_expression_placeholder_end
+    command_heredoc_expression_placeholder_start ~ placeholder_options? ~ command_heredoc_expression_placeholder_expression ~ command_heredoc_expression_placeholder_end
 }
 
 command_heredoc_contents = {

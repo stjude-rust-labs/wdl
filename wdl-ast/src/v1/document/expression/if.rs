@@ -47,6 +47,9 @@ impl If {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::expression::If;
     /// use ast::v1::document::expression::Literal;
     /// use ast::v1::document::Expression;
@@ -54,7 +57,11 @@ impl If {
     ///
     /// let r#if = If::new(
     ///     Box::new(Expression::Literal(Literal::Boolean(false))),
-    ///     Box::new(Expression::Literal(Literal::String(String::from("foo")))),
+    ///     Box::new(Expression::Literal(Literal::String(String::DoubleQuoted(
+    ///         Inner::new(vec![Component::LiteralContents(std::string::String::from(
+    ///             "foo",
+    ///         ))]),
+    ///     )))),
     ///     Box::new(Expression::Literal(Literal::Boolean(true))),
     /// );
     ///
@@ -85,6 +92,9 @@ impl If {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::expression::If;
     /// use ast::v1::document::expression::Literal;
     /// use ast::v1::document::Expression;
@@ -92,7 +102,11 @@ impl If {
     ///
     /// let r#if = If::new(
     ///     Box::new(Expression::Literal(Literal::Boolean(false))),
-    ///     Box::new(Expression::Literal(Literal::String(String::from("foo")))),
+    ///     Box::new(Expression::Literal(Literal::String(String::DoubleQuoted(
+    ///         Inner::new(vec![Component::LiteralContents(std::string::String::from(
+    ///             "foo",
+    ///         ))]),
+    ///     )))),
     ///     Box::new(Expression::Literal(Literal::Boolean(true))),
     /// );
     ///
@@ -110,6 +124,9 @@ impl If {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::expression::If;
     /// use ast::v1::document::expression::Literal;
     /// use ast::v1::document::Expression;
@@ -117,7 +134,11 @@ impl If {
     ///
     /// let r#if = If::new(
     ///     Box::new(Expression::Literal(Literal::Boolean(false))),
-    ///     Box::new(Expression::Literal(Literal::String(String::from("foo")))),
+    ///     Box::new(Expression::Literal(Literal::String(String::DoubleQuoted(
+    ///         Inner::new(vec![Component::LiteralContents(std::string::String::from(
+    ///             "foo",
+    ///         ))]),
+    ///     )))),
     ///     Box::new(Expression::Literal(Literal::Boolean(true))),
     /// );
     ///
@@ -135,6 +156,9 @@ impl If {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::expression::If;
     /// use ast::v1::document::expression::Literal;
     /// use ast::v1::document::Expression;
@@ -142,7 +166,11 @@ impl If {
     ///
     /// let r#if = If::new(
     ///     Box::new(Expression::Literal(Literal::Boolean(false))),
-    ///     Box::new(Expression::Literal(Literal::String(String::from("foo")))),
+    ///     Box::new(Expression::Literal(Literal::String(String::DoubleQuoted(
+    ///         Inner::new(vec![Component::LiteralContents(std::string::String::from(
+    ///             "foo",
+    ///         ))]),
+    ///     )))),
     ///     Box::new(Expression::Literal(Literal::Boolean(true))),
     /// );
     /// assert!(matches!(

@@ -124,14 +124,14 @@ impl TryFrom<Pair<'_, Rule>> for Object {
                         node.clone(),
                         identifier_based_kv_key,
                         identifier_based_kv_pair
-                    )?;
+                    );
                     let identifier_node =
-                        extract_one!(key_node, singular_identifier, identifier_based_kv_key)?;
+                        extract_one!(key_node, singular_identifier, identifier_based_kv_key);
                     let identifier =
                         Identifier::try_from(identifier_node).map_err(Error::Identifier)?;
 
-                    let value_node = extract_one!(node, kv_value, identifier_based_kv_pair)?;
-                    let expression_node = extract_one!(value_node, expression, kv_value)?;
+                    let value_node = extract_one!(node, kv_value, identifier_based_kv_pair);
+                    let expression_node = extract_one!(value_node, expression, kv_value);
                     let expression = Expression::try_from(expression_node)
                         .map_err(Box::new)
                         .map_err(Error::Expression)?;

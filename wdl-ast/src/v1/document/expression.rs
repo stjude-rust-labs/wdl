@@ -11,14 +11,14 @@ use pest::pratt_parser::Op;
 use pest::pratt_parser::PrattParser;
 use wdl_grammar as grammar;
 use wdl_macros::check_node;
-use wdl_macros::extract_one;
 
+use crate::v1::document::expression::literal::String;
 use crate::v1::document::identifier::singular;
 use crate::v1::document::identifier::singular::Identifier;
 
 mod array;
 mod r#if;
-mod literal;
+pub mod literal;
 mod map;
 mod object;
 mod pair;
@@ -246,13 +246,7 @@ fn parse<'a, P: Iterator<Item = pest::iterators::Pair<'a, grammar::v1::Rule>>>(
                     .parse::<OrderedFloat<f64>>()
                     .map_err(Error::ParseFloat)?,
             ))),
-            Rule::string => {
-                // TODO: parse strings with placeholders properly.
-                let inner = extract_one!(node, string_inner, string)?;
-                Ok(Expression::Literal(Literal::String(
-                    inner.as_str().to_owned(),
-                )))
-            }
+            Rule::string => Ok(Expression::Literal(Literal::String(String::from(node)))),
             Rule::none => Ok(Expression::Literal(Literal::None)),
             Rule::singular_identifier => {
                 let identifier =

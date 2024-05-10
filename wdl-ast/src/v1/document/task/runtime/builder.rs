@@ -133,15 +133,21 @@ impl Builder {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::expression::Literal;
     /// use ast::v1::document::task::runtime::Builder;
     /// use ast::v1::document::task::runtime::Value;
     /// use ast::v1::document::Expression;
     /// use wdl_ast as ast;
     ///
-    /// let container = Value::try_from(Expression::Literal(Literal::String(String::from(
-    ///     "ubuntu:latest",
+    /// let container = Value::try_from(Expression::Literal(Literal::String(String::DoubleQuoted(
+    ///     Inner::new(vec![Component::LiteralContents(std::string::String::from(
+    ///         "ubuntu:latest",
+    ///     ))]),
     /// ))))?;
+    ///
     /// let runtime = Builder::default()
     ///     .container(container.clone())?
     ///     .try_build()?;
@@ -191,13 +197,20 @@ impl Builder {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::expression::Literal;
     /// use ast::v1::document::task::runtime::Builder;
     /// use ast::v1::document::task::runtime::Value;
     /// use ast::v1::document::Expression;
     /// use wdl_ast as ast;
     ///
-    /// let memory = Value::try_from(Expression::Literal(Literal::String(String::from("2 GiB"))))?;
+    /// let memory = Value::try_from(Expression::Literal(Literal::String(String::DoubleQuoted(
+    ///     Inner::new(vec![Component::LiteralContents(std::string::String::from(
+    ///         "2 GiB",
+    ///     ))]),
+    /// ))))?;
     /// let runtime = Builder::default().memory(memory.clone())?.try_build()?;
     ///
     /// assert_eq!(runtime.memory(), Some(&memory));
@@ -245,13 +258,20 @@ impl Builder {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::expression::Literal;
     /// use ast::v1::document::task::runtime::Builder;
     /// use ast::v1::document::task::runtime::Value;
     /// use ast::v1::document::Expression;
     /// use wdl_ast as ast;
     ///
-    /// let disks = Value::try_from(Expression::Literal(Literal::String(String::from("1 GiB"))))?;
+    /// let disks = Value::try_from(Expression::Literal(Literal::String(String::DoubleQuoted(
+    ///     Inner::new(vec![Component::LiteralContents(std::string::String::from(
+    ///         "1 GiB",
+    ///     ))]),
+    /// ))))?;
     /// let runtime = Builder::default().disks(disks.clone())?.try_build()?;
     ///
     /// assert_eq!(runtime.disks(), Some(&disks));
@@ -362,15 +382,21 @@ impl Builder {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::expression::Literal;
     /// use ast::v1::document::task::runtime::Builder;
     /// use ast::v1::document::task::runtime::Value;
     /// use ast::v1::document::Expression;
     /// use wdl_ast as ast;
     ///
-    /// let container = Value::try_from(Expression::Literal(Literal::String(String::from(
-    ///     "ubuntu:latest",
+    /// let container = Value::try_from(Expression::Literal(Literal::String(String::DoubleQuoted(
+    ///     Inner::new(vec![Component::LiteralContents(std::string::String::from(
+    ///         "ubuntu:latest",
+    ///     ))]),
     /// ))))?;
+    ///
     /// let runtime = Builder::default()
     ///     .container(container.clone())?
     ///     .try_build()?;

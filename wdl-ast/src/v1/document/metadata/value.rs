@@ -4,7 +4,6 @@ use grammar::v1::Rule;
 use pest::iterators::Pair;
 use wdl_grammar as grammar;
 use wdl_macros::check_node;
-use wdl_macros::dive_one;
 use wdl_macros::unwrap_one;
 
 mod array;
@@ -41,7 +40,7 @@ type Result<T> = std::result::Result<T, Error>;
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Value {
     /// A string.
-    String(String),
+    String(crate::v1::document::expression::literal::String),
 
     /// An integer.
     Integer(String),
@@ -70,10 +69,9 @@ impl TryFrom<Pair<'_, grammar::v1::Rule>> for Value {
         let node = unwrap_one!(node, metadata_value);
 
         match node.as_rule() {
-            Rule::string => {
-                let inner = dive_one!(node, string_inner, string);
-                Ok(Value::String(inner.as_str().to_owned()))
-            }
+            Rule::string => Ok(Value::String(
+                crate::v1::document::expression::literal::String::from(node),
+            )),
             Rule::integer => Ok(Value::Integer(node.as_str().to_owned())),
             Rule::float => Ok(Value::Float(node.as_str().to_owned())),
             Rule::boolean => match node.as_str() {

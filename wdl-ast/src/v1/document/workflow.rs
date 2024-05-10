@@ -126,6 +126,9 @@ impl Workflow {
     /// ```
     /// use std::collections::BTreeMap;
     ///
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::metadata::Value;
     /// use ast::v1::document::workflow::Builder;
@@ -135,8 +138,10 @@ impl Workflow {
     ///
     /// let mut map = BTreeMap::new();
     /// map.insert(
-    ///     Located::unplaced(Identifier::try_from(String::from("foo"))?),
-    ///     Located::unplaced(Value::String(String::from("bar"))),
+    ///     Located::unplaced(Identifier::try_from(std::string::String::from("foo"))?),
+    ///     Located::unplaced(Value::String(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("bar")),
+    ///     ])))),
     /// );
     ///
     /// let metadata = Metadata::from(map);
@@ -153,7 +158,9 @@ impl Workflow {
     ///         .get(&Identifier::try_from("foo").unwrap())
     ///         .unwrap()
     ///         .inner(),
-    ///     &Value::String(String::from("bar"))
+    ///     &Value::String(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("bar")),
+    ///     ])))
     /// );
     /// assert_eq!(metadata.get(&Identifier::try_from("baz").unwrap()), None);
     ///
@@ -231,6 +238,9 @@ impl Workflow {
     /// ```
     /// use std::collections::BTreeMap;
     ///
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::metadata::Value;
     /// use ast::v1::document::workflow::Builder;
@@ -240,8 +250,10 @@ impl Workflow {
     ///
     /// let mut map = BTreeMap::new();
     /// map.insert(
-    ///     Located::unplaced(Identifier::try_from(String::from("baz")).unwrap()),
-    ///     Located::unplaced(Value::String(String::from("quux"))),
+    ///     Located::unplaced(Identifier::try_from(std::string::String::from("baz")).unwrap()),
+    ///     Located::unplaced(Value::String(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("quux")),
+    ///     ])))),
     /// );
     ///
     /// let parameter_metadata = Metadata::from(map);
@@ -258,7 +270,9 @@ impl Workflow {
     ///         .get(&Identifier::try_from("baz").unwrap())
     ///         .unwrap()
     ///         .inner(),
-    ///     &Value::String(String::from("quux"))
+    ///     &Value::String(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("quux")),
+    ///     ])))
     /// );
     /// assert_eq!(
     ///     parameter_metadata.get(&Identifier::try_from("foo").unwrap()),

@@ -145,7 +145,7 @@ impl TryFrom<Pair<'_, Rule>> for Struct {
         check_node!(node, struct_literal);
 
         let name_node = dive_one!(node.clone(), struct_literal_name, struct_literal);
-        let identifier_node = extract_one!(name_node, singular_identifier, struct_literal_name)?;
+        let identifier_node = extract_one!(name_node, singular_identifier, struct_literal_name);
         let name = Identifier::try_from(identifier_node).map_err(Error::Identifier)?;
 
         let mut inner = BTreeMap::new();
@@ -157,14 +157,14 @@ impl TryFrom<Pair<'_, Rule>> for Struct {
                         node.clone(),
                         identifier_based_kv_key,
                         identifier_based_kv_pair
-                    )?;
+                    );
                     let identifier_node =
-                        extract_one!(key_node, singular_identifier, identifier_based_kv_key)?;
+                        extract_one!(key_node, singular_identifier, identifier_based_kv_key);
                     let identifier =
                         Identifier::try_from(identifier_node).map_err(Error::Identifier)?;
 
-                    let value_node = extract_one!(node, kv_value, identifier_based_kv_pair)?;
-                    let expression_node = extract_one!(value_node, expression, kv_value)?;
+                    let value_node = extract_one!(node, kv_value, identifier_based_kv_pair);
+                    let expression_node = extract_one!(value_node, expression, kv_value);
                     let expression = Expression::try_from(expression_node)
                         .map_err(Box::new)
                         .map_err(Error::Expression)?;

@@ -135,7 +135,7 @@ impl TryFrom<Pair<'_, grammar::v1::Rule>> for Type {
                 Rule::object_type => kind = Some(Kind::Object),
                 Rule::struct_type => {
                     kind = {
-                        let identifier_node = extract_one!(node, singular_identifier, struct_type)?;
+                        let identifier_node = extract_one!(node, singular_identifier, struct_type);
                         let identifier =
                             Identifier::try_from(identifier_node).map_err(Error::Identifier)?;
                         Some(Kind::Struct(identifier))

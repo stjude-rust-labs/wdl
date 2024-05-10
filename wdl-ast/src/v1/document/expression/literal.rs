@@ -4,6 +4,10 @@ use ordered_float::OrderedFloat;
 
 use crate::v1::document::identifier::singular::Identifier;
 
+pub mod string;
+
+pub use string::String;
+
 /// An literal value within an [`Expression`](super::Expression).
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum Literal {

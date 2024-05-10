@@ -66,6 +66,9 @@ impl Metadata {
     /// ```
     /// use std::collections::BTreeMap;
     ///
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::metadata::Value;
     /// use ast::v1::document::Metadata;
@@ -75,7 +78,9 @@ impl Metadata {
     /// let mut map = BTreeMap::new();
     /// map.insert(
     ///     Located::unplaced(Identifier::try_from("hello").unwrap()),
-    ///     Located::unplaced(Value::String(String::from("world"))),
+    ///     Located::unplaced(Value::String(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("world")),
+    ///     ])))),
     /// );
     /// map.insert(
     ///     Located::unplaced(Identifier::try_from("foo").unwrap()),
@@ -91,7 +96,9 @@ impl Metadata {
     ///         .get(&Identifier::try_from("hello").unwrap())
     ///         .unwrap()
     ///         .inner(),
-    ///     &Value::String(String::from("world"))
+    ///     &Value::String(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("world")),
+    ///     ])))
     /// );
     /// assert_eq!(
     ///     inner
@@ -113,6 +120,9 @@ impl Metadata {
     /// ```
     /// use std::collections::BTreeMap;
     ///
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::metadata::Value;
     /// use ast::v1::document::Metadata;
@@ -122,7 +132,9 @@ impl Metadata {
     /// let mut map = BTreeMap::new();
     /// map.insert(
     ///     Located::unplaced(Identifier::try_from("hello").unwrap()),
-    ///     Located::unplaced(Value::String(String::from("world"))),
+    ///     Located::unplaced(Value::String(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("world")),
+    ///     ])))),
     /// );
     /// map.insert(
     ///     Located::unplaced(Identifier::try_from("foo").unwrap()),
@@ -165,7 +177,7 @@ impl TryFrom<Pair<'_, grammar::v1::Rule>> for Metadata {
                     // type does not support creating an iterator without taking
                     // ownership (at the time of writing). This can be made
                     // better with a PR to Pest.
-                    let key_node = extract_one!(node.clone(), metadata_key, metadata_kv)?;
+                    let key_node = extract_one!(node.clone(), metadata_key, metadata_kv);
                     let location =
                         Location::try_from(key_node.as_span()).map_err(Error::Location)?;
                     let identifier =
@@ -177,7 +189,7 @@ impl TryFrom<Pair<'_, grammar::v1::Rule>> for Metadata {
                     // Value extraction //
                     //==================//
 
-                    let value_node = extract_one!(node, metadata_value, metadata_kv)?;
+                    let value_node = extract_one!(node, metadata_value, metadata_kv);
                     let location =
                         Location::try_from(value_node.as_span()).map_err(Error::Location)?;
                     let value = Value::try_from(value_node).map_err(Error::Value)?;

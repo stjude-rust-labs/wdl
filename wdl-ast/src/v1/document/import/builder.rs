@@ -1,5 +1,6 @@
 //! Builder for an [`Import`].
 
+use crate::v1::document::expression::literal::String;
 use crate::v1::document::identifier::singular::Identifier;
 use crate::v1::document::import::Aliases;
 use crate::v1::document::Import;
@@ -90,6 +91,9 @@ impl Builder {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::import::Builder;
     /// use wdl_ast as ast;
@@ -100,7 +104,9 @@ impl Builder {
     ///         Identifier::try_from("foo_bar").unwrap(),
     ///     )
     ///     .r#as(Identifier::try_from("baz_quux").unwrap())?
-    ///     .uri(String::from("../mapping.wdl"))?
+    ///     .uri(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("../mapping.wdl")),
+    ///     ])))?
     ///     .try_build()?;
     ///
     /// assert_eq!(
@@ -122,6 +128,9 @@ impl Builder {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::import::Builder;
     /// use wdl_ast as ast;
@@ -132,7 +141,9 @@ impl Builder {
     ///         Identifier::try_from("foo_bar").unwrap(),
     ///     )
     ///     .r#as(Identifier::try_from("baz_quux").unwrap())?
-    ///     .uri(String::from("../mapping.wdl"))?
+    ///     .uri(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("../mapping.wdl")),
+    ///     ])))?
     ///     .try_build()?;
     ///
     /// assert_eq!(
@@ -156,6 +167,9 @@ impl Builder {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::import::Builder;
     /// use wdl_ast as ast;
@@ -166,10 +180,17 @@ impl Builder {
     ///         Identifier::try_from("foo_bar").unwrap(),
     ///     )
     ///     .r#as(Identifier::try_from("baz_quux").unwrap())?
-    ///     .uri(String::from("../mapping.wdl"))?
+    ///     .uri(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("../mapping.wdl")),
+    ///     ])))?
     ///     .try_build()?;
     ///
-    /// assert_eq!(import.uri(), "../mapping.wdl");
+    /// assert_eq!(
+    ///     import.uri(),
+    ///     &String::DoubleQuoted(Inner::new(vec![Component::LiteralContents(
+    ///         std::string::String::from("../mapping.wdl")
+    ///     ),]))
+    /// );
     ///
     /// # Ok::<(), Box<dyn std::error::Error>>(())
     /// ```
@@ -187,6 +208,9 @@ impl Builder {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use ast::v1::document::import::Builder;
     /// use wdl_ast as ast;
@@ -197,7 +221,9 @@ impl Builder {
     ///         Identifier::try_from("foo_bar").unwrap(),
     ///     )
     ///     .r#as(Identifier::try_from("baz_quux").unwrap())?
-    ///     .uri(String::from("../mapping.wdl"))?
+    ///     .uri(String::DoubleQuoted(Inner::new(vec![
+    ///         Component::LiteralContents(std::string::String::from("../mapping.wdl")),
+    ///     ])))?
     ///     .try_build()?;
     ///
     /// # Ok::<(), Box<dyn std::error::Error>>(())

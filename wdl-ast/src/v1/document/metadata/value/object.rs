@@ -56,11 +56,11 @@ impl TryFrom<Pair<'_, grammar::v1::Rule>> for Object {
                     // type does not support creating an iterator without taking
                     // ownership (at the time of writing). This can be made
                     // better with a PR to Pest.
-                    let key_node = extract_one!(node.clone(), metadata_key, metadata_kv)?;
+                    let key_node = extract_one!(node.clone(), metadata_key, metadata_kv);
                     let key = Identifier::try_from(unwrap_one!(key_node, metadata_key).as_str())
                         .map_err(Error::Identifier)?;
 
-                    let value_node = extract_one!(node, metadata_value, metadata_kv)?;
+                    let value_node = extract_one!(node, metadata_value, metadata_kv);
                     let value = Value::try_from(value_node).map_err(Error::Value)?;
 
                     inner.insert(key, value);

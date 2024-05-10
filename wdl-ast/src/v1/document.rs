@@ -96,6 +96,9 @@ impl Document {
     /// # Examples
     ///
     /// ```
+    /// use ast::v1::document::expression::literal::string::inner::Component;
+    /// use ast::v1::document::expression::literal::string::Inner;
+    /// use ast::v1::document::expression::literal::String;
     /// use ast::v1::document::identifier::singular::Identifier;
     /// use grammar::v1::Rule;
     /// use wdl_ast as ast;
@@ -114,7 +117,12 @@ impl Document {
     /// assert_eq!(tree.imports().len(), 1);
     ///
     /// let import = tree.imports().first().unwrap();
-    /// assert_eq!(import.uri(), "../hello.wdl");
+    /// assert_eq!(
+    ///     import.uri(),
+    ///     &String::DoubleQuoted(Inner::new(vec![Component::LiteralContents(
+    ///         std::string::String::from("../hello.wdl")
+    ///     )]))
+    /// );
     /// assert_eq!(import.r#as().unwrap().as_str(), "hello");
     /// assert_eq!(
     ///     import.aliases().unwrap().get("foo"),

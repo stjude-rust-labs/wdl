@@ -84,7 +84,7 @@ pub macro extract_one($node:expr, $type_:ident, $within:ident) {{
         .collect::<Vec<_>>();
 
     match nodes.len() {
-        1 => Ok(nodes.pop().unwrap()),
+        1 => nodes.pop().unwrap(),
         _ => panic!(
             "expected one {} node within a {} node",
             stringify!($type_),

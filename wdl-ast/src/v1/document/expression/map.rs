@@ -124,14 +124,25 @@ mod tests {
     use wdl_macros::test::valid_node;
 
     use super::*;
+    use crate::v1::document::expression::literal::string::inner::Component;
+    use crate::v1::document::expression::literal::string::Inner;
+    use crate::v1::document::expression::literal::String;
     use crate::v1::document::expression::Literal;
 
     #[test]
     fn it_parses_from_a_supported_node_type() {
         let map = valid_node!(r#"{"hello": "world"}"#, map_literal, Map);
         assert_eq!(
-            map.get(&Expression::Literal(Literal::String(String::from("hello")))),
-            Some(&Expression::Literal(Literal::String(String::from("world"))))
+            map.get(&Expression::Literal(Literal::String(String::DoubleQuoted(
+                Inner::new(vec![Component::LiteralContents(std::string::String::from(
+                    "hello"
+                ))])
+            )))),
+            Some(&Expression::Literal(Literal::String(String::DoubleQuoted(
+                Inner::new(vec![Component::LiteralContents(std::string::String::from(
+                    "world"
+                ))])
+            ))))
         );
     }
 
