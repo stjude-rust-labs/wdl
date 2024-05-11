@@ -14,7 +14,7 @@ At the time of writing (January 2024), we consider all rules herein to be up for
 
 ### `version_declaration_placement`
 
-The WDL version declaration is required for any v1 WDL document to be parsed. A missing version declaration will result in a validation error. However an incorrect placement of the decleration will be considered a lint warning. The version decleration should be the very first line in the document, unless there are header comments. In which case, there should be a blank line between the header and the version declaration. There should _always_ be a blank line following the version declaration.
+The WDL version declaration is required for any v1 WDL document to be parsed. A missing version declaration will result in a validation error. However an incorrect placement of the decleration will be considered a lint warning. The version decleration should be the very first line in the document, unless there are preamble comments. In which case, there should be a blank line between the preamble and the version declaration. There should _always_ be a blank line following the version declaration.
 
 **Group**: `spacing`
 
@@ -381,13 +381,13 @@ Bad:
     Int z = x + y# NO spaces between code and comment is hard to read.
 ```
 
-### `header_comment`
+### `preamble_comment`
 
-Full line comments which start with a double-pound-sign (`##`) are given special treatment. They are called header-comments, and **should only be used at the very beginning of a file**. These special comments are meant as a place for documentation that doesn't belong in any of the language-supported meta sections. This is often whole file documentation or documentation for structs contained in the file.
+Full line comments which start with a double-pound-sign (`##`) are given special treatment. They are called preamble comments, and **should only be used at the very beginning of a file**. These special comments are meant as a place for documentation that doesn't belong in any of the language-supported meta sections. This is often whole file documentation or documentation for structs contained in the file.
 
-`sprocket doc` is under active development at the time of writing. This tool will auto-document any WDL file in Markdown. Header-comments found by `sprocket doc` will be re-written in the output `.md` files (without the `##` prefix). Arbitrary and multi-line Markdown constructions will be preserved and rendered.
+`sprocket doc` is under active development at the time of writing. This tool will auto-document any WDL file in Markdown. Preamble comments found by `sprocket doc` will be re-written in the output `.md` files (without the `##` prefix). Arbitrary and multi-line Markdown constructions will be preserved and rendered.
 
-Header comments may only precede the version declaration. They are not allowed anywhere else.
+Preamble comments may only precede the version declaration. They are not allowed anywhere else.
 
 ### `double_quotes`
 
