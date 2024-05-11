@@ -53,8 +53,6 @@ jobs:
 
   gauntlet:
     runs-on: ubuntu-22.04
-    env:
-      CACHE_DIR: ~/.config/wdl-grammar
     steps:
       - uses: actions/checkout@v3
       - name: Update Rust

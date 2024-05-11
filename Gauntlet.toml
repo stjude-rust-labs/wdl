@@ -36498,6 +36498,11 @@ message = "[v1::W001::Style/Low] line contains only whitespace (113:1-113:4)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W001::Style/Low] line contains only whitespace (128:1-128:4)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
 message = "[v1::W001::Style/Low] line contains only whitespace (219:1-219:6)"
 
 [[concerns]]
@@ -36509,6 +36514,11 @@ message = "[v1::W001::Style/Low] line contains only whitespace (228:1-228:6)"
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
 message = "[v1::W001::Style/Low] line contains only whitespace (233:1-233:6)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W001::Style/Low] line contains only whitespace (234:1-234:6)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -36528,7 +36538,37 @@ message = "[v1::W001::Style/Low] line contains only whitespace (242:1-242:6)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W001::Style/Low] line contains only whitespace (243:1-243:6)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
 message = "[v1::W001::Style/Low] line contains only whitespace (247:1-247:4)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W001::Style/Low] line contains only whitespace (248:1-248:6)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W001::Style/Low] line contains only whitespace (251:1-251:6)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W001::Style/Low] line contains only whitespace (254:1-254:6)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W001::Style/Low] line contains only whitespace (257:1-257:6)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W001::Style/Low] line contains only whitespace (262:1-262:4)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -36543,7 +36583,22 @@ message = "[v1::W001::Style/Low] trailing space (111:21)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W001::Style/Low] trailing space (115:82)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
 message = "[v1::W001::Style/Low] trailing space (119:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W001::Style/Low] trailing space (126:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W001::Style/Low] trailing space (134:40)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -36553,7 +36608,17 @@ message = "[v1::W001::Style/Low] trailing space (30:180)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W001::Style/Low] trailing space (33:180)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
 message = "[v1::W001::Style/Low] trailing space (47:73)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W001::Style/Low] trailing space (56:73)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -36563,7 +36628,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: c
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: cpuPlatform (204:9-204:50)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nthreads (188:9-188:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nthreads (203:9-203:25)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -36583,6 +36658,31 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (129:6-129:14)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (138:14-138:20)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (140:14-140:20)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (144:6-144:14)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (16:12-16:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (17:12-17:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (184:6-184:19)"
 
 [[concerns]]
@@ -36598,7 +36698,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (189:16-189:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (18:12-18:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (199:6-199:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (201:14-201:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (204:16-204:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (266:12-266:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (281:12-281:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -48922,11 +49047,6 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (27:6-27:16)"
 
 [[concerns]]
 kind = "LintWarning"
-document = "chanzuckerberg/czid-workflows:workflows/diamond/diamond.wdl"
-message = "[v1::W007::Spacing/Low] missing newline at the end of the file (48:2-48:2)"
-
-[[concerns]]
-kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/host-genome-generation/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (42:9-42:31)"
 
@@ -49073,7 +49193,37 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (191:6-191:29)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (193:14-193:38)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (194:14-194:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (195:14-195:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (196:14-196:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (196:19-196:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (200:20-200:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (213:14-213:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -49083,7 +49233,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (216:14-216:32)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (217:6-217:22)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (224:6-224:18)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (243:6-243:15)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -49098,7 +49258,57 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (263:6-263:26)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (267:6-267:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (26:16-26:48)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (271:21-271:42)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (27:16-27:49)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (284:6-284:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (286:14-286:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (28:16-28:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (295:6-295:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (29:16-29:45)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (312:6-312:20)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (329:6-329:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -49113,7 +49323,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (350:17-350:23)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (367:6-367:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (429:6-429:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (430:6-430:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -49123,12 +49343,67 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (434:16-434:17)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (435:16-435:17)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (459:19-459:33)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (460:19-460:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (469:6-469:22)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (473:21-473:42)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (49:20-49:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (523:6-523:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (63:10-63:42)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (64:10-64:43)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (65:10-65:38)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (66:10-66:39)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (95:14-95:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
+message = "[v1::W007::Spacing/Low] missing newline at the end of the file (551:2-551:2)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -49923,7 +50198,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: a
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: accession2taxid_db (652:9-652:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: accession2taxid_db (691:9-691:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: accession2taxid_db (695:9-695:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -49933,7 +50218,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: a
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: accession2taxid_db (744:9-744:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: accession2taxid_db (787:9-787:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: accession2taxid_db (791:9-791:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -49944,6 +50239,11 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: a
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: annotated_merged_fa (903:9-903:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: annotated_merged_fa (907:9-907:33)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -49968,7 +50268,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: a
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: assembled_reads_fa (598:9-598:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: assembly_refined_taxid_annot_fasta (938:9-938:48)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: assembly_refined_taxid_annot_fasta (942:9-942:48)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -49978,7 +50288,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: c
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contig_coverage_json (1239:9-1239:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contig_stats_json (1236:9-1236:41)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contig_stats_json (1240:9-1240:41)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -49988,12 +50308,27 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: c
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contigs_fasta (1241:9-1241:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contigs_fasta (1070:9-1070:27)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contigs_fasta (1074:9-1074:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: counts_json_files (1156:9-1156:38)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: counts_json_files (1160:9-1160:38)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50008,7 +50343,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: db_path (599:9-599:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: deuterostome_db (1029:9-1029:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: deuterostome_db (1033:9-1033:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50018,7 +50363,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: deuterostome_db (1113:9-1113:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: deuterostome_db (734:9-734:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: deuterostome_db (738:9-738:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50028,7 +50383,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: deuterostome_db (785:9-785:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: deuterostome_db (984:9-984:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: deuterostome_db (988:9-988:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50038,7 +50403,22 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: diamond_args (600:9-600:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: diamond_wdl_version (604:9-604:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (1034:9-1034:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (1038:9-1038:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50048,7 +50428,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (1076:9-1076:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (1116:9-1116:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (1120:9-1120:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50063,12 +50453,27 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (1161:9-1161:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (1195:9-1195:31)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (1199:9-1199:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (1239:9-1239:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (1243:9-1243:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50128,7 +50533,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (559:9-559:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (603:9-603:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (606:9-606:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50138,7 +50553,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (653:9-653:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (692:9-692:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (696:9-696:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50148,7 +50573,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (746:9-746:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (789:9-789:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (793:9-793:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50158,7 +50593,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (833:9-833:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (873:9-873:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (877:9-877:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50173,12 +50618,27 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (911:9-911:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (939:9-939:31)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (943:9-943:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (989:9-989:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (993:9-993:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50238,7 +50698,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: i
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: input_file (829:9-829:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: json_files (1194:9-1194:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: json_files (1198:9-1198:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50258,7 +50728,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: l
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (1032:9-1032:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (1108:9-1108:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (1112:9-1112:24)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50268,7 +50748,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: l
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (651:9-651:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (690:9-690:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (694:9-694:24)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50278,7 +50768,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: l
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (743:9-743:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (786:9-786:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (790:9-790:24)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50288,12 +50788,27 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: l
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (910:9-910:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (983:9-983:24)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (987:9-987:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: local_diamond_index (600:9-600:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: local_diamond_index (602:9-602:34)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50308,12 +50823,27 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: m
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: min_alignment_length (745:9-745:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: min_alignment_length (788:9-788:33)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: min_alignment_length (792:9-792:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: minimap2_args (552:9-552:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: minimap2_wdl_version (557:9-557:36)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50338,7 +50868,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_contig_summary_json (1110:9-1110:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_hit_summary (1027:9-1027:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_hit_summary (1031:9-1031:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50348,7 +50888,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_hit_summary (1109:9-1109:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_hit_summary (827:9-827:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_hit_summary (831:9-831:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50358,7 +50908,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_hit_summary (909:9-909:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_m8 (689:9-689:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_m8 (693:9-693:19)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50368,7 +50928,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_m8_reassigned (1030:9-1030:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_m8_reassigned (1104:9-1104:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_m8_reassigned (1108:9-1108:30)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50378,7 +50948,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_m8_reassigned (876:9-876:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_top_m8 (779:9-779:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nr_top_m8 (783:9-783:23)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50388,7 +50968,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_contig_summary_json (1106:9-1106:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_hit_summary (1101:9-1101:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_hit_summary (1105:9-1105:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50398,7 +50988,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_hit_summary (1237:9-1237:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_hit_summary (826:9-826:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_hit_summary (830:9-830:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50408,7 +51008,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_hit_summary (908:9-908:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_hit_summary (982:9-982:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_hit_summary (986:9-986:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50418,7 +51028,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_info_db (1242:9-1242:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_m8 (646:9-646:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_m8 (650:9-650:19)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50428,7 +51048,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_m8_reassigned (1104:9-1104:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_m8_reassigned (1232:9-1232:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_m8_reassigned (1236:9-1236:30)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50438,7 +51068,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_m8_reassigned (875:9-875:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_m8_reassigned (981:9-981:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_m8_reassigned (985:9-985:30)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50448,7 +51088,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_top_m8 (1238:9-1238:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_top_m8 (732:9-732:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_top_m8 (736:9-736:23)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50463,6 +51113,11 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: p
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: pre_alignment_fasta (874:9-874:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: prefix (555:9-555:22)"
 
 [[concerns]]
@@ -50473,7 +51128,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: r
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: read_contig_sam (1075:9-1075:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: read_to_contig_tsv (1025:9-1025:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: read_to_contig_tsv (1029:9-1029:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50483,12 +51148,27 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: r
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: read_to_contig_tsv (737:9-737:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: read_to_contig_tsv (780:9-780:32)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: read_to_contig_tsv (784:9-784:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: read_to_contig_tsv (980:9-980:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: read_to_contig_tsv (984:9-984:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50513,6 +51193,11 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: r
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: reads_to_contigs_tsv (832:9-832:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: run_locally (553:9-553:36)"
 
 [[concerns]]
@@ -50523,12 +51208,27 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: r
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: run_locally (601:9-601:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s3_wd_uri (557:9-557:26)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s3_wd_uri (558:9-558:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s3_wd_uri (602:9-602:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s3_wd_uri (605:9-605:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50543,7 +51243,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: t
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_blacklist (1035:9-1035:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_blacklist (1111:9-1111:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_blacklist (1115:9-1115:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50553,7 +51263,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: t
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_blacklist (740:9-740:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_blacklist (783:9-783:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_blacklist (787:9-787:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50563,7 +51283,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: t
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_blacklist (990:9-990:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_whitelist (1030:9-1030:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_whitelist (1034:9-1034:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50573,7 +51303,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: t
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_whitelist (1114:9-1114:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_whitelist (735:9-735:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_whitelist (739:9-739:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50583,7 +51323,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: t
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_whitelist (786:9-786:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_whitelist (985:9-985:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_whitelist (989:9-989:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50593,7 +51343,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: u
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_deuterostome_filter (1036:9-1036:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_deuterostome_filter (1113:9-1113:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_deuterostome_filter (1117:9-1117:40)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50603,7 +51363,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: u
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_deuterostome_filter (741:9-741:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_deuterostome_filter (784:9-784:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_deuterostome_filter (788:9-788:40)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50613,7 +51383,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: u
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_deuterostome_filter (991:9-991:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_taxon_whitelist (1033:9-1033:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_taxon_whitelist (1037:9-1037:36)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50623,7 +51403,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: u
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_taxon_whitelist (1118:9-1118:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_taxon_whitelist (738:9-738:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_taxon_whitelist (742:9-742:36)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50633,7 +51423,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: u
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_taxon_whitelist (789:9-789:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_taxon_whitelist (988:9-988:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_taxon_whitelist (992:9-992:36)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50643,7 +51443,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: accession2taxid_db (1292:9-1292:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: deuterostome_db (1292:9-1292:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: deuterostome_db (1296:9-1296:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50653,7 +51463,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: diamond_args (1304:9-1304:43)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: diamond_db (1299:9-1299:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: diamond_db (1303:9-1303:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50663,7 +51483,22 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: diamond_local_db_path (1289:9-1289:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: diamond_wdl_version (1306:9-1306:46)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: docker_image_id (1268:9-1268:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: docker_image_id (1272:9-1272:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50673,7 +51508,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: guppy_basecaller_setting (1279:9-1279:48)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: input_fastq (1272:9-1272:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: input_fastq (1276:9-1276:25)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50683,7 +51528,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: library_type (1278:9-1278:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: lineage_db (1287:9-1287:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: lineage_db (1291:9-1291:24)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50693,7 +51548,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: min_read_length (1295:9-1295:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_args (1296:9-1296:61)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_args (1300:9-1300:61)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50703,7 +51568,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_db (1299:9-1299:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_local_db_path (1284:9-1284:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_local_db_path (1288:9-1288:37)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50713,7 +51588,22 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_prefix (1301:9-1301:41)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_wdl_version (1307:9-1307:47)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap_host_db (1279:9-1279:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap_host_db (1283:9-1283:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50723,7 +51613,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap_human_db (1284:9-1284:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nt_info_db (1293:9-1293:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nt_info_db (1297:9-1297:24)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50733,7 +51633,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: polishing_iterations (1286:9-1286:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: s3_wd_uri (1270:9-1270:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: s3_wd_uri (1274:9-1274:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50743,7 +51653,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: subsample_depth (1281:9-1281:38)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxon_blacklist (1289:9-1289:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxon_blacklist (1293:9-1293:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50753,12 +51673,27 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxon_whitelist (1294:9-1294:113)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: use_deuterostome_filter (1302:9-1302:47)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: use_deuterostome_filter (1309:9-1309:47)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: use_taxon_whitelist (1303:9-1303:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: use_taxon_whitelist (1310:9-1310:44)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50773,7 +51708,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (1026:14-1026:30
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1027:6-1027:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1030:14-1030:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (1068:6-1068:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1072:6-1072:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50793,7 +51743,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (1100:14-1100:30
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1102:6-1102:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (1104:14-1104:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1108:14-1108:30)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50808,12 +51768,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (1144:14-1144:36
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1147:14-1147:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1148:14-1148:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (1154:6-1154:24)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1158:6-1158:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (1192:6-1192:17)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1196:6-1196:17)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50833,7 +51813,27 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (1234:14-1234:23
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1234:6-1234:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1236:14-1236:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1238:14-1238:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (1270:17-1270:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1274:17-1274:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50844,6 +51844,16 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (1284:15-1284:37
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (1288:14-1288:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1288:15-1288:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1292:14-1292:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50863,12 +51873,42 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (1297:16-1297:31
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1299:17-1299:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1300:16-1300:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1301:16-1301:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1307:16-1307:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (1616:14-1616:23)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (1618:14-1618:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1625:14-1625:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (1627:14-1627:23)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50938,7 +51978,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (554:15-554:35)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (557:16-557:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (557:17-557:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (558:17-558:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50948,7 +51998,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (586:14-586:19)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (588:14-588:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (594:6-594:20)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (596:6-596:20)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50963,7 +52023,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (602:17-602:26)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (605:17-605:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (635:14-635:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (639:14-639:19)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50983,7 +52053,27 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (648:14-648:32)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (648:6-648:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (650:14-650:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (652:14-652:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (678:14-678:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (682:14-682:23)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51003,7 +52093,27 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (691:14-691:32)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (691:6-691:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (693:14-693:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (695:14-695:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (721:14-721:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (725:14-725:23)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51018,12 +52128,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (732:14-732:23)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (734:6-734:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (736:14-736:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (740:14-740:32)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (744:14-744:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (767:14-767:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (771:14-771:30)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51038,7 +52168,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (779:14-779:23)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (781:6-781:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (783:14-783:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (787:14-787:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (791:14-791:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51048,7 +52193,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (814:14-814:30)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (818:14-818:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (823:6-823:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (827:6-827:19)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51068,12 +52223,37 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (872:14-872:30)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (872:6-872:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (875:14-875:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (876:14-876:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (901:6-901:24)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (905:6-905:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (936:6-936:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (940:6-940:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51084,6 +52264,16 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (978:6-978:24)"
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (981:14-981:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (982:6-982:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (985:14-985:30)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51438,12 +52628,27 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (394:6-394:23)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contig_coverage_json (126:5-126:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contig_coverage_json (162:5-162:40)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contig_stats_json (127:5-127:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contig_stats_json (163:5-163:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contig_in_contigs_fasta (128:5-128:33)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51483,6 +52688,11 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: duplicate_clusters_csv (161:5-161:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: duplicate_clusters_csv (197:5-197:32)"
 
 [[concerns]]
@@ -51493,12 +52703,22 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: f
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: fastqs (159:5-159:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: fastqs (195:5-195:23)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: file_ext (124:5-124:20)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: gsnap_m8_gsnap_deduped_m8 (129:5-129:35)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51518,12 +52738,22 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: l
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nonhost_fasta_refined_taxid_annot_fasta (160:5-160:49)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nonhost_fasta_refined_taxid_annot_fasta (196:5-196:49)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_db (92:5-92:17)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nt_info_db (130:5-130:20)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51538,12 +52768,27 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: refined_gsnap_in_gsnap_blast_top_m8 (125:5-125:45)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: refined_gsnap_in_gsnap_blast_top_m8 (161:5-161:45)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: refined_gsnap_in_gsnap_hitsummary2_tab (124:5-124:48)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: refined_gsnap_in_gsnap_hitsummary2_tab (160:5-160:48)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: refined_gsnap_in_gsnap_reassigned_m8 (123:5-123:46)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51678,7 +52923,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: t
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_taxon_whitelist (162:5-162:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: use_taxon_whitelist (198:5-198:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: contig_in_contig_coverage_json (198:5-198:40)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51688,7 +52943,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: contig_in_contig_stats_json (199:5-199:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: contig_in_contig_stats_json (235:5-235:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: contig_in_contigs_fasta (200:5-200:33)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51698,7 +52963,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: docker_image_id (189:5-189:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: docker_image_id (225:5-225:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: duplicate_clusters_csv (204:5-204:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51708,7 +52983,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: fastqs_0 (201:5-201:18)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: fastqs_0 (237:5-237:18)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: fastqs_1 (202:5-202:19)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51718,7 +53003,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: file_ext (205:5-205:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: file_ext (241:5-241:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: gsnap_m8_gsnap_deduped_m8 (194:5-194:35)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51728,7 +53023,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: lineage_db (209:5-209:90)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: lineage_db (245:5-245:90)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nonhost_fasta_refined_taxid_annot_fasta (203:5-203:49)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51738,7 +53043,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nt_db (206:5-206:76)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nt_db (242:5-242:76)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nt_info_db (208:5-208:89)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51748,7 +53063,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nt_loc_db (207:5-207:87)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: nt_loc_db (243:5-243:87)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: refined_gsnap_in_gsnap_blast_top_m8 (197:5-197:45)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51758,7 +53083,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: refined_gsnap_in_gsnap_hitsummary2_tab (196:5-196:48)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: refined_gsnap_in_gsnap_hitsummary2_tab (232:5-232:48)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: refined_gsnap_in_gsnap_reassigned_m8 (195:5-195:46)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51768,7 +53103,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: resist_genome_bed (211:5-211:83)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: resist_genome_bed (247:5-247:83)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: resist_genome_db (210:5-210:80)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51778,7 +53123,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: s3_wd_uri (190:5-190:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: s3_wd_uri (226:5-226:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxid_fasta_in_annotated_merged_fa (191:5-191:44)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51788,12 +53143,27 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxid_fasta_in_gsnap_hitsummary_tab (192:5-192:45)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxid_fasta_in_gsnap_hitsummary_tab (228:5-228:45)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxid_fasta_in_rapsearch2_hitsummary_tab (193:5-193:50)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxid_fasta_in_rapsearch2_hitsummary_tab (229:5-229:50)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: use_taxon_whitelist (212:5-212:40)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51808,7 +53178,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (119:6-119:14)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (119:6-119:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (122:12-122:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (123:10-123:46)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (124:10-124:48)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (125:10-125:45)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (129:10-129:35)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51824,6 +53219,11 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (144:10-144:50)"
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (147:10-147:41)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (155:6-155:18)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51858,12 +53258,52 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (165:10-165:35)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (178:10-178:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (179:11-179:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (190:12-190:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (191:6-191:18)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (193:10-193:50)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (194:10-194:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (194:12-194:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (195:10-195:46)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (196:10-196:48)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (197:10-197:45)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -51904,6 +53344,16 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (232:10-232:48)"
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (233:10-233:45)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (299:10-299:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/experimental.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (300:11-300:45)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -52888,6 +54338,11 @@ message = "[v1::W001::Style/Low] trailing space (123:28)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W001::Style/Low] trailing space (125:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W001::Style/Low] trailing space (131:28)"
 
 [[concerns]]
@@ -52898,7 +54353,22 @@ message = "[v1::W001::Style/Low] trailing space (132:48)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W001::Style/Low] trailing space (134:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W001::Style/Low] trailing space (135:48)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W001::Style/Low] trailing space (137:18)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W001::Style/Low] trailing space (140:18)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -52908,7 +54378,17 @@ message = "[v1::W001::Style/Low] trailing space (171:22)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W001::Style/Low] trailing space (175:22)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W001::Style/Low] trailing space (227:22)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W001::Style/Low] trailing space (231:22)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -52923,7 +54403,22 @@ message = "[v1::W001::Style/Low] trailing space (308:19)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W001::Style/Low] trailing space (313:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W001::Style/Low] trailing space (314:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W001::Style/Low] trailing space (318:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W001::Style/Low] trailing space (325:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -52933,7 +54428,17 @@ message = "[v1::W001::Style/Low] trailing space (332:11)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W001::Style/Low] trailing space (339:11)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W001::Style/Low] trailing space (342:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W001::Style/Low] trailing space (350:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -52953,7 +54458,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: a
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: accession2taxid (173:9-173:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: accession2taxid (225:9-225:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: accession2taxid (229:9-229:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -52963,7 +54478,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: c
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: count_type (178:9-178:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: count_type (230:9-230:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: count_type (234:9-234:33)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -52983,6 +54508,11 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: db_path (124:9-124:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: db_path (74:9-74:23)"
 
 [[concerns]]
@@ -52993,7 +54523,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: deuterostome_db (172:9-172:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: deuterostome_db (224:9-224:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: deuterostome_db (228:9-228:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53003,7 +54543,22 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: diamond_args (125:9-125:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: diamond_wdl_version (129:9-129:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (119:9-119:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (121:9-121:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53013,7 +54568,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (177:9-177:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (229:9-229:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (233:9-233:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53038,7 +54603,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: duplicate_cluster_size (174:9-174:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: duplicate_cluster_size (226:9-226:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: duplicate_cluster_size (230:9-230:36)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53049,6 +54624,11 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: fastas (121:9-121:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: fastas (123:9-123:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53088,12 +54668,27 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: l
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (170:9-170:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (222:9-222:24)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: lineage_db (226:9-226:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: local_diamond_index (125:9-125:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: local_diamond_index (127:9-127:34)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53108,7 +54703,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: m
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: m8_file (169:9-169:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: m8_file (221:9-221:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: m8_file (225:9-225:21)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53118,7 +54723,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: m
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: min_read_length (176:9-176:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: min_read_length (228:9-228:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: min_read_length (232:9-232:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53128,7 +54743,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: m
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: minimap2_wdl_version (80:9-80:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: prefix (126:9-126:22)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: prefix (128:9-128:22)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53138,7 +54763,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: p
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: prefix (175:9-175:22)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: prefix (227:9-227:22)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: prefix (231:9-231:22)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53173,6 +54808,11 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: r
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: run_locally (126:9-126:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: run_locally (77:9-77:37)"
 
 [[concerns]]
@@ -53183,12 +54823,27 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s3_wd_uri (122:9-122:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s3_wd_uri (175:9-175:25)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s3_wd_uri (179:9-179:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s3_wd_uri (231:9-231:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s3_wd_uri (235:9-235:25)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53213,7 +54868,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: t
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_blacklist (171:9-171:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_blacklist (223:9-223:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: taxon_blacklist (227:9-227:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53223,7 +54888,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: accession2taxid_db (290:5-290:105)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: alignment_scalability (293:5-293:42)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: alignment_scalability (297:5-297:42)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53233,7 +54908,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: czid_dedup_out_duplicate_clusters_csv (287:5-287:47)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: deuterostome_db (290:5-290:101)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: deuterostome_db (294:5-294:101)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53243,7 +54928,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: diamond_args (306:5-306:42)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: diamond_db (300:5-300:79)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: diamond_db (304:5-304:79)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53253,7 +54948,22 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: diamond_local_db_path (300:5-300:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: diamond_prefix (304:5-304:41)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: diamond_prefix (308:5-308:41)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: diamond_wdl_version (310:5-310:42)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53263,7 +54973,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: docker_image_id (281:5-281:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: duplicate_cluster_sizes_tsv (282:5-282:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: duplicate_cluster_sizes_tsv (286:5-286:37)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53273,7 +54993,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: host_filter_out_gsnap_filter_1_fa (283:5-283:43)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: host_filter_out_gsnap_filter_2_fa (280:5-280:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: host_filter_out_gsnap_filter_2_fa (284:5-284:44)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53283,7 +55013,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: host_filter_out_gsnap_filter_merged_fa (285:5-285:49)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: index_dir_suffix (288:5-288:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: index_dir_suffix (292:5-292:44)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53293,7 +55033,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: index_version (288:5-288:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: lineage_db (285:5-285:90)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: lineage_db (289:5-289:90)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53303,7 +55053,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: local_gsnap_genome_name (301:5-301:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: local_gsnap_index (294:5-294:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: local_gsnap_index (298:5-298:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53313,7 +55073,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: local_rapsearch2_index (302:5-302:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: min_read_length (289:5-289:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: min_read_length (293:5-293:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53323,7 +55093,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_args (305:5-305:52)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_db (299:5-299:94)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_db (303:5-303:94)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53333,7 +55113,22 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_local_db_path (299:5-299:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_prefix (303:5-303:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_prefix (307:5-307:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: minimap2_wdl_version (309:5-309:43)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53343,7 +55138,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: s3_wd_uri (282:5-282:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxon_blacklist (287:5-287:97)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: taxon_blacklist (291:5-291:97)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53353,7 +55158,17 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within workflo
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: use_deuterostome_filter (295:5-295:43)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: use_taxon_whitelist (292:5-292:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within workflow: use_taxon_whitelist (296:5-296:40)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53363,7 +55178,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (109:14-109:20)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (111:14-111:20)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (117:6-117:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (119:6-119:30)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53373,7 +55198,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (120:16-120:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (122:16-122:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (154:14-154:20)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (158:14-158:20)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53388,7 +55223,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (165:14-165:21)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (167:6-167:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (169:14-169:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (169:14-169:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (173:14-173:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53398,7 +55248,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (175:16-175:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (179:16-179:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (209:14-209:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (213:14-213:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53413,7 +55273,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (221:14-221:21)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (223:6-223:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (225:14-225:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (225:14-225:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (229:14-229:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53423,7 +55298,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (231:16-231:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (235:16-235:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (264:14-264:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (268:14-268:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53433,7 +55318,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (278:12-278:21)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (282:12-282:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (286:10-286:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (290:10-290:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53448,6 +55343,11 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (298:11-298:33)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (299:11-299:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (299:12-299:23)"
 
 [[concerns]]
@@ -53458,7 +55358,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (301:12-301:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (302:11-302:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (303:12-303:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (303:12-303:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (305:12-305:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (307:12-307:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (309:12-309:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53508,7 +55433,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (390:10-390:46)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (391:10-391:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (391:10-391:50)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (392:10-392:36)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53523,7 +55458,37 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (394:11-394:31)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (395:11-395:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (397:10-397:38)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (398:10-398:46)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (399:10-399:50)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (3:6-3:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (400:10-400:56)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (402:11-402:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53569,6 +55534,11 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (75:16-75:29)"
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (78:15-78:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/non_host_alignment.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (80:16-80:36)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54787,6 +56757,91 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (71:6-71:45)"
 
 [[concerns]]
 kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (143:6-143:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (32:12-32:14)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (33:13-33:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (34:13-34:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (35:13-35:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (36:13-36:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (37:13-37:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (38:13-38:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (39:13-39:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (40:13-40:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (41:10-41:12)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (42:13-42:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (43:13-43:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (44:13-44:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (45:13-45:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (48:6-48:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:data_structures/read_group.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (96:6-96:20)"
+
+[[concerns]]
+kind = "LintWarning"
 document = "stjudecloud/workflows:tools/cellranger.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (119:17-119:29)"
 
@@ -54813,12 +56868,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (87:14-87:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/fq.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (139:11-139:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/fq.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (140:11-140:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/fq.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (141:11-141:21)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/fq.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (142:11-142:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/fq.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (149:12-149:18)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/fq.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (150:12-150:18)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54833,6 +56908,16 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (152:12-152:18)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/fq.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (166:14-166:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/fq.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (167:15-167:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/fq.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (168:14-168:30)"
 
 [[concerns]]
@@ -54843,12 +56928,62 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (169:15-169:31)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/fq.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (71:11-71:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/fq.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (72:11-72:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/fq.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (73:11-73:21)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/fq.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (74:11-74:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/gatk4.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (107:14-107:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/gatk4.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (108:14-108:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/gatk4.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (109:21-109:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/gatk4.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (249:14-249:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/gatk4.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (250:14-250:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/gatk4.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (62:14-62:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/kraken2.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (347:11-347:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/kraken2.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (348:11-348:21)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54868,6 +57003,11 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (30:11-30:21)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/md5sum.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (36:14-36:20)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/md5sum.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (38:14-38:20)"
 
 [[concerns]]
@@ -54878,7 +57018,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (119:15-119:39)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/picard.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (121:15-121:39)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/picard.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (325:14-325:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/picard.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (327:14-327:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54888,7 +57038,27 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (420:14-420:28)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/picard.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (422:14-422:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/picard.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (481:14-481:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/picard.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (483:14-483:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (478:20-478:47)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (479:19-479:41)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54903,7 +57073,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (481:19-481:41)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (485:19-485:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (487:19-487:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (491:19-491:43)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54913,7 +57093,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (493:19-493:43)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (497:19-497:46)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (499:19-499:46)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (503:19-503:44)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54923,12 +57113,37 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (505:19-505:44)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (509:30-509:46)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (510:28-510:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (511:27-511:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (511:30-511:46)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (512:24-512:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (512:28-512:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (513:24-513:48)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54943,7 +57158,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (514:24-514:36)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (515:16-515:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (515:24-515:48)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (516:16-516:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54963,7 +57188,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (518:16-518:31)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (518:16-518:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (519:16-519:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (519:16-519:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (520:16-520:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54973,7 +57213,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (520:16-520:32)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (521:16-521:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (521:16-521:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (522:16-522:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54988,7 +57238,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (523:16-523:28)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (523:16-523:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (524:16-524:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (524:16-524:37)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -54998,7 +57258,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (525:16-525:29)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (525:16-525:38)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (526:16-526:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (526:16-526:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (527:16-527:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55013,12 +57288,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (528:16-528:32)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (528:16-528:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (529:16-529:29)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (529:16-529:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (530:16-530:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (530:16-530:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (531:16-531:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55033,7 +57328,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (532:16-532:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (532:16-532:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (533:16-533:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (533:16-533:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55043,12 +57348,27 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (534:16-534:37)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (535:15-535:41)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (535:16-535:27)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (536:15-536:45)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (537:15-537:41)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (538:15-538:42)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55063,7 +57383,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (539:15-539:41)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (539:15-539:42)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (53:16-53:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (540:15-540:42)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (540:15-540:43)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55073,12 +57408,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (541:15-541:42)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (541:15-541:47)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (542:15-542:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (542:15-542:43)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (543:13-543:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (543:15-543:47)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (544:13-544:22)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55093,12 +57448,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (545:13-545:23)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (545:13-545:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (546:13-546:22)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (546:13-546:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (547:13-547:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (547:13-547:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (548:13-548:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55113,7 +57488,27 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (549:13-549:30)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (549:13-549:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (54:16-54:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (550:13-550:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (550:13-550:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (551:13-551:30)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55123,12 +57518,27 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (551:13-551:31)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (552:13-552:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (552:13-552:31)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (553:13-553:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (553:13-553:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (554:13-554:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55143,7 +57553,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (555:13-555:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (555:13-555:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (556:13-556:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (556:13-556:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (557:13-557:34)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55153,7 +57578,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (557:13-557:40)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (558:13-558:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (558:13-558:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (559:13-559:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55168,7 +57603,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (55:16-55:32)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (55:16-55:46)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (560:13-560:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (560:13-560:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (561:13-561:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55179,6 +57629,16 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (561:13-561:31)"
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (562:13-562:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (562:13-562:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (563:13-563:25)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55213,7 +57673,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (568:13-568:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (568:13-568:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (569:13-569:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (569:13-569:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55223,7 +57693,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (56:16-56:34)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (56:16-56:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (570:13-570:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (570:13-570:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (571:13-571:29)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55238,7 +57723,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (572:13-572:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (572:13-572:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (573:13-573:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (573:13-573:30)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55248,7 +57743,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (574:13-574:28)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (574:13-574:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (575:13-575:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (575:13-575:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (576:13-576:23)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55263,12 +57773,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (577:13-577:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (577:13-577:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (578:13-578:23)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (578:13-578:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (579:13-579:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (579:13-579:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (57:16-57:44)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55283,7 +57813,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (580:13-580:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (580:13-580:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (581:13-581:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (581:13-581:33)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55293,7 +57833,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (582:13-582:31)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (582:13-582:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (583:13-583:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (583:13-583:36)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55303,7 +57853,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (584:13-584:36)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (584:13-584:42)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (585:13-585:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (585:13-585:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (586:13-586:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55313,12 +57878,27 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (586:13-586:42)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (587:13-587:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (587:13-587:40)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (588:13-588:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (588:13-588:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (589:13-589:31)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55333,12 +57913,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (58:16-58:40)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (58:16-58:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (590:13-590:24)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (590:13-590:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (591:13-591:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (591:13-591:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (592:13-592:25)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55353,7 +57953,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (593:13-593:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (593:13-593:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (594:13-594:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (594:13-594:32)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55363,7 +57973,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (595:13-595:29)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (595:13-595:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (596:13-596:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (596:13-596:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (597:13-597:34)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55378,6 +58003,11 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (598:13-598:36)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (599:13-599:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (599:13-599:34)"
 
 [[concerns]]
@@ -55388,12 +58018,27 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (59:16-59:44)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (600:13-600:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (600:13-600:36)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (601:13-601:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (601:13-601:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (602:13-602:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55413,7 +58058,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (604:13-604:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (60:13-60:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (60:16-60:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (61:13-61:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (62:13-62:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55424,6 +58084,16 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (62:13-62:30)"
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (63:13-63:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (63:13-63:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (64:13-64:25)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55443,6 +58113,16 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (66:13-66:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (816:9-816:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (817:9-817:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/star.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (818:9-818:30)"
 
 [[concerns]]
@@ -55458,12 +58138,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (820:9-820:30)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/util.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (24:17-24:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/util.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (26:17-26:23)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/util.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (413:14-413:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:tools/util.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (415:14-415:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/general/bam-to-fastqs.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (49:21-49:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/general/bam-to-fastqs.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (50:22-50:28)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55478,7 +58178,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (52:22-52:28)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:workflows/qc/quality-check-standard.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (570:11-570:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/qc/quality-check-standard.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (572:11-572:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/bwa-db-build.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (26:17-26:33)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55487,8 +58197,78 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (28:17-28:33)"
 
 [[concerns]]
 kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (103:15-103:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (104:15-104:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (106:21-106:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (41:16-41:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (42:16-42:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (43:16-43:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (44:17-44:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (45:17-45:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (46:23-46:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (47:23-47:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/gatk-reference.wdl"
+message = "[v1::W007::Spacing/Low] missing newline at the end of the file (108:2-108:2)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/make-qc-reference.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (125:14-125:21)"
+
+[[concerns]]
+kind = "LintWarning"
 document = "stjudecloud/workflows:workflows/reference/make-qc-reference.wdl"
 message = "[v1::W006::Naming/Low] identifier must be snake case (127:14-127:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/star-db-build.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (33:17-33:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/reference/star-db-build.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (34:17-34:24)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -55502,78 +58282,18 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (36:17-36:24)"
 
 [[concerns]]
 kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (182:12-182:14)"
+document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (44:14-44:23)"
 
 [[concerns]]
 kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (183:13-183:15)"
+document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (45:14-45:29)"
 
 [[concerns]]
 kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (184:13-184:15)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (185:13-185:15)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (186:13-186:15)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (187:13-187:15)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (188:13-188:15)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (189:13-189:15)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (190:13-190:15)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (191:10-191:12)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (192:13-192:15)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (193:13-193:15)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (194:13-194:15)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (195:13-195:15)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (198:6-198:25)"
+document = "stjudecloud/workflows:workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "[v1::W007::Spacing/Low] multiple empty lines at the end of file (126:1-127:1)"
 
 [[concerns]]
 kind = "LintWarning"
