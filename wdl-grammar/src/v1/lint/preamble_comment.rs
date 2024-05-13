@@ -1,4 +1,5 @@
-//! Preamble comments are full line comments starting with a double pound sign and must occur before the version declaration
+//! Preamble comments are full line comments starting with a double pound sign
+//! and must occur before the version declaration
 
 use std::collections::VecDeque;
 
