@@ -2198,7 +2198,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (92:12-92:21)"
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:chunked-scatter.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (78:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (77:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -2678,7 +2678,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (92:14-92:26)"
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:common.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (213:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (212:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -3333,7 +3333,7 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (126:2
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:delly.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (79:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (78:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -5938,7 +5938,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (99:13-99:22)"
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:gatk.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (980:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (979:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -6738,7 +6738,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (93:12-93:31)"
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:gridss.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (97:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (96:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -8813,7 +8813,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (985:16-985:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:hmftools.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (1197:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (1196:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -10318,7 +10318,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (98:16-98:29)"
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:ncbi.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (95:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (94:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -11838,7 +11838,7 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (1222:
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:picard.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (1065:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (1064:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -12348,7 +12348,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (91:12-91:24)"
 [[concerns]]
 kind = "LintWarning"
 document = "biowdl/tasks:sambamba.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (66:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (65:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -17388,12 +17388,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (94:6-94:24)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/annotation_filtration/AnnotationFiltration.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (121:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (120:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/annotation_filtration/AnnotationFiltration.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (129:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (128:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -17563,12 +17563,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (87:26-87:46)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/arrays/imputation/Imputation.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (372:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (371:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/arrays/imputation/Imputation.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (81:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (80:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -17648,12 +17648,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (96:6-96:17)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/arrays/multi_sample/MultiSampleArrays.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (72:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (71:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/arrays/multi_sample/MultiSampleArrays.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (96:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (95:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -18178,12 +18178,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (40:10-40:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/arrays/validate_chip/ValidateChip.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (252:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (251:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/arrays/validate_chip/ValidateChip.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (84:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (83:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -18458,7 +18458,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (8:10-8:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/germline/joint_genotyping/JointGenotyping.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (7:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (6:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -18643,7 +18643,7 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (360:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/germline/joint_genotyping/UltimaGenomics/UltimaGenomicsJointGenotyping.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (8:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (7:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -18763,12 +18763,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (6:10-6:44)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/germline/joint_genotyping/by_chromosome/JointGenotypingByChromosomePartOne.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (166:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (165:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/germline/joint_genotyping/by_chromosome/JointGenotypingByChromosomePartOne.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (202:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (201:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -19078,7 +19078,7 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (64:2-
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/germline/joint_genotyping/reblocking/ReblockGVCF.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (11:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (10:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -19158,12 +19158,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (45:10-45:35)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/germline/single_sample/exome/ExomeGermlineSingleSample.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (50:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (49:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/germline/single_sample/exome/ExomeGermlineSingleSample.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (75:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (74:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -19323,12 +19323,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (94:11-94:37)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/germline/single_sample/wgs/WholeGenomeGermlineSingleSample.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (43:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (42:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/germline/single_sample/wgs/WholeGenomeGermlineSingleSample.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (46:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (45:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -19463,17 +19463,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (9:10-9:24)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/germline/variant_calling/VariantCalling.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (12:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (11:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/germline/variant_calling/VariantCalling.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (15:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (14:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/germline/variant_calling/VariantCalling.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (59:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (58:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -19498,12 +19498,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (13:10-13:43)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/somatic/single_sample/ugwgs/UltimaGenomicsWholeGenomeCramOnly.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (13:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (12:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/somatic/single_sample/ugwgs/UltimaGenomicsWholeGenomeCramOnly.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (51:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (50:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -20358,12 +20358,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (94:16-94:17)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/somatic/single_sample/wgs/gdc_genome/GDCWholeGenomeSomaticSingleSample.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (490:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (489:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/dna_seq/somatic/single_sample/wgs/gdc_genome/GDCWholeGenomeSomaticSingleSample.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (624:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (623:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -20558,7 +20558,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (40:10-40:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/genotyping/illumina/IlluminaGenotypingArray.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (277:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (276:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -21413,7 +21413,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (25:10-25:26)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/qc/CheckFingerprint.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (8:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (7:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -21783,7 +21783,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (91:10-91:43)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/reprocessing/exome/ExomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (10:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (9:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -21903,7 +21903,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (6:10-6:35)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/reprocessing/external/exome/ExternalExomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (11:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (10:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -22018,7 +22018,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (6:10-6:41)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/broad/reprocessing/external/wgs/ExternalWholeGenomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (9:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (8:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -22303,7 +22303,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (59:6-59:30)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/cemba/build_cemba_references/BuildCembaReferences.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (58:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (57:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -23043,12 +23043,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (972:6-972:18)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/cemba/cemba_methylcseq/CEMBA.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (1113:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (1112:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/cemba/cemba_methylcseq/CEMBA.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (929:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (928:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -23183,7 +23183,7 @@ message = "[v1::W007::Spacing/Low] multiple empty lines at the end of file (197:
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/skylab/build_indices/BuildIndices.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (22:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (21:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -23753,12 +23753,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (7:10-7:14)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/skylab/multiome/atac.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (218:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (217:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/skylab/multiome/atac.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (487:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (486:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -23903,22 +23903,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (78:8-78:23)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/skylab/optimus/Optimus.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (237:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (236:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/skylab/optimus/Optimus.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (257:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (256:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/skylab/optimus/Optimus.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (68:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (67:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/skylab/optimus/Optimus.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (71:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (70:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -24233,12 +24233,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (9:14-9:26)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/skylab/scATAC/scATAC.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (105:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (104:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/skylab/scATAC/scATAC.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (169:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (168:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -24303,12 +24303,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (31:22-31:30)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/skylab/slideseq/SlideSeq.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (177:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (176:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/skylab/slideseq/SlideSeq.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (24:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (23:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -24438,7 +24438,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (6:10-6:30)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/skylab/smartseq2_multisample/MultiSampleSmartSeq2.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (149:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (148:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -24503,7 +24503,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (31:21-31:39)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:pipelines/skylab/smartseq2_single_nucleus_multisample/MultiSampleSmartSeq2SingleNucleus.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (145:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (144:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -26128,7 +26128,7 @@ message = "[v1::W007::Spacing/Low] multiple empty lines at the end of file (235:
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:projects/optimus/CreateOptimusAdapterMetadata.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (9:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (8:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -26328,17 +26328,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (8:10-8:34)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:projects/smartseq2/CreateSs2AdapterMetadata.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (146:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (145:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:projects/smartseq2/CreateSs2AdapterMetadata.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (178:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (177:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:projects/smartseq2/CreateSs2AdapterMetadata.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (8:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (7:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -28058,7 +28058,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (21:6-21:31)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/Alignment.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (50:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (49:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -28548,7 +28548,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (64:6-64:20)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/BamProcessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (63:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (62:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -28608,7 +28608,7 @@ message = "[v1::W007::Spacing/Low] multiple empty lines at the end of file (70:1
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/BamToCram.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (20:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (19:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -28738,7 +28738,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (18:6-18:31)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/CopyFilesFromCloudToCloud.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (39:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (38:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -29778,7 +29778,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (8:10-8:25)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/IlluminaGenotypingArrayTasks.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (458:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (457:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -31503,12 +31503,12 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (552:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/InternalArraysTasks.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (139:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (138:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/InternalArraysTasks.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (350:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (349:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -31618,7 +31618,7 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (155:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/InternalImputationTasks.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (39:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (38:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -32678,17 +32678,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (998:6-998:38)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/JointGenotypingTasks.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (487:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/JointGenotypingTasks.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (486:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/JointGenotypingTasks.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (963:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (962:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -34733,27 +34733,27 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (1039:
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/RNAWithUMIsTasks.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (118:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (117:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/RNAWithUMIsTasks.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (362:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (361:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/RNAWithUMIsTasks.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (402:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (401:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/RNAWithUMIsTasks.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (544:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (543:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/RNAWithUMIsTasks.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (587:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (586:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -35538,12 +35538,12 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (301:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/Utilities.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (255:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (254:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/broad/Utilities.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (284:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (283:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -35728,12 +35728,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (9:19-9:37)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/CheckInputs.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (140:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (139:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/CheckInputs.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (56:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (55:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -36093,12 +36093,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (5:6-5:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/H5adUtils.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (34:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (33:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/H5adUtils.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (5:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -36688,32 +36688,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (61:6-61:27)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/LoomUtils.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (161:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (160:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/LoomUtils.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (199:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (198:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/LoomUtils.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (217:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (216:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/LoomUtils.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (300:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (299:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/LoomUtils.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (61:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (60:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/LoomUtils.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (90:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (89:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -36913,17 +36913,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (80:6-80:26)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/Metrics.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (177:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (176:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/Metrics.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (243:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (242:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/Metrics.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (96:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (95:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -36938,112 +36938,127 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (3:6-3:31)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W001::Style/Low] line contains only whitespace (113:1-113:4)"
+message = "[v1::W001::Style/Low] line contains only whitespace (128:1-128:4)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W001::Style/Low] line contains only whitespace (219:1-219:6)"
+message = "[v1::W001::Style/Low] line contains only whitespace (234:1-234:6)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W001::Style/Low] line contains only whitespace (228:1-228:6)"
+message = "[v1::W001::Style/Low] line contains only whitespace (243:1-243:6)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W001::Style/Low] line contains only whitespace (233:1-233:6)"
+message = "[v1::W001::Style/Low] line contains only whitespace (248:1-248:6)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W001::Style/Low] line contains only whitespace (236:1-236:6)"
+message = "[v1::W001::Style/Low] line contains only whitespace (251:1-251:6)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W001::Style/Low] line contains only whitespace (239:1-239:6)"
+message = "[v1::W001::Style/Low] line contains only whitespace (254:1-254:6)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W001::Style/Low] line contains only whitespace (242:1-242:6)"
+message = "[v1::W001::Style/Low] line contains only whitespace (257:1-257:6)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W001::Style/Low] line contains only whitespace (247:1-247:4)"
+message = "[v1::W001::Style/Low] line contains only whitespace (262:1-262:4)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W001::Style/Low] trailing space (100:82)"
+message = "[v1::W001::Style/Low] trailing space (115:82)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W001::Style/Low] trailing space (111:21)"
+message = "[v1::W001::Style/Low] trailing space (126:21)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W001::Style/Low] trailing space (119:40)"
+message = "[v1::W001::Style/Low] trailing space (134:40)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W001::Style/Low] trailing space (30:180)"
+message = "[v1::W001::Style/Low] trailing space (33:180)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W001::Style/Low] trailing space (47:73)"
+message = "[v1::W001::Style/Low] trailing space (56:73)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: cpuPlatform (189:9-189:50)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: cpuPlatform (204:9-204:50)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nthreads (188:9-188:25)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: nthreads (203:9-203:25)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (123:14-123:20)"
+message = "[v1::W006::Naming/Low] identifier must be snake case (138:14-138:20)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (125:14-125:20)"
+message = "[v1::W006::Naming/Low] identifier must be snake case (140:14-140:20)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (129:6-129:14)"
+message = "[v1::W006::Naming/Low] identifier must be snake case (144:6-144:14)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (184:6-184:19)"
+message = "[v1::W006::Naming/Low] identifier must be snake case (16:12-16:19)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (186:14-186:23)"
+message = "[v1::W006::Naming/Low] identifier must be snake case (17:12-17:19)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (189:16-189:27)"
+message = "[v1::W006::Naming/Low] identifier must be snake case (18:12-18:19)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (266:12-266:26)"
+message = "[v1::W006::Naming/Low] identifier must be snake case (199:6-199:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (201:14-201:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (204:16-204:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "broadinstitute/warp:tasks/skylab/PairedTagUtils.wdl"
+message = "[v1::W006::Naming/Low] identifier must be snake case (281:12-281:26)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -37308,17 +37323,17 @@ message = "[v1::W007::Spacing/Low] multiple empty lines at the end of file (434:
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/Picard.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (261:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (260:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/Picard.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (325:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (324:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/Picard.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (381:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (380:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -37753,22 +37768,22 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (72:10-72:16)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/StarAlign.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (215:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (214:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/StarAlign.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (343:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (342:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/StarAlign.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (492:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (491:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tasks/skylab/StarAlign.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (502:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (501:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -38538,7 +38553,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (8:10-8:38)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:tests/skylab/smartseq2_single_nucleus/pr/test_smartseq2_single_nucleus_PR.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (17:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (16:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -38718,7 +38733,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (4:10-4:34)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/VerifyCramToUnmappedBams.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -38763,7 +38778,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (4:10-4:34)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/VerifyCramToUnmappedBamsUpdated.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -38858,12 +38873,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (5:10-5:28)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/VerifyExomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (29:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (28:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/VerifyExomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (59:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (58:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -40613,7 +40628,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (91:10-91:15)"
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/VerifyUltimaGenomicsWholeGenomeCramOnly.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (87:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (86:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -41338,7 +41353,7 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (296:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestArrays.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (296:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (295:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -41553,22 +41568,22 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (209:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestBroadInternalRNAWithUMIs.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (209:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (208:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestBroadInternalRNAWithUMIs.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestBroadInternalRNAWithUMIs.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (68:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (67:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestBroadInternalRNAWithUMIs.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (89:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (88:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -41768,17 +41783,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (188:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestBroadInternalUltimaGenomics.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestBroadInternalUltimaGenomics.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (70:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (69:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestBroadInternalUltimaGenomics.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (94:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (93:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -41948,17 +41963,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (125:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestCheckFingerprint.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestCheckFingerprint.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (64:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (63:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestCheckFingerprint.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (73:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (72:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -42083,22 +42098,22 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (100:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestCramToUnmappedBams.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (100:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestCramToUnmappedBams.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (47:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (46:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestCramToUnmappedBams.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (56:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestCramToUnmappedBams.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (57:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (99:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -42308,22 +42323,22 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (210:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestExomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (10:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (189:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestExomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (190:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (209:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestExomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (210:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (45:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestExomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (46:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (9:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -42488,17 +42503,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (153:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestExternalExomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestExternalExomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (66:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (65:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestExternalExomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (92:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (91:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -42658,17 +42673,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (158:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestExternalWholeGenomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestExternalWholeGenomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (66:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (65:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestExternalWholeGenomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (95:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (94:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -42853,12 +42868,12 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (146:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestGDCWholeGenomeSomaticSingleSample.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestGDCWholeGenomeSomaticSingleSample.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (94:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (93:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -43133,22 +43148,22 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (213:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestIlluminaGenotypingArray.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (112:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (111:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestIlluminaGenotypingArray.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (213:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (212:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestIlluminaGenotypingArray.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestIlluminaGenotypingArray.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (95:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (94:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -43363,17 +43378,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (169:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestImputation.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestImputation.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (77:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (76:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestImputation.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (93:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (92:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -43703,17 +43718,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (215:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestJointGenotyping.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (123:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (122:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestJointGenotyping.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (136:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (135:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestJointGenotyping.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -43828,17 +43843,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (93:2-
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestMultiSampleArrays.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (45:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestMultiSampleArrays.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (44:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestMultiSampleArrays.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (56:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (55:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -44068,17 +44083,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (134:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestMultiSampleSmartSeq2.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestMultiSampleSmartSeq2.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (77:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (76:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestMultiSampleSmartSeq2.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (90:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (89:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -44258,17 +44273,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (122:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestMultiSampleSmartSeq2SingleNucleus.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestMultiSampleSmartSeq2SingleNucleus.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (65:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (64:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestMultiSampleSmartSeq2SingleNucleus.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (78:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (77:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -44543,17 +44558,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (206:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestMultiome.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (113:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (112:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestMultiome.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestMultiome.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (93:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (92:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -45093,17 +45108,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (107:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestReblockGVCF.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestReblockGVCF.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (52:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (51:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestReblockGVCF.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (63:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (62:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -45263,17 +45278,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (143:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestSlideSeq.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestSlideSeq.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (51:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (50:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestSlideSeq.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (65:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (64:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -45488,17 +45503,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (154:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestSmartSeq2SingleSample.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestSmartSeq2SingleSample.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (65:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (64:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestSmartSeq2SingleSample.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (81:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (80:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -45763,17 +45778,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (185:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestUltimaGenomicsJointGenotyping.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (108:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (107:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestUltimaGenomicsJointGenotyping.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestUltimaGenomicsJointGenotyping.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (95:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (94:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -45913,17 +45928,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (141:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestUltimaGenomicsWholeGenomeCramOnly.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (49:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestUltimaGenomicsWholeGenomeCramOnly.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (48:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestUltimaGenomicsWholeGenomeCramOnly.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (67:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (66:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -46093,17 +46108,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (170:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestUltimaGenomicsWholeGenomeGermline.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestUltimaGenomicsWholeGenomeGermline.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (55:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (54:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestUltimaGenomicsWholeGenomeGermline.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (79:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (78:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -46353,17 +46368,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (193:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestValidateChip.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (103:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (102:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestValidateChip.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestValidateChip.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (85:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (84:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -46573,17 +46588,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (143:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestVariantCalling.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestVariantCalling.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (77:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (76:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestVariantCalling.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (90:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (89:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -46898,17 +46913,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (200:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestWholeGenomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestWholeGenomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (61:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (60:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestWholeGenomeReprocessing.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (90:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (89:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -47038,17 +47053,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (115:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestscATAC.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (45:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestscATAC.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (44:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/TestscATAC.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (71:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (70:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -47253,17 +47268,17 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (124:2
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/Testsnm3C.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/Testsnm3C.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (70:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (69:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "broadinstitute/warp:verification/test-wdls/Testsnm3C.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (88:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (87:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -47473,27 +47488,27 @@ message = "[v1::W001::Style/Low] trailing space (641:13)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W001::Style/Low] trailing space (646:14)"
+message = "[v1::W001::Style/Low] trailing space (647:14)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W001::Style/Low] trailing space (676:13)"
+message = "[v1::W001::Style/Low] trailing space (677:13)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W001::Style/Low] trailing space (699:12)"
+message = "[v1::W001::Style/Low] trailing space (700:12)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W001::Style/Low] trailing space (700:30)"
+message = "[v1::W001::Style/Low] trailing space (701:30)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W001::Style/Low] trailing space (755:6)"
+message = "[v1::W001::Style/Low] trailing space (756:6)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -47558,12 +47573,12 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: c
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contigs_fa (652:9-652:24)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contigs_fa (653:9-653:24)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contigs_fa (760:9-760:24)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: contigs_fa (761:9-761:24)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -47603,22 +47618,22 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: d
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (657:9-657:31)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (658:9-658:31)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (702:9-702:31)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (703:9-703:31)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (762:9-762:31)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: docker_image_id (763:9-763:31)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: final_summary (761:9-761:27)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: final_summary (762:9-762:27)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -47633,7 +47648,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: h
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: intermediate_files (656:9-656:40)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: intermediate_files (657:9-657:40)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -47658,7 +47673,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: k
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: main_amr_results (700:9-700:30)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: main_amr_results (701:9-701:30)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -47673,12 +47688,12 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: m
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: main_output_json (701:9-701:30)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: main_output_json (702:9-702:30)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: main_reports (654:9-654:34)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: main_reports (655:9-655:34)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -47698,7 +47713,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: n
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: non_host_reads_fa (653:9-653:39)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: non_host_reads_fa (654:9-654:39)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -47708,7 +47723,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: o
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W003::Completeness/Medium] missing parameter meta within task: raw_reports (655:9-655:33)"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: raw_reports (656:9-656:33)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -47853,62 +47868,62 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (612:6-612:15)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (650:6-650:16)"
+message = "[v1::W006::Naming/Low] identifier must be snake case (651:6-651:16)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (698:6-698:22)"
+message = "[v1::W006::Naming/Low] identifier must be snake case (699:6-699:22)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W006::Naming/Low] identifier must be snake case (758:6-758:14)"
+message = "[v1::W006::Naming/Low] identifier must be snake case (759:6-759:14)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (18:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (17:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (266:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (265:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (271:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (270:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (283:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (282:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (287:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (286:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (332:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (331:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (412:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (411:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (452:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (451:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/amr/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (480:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (479:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -48233,7 +48248,7 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (230:2
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/benchmark/long-read-mngs-benchmark.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (5:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -48313,7 +48328,7 @@ message = "[v1::W003::Completeness/Medium] missing parameter meta within task: s
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/benchmark/mngs-benchmark-tasks.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (66:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (65:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -48748,7 +48763,7 @@ message = "[v1::W007::Spacing/Low] multiple empty lines at the end of file (234:
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/benchmark/short-read-mngs-benchmark.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (5:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -49848,12 +49863,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (928:6-928:18)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/consensus-genome/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (384:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (383:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/consensus-genome/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (866:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (865:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50153,12 +50168,12 @@ message = "[v1::W007::Spacing/Low] missing newline at the end of the file (551:2
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (3:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/index-generation/index-generation.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (61:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (60:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -50948,7 +50963,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (6:12-6:21)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/legacy-host-filter/legacy-host-filter.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (489:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (488:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -52153,32 +52168,32 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (985:14-985:30)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (1062:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (1061:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (1390:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (1389:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (1553:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (1552:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (233:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (232:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (262:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (261:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/long-read-mngs/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (867:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (866:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -52533,12 +52548,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (394:6-394:23)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/phylotree-ng/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (136:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (135:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/phylotree-ng/run.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (299:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (298:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -53848,12 +53863,12 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (953:12-953:21)"
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/host_filter.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (294:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (293:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "chanzuckerberg/czid-workflows:workflows/short-read-mngs/host_filter.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (581:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (580:1)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -56638,12 +56653,17 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (413:14-413:21)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/util.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (564:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (563:1)"
 
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:tools/util.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (596:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (595:1)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:workflows/dnaseq/dnaseq-standard-fastq.wdl"
+message = "[v1::W003::Completeness/Medium] missing parameter meta within task: array_lengths (118:9-118:33)"
 
 [[concerns]]
 kind = "LintWarning"
@@ -56783,7 +56803,7 @@ message = "[v1::W006::Naming/Low] identifier must be snake case (91:17-91:29)"
 [[concerns]]
 kind = "LintWarning"
 document = "stjudecloud/workflows:workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "[v1::W011::Spacing/Low] more than one empty line (44:1)"
+message = "[v1::W011::Spacing/Low] more than one empty line (43:1)"
 
 [[concerns]]
 kind = "LintWarning"

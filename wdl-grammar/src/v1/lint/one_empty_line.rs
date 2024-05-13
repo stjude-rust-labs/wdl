@@ -59,9 +59,13 @@ impl<'a> Rule<&'a Pair<'a, v1::Rule>> for OneEmptyLine {
             if line.trim().is_empty() {
                 n_empty_lines += 1;
             } else if n_empty_lines >= 2 {
-                let start =
-                    Position::new(line_no, NonZeroUsize::try_from(1).unwrap(), start_byte_no);
-                warnings.push_back(self.more_than_one_empty_line(Location::Position(start)));
+                warnings.push_back(self.more_than_one_empty_line(Location::Position(
+                    Position::new(
+                        NonZeroUsize::try_from(line_no.get() - 1).unwrap(),
+                        NonZeroUsize::try_from(1).unwrap(),
+                        start_byte_no,
+                    ),
+                )));
 
                 n_empty_lines = 0;
             } else {
@@ -105,7 +109,7 @@ workflow a_workflow {}"#,
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W011::Spacing/Low] more than one empty line (4:1)"
+            "[v1::W011::Spacing/Low] more than one empty line (3:1)"
         );
 
         Ok(())
