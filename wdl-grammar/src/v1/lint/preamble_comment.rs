@@ -30,7 +30,7 @@ impl<'a> PreambleComment {
             .group(self.group())
             .subject("preamble comment without a double pound sign")
             .body(
-                "Header comments are full line comments before the version declaration and they \
+                "Preamble comments are full line comments before the version declaration and they \
                  start with a double pound sign.",
             )
             .push_location(location)
