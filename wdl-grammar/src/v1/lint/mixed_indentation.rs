@@ -30,7 +30,7 @@ impl<'a> MixedIndentation {
         // SAFETY: this error is written so that it will always unwrap.
         lint::warning::Builder::default()
             .code(self.code())
-            .level(lint::Level::Medium)
+            .level(lint::Level::High)
             .tags(self.tags())
             .subject("mixed indentation characters")
             .body(
@@ -51,7 +51,7 @@ impl Rule<&Pair<'_, v1::Rule>> for MixedIndentation {
     }
 
     fn tags(&self) -> lint::TagSet {
-        TagSet::new(&[lint::Tag::Style, lint::Tag::Spacing])
+        TagSet::new(&[lint::Tag::Style, lint::Tag::Spacing, lint::Tag::Clarity])
     }
 
     fn check(&self, tree: &Pair<'_, v1::Rule>) -> lint::Result {
@@ -109,7 +109,8 @@ mod tests {
         assert_eq!(
             errors.first().to_string(),
             String::from(
-                "[v1::W004::[Spacing, Style]::Medium] mixed indentation characters (1:12-4:1)"
+                "[v1::W004::[Spacing, Style, Clarity]::High] mixed indentation characters \
+                 (1:12-4:1)"
             )
         );
 
