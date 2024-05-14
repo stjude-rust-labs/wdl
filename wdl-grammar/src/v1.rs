@@ -87,7 +87,7 @@ pub type Result<'a> = wdl_core::parse::Result<Pair<'a, crate::v1::Rule>>;
 /// let warning = concerns.inner().first();
 /// assert_eq!(
 ///     warning.to_string(),
-///     String::from("[v1::W001::Style/Low] line contains only whitespace (2:1-2:1)")
+///     String::from("[v1::W001::[Spacing, Style]::Low] line contains only whitespace (2:1-2:1)")
 /// );
 ///
 /// let tree = result.into_tree().unwrap();
@@ -217,7 +217,7 @@ pub fn parse_rule(rule: Rule, input: &str) -> std::result::Result<Result<'_>, Er
 /// let warning = concerns.inner().first();
 /// assert_eq!(
 ///     warning.to_string(),
-///     String::from("[v1::W001::Style/Low] line contains only whitespace (2:1-2:1)")
+///     String::from("[v1::W001::[Spacing, Style]::Low] line contains only whitespace (2:1-2:1)")
 /// );
 ///
 /// let pair = pt.into_tree().unwrap();

@@ -6,8 +6,8 @@ use nonempty::NonEmpty;
 use pest::iterators::Pair;
 use wdl_core::concern::code;
 use wdl_core::concern::lint;
-use wdl_core::concern::lint::Group;
 use wdl_core::concern::lint::Rule;
+use wdl_core::concern::lint::TagSet;
 use wdl_core::concern::Code;
 use wdl_core::file::Location;
 use wdl_core::Version;
@@ -32,7 +32,7 @@ impl<'a> NoCurlyCommands {
         lint::warning::Builder::default()
             .code(self.code())
             .level(lint::Level::Medium)
-            .group(self.group())
+            .tags(self.tags())
             .push_location(location)
             .subject("curly command found")
             .body(
@@ -51,8 +51,8 @@ impl<'a> Rule<&'a Pair<'a, v1::Rule>> for NoCurlyCommands {
         Code::try_new(code::Kind::Warning, Version::V1, 2).unwrap()
     }
 
-    fn group(&self) -> lint::Group {
-        Group::Style
+    fn tags(&self) -> lint::TagSet {
+        TagSet::new(&[lint::Tag::Style])
     }
 
     fn check(&self, tree: &'a Pair<'_, v1::Rule>) -> lint::Result {
@@ -103,7 +103,7 @@ mod tests {
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W002::Style/Medium] curly command found (2:5-2:15)"
+            "[v1::W002::[Style]::Medium] curly command found (2:5-2:15)"
         );
 
         Ok(())
@@ -130,7 +130,7 @@ mod tests {
         let warnings = NoCurlyCommands.no_curly_commands(location);
         assert_eq!(
             warnings.to_string(),
-            "[v1::W002::Style/Medium] curly command found (1:1)"
+            "[v1::W002::[Style]::Medium] curly command found (1:1)"
         )
     }
 }

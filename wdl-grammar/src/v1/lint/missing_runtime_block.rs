@@ -6,8 +6,9 @@ use nonempty::NonEmpty;
 use pest::iterators::Pair;
 use wdl_core::concern::code;
 use wdl_core::concern::lint;
-use wdl_core::concern::lint::Group;
 use wdl_core::concern::lint::Rule;
+use wdl_core::concern::lint::Tag;
+use wdl_core::concern::lint::TagSet;
 use wdl_core::concern::Code;
 use wdl_core::file::Location;
 use wdl_core::Version;
@@ -29,7 +30,7 @@ impl<'a> MissingRuntimeBlock {
         lint::warning::Builder::default()
             .code(self.code())
             .level(lint::Level::Medium)
-            .group(self.group())
+            .tags(self.tags())
             .push_location(location)
             .subject("missing runtime block within a task")
             .body("Tasks that don't declare runtime blocks are unlikely to be portable")
@@ -47,8 +48,8 @@ impl<'a> Rule<&'a Pair<'a, v1::Rule>> for MissingRuntimeBlock {
         Code::try_new(code::Kind::Warning, Version::V1, 5).unwrap()
     }
 
-    fn group(&self) -> Group {
-        Group::Completeness
+    fn tags(&self) -> TagSet {
+        TagSet::new(&[Tag::Completeness])
     }
 
     fn check(&self, tree: &'a Pair<'a, v1::Rule>) -> lint::Result {
@@ -120,7 +121,7 @@ task hello_task {
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W005::Completeness/Medium] missing runtime block within a task (3:1-16:2)"
+            "[v1::W005::[Completeness]::Medium] missing runtime block within a task (3:1-16:2)"
         );
 
         Ok(())
@@ -205,11 +206,11 @@ task subsitute {
         assert_eq!(warnings.len(), 2);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W005::Completeness/Medium] missing runtime block within a task (3:1-16:2)"
+            "[v1::W005::[Completeness]::Medium] missing runtime block within a task (3:1-16:2)"
         );
         assert_eq!(
             warnings.get(1).unwrap().to_string(),
-            "[v1::W005::Completeness/Medium] missing runtime block within a task (18:1-31:2)"
+            "[v1::W005::[Completeness]::Medium] missing runtime block within a task (18:1-31:2)"
         );
         Ok(())
     }
@@ -263,7 +264,7 @@ task subsitute {
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W005::Completeness/Medium] missing runtime block within a task (22:1-35:2)"
+            "[v1::W005::[Completeness]::Medium] missing runtime block within a task (22:1-35:2)"
         );
         Ok(())
     }

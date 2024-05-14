@@ -6,8 +6,8 @@ use nonempty::NonEmpty;
 use pest::iterators::Pair;
 use wdl_core::concern::code;
 use wdl_core::concern::lint;
-use wdl_core::concern::lint::Group;
 use wdl_core::concern::lint::Rule;
+use wdl_core::concern::lint::TagSet;
 use wdl_core::concern::Code;
 use wdl_core::file::Location;
 use wdl_core::str::whitespace;
@@ -31,7 +31,7 @@ impl<'a> MixedIndentation {
         lint::warning::Builder::default()
             .code(self.code())
             .level(lint::Level::Medium)
-            .group(self.group())
+            .tags(self.tags())
             .subject("mixed indentation characters")
             .body(
                 "Mixed indentation characters were found within a command. This causes leading \
@@ -50,8 +50,8 @@ impl Rule<&Pair<'_, v1::Rule>> for MixedIndentation {
         Code::try_new(code::Kind::Warning, Version::V1, 4).unwrap()
     }
 
-    fn group(&self) -> lint::Group {
-        Group::Style
+    fn tags(&self) -> lint::TagSet {
+        TagSet::new(&[lint::Tag::Style, lint::Tag::Spacing])
     }
 
     fn check(&self, tree: &Pair<'_, v1::Rule>) -> lint::Result {
@@ -108,7 +108,9 @@ mod tests {
 
         assert_eq!(
             errors.first().to_string(),
-            String::from("[v1::W004::Style/Medium] mixed indentation characters (1:12-4:1)")
+            String::from(
+                "[v1::W004::[Spacing, Style]::Medium] mixed indentation characters (1:12-4:1)"
+            )
         );
 
         Ok(())
