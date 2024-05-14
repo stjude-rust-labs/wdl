@@ -55,22 +55,49 @@ impl<'a> Rule<&'a Pair<'a, v1::Rule>> for OneEmptyLine {
 
         let mut n_empty_lines = 0;
 
+        // This will never get used as we overwrite on first instance.
+        let mut start: Position = Position::new(
+            NonZeroUsize::try_from(1).unwrap(),
+            NonZeroUsize::try_from(1).unwrap(),
+            1,
+        );
+
         for (line_no, start_byte_no, _end_byte_no, line) in tree.as_str().lines_with_offsets() {
             if line.trim().is_empty() {
+                if n_empty_lines == 1 {
+                    start = Position::new(
+                        NonZeroUsize::try_from(line_no.get()).unwrap(),
+                        NonZeroUsize::try_from(1).unwrap(),
+                        start_byte_no,
+                    );
+                }
+
                 n_empty_lines += 1;
             } else if n_empty_lines >= 2 {
-                warnings.push_back(self.more_than_one_empty_line(Location::Position(
-                    Position::new(
+                warnings.push_back(self.more_than_one_empty_line(Location::Span {
+                    start: start.clone(),
+                    end: Position::new(
                         NonZeroUsize::try_from(line_no.get() - 1).unwrap(),
                         NonZeroUsize::try_from(1).unwrap(),
                         start_byte_no,
                     ),
-                )));
+                }));
 
                 n_empty_lines = 0;
             } else {
                 n_empty_lines = 0;
             }
+        }
+
+        if n_empty_lines > 1 {
+            warnings.push_back(self.more_than_one_empty_line(Location::Span {
+                start,
+                end: Position::new(
+                    NonZeroUsize::try_from(tree.as_str().lines().count()).unwrap(),
+                    NonZeroUsize::try_from(1).unwrap(),
+                    tree.as_str().len(),
+                ),
+            }));
         }
 
         match warnings.pop_front() {
@@ -109,7 +136,65 @@ workflow a_workflow {}"#,
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W011::Spacing/Low] more than one empty line (3:1)"
+            "[v1::W011::Spacing/Low] more than one empty line (3:1-3:1)"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn it_catches_multiple_too_many_empty_lines() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(
+            Rule::document,
+            r#"version 1.0
+
+
+
+workflow a_workflow {
+
+
+}
+
+"#,
+        )?
+        .next()
+        .unwrap();
+
+        let warnings = OneEmptyLine.check(&tree)?.unwrap();
+        assert_eq!(warnings.len(), 2);
+        assert_eq!(
+            warnings.first().to_string(),
+            "[v1::W011::Spacing/Low] more than one empty line (3:1-4:1)"
+        );
+        assert_eq!(
+            warnings.last().to_string(),
+            "[v1::W011::Spacing/Low] more than one empty line (7:1-7:1)"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn it_catches_trailing_too_many_empty_lines() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(
+            Rule::document,
+            r#"version 1.0
+
+workflow a_workflow {
+
+}
+
+
+"#,
+        )?
+        .next()
+        .unwrap();
+
+        let warnings = OneEmptyLine.check(&tree)?.unwrap();
+        assert_eq!(warnings.len(), 1);
+        assert_eq!(
+            warnings.first().to_string(),
+            "[v1::W011::Spacing/Low] more than one empty line (7:1-7:1)"
         );
 
         Ok(())
