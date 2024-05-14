@@ -372,6 +372,8 @@ where
 
     /// Requires that the current token is in the given token set.
     ///
+    /// # Panics
+    ///
     /// Panics if the token is not in the token set.
     pub fn require_in(&mut self, tokens: TokenSet) {
         match self.next() {

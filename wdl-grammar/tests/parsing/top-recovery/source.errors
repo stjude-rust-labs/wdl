@@ -1,0 +1,8 @@
+  × expected `import` keyword, `struct` keyword, `task` keyword, or `workflow` keyword, but found `Int` keyword
+    ╭─[tests/parsing/top-recovery/source.wdl:9:1]
+  8 │ 
+  9 │ Int i = 0
+    · ─┬─
+    ·  ╰── unexpected `Int` keyword
+ 10 │ 
+    ╰────
