@@ -7,8 +7,8 @@ use nonempty::NonEmpty;
 use pest::iterators::Pair;
 use wdl_core::concern::code;
 use wdl_core::concern::lint;
-use wdl_core::concern::lint::TagSet;
 use wdl_core::concern::lint::Rule;
+use wdl_core::concern::lint::TagSet;
 use wdl_core::concern::Code;
 use wdl_core::file::Location;
 use wdl_core::Version;
@@ -135,7 +135,8 @@ version 1.0
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W010::[Pedantic, Style]::Low] preamble comment without a double pound sign (1:1-1:12)"
+            "[v1::W010::[Pedantic, Style]::Low] preamble comment without a double pound sign \
+             (1:1-1:12)"
         );
         Ok(())
     }
@@ -157,8 +158,8 @@ version 1.0
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W010::[Pedantic, Style]::Low] double pound signs are reserved for preamble comments \
-             (4:1-4:19)"
+            "[v1::W010::[Pedantic, Style]::Low] double pound signs are reserved for preamble \
+             comments (4:1-4:19)"
         );
         Ok(())
     }
