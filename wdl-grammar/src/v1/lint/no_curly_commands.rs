@@ -31,14 +31,11 @@ impl<'a> NoCurlyCommands {
         // SAFETY: this error is written so that it will always unwrap.
         lint::warning::Builder::default()
             .code(self.code())
-            .level(lint::Level::Medium)
+            .level(lint::Level::High)
             .tags(self.tags())
             .push_location(location)
             .subject("curly command found")
-            .body(
-                "Command blocks using curly braces (`{}`) are considered less
-                idiomatic than heredoc commands.",
-            )
+            .body("Command blocks using curly braces (`{}`) can create ambiguity with Bash syntax.")
             .fix("Replace the curly command block with a heredoc command block.")
             .try_build()
             .unwrap()
@@ -52,7 +49,7 @@ impl<'a> Rule<&'a Pair<'a, v1::Rule>> for NoCurlyCommands {
     }
 
     fn tags(&self) -> lint::TagSet {
-        TagSet::new(&[lint::Tag::Style])
+        TagSet::new(&[lint::Tag::Clarity])
     }
 
     fn check(&self, tree: &'a Pair<'_, v1::Rule>) -> lint::Result {
@@ -103,7 +100,7 @@ mod tests {
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W002::[Style]::Medium] curly command found (2:5-2:15)"
+            "[v1::W002::[Clarity]::High] curly command found (2:5-2:15)"
         );
 
         Ok(())
@@ -130,7 +127,7 @@ mod tests {
         let warnings = NoCurlyCommands.no_curly_commands(location);
         assert_eq!(
             warnings.to_string(),
-            "[v1::W002::[Style]::Medium] curly command found (1:1)"
+            "[v1::W002::[Clarity]::High] curly command found (1:1)"
         )
     }
 }

@@ -18,6 +18,9 @@ pub enum Tag {
 
     /// Rules associated with the style of a document.
     Style,
+
+    /// Rules associated with the clarity of a document.
+    Clarity,
 }
 
 impl std::fmt::Display for Tag {
@@ -27,6 +30,7 @@ impl std::fmt::Display for Tag {
             Self::Naming => write!(f, "Naming"),
             Self::Spacing => write!(f, "Spacing"),
             Self::Style => write!(f, "Style"),
+            Self::Clarity => write!(f, "Clarity"),
         }
     }
 }
