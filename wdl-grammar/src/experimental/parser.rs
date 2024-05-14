@@ -115,11 +115,11 @@ pub enum Error {
         /// The lexer error that occurred.
         error: lexer::Error,
         /// The span where the error occurred.
-        #[label(primary)]
+        #[label(primary, "this is not a WDL token")]
         span: SourceSpan,
     },
     /// An unexpected token was encountered when a single token was expected.
-    #[error("expected {expected}, found {found}", expected = Expected::new(*.expected, *.describe), found = Found::new(*.found, *.describe))]
+    #[error("expected {expected}, but found {found}", expected = Expected::new(*.expected, *.describe), found = Found::new(*.found, *.describe))]
     Expected {
         /// The expected token set.
         expected: TokenSet,
@@ -297,8 +297,7 @@ where
         until: TokenSet,
         recovery: TokenSet,
         mut cb: F,
-    ) -> Result<(), Error>
-    where
+    ) where
         F: FnMut(&mut Self, Marker) -> Result<bool, (Marker, Error)>,
     {
         let recovery = if let Some(delimiter) = delimiter {
@@ -332,8 +331,6 @@ where
 
             next = self.peek();
         }
-
-        Ok(())
     }
 
     /// Adds an error event to the event list.
@@ -344,10 +341,12 @@ where
     /// Recovers from an error by consuming all tokens not
     /// in the given token set.
     pub fn recover(&mut self, tokens: TokenSet) {
-        for (token, _) in self {
+        while let Some((token, _)) = self.peek() {
             if tokens.contains(token.into_raw()) {
                 break;
             }
+
+            self.next().unwrap();
         }
     }
 
@@ -367,6 +366,19 @@ where
             _ => panic!(
                 "lexer not at required token {token}",
                 token = T::describe(token.into_raw())
+            ),
+        }
+    }
+
+    /// Requires that the current token is in the given token set.
+    ///
+    /// Panics if the token is not in the token set.
+    pub fn require_in(&mut self, tokens: TokenSet) {
+        match self.next() {
+            Some((t, _)) if tokens.contains(t.into_raw()) => {}
+            _ => panic!(
+                "expected {expected}",
+                expected = Expected::new(tokens, T::describe),
             ),
         }
     }
