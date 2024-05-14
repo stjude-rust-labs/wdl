@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are snakecase (#13, contributed by @simojoe).
 * Adds the `newline_eof` rule for tasks (#18, contributed by @simojoe).
 
+### Changed
+
+* Changes the singular `Group` feature of lint warnings to one or more `Tags` (#37, contributed by @a-frantz)
+
 ## 0.2.0 - 12-17-2023
 
 ### Added
