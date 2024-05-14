@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Adds a new experimental `SyntaxTree` representation; requires the 
+  `experimental` feature to be activated ([#36](https://github.com/stjude-rust-labs/wdl/pull/36)).
 * Adds an `experimental` module containing the start of a new
   infallible WDL parser implementation based on `logos` and `rowan` ([#30](https://github.com/stjude-rust-labs/wdl/pull/30)).
 * Adds the `missing_runtime_block` rule for tasks (#10, contributed by
@@ -16,8 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Adds the `snake_case` rule that ensures all tasks, workflows, and variables
   are snakecase (#13, contributed by @simojoe).
 * Adds the `newline_eof` rule for tasks (#18, contributed by @simojoe).
-* Adds the `preamble_comment` rule for preamble comments formatting (contributed
-  by @simojoe).
+* Adds the `preamble_comment` rule for preamble comments formatting (#32,
+  contributed by @simojoe).
+* Adds the `one_empty_line` rule that ensures no excess of empty lines
+  (#33, contributed by @simojoe).
 
 ### Changed
 
