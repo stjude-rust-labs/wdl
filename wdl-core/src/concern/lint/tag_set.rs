@@ -41,6 +41,10 @@ pub struct TagSet(u32);
 
 impl TagSet {
     /// Constructs a tag set from a slice of tags.
+    ///
+    /// # Panics
+    ///
+    /// This method will panic if the provided slice is empty.
     pub const fn new(tags: &[Tag]) -> Self {
         if tags.is_empty() {
             panic!("a tag set must be non-empty");
@@ -51,7 +55,7 @@ impl TagSet {
         while i < tags.len() {
             bits |= Self::mask(tags[i]);
             if matches!(tags[i], Tag::Naming | Tag::Spacing) {
-                bits |= Self::mask(Tag::Style)
+                bits |= Self::mask(Tag::Style);
             }
             i += 1;
         }
