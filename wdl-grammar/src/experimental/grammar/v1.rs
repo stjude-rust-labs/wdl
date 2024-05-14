@@ -2,6 +2,7 @@
 
 use super::macros::expected;
 use super::macros::expected_fn;
+use crate::experimental::grammar::macros::expected_with_name;
 use crate::experimental::lexer::v1::Token;
 use crate::experimental::lexer::TokenSet;
 use crate::experimental::parser;
@@ -21,6 +22,14 @@ const TOP_EXPECTED_SET: TokenSet = TokenSet::new(&[
     Token::WorkflowKeyword as u8,
 ]);
 
+/// The names of the expected top-level items.
+const TOP_EXPECTED_NAMES: &[&str] = &[
+    "import statement",
+    "struct definition",
+    "task definition",
+    "workflow definition",
+];
+
 /// The recovery set for top-level.
 const TOP_RECOVERY_SET: TokenSet = TOP_EXPECTED_SET;
 
@@ -34,7 +43,7 @@ const PRIMITIVE_TYPE_SET: TokenSet = TokenSet::new(&[
 ]);
 
 /// A set of tokens for all types.
-const TYPE_SET: TokenSet = PRIMITIVE_TYPE_SET.union(TokenSet::new(&[
+const TYPE_EXPECTED_SET: TokenSet = PRIMITIVE_TYPE_SET.union(TokenSet::new(&[
     Token::MapTypeKeyword as u8,
     Token::ArrayTypeKeyword as u8,
     Token::PairTypeKeyword as u8,
@@ -43,14 +52,14 @@ const TYPE_SET: TokenSet = PRIMITIVE_TYPE_SET.union(TokenSet::new(&[
 ]));
 
 /// The expected set of tokens in a struct definition of a WDL document.
-const STRUCT_ITEM_EXPECTED_SET: TokenSet = TYPE_SET;
+const STRUCT_ITEM_EXPECTED_SET: TokenSet = TYPE_EXPECTED_SET;
 
 /// The recovery set for struct items.
 const STRUCT_ITEM_RECOVERY_SET: TokenSet =
     STRUCT_ITEM_EXPECTED_SET.union(TokenSet::new(&[Token::CloseBrace as u8]));
 
 /// The expected set of tokens in a task definition of a WDL document.
-const TASK_ITEM_EXPECTED_SET: TokenSet = TYPE_SET.union(TokenSet::new(&[
+const TASK_ITEM_EXPECTED_SET: TokenSet = TYPE_EXPECTED_SET.union(TokenSet::new(&[
     Token::InputKeyword as u8,
     Token::CommandKeyword as u8,
     Token::OutputKeyword as u8,
@@ -64,7 +73,7 @@ const TASK_ITEM_RECOVERY_SET: TokenSet =
     TASK_ITEM_EXPECTED_SET.union(TokenSet::new(&[Token::CloseBrace as u8]));
 
 /// The recovery set for workflow items.
-const WORKFLOW_ITEM_RECOVERY_SET: TokenSet = TYPE_SET.union(TokenSet::new(&[
+const WORKFLOW_ITEM_RECOVERY_SET: TokenSet = TYPE_EXPECTED_SET.union(TokenSet::new(&[
     Token::InputKeyword as u8,
     Token::OutputKeyword as u8,
     Token::MetaKeyword as u8,
@@ -104,8 +113,8 @@ fn item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> 
                 .unwrap_or_else(|| (None, parser.span()));
             Err((
                 marker,
-                Error::Expected {
-                    expected: TOP_EXPECTED_SET,
+                Error::ExpectedOneOf {
+                    expected: TOP_EXPECTED_NAMES,
                     found,
                     span,
                     describe: Token::describe,
@@ -123,7 +132,7 @@ fn import_statement(parser: &mut Parser<'_>, _marker: Marker) -> Result<(), (Mar
 
 /// Parses a name (i.e. identifier) for a struct, task, or workflow definition.
 fn name(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
-    expected!(parser, marker, Token::Ident);
+    expected_with_name!(parser, marker, Token::Ident, "name");
     marker.complete(parser, SyntaxKind::NameNode);
     Ok(())
 }
@@ -202,7 +211,7 @@ fn ty(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
             Err((
                 marker,
                 Error::Expected {
-                    expected: TYPE_SET,
+                    expected: "type",
                     found,
                     span,
                     describe: Token::describe,

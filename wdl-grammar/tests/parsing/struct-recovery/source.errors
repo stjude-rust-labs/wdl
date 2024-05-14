@@ -6,7 +6,7 @@
    ·     ╰── this is not a WDL token
  7 │     String a
    ╰────
-  × expected identifier, `Array` keyword, `Boolean` keyword, `File` keyword, `Float` keyword, `Int` keyword, `Map` keyword, `Object` keyword, `Pair` keyword, or `String` keyword, but found `?`
+  × expected type, but found `?`
    ╭─[tests/parsing/struct-recovery/source.wdl:8:5]
  7 │     String a
  8 │     ?  # Unexpected token
@@ -14,8 +14,7 @@
    ·     ╰── unexpected `?`
  9 │     Float b
    ╰────
-  × expected identifier, `Array` keyword, `Boolean` keyword, `File` keyword, `Float` keyword, `Int` keyword, `Map` keyword, `Object` keyword, `Pair` keyword, or `String` keyword, but found `struct`
-  │ keyword
+  × expected type, but found `struct` keyword
     ╭─[tests/parsing/struct-recovery/source.wdl:10:5]
   9 │     Float b
  10 │     struct   # Unexpected keyword
