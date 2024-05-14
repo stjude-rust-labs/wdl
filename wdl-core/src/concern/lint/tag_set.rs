@@ -18,9 +18,6 @@ pub enum Tag {
 
     /// Rules associated with the style of a document.
     Style,
-
-    /// Rules often considered overly opinionated.
-    Pedantic,
 }
 
 impl std::fmt::Display for Tag {
@@ -30,7 +27,6 @@ impl std::fmt::Display for Tag {
             Self::Naming => write!(f, "Naming"),
             Self::Spacing => write!(f, "Spacing"),
             Self::Style => write!(f, "Style"),
-            Self::Pedantic => write!(f, "Pedantic"),
         }
     }
 }
@@ -50,7 +46,7 @@ impl TagSet {
         let mut i = 0;
         while i < tags.len() {
             bits |= Self::mask(tags[i]);
-            if matches!(tags[i], Tag::Naming | Tag::Spacing | Tag::Pedantic) {
+            if matches!(tags[i], Tag::Naming | Tag::Spacing) {
                 bits |= Self::mask(Tag::Style)
             }
             i += 1;
