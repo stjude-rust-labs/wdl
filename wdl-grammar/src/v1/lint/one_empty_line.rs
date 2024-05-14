@@ -89,16 +89,9 @@ impl<'a> Rule<&'a Pair<'a, v1::Rule>> for OneEmptyLine {
             }
         }
 
-        if n_empty_lines > 1 {
-            warnings.push_back(self.more_than_one_empty_line(Location::Span {
-                start,
-                end: Position::new(
-                    NonZeroUsize::try_from(tree.as_str().lines().count()).unwrap(),
-                    NonZeroUsize::try_from(1).unwrap(),
-                    tree.as_str().len(),
-                ),
-            }));
-        }
+        // This will not catch newlines at the EOF.
+        // Those are intentionally omitted here.
+        // The newline_eof rule will catch those.
 
         match warnings.pop_front() {
             Some(front) => {
@@ -175,7 +168,7 @@ workflow a_workflow {
     }
 
     #[test]
-    fn it_catches_trailing_too_many_empty_lines() -> Result<(), Box<dyn std::error::Error>> {
+    fn it_ignore_too_many_empty_lines_at_eof() -> Result<(), Box<dyn std::error::Error>> {
         let tree = Parser::parse(
             Rule::document,
             r#"version 1.0
@@ -190,12 +183,7 @@ workflow a_workflow {
         .next()
         .unwrap();
 
-        let warnings = OneEmptyLine.check(&tree)?.unwrap();
-        assert_eq!(warnings.len(), 1);
-        assert_eq!(
-            warnings.first().to_string(),
-            "[v1::W011::Spacing/Low] more than one empty line (7:1-7:1)"
-        );
+        assert!(OneEmptyLine.check(&tree)?.is_none());
 
         Ok(())
     }
