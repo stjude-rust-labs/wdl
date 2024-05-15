@@ -1,0 +1,1000 @@
+RootNode@0..2446
+  Comment@0..51 "# This is a test of p ..."
+  Whitespace@51..53 "\n\n"
+  VersionStatementNode@53..64
+    VersionKeyword@53..60 "version"
+    Whitespace@60..61 " "
+    Version@61..64 "1.1"
+  Whitespace@64..66 "\n\n"
+  TaskDefinitionNode@66..1254
+    TaskKeyword@66..70 "task"
+    NameNode@70..75
+      Whitespace@70..71 " "
+      Ident@71..75 "test"
+    Whitespace@75..76 " "
+    OpenBrace@76..77 "{"
+    Whitespace@77..82 "\n    "
+    MetadataSectionNode@82..657
+      MetaKeyword@82..86 "meta"
+      Whitespace@86..87 " "
+      OpenBrace@87..88 "{"
+      Whitespace@88..97 "\n        "
+      MetadataObjectItemNode@97..107
+        Ident@97..98 "a"
+        Colon@98..99 ":"
+        LiteralStringNode@99..107
+          Whitespace@99..100 " "
+          DoubleQuote@100..101 "\""
+          LiteralStringText@101..106 "hello"
+          DoubleQuote@106..107 "\""
+      Whitespace@107..116 "\n        "
+      MetadataObjectItemNode@116..126
+        Ident@116..117 "b"
+        Colon@117..118 ":"
+        LiteralStringNode@118..126
+          Whitespace@118..119 " "
+          SingleQuote@119..120 "'"
+          LiteralStringText@120..125 "world"
+          SingleQuote@125..126 "'"
+      Whitespace@126..135 "\n        "
+      MetadataObjectItemNode@135..139
+        Ident@135..136 "c"
+        Colon@136..137 ":"
+        LiteralIntegerNode@137..139
+          Whitespace@137..138 " "
+          Integer@138..139 "5"
+      Whitespace@139..148 "\n        "
+      MetadataObjectItemNode@148..155
+        Ident@148..149 "d"
+        Colon@149..150 ":"
+        LiteralIntegerNode@150..155
+          Whitespace@150..151 " "
+          Minus@151..152 "-"
+          Integer@152..155 "0xf"
+      Whitespace@155..164 "\n        "
+      MetadataObjectItemNode@164..173
+        Ident@164..165 "e"
+        Colon@165..166 ":"
+        LiteralFloatNode@166..173
+          Whitespace@166..167 " "
+          Float@167..173 "1.0e10"
+      Whitespace@173..182 "\n        "
+      MetadataObjectItemNode@182..188
+        Ident@182..183 "f"
+        Colon@183..184 ":"
+        LiteralFloatNode@184..188
+          Whitespace@184..185 " "
+          Minus@185..186 "-"
+          Float@186..188 "2."
+      Whitespace@188..197 "\n        "
+      MetadataObjectItemNode@197..204
+        Ident@197..198 "g"
+        Colon@198..199 ":"
+        LiteralBooleanNode@199..204
+          Whitespace@199..200 " "
+          TrueKeyword@200..204 "true"
+      Whitespace@204..213 "\n        "
+      MetadataObjectItemNode@213..221
+        Ident@213..214 "h"
+        Colon@214..215 ":"
+        LiteralBooleanNode@215..221
+          Whitespace@215..216 " "
+          FalseKeyword@216..221 "false"
+      Whitespace@221..230 "\n        "
+      MetadataObjectItemNode@230..237
+        Ident@230..231 "i"
+        Colon@231..232 ":"
+        LiteralNullNode@232..237
+          Whitespace@232..233 " "
+          NullKeyword@233..237 "null"
+      Whitespace@237..246 "\n        "
+      MetadataObjectItemNode@246..422
+        Ident@246..247 "j"
+        Colon@247..248 ":"
+        MetadataObjectNode@248..422
+          Whitespace@248..249 " "
+          OpenBrace@249..250 "{"
+          Whitespace@250..263 "\n            "
+          MetadataObjectItemNode@263..275
+            Ident@263..264 "a"
+            Colon@264..265 ":"
+            MetadataArrayNode@265..275
+              Whitespace@265..266 " "
+              OpenBracket@266..267 "["
+              LiteralIntegerNode@267..268
+                Integer@267..268 "1"
+              Comma@268..269 ","
+              Whitespace@269..270 " "
+              LiteralIntegerNode@270..271
+                Integer@270..271 "2"
+              Comma@271..272 ","
+              Whitespace@272..273 " "
+              LiteralIntegerNode@273..274
+                Integer@273..274 "3"
+              CloseBracket@274..275 "]"
+          Comma@275..276 ","
+          Whitespace@276..289 "\n            "
+          MetadataObjectItemNode@289..315
+            Ident@289..290 "b"
+            Colon@290..291 ":"
+            MetadataArrayNode@291..315
+              Whitespace@291..292 " "
+              OpenBracket@292..293 "["
+              LiteralStringNode@293..300
+                DoubleQuote@293..294 "\""
+                LiteralStringText@294..299 "hello"
+                DoubleQuote@299..300 "\""
+              Comma@300..301 ","
+              Whitespace@301..302 " "
+              LiteralStringNode@302..309
+                DoubleQuote@302..303 "\""
+                LiteralStringText@303..308 "world"
+                DoubleQuote@308..309 "\""
+              Comma@309..310 ","
+              Whitespace@310..311 " "
+              LiteralStringNode@311..314
+                DoubleQuote@311..312 "\""
+                LiteralStringText@312..313 "!"
+                DoubleQuote@313..314 "\""
+              CloseBracket@314..315 "]"
+          Comma@315..316 ","
+          Whitespace@316..329 "\n            "
+          MetadataObjectItemNode@329..412
+            Ident@329..330 "c"
+            Colon@330..331 ":"
+            MetadataObjectNode@331..412
+              Whitespace@331..332 " "
+              OpenBrace@332..333 "{"
+              Whitespace@333..350 "\n                "
+              MetadataObjectItemNode@350..354
+                Ident@350..351 "x"
+                Colon@351..352 ":"
+                LiteralIntegerNode@352..354
+                  Whitespace@352..353 " "
+                  Integer@353..354 "1"
+              Comma@354..355 ","
+              Whitespace@355..372 "\n                "
+              MetadataObjectItemNode@372..376
+                Ident@372..373 "y"
+                Colon@373..374 ":"
+                LiteralIntegerNode@374..376
+                  Whitespace@374..375 " "
+                  Integer@375..376 "2"
+              Comma@376..377 ","
+              Whitespace@377..394 "\n                "
+              MetadataObjectItemNode@394..398
+                Ident@394..395 "z"
+                Colon@395..396 ":"
+                LiteralIntegerNode@396..398
+                  Whitespace@396..397 " "
+                  Integer@397..398 "3"
+              Whitespace@398..411 "\n            "
+              CloseBrace@411..412 "}"
+          Whitespace@412..421 "\n        "
+          CloseBrace@421..422 "}"
+      Whitespace@422..431 "\n        "
+      MetadataObjectItemNode@431..651
+        Ident@431..432 "k"
+        Colon@432..433 ":"
+        MetadataArrayNode@433..651
+          Whitespace@433..434 " "
+          OpenBracket@434..435 "["
+          Whitespace@435..448 "\n            "
+          MetadataObjectNode@448..577
+            OpenBrace@448..449 "{"
+            Whitespace@449..466 "\n                "
+            MetadataObjectItemNode@466..471
+              Ident@466..467 "a"
+              Colon@467..468 ":"
+              MetadataObjectNode@468..471
+                Whitespace@468..469 " "
+                OpenBrace@469..470 "{"
+                CloseBrace@470..471 "}"
+            Comma@471..472 ","
+            Whitespace@472..489 "\n                "
+            MetadataObjectItemNode@489..493
+              Ident@489..490 "b"
+              Colon@490..491 ":"
+              LiteralIntegerNode@491..493
+                Whitespace@491..492 " "
+                Integer@492..493 "0"
+            Comma@493..494 ","
+            Whitespace@494..511 "\n                "
+            MetadataObjectItemNode@511..516
+              Ident@511..512 "c"
+              Colon@512..513 ":"
+              LiteralStringNode@513..516
+                Whitespace@513..514 " "
+                DoubleQuote@514..515 "\""
+                DoubleQuote@515..516 "\""
+            Comma@516..517 ","
+            Whitespace@517..534 "\n                "
+            MetadataObjectItemNode@534..539
+              Ident@534..535 "d"
+              Colon@535..536 ":"
+              LiteralStringNode@536..539
+                Whitespace@536..537 " "
+                SingleQuote@537..538 "'"
+                SingleQuote@538..539 "'"
+            Comma@539..540 ","
+            Whitespace@540..557 "\n                "
+            MetadataObjectItemNode@557..562
+              Ident@557..558 "e"
+              Colon@558..559 ":"
+              MetadataArrayNode@559..562
+                Whitespace@559..560 " "
+                OpenBracket@560..561 "["
+                CloseBracket@561..562 "]"
+            Comma@562..563 ","
+            Whitespace@563..576 "\n            "
+            CloseBrace@576..577 "}"
+          Comma@577..578 ","
+          Whitespace@578..591 "\n            "
+          MetadataObjectNode@591..641
+            OpenBrace@591..592 "{"
+            Whitespace@592..609 "\n                "
+            MetadataObjectItemNode@609..627
+              Ident@609..610 "x"
+              Colon@610..611 ":"
+              MetadataArrayNode@611..627
+                Whitespace@611..612 " "
+                OpenBracket@612..613 "["
+                LiteralFloatNode@613..616
+                  Float@613..616 "1.0"
+                Comma@616..617 ","
+                Whitespace@617..618 " "
+                LiteralFloatNode@618..621
+                  Float@618..621 "2.0"
+                Comma@621..622 ","
+                Whitespace@622..623 " "
+                LiteralFloatNode@623..626
+                  Float@623..626 "3.0"
+                CloseBracket@626..627 "]"
+            Whitespace@627..640 "\n            "
+            CloseBrace@640..641 "}"
+          Whitespace@641..650 "\n        "
+          CloseBracket@650..651 "]"
+      Whitespace@651..656 "\n    "
+      CloseBrace@656..657 "}"
+    Whitespace@657..667 "\n    \n    "
+    ParameterMetadataSectionNode@667..1252
+      ParameterMetaKeyword@667..681 "parameter_meta"
+      Whitespace@681..682 " "
+      OpenBrace@682..683 "{"
+      Whitespace@683..692 "\n        "
+      MetadataObjectItemNode@692..702
+        Ident@692..693 "a"
+        Colon@693..694 ":"
+        LiteralStringNode@694..702
+          Whitespace@694..695 " "
+          DoubleQuote@695..696 "\""
+          LiteralStringText@696..701 "hello"
+          DoubleQuote@701..702 "\""
+      Whitespace@702..711 "\n        "
+      MetadataObjectItemNode@711..721
+        Ident@711..712 "b"
+        Colon@712..713 ":"
+        LiteralStringNode@713..721
+          Whitespace@713..714 " "
+          SingleQuote@714..715 "'"
+          LiteralStringText@715..720 "world"
+          SingleQuote@720..721 "'"
+      Whitespace@721..730 "\n        "
+      MetadataObjectItemNode@730..734
+        Ident@730..731 "c"
+        Colon@731..732 ":"
+        LiteralIntegerNode@732..734
+          Whitespace@732..733 " "
+          Integer@733..734 "5"
+      Whitespace@734..743 "\n        "
+      MetadataObjectItemNode@743..750
+        Ident@743..744 "d"
+        Colon@744..745 ":"
+        LiteralIntegerNode@745..750
+          Whitespace@745..746 " "
+          Minus@746..747 "-"
+          Integer@747..750 "0xf"
+      Whitespace@750..759 "\n        "
+      MetadataObjectItemNode@759..768
+        Ident@759..760 "e"
+        Colon@760..761 ":"
+        LiteralFloatNode@761..768
+          Whitespace@761..762 " "
+          Float@762..768 "1.0e10"
+      Whitespace@768..777 "\n        "
+      MetadataObjectItemNode@777..783
+        Ident@777..778 "f"
+        Colon@778..779 ":"
+        LiteralFloatNode@779..783
+          Whitespace@779..780 " "
+          Minus@780..781 "-"
+          Float@781..783 "2."
+      Whitespace@783..792 "\n        "
+      MetadataObjectItemNode@792..799
+        Ident@792..793 "g"
+        Colon@793..794 ":"
+        LiteralBooleanNode@794..799
+          Whitespace@794..795 " "
+          TrueKeyword@795..799 "true"
+      Whitespace@799..808 "\n        "
+      MetadataObjectItemNode@808..816
+        Ident@808..809 "h"
+        Colon@809..810 ":"
+        LiteralBooleanNode@810..816
+          Whitespace@810..811 " "
+          FalseKeyword@811..816 "false"
+      Whitespace@816..825 "\n        "
+      MetadataObjectItemNode@825..832
+        Ident@825..826 "i"
+        Colon@826..827 ":"
+        LiteralNullNode@827..832
+          Whitespace@827..828 " "
+          NullKeyword@828..832 "null"
+      Whitespace@832..841 "\n        "
+      MetadataObjectItemNode@841..1017
+        Ident@841..842 "j"
+        Colon@842..843 ":"
+        MetadataObjectNode@843..1017
+          Whitespace@843..844 " "
+          OpenBrace@844..845 "{"
+          Whitespace@845..858 "\n            "
+          MetadataObjectItemNode@858..870
+            Ident@858..859 "a"
+            Colon@859..860 ":"
+            MetadataArrayNode@860..870
+              Whitespace@860..861 " "
+              OpenBracket@861..862 "["
+              LiteralIntegerNode@862..863
+                Integer@862..863 "1"
+              Comma@863..864 ","
+              Whitespace@864..865 " "
+              LiteralIntegerNode@865..866
+                Integer@865..866 "2"
+              Comma@866..867 ","
+              Whitespace@867..868 " "
+              LiteralIntegerNode@868..869
+                Integer@868..869 "3"
+              CloseBracket@869..870 "]"
+          Comma@870..871 ","
+          Whitespace@871..884 "\n            "
+          MetadataObjectItemNode@884..910
+            Ident@884..885 "b"
+            Colon@885..886 ":"
+            MetadataArrayNode@886..910
+              Whitespace@886..887 " "
+              OpenBracket@887..888 "["
+              LiteralStringNode@888..895
+                DoubleQuote@888..889 "\""
+                LiteralStringText@889..894 "hello"
+                DoubleQuote@894..895 "\""
+              Comma@895..896 ","
+              Whitespace@896..897 " "
+              LiteralStringNode@897..904
+                DoubleQuote@897..898 "\""
+                LiteralStringText@898..903 "world"
+                DoubleQuote@903..904 "\""
+              Comma@904..905 ","
+              Whitespace@905..906 " "
+              LiteralStringNode@906..909
+                DoubleQuote@906..907 "\""
+                LiteralStringText@907..908 "!"
+                DoubleQuote@908..909 "\""
+              CloseBracket@909..910 "]"
+          Comma@910..911 ","
+          Whitespace@911..924 "\n            "
+          MetadataObjectItemNode@924..1007
+            Ident@924..925 "c"
+            Colon@925..926 ":"
+            MetadataObjectNode@926..1007
+              Whitespace@926..927 " "
+              OpenBrace@927..928 "{"
+              Whitespace@928..945 "\n                "
+              MetadataObjectItemNode@945..949
+                Ident@945..946 "x"
+                Colon@946..947 ":"
+                LiteralIntegerNode@947..949
+                  Whitespace@947..948 " "
+                  Integer@948..949 "1"
+              Comma@949..950 ","
+              Whitespace@950..967 "\n                "
+              MetadataObjectItemNode@967..971
+                Ident@967..968 "y"
+                Colon@968..969 ":"
+                LiteralIntegerNode@969..971
+                  Whitespace@969..970 " "
+                  Integer@970..971 "2"
+              Comma@971..972 ","
+              Whitespace@972..989 "\n                "
+              MetadataObjectItemNode@989..993
+                Ident@989..990 "z"
+                Colon@990..991 ":"
+                LiteralIntegerNode@991..993
+                  Whitespace@991..992 " "
+                  Integer@992..993 "3"
+              Whitespace@993..1006 "\n            "
+              CloseBrace@1006..1007 "}"
+          Whitespace@1007..1016 "\n        "
+          CloseBrace@1016..1017 "}"
+      Whitespace@1017..1026 "\n        "
+      MetadataObjectItemNode@1026..1246
+        Ident@1026..1027 "k"
+        Colon@1027..1028 ":"
+        MetadataArrayNode@1028..1246
+          Whitespace@1028..1029 " "
+          OpenBracket@1029..1030 "["
+          Whitespace@1030..1043 "\n            "
+          MetadataObjectNode@1043..1172
+            OpenBrace@1043..1044 "{"
+            Whitespace@1044..1061 "\n                "
+            MetadataObjectItemNode@1061..1066
+              Ident@1061..1062 "a"
+              Colon@1062..1063 ":"
+              MetadataObjectNode@1063..1066
+                Whitespace@1063..1064 " "
+                OpenBrace@1064..1065 "{"
+                CloseBrace@1065..1066 "}"
+            Comma@1066..1067 ","
+            Whitespace@1067..1084 "\n                "
+            MetadataObjectItemNode@1084..1088
+              Ident@1084..1085 "b"
+              Colon@1085..1086 ":"
+              LiteralIntegerNode@1086..1088
+                Whitespace@1086..1087 " "
+                Integer@1087..1088 "0"
+            Comma@1088..1089 ","
+            Whitespace@1089..1106 "\n                "
+            MetadataObjectItemNode@1106..1111
+              Ident@1106..1107 "c"
+              Colon@1107..1108 ":"
+              LiteralStringNode@1108..1111
+                Whitespace@1108..1109 " "
+                DoubleQuote@1109..1110 "\""
+                DoubleQuote@1110..1111 "\""
+            Comma@1111..1112 ","
+            Whitespace@1112..1129 "\n                "
+            MetadataObjectItemNode@1129..1134
+              Ident@1129..1130 "d"
+              Colon@1130..1131 ":"
+              LiteralStringNode@1131..1134
+                Whitespace@1131..1132 " "
+                SingleQuote@1132..1133 "'"
+                SingleQuote@1133..1134 "'"
+            Comma@1134..1135 ","
+            Whitespace@1135..1152 "\n                "
+            MetadataObjectItemNode@1152..1157
+              Ident@1152..1153 "e"
+              Colon@1153..1154 ":"
+              MetadataArrayNode@1154..1157
+                Whitespace@1154..1155 " "
+                OpenBracket@1155..1156 "["
+                CloseBracket@1156..1157 "]"
+            Comma@1157..1158 ","
+            Whitespace@1158..1171 "\n            "
+            CloseBrace@1171..1172 "}"
+          Comma@1172..1173 ","
+          Whitespace@1173..1186 "\n            "
+          MetadataObjectNode@1186..1236
+            OpenBrace@1186..1187 "{"
+            Whitespace@1187..1204 "\n                "
+            MetadataObjectItemNode@1204..1222
+              Ident@1204..1205 "x"
+              Colon@1205..1206 ":"
+              MetadataArrayNode@1206..1222
+                Whitespace@1206..1207 " "
+                OpenBracket@1207..1208 "["
+                LiteralFloatNode@1208..1211
+                  Float@1208..1211 "1.0"
+                Comma@1211..1212 ","
+                Whitespace@1212..1213 " "
+                LiteralFloatNode@1213..1216
+                  Float@1213..1216 "2.0"
+                Comma@1216..1217 ","
+                Whitespace@1217..1218 " "
+                LiteralFloatNode@1218..1221
+                  Float@1218..1221 "3.0"
+                CloseBracket@1221..1222 "]"
+            Whitespace@1222..1235 "\n            "
+            CloseBrace@1235..1236 "}"
+          Whitespace@1236..1245 "\n        "
+          CloseBracket@1245..1246 "]"
+      Whitespace@1246..1251 "\n    "
+      CloseBrace@1251..1252 "}"
+    Whitespace@1252..1253 "\n"
+    CloseBrace@1253..1254 "}"
+  Whitespace@1254..1256 "\n\n"
+  WorkflowDefinitionNode@1256..2445
+    WorkflowKeyword@1256..1264 "workflow"
+    NameNode@1264..1266
+      Whitespace@1264..1265 " "
+      Ident@1265..1266 "w"
+    Whitespace@1266..1267 " "
+    OpenBrace@1267..1268 "{"
+    Whitespace@1268..1273 "\n    "
+    MetadataSectionNode@1273..1848
+      MetaKeyword@1273..1277 "meta"
+      Whitespace@1277..1278 " "
+      OpenBrace@1278..1279 "{"
+      Whitespace@1279..1288 "\n        "
+      MetadataObjectItemNode@1288..1298
+        Ident@1288..1289 "a"
+        Colon@1289..1290 ":"
+        LiteralStringNode@1290..1298
+          Whitespace@1290..1291 " "
+          DoubleQuote@1291..1292 "\""
+          LiteralStringText@1292..1297 "hello"
+          DoubleQuote@1297..1298 "\""
+      Whitespace@1298..1307 "\n        "
+      MetadataObjectItemNode@1307..1317
+        Ident@1307..1308 "b"
+        Colon@1308..1309 ":"
+        LiteralStringNode@1309..1317
+          Whitespace@1309..1310 " "
+          SingleQuote@1310..1311 "'"
+          LiteralStringText@1311..1316 "world"
+          SingleQuote@1316..1317 "'"
+      Whitespace@1317..1326 "\n        "
+      MetadataObjectItemNode@1326..1330
+        Ident@1326..1327 "c"
+        Colon@1327..1328 ":"
+        LiteralIntegerNode@1328..1330
+          Whitespace@1328..1329 " "
+          Integer@1329..1330 "5"
+      Whitespace@1330..1339 "\n        "
+      MetadataObjectItemNode@1339..1346
+        Ident@1339..1340 "d"
+        Colon@1340..1341 ":"
+        LiteralIntegerNode@1341..1346
+          Whitespace@1341..1342 " "
+          Minus@1342..1343 "-"
+          Integer@1343..1346 "0xf"
+      Whitespace@1346..1355 "\n        "
+      MetadataObjectItemNode@1355..1364
+        Ident@1355..1356 "e"
+        Colon@1356..1357 ":"
+        LiteralFloatNode@1357..1364
+          Whitespace@1357..1358 " "
+          Float@1358..1364 "1.0e10"
+      Whitespace@1364..1373 "\n        "
+      MetadataObjectItemNode@1373..1379
+        Ident@1373..1374 "f"
+        Colon@1374..1375 ":"
+        LiteralFloatNode@1375..1379
+          Whitespace@1375..1376 " "
+          Minus@1376..1377 "-"
+          Float@1377..1379 "2."
+      Whitespace@1379..1388 "\n        "
+      MetadataObjectItemNode@1388..1395
+        Ident@1388..1389 "g"
+        Colon@1389..1390 ":"
+        LiteralBooleanNode@1390..1395
+          Whitespace@1390..1391 " "
+          TrueKeyword@1391..1395 "true"
+      Whitespace@1395..1404 "\n        "
+      MetadataObjectItemNode@1404..1412
+        Ident@1404..1405 "h"
+        Colon@1405..1406 ":"
+        LiteralBooleanNode@1406..1412
+          Whitespace@1406..1407 " "
+          FalseKeyword@1407..1412 "false"
+      Whitespace@1412..1421 "\n        "
+      MetadataObjectItemNode@1421..1428
+        Ident@1421..1422 "i"
+        Colon@1422..1423 ":"
+        LiteralNullNode@1423..1428
+          Whitespace@1423..1424 " "
+          NullKeyword@1424..1428 "null"
+      Whitespace@1428..1437 "\n        "
+      MetadataObjectItemNode@1437..1613
+        Ident@1437..1438 "j"
+        Colon@1438..1439 ":"
+        MetadataObjectNode@1439..1613
+          Whitespace@1439..1440 " "
+          OpenBrace@1440..1441 "{"
+          Whitespace@1441..1454 "\n            "
+          MetadataObjectItemNode@1454..1466
+            Ident@1454..1455 "a"
+            Colon@1455..1456 ":"
+            MetadataArrayNode@1456..1466
+              Whitespace@1456..1457 " "
+              OpenBracket@1457..1458 "["
+              LiteralIntegerNode@1458..1459
+                Integer@1458..1459 "1"
+              Comma@1459..1460 ","
+              Whitespace@1460..1461 " "
+              LiteralIntegerNode@1461..1462
+                Integer@1461..1462 "2"
+              Comma@1462..1463 ","
+              Whitespace@1463..1464 " "
+              LiteralIntegerNode@1464..1465
+                Integer@1464..1465 "3"
+              CloseBracket@1465..1466 "]"
+          Comma@1466..1467 ","
+          Whitespace@1467..1480 "\n            "
+          MetadataObjectItemNode@1480..1506
+            Ident@1480..1481 "b"
+            Colon@1481..1482 ":"
+            MetadataArrayNode@1482..1506
+              Whitespace@1482..1483 " "
+              OpenBracket@1483..1484 "["
+              LiteralStringNode@1484..1491
+                DoubleQuote@1484..1485 "\""
+                LiteralStringText@1485..1490 "hello"
+                DoubleQuote@1490..1491 "\""
+              Comma@1491..1492 ","
+              Whitespace@1492..1493 " "
+              LiteralStringNode@1493..1500
+                DoubleQuote@1493..1494 "\""
+                LiteralStringText@1494..1499 "world"
+                DoubleQuote@1499..1500 "\""
+              Comma@1500..1501 ","
+              Whitespace@1501..1502 " "
+              LiteralStringNode@1502..1505
+                DoubleQuote@1502..1503 "\""
+                LiteralStringText@1503..1504 "!"
+                DoubleQuote@1504..1505 "\""
+              CloseBracket@1505..1506 "]"
+          Comma@1506..1507 ","
+          Whitespace@1507..1520 "\n            "
+          MetadataObjectItemNode@1520..1603
+            Ident@1520..1521 "c"
+            Colon@1521..1522 ":"
+            MetadataObjectNode@1522..1603
+              Whitespace@1522..1523 " "
+              OpenBrace@1523..1524 "{"
+              Whitespace@1524..1541 "\n                "
+              MetadataObjectItemNode@1541..1545
+                Ident@1541..1542 "x"
+                Colon@1542..1543 ":"
+                LiteralIntegerNode@1543..1545
+                  Whitespace@1543..1544 " "
+                  Integer@1544..1545 "1"
+              Comma@1545..1546 ","
+              Whitespace@1546..1563 "\n                "
+              MetadataObjectItemNode@1563..1567
+                Ident@1563..1564 "y"
+                Colon@1564..1565 ":"
+                LiteralIntegerNode@1565..1567
+                  Whitespace@1565..1566 " "
+                  Integer@1566..1567 "2"
+              Comma@1567..1568 ","
+              Whitespace@1568..1585 "\n                "
+              MetadataObjectItemNode@1585..1589
+                Ident@1585..1586 "z"
+                Colon@1586..1587 ":"
+                LiteralIntegerNode@1587..1589
+                  Whitespace@1587..1588 " "
+                  Integer@1588..1589 "3"
+              Whitespace@1589..1602 "\n            "
+              CloseBrace@1602..1603 "}"
+          Whitespace@1603..1612 "\n        "
+          CloseBrace@1612..1613 "}"
+      Whitespace@1613..1622 "\n        "
+      MetadataObjectItemNode@1622..1842
+        Ident@1622..1623 "k"
+        Colon@1623..1624 ":"
+        MetadataArrayNode@1624..1842
+          Whitespace@1624..1625 " "
+          OpenBracket@1625..1626 "["
+          Whitespace@1626..1639 "\n            "
+          MetadataObjectNode@1639..1768
+            OpenBrace@1639..1640 "{"
+            Whitespace@1640..1657 "\n                "
+            MetadataObjectItemNode@1657..1662
+              Ident@1657..1658 "a"
+              Colon@1658..1659 ":"
+              MetadataObjectNode@1659..1662
+                Whitespace@1659..1660 " "
+                OpenBrace@1660..1661 "{"
+                CloseBrace@1661..1662 "}"
+            Comma@1662..1663 ","
+            Whitespace@1663..1680 "\n                "
+            MetadataObjectItemNode@1680..1684
+              Ident@1680..1681 "b"
+              Colon@1681..1682 ":"
+              LiteralIntegerNode@1682..1684
+                Whitespace@1682..1683 " "
+                Integer@1683..1684 "0"
+            Comma@1684..1685 ","
+            Whitespace@1685..1702 "\n                "
+            MetadataObjectItemNode@1702..1707
+              Ident@1702..1703 "c"
+              Colon@1703..1704 ":"
+              LiteralStringNode@1704..1707
+                Whitespace@1704..1705 " "
+                DoubleQuote@1705..1706 "\""
+                DoubleQuote@1706..1707 "\""
+            Comma@1707..1708 ","
+            Whitespace@1708..1725 "\n                "
+            MetadataObjectItemNode@1725..1730
+              Ident@1725..1726 "d"
+              Colon@1726..1727 ":"
+              LiteralStringNode@1727..1730
+                Whitespace@1727..1728 " "
+                SingleQuote@1728..1729 "'"
+                SingleQuote@1729..1730 "'"
+            Comma@1730..1731 ","
+            Whitespace@1731..1748 "\n                "
+            MetadataObjectItemNode@1748..1753
+              Ident@1748..1749 "e"
+              Colon@1749..1750 ":"
+              MetadataArrayNode@1750..1753
+                Whitespace@1750..1751 " "
+                OpenBracket@1751..1752 "["
+                CloseBracket@1752..1753 "]"
+            Comma@1753..1754 ","
+            Whitespace@1754..1767 "\n            "
+            CloseBrace@1767..1768 "}"
+          Comma@1768..1769 ","
+          Whitespace@1769..1782 "\n            "
+          MetadataObjectNode@1782..1832
+            OpenBrace@1782..1783 "{"
+            Whitespace@1783..1800 "\n                "
+            MetadataObjectItemNode@1800..1818
+              Ident@1800..1801 "x"
+              Colon@1801..1802 ":"
+              MetadataArrayNode@1802..1818
+                Whitespace@1802..1803 " "
+                OpenBracket@1803..1804 "["
+                LiteralFloatNode@1804..1807
+                  Float@1804..1807 "1.0"
+                Comma@1807..1808 ","
+                Whitespace@1808..1809 " "
+                LiteralFloatNode@1809..1812
+                  Float@1809..1812 "2.0"
+                Comma@1812..1813 ","
+                Whitespace@1813..1814 " "
+                LiteralFloatNode@1814..1817
+                  Float@1814..1817 "3.0"
+                CloseBracket@1817..1818 "]"
+            Whitespace@1818..1831 "\n            "
+            CloseBrace@1831..1832 "}"
+          Whitespace@1832..1841 "\n        "
+          CloseBracket@1841..1842 "]"
+      Whitespace@1842..1847 "\n    "
+      CloseBrace@1847..1848 "}"
+    Whitespace@1848..1858 "\n    \n    "
+    ParameterMetadataSectionNode@1858..2443
+      ParameterMetaKeyword@1858..1872 "parameter_meta"
+      Whitespace@1872..1873 " "
+      OpenBrace@1873..1874 "{"
+      Whitespace@1874..1883 "\n        "
+      MetadataObjectItemNode@1883..1893
+        Ident@1883..1884 "a"
+        Colon@1884..1885 ":"
+        LiteralStringNode@1885..1893
+          Whitespace@1885..1886 " "
+          DoubleQuote@1886..1887 "\""
+          LiteralStringText@1887..1892 "hello"
+          DoubleQuote@1892..1893 "\""
+      Whitespace@1893..1902 "\n        "
+      MetadataObjectItemNode@1902..1912
+        Ident@1902..1903 "b"
+        Colon@1903..1904 ":"
+        LiteralStringNode@1904..1912
+          Whitespace@1904..1905 " "
+          SingleQuote@1905..1906 "'"
+          LiteralStringText@1906..1911 "world"
+          SingleQuote@1911..1912 "'"
+      Whitespace@1912..1921 "\n        "
+      MetadataObjectItemNode@1921..1925
+        Ident@1921..1922 "c"
+        Colon@1922..1923 ":"
+        LiteralIntegerNode@1923..1925
+          Whitespace@1923..1924 " "
+          Integer@1924..1925 "5"
+      Whitespace@1925..1934 "\n        "
+      MetadataObjectItemNode@1934..1941
+        Ident@1934..1935 "d"
+        Colon@1935..1936 ":"
+        LiteralIntegerNode@1936..1941
+          Whitespace@1936..1937 " "
+          Minus@1937..1938 "-"
+          Integer@1938..1941 "0xf"
+      Whitespace@1941..1950 "\n        "
+      MetadataObjectItemNode@1950..1959
+        Ident@1950..1951 "e"
+        Colon@1951..1952 ":"
+        LiteralFloatNode@1952..1959
+          Whitespace@1952..1953 " "
+          Float@1953..1959 "1.0e10"
+      Whitespace@1959..1968 "\n        "
+      MetadataObjectItemNode@1968..1974
+        Ident@1968..1969 "f"
+        Colon@1969..1970 ":"
+        LiteralFloatNode@1970..1974
+          Whitespace@1970..1971 " "
+          Minus@1971..1972 "-"
+          Float@1972..1974 "2."
+      Whitespace@1974..1983 "\n        "
+      MetadataObjectItemNode@1983..1990
+        Ident@1983..1984 "g"
+        Colon@1984..1985 ":"
+        LiteralBooleanNode@1985..1990
+          Whitespace@1985..1986 " "
+          TrueKeyword@1986..1990 "true"
+      Whitespace@1990..1999 "\n        "
+      MetadataObjectItemNode@1999..2007
+        Ident@1999..2000 "h"
+        Colon@2000..2001 ":"
+        LiteralBooleanNode@2001..2007
+          Whitespace@2001..2002 " "
+          FalseKeyword@2002..2007 "false"
+      Whitespace@2007..2016 "\n        "
+      MetadataObjectItemNode@2016..2023
+        Ident@2016..2017 "i"
+        Colon@2017..2018 ":"
+        LiteralNullNode@2018..2023
+          Whitespace@2018..2019 " "
+          NullKeyword@2019..2023 "null"
+      Whitespace@2023..2032 "\n        "
+      MetadataObjectItemNode@2032..2208
+        Ident@2032..2033 "j"
+        Colon@2033..2034 ":"
+        MetadataObjectNode@2034..2208
+          Whitespace@2034..2035 " "
+          OpenBrace@2035..2036 "{"
+          Whitespace@2036..2049 "\n            "
+          MetadataObjectItemNode@2049..2061
+            Ident@2049..2050 "a"
+            Colon@2050..2051 ":"
+            MetadataArrayNode@2051..2061
+              Whitespace@2051..2052 " "
+              OpenBracket@2052..2053 "["
+              LiteralIntegerNode@2053..2054
+                Integer@2053..2054 "1"
+              Comma@2054..2055 ","
+              Whitespace@2055..2056 " "
+              LiteralIntegerNode@2056..2057
+                Integer@2056..2057 "2"
+              Comma@2057..2058 ","
+              Whitespace@2058..2059 " "
+              LiteralIntegerNode@2059..2060
+                Integer@2059..2060 "3"
+              CloseBracket@2060..2061 "]"
+          Comma@2061..2062 ","
+          Whitespace@2062..2075 "\n            "
+          MetadataObjectItemNode@2075..2101
+            Ident@2075..2076 "b"
+            Colon@2076..2077 ":"
+            MetadataArrayNode@2077..2101
+              Whitespace@2077..2078 " "
+              OpenBracket@2078..2079 "["
+              LiteralStringNode@2079..2086
+                DoubleQuote@2079..2080 "\""
+                LiteralStringText@2080..2085 "hello"
+                DoubleQuote@2085..2086 "\""
+              Comma@2086..2087 ","
+              Whitespace@2087..2088 " "
+              LiteralStringNode@2088..2095
+                DoubleQuote@2088..2089 "\""
+                LiteralStringText@2089..2094 "world"
+                DoubleQuote@2094..2095 "\""
+              Comma@2095..2096 ","
+              Whitespace@2096..2097 " "
+              LiteralStringNode@2097..2100
+                DoubleQuote@2097..2098 "\""
+                LiteralStringText@2098..2099 "!"
+                DoubleQuote@2099..2100 "\""
+              CloseBracket@2100..2101 "]"
+          Comma@2101..2102 ","
+          Whitespace@2102..2115 "\n            "
+          MetadataObjectItemNode@2115..2198
+            Ident@2115..2116 "c"
+            Colon@2116..2117 ":"
+            MetadataObjectNode@2117..2198
+              Whitespace@2117..2118 " "
+              OpenBrace@2118..2119 "{"
+              Whitespace@2119..2136 "\n                "
+              MetadataObjectItemNode@2136..2140
+                Ident@2136..2137 "x"
+                Colon@2137..2138 ":"
+                LiteralIntegerNode@2138..2140
+                  Whitespace@2138..2139 " "
+                  Integer@2139..2140 "1"
+              Comma@2140..2141 ","
+              Whitespace@2141..2158 "\n                "
+              MetadataObjectItemNode@2158..2162
+                Ident@2158..2159 "y"
+                Colon@2159..2160 ":"
+                LiteralIntegerNode@2160..2162
+                  Whitespace@2160..2161 " "
+                  Integer@2161..2162 "2"
+              Comma@2162..2163 ","
+              Whitespace@2163..2180 "\n                "
+              MetadataObjectItemNode@2180..2184
+                Ident@2180..2181 "z"
+                Colon@2181..2182 ":"
+                LiteralIntegerNode@2182..2184
+                  Whitespace@2182..2183 " "
+                  Integer@2183..2184 "3"
+              Whitespace@2184..2197 "\n            "
+              CloseBrace@2197..2198 "}"
+          Whitespace@2198..2207 "\n        "
+          CloseBrace@2207..2208 "}"
+      Whitespace@2208..2217 "\n        "
+      MetadataObjectItemNode@2217..2437
+        Ident@2217..2218 "k"
+        Colon@2218..2219 ":"
+        MetadataArrayNode@2219..2437
+          Whitespace@2219..2220 " "
+          OpenBracket@2220..2221 "["
+          Whitespace@2221..2234 "\n            "
+          MetadataObjectNode@2234..2363
+            OpenBrace@2234..2235 "{"
+            Whitespace@2235..2252 "\n                "
+            MetadataObjectItemNode@2252..2257
+              Ident@2252..2253 "a"
+              Colon@2253..2254 ":"
+              MetadataObjectNode@2254..2257
+                Whitespace@2254..2255 " "
+                OpenBrace@2255..2256 "{"
+                CloseBrace@2256..2257 "}"
+            Comma@2257..2258 ","
+            Whitespace@2258..2275 "\n                "
+            MetadataObjectItemNode@2275..2279
+              Ident@2275..2276 "b"
+              Colon@2276..2277 ":"
+              LiteralIntegerNode@2277..2279
+                Whitespace@2277..2278 " "
+                Integer@2278..2279 "0"
+            Comma@2279..2280 ","
+            Whitespace@2280..2297 "\n                "
+            MetadataObjectItemNode@2297..2302
+              Ident@2297..2298 "c"
+              Colon@2298..2299 ":"
+              LiteralStringNode@2299..2302
+                Whitespace@2299..2300 " "
+                DoubleQuote@2300..2301 "\""
+                DoubleQuote@2301..2302 "\""
+            Comma@2302..2303 ","
+            Whitespace@2303..2320 "\n                "
+            MetadataObjectItemNode@2320..2325
+              Ident@2320..2321 "d"
+              Colon@2321..2322 ":"
+              LiteralStringNode@2322..2325
+                Whitespace@2322..2323 " "
+                SingleQuote@2323..2324 "'"
+                SingleQuote@2324..2325 "'"
+            Comma@2325..2326 ","
+            Whitespace@2326..2343 "\n                "
+            MetadataObjectItemNode@2343..2348
+              Ident@2343..2344 "e"
+              Colon@2344..2345 ":"
+              MetadataArrayNode@2345..2348
+                Whitespace@2345..2346 " "
+                OpenBracket@2346..2347 "["
+                CloseBracket@2347..2348 "]"
+            Comma@2348..2349 ","
+            Whitespace@2349..2362 "\n            "
+            CloseBrace@2362..2363 "}"
+          Comma@2363..2364 ","
+          Whitespace@2364..2377 "\n            "
+          MetadataObjectNode@2377..2427
+            OpenBrace@2377..2378 "{"
+            Whitespace@2378..2395 "\n                "
+            MetadataObjectItemNode@2395..2413
+              Ident@2395..2396 "x"
+              Colon@2396..2397 ":"
+              MetadataArrayNode@2397..2413
+                Whitespace@2397..2398 " "
+                OpenBracket@2398..2399 "["
+                LiteralFloatNode@2399..2402
+                  Float@2399..2402 "1.0"
+                Comma@2402..2403 ","
+                Whitespace@2403..2404 " "
+                LiteralFloatNode@2404..2407
+                  Float@2404..2407 "2.0"
+                Comma@2407..2408 ","
+                Whitespace@2408..2409 " "
+                LiteralFloatNode@2409..2412
+                  Float@2409..2412 "3.0"
+                CloseBracket@2412..2413 "]"
+            Whitespace@2413..2426 "\n            "
+            CloseBrace@2426..2427 "}"
+          Whitespace@2427..2436 "\n        "
+          CloseBracket@2436..2437 "]"
+      Whitespace@2437..2442 "\n    "
+      CloseBrace@2442..2443 "}"
+    Whitespace@2443..2444 "\n"
+    CloseBrace@2444..2445 "}"
+  Whitespace@2445..2446 "\n"
