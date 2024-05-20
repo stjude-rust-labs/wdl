@@ -165,8 +165,10 @@ pub enum SyntaxKind {
     Greater,
     /// The `.` symbol token.
     Dot,
-    /// A literal string text token.
+    /// A literal text part of a string.
     LiteralStringText,
+    /// A literal text part of a command.
+    LiteralCommandText,
     /// A placeholder open token.
     PlaceholderOpen,
 
@@ -203,6 +205,10 @@ pub enum SyntaxKind {
     InputSectionNode,
     /// Represents an output section node.
     OutputSectionNode,
+    /// Represents a braced command section node.
+    BracedCommandSectionNode,
+    /// Represents a heredoc command section node.
+    HeredocCommandSectionNode,
     /// Represents a primitive type node.
     PrimitiveTypeNode,
     /// Represents a map type node.
