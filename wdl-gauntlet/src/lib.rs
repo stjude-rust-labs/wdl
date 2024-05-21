@@ -236,24 +236,63 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                         .map_err(Error::GrammarV1)?
                         .into_parts();
                     if let Some(these_concerns) = these_concerns {
-                        detected_concerns.extend(these_concerns.into_inner().map(|concern| {
-                            ReportableConcern::from_concern(
-                                document_identifier.to_string(),
-                                concern,
-                            )
-                        }));
+                        if let Some(parse_errors) = these_concerns.parse_errors() {
+                            detected_concerns.extend(parse_errors.into_iter().map(|error| {
+                                // SAFETY: We ensure these concerns are not LintWarnings,
+                                // so they will always unwrap.
+                                ReportableConcern::from_concern(
+                                    document_identifier.to_string(),
+                                    wdl_core::Concern::ParseError(error.to_owned()),
+                                )
+                                .unwrap()
+                            }));
+                        }
+                        if let Some(validation_failures) = these_concerns.validation_failures() {
+                            detected_concerns.extend(validation_failures.into_iter().map(
+                                |failure| {
+                                    // SAFETY: We ensure these concerns are not LintWarnings,
+                                    // so they will always unwrap.
+                                    ReportableConcern::from_concern(
+                                        document_identifier.to_string(),
+                                        wdl_core::Concern::ValidationFailure(failure.to_owned()),
+                                    )
+                                    .unwrap()
+                                },
+                            ));
+                        }
                     }
 
                     if let Some(pt) = pt {
                         let (_, these_concerns) =
                             ast::v1::parse(pt).map_err(Error::AstV1)?.into_parts();
                         if let Some(these_concerns) = these_concerns {
-                            detected_concerns.extend(these_concerns.into_inner().map(|concern| {
-                                ReportableConcern::from_concern(
-                                    document_identifier.to_string(),
-                                    concern,
-                                )
-                            }));
+                            if let Some(parse_errors) = these_concerns.parse_errors() {
+                                detected_concerns.extend(parse_errors.into_iter().map(|error| {
+                                    // SAFETY: We ensure these concerns are not LintWarnings,
+                                    // so they will always unwrap.
+                                    ReportableConcern::from_concern(
+                                        document_identifier.to_string(),
+                                        wdl_core::Concern::ParseError(error.to_owned()),
+                                    )
+                                    .unwrap()
+                                }));
+                            }
+                            if let Some(validation_failures) = these_concerns.validation_failures()
+                            {
+                                detected_concerns.extend(validation_failures.into_iter().map(
+                                    |failure| {
+                                        // SAFETY: We ensure these concerns are not LintWarnings,
+                                        // so they will always unwrap.
+                                        ReportableConcern::from_concern(
+                                            document_identifier.to_string(),
+                                            wdl_core::Concern::ValidationFailure(
+                                                failure.to_owned(),
+                                            ),
+                                        )
+                                        .unwrap()
+                                    },
+                                ));
+                            }
                         }
                     }
 
