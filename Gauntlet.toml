@@ -1,12 +1,28 @@
 version = "v1"
 
 [[repositories]]
+organization = "ENCODE-DCC"
+name = "chip-seq-pipeline2"
+
+[[repositories]]
 organization = "PacificBiosciences"
 name = "HiFi-human-WGS-WDL"
 
 [[repositories]]
+organization = "aws-samples"
+name = "amazon-omics-tutorials"
+
+[[repositories]]
 organization = "biowdl"
 name = "tasks"
+
+[[repositories]]
+organization = "broadinstitute"
+name = "gatk-tool-wdls"
+
+[[repositories]]
+organization = "broadinstitute"
+name = "palantir-workflows"
 
 [[repositories]]
 organization = "broadinstitute"
@@ -17,8 +33,169 @@ organization = "chanzuckerberg"
 name = "czid-workflows"
 
 [[repositories]]
+organization = "getwilds"
+name = "ww-fastq-to-cram"
+
+[[repositories]]
+organization = "getwilds"
+name = "ww-star-deseq2"
+
+[[repositories]]
+organization = "getwilds"
+name = "ww-vc-trio"
+
+[[repositories]]
 organization = "stjudecloud"
 name = "workflows"
+
+[[repositories]]
+organization = "theiagen"
+name = "public_health_bioinformatics"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:chip.wdl"
+message = "The following tokens are required: comma. (1262:26)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_bam2ta.wdl"
+message = "The following tokens are required: comma. (30:37)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_bam_to_pbam.wdl"
+message = "The following tokens are required: comma. (32:37)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_bowtie2.wdl"
+message = "The following tokens are required: comma. (33:37)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_bwa.wdl"
+message = "The following tokens are required: comma. (31:33)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_choose_ctl.wdl"
+message = "The following tokens are required: comma. (66:45)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_count_signal_track.wdl"
+message = "The following tokens are required: comma. (21:61)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_filter.wdl"
+message = "The following tokens are required: comma. (33:37)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_gc_bias.wdl"
+message = "The following tokens are required: comma. (18:25)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_idr.wdl"
+message = "The following tokens are required: comma. (31:31)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_jsd.wdl"
+message = "The following tokens are required: comma. (27:31)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_macs2.wdl"
+message = "The following tokens are required: comma. (36:39)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_macs2_signal_track.wdl"
+message = "The following tokens are required: comma. (29:61)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_overlap.wdl"
+message = "The following tokens are required: comma. (30:39)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_pool_ta.wdl"
+message = "The following tokens are required: comma. (19:39)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_reproducibility.wdl"
+message = "The following tokens are required: comma. (22:55)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_spp.wdl"
+message = "The following tokens are required: comma. (35:37)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_spr.wdl"
+message = "The following tokens are required: comma. (28:31)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_subsample_ctl.wdl"
+message = "The following tokens are required: comma. (25:51)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_trimmomatic.wdl"
+message = "The following tokens are required: comma. (37:45)"
+
+[[concerns]]
+kind = "ParseError"
+document = "ENCODE-DCC/chip-seq-pipeline2:dev/test/test_task/test_xcor.wdl"
+message = "The following tokens are required: comma. (30:33)"
+
+[[concerns]]
+kind = "ParseError"
+document = "aws-samples/amazon-omics-tutorials:example-workflows/gatk-best-practices/workflows/somatic-snps-and-indels/mutec2.wdl"
+message = "The following tokens are required: singular_identifier. (112:41)"
+
+[[concerns]]
+kind = "ParseError"
+document = "aws-samples/amazon-omics-tutorials:example-workflows/protein-folding/workflows/alphafold/alphafold-600.wdl"
+message = "The following tokens are required: singular_identifier, or, and, add, sub, mul, div, remainder, eq, neq, lte, gte, lt, gt, member, index, call. (110:29)"
+
+[[concerns]]
+kind = "ParseError"
+document = "aws-samples/amazon-omics-tutorials:example-workflows/protein-folding/workflows/esmfold/esmfold.wdl"
+message = "The following tokens are required: singular_identifier, or, and, add, sub, mul, div, remainder, eq, neq, lte, gte, lt, gt, member, index, call. (58:29)"
+
+[[concerns]]
+kind = "ParseError"
+document = "broadinstitute/palantir-workflows:BenchmarkVCFs/BenchmarkVCFs.wdl"
+message = "The following tokens are required: singular_identifier. (271:111)"
+
+[[concerns]]
+kind = "ParseError"
+document = "broadinstitute/palantir-workflows:HaplotypeMap/BuildHaplotypeMap.wdl"
+message = "The following tokens are required: version. (17:1)"
+
+[[concerns]]
+kind = "ParseError"
+document = "broadinstitute/palantir-workflows:ImputationPipeline/AggregatePRSResults.wdl"
+message = "The following tokens are required: or, and, add, sub, mul, div, remainder, eq, neq, lte, gte, lt, gt, member, index, call. (217:82)"
+
+[[concerns]]
+kind = "ParseError"
+document = "broadinstitute/palantir-workflows:ImputationPipeline/EndToEndPipeline.wdl"
+message = "The following tokens are required: comma. (76:4)"
+
+[[concerns]]
+kind = "ParseError"
+document = "broadinstitute/palantir-workflows:ImputationPipeline/Validation/ValidateImputation.wdl"
+message = "The following tokens are required: comma. (122:3)"
 
 [[concerns]]
 kind = "ParseError"
@@ -74,6 +251,251 @@ message = "The following tokens are required: or, and, add, sub, mul, div, remai
 kind = "ParseError"
 document = "stjudecloud/workflows:template/task-templates.wdl"
 message = "The following tokens are required: expression. (49:35)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/freyja/wf_freyja_dashboard.wdl"
+message = "The following tokens are required: workflow_call_input. (26:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/freyja/wf_freyja_fastq.wdl"
+message = "The following tokens are required: workflow_call_input. (49:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/freyja/wf_freyja_plot.wdl"
+message = "The following tokens are required: workflow_call_input. (22:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/freyja/wf_freyja_update.wdl"
+message = "The following tokens are required: workflow_call_input. (12:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/phylogenetics/wf_augur.wdl"
+message = "The following tokens are required: workflow_call_input. (49:5)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/phylogenetics/wf_augur_prep.wdl"
+message = "The following tokens are required: workflow_call_input. (30:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/phylogenetics/wf_core_gene_snp.wdl"
+message = "The following tokens are required: workflow_call_input. (90:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/phylogenetics/wf_find_shared_variants.wdl"
+message = "The following tokens are required: workflow_call_input. (29:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/phylogenetics/wf_ksnp3.wdl"
+message = "The following tokens are required: workflow_call_input. (72:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/phylogenetics/wf_lyveset.wdl"
+message = "The following tokens are required: workflow_call_input. (24:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/phylogenetics/wf_mashtree_fasta.wdl"
+message = "The following tokens are required: workflow_call_input. (44:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/phylogenetics/wf_nextclade_addToRefTree.wdl"
+message = "The following tokens are required: workflow_call_input. (31:5)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/phylogenetics/wf_snippy_streamline.wdl"
+message = "The following tokens are required: workflow_call_input. (56:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/phylogenetics/wf_snippy_tree.wdl"
+message = "The following tokens are required: workflow_call_input. (186:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/standalone_modules/wf_amrfinderplus.wdl"
+message = "The following tokens are required: workflow_call_input. (18:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/standalone_modules/wf_gambit_query.wdl"
+message = "The following tokens are required: workflow_call_input. (18:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/standalone_modules/wf_gambitcore.wdl"
+message = "The following tokens are required: workflow_call_input. (18:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/standalone_modules/wf_kraken2_ont.wdl"
+message = "The following tokens are required: workflow_call_input. (29:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/standalone_modules/wf_kraken2_pe.wdl"
+message = "The following tokens are required: workflow_call_input. (31:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/standalone_modules/wf_kraken2_se.wdl"
+message = "The following tokens are required: workflow_call_input. (29:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/standalone_modules/wf_rasusa.wdl"
+message = "The following tokens are required: workflow_call_input. (24:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/standalone_modules/wf_snippy_variants.wdl"
+message = "The following tokens are required: workflow_call_input. (56:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/standalone_modules/wf_tbprofiler_tngs.wdl"
+message = "The following tokens are required: workflow_call_input. (20:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/submission/wf_terra_2_ncbi.wdl"
+message = "The following tokens are required: workflow_call_input. (23:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiacov/updates/wf_ncbi_scrub_pe.wdl"
+message = "The following tokens are required: workflow_call_input. (27:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiacov/updates/wf_ncbi_scrub_se.wdl"
+message = "The following tokens are required: workflow_call_input. (24:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiacov/updates/wf_pangolin_update.wdl"
+message = "The following tokens are required: workflow_call_input. (61:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiacov/updates/wf_vadr_update.wdl"
+message = "The following tokens are required: workflow_call_input. (20:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiacov/wf_theiacov_clearlabs.wdl"
+message = "The following tokens are required: workflow_call_input. (161:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiacov/wf_theiacov_fasta.wdl"
+message = "The following tokens are required: workflow_call_input. (120:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiacov/wf_theiacov_fasta_batch.wdl"
+message = "The following tokens are required: workflow_call_input. (62:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiacov/wf_theiacov_illumina_pe.wdl"
+message = "The following tokens are required: workflow_call_input. (344:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiacov/wf_theiacov_illumina_se.wdl"
+message = "The following tokens are required: workflow_call_input. (204:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiacov/wf_theiacov_ont.wdl"
+message = "The following tokens are required: workflow_call_input. (330:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiaeuk/wf_cauris_cladetyper.wdl"
+message = "The following tokens are required: workflow_call_input. (18:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiaeuk/wf_theiaeuk_illumina_pe.wdl"
+message = "The following tokens are required: workflow_call_input. (50:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiameta/wf_theiameta_illumina_pe.wdl"
+message = "The following tokens are required: workflow_call_input. (180:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiaprok/wf_theiaprok_fasta.wdl"
+message = "The following tokens are required: workflow_call_input. (52:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiaprok/wf_theiaprok_illumina_pe.wdl"
+message = "The following tokens are required: workflow_call_input. (69:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiaprok/wf_theiaprok_illumina_se.wdl"
+message = "The following tokens are required: workflow_call_input. (69:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/theiaprok/wf_theiaprok_ont.wdl"
+message = "The following tokens are required: workflow_call_input. (65:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/utilities/data_import/wf_assembly_fetch.wdl"
+message = "The following tokens are required: workflow_call_input. (27:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/utilities/data_import/wf_basespace_fetch.wdl"
+message = "The following tokens are required: workflow_call_input. (26:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/utilities/file_handling/wf_concatenate_column.wdl"
+message = "The following tokens are required: workflow_call_input. (18:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/utilities/file_handling/wf_rename_fastq_files.wdl"
+message = "The following tokens are required: workflow_call_input. (29:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/utilities/file_handling/wf_transfer_column.wdl"
+message = "The following tokens are required: workflow_call_input. (18:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/utilities/file_handling/wf_zip_column.wdl"
+message = "The following tokens are required: workflow_call_input. (18:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/utilities/wf_czgenepi_prep.wdl"
+message = "The following tokens are required: workflow_call_input. (37:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:workflows/utilities/wf_theiavalidate.wdl"
+message = "The following tokens are required: workflow_call_input. (54:3)"
 
 [[concerns]]
 kind = "ValidationFailure"
