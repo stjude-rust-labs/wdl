@@ -1,4 +1,4 @@
-# This is a test of parsing task metadata sections.
+# This is a test of parsing task and workflow metadata sections.
 
 version 1.1
 
