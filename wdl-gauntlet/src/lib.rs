@@ -12,7 +12,6 @@ use std::process;
 
 use clap::Parser;
 use colored::Colorize as _;
-use indexmap::IndexMap;
 use indexmap::IndexSet;
 use log::debug;
 use log::info;
@@ -159,21 +158,18 @@ pub async fn gauntlet(args: Args) -> Result<()> {
         }
     };
 
-    // if let Some(repositories) = args.repositories {
-    //     config.inner_mut().extend_repositories(
-    //         repositories
-    //             .into_iter()
-    //             .map(|value| {
-    //                 value
-    //                     .parse::<Identifier>()
-    //                     .map_err(Error::RepositoryIdentifier)
-    //                     .unwrap()
-    //             })
-    //             .collect::<IndexSet<_>>(),
-    //     )
-    // }
-
     let mut cache = Cache::new(args.cache_dir);
+
+    if let Some(repositories) = args.repositories {
+        repositories.into_iter().for_each(|value| {
+            let identifier = value
+                .parse::<Identifier>()
+                .map_err(Error::RepositoryIdentifier)
+                .unwrap();
+            cache.add_by_identifier(&identifier, None);
+        });
+        config.inner_mut().extend_repositories(cache.repositories().clone())
+    }
 
     let mut report = Report::from(std::io::stdout().lock());
 

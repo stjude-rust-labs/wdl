@@ -109,11 +109,9 @@ impl Inner {
     ///
     /// assert_eq!(inner.repositories().len(), 2);
     /// ```
-    pub fn extend_repositories<
-        T: IntoIterator<Item = (repository::Identifier, repository::Repository)>,
-    >(
+    pub fn extend_repositories(
         &mut self,
-        items: T,
+        items: IndexMap<repository::Identifier, repository::Repository>,
     ) {
         self.repositories.extend(items);
         self.repositories.sort_by(|a, _, b, _| a.cmp(&b));
