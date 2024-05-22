@@ -159,31 +159,27 @@ pub async fn gauntlet(args: Args) -> Result<()> {
         }
     };
 
-    if let Some(repositories) = args.repositories {
-        config.inner_mut().extend_repositories(
-            repositories
-                .into_iter()
-                .map(|value| {
-                    (
-                        value
-                            .parse::<Identifier>()
-                            .map_err(Error::RepositoryIdentifier)
-                            .unwrap(),
-                        None,
-                    )
-                })
-                .collect::<IndexMap<_, _>>(),
-        )
-    }
+    // if let Some(repositories) = args.repositories {
+    //     config.inner_mut().extend_repositories(
+    //         repositories
+    //             .into_iter()
+    //             .map(|value| {
+    //                 value
+    //                     .parse::<Identifier>()
+    //                     .map_err(Error::RepositoryIdentifier)
+    //                     .unwrap()
+    //             })
+    //             .collect::<IndexSet<_>>(),
+    //     )
+    // }
 
     let mut cache = Cache::new(args.cache_dir);
 
     let mut report = Report::from(std::io::stdout().lock());
 
-    for (index, (repository_identifier, commit_hash)) in
-        config.inner().repositories().iter().enumerate()
-    {
-        let repository = cache.add_by_identifier(repository_identifier, commit_hash.clone());
+    for (index, (repository_identifier, repo)) in config.inner().repositories().iter().enumerate() {
+        let repository =
+            cache.add_by_identifier(repository_identifier, Some(repo.commit_hash().clone()));
 
         let results = repository.wdl_files();
 

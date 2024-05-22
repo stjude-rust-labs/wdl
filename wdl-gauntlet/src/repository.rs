@@ -7,6 +7,8 @@ use git2::build::RepoBuilder;
 use git2::FetchOptions;
 use indexmap::IndexMap;
 use log::info;
+use serde::Deserialize;
+use serde::Serialize;
 
 pub mod cache;
 pub mod identifier;
@@ -18,7 +20,7 @@ pub use identifier::Identifier;
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub struct RawHash([u8; 20]);
 
-impl serde::Serialize for RawHash {
+impl Serialize for RawHash {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -27,7 +29,7 @@ impl serde::Serialize for RawHash {
     }
 }
 
-impl<'de> serde::Deserialize<'de> for RawHash {
+impl<'de> Deserialize<'de> for RawHash {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -56,6 +58,7 @@ impl std::convert::TryFrom<&[u8]> for RawHash {
 }
 
 /// A repository of GitHub files.
+#[derive(Clone, Eq, PartialEq, Hash, Serialize, Deserialize, Debug)]
 pub struct Repository {
     /// The root directory of the [`Repository`].
     root: PathBuf,
@@ -140,6 +143,11 @@ impl Repository {
     #[allow(dead_code)]
     pub fn identifier(&self) -> &Identifier {
         &self.identifier
+    }
+
+    /// Gets the commit hash from the [`Repository`] by reference.
+    pub fn commit_hash(&self) -> &RawHash {
+        &self.commit_hash
     }
 
     /// Retrieve all the WDL files from the [`Repository`].

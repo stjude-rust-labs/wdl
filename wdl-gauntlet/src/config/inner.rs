@@ -10,7 +10,6 @@ use serde_with::serde_as;
 
 use crate::config::ReportableConcern;
 use crate::repository;
-use crate::repository::RawHash;
 
 mod repr;
 
@@ -19,10 +18,6 @@ pub use repr::ReportableConcernsRepr;
 /// A set of concerns serialized into their string form for storage within a
 /// configuration file.
 pub type ReportableConcerns = IndexSet<ReportableConcern>;
-
-/// A unique set of [repository identifiers](repository::Identifier),
-/// each mapping to a byte slice that can be converted to a [`git2::Oid`].
-pub type Repositories = IndexMap<repository::Identifier, Option<RawHash>>;
 
 /// The  configuration object for a [`Config`](super::Config).
 ///
@@ -35,7 +30,7 @@ pub struct Inner {
 
     /// The repositories.
     #[serde(default)]
-    repositories: Repositories,
+    repositories: IndexMap<repository::Identifier, repository::Repository>,
 
     /// The reportable concerns.
     #[serde_as(as = "ReportableConcernsRepr")]
@@ -82,7 +77,7 @@ impl Inner {
     /// let inner: Inner = toml::from_str(&config).unwrap();
     /// assert_eq!(inner.repositories().len(), 1);
     /// ```
-    pub fn repositories(&self) -> &Repositories {
+    pub fn repositories(&self) -> &IndexMap<repository::Identifier, repository::Repository> {
         &self.repositories
     }
 
@@ -115,7 +110,7 @@ impl Inner {
     /// assert_eq!(inner.repositories().len(), 2);
     /// ```
     pub fn extend_repositories<
-        T: IntoIterator<Item = (repository::Identifier, Option<RawHash>)>,
+        T: IntoIterator<Item = (repository::Identifier, repository::Repository)>,
     >(
         &mut self,
         items: T,
