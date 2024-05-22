@@ -21,13 +21,20 @@ pub struct Repository {
     /// The name for the [`Repository`] expressed as an [`Identifier`].
     identifier: Identifier,
 
-    /// Raw `git2` repository.
-    raw_repository: git2::Repository,
+    /// Raw [`git2::Repository`]`.
+    _raw_repository: git2::Repository,
+
+    /// The commit hash for the [`Repository`].
+    commit_hash: [u8; 20],
 }
 
 impl Repository {
     /// Create a new [`Repository`].
-    pub fn new(root: impl Into<PathBuf>, identifier: Identifier) -> Self {
+    pub fn new(
+        root: impl Into<PathBuf>,
+        identifier: Identifier,
+        commit_hash: Option<[u8; 20]>,
+    ) -> Self {
         let root = root.into().join(identifier.name());
 
         // Ensure the root directory exists.
@@ -54,11 +61,35 @@ impl Repository {
                     .expect("failed to clone repository")
             }
         };
+        let commit_hash = match commit_hash {
+            Some(hash) => {
+                let obj = git_repo
+                    .find_object(
+                        git2::Oid::from_bytes(&hash).expect("failed to convert hash"),
+                        Some(git2::ObjectType::Commit),
+                    )
+                    .expect("failed to find object");
+                git_repo
+                    .set_head_detached(obj.id())
+                    .expect("failed to set head detached");
+                hash
+            }
+            None => {
+                let head = git_repo.head().expect("failed to get head");
+                let commit = head.peel_to_commit().expect("failed to peel to commit");
+                commit
+                    .id()
+                    .as_bytes()
+                    .try_into()
+                    .expect("failed to convert commit hash")
+            }
+        };
 
         Self {
             root,
             identifier,
-            raw_repository: git_repo,
+            _raw_repository: git_repo,
+            commit_hash,
         }
     }
 

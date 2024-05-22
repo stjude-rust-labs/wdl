@@ -44,13 +44,19 @@ impl Cache {
         &self.repositories
     }
 
-    /// Add a repository to the `Cache` from an `Identifier`.
-    pub fn add_by_identifier(&mut self, identifier: &Identifier) -> &Repository {
+    /// Add a repository to the `Cache` from an `Identifier`
+    /// and optionally a commit hash.
+    pub fn add_by_identifier(
+        &mut self,
+        identifier: &Identifier,
+        commit_hash: Option<[u8; 20]>,
+    ) -> &Repository {
         let repository = Repository::new(
             self.root
                 .join(identifier.organization())
                 .join(identifier.name()),
             identifier.clone(),
+            commit_hash,
         );
 
         self.repositories.insert(identifier.clone(), repository);

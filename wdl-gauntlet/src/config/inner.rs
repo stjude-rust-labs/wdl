@@ -113,7 +113,9 @@ impl Inner {
     ///
     /// assert_eq!(inner.repositories().len(), 2);
     /// ```
-    pub fn extend_repositories<T: IntoIterator<Item = (repository::Identifier, Option<[u8; 20]>)>>(
+    pub fn extend_repositories<
+        T: IntoIterator<Item = (repository::Identifier, Option<[u8; 20]>)>,
+    >(
         &mut self,
         items: T,
     ) {
