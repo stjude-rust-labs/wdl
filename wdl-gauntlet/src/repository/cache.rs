@@ -5,7 +5,6 @@ use std::path::PathBuf;
 use indexmap::IndexMap;
 use log::info;
 
-use super::RawHash;
 use crate::repository::identifier::Identifier;
 use crate::repository::Repository;
 
@@ -45,24 +44,17 @@ impl Cache {
         &self.repositories
     }
 
-    /// Add a repository to the `Cache` from an `Identifier`
-    /// and optionally a commit hash.
-    pub fn add_by_identifier(
-        &mut self,
-        identifier: &Identifier,
-        commit_hash: Option<RawHash>,
-    ) -> &Repository {
+    /// Add a repository to the `Cache` from an [`Identifier`].
+    pub fn add_by_identifier(&mut self, identifier: &Identifier) {
         let repository = Repository::new(
             self.root
                 .join(identifier.organization())
                 .join(identifier.name()),
             identifier.clone(),
-            commit_hash,
+            None,
         );
 
         self.repositories.insert(identifier.clone(), repository);
-        self.get_repository(identifier)
-            .expect("failed to add repository")
     }
 
     /// Get a repository from the `Cache` by its identifier.

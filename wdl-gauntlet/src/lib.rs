@@ -160,28 +160,31 @@ pub async fn gauntlet(args: Args) -> Result<()> {
 
     let mut cache = Cache::new(args.cache_dir);
 
+    if args.refresh {
+        info!("refreshing cache directory: {:?}", cache.root());
+        std::fs::remove_dir_all(&cache.root()).map_err(Error::Io)?;
+        std::fs::create_dir_all(&cache.root()).map_err(Error::Io)?;
+        config.inner_mut().update_repositories();
+    }
+        
+
     if let Some(repositories) = args.repositories {
         repositories.into_iter().for_each(|value| {
             let identifier = value
                 .parse::<Identifier>()
                 .map_err(Error::RepositoryIdentifier)
                 .unwrap();
-            cache.add_by_identifier(&identifier, None);
+            cache.add_by_identifier(&identifier);
         });
-        config.inner_mut().extend_repositories(cache.repositories().clone())
-    }
-
-    if args.refresh {
-        config.inner_mut().update_repositories();
+        config
+            .inner_mut()
+            .extend_repositories(cache.repositories().clone())
     }
 
     let mut report = Report::from(std::io::stdout().lock());
 
     for (index, (repository_identifier, repo)) in config.inner().repositories().iter().enumerate() {
-        let repository =
-            cache.add_by_identifier(repository_identifier, Some(repo.commit_hash().clone()));
-
-        let results = repository.wdl_files();
+        let results = repo.wdl_files();
 
         report.title(repository_identifier).map_err(Error::Io)?;
         report.next_section().map_err(Error::Io)?;

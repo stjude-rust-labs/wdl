@@ -57,7 +57,7 @@ pub struct Repository {
     identifier: Identifier,
 
     /// The commit hash for the [`Repository`].
-    commit_hash: RawHash,
+    commit_hash: Option<RawHash>,
 }
 
 impl Repository {
@@ -75,24 +75,17 @@ impl Repository {
             std::fs::create_dir_all(&root).expect("failed to create repository root directory");
         }
 
-        let git_repo = match git2::Repository::open(&root) {
-            Ok(repo) => {
-                info!("opening existing repository: {:?}", root);
-                repo
-            }
-            Err(_) => {
-                info!("cloning repository: {:?}", identifier);
-                let mut fo = FetchOptions::new();
-                fo.depth(1);
-                RepoBuilder::new()
-                    .fetch_options(fo)
-                    .clone(
-                        format!("https://github.com/{}.git", identifier).as_str(),
-                        &root,
-                    )
-                    .expect("failed to clone repository")
-            }
-        };
+        info!("cloning repository: {:?}", identifier);
+        let mut fo = FetchOptions::new();
+        fo.depth(1);
+        let git_repo = RepoBuilder::new()
+            .fetch_options(fo)
+            .clone(
+                format!("https://github.com/{}.git", identifier).as_str(),
+                &root,
+            )
+            .expect("failed to clone repository");
+
         let commit_hash = match commit_hash {
             Some(hash) => {
                 let obj = git_repo
@@ -119,7 +112,7 @@ impl Repository {
         Self {
             root,
             identifier,
-            commit_hash,
+            commit_hash: Some(commit_hash),
         }
     }
 
@@ -129,20 +122,55 @@ impl Repository {
     }
 
     /// Gets the repository identifier from the [`Repository`] by reference.
-    #[allow(dead_code)]
     pub fn identifier(&self) -> &Identifier {
         &self.identifier
     }
 
     /// Gets the commit hash from the [`Repository`] by reference.
-    pub fn commit_hash(&self) -> &RawHash {
+    pub fn commit_hash(&self) -> &Option<RawHash> {
         &self.commit_hash
     }
 
     /// Retrieve all the WDL files from the [`Repository`].
     pub fn wdl_files(&self) -> IndexMap<String, String> {
+        let git_repo = match git2::Repository::open(&self.root) {
+            Ok(repo) => {
+                info!("opening existing repository: {:?}", self.root);
+                repo
+            }
+            Err(_) => {
+                info!("cloning repository: {:?}", self.identifier);
+                let mut fo = FetchOptions::new();
+                fo.depth(1);
+                RepoBuilder::new()
+                    .fetch_options(fo)
+                    .clone(
+                        format!("https://github.com/{}.git", self.identifier).as_str(),
+                        &self.root,
+                    )
+                    .expect("failed to clone repository")
+            }
+        };
+
+        match self.commit_hash.clone() {
+            Some(hash) => {
+                let obj = git_repo
+                    .find_object(
+                        git2::Oid::from_bytes(&hash.0).expect("failed to convert hash"),
+                        Some(git2::ObjectType::Commit),
+                    )
+                    .expect("failed to find object");
+                git_repo
+                    .set_head_detached(obj.id())
+                    .expect("failed to set head detached");
+            }
+            None => {
+                unreachable!("commit hash must be set");
+            }
+        };
         let mut wdl_files = IndexMap::new();
         self.add_wdl_files(&self.root, &mut wdl_files);
+        std::fs::remove_dir_all(&self.root).expect("failed to remove root directory");
         wdl_files
     }
 
@@ -168,10 +196,8 @@ impl Repository {
     }
 
     /// Update to the latest commit hash for the [`Repository`].
+    /// Assumes the repository has already been cleared.
     pub fn update(&mut self) {
-        // Clear the repo's root directory.
-        std::fs::remove_dir_all(&self.root).expect("failed to remove root directory");
-
         // Re-clone the repository.
         info!("cloning repository: {:?}", self.identifier);
         let mut fo = FetchOptions::new();
@@ -190,6 +216,6 @@ impl Repository {
 
         let mut bytes = [0u8; 20];
         bytes.copy_from_slice(commit.id().as_bytes());
-        self.commit_hash = RawHash(bytes)
+        self.commit_hash = Some(RawHash(bytes));
     }
 }
