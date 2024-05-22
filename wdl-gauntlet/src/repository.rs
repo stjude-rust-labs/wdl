@@ -13,6 +13,9 @@ pub mod identifier;
 pub use cache::Cache;
 pub use identifier::Identifier;
 
+/// A raw hash.
+pub type RawHash = [u8; 20];
+
 /// A repository of GitHub files.
 pub struct Repository {
     /// The root directory of the [`Repository`].
@@ -27,7 +30,7 @@ impl Repository {
     pub fn new(
         root: impl Into<PathBuf>,
         identifier: Identifier,
-        commit_hash: Option<[u8; 20]>,
+        commit_hash: Option<RawHash>,
     ) -> Self {
         let root = root.into();
 

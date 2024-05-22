@@ -8,6 +8,8 @@ use log::info;
 use crate::repository::identifier::Identifier;
 use crate::repository::Repository;
 
+use super::RawHash;
+
 /// A cache for storing `Repository` files.
 pub struct Cache {
     /// The root directory of the `Cache`.
@@ -49,7 +51,7 @@ impl Cache {
     pub fn add_by_identifier(
         &mut self,
         identifier: &Identifier,
-        commit_hash: Option<[u8; 20]>,
+        commit_hash: Option<RawHash>,
     ) -> &Repository {
         let repository = Repository::new(
             self.root

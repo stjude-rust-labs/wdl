@@ -27,12 +27,12 @@ pub mod repository;
 
 pub use config::Config;
 pub use report::Report;
-pub use repository::Cache;
-pub use repository::Identifier;
 pub use repository::Repository;
 
 use crate::config::ReportableConcern;
 use crate::report::Status;
+use crate::repository::Cache;
+use crate::repository::Identifier;
 
 /// The exit code to emit when any test unexpectedly fails.
 const EXIT_CODE_FAILED: i32 = 1;
