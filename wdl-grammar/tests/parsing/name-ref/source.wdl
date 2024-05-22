@@ -3,7 +3,7 @@
 version 1.1
 
 task test {
-    Integer x = 0
-    Integer y = -x
-    Integer z = x + y * x
+    Int x = 0
+    Int y = -x
+    Int z = x + y * x
 }
