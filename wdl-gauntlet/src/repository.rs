@@ -20,12 +20,6 @@ pub struct Repository {
 
     /// The name for the [`Repository`] expressed as an [`Identifier`].
     identifier: Identifier,
-
-    /// Raw [`git2::Repository`]`.
-    _raw_repository: git2::Repository,
-
-    /// The commit hash for the [`Repository`].
-    commit_hash: [u8; 20],
 }
 
 impl Repository {
@@ -35,7 +29,7 @@ impl Repository {
         identifier: Identifier,
         commit_hash: Option<[u8; 20]>,
     ) -> Self {
-        let root = root.into().join(identifier.name());
+        let root = root.into();
 
         // Ensure the root directory exists.
         if !root.exists() {
@@ -88,8 +82,6 @@ impl Repository {
         Self {
             root,
             identifier,
-            _raw_repository: git_repo,
-            commit_hash,
         }
     }
 
