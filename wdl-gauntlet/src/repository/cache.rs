@@ -5,10 +5,9 @@ use std::path::PathBuf;
 use indexmap::IndexMap;
 use log::info;
 
+use super::RawHash;
 use crate::repository::identifier::Identifier;
 use crate::repository::Repository;
-
-use super::RawHash;
 
 /// A cache for storing `Repository` files.
 pub struct Cache {

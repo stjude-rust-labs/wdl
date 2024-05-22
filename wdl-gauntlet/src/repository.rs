@@ -2,6 +2,7 @@
 
 use std::path::PathBuf;
 
+use faster_hex;
 use git2::build::RepoBuilder;
 use git2::FetchOptions;
 use indexmap::IndexMap;
@@ -13,8 +14,46 @@ pub mod identifier;
 pub use cache::Cache;
 pub use identifier::Identifier;
 
-/// A raw hash.
-pub type RawHash = [u8; 20];
+/// A byte slice that can be converted to a [`git2::Oid`].
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Ord, PartialOrd)]
+pub struct RawHash([u8; 20]);
+
+impl serde::Serialize for RawHash {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        faster_hex::hex_string(&self.0).serialize(serializer)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for RawHash {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        if s.len() != 40 {
+            return Err(serde::de::Error::custom(
+                "a commit hash must have 40 characters",
+            ));
+        }
+
+        let mut hash = [0u8; 20];
+        faster_hex::hex_decode(s.as_bytes(), &mut hash).map_err(serde::de::Error::custom)?;
+        Ok(Self(hash))
+    }
+}
+
+impl std::convert::TryFrom<&[u8]> for RawHash {
+    type Error = faster_hex::Error;
+
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        let mut hash = [0u8; 20];
+        faster_hex::hex_decode(value, &mut hash)?;
+        Ok(Self(hash))
+    }
+}
 
 /// A repository of GitHub files.
 pub struct Repository {
@@ -23,6 +62,9 @@ pub struct Repository {
 
     /// The name for the [`Repository`] expressed as an [`Identifier`].
     identifier: Identifier,
+
+    /// The commit hash for the [`Repository`].
+    commit_hash: RawHash,
 }
 
 impl Repository {
@@ -62,7 +104,7 @@ impl Repository {
             Some(hash) => {
                 let obj = git_repo
                     .find_object(
-                        git2::Oid::from_bytes(&hash).expect("failed to convert hash"),
+                        git2::Oid::from_bytes(&hash.0).expect("failed to convert hash"),
                         Some(git2::ObjectType::Commit),
                     )
                     .expect("failed to find object");
@@ -85,6 +127,7 @@ impl Repository {
         Self {
             root,
             identifier,
+            commit_hash,
         }
     }
 
