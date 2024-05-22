@@ -2,14 +2,10 @@
 
 use std::path::PathBuf;
 
-use git2::build::CheckoutBuilder;
 use git2::build::RepoBuilder;
 use git2::FetchOptions;
-use git2::RemoteCallbacks;
 use indexmap::IndexMap;
-use log::debug;
 use log::info;
-use log::warn;
 
 pub mod cache;
 pub mod identifier;
@@ -53,7 +49,7 @@ impl Repository {
                     .fetch_options(fo)
                     .clone(
                         format!("https://github.com/{}.git", identifier).as_str(),
-                &root,
+                        &root,
                     )
                     .expect("failed to clone repository")
             }

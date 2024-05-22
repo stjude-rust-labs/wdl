@@ -3,9 +3,7 @@
 use std::path::PathBuf;
 
 use indexmap::IndexMap;
-use log::debug;
 use log::info;
-use log::warn;
 
 use crate::repository::identifier::Identifier;
 use crate::repository::Repository;
