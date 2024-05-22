@@ -117,6 +117,13 @@ impl Inner {
         self.repositories.sort_by(|a, _, b, _| a.cmp(&b));
     }
 
+    /// Update the `repositories` for this [`Inner`].
+    pub fn update_repositories(&mut self) {
+        for repository in self.repositories.values_mut() {
+            repository.update();
+        }
+    }
+
     /// Gets the [`ReportableConcerns`] for this [`Inner`] by reference.
     ///
     /// # Examples

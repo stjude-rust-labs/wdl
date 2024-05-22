@@ -166,4 +166,30 @@ impl Repository {
             }
         }
     }
+
+    /// Update to the latest commit hash for the [`Repository`].
+    pub fn update(&mut self) {
+        // Clear the repo's root directory.
+        std::fs::remove_dir_all(&self.root).expect("failed to remove root directory");
+
+        // Re-clone the repository.
+        info!("cloning repository: {:?}", self.identifier);
+        let mut fo = FetchOptions::new();
+        fo.depth(1);
+        let git_repo = RepoBuilder::new()
+            .fetch_options(fo)
+            .clone(
+                format!("https://github.com/{}.git", self.identifier).as_str(),
+                &self.root,
+            )
+            .expect("failed to clone repository");
+
+        // Update the commit hash.
+        let head = git_repo.head().expect("failed to get head");
+        let commit = head.peel_to_commit().expect("failed to peel to commit");
+
+        let mut bytes = [0u8; 20];
+        bytes.copy_from_slice(commit.id().as_bytes());
+        self.commit_hash = RawHash(bytes)
+    }
 }

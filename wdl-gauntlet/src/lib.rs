@@ -121,7 +121,7 @@ pub struct Args {
 
     /// Overwrites the configuration file.
     #[arg(long)]
-    pub save_config: bool,
+    pub refresh: bool,
 
     /// Skips the retreiving of remote objects.
     #[arg(long)]
@@ -169,6 +169,10 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             cache.add_by_identifier(&identifier, None);
         });
         config.inner_mut().extend_repositories(cache.repositories().clone())
+    }
+
+    if args.refresh {
+        config.inner_mut().update_repositories();
     }
 
     let mut report = Report::from(std::io::stdout().lock());
@@ -359,7 +363,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
         .flatten()
         .collect::<IndexSet<_>>();
 
-    if args.save_config {
+    if args.refresh {
         info!("adding {} new expected concerns.", unexpected.len());
         info!(
             "removing {} outdated expected concerns.",
@@ -372,8 +376,8 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             .chain(unexpected.iter())
             .cloned()
             .collect::<IndexSet<_>>();
-
         config.inner_mut().set_concerns(new);
+
         config.save().map_err(Error::Config)?;
     } else if !missing_but_expected.is_empty() {
         println!(
