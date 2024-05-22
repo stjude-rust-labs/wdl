@@ -4,7 +4,6 @@
 #![warn(missing_docs)]
 #![warn(rust_2018_idioms)]
 #![warn(rust_2021_compatibility)]
-#![warn(missing_debug_implementations)]
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
@@ -27,12 +26,12 @@ pub mod repository;
 
 pub use config::Config;
 pub use report::Report;
+pub use repository::Cache;
+pub use repository::Identifier;
 pub use repository::Repository;
 
 use crate::config::ReportableConcern;
 use crate::report::Status;
-use crate::repository::options;
-use crate::repository::Identifier;
 
 /// The exit code to emit when any test unexpectedly fails.
 const EXIT_CODE_FAILED: i32 = 1;
@@ -55,12 +54,6 @@ pub enum Error {
     /// A WDL 1.x parse tree error.
     GrammarV1(grammar::v1::Error),
 
-    /// An error related to a [`Repository`].
-    Repository(repository::Error),
-
-    /// An error related to a repository [`Builder`](repository::Builder).
-    RepositoryBuilder(repository::builder::Error),
-
     /// An error related to a repository [`Identifier`].
     RepositoryIdentifier(repository::identifier::Error),
 }
@@ -72,10 +65,6 @@ impl std::fmt::Display for Error {
             Error::Config(err) => write!(f, "configuration file error: {err}"),
             Error::Io(err) => write!(f, "i/o error: {err}"),
             Error::GrammarV1(err) => write!(f, "grammar error: {err}"),
-            Error::Repository(err) => write!(f, "repository error: {err}"),
-            Error::RepositoryBuilder(err) => {
-                write!(f, "repository builder error: {err}")
-            }
             Error::RepositoryIdentifier(err) => {
                 write!(f, "repository identifier error: {err}")
             }
@@ -97,8 +86,8 @@ pub struct Args {
     pub repositories: Option<Vec<String>>,
 
     /// The location of the cache directory.
-    #[arg(long)]
-    pub cache_dir: Option<PathBuf>,
+    #[arg(long, default_value = ".gauntlet_cache")]
+    pub cache_dir: PathBuf,
 
     /// The location of the config file.
     #[arg(short, long)]
@@ -182,26 +171,14 @@ pub async fn gauntlet(args: Args) -> Result<()> {
         )
     }
 
+    let mut cache = Cache::new(args.cache_dir);
+
     let mut report = Report::from(std::io::stdout().lock());
 
     for (index, repository_identifier) in config.inner().repositories().iter().enumerate() {
-        let mut repository =
-            repository::Builder::default().identifier(repository_identifier.clone());
+        let repository = cache.add_by_identifier(repository_identifier);
 
-        if let Some(ref root) = args.cache_dir {
-            let mut repository_cache_root = root.clone();
-            repository_cache_root.push(repository_identifier.organization());
-            repository_cache_root.push(repository_identifier.name());
-            repository = repository.root(repository_cache_root);
-        }
-
-        if args.skip_remote {
-            let options = options::Builder::default().hydrate_remote(false).build();
-            repository = repository.options(options)
-        }
-
-        let mut repository = repository.try_build().map_err(Error::RepositoryBuilder)?;
-        let results = repository.hydrate().await.map_err(Error::Repository)?;
+        let results = repository.wdl_files();
 
         report.title(repository_identifier).map_err(Error::Io)?;
         report.next_section().map_err(Error::Io)?;
