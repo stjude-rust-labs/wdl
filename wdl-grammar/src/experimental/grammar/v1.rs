@@ -1276,7 +1276,8 @@ fn expr_with_precedence(
 /// Parses an atomic expression such as a literal.
 ///
 /// Due to the WDL grammar having an ambiguity between parenthesized expressions
-/// and pair literals, this function handles the former in addition to pair literals.
+/// and pair literals, this function handles the former in addition to pair
+/// literals.
 fn atom_expr(
     parser: &mut Parser<'_>,
     marker: Marker,

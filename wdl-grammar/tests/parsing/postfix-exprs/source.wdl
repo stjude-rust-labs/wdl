@@ -6,7 +6,7 @@ task test {
     Int a = min(0, 1)
     Int b = min(max(100, a), 10)
     Array[String] c = ["a", "b", "c"]
-    String d = d[a + b]
+    String d = c[a + b]
     MyStruct e = MyStruct {
         foo: MyFoo {
             bar: "baz",
