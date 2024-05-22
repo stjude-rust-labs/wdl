@@ -47,16 +47,6 @@ impl<'de> Deserialize<'de> for RawHash {
     }
 }
 
-impl std::convert::TryFrom<&[u8]> for RawHash {
-    type Error = faster_hex::Error;
-
-    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let mut hash = [0u8; 20];
-        faster_hex::hex_decode(value, &mut hash)?;
-        Ok(Self(hash))
-    }
-}
-
 /// A repository of GitHub files.
 #[derive(Clone, Eq, PartialEq, Hash, Serialize, Deserialize, Debug)]
 pub struct Repository {
@@ -119,11 +109,10 @@ impl Repository {
             None => {
                 let head = git_repo.head().expect("failed to get head");
                 let commit = head.peel_to_commit().expect("failed to peel to commit");
-                commit
-                    .id()
-                    .as_bytes()
-                    .try_into()
-                    .expect("failed to convert commit hash")
+
+                let mut bytes = [0u8; 20];
+                bytes.copy_from_slice(commit.id().as_bytes());
+                RawHash(bytes)
             }
         };
 
