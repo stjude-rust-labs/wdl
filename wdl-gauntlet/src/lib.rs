@@ -9,6 +9,7 @@
 
 use std::path::PathBuf;
 use std::process;
+use indexmap::IndexMap;
 
 use clap::Parser;
 use colored::Colorize as _;
@@ -163,11 +164,11 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             repositories
                 .into_iter()
                 .map(|value| {
-                    value
+                    (value
                         .parse::<Identifier>()
-                        .map_err(Error::RepositoryIdentifier)
+                        .map_err(Error::RepositoryIdentifier).unwrap(), None)
                 })
-                .collect::<Result<Vec<_>>>()?,
+                .collect::<IndexMap<_, _>>(),
         )
     }
 
@@ -175,7 +176,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
 
     let mut report = Report::from(std::io::stdout().lock());
 
-    for (index, repository_identifier) in config.inner().repositories().iter().enumerate() {
+    for (index, (repository_identifier, _commit_hash)) in config.inner().repositories().iter().enumerate() {
         let repository = cache.add_by_identifier(repository_identifier);
 
         let results = repository.wdl_files();

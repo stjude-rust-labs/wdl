@@ -21,7 +21,7 @@ pub type ReportableConcerns = IndexSet<ReportableConcern>;
 
 /// A unique set of [repository identifiers](repository::Identifier),
 /// each mapping to a byte slice that can be converted to a [`git2::Oid`].
-pub type Repositories = IndexMap<repository::Identifier, [u8; 20]>;
+pub type Repositories = IndexMap<repository::Identifier, Option<[u8; 20]>>;
 
 /// The  configuration object for a [`Config`](super::Config).
 ///
@@ -113,7 +113,7 @@ impl Inner {
     ///
     /// assert_eq!(inner.repositories().len(), 2);
     /// ```
-    pub fn extend_repositories<T: IntoIterator<Item = (repository::Identifier, [u8; 20])>>(
+    pub fn extend_repositories<T: IntoIterator<Item = (repository::Identifier, Option<[u8; 20]>)>>(
         &mut self,
         items: T,
     ) {
