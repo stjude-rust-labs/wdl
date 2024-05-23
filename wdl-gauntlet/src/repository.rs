@@ -62,6 +62,8 @@ pub struct Repository {
 
 impl Repository {
     /// Create a new [`Repository`].
+    /// Repositories initialized with this method will _always_ have
+    /// `Some(commit_hash)`.
     pub fn new(
         root: impl Into<PathBuf>,
         identifier: Identifier,
@@ -170,7 +172,22 @@ impl Repository {
         };
         let mut wdl_files = IndexMap::new();
         self.add_wdl_files(&self.root, &mut wdl_files);
-        std::fs::remove_dir_all(&self.root).expect("failed to remove root directory");
+
+        match std::fs::remove_dir_all(&self.root) {
+            Ok(_) => {
+                info!(
+                    "removed repository after parsing WDL files: {:?}",
+                    self.root
+                );
+            }
+            Err(_) => {
+                info!(
+                    "failed to remove repository after parsing WDL files: {:?}",
+                    self.root
+                );
+            }
+        }
+
         wdl_files
     }
 
@@ -196,8 +213,11 @@ impl Repository {
     }
 
     /// Update to the latest commit hash for the [`Repository`].
-    /// Assumes the repository has already been cleared.
     pub fn update(&mut self) {
+        // Try to delete the current repository.
+        // SAFETY: It shouldn't matter if this succeeds or fails.
+        let _ = std::fs::remove_dir_all(&self.root);
+
         // Re-clone the repository.
         info!("cloning repository: {:?}", self.identifier);
         let mut fo = FetchOptions::new();

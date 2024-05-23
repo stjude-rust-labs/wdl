@@ -119,7 +119,10 @@ pub struct Args {
     #[arg(short, long)]
     pub quiet: bool,
 
-    /// Overwrites the configuration file.
+    /// Overwrites the configuration file with new expected concerns and the
+    /// latest commit hashes. This will create temporary shallow clones of every
+    /// test repository. Normally, there is only one repository on disk at a
+    /// time. The difference in disk space usage should be negligible.
     #[arg(long)]
     pub refresh: bool,
 
@@ -161,12 +164,9 @@ pub async fn gauntlet(args: Args) -> Result<()> {
     let mut cache = Cache::new(args.cache_dir);
 
     if args.refresh {
-        info!("refreshing cache directory: {:?}", cache.root());
-        std::fs::remove_dir_all(&cache.root()).map_err(Error::Io)?;
-        std::fs::create_dir_all(&cache.root()).map_err(Error::Io)?;
+        info!("refreshing repository commit hashes.");
         config.inner_mut().update_repositories();
     }
-        
 
     if let Some(repositories) = args.repositories {
         repositories.into_iter().for_each(|value| {

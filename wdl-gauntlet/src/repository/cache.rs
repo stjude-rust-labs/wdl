@@ -45,6 +45,8 @@ impl Cache {
     }
 
     /// Add a repository to the `Cache` from an [`Identifier`].
+    /// By a guarantee of [`Repository::new()`], the added repository will
+    /// _always_ have `Some(commit_hash)`.
     pub fn add_by_identifier(&mut self, identifier: &Identifier) {
         let repository = Repository::new(
             self.root
