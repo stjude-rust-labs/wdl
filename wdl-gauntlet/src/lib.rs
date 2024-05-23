@@ -165,9 +165,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
 
     if args.refresh {
         info!("refreshing repository commit hashes.");
-        config
-            .inner_mut()
-            .update_repositories(work_dir.root());
+        config.inner_mut().update_repositories(work_dir.root());
     }
 
     if let Some(repositories) = args.repositories {
@@ -191,7 +189,11 @@ pub async fn gauntlet(args: Args) -> Result<()> {
         report.title(repository_identifier).map_err(Error::Io)?;
         report.next_section().map_err(Error::Io)?;
 
-        for (path, content) in results {
+        for (relative_path, content) in results {
+            let abs_path = work_dir
+                .root()
+                .join(repository_identifier.to_string())
+                .join(relative_path.clone());
             if let Some(ref filters) = args.filter {
                 let mut skip = true;
 
@@ -203,15 +205,15 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                 }
 
                 if skip {
-                    trace!("skipping: {path}");
+                    trace!("skipping: {:?}", abs_path);
                     continue;
                 }
             }
 
-            trace!("processing: {path}");
+            trace!("processing: {:?}", abs_path);
 
             let document_identifier =
-                document::Identifier::new(repository_identifier.clone(), path);
+                document::Identifier::new(repository_identifier.clone(), relative_path);
 
             match config.inner().version() {
                 wdl_core::Version::V1 => {
