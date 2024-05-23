@@ -161,7 +161,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
         }
     };
 
-    let mut work_dir = WorkDir::new();
+    let mut work_dir = WorkDir::default();
 
     if args.refresh {
         info!("refreshing repository commit hashes.");

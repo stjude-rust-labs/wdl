@@ -9,6 +9,7 @@ use crate::repository::identifier::Identifier;
 use crate::repository::Repository;
 
 /// A working directory for storing `Repository` files.
+#[derive(Debug)]
 pub struct WorkDir {
     /// The root directory of the `WorkDir`.
     root: TempDir,
@@ -17,20 +18,25 @@ pub struct WorkDir {
     repositories: IndexMap<Identifier, Repository>,
 }
 
+/// Create a default `WorkDir`.
+impl Default for WorkDir {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl WorkDir {
     /// Create a new `WorkDir`.
     pub fn new() -> Self {
-        let root = TempDir::new().expect("failed to create temporary directory");
-
         Self {
-            root,
+            root: TempDir::new().expect("failed to create temporary directory"),
             repositories: IndexMap::new(),
         }
     }
 
     /// Get the root directory of the `WorkDir`.
     pub fn root(&self) -> &Path {
-        &self.root.path()
+        self.root.path()
     }
 
     /// Get the repositories stored in the `WorkDir`.

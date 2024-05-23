@@ -172,7 +172,7 @@ impl Repository {
             }
         };
         let mut wdl_files = IndexMap::new();
-        self.add_wdl_files(&repo_root, &mut wdl_files, &repo_root);
+        add_wdl_files(&repo_root, &mut wdl_files, &repo_root);
 
         match std::fs::remove_dir_all(&repo_root) {
             Ok(_) => {
@@ -190,40 +190,6 @@ impl Repository {
         }
 
         wdl_files
-    }
-
-    /// Add to an [`IndexMap`] all the WDL files in a directory
-    /// and its subdirectories.
-    fn add_wdl_files(
-        &self,
-        path: &PathBuf,
-        wdl_files: &mut IndexMap<String, String>,
-        leading_dirs: &Path,
-    ) {
-        if path.is_dir() {
-            for entry in std::fs::read_dir(path).expect("failed to read directory") {
-                let entry = entry.expect("failed to read entry");
-                let path = entry.path();
-                self.add_wdl_files(&path, wdl_files, leading_dirs);
-            }
-        } else if path.is_file() {
-            let path_str = path
-                .to_str()
-                .expect("failed to convert file name to string");
-            if path_str.ends_with(".wdl") {
-                let contents =
-                    std::fs::read_to_string(&path).expect("failed to read file contents");
-                // Strip leading directories from the path.
-                // SAFETY: `path_str` is guaranteed to start with `leading_dirs`
-                wdl_files.insert(
-                    path_str
-                        .strip_prefix(leading_dirs.to_str().unwrap())
-                        .unwrap()
-                        .to_string(),
-                    contents,
-                );
-            }
-        }
     }
 
     /// Update to the latest commit hash for the [`Repository`].
@@ -255,5 +221,33 @@ impl Repository {
         let mut bytes = [0u8; 20];
         bytes.copy_from_slice(commit.id().as_bytes());
         self.commit_hash = Some(RawHash(bytes));
+    }
+}
+
+/// Add to an [`IndexMap`] all the WDL files in a directory
+/// and its subdirectories.
+fn add_wdl_files(path: &PathBuf, wdl_files: &mut IndexMap<String, String>, leading_dirs: &Path) {
+    if path.is_dir() {
+        for entry in std::fs::read_dir(path).expect("failed to read directory") {
+            let entry = entry.expect("failed to read entry");
+            let path = entry.path();
+            add_wdl_files(&path, wdl_files, leading_dirs);
+        }
+    } else if path.is_file() {
+        let path_str = path
+            .to_str()
+            .expect("failed to convert file name to string");
+        if path_str.ends_with(".wdl") {
+            let contents = std::fs::read_to_string(path).expect("failed to read file contents");
+            // Strip leading directories from the path.
+            // SAFETY: `path_str` is guaranteed to start with `leading_dirs`
+            wdl_files.insert(
+                path_str
+                    .strip_prefix(leading_dirs.to_str().unwrap())
+                    .unwrap()
+                    .to_string(),
+                contents,
+            );
+        }
     }
 }

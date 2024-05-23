@@ -116,7 +116,7 @@ impl Inner {
         items: IndexMap<repository::Identifier, repository::Repository>,
     ) {
         self.repositories.extend(items);
-        self.repositories.sort_by(|a, _, b, _| a.cmp(&b));
+        self.repositories.sort_by(|a, _, b, _| a.cmp(b));
     }
 
     /// Update the `repositories` for this [`Inner`].
@@ -192,7 +192,7 @@ impl Inner {
 
     /// Sorts the [`Repositories`] and the [`ReportableConcerns`] by key.
     pub fn sort(&mut self) {
-        self.repositories.sort_by(|a, _, b, _| a.cmp(&b));
+        self.repositories.sort_by(|a, _, b, _| a.cmp(b));
         self.concerns.sort();
     }
 }
