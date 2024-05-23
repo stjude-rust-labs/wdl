@@ -192,8 +192,9 @@ pub async fn gauntlet(args: Args) -> Result<()> {
         for (relative_path, content) in results {
             let abs_path = work_dir
                 .root()
-                .join(repository_identifier.to_string())
-                .join(relative_path.clone());
+                .join(&repository_identifier.organization())
+                .join(&repository_identifier.name())
+                .join(&relative_path);
             if let Some(ref filters) = args.filter {
                 let mut skip = true;
 
