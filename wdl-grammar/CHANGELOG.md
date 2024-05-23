@@ -7,8 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+* Fixed parsing of placeholder options in the experimental parser such
+  that it can disambiguate between the `sep` option and a `sep` function
+  call ([#44](https://github.com/stjude-rust-labs/wdl/pull/44)).
+
 ### Added
 
+* Adds support for import statements to the experimental parser ([#43](https://github.com/stjude-rust-labs/wdl/pull/43)).
+* Adds support for bound declarations and expressions in the experimental
+  parser ([#42](https://github.com/stjude-rust-labs/wdl/pull/42)).
+* Adds support for parsing `meta` and `parameter_meta` sections in tasks
+  and workflows in the experimental parser ([#39](https://github.com/stjude-rust-labs/wdl/pull/39)).
 * Adds support for parsing struct definitions to the experimental parser;
   requires the `experimental` feature to be activated ([#38](https://github.com/stjude-rust-labs/wdl/pull/38)).
 * Adds a new experimental `SyntaxTree` representation; requires the 

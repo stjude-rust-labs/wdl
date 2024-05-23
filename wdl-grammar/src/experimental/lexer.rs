@@ -226,9 +226,10 @@ pub type LexerResult<T> = Result<T, Error>;
 ///
 /// A lexer produces a stream of tokens from a WDL source string.
 #[allow(missing_debug_implementations)]
+#[derive(Clone)]
 pub struct Lexer<'a, T>(logos::Lexer<'a, T>)
 where
-    T: Logos<'a>;
+    T: Logos<'a, Extras = ()>;
 
 impl<'a, T> Lexer<'a, T>
 where
@@ -254,16 +255,7 @@ where
 
     /// Gets the current span of the lexer.
     pub fn span(&self) -> SourceSpan {
-        let mut span = self.0.span();
-        if span.end == self.source_len() {
-            // miette doesn't support placing a highlight at
-            // the end of the input, so use the last valid
-            // byte in the source
-            span.start -= 1;
-            span.end = span.start + 1;
-        }
-
-        to_source_span(span)
+        to_source_span(self.0.span())
     }
 
     /// Peeks at the next token.
@@ -278,8 +270,7 @@ where
     /// as the current lexer.
     pub fn morph<T2>(self) -> Lexer<'a, T2>
     where
-        T2: Logos<'a, Source = str, Error = Error>,
-        T::Extras: Into<T2::Extras>,
+        T2: Logos<'a, Source = str, Error = Error, Extras = ()> + Copy,
     {
         Lexer(self.0.morph())
     }
@@ -287,7 +278,7 @@ where
 
 impl<'a, T> Iterator for Lexer<'a, T>
 where
-    T: Logos<'a, Error = Error>,
+    T: Logos<'a, Error = Error, Extras = ()> + Copy,
 {
     type Item = (LexerResult<T>, SourceSpan);
 

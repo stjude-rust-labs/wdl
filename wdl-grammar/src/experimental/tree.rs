@@ -21,6 +21,8 @@ use crate::experimental::parser::Parser;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(u16)]
 pub enum SyntaxKind {
+    /// The token is unknown to WDL.
+    Unknown,
     /// A whitespace token.
     Whitespace,
     /// A comment token.
@@ -33,8 +35,6 @@ pub enum SyntaxKind {
     Integer,
     /// An identifier token.
     Ident,
-    /// A qualified name token.
-    QualifiedName,
     /// A single quote token.
     SingleQuote,
     /// A double quote token.
@@ -165,6 +165,10 @@ pub enum SyntaxKind {
     Greater,
     /// The `.` symbol token.
     Dot,
+    /// A literal string text token.
+    LiteralStringText,
+    /// A placeholder open token.
+    PlaceholderOpen,
 
     /// Abandoned nodes are nodes that encountered errors.
     ///
@@ -183,6 +187,8 @@ pub enum SyntaxKind {
     VersionStatementNode,
     /// Represents an import statement node.
     ImportStatementNode,
+    /// Represents an import alias node.
+    ImportAliasNode,
     /// Represents a struct definition node.
     StructDefinitionNode,
     /// Represents a task definition node.
@@ -191,6 +197,8 @@ pub enum SyntaxKind {
     WorkflowDefinitionNode,
     /// Represents an unbound declaration node.
     UnboundDeclNode,
+    /// Represents a bound declaration node.
+    BoundDeclNode,
     /// Represents a primitive type node.
     PrimitiveTypeNode,
     /// Represents a map type node.
@@ -203,6 +211,92 @@ pub enum SyntaxKind {
     ObjectTypeNode,
     /// Represents a type reference node.
     TypeRefNode,
+    /// Represents a metadata section node.
+    MetadataSectionNode,
+    /// Represents a parameter metadata section node.
+    ParameterMetadataSectionNode,
+    /// Represents a metadata object item node.
+    MetadataObjectItemNode,
+    /// Represents a metadata object node.
+    MetadataObjectNode,
+    /// Represents a metadata array node.
+    MetadataArrayNode,
+    /// Represents a literal integer node.  
+    LiteralIntegerNode,
+    /// Represents a literal float node.  
+    LiteralFloatNode,
+    /// Represents a literal boolean node.
+    LiteralBooleanNode,
+    /// Represents a literal null node.
+    LiteralNullNode,
+    /// Represents a literal string node.
+    LiteralStringNode,
+    /// Represents a literal pair node.
+    LiteralPairNode,
+    /// Represents a literal array node.
+    LiteralArrayNode,
+    /// Represents a literal map node.
+    LiteralMapNode,
+    /// Represents a literal map item node.
+    LiteralMapItemNode,
+    /// Represents a literal object node.
+    LiteralObjectNode,
+    /// Represents a literal object item node.
+    LiteralObjectItemNode,
+    /// Represents a literal struct node.
+    LiteralStructNode,
+    /// Represents a literal struct item node.
+    LiteralStructItemNode,
+    /// Represents a parenthesized expression node.
+    ParenthesizedExprNode,
+    /// Represents a name reference node.
+    NameReferenceNode,
+    /// Represents an `if` expression node.
+    IfExprNode,
+    /// Represents a logical not expression node.
+    LogicalNotExprNode,
+    /// Represents a negation expression node.
+    NegationExprNode,
+    /// Represents a logical `OR` expression node.
+    LogicalOrExprNode,
+    /// Represents a logical `AND` expression node.
+    LogicalAndExprNode,
+    /// Represents an equality expression node.
+    EqualityExprNode,
+    /// Represents an inequality expression node.
+    InequalityExprNode,
+    /// Represents a "less than" expression node.
+    LessExprNode,
+    /// Represents a "less than or equal to" expression node.
+    LessEqualExprNode,
+    /// Represents a "greater than" expression node.
+    GreaterExprNode,
+    /// Represents a "greater than or equal to" expression node.
+    GreaterEqualExprNode,
+    /// Represents an addition expression node.
+    AdditionExprNode,
+    /// Represents a subtraction expression node.
+    SubtractionExprNode,
+    /// Represents a multiplication expression node.
+    MultiplicationExprNode,
+    /// Represents a division expression node.
+    DivisionExprNode,
+    /// Represents a modulo expression node.
+    ModuloExprNode,
+    /// Represents a call expression node.'
+    CallExprNode,
+    /// Represents an index expression node.
+    IndexExprNode,
+    /// Represents an an access expression node.
+    AccessExprNode,
+    /// Represents a placeholder node in a string literal.
+    PlaceholderNode,
+    /// Placeholder `sep` option node.
+    PlaceholderSepOptionNode,
+    /// Placeholder `default` option node.
+    PlaceholderDefaultOptionNode,
+    /// Placeholder `true`/`false` option node.
+    PlaceholderTrueFalseOptionNode,
 
     // WARNING: this must always be the last variant.
     /// The exclusive maximum syntax kind value.
@@ -257,28 +351,53 @@ impl SyntaxTree {
     /// a valid WDL document.
     pub fn parse(source: &str) -> (Self, Vec<Error>) {
         let parser = Parser::new(Lexer::new(source));
-        let events = grammar::document(source, parser);
-        Self::build(source, events)
+        let (events, errors) = grammar::document(source, parser);
+        Self::build(source, events, errors)
     }
 
     /// Builds the concrete syntax tree from a list of parser events.
-    fn build(source: &str, events: Vec<Event>) -> (Self, Vec<Error>) {
+    fn build(source: &str, mut events: Vec<Event>, errors: Vec<Error>) -> (Self, Vec<Error>) {
         let mut builder = GreenNodeBuilder::default();
-        let mut errors = Vec::new();
+        let mut ancestors = Vec::new();
 
-        for event in events {
-            match event {
-                Event::NodeStarted(SyntaxKind::Abandoned) => {
-                    // The node was abandoned, so all the descendants of the
-                    // node will attach to the current node
+        for i in 0..events.len() {
+            match std::mem::replace(&mut events[i], Event::abandoned()) {
+                Event::NodeStarted {
+                    kind,
+                    forward_parent,
+                } => {
+                    // Walk the forward parent chain, if there is one, and push
+                    // each forward parent to the ancestors list
+                    ancestors.push(kind);
+                    let mut idx = i;
+                    let mut fp: Option<usize> = forward_parent;
+                    while let Some(distance) = fp {
+                        idx += distance;
+                        fp = match std::mem::replace(&mut events[idx], Event::abandoned()) {
+                            Event::NodeStarted {
+                                kind,
+                                forward_parent,
+                            } => {
+                                ancestors.push(kind);
+                                forward_parent
+                            }
+                            _ => unreachable!(),
+                        };
+                    }
+
+                    // As the current node was pushed first and then its ancestors, walk
+                    // the list in reverse to start the "oldest" ancestor first
+                    for kind in ancestors.drain(..).rev() {
+                        if kind != SyntaxKind::Abandoned {
+                            builder.start_node(kind.into());
+                        }
+                    }
                 }
-                Event::NodeStarted(kind) => builder.start_node(kind.into()),
                 Event::NodeFinished => builder.finish_node(),
                 Event::Token { kind, span } => builder.token(
                     kind.into(),
                     &source[span.offset()..span.offset() + span.len()],
                 ),
-                Event::Error(error) => errors.push(error),
             }
         }
 
