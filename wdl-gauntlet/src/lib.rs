@@ -30,8 +30,8 @@ pub use repository::Repository;
 
 use crate::config::ReportableConcern;
 use crate::report::Status;
-use crate::repository::Cache;
 use crate::repository::Identifier;
+use crate::repository::WorkDir;
 
 /// The exit code to emit when any test unexpectedly fails.
 const EXIT_CODE_FAILED: i32 = 1;
@@ -83,11 +83,11 @@ type Result<T> = std::result::Result<T, Error>;
 #[command(author, version, about, long_about)]
 pub struct Args {
     /// The GitHub repositories to evaluate (e.g., "stjudecloud/workflows").
+    /// This will create temporary shallow clones of every
+    /// test repository specified on the CL. Normally, there is only one
+    /// repository on disk at a time. The difference in disk space usage
+    /// should be negligible.
     pub repositories: Option<Vec<String>>,
-
-    /// The location of the cache directory.
-    #[arg(long, default_value = ".gauntlet_cache")]
-    pub cache_dir: PathBuf,
 
     /// The location of the config file.
     #[arg(short, long)]
@@ -161,7 +161,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
         }
     };
 
-    let mut cache = Cache::new(args.cache_dir);
+    let mut work_dir = WorkDir::new();
 
     if args.refresh {
         info!("refreshing repository commit hashes.");
@@ -174,11 +174,11 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                 .parse::<Identifier>()
                 .map_err(Error::RepositoryIdentifier)
                 .unwrap();
-            cache.add_by_identifier(&identifier);
+            work_dir.add_by_identifier(&identifier);
         });
         config
             .inner_mut()
-            .extend_repositories(cache.repositories().clone())
+            .extend_repositories(work_dir.repositories().clone())
     }
 
     let mut report = Report::from(std::io::stdout().lock());

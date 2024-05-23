@@ -10,11 +10,11 @@ use log::info;
 use serde::Deserialize;
 use serde::Serialize;
 
-pub mod cache;
 pub mod identifier;
+pub mod work_dir;
 
-pub use cache::Cache;
 pub use identifier::Identifier;
+pub use work_dir::WorkDir;
 
 /// A byte slice that can be converted to a [`git2::Oid`].
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Ord, PartialOrd)]

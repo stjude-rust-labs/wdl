@@ -1,32 +1,24 @@
-//! Cache for storing `Repository` files.
-
-use std::path::PathBuf;
+//! WorkDir for storing `Repository` files.
 
 use indexmap::IndexMap;
-use log::info;
+use temp_dir::TempDir;
 
 use crate::repository::identifier::Identifier;
 use crate::repository::Repository;
 
-/// A cache for storing `Repository` files.
-pub struct Cache {
-    /// The root directory of the `Cache`.
-    root: PathBuf,
+/// A working directory for storing `Repository` files.
+pub struct WorkDir {
+    /// The root directory of the `WorkDir`.
+    root: TempDir,
 
-    /// The repositories stored in the `Cache`.
+    /// The repositories stored in the `WorkDir`.
     repositories: IndexMap<Identifier, Repository>,
 }
 
-impl Cache {
-    /// Create a new `Cache`.
-    pub fn new(root: impl Into<PathBuf>) -> Self {
-        let root = root.into();
-
-        // Ensure the root directory exists.
-        if !root.exists() {
-            info!("creating cache root directory: {:?}", root);
-            std::fs::create_dir_all(&root).expect("failed to create cache root directory");
-        }
+impl WorkDir {
+    /// Create a new `WorkDir`.
+    pub fn new() -> Self {
+        let root = TempDir::new().expect("failed to create temporary directory");
 
         Self {
             root,
@@ -34,22 +26,23 @@ impl Cache {
         }
     }
 
-    /// Get the root directory of the `Cache`.
-    pub fn root(&self) -> &PathBuf {
+    /// Get the root directory of the `WorkDir`.
+    pub fn root(&self) -> &TempDir {
         &self.root
     }
 
-    /// Get the repositories stored in the `Cache`.
+    /// Get the repositories stored in the `WorkDir`.
     pub fn repositories(&self) -> &IndexMap<Identifier, Repository> {
         &self.repositories
     }
 
-    /// Add a repository to the `Cache` from an [`Identifier`].
+    /// Add a repository to the `WorkDir` from an [`Identifier`].
     /// By a guarantee of [`Repository::new()`], the added repository will
     /// _always_ have `Some(commit_hash)`.
     pub fn add_by_identifier(&mut self, identifier: &Identifier) {
         let repository = Repository::new(
             self.root
+                .path()
                 .join(identifier.organization())
                 .join(identifier.name()),
             identifier.clone(),
@@ -59,7 +52,7 @@ impl Cache {
         self.repositories.insert(identifier.clone(), repository);
     }
 
-    /// Get a repository from the `Cache` by its identifier.
+    /// Get a repository from the `WorkDir` by its identifier.
     pub fn get_repository(&self, identifier: &Identifier) -> Option<&Repository> {
         self.repositories.get(identifier)
     }
