@@ -7,5 +7,3 @@ target/
 rustc-ice*
 
 .idea
-
-.gauntlet_cache/

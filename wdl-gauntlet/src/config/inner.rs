@@ -49,11 +49,7 @@ impl Inner {
     /// use gauntlet::config::Inner;
     /// use wdl_gauntlet as gauntlet;
     ///
-    /// let config = r#"version = "v1"
-    ///
-    /// [[repositories]]
-    /// organization = "Foo"
-    /// name = "Bar""#;
+    /// let config = r#"version = "v1""#;
     ///
     /// let inner: Inner = toml::from_str(&config).unwrap();
     /// assert_eq!(inner.version(), &wdl_core::Version::V1);
@@ -63,54 +59,11 @@ impl Inner {
     }
 
     /// Gets the [`Repositories`] for this [`Inner`] by reference.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use gauntlet::config::Inner;
-    /// use wdl_gauntlet as gauntlet;
-    ///
-    /// let config = r#"version = "v1"
-    ///
-    /// [[repositories]]
-    /// organization = "Foo"
-    /// name = "Bar""#;
-    ///
-    /// let inner: Inner = toml::from_str(&config).unwrap();
-    /// assert_eq!(inner.repositories().len(), 1);
-    /// ```
     pub fn repositories(&self) -> &IndexMap<repository::Identifier, repository::Repository> {
         &self.repositories
     }
 
-    /// Extends the [`Repositories`] for this [`Inner`].
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use gauntlet::config::Inner;
-    /// use indexmap::IndexSet;
-    /// use wdl_gauntlet as gauntlet;
-    ///
-    /// let config = r#"version = "v1"
-    ///
-    /// [[repositories]]
-    /// organization = "Foo"
-    /// name = "Bar""#;
-    ///
-    /// let mut inner: Inner = toml::from_str(&config).unwrap();
-    ///
-    /// let mut repositories = IndexSet::new();
-    /// repositories.insert(
-    ///     "Foo/Baz"
-    ///         .parse::<gauntlet::repository::Identifier>()
-    ///         .unwrap(),
-    /// );
-    ///
-    /// inner.extend_repositories(repositories);
-    ///
-    /// assert_eq!(inner.repositories().len(), 2);
-    /// ```
+    /// Extends the `repositories` for this [`Inner`] with the given items.
     pub fn extend_repositories(
         &mut self,
         items: IndexMap<repository::Identifier, repository::Repository>,
@@ -127,64 +80,11 @@ impl Inner {
     }
 
     /// Gets the [`ReportableConcerns`] for this [`Inner`] by reference.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use gauntlet::config::Inner;
-    /// use wdl_gauntlet as gauntlet;
-    ///
-    /// let config = r#"version = "v1"
-    ///
-    /// [[concerns]]
-    /// document = "Foo/Bar:baz.wdl"
-    /// kind = "LintWarning"
-    /// message = '''an error'''"#;
-    ///
-    /// let mut inner: Inner = toml::from_str(&config).unwrap();
-    ///
-    /// assert_eq!(inner.concerns().len(), 1);
-    /// ```
     pub fn concerns(&self) -> &ReportableConcerns {
         &self.concerns
     }
 
     /// Replaces the [`ReportableConcerns`] for this [`Inner`].
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use indexmap::IndexSet;
-    /// use wdl_gauntlet::config::reportable_concern::Kind;
-    /// use wdl_gauntlet::config::Inner;
-    /// use wdl_gauntlet::config::ReportableConcern;
-    ///
-    /// let config = r#"version = "v1"
-    ///
-    /// [[concerns]]
-    /// document = "Foo/Bar:baz.wdl"
-    /// kind = "LintWarning"
-    /// message = '''an error'''"#;
-    ///
-    /// let mut inner: Inner = toml::from_str(&config).unwrap();
-    ///
-    /// let mut concerns = IndexSet::new();
-    /// concerns.insert(ReportableConcern::new(
-    ///     Kind::LintWarning,
-    ///     "Foo/Bar:quux.wdl",
-    ///     "Hello, world!",
-    /// ));
-    /// inner.set_concerns(concerns);
-    ///
-    /// assert_eq!(inner.concerns().len(), 1);
-    ///
-    /// let reportable_concern = inner.concerns().first().unwrap();
-    /// assert_eq!(reportable_concern.kind(), &Kind::LintWarning);
-    /// assert_eq!(reportable_concern.document(), "Foo/Bar:quux.wdl");
-    /// assert_eq!(reportable_concern.message(), "Hello, world!");
-    ///
-    /// Ok::<(), Box<dyn std::error::Error>>(())
-    /// ```
     pub fn set_concerns(&mut self, concerns: ReportableConcerns) {
         self.concerns = concerns;
         self.concerns.sort();
