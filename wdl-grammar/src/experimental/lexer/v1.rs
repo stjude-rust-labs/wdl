@@ -23,7 +23,7 @@ pub enum SQStringToken {
     /// This token is considered part of the literal text.
     ///
     /// Note that escape sequences are not validated by the lexer.
-    #[regex(r"\\.")]
+    #[regex(r"\\(\n|\r|.)")]
     Escape,
 
     /// A span of literal text.
@@ -62,7 +62,7 @@ pub enum DQStringToken {
     /// This token is considered part of the literal text.
     ///
     /// Note that escape sequences are not validated by the lexer.
-    #[regex(r"\\.")]
+    #[regex(r"\\(\n|\r|.)")]
     Escape,
 
     /// A span of literal text of the string.
@@ -100,7 +100,7 @@ pub enum HeredocCommandToken {
     /// This token is considered part of the literal text.
     ///
     /// Note that escape sequences are not validated by the lexer.
-    #[regex(r"\\.")]
+    #[regex(r"\\(\n|\r|.)")]
     Escape,
 
     /// A span of literal text.
@@ -147,7 +147,7 @@ pub enum BraceCommandToken {
     /// This token is considered part of the literal text.
     ///
     /// Note that escape sequences are not validated by the lexer.
-    #[regex(r"\\.")]
+    #[regex(r"\\(\n|\r|.)")]
     Escape,
 
     /// A span of literal text.
