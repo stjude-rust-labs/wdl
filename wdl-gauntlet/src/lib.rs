@@ -390,7 +390,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
         println!(
             "\n{}\n",
             "undetected but expected concerns remain: you should remove these from your \
-             configuration file or run the command with the `--save-config` option!"
+             configuration file or run the command with the `--refresh` option!"
                 .red()
                 .bold()
         );
