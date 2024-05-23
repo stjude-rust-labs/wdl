@@ -1,5 +1,7 @@
 //! WorkDir for storing `Repository` files.
 
+use std::path::Path;
+
 use indexmap::IndexMap;
 use temp_dir::TempDir;
 
@@ -27,8 +29,8 @@ impl WorkDir {
     }
 
     /// Get the root directory of the `WorkDir`.
-    pub fn root(&self) -> &TempDir {
-        &self.root
+    pub fn root(&self) -> &Path {
+        &self.root.path()
     }
 
     /// Get the repositories stored in the `WorkDir`.
@@ -41,12 +43,13 @@ impl WorkDir {
     /// _always_ have `Some(commit_hash)`.
     pub fn add_by_identifier(&mut self, identifier: &Identifier) {
         let repository = Repository::new(
-            self.root
+            identifier.clone(),
+            None,
+            &self
+                .root
                 .path()
                 .join(identifier.organization())
                 .join(identifier.name()),
-            identifier.clone(),
-            None,
         );
 
         self.repositories.insert(identifier.clone(), repository);

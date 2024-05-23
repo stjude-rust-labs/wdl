@@ -2,6 +2,8 @@
 //!
 //! This struct holds the configuration values.
 
+use std::path::Path;
+
 use indexmap::IndexMap;
 use indexmap::IndexSet;
 use serde::Deserialize;
@@ -118,9 +120,9 @@ impl Inner {
     }
 
     /// Update the `repositories` for this [`Inner`].
-    pub fn update_repositories(&mut self) {
+    pub fn update_repositories(&mut self, work_dir: &Path) {
         for repository in self.repositories.values_mut() {
-            repository.update();
+            repository.update(work_dir);
         }
     }
 

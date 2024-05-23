@@ -1,5 +1,6 @@
 //! A local repository of files from a remote GitHub repository.
 
+use std::path::Path;
 use std::path::PathBuf;
 
 use faster_hex;
@@ -50,9 +51,6 @@ impl<'de> Deserialize<'de> for RawHash {
 /// A repository of GitHub files.
 #[derive(Clone, Eq, PartialEq, Hash, Serialize, Deserialize, Debug)]
 pub struct Repository {
-    /// The root directory of the [`Repository`].
-    root: PathBuf,
-
     /// The name for the [`Repository`] expressed as an [`Identifier`].
     identifier: Identifier,
 
@@ -64,17 +62,16 @@ impl Repository {
     /// Create a new [`Repository`].
     /// Repositories initialized with this method will _always_ have
     /// `Some(commit_hash)`.
-    pub fn new(
-        root: impl Into<PathBuf>,
-        identifier: Identifier,
-        commit_hash: Option<RawHash>,
-    ) -> Self {
-        let root = root.into();
+    pub fn new(identifier: Identifier, commit_hash: Option<RawHash>, work_dir: &Path) -> Self {
+        let repo_root = work_dir
+            .join(identifier.organization())
+            .join(identifier.name());
 
         // Ensure the root directory exists.
-        if !root.exists() {
-            info!("creating repository root directory: {:?}", root);
-            std::fs::create_dir_all(&root).expect("failed to create repository root directory");
+        if !repo_root.exists() {
+            info!("creating repository root directory: {:?}", repo_root);
+            std::fs::create_dir_all(&repo_root)
+                .expect("failed to create repository root directory");
         }
 
         info!("cloning repository: {:?}", identifier);
@@ -84,7 +81,7 @@ impl Repository {
             .fetch_options(fo)
             .clone(
                 format!("https://github.com/{}.git", identifier).as_str(),
-                &root,
+                &repo_root,
             )
             .expect("failed to clone repository");
 
@@ -112,15 +109,9 @@ impl Repository {
         };
 
         Self {
-            root,
             identifier,
             commit_hash: Some(commit_hash),
         }
-    }
-
-    /// Get the root directory of the [`Repository`].
-    pub fn root(&self) -> &PathBuf {
-        &self.root
     }
 
     /// Gets the repository identifier from the [`Repository`] by reference.
@@ -134,10 +125,19 @@ impl Repository {
     }
 
     /// Retrieve all the WDL files from the [`Repository`].
-    pub fn wdl_files(&self) -> IndexMap<String, String> {
-        let git_repo = match git2::Repository::open(&self.root) {
+    pub fn wdl_files(&self, root: &Path) -> IndexMap<String, String> {
+        let work_dir = root
+            .join(self.identifier.organization())
+            .join(self.identifier.name());
+        // Ensure work_dir exists.
+        if !work_dir.exists() {
+            info!("creating repository root directory: {:?}", work_dir);
+            std::fs::create_dir_all(&work_dir).expect("failed to create repository root directory");
+        }
+
+        let git_repo = match git2::Repository::open(&work_dir) {
             Ok(repo) => {
-                info!("opening existing repository: {:?}", self.root);
+                info!("opening existing repository: {:?}", work_dir);
                 repo
             }
             Err(_) => {
@@ -148,7 +148,7 @@ impl Repository {
                     .fetch_options(fo)
                     .clone(
                         format!("https://github.com/{}.git", self.identifier).as_str(),
-                        &self.root,
+                        &work_dir,
                     )
                     .expect("failed to clone repository")
             }
@@ -171,19 +171,16 @@ impl Repository {
             }
         };
         let mut wdl_files = IndexMap::new();
-        self.add_wdl_files(&self.root, &mut wdl_files);
+        self.add_wdl_files(&work_dir, &mut wdl_files);
 
-        match std::fs::remove_dir_all(&self.root) {
+        match std::fs::remove_dir_all(&work_dir) {
             Ok(_) => {
-                info!(
-                    "removed repository after parsing WDL files: {:?}",
-                    self.root
-                );
+                info!("removed repository after parsing WDL files: {:?}", work_dir);
             }
             Err(_) => {
                 info!(
                     "failed to remove repository after parsing WDL files: {:?}",
-                    self.root
+                    work_dir
                 );
             }
         }
@@ -213,12 +210,16 @@ impl Repository {
     }
 
     /// Update to the latest commit hash for the [`Repository`].
-    pub fn update(&mut self) {
+    pub fn update(&mut self, root: &Path) {
+        let work_dir = root
+            .join(self.identifier.organization())
+            .join(self.identifier.name());
+
         // Try to delete the current repository.
         // SAFETY: It shouldn't matter if this succeeds or fails.
-        let _ = std::fs::remove_dir_all(&self.root);
+        let _ = std::fs::remove_dir_all(&work_dir);
 
-        // Re-clone the repository.
+        // [Re-]Clone the repository.
         info!("cloning repository: {:?}", self.identifier);
         let mut fo = FetchOptions::new();
         fo.depth(1);
@@ -226,7 +227,7 @@ impl Repository {
             .fetch_options(fo)
             .clone(
                 format!("https://github.com/{}.git", self.identifier).as_str(),
-                &self.root,
+                &work_dir,
             )
             .expect("failed to clone repository");
 

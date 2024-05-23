@@ -165,7 +165,9 @@ pub async fn gauntlet(args: Args) -> Result<()> {
 
     if args.refresh {
         info!("refreshing repository commit hashes.");
-        config.inner_mut().update_repositories();
+        config
+            .inner_mut()
+            .update_repositories(work_dir.root());
     }
 
     if let Some(repositories) = args.repositories {
@@ -184,7 +186,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
     let mut report = Report::from(std::io::stdout().lock());
 
     for (index, (repository_identifier, repo)) in config.inner().repositories().iter().enumerate() {
-        let results = repo.wdl_files();
+        let results = repo.wdl_files(work_dir.root());
 
         report.title(repository_identifier).map_err(Error::Io)?;
         report.next_section().map_err(Error::Io)?;
