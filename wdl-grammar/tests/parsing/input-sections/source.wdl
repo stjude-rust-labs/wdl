@@ -5,17 +5,19 @@ version 1.1
 task t {
     input {
         String a
-        Integer b = 1 + 2
+        Int b = 1 + 2
         String c = "Hello, ~{a}"
-        Map[String, Integer] d
+        Map[String, Int] d
     }
 }
 
 workflow w {
     input {
         String a
-        Integer b = 1 + 2
+        Int b = 1 + 2
         String c = "Hello, ~{a}"
-        Map[String, Integer] d
+        Map[String, Int] d
+        File e
+        File f = "URL"
     }
 }
