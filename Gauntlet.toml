@@ -30,7 +30,7 @@ commit_hash = "a22865d02b2f674da388c472654a73599afb94ed"
 
 [repositories."chanzuckerberg/czid-workflows"]
 identifier = "chanzuckerberg/czid-workflows"
-commit_hash = "29224db788736241d3d162e3f0e97e21882001cd"
+commit_hash = "6ed1fc2ec1aa477b38ca45f0a39fa6402d2a0163"
 
 [repositories."getwilds/ww-fastq-to-cram"]
 identifier = "getwilds/ww-fastq-to-cram"
@@ -50,7 +50,7 @@ commit_hash = "2970ed4ffec95cbc3c94b3e85543d46c4e730f71"
 
 [repositories."theiagen/public_health_bioinformatics"]
 identifier = "theiagen/public_health_bioinformatics"
-commit_hash = "64401efb8b4bd6f2cf4832e9d431354f9b88e12b"
+commit_hash = "dce427204424361a17c084224727e9df1e00eb63"
 
 [[concerns]]
 kind = "ParseError"
@@ -421,6 +421,11 @@ message = "The following tokens are required: workflow_call_input. (204:3)"
 kind = "ParseError"
 document = "theiagen/public_health_bioinformatics:/workflows/theiacov/wf_theiacov_ont.wdl"
 message = "The following tokens are required: workflow_call_input. (330:3)"
+
+[[concerns]]
+kind = "ParseError"
+document = "theiagen/public_health_bioinformatics:/workflows/theiacov/wf_theiacov_ont.wdl"
+message = "The following tokens are required: workflow_call_input. (346:3)"
 
 [[concerns]]
 kind = "ParseError"

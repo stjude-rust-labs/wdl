@@ -169,6 +169,9 @@ impl Repository {
                 git_repo
                     .set_head_detached(obj.id())
                     .expect("failed to set head detached");
+                let mut co = git2::build::CheckoutBuilder::new();
+                co.force();
+                git_repo.checkout_head(Some(&mut co)).expect("failed to checkout head");
             }
             None => {
                 unreachable!("commit hash must be set");
