@@ -63,8 +63,6 @@ Before submitting this PR, please make sure:
 - [ ] You have added an entry to the relevant `CHANGELOG.md` (see
       ["keep a changelog"] for more information).
 - [ ] Your commit messages follow the [conventional commit] style.
-- [ ] Your changes are squashed into a single commit (unless there is a _really_
-      good, articulated reason as to why there should be more than one).
 
 END SECTION -->
 
