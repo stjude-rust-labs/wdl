@@ -420,11 +420,6 @@ message = "The following tokens are required: workflow_call_input. (204:3)"
 [[concerns]]
 kind = "ParseError"
 document = "theiagen/public_health_bioinformatics:/workflows/theiacov/wf_theiacov_ont.wdl"
-message = "The following tokens are required: workflow_call_input. (330:3)"
-
-[[concerns]]
-kind = "ParseError"
-document = "theiagen/public_health_bioinformatics:/workflows/theiacov/wf_theiacov_ont.wdl"
 message = "The following tokens are required: workflow_call_input. (346:3)"
 
 [[concerns]]
