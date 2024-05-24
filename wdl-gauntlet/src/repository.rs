@@ -17,6 +17,9 @@ pub mod work_dir;
 pub use identifier::Identifier;
 pub use work_dir::WorkDir;
 
+/// Fetch up to this many commits when cloning a repository.
+const FETCH_DEPTH: i32 = 25;
+
 /// A byte slice that can be converted to a [`git2::Oid`].
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub struct RawHash([u8; 20]);
@@ -76,7 +79,7 @@ impl Repository {
 
         info!("cloning repository: {:?}", identifier);
         let mut fo = FetchOptions::new();
-        fo.depth(1);
+        fo.depth(FETCH_DEPTH);
         let git_repo = RepoBuilder::new()
             .fetch_options(fo)
             .clone(
@@ -144,7 +147,7 @@ impl Repository {
             Err(_) => {
                 info!("cloning repository: {:?}", self.identifier);
                 let mut fo = FetchOptions::new();
-                fo.depth(1);
+                fo.depth(FETCH_DEPTH);
                 RepoBuilder::new()
                     .fetch_options(fo)
                     .clone(
@@ -205,7 +208,7 @@ impl Repository {
         // [Re-]Clone the repository.
         info!("cloning repository: {:?}", self.identifier);
         let mut fo = FetchOptions::new();
-        fo.depth(1);
+        fo.depth(FETCH_DEPTH);
         let git_repo = RepoBuilder::new()
             .fetch_options(fo)
             .clone(
