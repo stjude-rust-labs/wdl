@@ -50,7 +50,7 @@ const PRIMITIVE_TYPE_SET: TokenSet = TokenSet::new(&[
 ]);
 
 /// The expected names of primitive types.
-const PRIMITIVE_TYPE_NAMES: &[&str] = &["Boolean", "Integer", "Float", "String", "File"];
+const PRIMITIVE_TYPE_NAMES: &[&str] = &["Boolean", "Int", "Float", "String", "File"];
 
 /// A set of tokens for all types.
 const TYPE_EXPECTED_SET: TokenSet = PRIMITIVE_TYPE_SET.union(TokenSet::new(&[
