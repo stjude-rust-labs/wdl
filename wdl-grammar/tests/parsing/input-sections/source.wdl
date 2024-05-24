@@ -13,8 +13,8 @@ task t {
 
 workflow w {
     input {
-        String a
-        Int b = 1 + 2
+        String? a
+        Int? b = 1 + 2
         String c = "Hello, ~{a}"
         Map[String, Int] d
         File e
