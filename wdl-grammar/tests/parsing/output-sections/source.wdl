@@ -1,4 +1,4 @@
-# This is a test of input sections in tasks and workflows.
+# This is a test of output sections in tasks and workflows.
 
 version 1.1
 
