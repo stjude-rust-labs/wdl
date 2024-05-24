@@ -14,7 +14,7 @@ use wdl_core::Version;
 
 use crate::v1;
 
-///
+/// Detects strings that are not defined with double quotes.
 #[derive(Debug)]
 pub struct DoubleQuotes;
 
@@ -45,7 +45,7 @@ impl<'a> Rule<&'a Pair<'a, v1::Rule>> for DoubleQuotes {
     }
 
     fn tags(&self) -> lint::TagSet {
-        TagSet::new(&[lint::Tag::Naming])
+        TagSet::new(&[lint::Tag::Clarity, lint::Tag::Style])
     }
 
     fn check(&self, tree: &'a Pair<'_, v1::Rule>) -> lint::Result {
@@ -99,7 +99,7 @@ mod tests {
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W012::[Naming, Style]::Low] string defined with single quotes (1:8-1:36)"
+            "[v1::W012::[Style, Clarity]::Low] string defined with single quotes (1:8-1:36)"
         );
 
         Ok(())
@@ -115,7 +115,7 @@ mod tests {
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W012::[Naming, Style]::Low] string defined with single quotes (1:21-1:26)"
+            "[v1::W012::[Style, Clarity]::Low] string defined with single quotes (1:21-1:26)"
         );
 
         Ok(())
@@ -140,7 +140,7 @@ mod tests {
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W012::[Naming, Style]::Low] string defined with single quotes (3:22-3:29)"
+            "[v1::W012::[Style, Clarity]::Low] string defined with single quotes (3:22-3:29)"
         );
 
         Ok(())
