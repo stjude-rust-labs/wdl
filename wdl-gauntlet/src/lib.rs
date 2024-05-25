@@ -1,4 +1,4 @@
-//! `wdl-grammar gauntlet`
+//! `wdl-gauntlet`
 
 #![feature(let_chains)]
 #![warn(missing_docs)]
@@ -103,7 +103,7 @@ pub struct Args {
     #[arg(short, long)]
     pub filter: Option<Vec<String>>,
 
-    /// Enables logging for all modules (not just `wdl-grammar`).
+    /// Enables logging for all modules (not just `wdl-gauntlet`).
     #[arg(short, long)]
     pub log_all_modules: bool,
 
@@ -125,10 +125,6 @@ pub struct Args {
     /// time. The difference in disk space usage should be negligible.
     #[arg(long)]
     pub refresh: bool,
-
-    /// Skips the retreiving of remote objects.
-    #[arg(long)]
-    pub skip_remote: bool,
 
     /// Displays warnings as part of the report output.
     #[arg(long)]

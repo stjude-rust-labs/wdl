@@ -15,11 +15,10 @@ pub mod reportable_concern;
 pub use inner::Inner;
 pub use reportable_concern::ReportableConcern;
 
-/// The default directory name for the `wdl-grammar` configuration file and
-/// cache.
-const DEFAULT_CONFIG_DIR: &str = "wdl-grammar";
+/// The default directory name for the `wdl-gauntlet` configuration file
+const DEFAULT_CONFIG_DIR: &str = "wdl-gauntlet";
 
-/// The default name for the `wdl-grammar` configuration file.
+/// The default name for the `wdl-gauntlet` configuration file.
 const DEFAULT_CONFIG_FILE: &str = "Gauntlet.toml";
 
 /// An error related to a [`Config`].
