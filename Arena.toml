@@ -1,0 +1,1015 @@
+version = "v1"
+
+[repositories."stjudecloud/workflows"]
+identifier = "stjudecloud/workflows"
+commit_hash = "2970ed4ffec95cbc3c94b3e85543d46c4e730f71"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/flag_filter.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (124:10-124:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/flag_filter.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (71:6-71:45)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (147:6-147:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (32:12-32:14)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (33:13-33:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (34:13-34:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (35:13-35:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (36:13-36:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (37:13-37:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (38:13-38:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (39:13-39:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (40:13-40:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (41:10-41:12)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (42:13-42:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (43:13-43:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (44:13-44:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (45:13-45:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (48:6-48:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (96:6-96:20)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/cellranger.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (119:17-119:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/cellranger.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (120:17-120:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/cellranger.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (82:14-82:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/cellranger.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (83:14-83:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/cellranger.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (87:14-87:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (139:11-139:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (140:11-140:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (149:12-149:18)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (150:12-150:18)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (166:14-166:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (167:15-167:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (71:11-71:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (72:11-72:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (107:14-107:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (108:14-108:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (109:21-109:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (249:14-249:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (250:14-250:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (62:14-62:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (347:11-347:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (348:11-348:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/librarian.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (30:11-30:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/md5sum.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (36:14-36:20)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (121:15-121:39)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (327:14-327:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (422:14-422:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (483:14-483:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "[v1::W010::[Style]::Low] preamble comment without a double pound sign (2:1-2:2)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "[v1::W010::[Style]::Low] preamble comment without a double pound sign (3:1-3:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "[v1::W010::[Style]::Low] preamble comment without a double pound sign (4:1-4:50)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (478:20-478:47)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (479:19-479:41)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (485:19-485:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (491:19-491:43)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (497:19-497:46)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (503:19-503:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (509:30-509:46)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (510:28-510:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (511:27-511:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (512:24-512:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (513:24-513:48)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (514:24-514:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (515:16-515:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (516:16-516:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (517:16-517:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (518:16-518:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (519:16-519:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (520:16-520:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (521:16-521:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (522:16-522:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (523:16-523:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (524:16-524:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (525:16-525:38)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (526:16-526:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (527:16-527:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (528:16-528:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (529:16-529:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (530:16-530:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (531:16-531:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (532:16-532:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (533:16-533:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (535:15-535:41)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (536:15-536:45)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (537:15-537:41)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (538:15-538:42)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (539:15-539:42)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (53:16-53:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (540:15-540:43)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (541:15-541:47)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (542:15-542:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (543:13-543:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (544:13-544:22)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (545:13-545:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (546:13-546:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (547:13-547:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (548:13-548:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (549:13-549:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (54:16-54:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (550:13-550:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (551:13-551:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (552:13-552:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (553:13-553:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (554:13-554:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (555:13-555:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (556:13-556:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (557:13-557:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (558:13-558:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (559:13-559:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (55:16-55:46)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (560:13-560:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (561:13-561:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (562:13-562:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (563:13-563:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (564:13-564:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (565:13-565:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (566:13-566:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (567:13-567:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (568:13-568:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (569:13-569:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (56:16-56:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (570:13-570:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (571:13-571:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (572:13-572:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (573:13-573:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (574:13-574:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (575:13-575:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (576:13-576:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (577:13-577:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (578:13-578:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (579:13-579:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (57:16-57:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (580:13-580:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (581:13-581:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (582:13-582:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (583:13-583:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (584:13-584:42)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (585:13-585:40)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (586:13-586:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (587:13-587:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (588:13-588:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (589:13-589:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (58:16-58:44)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (590:13-590:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (591:13-591:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (592:13-592:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (593:13-593:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (594:13-594:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (595:13-595:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (596:13-596:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (597:13-597:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (598:13-598:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (599:13-599:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (600:13-600:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (601:13-601:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (602:13-602:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (60:13-60:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (61:13-61:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (62:13-62:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (63:13-63:34)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (64:13-64:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (816:9-816:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (817:9-817:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (818:9-818:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (24:17-24:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (413:14-413:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "[v1::W011::[Spacing, Style]::Low] more than one empty line (563:1-563:1)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "[v1::W011::[Spacing, Style]::Low] more than one empty line (595:1-595:1)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
+message = "[v1::W003::[Completeness]::Medium] missing parameter meta within task: array_lengths (118:9-118:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (49:21-49:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (50:22-50:28)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (570:11-570:35)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/bwa-db-build.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (26:17-26:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (103:15-103:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (104:15-104:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (106:21-106:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (41:16-41:32)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (42:16-42:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (43:16-43:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (44:17-44:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (45:17-45:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (46:23-46:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (47:23-47:37)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "[v1::W007::[Spacing, Style]::Low] missing newline at the end of the file (108:2-108:2)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "[v1::W010::[Style]::Low] preamble comment without a double pound sign (1:1-1:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "[v1::W010::[Style]::Low] preamble comment without a double pound sign (2:1-2:50)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (125:14-125:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (33:17-33:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (34:17-34:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (44:14-44:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (45:14-45:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "[v1::W007::[Spacing, Style]::Low] multiple empty lines at the end of file (126:1-127:1)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "[v1::W010::[Style]::Low] preamble comment without a double pound sign (1:1-1:31)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "[v1::W010::[Style]::Low] preamble comment without a double pound sign (2:1-2:50)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (59:17-59:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (60:17-60:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (83:21-83:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (84:21-84:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (90:17-90:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (91:17-91:29)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
+message = "[v1::W011::[Spacing, Style]::Low] more than one empty line (43:1-43:1)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (104:14-104:30)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (105:14-105:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (109:14-109:25)"
