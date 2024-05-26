@@ -21,7 +21,7 @@ const DEFAULT_CONFIG_DIR: &str = "wdl-gauntlet";
 /// The default name for the `wdl-gauntlet` configuration file.
 const DEFAULT_CONFIG_FILE: &str = "Gauntlet.toml";
 
-/// The default name for the `wdl-gauntlet` configuration file.
+/// The default name for the `wdl-gauntlet --arena` configuration file.
 const DEFAULT_ARENA_CONFIG_FILE: &str = "Arena.toml";
 
 /// An error related to a [`Config`].
