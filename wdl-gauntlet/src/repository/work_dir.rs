@@ -52,10 +52,7 @@ impl WorkDir {
             identifier.clone(),
             None,
             &self
-                .root
-                .path()
-                .join(identifier.organization())
-                .join(identifier.name()),
+                .root(),
         );
 
         self.repositories.insert(identifier.clone(), repository);
