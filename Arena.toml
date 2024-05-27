@@ -1,8 +1,166 @@
 version = "v1"
 
+[repositories."ENCODE-DCC/chip-seq-pipeline2"]
+identifier = "ENCODE-DCC/chip-seq-pipeline2"
+commit_hash = "26eeda81a0540dc793fc69b0c390d232ca7ca50a"
+
+[repositories."getwilds/ww-fastq-to-cram"]
+identifier = "getwilds/ww-fastq-to-cram"
+commit_hash = "7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc"
+
 [repositories."stjudecloud/workflows"]
 identifier = "stjudecloud/workflows"
 commit_hash = "2970ed4ffec95cbc3c94b3e85543d46c4e730f71"
+
+[[concerns]]
+kind = "LintWarning"
+document = "ENCODE-DCC/chip-seq-pipeline2:/dev/test/test_task/compare_md5sum.wdl"
+message = "[v1::W001::[Spacing, Style]::Low] trailing space (10:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "ENCODE-DCC/chip-seq-pipeline2:/dev/test/test_task/compare_md5sum.wdl"
+message = "[v1::W001::[Spacing, Style]::Low] trailing space (68:66)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "ENCODE-DCC/chip-seq-pipeline2:/dev/test/test_task/compare_md5sum.wdl"
+message = "[v1::W003::[Completeness]::Medium] missing parameter meta within task: files (5:6-5:23)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "ENCODE-DCC/chip-seq-pipeline2:/dev/test/test_task/compare_md5sum.wdl"
+message = "[v1::W003::[Completeness]::Medium] missing parameter meta within task: labels (4:6-4:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "ENCODE-DCC/chip-seq-pipeline2:/dev/test/test_task/compare_md5sum.wdl"
+message = "[v1::W003::[Completeness]::Medium] missing parameter meta within task: ref_files (6:6-6:27)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "ENCODE-DCC/chip-seq-pipeline2:/dev/test/test_task/compare_md5sum.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (2:6-2:20)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W001::[Spacing, Style]::Low] trailing space (133:46)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W001::[Spacing, Style]::Low] trailing space (182:63)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W001::[Spacing, Style]::Low] trailing space (34:105)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W001::[Spacing, Style]::Low] trailing space (57:13)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W001::[Spacing, Style]::Low] trailing space (8:42)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W003::[Completeness]::Medium] extraneous parameter meta within task: crai (203:5-203:9)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W003::[Completeness]::Medium] extraneous parameter meta within task: cram (202:5-202:9)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W003::[Completeness]::Medium] extraneous parameter meta within task: unmapped_bam (129:5-129:17)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W003::[Completeness]::Medium] extraneous parameter meta within task: validation (165:5-165:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W003::[Completeness]::Medium] extraneous parameter meta within workflow: unmapped_cram_indexes (75:5-75:26)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W003::[Completeness]::Medium] extraneous parameter meta within workflow: unmapped_crams (74:5-74:19)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W003::[Completeness]::Medium] extraneous parameter meta within workflow: validation (76:5-76:15)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (10:15-10:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (134:6-134:18)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (170:6-170:21)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (23:10-23:36)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (83:6-83:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (85:17-85:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (86:17-86:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake case (9:15-9:33)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W007::[Spacing, Style]::Low] missing newline at the end of the file (205:2-205:2)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W010::[Style]::Low] double pound signs are reserved for preamble comments (21:1-21:25)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W010::[Style]::Low] double pound signs are reserved for preamble comments (5:1-5:24)"
+
+[[concerns]]
+kind = "LintWarning"
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "[v1::W010::[Style]::Low] double pound signs are reserved for preamble comments (80:1-80:22)"
 
 [[concerns]]
 kind = "LintWarning"
