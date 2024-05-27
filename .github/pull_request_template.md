@@ -44,6 +44,9 @@ Rule specific checks:
 - [ ] You have run `wdl-gauntlet --refresh` to ensure that all of the rules
       added/removed are now reflected in the baseline configuration file
       (`Gauntlet.toml`).
+- [ ] You have run `wdl-gauntlet --refresh --arena` to ensure that all of the rules
+      added/removed are now reflected in the baseline configuration file
+      (`Arena.toml`).
 
 END SECTION -->
 
