@@ -205,10 +205,8 @@ pub enum SyntaxKind {
     InputSectionNode,
     /// Represents an output section node.
     OutputSectionNode,
-    /// Represents a braced command section node.
-    BracedCommandSectionNode,
-    /// Represents a heredoc command section node.
-    HeredocCommandSectionNode,
+    /// Represents a command section node.
+    CommandSectionNode,
     /// Represents a primitive type node.
     PrimitiveTypeNode,
     /// Represents a map type node.

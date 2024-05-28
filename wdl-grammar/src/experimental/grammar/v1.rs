@@ -676,6 +676,7 @@ fn decl(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> 
 fn command_section(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     parser.require(Token::CommandKeyword);
 
+    // Check to see if this is a "braced" command
     if let Some((Token::OpenBrace, _)) = parser.peek() {
         let start = parser.next().expect("should have token").1;
         if let Err(e) =
@@ -683,23 +684,21 @@ fn command_section(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marke
         {
             return Err((marker, e));
         }
+    } else {
+        // Not a "braced" command, so it should be a "heredoc" command.
+        let start = match parser.expect(Token::HeredocCommandStart) {
+            Ok(span) => span,
+            Err(e) => return Err((marker, e)),
+        };
 
-        marker.complete(parser, SyntaxKind::BracedCommandSectionNode);
-        return Ok(());
+        if let Err(e) =
+            parser.interpolate(|interpolator| interpolate_heredoc_command(start, interpolator))
+        {
+            return Err((marker, e));
+        }
     }
 
-    let start = match parser.expect(Token::HeredocCommandStart) {
-        Ok(span) => span,
-        Err(e) => return Err((marker, e)),
-    };
-
-    if let Err(e) =
-        parser.interpolate(|interpolator| interpolate_heredoc_command(start, interpolator))
-    {
-        return Err((marker, e));
-    }
-
-    marker.complete(parser, SyntaxKind::HeredocCommandSectionNode);
+    marker.complete(parser, SyntaxKind::CommandSectionNode);
     Ok(())
 }
 

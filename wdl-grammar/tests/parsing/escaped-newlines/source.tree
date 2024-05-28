@@ -28,7 +28,7 @@ RootNode@0..333
         LiteralStringText@113..127 "first \\\nsecond"
         DoubleQuote@127..128 "\""
       Whitespace@128..134 "\n\n    "
-    HeredocCommandSectionNode@134..204
+    CommandSectionNode@134..204
       CommandKeyword@134..141 "command"
       Whitespace@141..142 " "
       OpenHeredoc@142..145 "<<<"
@@ -59,7 +59,7 @@ RootNode@0..333
         LiteralStringText@238..252 "first \\\nsecond"
         SingleQuote@252..253 "'"
       Whitespace@253..259 "\n\n    "
-    BracedCommandSectionNode@259..330
+    CommandSectionNode@259..330
       CommandKeyword@259..266 "command"
       Whitespace@266..267 " "
       OpenBrace@267..268 "{"
