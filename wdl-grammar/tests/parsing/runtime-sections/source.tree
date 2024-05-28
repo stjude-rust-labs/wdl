@@ -1,4 +1,4 @@
-RootNode@0..351
+RootNode@0..355
   Comment@0..46 "# This is a test of r ..."
   Whitespace@46..48 "\n\n"
   VersionStatementNode@48..59
@@ -6,7 +6,7 @@ RootNode@0..351
     Whitespace@55..56 " "
     Version@56..59 "1.1"
   Whitespace@59..61 "\n\n"
-  TaskDefinitionNode@61..350
+  TaskDefinitionNode@61..354
     TaskKeyword@61..65 "task"
     NameNode@65..70
       Whitespace@65..66 " "
@@ -14,7 +14,7 @@ RootNode@0..351
     Whitespace@70..71 " "
     OpenBrace@71..72 "{"
     Whitespace@72..77 "\n    "
-    RuntimeSectionNode@77..348
+    RuntimeSectionNode@77..352
       RuntimeKeyword@77..84 "runtime"
       Whitespace@84..85 " "
       OpenBrace@85..86 "{"
@@ -58,36 +58,36 @@ RootNode@0..351
           Whitespace@221..222 " "
           FalseKeyword@222..227 "false"
         Whitespace@227..236 "\n        "
-      RuntimeItemNode@236..347
+      RuntimeItemNode@236..351
         Ident@236..242 "inputs"
         Colon@242..243 ":"
-        LiteralObjectNode@243..342
+        LiteralObjectNode@243..346
           Whitespace@243..244 " "
           ObjectKeyword@244..250 "object"
           Whitespace@250..251 " "
           OpenBrace@251..252 "{"
-          Whitespace@252..261 "\n        "
-          LiteralObjectItemNode@261..341
-            Ident@261..264 "foo"
-            Colon@264..265 ":"
-            LiteralObjectNode@265..332
-              Whitespace@265..266 " "
-              ObjectKeyword@266..272 "object"
-              Whitespace@272..273 " "
-              OpenBrace@273..274 "{"
-              Whitespace@274..292 " \n                "
-              LiteralObjectItemNode@292..331
-                Ident@292..312 "localizationOptional"
-                Colon@312..313 ":"
-                LiteralBooleanNode@313..318
-                  Whitespace@313..314 " "
-                  TrueKeyword@314..318 "true"
-                Whitespace@318..331 "\n            "
-              CloseBrace@331..332 "}"
-            Whitespace@332..341 "\n        "
-          CloseBrace@341..342 "}"
-        Whitespace@342..347 "\n    "
-      CloseBrace@347..348 "}"
-    Whitespace@348..349 "\n"
-    CloseBrace@349..350 "}"
-  Whitespace@350..351 "\n"
+          Whitespace@252..265 "\n            "
+          LiteralObjectItemNode@265..345
+            Ident@265..268 "foo"
+            Colon@268..269 ":"
+            LiteralObjectNode@269..336
+              Whitespace@269..270 " "
+              ObjectKeyword@270..276 "object"
+              Whitespace@276..277 " "
+              OpenBrace@277..278 "{"
+              Whitespace@278..296 " \n                "
+              LiteralObjectItemNode@296..335
+                Ident@296..316 "localizationOptional"
+                Colon@316..317 ":"
+                LiteralBooleanNode@317..322
+                  Whitespace@317..318 " "
+                  TrueKeyword@318..322 "true"
+                Whitespace@322..335 "\n            "
+              CloseBrace@335..336 "}"
+            Whitespace@336..345 "\n        "
+          CloseBrace@345..346 "}"
+        Whitespace@346..351 "\n    "
+      CloseBrace@351..352 "}"
+    Whitespace@352..353 "\n"
+    CloseBrace@353..354 "}"
+  Whitespace@354..355 "\n"
