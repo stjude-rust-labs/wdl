@@ -227,6 +227,9 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                     if let Some(these_concerns) = these_concerns {
                         detected_concerns.extend(these_concerns.into_inner().iter().filter_map(
                             |concern| {
+                                // from_concern() will return `None` if the concern is not
+                                // of the right type (based on the value of `args.arena`)
+                                // in which case filter_map() will drop it.
                                 ReportableConcern::from_concern(
                                     document_identifier.to_string(),
                                     concern.clone(),
@@ -242,6 +245,9 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                         if let Some(these_concerns) = these_concerns {
                             detected_concerns.extend(
                                 these_concerns.into_inner().iter().filter_map(|concern| {
+                                    // from_concern() will return `None` if the concern is not
+                                    // of the right type (based on the value of `args.arena`)
+                                    // in which case filter_map() will drop it.
                                     ReportableConcern::from_concern(
                                         document_identifier.to_string(),
                                         concern.clone(),
