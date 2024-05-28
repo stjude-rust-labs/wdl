@@ -10,7 +10,7 @@ task test {
         shortTask: true
         localizationOptional: false
         inputs: object {
-        foo: object { 
+            foo: object { 
                 localizationOptional: true
             }
         }
