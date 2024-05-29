@@ -746,6 +746,19 @@ where
         }
     }
 
+    /// Updates the syntax kind of the last token event.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the last event was not a token.
+    pub fn update_last_token_kind(&mut self, new_kind: SyntaxKind) {
+        let last = self.events.last_mut().expect("expected a last event");
+        match last {
+            Event::Token { kind, .. } => *kind = new_kind,
+            _ => panic!("the last event is not a token"),
+        }
+    }
+
     /// Consumes any trivia tokens by adding them to the event list.
     fn consume_trivia(
         &mut self,

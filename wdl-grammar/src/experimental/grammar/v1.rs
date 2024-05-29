@@ -407,6 +407,7 @@ fn import_statement(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Mark
 
     if parser.next_if(Token::AsKeyword) {
         expected_in!(parser, marker, ANY_IDENT, "import namespace");
+        parser.update_last_token_kind(SyntaxKind::Ident);
     }
 
     while let Some((Token::AliasKeyword, _)) = parser.peek() {
@@ -421,8 +422,10 @@ fn import_statement(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Mark
 fn import_alias(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     parser.require(Token::AliasKeyword);
     expected_in!(parser, marker, ANY_IDENT, "source type name");
+    parser.update_last_token_kind(SyntaxKind::Ident);
     expected!(parser, marker, Token::AsKeyword);
     expected_in!(parser, marker, ANY_IDENT, "target type name");
+    parser.update_last_token_kind(SyntaxKind::Ident);
     marker.complete(parser, SyntaxKind::ImportAliasNode);
     Ok(())
 }
@@ -431,6 +434,7 @@ fn import_alias(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, 
 fn struct_definition(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     parser.require(Token::StructKeyword);
     expected_in!(parser, marker, ANY_IDENT, "struct name");
+    parser.update_last_token_kind(SyntaxKind::Ident);
     braced!(parser, marker, |parser| {
         parser.delimited(
             None,
@@ -448,6 +452,7 @@ fn struct_definition(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Mar
 fn task_definition(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     parser.require(Token::TaskKeyword);
     expected_in!(parser, marker, ANY_IDENT, "task name");
+    parser.update_last_token_kind(SyntaxKind::Ident);
     braced!(parser, marker, |parser| {
         parser.delimited(None, UNTIL_CLOSE_BRACE, TASK_ITEM_RECOVERY_SET, task_item);
         Ok(())
@@ -460,6 +465,7 @@ fn task_definition(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marke
 fn workflow_definition(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     parser.require(Token::WorkflowKeyword);
     expected_in!(parser, marker, ANY_IDENT, "workflow name");
+    parser.update_last_token_kind(SyntaxKind::Ident);
     braced!(parser, marker, |parser| {
         parser.delimited(
             None,
@@ -477,6 +483,7 @@ fn workflow_definition(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (M
 fn unbound_decl(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     expected_fn!(parser, marker, ty);
     expected_in!(parser, marker, ANY_IDENT, "declaration name");
+    parser.update_last_token_kind(SyntaxKind::Ident);
     marker.complete(parser, SyntaxKind::UnboundDeclNode);
     Ok(())
 }
@@ -680,6 +687,7 @@ fn input_section(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker,
 fn decl(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     expected_fn!(parser, marker, ty);
     expected_in!(parser, marker, ANY_IDENT, "declaration name");
+    parser.update_last_token_kind(SyntaxKind::Ident);
 
     let kind = if parser.next_if(Token::Assignment) {
         expected_fn!(parser, marker, expr);
@@ -931,6 +939,7 @@ fn runtime_section(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marke
 /// Parses a runtime item in a runtime section.
 fn runtime_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     expected_in!(parser, marker, ANY_IDENT, "runtime key");
+    parser.update_last_token_kind(SyntaxKind::Ident);
     expected!(parser, marker, Token::Colon);
     expected_fn!(parser, marker, expr);
     marker.complete(parser, SyntaxKind::RuntimeItemNode);
@@ -956,6 +965,7 @@ fn metadata_section(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Mark
 /// Parses an item in a metadata object.
 fn metadata_object_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     expected_in!(parser, marker, ANY_IDENT, "metadata key");
+    parser.update_last_token_kind(SyntaxKind::Ident);
     expected!(parser, marker, Token::Colon);
     expected_fn!(parser, marker, metadata_value);
     marker.complete(parser, SyntaxKind::MetadataObjectItemNode);
@@ -1412,6 +1422,7 @@ fn parameter_metadata_section(
 fn bound_decl(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     expected_fn!(parser, marker, ty);
     expected_in!(parser, marker, ANY_IDENT, "declaration name");
+    parser.update_last_token_kind(SyntaxKind::Ident);
     expected!(parser, marker, Token::Assignment);
     expected_fn!(parser, marker, expr);
     marker.complete(parser, SyntaxKind::BoundDeclNode);
@@ -1440,6 +1451,7 @@ fn scatter_statement(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Mar
     parser.require(Token::ScatterKeyword);
     paren!(parser, marker, |parser| {
         parser.expect_in(ANY_IDENT, &["scatter variable name"])?;
+        parser.update_last_token_kind(SyntaxKind::Ident);
         parser.expect(Token::InKeyword)?;
         expected_fn!(parser, expr);
         Ok(())
@@ -1461,13 +1473,16 @@ fn scatter_statement(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Mar
 fn call_statement(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     parser.require(Token::CallKeyword);
     expected_in!(parser, marker, ANY_IDENT, "task name");
+    parser.update_last_token_kind(SyntaxKind::Ident);
 
     if parser.next_if(Token::Dot) {
         expected_in!(parser, marker, ANY_IDENT, "task name");
+        parser.update_last_token_kind(SyntaxKind::Ident);
     }
 
     if parser.next_if(Token::AsKeyword) {
         expected_in!(parser, marker, ANY_IDENT, "call output name");
+        parser.update_last_token_kind(SyntaxKind::Ident);
     }
 
     while let Some((Token::AfterKeyword, _)) = parser.peek() {
@@ -1496,6 +1511,7 @@ fn call_statement(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker
 fn after_clause(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     parser.require(Token::AfterKeyword);
     expected_in!(parser, marker, ANY_IDENT, "task name");
+    parser.update_last_token_kind(SyntaxKind::Ident);
     marker.complete(parser, SyntaxKind::AfterClauseNode);
     Ok(())
 }
@@ -1503,6 +1519,7 @@ fn after_clause(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, 
 /// Parses a call input item.
 fn call_input_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     expected_in!(parser, marker, ANY_IDENT, "call input key");
+    parser.update_last_token_kind(SyntaxKind::Ident);
 
     if parser.next_if(Token::Assignment) {
         expected_fn!(parser, marker, expr);
@@ -1761,6 +1778,7 @@ fn object(parser: &mut Parser<'_>, marker: Marker) -> Result<CompletedMarker, (M
 /// Parses a single item in a literal object.
 fn object_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     expected_in!(parser, marker, ANY_IDENT, "object key");
+    parser.update_last_token_kind(SyntaxKind::Ident);
     expected!(parser, marker, Token::Colon);
     expected_fn!(parser, marker, expr);
     marker.complete(parser, SyntaxKind::LiteralObjectItemNode);
@@ -1773,6 +1791,7 @@ fn literal_struct_or_name_ref(
     marker: Marker,
 ) -> Result<CompletedMarker, (Marker, Error)> {
     expected_in!(parser, marker, ANY_IDENT, "identifier");
+    parser.update_last_token_kind(SyntaxKind::Ident);
 
     if !matches!(parser.peek(), Some((Token::OpenBrace, _)) | None) {
         // This is actually a name reference.
@@ -1794,6 +1813,7 @@ fn literal_struct_or_name_ref(
 /// Parses a single item in a literal struct.
 fn literal_struct_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Error)> {
     expected_in!(parser, marker, ANY_IDENT, "struct member name");
+    parser.update_last_token_kind(SyntaxKind::Ident);
     expected!(parser, marker, Token::Colon);
     expected_fn!(parser, marker, expr);
     marker.complete(parser, SyntaxKind::LiteralStructItemNode);
@@ -1841,6 +1861,7 @@ fn access_expr(
 ) -> Result<CompletedMarker, (Marker, Error)> {
     parser.require(Token::Dot);
     expected_in!(parser, marker, ANY_IDENT, "member name");
+    parser.update_last_token_kind(SyntaxKind::Ident);
     Ok(marker.complete(parser, SyntaxKind::AccessExprNode))
 }
 

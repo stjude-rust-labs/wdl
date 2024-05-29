@@ -19,7 +19,7 @@ RootNode@0..175
       OpenBrace@92..93 "{"
       Whitespace@93..102 "\n        "
       MetadataObjectItemNode@102..118
-        VersionKeyword@102..109 "version"
+        Ident@102..109 "version"
         Colon@109..110 ":"
         LiteralStringNode@110..118
           Whitespace@110..111 " "
@@ -35,7 +35,7 @@ RootNode@0..175
       OpenBrace@145..146 "{"
       Whitespace@146..155 "\n        "
       MetadataObjectItemNode@155..166
-        TaskKeyword@155..159 "task"
+        Ident@155..159 "task"
         Colon@159..160 ":"
         LiteralStringNode@160..166
           Whitespace@160..161 " "
