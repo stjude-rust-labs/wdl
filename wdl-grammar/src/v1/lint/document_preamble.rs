@@ -6,7 +6,8 @@ use nonempty::NonEmpty;
 use pest::iterators::Pair;
 use wdl_core::concern::code;
 use wdl_core::concern::lint;
-use wdl_core::concern::lint::Group;
+use wdl_core::concern::lint::Tag;
+use wdl_core::concern::lint::TagSet;
 use wdl_core::concern::lint::Rule;
 use wdl_core::concern::Code;
 use wdl_core::file::Location;
@@ -70,8 +71,8 @@ impl<'a> Rule<&Pair<'a, v1::Rule>> for DocumentPreamble {
         Code::try_new(code::Kind::Error, Version::V1, 9).unwrap()
     }
 
-    fn group(&self) -> Group {
-        Group::Spacing
+    fn tags(&self) -> TagSet {
+        TagSet::new(&[Tag::Spacing])
     }
 
     fn check(&self, tree: &Pair<'_, v1::Rule>) -> lint::Result {
