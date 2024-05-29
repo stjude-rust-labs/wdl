@@ -477,7 +477,7 @@ where
             .unwrap()
             .0
             .expect("should have peeked at a valid token");
-        while let Some((Ok(token), span)) = lexer.peek() {
+        while let Some((Ok(token), span)) = lexer.next() {
             if token.is_trivia() {
                 // Do not consume trivia here as we're between peeked tokens.
                 continue;
