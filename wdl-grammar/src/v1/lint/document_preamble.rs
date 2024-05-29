@@ -35,7 +35,7 @@ impl<'a> DocumentPreamble {
             .subject("Improperly placed version declaration")
             .body(
                 "The version declaration must be the first line of a WDL document or immediately \
-                 following  exactly one blank line and any header comments.",
+                 following exactly one blank line and any header comments.",
             )
             .push_location(location)
             .fix(
