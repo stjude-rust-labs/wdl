@@ -34,13 +34,13 @@ impl<'a> DocumentPreamble {
             .tags(self.tags())
             .subject("Improperly placed version declaration")
             .body(
-                "The version declaration must be the first line of a WDL document or one blank \
-                 line after header comments.",
+                "The version declaration must be the first line of a WDL document or immediately \
+                 following  exactly one blank line and any header comments.",
             )
             .push_location(location)
             .fix(
-                "Move the version declaration to the first line of the WDL document or one blank \
-                 line after header comments.",
+                "Move the version declaration to the first line of the WDL document or \
+                 immediately following any header comments and exactly one blank line.",
             )
             .try_build()
             .unwrap()
@@ -72,7 +72,7 @@ impl<'a> Rule<&Pair<'a, v1::Rule>> for DocumentPreamble {
     }
 
     fn tags(&self) -> TagSet {
-        TagSet::new(&[Tag::Spacing])
+        TagSet::new(&[Tag::Spacing, Tag::Style])
     }
 
     fn check(&self, tree: &Pair<'_, v1::Rule>) -> lint::Result {
@@ -145,7 +145,7 @@ mod tests {
     fn it_catches_missing_newline() -> Result<(), Box<dyn std::error::Error>> {
         let tree = Parser::parse(
             Rule::document,
-            r#"## Header comment
+            r#"## Preamble comment
 version 1.0"#,
         )?
         .next()
@@ -166,7 +166,7 @@ version 1.0"#,
         let tree = Parser::parse(
             Rule::document,
             r#"
-## Header comment
+## Preamble comment
 version 1.0"#,
         )?
         .next()
@@ -192,7 +192,7 @@ version 1.0"#,
         let tree = Parser::parse(
             Rule::document,
             r#"
-## Header comment
+## Preamble comment
 
 version 1.0"#,
         )?
@@ -233,7 +233,7 @@ version 1.0"#,
     fn it_handles_correct() -> Result<(), Box<dyn std::error::Error>> {
         let tree = Parser::parse(
             Rule::document,
-            r#"## Header comment
+            r#"## Preamble comment
 
 version 1.0"#,
         )?
@@ -248,7 +248,7 @@ version 1.0"#,
     fn it_handles_multiple_comments_correct() -> Result<(), Box<dyn std::error::Error>> {
         let tree = Parser::parse(
             Rule::document,
-            r#"## Header comment
+            r#"## Preamble comment
 ## Another comment
 
 version 1.0"#,
@@ -265,6 +265,44 @@ version 1.0"#,
         let tree = Parser::parse(Rule::document, r#"version 1.0"#)?
             .next()
             .unwrap();
+
+        assert!(DocumentPreamble.check(&tree)?.is_none());
+        Ok(())
+    }
+
+    #[test]
+    fn it_catches_too_many_newlines() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(
+            Rule::document,
+            r#"## Preamble comment
+
+
+version 1.0"#,
+        )?
+        .next()
+        .unwrap();
+
+        let warnings = DocumentPreamble.check(&tree)?.unwrap();
+
+        assert_eq!(warnings.len(), 1);
+        assert_eq!(
+            warnings.first().to_string(),
+            "[v1::E009::[Spacing, Style]::Low] Improperly placed version declaration (4:1-4:12)"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn it_handles_normal_comments_correctly() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(
+            Rule::document,
+            r#"#normal comments should
+# be fine in this Rule
+
+version 1.1"#,
+        )?
+        .next()
+        .unwrap();
 
         assert!(DocumentPreamble.check(&tree)?.is_none());
         Ok(())
