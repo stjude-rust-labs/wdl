@@ -31,7 +31,7 @@ impl<'a> DocumentPreamble {
         lint::warning::Builder::default()
             .code(self.code())
             .level(lint::Level::Low)
-            .group(lint::Group::Spacing)
+            .tags(self.tags())
             .subject("Improperly placed version declaration")
             .body(
                 "The version declaration must be the first line of a WDL document or one blank \
@@ -55,7 +55,7 @@ impl<'a> DocumentPreamble {
         lint::warning::Builder::default()
             .code(self.code())
             .level(lint::Level::Low)
-            .group(lint::Group::Spacing)
+            .tags(self.tags())
             .subject("Leading whitespace detected")
             .body("No whitespace is allowed at the beginning of the document")
             .push_location(location)
