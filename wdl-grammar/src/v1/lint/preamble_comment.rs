@@ -166,7 +166,7 @@ version 1.0
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W010::[Style]::Low] preamble comment without a double pound sign (1:1-1:12)"
+            "[v1::W010::[Style]::Low] preamble comment(s) without a double pound sign (1:1-1:12)"
         );
         Ok(())
     }
@@ -189,7 +189,7 @@ version 1.0
         assert_eq!(warnings.len(), 1);
         assert_eq!(
             warnings.first().to_string(),
-            "[v1::W010::[Style]::Low] preamble comment without a double pound sign (1:1-3:21)"
+            "[v1::W010::[Style]::Low] preamble comment(s) without a double pound sign (1:1-3:21)"
         );
         Ok(())
     }
