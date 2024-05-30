@@ -30,13 +30,13 @@ impl<'a> PreambleComment {
             .code(self.code())
             .level(lint::Level::Low)
             .tags(self.tags())
-            .subject("preamble comment without a double pound sign")
+            .subject("preamble comment(s) without a double pound sign")
             .body(
                 "Preamble comments are full line comments before the version declaration and they \
                  start with a double pound sign.",
             )
             .push_location(location)
-            .fix("Add a pound sign at the start of the line.")
+            .fix("Add a pound sign at the start of each offending comment.")
             .try_build()
             .unwrap()
     }
