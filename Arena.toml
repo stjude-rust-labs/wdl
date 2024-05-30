@@ -10,7 +10,7 @@ commit_hash = "7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc"
 
 [repositories."stjudecloud/workflows"]
 identifier = "stjudecloud/workflows"
-commit_hash = "511a7358402c4ce24864cf837156df400fc94da2"
+commit_hash = "08e3d49c7fb10086fe516feb2f400c1d65ef6100"
 
 [[concerns]]
 kind = "LintWarning"
@@ -121,21 +121,6 @@ message = "[v1::W006::[Naming, Style, Clarity]::Medium] identifier must be snake
 kind = "LintWarning"
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "[v1::W007::[Spacing, Style]::Low] missing newline at the end of the file (205:2-205:2)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "[v1::W010::[Style]::Low] double pound signs are reserved for preamble comments (21:1-21:25)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "[v1::W010::[Style]::Low] double pound signs are reserved for preamble comments (5:1-5:24)"
-
-[[concerns]]
-kind = "LintWarning"
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "[v1::W010::[Style]::Low] double pound signs are reserved for preamble comments (80:1-80:22)"
 
 [[concerns]]
 kind = "LintWarning"
