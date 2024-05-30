@@ -10,7 +10,7 @@ commit_hash = "7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc"
 
 [repositories."stjudecloud/workflows"]
 identifier = "stjudecloud/workflows"
-commit_hash = "8330aac3ae81c9452e0b5e26d29a68d2919c2e48"
+commit_hash = "99827132a8d2e6e84bcfe38403dfe821efaffaca"
 
 [[concerns]]
 kind = "LintWarning"
