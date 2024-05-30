@@ -77,14 +77,7 @@ impl Rule<&Pair<'_, v1::Rule>> for SnakeCase {
 
         for node in tree.clone().into_inner().flatten() {
             if SNAKE_CASE_RULES.contains(&node.as_rule()) {
-                let identifier: &str = node
-                    .clone()
-                    .into_inner()
-                    .flatten()
-                    .filter(|x| x.as_rule() == v1::Rule::singular_identifier)
-                    .next()
-                    .unwrap()
-                    .as_str();
+                let identifier: &str = node.as_str();
                 let properly_cased_identifier: &str = &node.as_span().as_str().to_case(Case::Snake);
                 if identifier != properly_cased_identifier {
                     warnings.push_back(SnakeCase.not_snake_case(SnakeCaseWarning {
