@@ -164,4 +164,34 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn it_catches_placeholder_string2() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(
+            Rule::document,
+            r#"version 1.1
+            task foo {
+                command <<<
+                    echo 'this Bash string should be ignored'
+                    echo "~{if foo then 'this should be flagged' else 'this one too'}"
+                >>>
+            }
+            "#,
+        )?
+        .next()
+        .unwrap();
+        let warnings = DoubleQuotes.check(&tree)?.unwrap();
+
+        assert_eq!(warnings.len(), 2);
+        assert_eq!(
+            warnings.first().to_string(),
+            "[v1::W012::[Style, Clarity]::Low] string defined with single quotes (5:41-5:65)"
+        );
+        assert_eq!(
+            warnings.last().to_string(),
+            "[v1::W012::[Style, Clarity]::Low] string defined with single quotes (5:71-5:85)"
+        );
+
+        Ok(())
+    }
 }
