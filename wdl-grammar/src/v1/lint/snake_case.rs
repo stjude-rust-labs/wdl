@@ -2,8 +2,9 @@
 
 use std::collections::VecDeque;
 
+use convert_case::Boundary;
 use convert_case::Case;
-use convert_case::Casing;
+use convert_case::Converter;
 use nonempty::NonEmpty;
 use pest::iterators::Pair;
 use wdl_core::concern::code;
@@ -75,16 +76,20 @@ impl Rule<&Pair<'_, v1::Rule>> for SnakeCase {
     fn check(&self, tree: &Pair<'_, v1::Rule>) -> lint::Result {
         let mut warnings = VecDeque::new();
 
+        let converter = Converter::new()
+            .remove_boundaries(&[Boundary::DigitLower, Boundary::LowerDigit])
+            .to_case(Case::Snake);
+
         for node in tree.clone().into_inner().flatten() {
             if SNAKE_CASE_RULES.contains(&node.as_rule()) {
                 let identifier: &str = node.as_str();
-                let properly_cased_identifier: &str = &node.as_span().as_str().to_case(Case::Snake);
+                let properly_cased_identifier = converter.convert(identifier);
                 if identifier != properly_cased_identifier {
                     warnings.push_back(SnakeCase.not_snake_case(SnakeCaseWarning {
                         location:
                             Location::try_from(node.as_span()).map_err(lint::Error::Location)?,
                         identifier,
-                        properly_cased_identifier,
+                        properly_cased_identifier: properly_cased_identifier.as_str(),
                     }));
                 }
             }
@@ -135,6 +140,21 @@ mod tests {
         let tree = Parser::parse(
             Rule::task,
             r#"task good_name {
+            command <<< >>>
+        }"#,
+        )?
+        .next()
+        .unwrap();
+        let warnings = SnakeCase.check(&tree)?;
+        assert!(warnings.is_none());
+        Ok(())
+    }
+
+    #[test]
+    fn it_ignores_a_lower_digit_boundaried_name() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(
+            Rule::task,
+            r#"task md5 {
             command <<< >>>
         }"#,
         )?
