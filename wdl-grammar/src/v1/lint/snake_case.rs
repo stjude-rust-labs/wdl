@@ -17,6 +17,7 @@ use wdl_core::Version;
 
 use crate::v1;
 
+/// Rules that should use snake case for their identifiers.
 const SNAKE_CASE_RULES: &[v1::Rule] = &[
     v1::Rule::task_name,
     v1::Rule::workflow_name,
