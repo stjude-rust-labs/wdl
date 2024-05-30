@@ -114,8 +114,8 @@ impl<'a> Rule<&Pair<'a, v1::Rule>> for PreambleComment {
                         end_of_comment_block = Some(node.as_span().end_pos());
                     }
                 }
-                v1::Rule::WHITESPACE | v1::Rule::NEWLINE => {} /* Whitespace shouldn't reset the
-                                                                 * comment block detection */
+                v1::Rule::WHITESPACE | v1::Rule::NEWLINE => {} // Whitespace shouldn't reset the
+                // comment block detection
                 _ => {
                     if start_of_comment_block.is_some() {
                         let location = Location::Span {
@@ -172,7 +172,8 @@ version 1.0
     }
 
     #[test]
-    fn it_catches_badly_formatted_preamble_comment_block() -> Result<(), Box<dyn std::error::Error>> {
+    fn it_catches_badly_formatted_preamble_comment_block() -> Result<(), Box<dyn std::error::Error>>
+    {
         let tree = Parser::parse(
             Rule::document,
             r#"# a comment
