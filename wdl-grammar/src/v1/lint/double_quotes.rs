@@ -145,4 +145,23 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn it_catches_placeholder_string() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(
+            Rule::bound_declaration,
+            r#"String nested = "Hello ~{if alien then 'world' else planet}!""#,
+        )?
+        .next()
+        .unwrap();
+        let warnings = DoubleQuotes.check(&tree)?.unwrap();
+
+        assert_eq!(warnings.len(), 1);
+        assert_eq!(
+            warnings.first().to_string(),
+            "[v1::W012::[Style, Clarity]::Low] string defined with single quotes (1:40-1:47)"
+        );
+
+        Ok(())
+    }
 }
