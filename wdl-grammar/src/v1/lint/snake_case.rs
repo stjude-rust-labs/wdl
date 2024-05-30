@@ -13,15 +13,14 @@ use wdl_core::concern::lint::TagSet;
 use wdl_core::concern::Code;
 use wdl_core::file::Location;
 use wdl_core::Version;
-use wdl_macros::dive_one;
 
 use crate::v1;
 
 const SNAKE_CASE_RULES: &[v1::Rule] = &[
-    v1::Rule::task,
-    v1::Rule::workflow,
-    v1::Rule::bound_declaration,
-    v1::Rule::unbound_declaration,
+    v1::Rule::task_name,
+    v1::Rule::workflow_name,
+    v1::Rule::bound_declaration_name,
+    v1::Rule::unbound_declaration_name,
 ];
 
 /// Detects names that should use snake case.
@@ -78,8 +77,14 @@ impl Rule<&Pair<'_, v1::Rule>> for SnakeCase {
 
         for node in tree.clone().into_inner().flatten() {
             if SNAKE_CASE_RULES.contains(&node.as_rule()) {
-                let identifier: &str = dive_one!(node, identifier, task);
-                println!("identifier: {}", identifier);
+                let identifier: &str = node
+                    .clone()
+                    .into_inner()
+                    .flatten()
+                    .filter(|x| x.as_rule() == v1::Rule::singular_identifier)
+                    .next()
+                    .unwrap()
+                    .as_str();
                 let properly_cased_identifier: &str = &node.as_span().as_str().to_case(Case::Snake);
                 if identifier != properly_cased_identifier {
                     warnings.push_back(SnakeCase.not_snake_case(SnakeCaseWarning {
