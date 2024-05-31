@@ -52,9 +52,9 @@ impl Rule<&Pair<'_, v1::Rule>> for MixedIndentation {
     }
 
     fn body(&self) -> &'static str {
-        "Mixed indentation characters were found within a command. This causes leading whitespace \
-         stripping to be skipped. Commands may be whitespace sensitive, and skipping the \
-         whitespace stripping step may cause unexpected behavior."
+        "Mixing indentation characters (tab literals and spaces) within the command line causes \
+         leading whitespace stripping to be skipped. Commands may be whitespace sensitive, and \
+         skipping the whitespace stripping step may cause unexpected behavior."
     }
 
     fn check(&self, tree: &Pair<'_, v1::Rule>) -> lint::Result {

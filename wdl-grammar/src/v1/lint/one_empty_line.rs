@@ -51,8 +51,8 @@ impl<'a> Rule<&'a Pair<'a, v1::Rule>> for OneEmptyLine {
     }
 
     fn body(&self) -> &'static str {
-        "There should be at most one empty line in a row. Superfluous empty lines make the \
-         code harder to read."
+        "There should be at most one empty line in a row. Superfluous empty lines make the code \
+         harder to read."
     }
 
     fn check(&self, tree: &'a Pair<'_, v1::Rule>) -> lint::Result {

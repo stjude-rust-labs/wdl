@@ -49,7 +49,7 @@ impl<'a> Rule<&'a Pair<'a, v1::Rule>> for DoubleQuotes {
     }
 
     fn body(&self) -> &'static str {
-        "All strings should be defined using double quotes. There is no syntactical difference \
+        "All strings should be defined using double quotes. There is no semantic difference \
          between single and double quotes in WDL, but double quotes should be used exclusively to \
          ensure consistency and avoid any confusion."
     }
