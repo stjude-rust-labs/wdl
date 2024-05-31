@@ -54,7 +54,7 @@ impl<'a> Rule<&'a Pair<'a, v1::Rule>> for NoCurlyCommands {
 
     fn body(&self) -> &'static str {
         "Curly command blocks are no longer considered idiomatic WDL. Idiomatic WDL code uses \
-         heredoc command blocks instead. This is because curly command blocks can create ambiguity \
+         heredoc command blocks instead. This is because curly command blocks create ambiguity \
          with Bash syntax."
     }
 
