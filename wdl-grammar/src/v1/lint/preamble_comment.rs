@@ -95,7 +95,9 @@ impl<'a> Rule<&Pair<'a, v1::Rule>> for PreambleComment {
          after the version declaration. All comments before the version declaration should start \
          with a double pound sign (or if they are not suitable as preamble comments they should be \
          moved to _after_ the version declaration). Comments beginning with 3 or more pound signs \
-         are permitted after the version declaration, as they are not considered preamble comments."
+         are permitted after the version declaration, as they are not considered preamble comments. \
+         Comments beginning with 3 or more pound signs before the version declaration are not \
+         permitted."
     }
 
     fn check(&self, tree: &Pair<'a, v1::Rule>) -> lint::Result {
