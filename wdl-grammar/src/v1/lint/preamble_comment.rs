@@ -31,10 +31,7 @@ impl<'a> PreambleComment {
             .level(lint::Level::Low)
             .tags(self.tags())
             .subject("preamble comment(s) without a double pound sign")
-            .body(
-                "Preamble comments are full line comments before the version declaration and they \
-                 start with a double pound sign.",
-            )
+            .body(self.body())
             .push_location(location)
             .fix("Add a pound sign at the start of each offending comment.")
             .try_build()
@@ -51,10 +48,7 @@ impl<'a> PreambleComment {
             .level(lint::Level::Low)
             .tags(self.tags())
             .subject("double pound signs are reserved for preamble comments")
-            .body(
-                "Only full line comments before the version declaration should start with a \
-                 double pound sign.",
-            )
+            .body(self.body())
             .push_location(location)
             .fix("Remove a pound sign at the start of the comment.")
             .try_build()
@@ -70,6 +64,18 @@ impl<'a> Rule<&Pair<'a, v1::Rule>> for PreambleComment {
 
     fn tags(&self) -> TagSet {
         TagSet::new(&[lint::Tag::Style])
+    }
+
+    fn body(&self) -> &'static str {
+        "Preamble comments are full line comments before the version declaration and they start \
+         with a double pound sign. These comments are reserved for documentation that doesn't fit \
+         within any of the WDL-defined documentation elements (such as `meta` and `parameter_meta` \
+         sections). They may provide context for a collection of tasks or structs, or they may \
+         provide a high-level overview of the workflow. Double-pound-sign comments are not allowed \
+         after the version declaration. All comments before the version declaration should start \
+         with a double pound sign (or if they are not suitable as preamble comments they should be \
+         moved to _after_ the version declaration). Comments beginning with 3 or more pound signs \
+         are permitted after the version declaration, as they are not considered preamble comments."
     }
 
     fn check(&self, tree: &Pair<'a, v1::Rule>) -> lint::Result {
