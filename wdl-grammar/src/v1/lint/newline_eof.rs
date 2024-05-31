@@ -67,7 +67,7 @@ impl<'a> Rule<&'a Pair<'a, v1::Rule>> for NewlineEOF {
     }
 
     fn body(&self) -> &'static str {
-        "The file should end with a newline. This is to conform to [POSIX standards](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206)."
+        "The file should end with one and only one newline character. This is to conform to [POSIX standards](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206)."
     }
 
     fn check(&self, tree: &'a Pair<'_, v1::Rule>) -> lint::Result {
