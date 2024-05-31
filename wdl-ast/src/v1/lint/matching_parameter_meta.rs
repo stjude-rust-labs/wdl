@@ -85,7 +85,7 @@ impl<'a> MatchingParameterMeta {
         lint::warning::Builder::default()
             .code(self.code())
             .level(lint::Level::Medium)
-            .tags(TagSet::new(&[lint::Tag::Completeness]))
+            .tags(self.tags())
             .push_location(location.clone())
             .subject(format!(
                 "extraneous parameter meta within {}: {}",
