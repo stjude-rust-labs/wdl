@@ -33,7 +33,27 @@ impl<'a> PreambleComment {
             .subject("preamble comment(s) without a double pound sign")
             .body(self.body())
             .push_location(location)
-            .fix("Add a pound sign at the start of each offending comment.")
+            .fix(
+                "Add a pound sign at the start of each offending comment OR move any single pound \
+                 sign comments to after the version declaration.",
+            )
+            .try_build()
+            .unwrap()
+    }
+
+    /// Create a warning for preamble comments with 3 or more pound signs
+    fn triple_pound_sign_preamble_comment(&self, location: Location) -> lint::Warning
+    where
+        Self: Rule<&'a Pair<'a, v1::Rule>>,
+    {
+        lint::warning::Builder::default()
+            .code(self.code())
+            .level(lint::Level::Low)
+            .tags(self.tags())
+            .subject("triple pound sign comments are not permitted before the version declaration")
+            .body(self.body())
+            .push_location(location)
+            .fix("Change the triple pound signs to double pound signs.")
             .try_build()
             .unwrap()
     }
@@ -101,6 +121,12 @@ impl<'a> Rule<&Pair<'a, v1::Rule>> for PreambleComment {
                     }
                 }
                 v1::Rule::COMMENT => {
+                    // Catches preamble comment with too many pound signs
+                    if is_preamble & node.as_str().trim().starts_with("###") {
+                        let location = Location::try_from(node.as_span()).unwrap();
+                        warnings.push_back(self.triple_pound_sign_preamble_comment(location));
+                    }
+
                     // Catches missing double pound sign
                     if is_preamble & !node.as_str().trim().starts_with("##") {
                         if start_of_comment_block.is_none() {
@@ -196,6 +222,27 @@ version 1.0
         assert_eq!(
             warnings.first().to_string(),
             "[v1::W010::[Style]::Low] preamble comment(s) without a double pound sign (1:1-3:21)"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn it_catches_triple_pound_sign_preamble_comment() -> Result<(), Box<dyn std::error::Error>> {
+        let tree = Parser::parse(
+            Rule::document,
+            r#"### a comment
+version 1.0
+"#,
+        )?
+        .next()
+        .unwrap();
+
+        let warnings = PreambleComment.check(&tree)?.unwrap();
+        assert_eq!(warnings.len(), 1);
+        assert_eq!(
+            warnings.first().to_string(),
+            "[v1::W010::[Style]::Low] triple pound sign comments are not permitted before the \
+             version declaration (1:1-1:14)"
         );
         Ok(())
     }
