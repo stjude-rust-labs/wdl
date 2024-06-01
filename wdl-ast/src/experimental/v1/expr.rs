@@ -679,11 +679,43 @@ impl AstNode for LiteralBoolean {
     }
 }
 
+/// Represents an integer token.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Integer(SyntaxToken);
+
+impl AstToken for Integer {
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        kind == SyntaxKind::Integer
+    }
+
+    fn cast(syntax: SyntaxToken) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match syntax.kind() {
+            SyntaxKind::Integer => Some(Self(syntax)),
+            _ => None,
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxToken {
+        &self.0
+    }
+}
+
 /// Represents a literal integer.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LiteralInteger(pub(super) SyntaxNode);
 
 impl LiteralInteger {
+    /// Gets the integer token for the literal.
+    pub fn token(&self) -> Integer {
+        token(&self.0).expect("should have integer token")
+    }
+
     /// Gets the value of the literal integer.
     ///
     /// A literal integer in WDL is a *signed* 64-bit integer.
@@ -753,11 +785,43 @@ impl AstNode for LiteralInteger {
     }
 }
 
+/// Represents a float token.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Float(SyntaxToken);
+
+impl AstToken for Float {
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        kind == SyntaxKind::Float
+    }
+
+    fn cast(syntax: SyntaxToken) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match syntax.kind() {
+            SyntaxKind::Float => Some(Self(syntax)),
+            _ => None,
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxToken {
+        &self.0
+    }
+}
+
 /// Represents a literal float.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LiteralFloat(pub(crate) SyntaxNode);
 
 impl LiteralFloat {
+    /// Gets the float token for the literal.
+    pub fn token(&self) -> Float {
+        token(&self.0).expect("should have float token")
+    }
+
     /// Gets the value of the literal float.
     ///
     /// Returns `None` if the literal value is not in range.
@@ -914,7 +978,7 @@ impl StringPart {
 
 /// Represents a textual part of a string.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct StringText(SyntaxToken);
+pub struct StringText(pub(super) SyntaxToken);
 
 impl AstToken for StringText {
     fn can_cast(kind: SyntaxKind) -> bool
@@ -1945,9 +2009,9 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use super::*;
-    use crate::experimental::v1::VisitReason;
     use crate::experimental::v1::Visitor;
     use crate::experimental::Document;
+    use crate::experimental::VisitReason;
 
     #[test]
     fn literal_booleans() {

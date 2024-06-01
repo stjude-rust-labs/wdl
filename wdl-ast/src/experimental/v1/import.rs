@@ -109,10 +109,10 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use super::*;
-    use crate::experimental::v1::VisitReason;
     use crate::experimental::v1::Visitor;
     use crate::experimental::Ast;
     use crate::experimental::Document;
+    use crate::experimental::VisitReason;
 
     #[test]
     fn import_statements() {
