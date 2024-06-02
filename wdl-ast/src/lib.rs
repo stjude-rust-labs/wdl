@@ -1,6 +1,5 @@
 //! An abstract syntax tree for Workflow Description Language documents.
 
-#![feature(decl_macro)]
 #![warn(missing_docs)]
 #![warn(rust_2018_idioms)]
 #![warn(rust_2021_compatibility)]
