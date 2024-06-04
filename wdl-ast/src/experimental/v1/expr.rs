@@ -944,6 +944,24 @@ impl AstToken for StringText {
 pub struct Placeholder(pub(super) SyntaxNode);
 
 impl Placeholder {
+    /// Returns whether or not placeholder has a tilde (`~`) opening.
+    ///
+    /// If this method returns false, the opening was a dollar sign (`$`).
+    pub fn has_tilde(&self) -> bool {
+        self.0
+            .children_with_tokens()
+            .find_map(|c| match c.kind() {
+                SyntaxKind::PlaceholderOpen => Some(
+                    c.as_token()
+                        .expect("should be token")
+                        .text()
+                        .starts_with('~'),
+                ),
+                _ => None,
+            })
+            .expect("should have a placeholder open token")
+    }
+
     /// Gets the options for the placeholder.
     pub fn options(&self) -> AstChildren<PlaceholderOption> {
         children(&self.0)
@@ -2362,16 +2380,9 @@ task test {
         let parts: Vec<_> = s.parts().collect();
         assert_eq!(parts.len(), 3);
         assert_eq!(parts[0].clone().unwrap_text().as_str(), "Hello, ");
-        assert_eq!(
-            parts[1]
-                .clone()
-                .unwrap_placeholder()
-                .expr()
-                .unwrap_name_ref()
-                .name()
-                .as_str(),
-            "name"
-        );
+        let placeholder = parts[1].clone().unwrap_placeholder();
+        assert!(!placeholder.has_tilde());
+        assert_eq!(placeholder.expr().unwrap_name_ref().name().as_str(), "name");
         assert_eq!(parts[2].clone().unwrap_text().as_str(), "!");
 
         // Fourth declaration
@@ -2382,10 +2393,10 @@ task test {
         let parts: Vec<_> = s.parts().collect();
         assert_eq!(parts.len(), 3);
         assert_eq!(parts[0].clone().unwrap_text().as_str(), "String");
+        let placeholder = parts[1].clone().unwrap_placeholder();
+        assert!(placeholder.has_tilde());
         assert_eq!(
-            parts[1]
-                .clone()
-                .unwrap_placeholder()
+            placeholder
                 .expr()
                 .unwrap_literal()
                 .unwrap_string()
