@@ -3637,8 +3637,8 @@ task test {
 version 1.1
 
 task test {
-    Integer a = -1
-    Integer b = ---a
+    Int a = -1
+    Int b = ---a
 }
 "#,
         );
@@ -3655,7 +3655,7 @@ task test {
         assert_eq!(decls.len(), 2);
 
         // First declaration
-        assert_eq!(decls[0].ty().to_string(), "Integer");
+        assert_eq!(decls[0].ty().to_string(), "Int");
         assert_eq!(decls[0].name().as_str(), "a");
         assert_eq!(
             decls[0]
@@ -3670,7 +3670,7 @@ task test {
         );
 
         // Second declaration
-        assert_eq!(decls[1].ty().to_string(), "Integer");
+        assert_eq!(decls[1].ty().to_string(), "Int");
         assert_eq!(decls[1].name().as_str(), "b");
         assert_eq!(
             decls[1]
@@ -3962,8 +3962,8 @@ task test {
 version 1.1
 
 task test {
-    Integer a = 1
-    Integer b = 2
+    Int a = 1
+    Int b = 2
     Boolean c = a < b
 }
 "#,
@@ -3981,7 +3981,7 @@ task test {
         assert_eq!(decls.len(), 3);
 
         // First declaration
-        assert_eq!(decls[0].ty().to_string(), "Integer");
+        assert_eq!(decls[0].ty().to_string(), "Int");
         assert_eq!(decls[0].name().as_str(), "a");
         assert_eq!(
             decls[0]
@@ -3994,7 +3994,7 @@ task test {
         );
 
         // Second declaration
-        assert_eq!(decls[1].ty().to_string(), "Integer");
+        assert_eq!(decls[1].ty().to_string(), "Int");
         assert_eq!(decls[1].name().as_str(), "b");
         assert_eq!(
             decls[1]
@@ -4040,8 +4040,8 @@ task test {
 version 1.1
 
 task test {
-    Integer a = 1
-    Integer b = 2
+    Int a = 1
+    Int b = 2
     Boolean c = a <= b
 }
 "#,
@@ -4059,7 +4059,7 @@ task test {
         assert_eq!(decls.len(), 3);
 
         // First declaration
-        assert_eq!(decls[0].ty().to_string(), "Integer");
+        assert_eq!(decls[0].ty().to_string(), "Int");
         assert_eq!(decls[0].name().as_str(), "a");
         assert_eq!(
             decls[0]
@@ -4072,7 +4072,7 @@ task test {
         );
 
         // Second declaration
-        assert_eq!(decls[1].ty().to_string(), "Integer");
+        assert_eq!(decls[1].ty().to_string(), "Int");
         assert_eq!(decls[1].name().as_str(), "b");
         assert_eq!(
             decls[1]
@@ -4118,8 +4118,8 @@ task test {
 version 1.1
 
 task test {
-    Integer a = 1
-    Integer b = 2
+    Int a = 1
+    Int b = 2
     Boolean c = a > b
 }
 "#,
@@ -4137,7 +4137,7 @@ task test {
         assert_eq!(decls.len(), 3);
 
         // First declaration
-        assert_eq!(decls[0].ty().to_string(), "Integer");
+        assert_eq!(decls[0].ty().to_string(), "Int");
         assert_eq!(decls[0].name().as_str(), "a");
         assert_eq!(
             decls[0]
@@ -4150,7 +4150,7 @@ task test {
         );
 
         // Second declaration
-        assert_eq!(decls[1].ty().to_string(), "Integer");
+        assert_eq!(decls[1].ty().to_string(), "Int");
         assert_eq!(decls[1].name().as_str(), "b");
         assert_eq!(
             decls[1]
@@ -4196,8 +4196,8 @@ task test {
 version 1.1
 
 task test {
-    Integer a = 1
-    Integer b = 2
+    Int a = 1
+    Int b = 2
     Boolean c = a >= b
 }
 "#,
@@ -4215,7 +4215,7 @@ task test {
         assert_eq!(decls.len(), 3);
 
         // First declaration
-        assert_eq!(decls[0].ty().to_string(), "Integer");
+        assert_eq!(decls[0].ty().to_string(), "Int");
         assert_eq!(decls[0].name().as_str(), "a");
         assert_eq!(
             decls[0]
@@ -4228,7 +4228,7 @@ task test {
         );
 
         // Second declaration
-        assert_eq!(decls[1].ty().to_string(), "Integer");
+        assert_eq!(decls[1].ty().to_string(), "Int");
         assert_eq!(decls[1].name().as_str(), "b");
         assert_eq!(
             decls[1]
@@ -4274,9 +4274,9 @@ task test {
 version 1.1
 
 task test {
-    Integer a = 1
-    Integer b = 2
-    Integer c = a + b
+    Int a = 1
+    Int b = 2
+    Int c = a + b
 }
 "#,
         );
@@ -4293,7 +4293,7 @@ task test {
         assert_eq!(decls.len(), 3);
 
         // First declaration
-        assert_eq!(decls[0].ty().to_string(), "Integer");
+        assert_eq!(decls[0].ty().to_string(), "Int");
         assert_eq!(decls[0].name().as_str(), "a");
         assert_eq!(
             decls[0]
@@ -4306,7 +4306,7 @@ task test {
         );
 
         // Second declaration
-        assert_eq!(decls[1].ty().to_string(), "Integer");
+        assert_eq!(decls[1].ty().to_string(), "Int");
         assert_eq!(decls[1].name().as_str(), "b");
         assert_eq!(
             decls[1]
@@ -4319,7 +4319,7 @@ task test {
         );
 
         // Third declaration
-        assert_eq!(decls[2].ty().to_string(), "Integer");
+        assert_eq!(decls[2].ty().to_string(), "Int");
         assert_eq!(decls[2].name().as_str(), "c");
         let (lhs, rhs) = decls[2].expr().unwrap_addition().operands();
         assert_eq!(lhs.unwrap_name_ref().name().as_str(), "a");
@@ -4352,9 +4352,9 @@ task test {
 version 1.1
 
 task test {
-    Integer a = 1
-    Integer b = 2
-    Integer c = a - b
+    Int a = 1
+    Int b = 2
+    Int c = a - b
 }
 "#,
         );
@@ -4371,7 +4371,7 @@ task test {
         assert_eq!(decls.len(), 3);
 
         // First declaration
-        assert_eq!(decls[0].ty().to_string(), "Integer");
+        assert_eq!(decls[0].ty().to_string(), "Int");
         assert_eq!(decls[0].name().as_str(), "a");
         assert_eq!(
             decls[0]
@@ -4384,7 +4384,7 @@ task test {
         );
 
         // Second declaration
-        assert_eq!(decls[1].ty().to_string(), "Integer");
+        assert_eq!(decls[1].ty().to_string(), "Int");
         assert_eq!(decls[1].name().as_str(), "b");
         assert_eq!(
             decls[1]
@@ -4397,7 +4397,7 @@ task test {
         );
 
         // Third declaration
-        assert_eq!(decls[2].ty().to_string(), "Integer");
+        assert_eq!(decls[2].ty().to_string(), "Int");
         assert_eq!(decls[2].name().as_str(), "c");
         let (lhs, rhs) = decls[2].expr().unwrap_subtraction().operands();
         assert_eq!(lhs.unwrap_name_ref().name().as_str(), "a");
@@ -4430,9 +4430,9 @@ task test {
 version 1.1
 
 task test {
-    Integer a = 1
-    Integer b = 2
-    Integer c = a * b
+    Int a = 1
+    Int b = 2
+    Int c = a * b
 }
 "#,
         );
@@ -4449,7 +4449,7 @@ task test {
         assert_eq!(decls.len(), 3);
 
         // First declaration
-        assert_eq!(decls[0].ty().to_string(), "Integer");
+        assert_eq!(decls[0].ty().to_string(), "Int");
         assert_eq!(decls[0].name().as_str(), "a");
         assert_eq!(
             decls[0]
@@ -4462,7 +4462,7 @@ task test {
         );
 
         // Second declaration
-        assert_eq!(decls[1].ty().to_string(), "Integer");
+        assert_eq!(decls[1].ty().to_string(), "Int");
         assert_eq!(decls[1].name().as_str(), "b");
         assert_eq!(
             decls[1]
@@ -4475,7 +4475,7 @@ task test {
         );
 
         // Third declaration
-        assert_eq!(decls[2].ty().to_string(), "Integer");
+        assert_eq!(decls[2].ty().to_string(), "Int");
         assert_eq!(decls[2].name().as_str(), "c");
         let (lhs, rhs) = decls[2].expr().unwrap_multiplication().operands();
         assert_eq!(lhs.unwrap_name_ref().name().as_str(), "a");
@@ -4508,9 +4508,9 @@ task test {
 version 1.1
 
 task test {
-    Integer a = 1
-    Integer b = 2
-    Integer c = a / b
+    Int a = 1
+    Int b = 2
+    Int c = a / b
 }
 "#,
         );
@@ -4527,7 +4527,7 @@ task test {
         assert_eq!(decls.len(), 3);
 
         // First declaration
-        assert_eq!(decls[0].ty().to_string(), "Integer");
+        assert_eq!(decls[0].ty().to_string(), "Int");
         assert_eq!(decls[0].name().as_str(), "a");
         assert_eq!(
             decls[0]
@@ -4540,7 +4540,7 @@ task test {
         );
 
         // Second declaration
-        assert_eq!(decls[1].ty().to_string(), "Integer");
+        assert_eq!(decls[1].ty().to_string(), "Int");
         assert_eq!(decls[1].name().as_str(), "b");
         assert_eq!(
             decls[1]
@@ -4553,7 +4553,7 @@ task test {
         );
 
         // Third declaration
-        assert_eq!(decls[2].ty().to_string(), "Integer");
+        assert_eq!(decls[2].ty().to_string(), "Int");
         assert_eq!(decls[2].name().as_str(), "c");
         let (lhs, rhs) = decls[2].expr().unwrap_division().operands();
         assert_eq!(lhs.unwrap_name_ref().name().as_str(), "a");
@@ -4586,9 +4586,9 @@ task test {
 version 1.1
 
 task test {
-    Integer a = 1
-    Integer b = 2
-    Integer c = a % b
+    Int a = 1
+    Int b = 2
+    Int c = a % b
 }
 "#,
         );
@@ -4605,7 +4605,7 @@ task test {
         assert_eq!(decls.len(), 3);
 
         // First declaration
-        assert_eq!(decls[0].ty().to_string(), "Integer");
+        assert_eq!(decls[0].ty().to_string(), "Int");
         assert_eq!(decls[0].name().as_str(), "a");
         assert_eq!(
             decls[0]
@@ -4618,7 +4618,7 @@ task test {
         );
 
         // Second declaration
-        assert_eq!(decls[1].ty().to_string(), "Integer");
+        assert_eq!(decls[1].ty().to_string(), "Int");
         assert_eq!(decls[1].name().as_str(), "b");
         assert_eq!(
             decls[1]
@@ -4631,7 +4631,7 @@ task test {
         );
 
         // Third declaration
-        assert_eq!(decls[2].ty().to_string(), "Integer");
+        assert_eq!(decls[2].ty().to_string(), "Int");
         assert_eq!(decls[2].name().as_str(), "c");
         let (lhs, rhs) = decls[2].expr().unwrap_modulo().operands();
         assert_eq!(lhs.unwrap_name_ref().name().as_str(), "a");
