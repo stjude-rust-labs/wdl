@@ -90,7 +90,7 @@ enum Error {
         #[label("first workflow is defined here")]
         first: SourceSpan,
     },
-    /// Missing command section in a test.
+    /// Missing command section in a task.
     #[error("task `{task}` is missing a command section")]
     MissingCommandSection {
         /// The name of the task or workflow.
