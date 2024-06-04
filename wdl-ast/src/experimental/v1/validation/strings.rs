@@ -5,7 +5,6 @@ use miette::SourceSpan;
 use wdl_grammar::experimental::lexer::v1::EscapeToken;
 use wdl_grammar::experimental::lexer::v1::Logos;
 
-use crate::experimental::v1::CommandText;
 use crate::experimental::v1::StringText;
 use crate::experimental::v1::Visitor;
 use crate::experimental::AstToken;
@@ -35,7 +34,7 @@ enum Error {
     #[error("invalid octal escape sequence")]
     InvalidOctalEscape {
         /// The span of the invalid escape sequence.
-        #[label(primary, "expected escape sequence of three 0-7 digits to follow this")]
+        #[label(primary, "expected a sequence of three octal digits to follow this")]
         span: SourceSpan,
     },
     /// An invalid hex escape sequence was encountered.
@@ -44,7 +43,7 @@ enum Error {
         /// The span of the invalid escape sequence.
         #[label(
             primary,
-            "expected escape sequence of two hexadecimal digits to follow this"
+            "expected a sequence of two hexadecimal digits to follow this"
         )]
         span: SourceSpan,
     },
@@ -54,7 +53,7 @@ enum Error {
         /// The span of the invalid escape sequence.
         #[label(
             primary,
-            "expected escape sequence of four hexadecimal digits to follow this"
+            "expected a sequence of four hexadecimal digits to follow this"
         )]
         span: SourceSpan,
     },
@@ -64,7 +63,7 @@ enum Error {
         /// The span of the invalid escape sequence.
         #[label(
             primary,
-            "expected escape sequence of eight hexadecimal digits to follow this"
+            "expected a sequence of eight hexadecimal digits to follow this"
         )]
         span: SourceSpan,
     },
@@ -84,8 +83,8 @@ enum Error {
     },
 }
 
-/// Used to check literal text in a string or command.
-fn check_text(diagnostics: &mut Diagnostics, start: usize, text: &str, is_command: bool) {
+/// Used to check literal text in a string.
+fn check_text(diagnostics: &mut Diagnostics, start: usize, text: &str) {
     let lexer = EscapeToken::lexer(text).spanned();
     for (token, span) in lexer {
         match token.expect("should lex") {
@@ -107,25 +106,19 @@ fn check_text(diagnostics: &mut Diagnostics, start: usize, text: &str, is_comman
                 span: SourceSpan::new((start + span.start).into(), span.len()),
             }),
             EscapeToken::Continuation => {
-                if !is_command {
-                    diagnostics.add(Error::InvalidLineContinuation {
-                        span: SourceSpan::new((start + span.start).into(), span.len()),
-                    });
-                }
+                diagnostics.add(Error::InvalidLineContinuation {
+                    span: SourceSpan::new((start + span.start).into(), span.len()),
+                });
             }
             EscapeToken::Newline => {
-                if !is_command {
-                    diagnostics.add(Error::MustEscapeNewline {
-                        span: SourceSpan::new((start + span.start).into(), span.len()),
-                    });
-                }
+                diagnostics.add(Error::MustEscapeNewline {
+                    span: SourceSpan::new((start + span.start).into(), span.len()),
+                });
             }
             EscapeToken::Tab => {
-                if !is_command {
-                    diagnostics.add(Error::MustEscapeTab {
-                        span: SourceSpan::new((start + span.start).into(), span.len()),
-                    });
-                }
+                diagnostics.add(Error::MustEscapeTab {
+                    span: SourceSpan::new((start + span.start).into(), span.len()),
+                });
             }
             EscapeToken::Unknown => diagnostics.add(Error::UnknownEscapeSequence {
                 sequence: text[span.start..span.end].to_string(),
@@ -137,7 +130,7 @@ fn check_text(diagnostics: &mut Diagnostics, start: usize, text: &str, is_comman
 
 /// A visitor of literal text within an AST.
 ///
-/// Ensures that string and command text:
+/// Ensures that string text:
 ///
 /// * Does not contain characters that must be escaped.
 /// * Does not contain invalid escape sequences.
@@ -146,19 +139,6 @@ pub struct LiteralTextVisitor;
 
 impl Visitor for LiteralTextVisitor {
     type State = Diagnostics;
-
-    fn command_text(&mut self, state: &mut Self::State, reason: VisitReason, text: &CommandText) {
-        if reason != VisitReason::Enter {
-            return;
-        }
-
-        check_text(
-            state,
-            text.syntax().text_range().start().into(),
-            text.as_str(),
-            true,
-        );
-    }
 
     fn string_text(&mut self, state: &mut Self::State, reason: VisitReason, text: &StringText) {
         if reason != VisitReason::Enter {
@@ -169,7 +149,6 @@ impl Visitor for LiteralTextVisitor {
             state,
             text.syntax().text_range().start().into(),
             text.as_str(),
-            false,
         );
     }
 }

@@ -17,6 +17,8 @@ task test {
     String i = "can't have a
                 newline"
 
+    # For the command, only the string literal inside the placeholder
+    # should cause an error
     command <<<
         no problems here \\ \n \r \t \' \" \~ \$ \000 \777 \x00 \xfF \u0000 \uaAfF \U00000000 \UAaAaFfFf!
         invalid escape sequence ~{"\j"}
@@ -30,20 +32,4 @@ task test {
         can have a
             newline
     >>>
-}
-
-task other {
-    command {
-        no problems here \\ \n \r \t \' \" \~ \$ \000 \777 \x00 \xfF \u0000 \uaAfF \U00000000 \UAaAaFfFf!
-        invalid escape sequence ~{"\j"}
-        line \
-        continuation
-        invalid ~{"octal"} here: \0
-        \xnn is an invalid hex escape!
-        this \u000 is too short
-        this \UAAAXAAAA contains a non-hex character!
-        can have a	tab!
-        can have a
-            newline
-    }
 }

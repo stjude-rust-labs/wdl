@@ -16,25 +16,25 @@ error: invalid octal escape sequence
    ┌─ tests/validation/strings/source.wdl:12:42
    │
 12 │     String d = "invalid ~{"octal"} here: /0"
-   │                                          ^ expected escape sequence of three 0-7 digits to follow this
+   │                                          ^ expected a sequence of three octal digits to follow this
 
 error: invalid hex escape sequence
    ┌─ tests/validation/strings/source.wdl:13:17
    │
 13 │     String e = "/xnn is an invalid hex escape!"
-   │                 ^^ expected escape sequence of two hexadecimal digits to follow this
+   │                 ^^ expected a sequence of two hexadecimal digits to follow this
 
 error: invalid unicode escape sequence
    ┌─ tests/validation/strings/source.wdl:14:22
    │
 14 │     String f = "this /u000 is too short"
-   │                      ^^ expected escape sequence of four hexadecimal digits to follow this
+   │                      ^^ expected a sequence of four hexadecimal digits to follow this
 
 error: invalid unicode escape sequence
    ┌─ tests/validation/strings/source.wdl:15:22
    │
 15 │     String g = 'this /UAAAXAAAA contains a non-hex character!'
-   │                      ^^ expected escape sequence of eight hexadecimal digits to follow this
+   │                      ^^ expected a sequence of eight hexadecimal digits to follow this
 
 error: literal strings cannot contain tab characters
    ┌─ tests/validation/strings/source.wdl:16:29
@@ -51,62 +51,8 @@ error: literal strings cannot contain newline characters
    │ ╰^ escape this newline with `/n`
 
 error: unknown escape sequence `/j`
-   ┌─ tests/validation/strings/source.wdl:22:36
+   ┌─ tests/validation/strings/source.wdl:24:36
    │
-22 │         invalid escape sequence ~{"/j"}
+24 │         invalid escape sequence ~{"/j"}
    │                                    ^^ this is an unknown escape sequence
-
-error: invalid octal escape sequence
-   ┌─ tests/validation/strings/source.wdl:25:34
-   │
-25 │         invalid ~{"octal"} here: /0
-   │                                  ^ expected escape sequence of three 0-7 digits to follow this
-
-error: invalid hex escape sequence
-   ┌─ tests/validation/strings/source.wdl:26:9
-   │
-26 │         /xnn is an invalid hex escape!
-   │         ^^ expected escape sequence of two hexadecimal digits to follow this
-
-error: invalid unicode escape sequence
-   ┌─ tests/validation/strings/source.wdl:27:14
-   │
-27 │         this /u000 is too short
-   │              ^^ expected escape sequence of four hexadecimal digits to follow this
-
-error: invalid unicode escape sequence
-   ┌─ tests/validation/strings/source.wdl:28:14
-   │
-28 │         this /UAAAXAAAA contains a non-hex character!
-   │              ^^ expected escape sequence of eight hexadecimal digits to follow this
-
-error: unknown escape sequence `/j`
-   ┌─ tests/validation/strings/source.wdl:38:36
-   │
-38 │         invalid escape sequence ~{"/j"}
-   │                                    ^^ this is an unknown escape sequence
-
-error: invalid octal escape sequence
-   ┌─ tests/validation/strings/source.wdl:41:34
-   │
-41 │         invalid ~{"octal"} here: /0
-   │                                  ^ expected escape sequence of three 0-7 digits to follow this
-
-error: invalid hex escape sequence
-   ┌─ tests/validation/strings/source.wdl:42:9
-   │
-42 │         /xnn is an invalid hex escape!
-   │         ^^ expected escape sequence of two hexadecimal digits to follow this
-
-error: invalid unicode escape sequence
-   ┌─ tests/validation/strings/source.wdl:43:14
-   │
-43 │         this /u000 is too short
-   │              ^^ expected escape sequence of four hexadecimal digits to follow this
-
-error: invalid unicode escape sequence
-   ┌─ tests/validation/strings/source.wdl:44:14
-   │
-44 │         this /UAAAXAAAA contains a non-hex character!
-   │              ^^ expected escape sequence of eight hexadecimal digits to follow this
 
