@@ -1,4 +1,4 @@
-//! Validation of string literals in a V1 AST.
+//! Validation of number literals in a V1 AST.
 
 use miette::Diagnostic;
 use miette::SourceSpan;
