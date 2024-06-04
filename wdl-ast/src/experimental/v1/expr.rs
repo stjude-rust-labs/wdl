@@ -2041,7 +2041,7 @@ task test {
             type State = ();
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
-                if reason != VisitReason::Enter {
+                if reason == VisitReason::Exit {
                     return;
                 }
 
@@ -2196,7 +2196,7 @@ task test {
             type State = ();
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
-                if reason != VisitReason::Enter {
+                if reason == VisitReason::Exit {
                     return;
                 }
 
@@ -2363,7 +2363,7 @@ task test {
             type State = ();
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
-                if reason != VisitReason::Enter {
+                if reason == VisitReason::Exit {
                     return;
                 }
 
@@ -2465,7 +2465,7 @@ task test {
             type State = ();
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
-                if reason != VisitReason::Enter {
+                if reason == VisitReason::Exit {
                     return;
                 }
 
@@ -2696,7 +2696,7 @@ task test {
             type State = ();
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
-                if reason != VisitReason::Enter {
+                if reason == VisitReason::Exit {
                     return;
                 }
 
@@ -2892,7 +2892,7 @@ task test {
             type State = ();
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
-                if reason != VisitReason::Enter {
+                if reason == VisitReason::Exit {
                     return;
                 }
 
@@ -3019,7 +3019,7 @@ task test {
             type State = ();
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
-                if reason != VisitReason::Enter {
+                if reason == VisitReason::Exit {
                     return;
                 }
 
@@ -3148,7 +3148,7 @@ task test {
             type State = ();
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
-                if reason != VisitReason::Enter {
+                if reason == VisitReason::Exit {
                     return;
                 }
 
@@ -3296,7 +3296,7 @@ task test {
             type State = ();
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
-                if reason != VisitReason::Enter {
+                if reason == VisitReason::Exit {
                     return;
                 }
 
@@ -3457,7 +3457,7 @@ task test {
             type State = ();
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
-                if reason != VisitReason::Enter {
+                if reason == VisitReason::Exit {
                     return;
                 }
 

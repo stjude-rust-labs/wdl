@@ -141,7 +141,7 @@ impl Visitor for LiteralTextVisitor {
     type State = Diagnostics;
 
     fn string_text(&mut self, state: &mut Self::State, reason: VisitReason, text: &StringText) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             return;
         }
 

@@ -176,7 +176,7 @@ import "qux.wdl" as x alias A as B alias C as D
                         reason: VisitReason,
                         stmt: &ImportStatement,
                     ) {
-                        if reason != VisitReason::Enter {
+                        if reason == VisitReason::Exit {
                             return;
                         }
 

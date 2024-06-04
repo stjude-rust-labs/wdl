@@ -115,7 +115,7 @@ impl Visitor for UniqueKeysVisitor {
         reason: VisitReason,
         section: &RuntimeSection,
     ) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             return;
         }
 
@@ -133,7 +133,7 @@ impl Visitor for UniqueKeysVisitor {
         reason: VisitReason,
         section: &MetadataSection,
     ) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             return;
         }
 
@@ -151,7 +151,7 @@ impl Visitor for UniqueKeysVisitor {
         reason: VisitReason,
         section: &ParameterMetadataSection,
     ) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             return;
         }
 
@@ -169,7 +169,7 @@ impl Visitor for UniqueKeysVisitor {
         reason: VisitReason,
         object: &MetadataObject,
     ) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             return;
         }
 
@@ -185,7 +185,7 @@ impl Visitor for UniqueKeysVisitor {
     }
 
     fn expr(&mut self, state: &mut Self::State, reason: VisitReason, expr: &Expr) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             return;
         }
 

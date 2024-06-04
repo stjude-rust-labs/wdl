@@ -212,7 +212,7 @@ impl Visitor for CountingVisitor {
     type State = Diagnostics;
 
     fn document(&mut self, state: &mut Self::State, reason: VisitReason, _: &Document) {
-        if reason != VisitReason::Exit {
+        if reason == VisitReason::Enter {
             return;
         }
 
@@ -227,7 +227,7 @@ impl Visitor for CountingVisitor {
         reason: VisitReason,
         workflow: &WorkflowDefinition,
     ) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             self.reset();
             return;
         }
@@ -253,7 +253,7 @@ impl Visitor for CountingVisitor {
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             if self.command.is_none() {
                 let name = task.name();
                 state.add(Error::MissingCommandSection {
@@ -276,7 +276,7 @@ impl Visitor for CountingVisitor {
         reason: VisitReason,
         def: &StructDefinition,
     ) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             return;
         }
 
@@ -297,7 +297,7 @@ impl Visitor for CountingVisitor {
         reason: VisitReason,
         section: &CommandSection,
     ) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             return;
         }
 
@@ -328,7 +328,7 @@ impl Visitor for CountingVisitor {
         reason: VisitReason,
         section: &InputSection,
     ) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             return;
         }
 
@@ -359,7 +359,7 @@ impl Visitor for CountingVisitor {
         reason: VisitReason,
         section: &OutputSection,
     ) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             return;
         }
 
@@ -390,7 +390,7 @@ impl Visitor for CountingVisitor {
         reason: VisitReason,
         section: &RuntimeSection,
     ) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             return;
         }
 
@@ -421,7 +421,7 @@ impl Visitor for CountingVisitor {
         reason: VisitReason,
         section: &MetadataSection,
     ) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             return;
         }
 
@@ -452,7 +452,7 @@ impl Visitor for CountingVisitor {
         reason: VisitReason,
         section: &ParameterMetadataSection,
     ) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             return;
         }
 

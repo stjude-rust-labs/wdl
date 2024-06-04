@@ -45,11 +45,24 @@ impl Visitor for NumberVisitor {
     type State = Diagnostics;
 
     fn expr(&mut self, state: &mut Self::State, reason: VisitReason, expr: &Expr) {
-        if reason != VisitReason::Enter {
+        if reason == VisitReason::Exit {
             self.negation_start = None;
             return;
         }
 
+        // Check for either a literal integer, literal float, or a negation with an
+        // immediate literal integer or literal float operand.
+        //
+        // In the case of floats, we can simply check if `value` returns `is_none`,
+        // which will indicate that the literal is out of range.
+        //
+        // For integers, we check to see if the value is 9223372036854775808
+        // (0x8000000000000000), which is normally out of range for a signed
+        // 64-bit integer. However, if it is an immediate operand of a negation
+        // expression, we accept the value, as it's actually -9223372036854775808.
+        //
+        // If a value is out of range and an operand to a negation expression, we start
+        // the error span at the minus token.
         match expr {
             Expr::Literal(LiteralExpr::Integer(i)) => match i.value() {
                 Some(0x8000000000000000) if self.negation_start.is_some() => {
