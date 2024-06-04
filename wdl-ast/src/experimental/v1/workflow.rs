@@ -1,4 +1,4 @@
-//! V1 AST representation for declarations.
+//! V1 AST representation for workflows.
 
 use rowan::ast::support::child;
 use rowan::ast::support::children;
