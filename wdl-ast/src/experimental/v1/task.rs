@@ -492,7 +492,7 @@ impl MetadataObjectItem {
         token(&self.0).expect("expected a name")
     }
 
-    /// GEts the value of the item.
+    /// Gets the value of the item.
     pub fn value(&self) -> MetadataValue {
         child(&self.0).expect("expected a value")
     }
