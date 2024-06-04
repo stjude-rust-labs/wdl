@@ -176,23 +176,6 @@ impl Document {
         )
     }
 
-    /// Gets the preamble comments.
-    ///
-    /// In a valid WDL document, preamble comments are those that precede the
-    /// version statement.
-    pub fn preamble_comments(&self) -> impl Iterator<Item = Comment> {
-        self.0
-            .children_with_tokens()
-            .map_while(|c| match c {
-                NodeOrToken::Node(_) => None,
-                NodeOrToken::Token(t) => match t.kind() {
-                    SyntaxKind::Whitespace | SyntaxKind::Comment => Some(t),
-                    _ => None,
-                },
-            })
-            .filter_map(Comment::cast)
-    }
-
     /// Gets the version statement of the document.
     ///
     /// This can be used to determine the version of the document that was
@@ -354,39 +337,5 @@ impl AstToken for Ident {
 
     fn syntax(&self) -> &SyntaxToken {
         &self.0
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use pretty_assertions::assert_eq;
-
-    use super::*;
-
-    #[test]
-    fn document_has_preamble_comments() {
-        let parse = Document::parse(
-            r#"
-## This is a preamble comment.
-
-## This is also a preamble comment.
-
-version 1.1
-
-# This is not a preamble comment
-"#,
-        );
-        let document = parse.into_result().expect("there should be no errors");
-        let comments = document
-            .preamble_comments()
-            .map(|c| c.as_str().to_string())
-            .collect::<Vec<_>>();
-        assert_eq!(
-            comments,
-            &[
-                "## This is a preamble comment.",
-                "## This is also a preamble comment."
-            ]
-        );
     }
 }
