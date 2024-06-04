@@ -734,14 +734,8 @@ impl LiteralInteger {
     /// `9223372036854775808`, which will only be accepted as an
     /// operand to a negation expression).
     pub fn value(&self) -> Option<u64> {
-        let token = self
-            .0
-            .children_with_tokens()
-            .filter_map(NodeOrToken::into_token)
-            .find(|t| t.kind() == SyntaxKind::Integer)
-            .expect("integer token should be present");
-
-        let text = token.text();
+        let token = self.token();
+        let text = token.as_str();
         let i = if text == "0" {
             0
         } else if text.starts_with("0x") || text.starts_with("0X") {
@@ -826,15 +820,8 @@ impl LiteralFloat {
     ///
     /// Returns `None` if the literal value is not in range.
     pub fn value(&self) -> Option<f64> {
-        let token = self
-            .0
-            .children_with_tokens()
-            .filter_map(NodeOrToken::into_token)
-            .find(|t| t.kind() == SyntaxKind::Float)
-            .expect("integer token should be present");
-
-        token
-            .text()
+        self.token()
+            .as_str()
             .parse()
             .ok()
             .and_then(|f: f64| if f.is_infinite() { None } else { Some(f) })
