@@ -1,18 +1,15 @@
-//! The experimental parser file tests.
+//! The lint file tests.
 //!
-//! This test looks for directories in `tests/parsing`.
+//! This test looks for directories in `tests/lints`.
 //!
 //! Each directory is expected to contain:
 //!
-//! * `source.wdl` - the test input source to parse.
-//! * `source.tree` - the expected CST representation of the source.
-//! * `source.errors` - the expected set of parser errors encountered during the
-//!   parse.
+//! * `source.wdl` - the test input source to parse; the first line in the file
+//!   must be a comment with the lint rule name to run.
+//! * `source.errors` - the expected set of lint diagnostics.
 //!
-//! Both `source.tree` and `source.errors` may be automatically generated or
-//! updated by setting the `BLESS` environment variable when running this test.
-//!
-//! This test currently requires the `experimental` feature to run.
+//! The `source.errors` file may be automatically generated or updated by
+//! setting the `BLESS` environment variable when running this test.
 
 use std::collections::HashSet;
 use std::env;
@@ -31,8 +28,10 @@ use codespan_reporting::term::Config;
 use colored::Colorize;
 use pretty_assertions::StrComparison;
 use rayon::prelude::*;
-use wdl_grammar::experimental::Diagnostic;
-use wdl_grammar::experimental::SyntaxTree;
+use wdl_ast::experimental::Diagnostic;
+use wdl_ast::experimental::Document;
+use wdl_ast::experimental::Validator;
+use wdl_lint::v1;
 
 fn find_tests() -> Vec<PathBuf> {
     // Check for filter arguments consisting of test names
@@ -44,7 +43,7 @@ fn find_tests() -> Vec<PathBuf> {
     }
 
     let mut tests: Vec<PathBuf> = Vec::new();
-    for entry in Path::new("tests/parsing").read_dir().unwrap() {
+    for entry in Path::new("tests/lints").read_dir().unwrap() {
         let entry = entry.expect("failed to read directory");
         let path = entry.path();
         if !path.is_dir()
@@ -71,8 +70,8 @@ fn normalize(s: &str, is_error: bool) -> String {
     s.replace("\r\n", "\n")
 }
 
-fn format_diagnostics(
-    diagnostics: impl Iterator<Item = Diagnostic>,
+fn format_diagnostics<'a>(
+    diagnostics: impl Iterator<Item = &'a Diagnostic>,
     path: &Path,
     source: &str,
 ) -> String {
@@ -132,13 +131,25 @@ fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), String> {
             )
         })?
         .replace("\r\n", "\n");
-    let (tree, diagnostics) = SyntaxTree::parse(&source);
-    compare_result(&path.with_extension("tree"), &format!("{:#?}", tree), false)?;
-    compare_result(
-        &path.with_extension("errors"),
-        &format_diagnostics(diagnostics.into_iter(), &path, &source),
-        true,
-    )?;
+    match Document::parse(&source).into_result() {
+        Ok(document) => {
+            let rules = v1::rules();
+            let mut validator = Validator::default();
+            validator.add_v1_visitors(rules.iter().map(|r| r.visitor()));
+            let errors = match validator.validate(&document) {
+                Ok(()) => String::new(),
+                Err(diagnostics) => format_diagnostics(diagnostics.iter(), &path, &source),
+            };
+            compare_result(&path.with_extension("errors"), &errors, true)?;
+        }
+        Err(diagnostics) => {
+            compare_result(
+                &path.with_extension("errors"),
+                &format_diagnostics(diagnostics.iter(), &path, &source),
+                true,
+            )?;
+        }
+    }
     ntests.fetch_add(1, Ordering::SeqCst);
     Ok(())
 }
