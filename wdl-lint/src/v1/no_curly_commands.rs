@@ -79,9 +79,9 @@ impl Visitor for NoCurlyCommandsVisitor {
 
             let task = command_keyword
                 .parent()
-                .expect("should have a task")
+                .expect("should have a parent token")
                 .parent()
-                .expect("should have a task");
+                .expect("should have a parent token");
             let name = support::token(&task, SyntaxKind::Ident)
                 .expect("should have a task name");
             state.add(curly_commands(name.text(), span.to_span()));
