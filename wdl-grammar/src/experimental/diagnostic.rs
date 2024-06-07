@@ -69,8 +69,8 @@ pub enum Severity {
 /// Represents a diagnostic to display to the user.
 #[derive(Debug, Clone)]
 pub struct Diagnostic {
-    /// The optional code associated with the diagnostic.
-    code: Option<String>,
+    /// The optional rule associated with the diagnostic.
+    rule: Option<String>,
     /// The default severity of the diagnostic.
     severity: Severity,
     /// The diagnostic message.
@@ -87,7 +87,7 @@ impl Diagnostic {
     /// Creates a new diagnostic error with the given message.
     pub fn error(message: impl Into<String>) -> Self {
         Self {
-            code: None,
+            rule: None,
             severity: Severity::Error,
             message: message.into(),
             fix: None,
@@ -98,7 +98,7 @@ impl Diagnostic {
     /// Creates a new diagnostic warning with the given message.
     pub fn warning(message: impl Into<String>) -> Self {
         Self {
-            code: None,
+            rule: None,
             severity: Severity::Warning,
             message: message.into(),
             fix: None,
@@ -109,7 +109,7 @@ impl Diagnostic {
     /// Creates a new diagnostic node with the given message.
     pub fn note(message: impl Into<String>) -> Self {
         Self {
-            code: None,
+            rule: None,
             severity: Severity::Note,
             message: message.into(),
             fix: None,
@@ -117,9 +117,9 @@ impl Diagnostic {
         }
     }
 
-    /// Sets the code for the diagnostic.
-    pub fn with_code(mut self, code: impl Into<String>) -> Self {
-        self.code = Some(code.into());
+    /// Sets the rule for the diagnostic.
+    pub fn with_rule(mut self, rule: impl Into<String>) -> Self {
+        self.rule = Some(rule.into());
         self
     }
 
@@ -145,9 +145,9 @@ impl Diagnostic {
         self
     }
 
-    /// Gets the optional code associated with the diagnostic.
-    pub fn code(&self) -> Option<&str> {
-        self.code.as_deref()
+    /// Gets the optional rule associated with the diagnostic.
+    pub fn rule(&self) -> Option<&str> {
+        self.rule.as_deref()
     }
 
     /// Gets the default severity level of the diagnostic.
@@ -185,8 +185,8 @@ impl Diagnostic {
             Severity::Note => codespan::Diagnostic::note(),
         };
 
-        if let Some(code) = &self.code {
-            diagnostic.message = format!("{msg} [rule: {code}]", msg = self.message);
+        if let Some(rule) = &self.rule {
+            diagnostic.message = format!("{msg} [rule: {rule}]", msg = self.message);
         } else {
             diagnostic.message.clone_from(&self.message);
         }
