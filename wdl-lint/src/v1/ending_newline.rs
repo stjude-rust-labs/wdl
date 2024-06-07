@@ -14,7 +14,7 @@ use crate::Tag;
 use crate::TagSet;
 
 /// The identifier for the ending newline rule.
-const ID: &str = "ending_newline";
+const ID: &str = "EndingNewline";
 
 /// Creates a "missing ending newline" diagnostic.
 fn missing_ending_newline(span: Span) -> Diagnostic {

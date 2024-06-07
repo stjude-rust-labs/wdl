@@ -185,8 +185,11 @@ impl Diagnostic {
             Severity::Note => codespan::Diagnostic::note(),
         };
 
-        diagnostic.code = self.code.clone();
-        diagnostic.message.clone_from(&self.message);
+        if let Some(code) = &self.code {
+            diagnostic.message = format!("{msg} [rule: {code}]", msg = self.message);
+        } else {
+            diagnostic.message.clone_from(&self.message);
+        }
 
         if let Some(fix) = &self.fix {
             diagnostic.notes.push(format!("fix: {fix}"));

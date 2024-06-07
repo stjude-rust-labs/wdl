@@ -19,7 +19,7 @@ pub use missing_runtime::*;
 pub trait Rule {
     /// The unique identifier for the lint rule.
     ///
-    /// The identifier is required to be snake case.
+    /// The identifier is required to be pascal case.
     ///
     /// This is what will show up in style guides and is the identifier by which
     /// a lint rule is disabled.
@@ -51,13 +51,13 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(EndingNewlineRule),
     ];
 
-    // Ensure all the rule ids are unique and snake case
+    // Ensure all the rule ids are unique and pascal case
     #[cfg(debug_assertions)]
     {
         let mut set = std::collections::HashSet::new();
         for r in rules.iter() {
-            if r.id().to_case(Case::Snake) != r.id() {
-                panic!("lint rule id `{id}` is not snake case", id = r.id());
+            if r.id().to_case(Case::Pascal) != r.id() {
+                panic!("lint rule id `{id}` is not pascal case", id = r.id());
             }
 
             if !set.insert(r.id()) {

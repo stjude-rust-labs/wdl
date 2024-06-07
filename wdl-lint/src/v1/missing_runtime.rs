@@ -13,7 +13,7 @@ use crate::Tag;
 use crate::TagSet;
 
 /// The identifier for the missing runtime rule.
-const ID: &str = "missing_runtime";
+const ID: &str = "MissingRuntime";
 
 /// Creates a "missing runtime section" diagnostic.
 fn missing_runtime_section(task: &str, span: Span) -> Diagnostic {

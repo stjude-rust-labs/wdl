@@ -14,7 +14,7 @@ use crate::Tag;
 use crate::TagSet;
 
 /// The identifier for the double quotes rule.
-const ID: &str = "double_quotes";
+const ID: &str = "DoubleQuotes";
 
 /// Creates a "use double quotes" diagnostic.
 fn use_double_quotes(span: Span) -> Diagnostic {

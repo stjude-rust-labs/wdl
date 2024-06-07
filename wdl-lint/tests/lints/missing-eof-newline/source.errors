@@ -1,4 +1,4 @@
-warning[ending_newline]: missing newline at the end of the file
+warning: missing newline at the end of the file [rule: EndingNewline]
   ┌─ tests/lints/missing-eof-newline/source.wdl:7:1
   │
 7 │ }
