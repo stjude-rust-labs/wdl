@@ -21,7 +21,7 @@ fn missing_runtime_section(task: &str, span: Span) -> Diagnostic {
         .with_code(ID)
         .with_label("this task is missing a runtime section", span)
         .with_fix(
-            "add a runtime section to the task with desired cpu, memory and container/docker \
+            "add a runtime section to the task with desired cpu, memory and container \
              requirements",
         )
 }
