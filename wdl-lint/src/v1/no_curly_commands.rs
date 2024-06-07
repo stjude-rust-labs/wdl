@@ -1,9 +1,9 @@
 //! A lint rule for ensuring no curly commands are used.
 
-use rowan::ast::support;
-use rowan::ast::AstNode;
+use wdl_ast::experimental::support;
 use wdl_ast::experimental::v1::CommandSection;
 use wdl_ast::experimental::v1::Visitor;
+use wdl_ast::experimental::AstNode;
 use wdl_ast::experimental::AstToken;
 use wdl_ast::experimental::Diagnostic;
 use wdl_ast::experimental::Diagnostics;
