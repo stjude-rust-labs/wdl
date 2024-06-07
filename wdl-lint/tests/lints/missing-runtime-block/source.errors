@@ -4,5 +4,5 @@ warning[missing_runtime]: task `bad` is missing a runtime section
 5 │ task bad {
   │      ^^^ this task is missing a runtime section
   │
-  = fix: add a runtime section to the task with desired cpu, memory and container requirements
+  = fix: add a runtime section to the task
 
