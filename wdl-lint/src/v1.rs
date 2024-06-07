@@ -49,6 +49,7 @@ pub trait Rule {
 pub fn rules() -> Vec<Box<dyn Rule>> {
     let rules: Vec<Box<dyn Rule>> = vec![
         Box::new(DoubleQuotesRule),
+        Box::new(NoCurlyCommandsRule),
         Box::new(MissingRuntimeRule),
         Box::new(EndingNewlineRule),
     ];

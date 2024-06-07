@@ -1,11 +1,14 @@
 //! A lint rule for ensuring no curly commands are used.
 
-use wdl_ast::experimental::v1::TaskDefinition;
+use rowan::ast::support;
+use rowan::ast::AstNode;
+use wdl_ast::experimental::v1::CommandSection;
 use wdl_ast::experimental::v1::Visitor;
-use wdl_ast::experimental::AstToken;
 use wdl_ast::experimental::Diagnostic;
 use wdl_ast::experimental::Diagnostics;
 use wdl_ast::experimental::Span;
+use wdl_ast::experimental::SyntaxKind;
+use wdl_ast::experimental::ToSpan;
 use wdl_ast::experimental::VisitReason;
 
 use super::Rule;
@@ -21,8 +24,8 @@ fn curly_commands(task: &str, span: Span) -> Diagnostic {
         "task `{task}` uses curly braces in command section"
     ))
     .with_rule(ID)
-    .with_label("this task uses curly braces in the command section", span)
-    .with_fix("remove curly braces from the command section")
+    .with_label("this command section uses curly braces", span)
+    .with_fix("instead of curly braces, use heredoc syntax (<<<>>>>) for command sections")
 }
 
 /// Detects curly command section for tasks.
@@ -59,21 +62,29 @@ struct NoCurlyCommandsVisitor;
 impl Visitor for NoCurlyCommandsVisitor {
     type State = Diagnostics;
 
-    fn task_definition(
+    fn command_section(
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        task: &TaskDefinition,
+        section: &CommandSection,
     ) {
         if reason == VisitReason::Exit {
             return;
         }
 
-        for command in task.commands() {
-            if !command.is_heredoc() {
-                let name = task.name();
-                state.add(curly_commands(name.as_str(), name.span()))
-            }
+        if !section.is_heredoc() {
+            let command_keyword = support::token(section.syntax(), SyntaxKind::CommandKeyword)
+                .expect("should have a command keyword token");
+            let span = command_keyword.text_range();
+
+            let task = command_keyword
+                .parent()
+                .expect("should have a task")
+                .parent()
+                .expect("should have a task");
+            let name = support::token(&task, SyntaxKind::Ident)
+                .expect("should have a task name");
+            state.add(curly_commands(name.text(), span.to_span()));
         }
     }
 }

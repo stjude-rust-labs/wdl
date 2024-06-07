@@ -4,10 +4,14 @@ version 1.1
 
 task bad {
     runtime {}
-    command {}
+    command {
+        echo "Hello, World!"
+    }
 }
 
 task good {
     runtime {}
-    command <<<>>>
+    command <<<
+        echo "Hello, World!"
+    >>>
 }
