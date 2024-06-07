@@ -25,10 +25,17 @@ fn missing_ending_newline(span: Span) -> Diagnostic {
 }
 
 /// Creates a "multiple ending newline" diagnostic.
-fn multiple_ending_newline(span: Span) -> Diagnostic {
+fn multiple_ending_newline(span: Span, count: usize) -> Diagnostic {
     Diagnostic::note("multiple empty lines at the end of file")
         .with_code(ID)
-        .with_label("duplicate newline here", span)
+        .with_label(
+            if count > 1 {
+                "duplicate newlines here"
+            } else {
+                "duplicate newline here"
+            },
+            span,
+        )
         .with_fix("remove all but one empty line at the end of the file")
 }
 
@@ -58,6 +65,11 @@ impl Rule for EndingNewlineRule {
     }
 }
 
+/// Strips a newline sequence from the end of the given string.
+fn strip_newline(s: &str) -> Option<&str> {
+    s.strip_prefix("\r\n").or_else(|| s.strip_prefix('\n'))
+}
+
 /// Implements the visitor for the ending newline rule.
 struct EndingNewlineVisitor;
 
@@ -77,23 +89,24 @@ impl Visitor for EndingNewlineVisitor {
                 let last = last.into_token().expect("whitespace should be a token");
                 let start = usize::from(last.text_range().start());
                 let text = last.text();
-                match text
-                    .strip_suffix("\r\n")
-                    .or_else(|| text.strip_suffix('\n'))
-                {
-                    Some(text) => {
-                        // At least one newline, check for another; otherwise ok
-                        if text.ends_with('\n') {
-                            state.add(multiple_ending_newline(Span::new(
-                                start + (text.len() - 1),
-                                1,
-                            )));
+                let len = text.len();
+                match strip_newline(last.text()) {
+                    Some(mut text) => {
+                        // Count the number of extra newlines
+                        let mut extra = 0;
+                        while let Some(stripped) = strip_newline(text) {
+                            extra += 1;
+                            text = stripped;
+                        }
+
+                        if extra > 0 {
+                            state.add(multiple_ending_newline(
+                                Span::new(start + text.len(), len - text.len() - 1),
+                                extra,
+                            ));
                         }
                     }
-                    None => state.add(missing_ending_newline(Span::new(
-                        start + (text.len() - 1),
-                        1,
-                    ))),
+                    None => state.add(missing_ending_newline(Span::new(start + (len - 1), 1))),
                 }
             }
             Some(last) => {
