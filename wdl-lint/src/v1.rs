@@ -10,10 +10,12 @@ use crate::TagSet;
 mod double_quotes;
 mod ending_newline;
 mod missing_runtime;
+mod no_curly_commands;
 
 pub use double_quotes::*;
 pub use ending_newline::*;
 pub use missing_runtime::*;
+pub use no_curly_commands::*;
 
 /// A trait implemented by lint rules.
 pub trait Rule {
