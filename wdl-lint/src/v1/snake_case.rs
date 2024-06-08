@@ -141,12 +141,7 @@ impl Visitor for SnakeCaseVisitor {
         let properly_cased_name = convert_to_snake_case(name.as_str());
         if name.as_str() != properly_cased_name {
             let span = name.span();
-            let warning = snake_case(
-                Context::Variable,
-                name.as_str(),
-                &properly_cased_name,
-                span,
-            );
+            let warning = snake_case(Context::Variable, name.as_str(), &properly_cased_name, span);
             state.add(warning);
         }
     }
@@ -160,12 +155,7 @@ impl Visitor for SnakeCaseVisitor {
         let properly_cased_name = convert_to_snake_case(name.as_str());
         if name.as_str() != properly_cased_name {
             let span = name.span();
-            let warning = snake_case(
-                Context::Variable,
-                name.as_str(),
-                &properly_cased_name,
-                span,
-            );
+            let warning = snake_case(Context::Variable, name.as_str(), &properly_cased_name, span);
             state.add(warning);
         }
     }
