@@ -1,0 +1,32 @@
+warning: workflow identifier `BadWorkflow` is not snake_case [rule: SnakeCase]
+  ┌─ tests/lints/snake-case/source.wdl:5:10
+  │
+5 │ workflow BadWorkflow {
+  │          ^^^^^^^^^^^ this identifier must be snake_case
+  │
+  = fix: replace `BadWorkflow` with `bad_workflow`
+
+warning: task identifier `BadTask` is not snake_case [rule: SnakeCase]
+   ┌─ tests/lints/snake-case/source.wdl:10:6
+   │
+10 │ task BadTask {
+   │      ^^^^^^^ this identifier must be snake_case
+   │
+   = fix: replace `BadTask` with `bad_task`
+
+warning: variable identifier `badOut` is not snake_case [rule: SnakeCase]
+   ┌─ tests/lints/snake-case/source.wdl:15:14
+   │
+15 │         File badOut = "out.txt"
+   │              ^^^^^^ this identifier must be snake_case
+   │
+   = fix: replace `badOut` with `bad_out`
+
+warning: variable identifier `bAdFiElD` is not snake_case [rule: SnakeCase]
+   ┌─ tests/lints/snake-case/source.wdl:32:12
+   │
+32 │     String bAdFiElD  # unfortunately, `convert-case` doesn't understand sarcasm case
+   │            ^^^^^^^^ this identifier must be snake_case
+   │
+   = fix: replace `bAdFiElD` with `b_ad_fi_el_d`
+
