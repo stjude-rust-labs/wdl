@@ -59,9 +59,9 @@ const ID: &str = "SnakeCase";
 
 /// Creates a "snake case" diagnostic.
 fn snake_case(context: Context, name: &str, properly_cased_name: &str, span: Span) -> Diagnostic {
-    Diagnostic::warning(format!("{context} identifier `{name}` is not snake_case"))
+    Diagnostic::warning(format!("{context} name `{name}` is not snake_case"))
         .with_rule(ID)
-        .with_label("this identifier must be snake_case", span)
+        .with_label("this name must be snake_case", span)
         .with_fix(format!("replace `{name}` with `{properly_cased_name}`"))
 }
 
@@ -114,8 +114,8 @@ struct SnakeCaseVisitor {
 }
 
 impl SnakeCaseVisitor {
-    /// Determines current context.
-    fn determine_context(&self) -> Context {
+    /// Determines current declaration context.
+    fn determine_decl_context(&self) -> Context {
         if self.within_struct {
             Context::Struct
         } else if self.within_input {
