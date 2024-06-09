@@ -108,8 +108,11 @@ impl Rule for SnakeCaseRule {
 /// Implements the visitor for the snake case rule.
 #[derive(Debug, Default)]
 struct SnakeCaseVisitor {
+    /// Whether the visitor is currently within a struct.
     within_struct: bool,
+    /// Whether the visitor is currently within an input section.
     within_input: bool,
+    /// Whether the visitor is currently within an output section.
     within_output: bool,
 }
 
@@ -213,7 +216,7 @@ impl Visitor for SnakeCaseVisitor {
         }
 
         let name = decl.name();
-        let context = self.determine_context();
+        let context = self.determine_decl_context();
         check_name(context, name.as_str(), name.span(), state);
     }
 
@@ -223,7 +226,7 @@ impl Visitor for SnakeCaseVisitor {
         }
 
         let name = decl.name();
-        let context = self.determine_context();
+        let context = self.determine_decl_context();
         check_name(context, name.as_str(), name.span(), state);
     }
 }
