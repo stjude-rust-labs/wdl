@@ -50,7 +50,7 @@ fn extra_param_meta(parent: &TaskOrWorkflow, extra: &str, span: Span) -> Diagnos
         TaskOrWorkflow::Workflow(w) => ("workflow", w.name()),
     };
 
-    Diagnostic::warning(format!(
+    Diagnostic::note(format!(
         "{context} `{parent}` has an extraneous parameter metadata key named `{extra}`",
         parent = parent.as_str(),
     ))
