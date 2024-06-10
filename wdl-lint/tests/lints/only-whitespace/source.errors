@@ -57,11 +57,3 @@ warning: line contains only whitespace [rule: Whitespace]
    │
    = fix: remove the whitespace from this line
 
-warning: missing newline at the end of the file [rule: EndingNewline]
-   ┌─ tests/lints/only-whitespace/source.wdl:16:5
-   │
-16 │      
-   │     ^ expected a newline to follow this
-   │
-   = fix: add an empty line at the end of the file
-
