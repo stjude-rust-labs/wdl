@@ -1,11 +1,9 @@
 note: unnecessary whitespace in document preamble [rule: PreambleWhitespace]
-  ┌─ tests/lints/preamble-comment-after-version/source.wdl:1:38
-  │  
-1 │   ## This is a normal preamble comment.
-  │ ╭─────────────────────────────────────^
-2 │ │        ## Bad leading whitespace!
-  │ ╰───────^
-  │  
+  ┌─ tests/lints/preamble-comment-after-version/source.wdl:2:1
+  │
+2 │        ## Bad leading whitespace!
+  │ ^^^^^^^
+  │
   = fix: remove the unnecessary whitespace
 
 note: preamble comments cannot come after the version statement [rule: PreambleComments]

@@ -185,9 +185,25 @@ impl Visitor for PreambleWhitespaceVisitor {
                 // Whitespace token is valid
                 return;
             }
+
+            // Don't include the newline separating the previous comment from the whitespace
+            let offset = if s.starts_with("\r\n") {
+                2
+            } else if s.starts_with('\n') {
+                1
+            } else {
+                0
+            };
+
+            let span = whitespace.span();
+            state.add(unnecessary_whitespace(Span::new(
+                span.start() + offset,
+                span.len() - offset,
+            )));
+            return;
         }
 
-        // At this point, the whitespace is unnecessary
+        // At this point, the whitespace is entirely unnecessary
         state.add(unnecessary_whitespace(whitespace.span()));
     }
 }
