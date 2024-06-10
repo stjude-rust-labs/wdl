@@ -1,4 +1,5 @@
 ## This is a normal preamble comment.
+       ## Bad leading whitespace!
 
 version 1.1
 

@@ -31,7 +31,7 @@ fn unnecessary_whitespace(span: Span) -> Diagnostic {
 
 /// Creates an "expected a blank line" diagnostic.
 fn expected_blank_line(span: Span) -> Diagnostic {
-    Diagnostic::note("expected a blank line before version statement")
+    Diagnostic::note("expected a blank line before the version statement")
         .with_rule(ID)
         .with_highlight(span)
         .with_fix("add a blank line between the last preamble comment and the version statement")
@@ -55,7 +55,8 @@ impl Rule for PreambleWhitespaceRule {
          the version declaration statement itself. Only comments and whitespace are permitted \
          before the version declaration. If there are no comments, the version declaration must be \
          the first line of the document. If there are comments, there must be exactly one blank \
-         line between the last comment and the version declaration."
+         line between the last comment and the version declaration. No extraneous whitespace is \
+         allowed."
     }
 
     fn tags(&self) -> TagSet {

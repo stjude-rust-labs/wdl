@@ -76,7 +76,7 @@ impl Rule for PreambleCommentsRule {
     }
 
     fn tags(&self) -> TagSet {
-        TagSet::new(&[Tag::Spacing, Tag::Style])
+        TagSet::new(&[Tag::Spacing, Tag::Style, Tag::Clarity])
     }
 
     fn visitor(&self) -> Box<dyn Visitor<State = Diagnostics>> {
@@ -128,7 +128,7 @@ impl Visitor for PreambleCommentsVisitor {
             }
 
             // Check for missing space
-            if !text.starts_with(' ') {
+            if !text.is_empty() && !text.starts_with(' ') {
                 state.add(missing_space(comment.span()));
                 return;
             }

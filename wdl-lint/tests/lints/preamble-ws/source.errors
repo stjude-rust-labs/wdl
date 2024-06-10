@@ -6,7 +6,7 @@ note: unnecessary whitespace in document preamble [rule: PreambleWhitespace]
   │
   = fix: remove the unnecessary whitespace
 
-note: expected a blank line before version statement [rule: PreambleWhitespace]
+note: expected a blank line before the version statement [rule: PreambleWhitespace]
   ┌─ tests/lints/preamble-ws/source.wdl:2:1
   │
 2 │         version 1.1

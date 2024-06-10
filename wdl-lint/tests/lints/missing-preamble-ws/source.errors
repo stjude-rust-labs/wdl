@@ -1,4 +1,4 @@
-note: expected a blank line before version statement [rule: PreambleWhitespace]
+note: expected a blank line before the version statement [rule: PreambleWhitespace]
   ┌─ tests/lints/missing-preamble-ws/source.wdl:1:50
   │  
 1 │   ## This is a test of missing preamble whitespace.
