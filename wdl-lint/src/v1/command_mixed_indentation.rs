@@ -1,12 +1,18 @@
 //! A lint rule for checking mixed indentation in command text.
 
+use std::fmt;
+
+use wdl_ast::experimental::support;
 use wdl_ast::experimental::v1::CommandPart;
 use wdl_ast::experimental::v1::CommandSection;
 use wdl_ast::experimental::v1::Visitor;
+use wdl_ast::experimental::AstNode;
 use wdl_ast::experimental::AstToken;
 use wdl_ast::experimental::Diagnostic;
 use wdl_ast::experimental::Diagnostics;
 use wdl_ast::experimental::Span;
+use wdl_ast::experimental::SyntaxKind;
+use wdl_ast::experimental::ToSpan;
 use wdl_ast::experimental::VisitReason;
 
 use super::Rule;
@@ -17,11 +23,52 @@ use crate::TagSet;
 /// The identifier for the command section mixed indentation rule.
 const ID: &str = "CommandSectionMixedIndentation";
 
+/// Represents the indentation kind.
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+enum IndentationKind {
+    /// Spaces are used for the indentation.
+    Spaces,
+    /// Tabs are used for the indentation.
+    Tabs,
+}
+
+impl fmt::Display for IndentationKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Spaces => write!(f, "spaces"),
+            Self::Tabs => write!(f, "tabs"),
+        }
+    }
+}
+
+impl From<u8> for IndentationKind {
+    fn from(b: u8) -> Self {
+        match b {
+            b' ' => Self::Spaces,
+            b'\t' => Self::Tabs,
+            _ => panic!("not indentation"),
+        }
+    }
+}
+
 /// Creates a "mixed indentation" diagnostic.
-fn mixed_indentation(span: Span) -> Diagnostic {
+fn mixed_indentation(command: Span, span: Span, kind: IndentationKind) -> Diagnostic {
     Diagnostic::warning("mixed indentation within a command")
         .with_rule(ID)
-        .with_label("spaces mixed with tabs here", span)
+        .with_label(
+            format!(
+                "indented with {kind} until this {anti}",
+                anti = match kind {
+                    IndentationKind::Spaces => "tab",
+                    IndentationKind::Tabs => "space",
+                }
+            ),
+            span,
+        )
+        .with_label(
+            "this command section uses both tabs and spaces in leading whitespace",
+            command,
+        )
         .with_fix("use the same whitespace character for indentation")
 }
 
@@ -69,44 +116,36 @@ impl Visitor for CommandSectionMixedIndentationVisitor {
             return;
         }
 
+        let mut kind = None;
+        let mut mixed_span = None;
         let mut skip_next_line = false;
-        for part in section.parts() {
+        'outer: for part in section.parts() {
             match part {
                 CommandPart::Text(text) => {
                     for (line, start, _) in lines_with_offset(text.as_str()) {
                         // Check to see if we should skip the next line
-                        // This happens after we encounter a placeholder or a line continuation
+                        // This happens after we encounter a placeholder
                         if skip_next_line {
                             skip_next_line = false;
                             continue;
                         }
 
-                        // If the line ends with `\`, then it is a continuation, skip the next line
-                        if line.ends_with('\\') {
-                            skip_next_line = true;
-                        }
-
-                        // Otherwise, count the leading whitespace on the line and whether tabs
-                        // and/or spaces are used
-                        let mut spaces = false;
-                        let mut tabs = false;
-                        let mut len = 0;
-                        for c in line.chars() {
-                            match c {
-                                ' ' => spaces = true,
-                                '\t' => tabs = true,
+                        // Otherwise, check the leading whitespace
+                        for (i, b) in line.as_bytes().iter().enumerate() {
+                            match b {
+                                b' ' | b'\t' => {
+                                    let current = IndentationKind::from(*b);
+                                    let kind = kind.get_or_insert(current);
+                                    if current != *kind {
+                                        // Mixed indentation, store the span of the first mixed
+                                        // character
+                                        mixed_span =
+                                            Some(Span::new(text.span().start() + start + i, 1));
+                                        break 'outer;
+                                    }
+                                }
                                 _ => break,
                             }
-
-                            len += 1;
-                        }
-
-                        // If both spaces and tabs were present, the indentation is mixed
-                        if spaces && tabs {
-                            state.add(mixed_indentation(Span::new(
-                                text.span().start() + start,
-                                len,
-                            )));
                         }
                     }
                 }
@@ -116,6 +155,17 @@ impl Visitor for CommandSectionMixedIndentationVisitor {
                     skip_next_line = true;
                 }
             }
+        }
+
+        if let Some(span) = mixed_span {
+            let command_keyword = support::token(section.syntax(), SyntaxKind::CommandKeyword)
+                .expect("should have a command keyword token");
+
+            state.add(mixed_indentation(
+                command_keyword.text_range().to_span(),
+                span,
+                kind.expect("an indentation kind should be present"),
+            ));
         }
     }
 }
