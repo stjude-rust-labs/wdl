@@ -14,7 +14,7 @@ task test1 {
 task test2 {
     command {
         this line has a continuation \
- 		   and should not be a warning
+ 		   and should be a warning
     }
 
     runtime {}
