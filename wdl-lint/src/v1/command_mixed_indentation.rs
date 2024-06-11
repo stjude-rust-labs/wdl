@@ -14,8 +14,8 @@ use crate::util::lines_with_offset;
 use crate::Tag;
 use crate::TagSet;
 
-/// The identifier for the mixed indentation rule.
-const ID: &str = "MixedIndentation";
+/// The identifier for the command section mixed indentation rule.
+const ID: &str = "CommandSectionMixedIndentation";
 
 /// Creates a "mixed indentation" diagnostic.
 fn mixed_indentation(span: Span) -> Diagnostic {
@@ -25,11 +25,11 @@ fn mixed_indentation(span: Span) -> Diagnostic {
         .with_fix("use the same whitespace character for indentation")
 }
 
-/// Detects mixed indentation in command text.
+/// Detects mixed indentation in a command section.
 #[derive(Debug, Clone, Copy)]
-pub struct MixedIndentationRule;
+pub struct CommandSectionMixedIndentationRule;
 
-impl Rule for MixedIndentationRule {
+impl Rule for CommandSectionMixedIndentationRule {
     fn id(&self) -> &'static str {
         ID
     }
@@ -45,18 +45,18 @@ impl Rule for MixedIndentationRule {
     }
 
     fn tags(&self) -> TagSet {
-        TagSet::new(&[Tag::Style, Tag::Spacing, Tag::Clarity])
+        TagSet::new(&[Tag::Correctness, Tag::Spacing, Tag::Clarity])
     }
 
     fn visitor(&self) -> Box<dyn Visitor<State = Diagnostics>> {
-        Box::new(MixedIndentationVisitor)
+        Box::new(CommandSectionMixedIndentationVisitor)
     }
 }
 
-/// Implements the visitor for the mixed indentation rule.
-struct MixedIndentationVisitor;
+/// Implements the visitor for the command section mixed indentation rule.
+struct CommandSectionMixedIndentationVisitor;
 
-impl Visitor for MixedIndentationVisitor {
+impl Visitor for CommandSectionMixedIndentationVisitor {
     type State = Diagnostics;
 
     fn command_section(
@@ -69,16 +69,21 @@ impl Visitor for MixedIndentationVisitor {
             return;
         }
 
-        let mut skip_first_line = false;
+        let mut skip_next_line = false;
         for part in section.parts() {
             match part {
                 CommandPart::Text(text) => {
-                    for (i, (line, start, _)) in lines_with_offset(text.as_str()).enumerate() {
-                        // Check to see if we should skip the first line
-                        // This happens after we encounter a placeholder
-                        if i == 0 && skip_first_line {
-                            skip_first_line = false;
+                    for (line, start, _) in lines_with_offset(text.as_str()) {
+                        // Check to see if we should skip the next line
+                        // This happens after we encounter a placeholder or a line continuation
+                        if skip_next_line {
+                            skip_next_line = false;
                             continue;
+                        }
+
+                        // If the line ends with `\`, then it is a continuation, skip the next line
+                        if line.ends_with('\\') {
+                            skip_next_line = true;
                         }
 
                         // Otherwise, count the leading whitespace on the line and whether tabs
@@ -106,9 +111,9 @@ impl Visitor for MixedIndentationVisitor {
                     }
                 }
                 CommandPart::Placeholder(_) => {
-                    // Encountered a placeholder, skip the next first line of text as it's
+                    // Encountered a placeholder, skip the next line of text as it's
                     // really a part of the same line
-                    skip_first_line = true;
+                    skip_next_line = true;
                 }
             }
         }

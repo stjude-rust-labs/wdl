@@ -7,22 +7,22 @@ use wdl_ast::experimental::Diagnostics;
 
 use crate::TagSet;
 
+mod command_mixed_indentation;
 mod double_quotes;
 mod ending_newline;
 mod matching_parameter_meta;
 mod missing_runtime;
-mod mixed_indentation;
 mod no_curly_commands;
 mod preamble_comments;
 mod preamble_whitespace;
 mod snake_case;
 mod whitespace;
 
+pub use command_mixed_indentation::*;
 pub use double_quotes::*;
 pub use ending_newline::*;
 pub use matching_parameter_meta::*;
 pub use missing_runtime::*;
-pub use mixed_indentation::*;
 pub use no_curly_commands::*;
 pub use preamble_comments::*;
 pub use preamble_whitespace::*;
@@ -69,7 +69,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(PreambleCommentsRule),
         Box::new(MatchingParameterMetaRule),
         Box::new(WhitespaceRule),
-        Box::new(MixedIndentationRule),
+        Box::new(CommandSectionMixedIndentationRule),
     ];
 
     // Ensure all the rule ids are unique and pascal case
