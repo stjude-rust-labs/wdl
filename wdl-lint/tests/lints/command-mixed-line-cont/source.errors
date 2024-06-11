@@ -23,7 +23,7 @@ warning: mixed indentation within a command [rule: CommandSectionMixedIndentatio
 15 │     command {
    │     ------- this command section uses both tabs and spaces in leading whitespace
 16 │         this line has a continuation /
-17 │            and should not be a warning
+17 │            and should be a warning
    │  ^^^ indented with spaces until this tab
    │
    = fix: use the same whitespace character for indentation
