@@ -12,7 +12,7 @@ note[PreambleComments]: preamble comments cannot come after the version statemen
 6 │ ## This is a preamble comment after the version
   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   │
-  = fix: change the comment to start with `#` followed by a space
+  = fix: change each comment to start with `#` followed by a space
 
 note[PreambleComments]: preamble comments cannot come after the version statement
    ┌─ tests/lints/preamble-comment-after-version/source.wdl:15:5
@@ -20,5 +20,5 @@ note[PreambleComments]: preamble comments cannot come after the version statemen
 15 │     ## This one is bad!
    │     ^^^^^^^^^^^^^^^^^^^
    │
-   = fix: change the comment to start with `#` followed by a space
+   = fix: change each comment to start with `#` followed by a space
 
