@@ -190,8 +190,18 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                         Err(diagnostics) => Some(diagnostics),
                     }
                 }
-                Err(diagnostics) => Some(diagnostics),
+                Err(diagnostics) => {
+                    // If we're in arena mode, skip over the files that failed to fully parse
+                    // We log those diagnostics as part of the normal gauntlet run.
+                    if args.arena {
+                        trace!("skipping {:?} as it has parse errors", abs_path);
+                        continue;
+                    }
+
+                    Some(diagnostics)
+                }
             };
+
             let elapsed = before.elapsed();
             total_time += elapsed;
 
