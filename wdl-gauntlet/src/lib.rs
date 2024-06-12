@@ -6,6 +6,7 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
+use std::path::Path;
 use std::path::PathBuf;
 use std::process;
 use std::time::Duration;
@@ -208,7 +209,14 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             // Convert the diagnostics to a set of short-form messages
             let mut actual = IndexSet::new();
             if let Some(diagnostics) = diagnostics {
-                let file: SimpleFile<_, _> = SimpleFile::new(document_identifier.path(), source);
+                let file: SimpleFile<_, _> = SimpleFile::new(
+                    Path::new(document_identifier.path())
+                        .file_name()
+                        .expect("should have file name")
+                        .to_str()
+                        .expect("path should be UTF-8"),
+                    source,
+                );
                 let config = codespan_reporting::term::Config {
                     display_style: DisplayStyle::Short,
                     ..Default::default()

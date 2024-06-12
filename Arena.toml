@@ -4,213 +4,213 @@ commit_hash = "7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc"
 
 [repositories."stjudecloud/workflows"]
 identifier = "stjudecloud/workflows"
-commit_hash = "a44b18a30fd6192af713fded4bc824f6e77f6ff9"
+commit_hash = "84bd23756563f32d144f11aa2e82a76e059a8b61"
 filters = ["/template/task-templates.wdl"]
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "/ww-fastq-to-cram.wdl:129:5: note: task `FastqToUnmappedBam` has an extraneous parameter metadata key named `unmapped_bam` [rule: MatchingParameterMeta]"
+message = "ww-fastq-to-cram.wdl:129:5: note: task `FastqToUnmappedBam` has an extraneous parameter metadata key named `unmapped_bam` [rule: MatchingParameterMeta]"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "/ww-fastq-to-cram.wdl:134:6: warning: task name `ValidateCram` is not snake_case [rule: SnakeCase]"
+message = "ww-fastq-to-cram.wdl:134:6: warning: task name `ValidateCram` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "/ww-fastq-to-cram.wdl:165:5: note: task `ValidateCram` has an extraneous parameter metadata key named `validation` [rule: MatchingParameterMeta]"
+message = "ww-fastq-to-cram.wdl:165:5: note: task `ValidateCram` has an extraneous parameter metadata key named `validation` [rule: MatchingParameterMeta]"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "/ww-fastq-to-cram.wdl:170:6: warning: task name `MergeBamsToCram` is not snake_case [rule: SnakeCase]"
+message = "ww-fastq-to-cram.wdl:170:6: warning: task name `MergeBamsToCram` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "/ww-fastq-to-cram.wdl:202:5: note: task `MergeBamsToCram` has an extraneous parameter metadata key named `cram` [rule: MatchingParameterMeta]"
+message = "ww-fastq-to-cram.wdl:202:5: note: task `MergeBamsToCram` has an extraneous parameter metadata key named `cram` [rule: MatchingParameterMeta]"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "/ww-fastq-to-cram.wdl:203:5: note: task `MergeBamsToCram` has an extraneous parameter metadata key named `crai` [rule: MatchingParameterMeta]"
+message = "ww-fastq-to-cram.wdl:203:5: note: task `MergeBamsToCram` has an extraneous parameter metadata key named `crai` [rule: MatchingParameterMeta]"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "/ww-fastq-to-cram.wdl:205:1: warning: missing newline at the end of the file [rule: EndingNewline]"
+message = "ww-fastq-to-cram.wdl:205:1: warning: missing newline at the end of the file [rule: EndingNewline]"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "/ww-fastq-to-cram.wdl:23:10: warning: workflow name `PairedFastqsToUnmappedCram` is not snake_case [rule: SnakeCase]"
+message = "ww-fastq-to-cram.wdl:23:10: warning: workflow name `PairedFastqsToUnmappedCram` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "/ww-fastq-to-cram.wdl:57:13: warning: line contains trailing whitespace [rule: Whitespace]"
+message = "ww-fastq-to-cram.wdl:57:13: warning: line contains trailing whitespace [rule: Whitespace]"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "/ww-fastq-to-cram.wdl:74:5: note: workflow `PairedFastqsToUnmappedCram` has an extraneous parameter metadata key named `unmapped_crams` [rule: MatchingParameterMeta]"
+message = "ww-fastq-to-cram.wdl:74:5: note: workflow `PairedFastqsToUnmappedCram` has an extraneous parameter metadata key named `unmapped_crams` [rule: MatchingParameterMeta]"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "/ww-fastq-to-cram.wdl:75:5: note: workflow `PairedFastqsToUnmappedCram` has an extraneous parameter metadata key named `unmapped_cram_indexes` [rule: MatchingParameterMeta]"
+message = "ww-fastq-to-cram.wdl:75:5: note: workflow `PairedFastqsToUnmappedCram` has an extraneous parameter metadata key named `unmapped_cram_indexes` [rule: MatchingParameterMeta]"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "/ww-fastq-to-cram.wdl:76:5: note: workflow `PairedFastqsToUnmappedCram` has an extraneous parameter metadata key named `validation` [rule: MatchingParameterMeta]"
+message = "ww-fastq-to-cram.wdl:76:5: note: workflow `PairedFastqsToUnmappedCram` has an extraneous parameter metadata key named `validation` [rule: MatchingParameterMeta]"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "/ww-fastq-to-cram.wdl:83:6: warning: task name `FastqToUnmappedBam` is not snake_case [rule: SnakeCase]"
+message = "ww-fastq-to-cram.wdl:83:6: warning: task name `FastqToUnmappedBam` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:32:12: warning: struct member name `ID` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:32:12: warning: struct member name `ID` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:33:13: warning: struct member name `BC` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:33:13: warning: struct member name `BC` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:34:13: warning: struct member name `CN` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:34:13: warning: struct member name `CN` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:35:13: warning: struct member name `DS` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:35:13: warning: struct member name `DS` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:36:13: warning: struct member name `DT` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:36:13: warning: struct member name `DT` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:37:13: warning: struct member name `FO` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:37:13: warning: struct member name `FO` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:38:13: warning: struct member name `KS` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:38:13: warning: struct member name `KS` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:39:13: warning: struct member name `LB` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:39:13: warning: struct member name `LB` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:40:13: warning: struct member name `PG` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:40:13: warning: struct member name `PG` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:41:10: warning: struct member name `PI` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:41:10: warning: struct member name `PI` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:42:13: warning: struct member name `PL` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:42:13: warning: struct member name `PL` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:43:13: warning: struct member name `PM` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:43:13: warning: struct member name `PM` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:44:13: warning: struct member name `PU` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:44:13: warning: struct member name `PU` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "/data_structures/read_group.wdl:45:13: warning: struct member name `SM` is not snake_case [rule: SnakeCase]"
+message = "read_group.wdl:45:13: warning: struct member name `SM` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "/tools/gatk4.wdl:107:14: warning: input name `dbSNP_vcf` is not snake_case [rule: SnakeCase]"
+message = "gatk4.wdl:107:14: warning: input name `dbSNP_vcf` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "/tools/gatk4.wdl:108:14: warning: input name `dbSNP_vcf_index` is not snake_case [rule: SnakeCase]"
+message = "gatk4.wdl:108:14: warning: input name `dbSNP_vcf_index` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "/tools/gatk4.wdl:249:14: warning: input name `dbSNP_vcf` is not snake_case [rule: SnakeCase]"
+message = "gatk4.wdl:249:14: warning: input name `dbSNP_vcf` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "/tools/gatk4.wdl:250:14: warning: input name `dbSNP_vcf_index` is not snake_case [rule: SnakeCase]"
+message = "gatk4.wdl:250:14: warning: input name `dbSNP_vcf_index` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "/tools/star.wdl:552:13: warning: input name `out_QS_conversion_add` is not snake_case [rule: SnakeCase]"
+message = "star.wdl:552:13: warning: input name `out_QS_conversion_add` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "/tools/star.wdl:553:13: warning: input name `out_sam_attr_IH_start` is not snake_case [rule: SnakeCase]"
+message = "star.wdl:553:13: warning: input name `out_sam_attr_IH_start` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "/tools/star.wdl:555:13: warning: input name `out_sam_flag_OR` is not snake_case [rule: SnakeCase]"
+message = "star.wdl:555:13: warning: input name `out_sam_flag_OR` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "/tools/star.wdl:556:13: warning: input name `out_sam_flag_AND` is not snake_case [rule: SnakeCase]"
+message = "star.wdl:556:13: warning: input name `out_sam_flag_AND` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "/tools/star.wdl:564:13: warning: input name `score_gap_GCAG` is not snake_case [rule: SnakeCase]"
+message = "star.wdl:564:13: warning: input name `score_gap_GCAG` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "/tools/star.wdl:565:13: warning: input name `score_gap_ATAC` is not snake_case [rule: SnakeCase]"
+message = "star.wdl:565:13: warning: input name `score_gap_ATAC` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "/tools/star.wdl:597:13: warning: input name `chim_score_junction_nonGTAG` is not snake_case [rule: SnakeCase]"
+message = "star.wdl:597:13: warning: input name `chim_score_junction_nonGTAG` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "/tools/star.wdl:61:13: warning: input name `genome_SA_index_n_bases` is not snake_case [rule: SnakeCase]"
+message = "star.wdl:61:13: warning: input name `genome_SA_index_n_bases` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "/tools/star.wdl:62:13: warning: input name `genome_SA_sparse_d` is not snake_case [rule: SnakeCase]"
+message = "star.wdl:62:13: warning: input name `genome_SA_sparse_d` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "/tools/star.wdl:818:9: warning: struct member name `GT_AG_and_CT_AC_motif` is not snake_case [rule: SnakeCase]"
+message = "star.wdl:818:9: warning: struct member name `GT_AG_and_CT_AC_motif` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "/tools/star.wdl:819:9: warning: struct member name `GC_AG_and_CT_GC_motif` is not snake_case [rule: SnakeCase]"
+message = "star.wdl:819:9: warning: struct member name `GC_AG_and_CT_GC_motif` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "/tools/star.wdl:820:9: warning: struct member name `AT_AC_and_GT_AT_motif` is not snake_case [rule: SnakeCase]"
+message = "star.wdl:820:9: warning: struct member name `AT_AC_and_GT_AT_motif` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "/workflows/reference/gatk-reference.wdl:101:15: warning: output name `dbSNP_vcf` is not snake_case [rule: SnakeCase]"
+message = "gatk-reference.wdl:101:15: warning: output name `dbSNP_vcf` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "/workflows/reference/gatk-reference.wdl:102:15: warning: output name `dbSNP_vcf_index` is not snake_case [rule: SnakeCase]"
+message = "gatk-reference.wdl:102:15: warning: output name `dbSNP_vcf_index` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "/workflows/reference/gatk-reference.wdl:40:16: warning: input name `dbSNP_vcf_url` is not snake_case [rule: SnakeCase]"
+message = "gatk-reference.wdl:40:16: warning: input name `dbSNP_vcf_url` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "/workflows/reference/gatk-reference.wdl:41:16: warning: input name `dbSNP_vcf_name` is not snake_case [rule: SnakeCase]"
+message = "gatk-reference.wdl:41:16: warning: input name `dbSNP_vcf_name` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "/workflows/reference/gatk-reference.wdl:42:17: warning: input name `dbSNP_vcf_index_url` is not snake_case [rule: SnakeCase]"
+message = "gatk-reference.wdl:42:17: warning: input name `dbSNP_vcf_index_url` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "/workflows/reference/gatk-reference.wdl:43:17: warning: input name `dbSNP_vcf_index_name` is not snake_case [rule: SnakeCase]"
+message = "gatk-reference.wdl:43:17: warning: input name `dbSNP_vcf_index_name` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "/workflows/rnaseq/rnaseq-core.wdl:138:13: warning: input name `chim_score_junction_nonGTAG` is not snake_case [rule: SnakeCase]"
+message = "rnaseq-core.wdl:138:13: warning: input name `chim_score_junction_nonGTAG` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
-message = "/workflows/rnaseq/rnaseq-variant-calling.wdl:42:14: warning: input name `dbSNP_vcf` is not snake_case [rule: SnakeCase]"
+message = "rnaseq-variant-calling.wdl:42:14: warning: input name `dbSNP_vcf` is not snake_case [rule: SnakeCase]"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
-message = "/workflows/rnaseq/rnaseq-variant-calling.wdl:43:14: warning: input name `dbSNP_vcf_index` is not snake_case [rule: SnakeCase]"
+message = "rnaseq-variant-calling.wdl:43:14: warning: input name `dbSNP_vcf_index` is not snake_case [rule: SnakeCase]"
