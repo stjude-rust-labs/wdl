@@ -1,6 +1,6 @@
 //! Lexing and parsing for Workflow Description Language (WDL) documents.
 //!
-//! This crate implements is an infallible WDL parser based
+//! This crate implements an infallible WDL parser based
 //! on the `logos` crate for lexing and the `rowan` crate for
 //! concrete syntax tree (CST) representation.
 //!
