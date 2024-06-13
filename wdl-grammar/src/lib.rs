@@ -5,7 +5,7 @@
 //! concrete syntax tree (CST) representation.
 //!
 //! The parser outputs a list of parser events that can be used
-//! to construct the CST; the parser also keeps a list of [Diagnostic] emitted
+//! to construct the CST; the parser also keeps a list of [Diagnostic]s emitted
 //! during the parse that relate to spans from the original source.
 //!
 //! See [SyntaxTree::parse] for parsing WDL source;
