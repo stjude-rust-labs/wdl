@@ -125,7 +125,7 @@ const WORKFLOW_ITEM_EXPECTED_NAMES: &[&str] = &[
     "parameter metadata section",
     "conditional statement",
     "scatter statement",
-    "task call statement",
+    "call statement",
     "private declaration",
 ];
 
