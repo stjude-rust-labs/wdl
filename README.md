@@ -84,7 +84,7 @@ intend to use more than one component crate in conjunction.
 
 ## ✨ The `wdl` CLI tool
 
-The `wdl` CLI tool provides a few commands to assist in the development of
+The `wdl` CLI tool provides commands to assist in the development of
 the `wdl` family of crates.
 
 The `wdl` CLI tool can be run with the following command:
