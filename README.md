@@ -102,7 +102,7 @@ The `wdl` CLI tool currently supports three subcommands:
 * `check` - Parses and validates a WDL source file. Exits with a status code of
   `0` if the file is syntactically valid; otherwise, prints the validation
   diagnostics and exits with a status code of `1`.
-* `lint` - Parses, validates, and runs the appropriate linting rules on a WDL
+* `lint` - Parses, validates, and runs the linting rules on a WDL
   source file. Exits with a status code of `0` if the file passes all lints;
   otherwise, prints the linting diagnostics and exits with a status code of `1`.
 
