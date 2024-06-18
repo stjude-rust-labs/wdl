@@ -1,0 +1,18 @@
+error: conflicting task name `foo`
+   ┌─ tests/validation/duplicate-task-name/source.wdl:13:6
+   │
+ 5 │ task foo {
+   │      --- first task with this name is here
+   ·
+13 │ task foo {
+   │      ^^^ this conflicts with a previous task of the same name
+
+error: conflicting task name `bar`
+   ┌─ tests/validation/duplicate-task-name/source.wdl:17:6
+   │
+ 9 │ task bar {
+   │      --- first task with this name is here
+   ·
+17 │ task bar {
+   │      ^^^ this conflicts with a previous task of the same name
+

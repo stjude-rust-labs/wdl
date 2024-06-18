@@ -312,8 +312,24 @@ document = "biowdl/tasks:/umi.wdl"
 message = 'umi.wdl:39:60: error: unknown escape sequence `\.`'
 
 [[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/WittyerTasks.wdl"
+message = "WittyerTasks.wdl:74:14: error: conflicting declaration name `wittyer_config`"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkAndCompareVCFs.wdl"
+message = "BenchmarkAndCompareVCFs.wdl:43:14: error: conflicting declaration name `preemptible`"
+
+[[diagnostics]]
 document = "broadinstitute/palantir-workflows:/HaplotypeMap/BuildHaplotypeMap.wdl"
 message = "BuildHaplotypeMap.wdl:17:1: error: a WDL document must start with a version statement"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl"
+message = "IsoformDiscoveryBenchmark.wdl:147:13: error: conflicting declaration name `gtf`"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/pipelines/broad/dna_seq/somatic/single_sample/wgs/gdc_genome/GDCWholeGenomeSomaticSingleSample.wdl"
+message = "GDCWholeGenomeSomaticSingleSample.wdl:672:14: error: conflicting declaration name `ubam`"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/pipelines/skylab/scATAC/scATAC.wdl"
