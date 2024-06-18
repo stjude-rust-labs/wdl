@@ -1069,6 +1069,10 @@ message = "star.wdl:62:13: warning[SnakeCase]: input name `genome_SA_sparse_d` i
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:816:8: warning[PascalCase]: struct name `SJMotifs` is not PascalCase"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
 message = "star.wdl:818:9: warning[SnakeCase]: struct member name `GT_AG_and_CT_AC_motif` is not snake_case"
 
 [[diagnostics]]

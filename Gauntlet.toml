@@ -8,7 +8,7 @@ commit_hash = "9a1a2846443e4b621f1dca0259fd3fa21885156a"
 
 [repositories."aws-samples/amazon-omics-tutorials"]
 identifier = "aws-samples/amazon-omics-tutorials"
-commit_hash = "0a49b4326f67ac72150159a183084a252cf45ee0"
+commit_hash = "136ecf7e5aaee18619e14ee65a97acc6d6704bef"
 
 [repositories."biowdl/tasks"]
 identifier = "biowdl/tasks"
