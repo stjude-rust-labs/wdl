@@ -24,7 +24,10 @@ fn misplaced_import(span: Span) -> Diagnostic {
     Diagnostic::warning("misplaced import")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("move this import so that it comes directly after the version statement")
+        .with_fix(
+            "move this import so that it comes after the version statement but before any \
+             document items",
+        )
 }
 
 /// Detects incorrect import placements.
@@ -37,7 +40,7 @@ impl Rule for ImportPlacementRule {
     }
 
     fn description(&self) -> &'static str {
-        "Ensures that imports are placed immediately following the version statement."
+        "Ensures that imports are placed between the version statement and any document items."
     }
 
     fn explanation(&self) -> &'static str {

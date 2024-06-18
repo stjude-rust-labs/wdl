@@ -3,9 +3,7 @@
 version 1.1
 
 import "good"
-
 import "good"
-
 import "good"
 
 workflow test {
@@ -13,5 +11,4 @@ workflow test {
 }
 
 import "bad"
-
 import "also bad"
