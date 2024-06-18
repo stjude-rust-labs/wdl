@@ -1,4 +1,4 @@
-//! A lint rule for that ensures structs are defined with pascal case names.
+//! A lint rule that ensures structs are defined with pascal case names.
 
 use convert_case::Boundary;
 use convert_case::Case;
