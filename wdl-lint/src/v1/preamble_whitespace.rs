@@ -64,7 +64,7 @@ impl Rule for PreambleWhitespaceRule {
          before the version declaration. If there are no comments, the version declaration must be \
          the first line of the document. If there are comments, there must be exactly one blank \
          line between the last comment and the version declaration. No extraneous whitespace is \
-         allowed."
+         allowed. A blank line must come after the preamble."
     }
 
     fn tags(&self) -> TagSet {
