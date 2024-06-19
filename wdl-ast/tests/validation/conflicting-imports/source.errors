@@ -23,8 +23,6 @@ error: conflicting import namespace `baz`
    │        ---------- the conflicting import namespace was introduced here
 12 │ import "/Baz.wdl" as baz                            # Conflicts
    │                      ^^^ this conflicts with another import namespace
-   │
-   = fix: add an `as` clause to the import to specify a namespace
 
 error: conflicting import namespace `baz`
    ┌─ tests/validation/conflicting-imports/source.wdl:13:8

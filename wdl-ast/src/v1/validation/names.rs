@@ -78,14 +78,19 @@ fn name_conflict(name: &str, conflicting: NameContext, first: NameContext) -> Di
 }
 
 /// Creates a "namespace conflict" diagnostic
-fn namespace_conflict(name: &str, conflicting: Span, first: Span) -> Diagnostic {
-    Diagnostic::error(format!("conflicting import namespace `{name}`"))
+fn namespace_conflict(name: &str, conflicting: Span, first: Span, suggest_fix: bool) -> Diagnostic {
+    let diagnostic = Diagnostic::error(format!("conflicting import namespace `{name}`"))
         .with_label("this conflicts with another import namespace", conflicting)
         .with_label(
             "the conflicting import namespace was introduced here",
             first,
-        )
-        .with_fix("add an `as` clause to the import to specify a namespace")
+        );
+
+    if suggest_fix {
+        diagnostic.with_fix("add an `as` clause to the import to specify a namespace")
+    } else {
+        diagnostic
+    }
 }
 
 /// Creates an "invalid import namespace" diagnostic
@@ -140,7 +145,12 @@ impl Visitor for UniqueNamesVisitor {
         match stmt.namespace() {
             Some((ns, span)) => {
                 if let Some(first) = self.namespaces.get(&ns) {
-                    state.add(namespace_conflict(&ns, span, *first));
+                    state.add(namespace_conflict(
+                        &ns,
+                        span,
+                        *first,
+                        stmt.explicit_namespace().is_none(),
+                    ));
                 } else {
                     self.namespaces.insert(ns, span);
                 }
