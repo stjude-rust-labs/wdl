@@ -1,4 +1,4 @@
-## This is a test of duplicate declarations.
+## This is a test of conflicting declaration names.
 
 version 1.1
 

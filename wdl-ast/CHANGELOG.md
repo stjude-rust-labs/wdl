@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added a method to `ImportStatement` for deriving the namespace from the
+  import URI ([#91](https://github.com/stjude-rust-labs/wdl/pull/91)).
 * Added validation of unique names, such as task, struct, and declarations
   ([#91](https://github.com/stjude-rust-labs/wdl/pull/91)).
 

@@ -1,4 +1,4 @@
-## This is a test of duplicate struct members.
+## This is a test of conflicting struct member names.
 
 version 1.1
 

@@ -1,4 +1,4 @@
-## This is a test of having duplicate struct names in a document.
+## This is a test of having conflicting struct names.
 
 version 1.1
 
@@ -25,3 +25,5 @@ struct Baz {
 }
 
 import "Bar" alias Baz as Foo
+
+import "qux" alias A as Qux alias B as Qux
