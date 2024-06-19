@@ -241,14 +241,14 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             // As the list of diagnostics has been sorted by document identifier, do
             // a binary search and collect the matching messages
             let diagnostics = config.inner().diagnostics();
-            let doc_id_str = document_identifier.to_string();
+            let doc_id = document_identifier.to_string();
             let expected: IndexSet<String> = diagnostics
-                .binary_search_by_key(&doc_id_str.as_str(), |d| d.document())
+                .binary_search_by_key(&doc_id, |d| d.document().to_string())
                 .map(|mut start_index| {
                     // As binary search may return any matching index, back up until we find the
                     // start of the range
                     for i in (0..start_index).rev() {
-                        if diagnostics[i].document() != doc_id_str {
+                        if diagnostics[i].document().to_string() != doc_id {
                             break;
                         }
 
@@ -258,7 +258,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                     diagnostics[start_index..]
                         .iter()
                         .map_while(|d| {
-                            if d.document() == doc_id_str {
+                            if d.document().to_string() == doc_id {
                                 Some(d.message().to_string())
                             } else {
                                 None
@@ -337,8 +337,16 @@ pub async fn gauntlet(args: Args) -> Result<()> {
 
         for message in messages {
             diagnostics.push(config::inner::Diagnostic::new(
-                identifier.to_string(),
+                identifier.clone(),
                 message,
+                config
+                    .inner()
+                    .repositories()
+                    .get(&identifier.repository().clone())
+                    .unwrap()
+                    .commit_hash()
+                    .clone()
+                    .unwrap(),
             ));
         }
     }
