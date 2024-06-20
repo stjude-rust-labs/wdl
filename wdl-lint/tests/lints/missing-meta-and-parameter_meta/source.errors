@@ -1,0 +1,24 @@
+note[MissingMetas]: workflow `test` is missing both meta and parameter_meta sections
+  ┌─ tests/lints/missing-meta-and-parameter_meta/source.wdl:5:10
+  │
+5 │ workflow test {
+  │          ^^^^ this workflow is missing both meta and parameter_meta sections
+  │
+  = fix: add meta and parameter_meta sections to the workflow
+
+warning[MatchingParameterMeta]: workflow `test` is missing a parameter metadata key for input `input_file`
+  ┌─ tests/lints/missing-meta-and-parameter_meta/source.wdl:7:14
+  │
+7 │         File input_file
+  │              ^^^^^^^^^^ this input does not have an entry in the parameter metadata section
+  │
+  = fix: add a `input_file` key to the `parameter_meta` section with a detailed description of the input.
+
+warning[EndingNewline]: missing newline at the end of the file
+   ┌─ tests/lints/missing-meta-and-parameter_meta/source.wdl:15:1
+   │
+15 │ }
+   │ ^ expected a newline to follow this
+   │
+   = fix: add an empty line at the end of the file
+

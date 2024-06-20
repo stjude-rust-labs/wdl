@@ -7,7 +7,8 @@ import "good"
 import "good"
 
 workflow test {
-
+    meta {}
+    output {}
 }
 
 import "bad"
