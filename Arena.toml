@@ -22,7 +22,7 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dc
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:134:6: warning[MissingMetas]: task `ValidateCram` is missing a `meta` section"
+message = "ww-fastq-to-cram.wdl:134:6: note[MissingMetas]: task `ValidateCram` is missing a `meta` section"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
 
 [[diagnostics]]
@@ -37,7 +37,7 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dc
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:170:6: warning[MissingMetas]: task `MergeBamsToCram` is missing a `meta` section"
+message = "ww-fastq-to-cram.wdl:170:6: note[MissingMetas]: task `MergeBamsToCram` is missing a `meta` section"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
 
 [[diagnostics]]
@@ -62,7 +62,7 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dc
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:23:10: warning[MissingMetas]: workflow `PairedFastqsToUnmappedCram` is missing a `meta` section"
+message = "ww-fastq-to-cram.wdl:23:10: note[MissingMetas]: workflow `PairedFastqsToUnmappedCram` is missing a `meta` section"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
 
 [[diagnostics]]
@@ -97,7 +97,7 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dc
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:83:6: warning[MissingMetas]: task `FastqToUnmappedBam` is missing a `meta` section"
+message = "ww-fastq-to-cram.wdl:83:6: note[MissingMetas]: task `FastqToUnmappedBam` is missing a `meta` section"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
 
 [[diagnostics]]
@@ -122,7 +122,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:125:6: warning[MissingMetas]: task `ConcatenateFastQs` is missing a `meta` section"
+message = "ww-star-deseq2.wdl:125:6: note[MissingMetas]: task `ConcatenateFastQs` is missing a `meta` section"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
 
 [[diagnostics]]
@@ -152,7 +152,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:159:6: warning[MissingMetas]: task `STARalignTwoPass` is missing a `meta` section"
+message = "ww-star-deseq2.wdl:159:6: note[MissingMetas]: task `STARalignTwoPass` is missing a `meta` section"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
 
 [[diagnostics]]
@@ -207,7 +207,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:225:6: warning[MissingMetas]: task `RNASeQC` is missing a `meta` section"
+message = "ww-star-deseq2.wdl:225:6: note[MissingMetas]: task `RNASeQC` is missing a `meta` section"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
 
 [[diagnostics]]
@@ -257,7 +257,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:6:10: warning[MissingMetas]: workflow `STAR2Pass` is missing a `meta` section"
+message = "ww-star-deseq2.wdl:6:10: note[MissingMetas]: workflow `STAR2Pass` is missing a `meta` section"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
 
 [[diagnostics]]
@@ -307,7 +307,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:87:6: warning[MissingMetas]: task `FindFastqs` is missing a `meta` section"
+message = "ww-star-deseq2.wdl:87:6: note[MissingMetas]: task `FindFastqs` is missing a `meta` section"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
 
 [[diagnostics]]
@@ -332,7 +332,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:17:10: warning[MissingMetas]: workflow `ww_vc_trio` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:17:10: note[MissingMetas]: workflow `ww_vc_trio` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -457,7 +457,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:262:6: warning[MissingMetas]: task `annovar` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:262:6: note[MissingMetas]: task `annovar` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -492,7 +492,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:298:6: warning[MissingMetas]: task `ApplyBaseRecalibrator` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:298:6: note[MissingMetas]: task `ApplyBaseRecalibrator` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -632,7 +632,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:353:6: warning[MissingMetas]: task `bcftoolsMpileup` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:353:6: note[MissingMetas]: task `bcftoolsMpileup` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -722,7 +722,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:392:6: warning[MissingMetas]: task `bedToolsQC` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:392:6: note[MissingMetas]: task `bedToolsQC` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -772,7 +772,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:420:6: warning[MissingMetas]: task `BwaMem` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:420:6: note[MissingMetas]: task `BwaMem` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -852,7 +852,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:456:6: warning[MissingMetas]: task `CollectHsMetrics` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:456:6: note[MissingMetas]: task `CollectHsMetrics` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -917,7 +917,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:492:6: warning[MissingMetas]: task `consensusProcessingR` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:492:6: note[MissingMetas]: task `consensusProcessingR` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -987,7 +987,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:518:6: warning[MissingMetas]: task `HaplotypeCaller` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:518:6: note[MissingMetas]: task `HaplotypeCaller` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -1072,7 +1072,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:558:6: warning[MissingMetas]: task `MergeBamAlignment` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:558:6: note[MissingMetas]: task `MergeBamAlignment` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -1117,7 +1117,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:596:6: warning[MissingMetas]: task `Mutect2TumorOnly` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:596:6: note[MissingMetas]: task `Mutect2TumorOnly` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -1187,7 +1187,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:643:6: warning[MissingMetas]: task `SamToFastq` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:643:6: note[MissingMetas]: task `SamToFastq` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -1227,7 +1227,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:680:6: warning[MissingMetas]: task `SortBed` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:680:6: note[MissingMetas]: task `SortBed` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -1252,7 +1252,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:709:6: warning[MissingMetas]: task `MarkDuplicates` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:709:6: note[MissingMetas]: task `MarkDuplicates` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -1282,7 +1282,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:745:6: warning[MissingMetas]: task `SortSam` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:745:6: note[MissingMetas]: task `SortSam` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
 
 [[diagnostics]]
@@ -1512,15 +1512,15 @@ permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fc
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:47:10: warning[MissingMetas]: workflow `cell_ranger_bam_to_fastqs` is missing a `meta` section"
+message = "10x-bam-to-fastqs.wdl:47:10: note[MissingMetas]: workflow `cell_ranger_bam_to_fastqs` is missing a `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:87:6: warning[MissingMetas]: task `parse_input` is missing a `meta` section"
+message = "10x-bam-to-fastqs.wdl:87:6: note[MissingMetas]: task `parse_input` is missing a `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:40:10: warning[MissingMetas]: workflow `scrnaseq_standard` is missing a `meta` section"
+message = "scrnaseq-standard.wdl:40:10: note[MissingMetas]: workflow `scrnaseq_standard` is missing a `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/scrnaseq-standard.wdl"
