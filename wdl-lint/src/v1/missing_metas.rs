@@ -53,7 +53,7 @@ const ID: &str = "MissingMetas";
 
 /// Creates a "missing section" diagnostic.
 fn missing_section(task: &str, section: Section, context: Context, span: Span) -> Diagnostic {
-    Diagnostic::warning(format!(
+    Diagnostic::note(format!(
         "{context} `{task}` is missing a `{section}` section"
     ))
     .with_rule(ID)
@@ -66,7 +66,7 @@ fn missing_section(task: &str, section: Section, context: Context, span: Span) -
 
 /// Creates a "missing sections" diagnostic.
 fn missing_sections(task: &str, context: Context, span: Span) -> Diagnostic {
-    Diagnostic::warning(format!(
+    Diagnostic::note(format!(
         "{context} `{task}` is missing both meta and parameter_meta sections"
     ))
     .with_rule(ID)
