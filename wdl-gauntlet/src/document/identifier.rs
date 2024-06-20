@@ -118,19 +118,23 @@ impl std::str::FromStr for Identifier {
 
 impl Serialize for Identifier {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: serde::Serializer {
+    where
+        S: serde::Serializer,
+    {
         self.to_string().serialize(serializer)
     }
 }
 
 impl<'de> Deserialize<'de> for Identifier {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where
-            D: serde::Deserializer<'de> {
+    where
+        D: serde::Deserializer<'de>,
+    {
         let s = String::deserialize(deserializer)?;
         let parts = s.split(SEPARATOR).collect::<Vec<_>>();
-        let repo = parts[0].parse::<repository::Identifier>().map_err(serde::de::Error::custom)?;
+        let repo = parts[0]
+            .parse::<repository::Identifier>()
+            .map_err(serde::de::Error::custom)?;
         Ok(Identifier::new(repo, parts[1].to_string()))
     }
 }
