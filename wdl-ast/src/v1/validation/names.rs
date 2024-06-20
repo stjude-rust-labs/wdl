@@ -9,6 +9,7 @@ use wdl_grammar::Span;
 use wdl_grammar::ToSpan;
 
 use crate::v1::BoundDecl;
+use crate::v1::CallStatement;
 use crate::v1::ImportStatement;
 use crate::v1::ScatterStatement;
 use crate::v1::StructDefinition;
@@ -18,6 +19,7 @@ use crate::v1::Visitor;
 use crate::v1::WorkflowDefinition;
 use crate::AstToken;
 use crate::Diagnostics;
+use crate::Ident;
 use crate::VisitReason;
 
 /// Represents the context of a name.
@@ -33,6 +35,8 @@ enum NameContext {
     StructMember(Span),
     /// The name is a declaration name.
     Declaration(Span),
+    /// The name is from a call statement.
+    Call(Span),
     /// The name is a scatter variable.
     ScatterVariable(Span),
 }
@@ -46,6 +50,7 @@ impl NameContext {
             Self::Struct(s) => *s,
             Self::StructMember(s) => *s,
             Self::Declaration(s) => *s,
+            Self::Call(s) => *s,
             Self::ScatterVariable(s) => *s,
         }
     }
@@ -59,6 +64,7 @@ impl fmt::Display for NameContext {
             Self::Struct(_) => write!(f, "struct"),
             Self::StructMember(_) => write!(f, "struct member"),
             Self::Declaration(_) => write!(f, "declaration"),
+            Self::Call(_) => write!(f, "call"),
             Self::ScatterVariable(_) => write!(f, "scatter variable"),
         }
     }
@@ -66,7 +72,7 @@ impl fmt::Display for NameContext {
 
 /// Creates a "name conflict" diagnostic
 fn name_conflict(name: &str, conflicting: NameContext, first: NameContext) -> Diagnostic {
-    Diagnostic::error(format!("conflicting {conflicting} name `{name}`",))
+    Diagnostic::error(format!("conflicting {conflicting} name `{name}`"))
         .with_label(
             format!("this conflicts with a {first} of the same name"),
             conflicting.span(),
@@ -88,6 +94,28 @@ fn namespace_conflict(name: &str, conflicting: Span, first: Span, suggest_fix: b
 
     if suggest_fix {
         diagnostic.with_fix("add an `as` clause to the import to specify a namespace")
+    } else {
+        diagnostic
+    }
+}
+
+/// Creates a "call conflict" diagnostic
+fn call_conflict(name: Ident, first: NameContext, suggest_fix: bool) -> Diagnostic {
+    let diagnostic = Diagnostic::error(format!(
+        "conflicting call name `{name}`",
+        name = name.as_str()
+    ))
+    .with_label(
+        format!("this conflicts with a {first} of the same name"),
+        name.span(),
+    )
+    .with_label(
+        format!("the {first} with the conflicting name is here"),
+        first.span(),
+    );
+
+    if suggest_fix {
+        diagnostic.with_fix("add an `as` clause to the call to specify a different name")
     } else {
         diagnostic
     }
@@ -314,6 +342,35 @@ impl Visitor for UniqueNamesVisitor {
         let context = NameContext::ScatterVariable(name.span());
         if let Some(first) = self.decls.get(name.as_str()) {
             state.add(name_conflict(name.as_str(), context, *first));
+        } else {
+            self.decls.insert(name.as_str().to_string(), context);
+        }
+    }
+
+    fn call_statement(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        stmt: &CallStatement,
+    ) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+
+        // Call statements introduce a declaration from the result
+        let (name, aliased) = stmt
+            .alias()
+            .map(|a| (a.name(), true))
+            .unwrap_or_else(|| (stmt.target().name().1, false));
+        let context = NameContext::Call(name.span());
+        if let Some(first) = self.decls.get_mut(name.as_str()) {
+            state.add(call_conflict(name, *first, !aliased));
+
+            // If the name came from a scatter variable, "promote" this declaration as the
+            // source of any additional conflicts.
+            if let NameContext::ScatterVariable(_) = first {
+                *first = context;
+            }
         } else {
             self.decls.insert(name.as_str().to_string(), context);
         }
