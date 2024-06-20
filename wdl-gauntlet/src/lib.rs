@@ -259,10 +259,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                         .iter()
                         .map_while(|d| {
                             if d.document() == &document_identifier {
-                                Some((
-                                    d.line_no(),
-                                    d.message().to_string())
-                                )
+                                Some((d.line_no(), d.message().to_string()))
                             } else {
                                 None
                             }
