@@ -17,1375 +17,1650 @@ filters = ["/template/task-templates.wdl"]
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:129:5: note[MatchingParameterMeta]: task `FastqToUnmappedBam` has an extraneous parameter metadata key named `unmapped_bam`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:134:6: warning[SnakeCase]: task name `ValidateCram` is not snake_case"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:165:5: note[MatchingParameterMeta]: task `ValidateCram` has an extraneous parameter metadata key named `validation`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:170:6: warning[SnakeCase]: task name `MergeBamsToCram` is not snake_case"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:202:5: note[MatchingParameterMeta]: task `MergeBamsToCram` has an extraneous parameter metadata key named `cram`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:203:5: note[MatchingParameterMeta]: task `MergeBamsToCram` has an extraneous parameter metadata key named `crai`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:205:1: warning[EndingNewline]: missing newline at the end of the file"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:23:10: warning[SnakeCase]: workflow name `PairedFastqsToUnmappedCram` is not snake_case"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 12
 message = "ww-fastq-to-cram.wdl:2:1: note[PreambleWhitespace]: expected a blank line after the version statement"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L12"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 858
+message = "ww-fastq-to-cram.wdl:23:10: warning[SnakeCase]: workflow name `PairedFastqsToUnmappedCram` is not snake_case"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L858"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 2232
 message = "ww-fastq-to-cram.wdl:57:13: warning[Whitespace]: line contains trailing whitespace"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L2232"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 2743
 message = "ww-fastq-to-cram.wdl:74:5: note[MatchingParameterMeta]: workflow `PairedFastqsToUnmappedCram` has an extraneous parameter metadata key named `unmapped_crams`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L2743"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 2810
 message = "ww-fastq-to-cram.wdl:75:5: note[MatchingParameterMeta]: workflow `PairedFastqsToUnmappedCram` has an extraneous parameter metadata key named `unmapped_cram_indexes`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L2810"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 2888
 message = "ww-fastq-to-cram.wdl:76:5: note[MatchingParameterMeta]: workflow `PairedFastqsToUnmappedCram` has an extraneous parameter metadata key named `validation`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L2888"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 3074
 message = "ww-fastq-to-cram.wdl:83:6: warning[SnakeCase]: task name `FastqToUnmappedBam` is not snake_case"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L3074"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 4456
+message = "ww-fastq-to-cram.wdl:129:5: note[MatchingParameterMeta]: task `FastqToUnmappedBam` has an extraneous parameter metadata key named `unmapped_bam`"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L4456"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 4604
+message = "ww-fastq-to-cram.wdl:134:6: warning[SnakeCase]: task name `ValidateCram` is not snake_case"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L4604"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 5318
+message = "ww-fastq-to-cram.wdl:165:5: note[MatchingParameterMeta]: task `ValidateCram` has an extraneous parameter metadata key named `validation`"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L5318"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 5477
+message = "ww-fastq-to-cram.wdl:170:6: warning[SnakeCase]: task name `MergeBamsToCram` is not snake_case"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L5477"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 6268
+message = "ww-fastq-to-cram.wdl:202:5: note[MatchingParameterMeta]: task `MergeBamsToCram` has an extraneous parameter metadata key named `cram`"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L6268"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 6317
+message = "ww-fastq-to-cram.wdl:203:5: note[MatchingParameterMeta]: task `MergeBamsToCram` has an extraneous parameter metadata key named `crai`"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L6317"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+line_no = 6354
+message = "ww-fastq-to-cram.wdl:205:1: warning[EndingNewline]: missing newline at the end of the file"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L6354"
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:10:22: warning[Whitespace]: line contains trailing whitespace"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:119:5: note[MatchingParameterMeta]: task `FindFastqs` has an extraneous parameter metadata key named `r1_locs`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:120:5: note[MatchingParameterMeta]: task `FindFastqs` has an extraneous parameter metadata key named `r2_locs`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:125:6: warning[SnakeCase]: task name `ConcatenateFastQs` is not snake_case"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:133:15: warning[DoubleQuotes]: string defined with single quotes"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:134:15: warning[DoubleQuotes]: string defined with single quotes"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:153:5: note[MatchingParameterMeta]: task `ConcatenateFastQs` has an extraneous parameter metadata key named `r1fastq`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:154:5: note[MatchingParameterMeta]: task `ConcatenateFastQs` has an extraneous parameter metadata key named `r2fastq`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:159:6: warning[SnakeCase]: task name `STARalignTwoPass` is not snake_case"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:192:10: warning[SnakeCase]: output name `geneCounts` is not snake_case"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:196:10: warning[SnakeCase]: output name `SJout` is not snake_case"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:212:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `bam`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:213:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `bai`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:214:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `geneCounts`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:215:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `log_final`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:216:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `log_progress`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:217:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `log`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:218:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `SJout`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:225:6: warning[SnakeCase]: task name `RNASeQC` is not snake_case"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:255:5: note[MatchingParameterMeta]: task `RNASeQC` has an extraneous parameter metadata key named `rnaseqc_metrics`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:25:36: warning[Whitespace]: line contains trailing whitespace"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 12
 message = "ww-star-deseq2.wdl:2:1: note[PreambleWhitespace]: expected a blank line after the version statement"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L12"
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:30:13: warning[Whitespace]: line contains trailing whitespace"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:31:43: warning[Whitespace]: line contains trailing whitespace"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:32:43: warning[Whitespace]: line contains trailing whitespace"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:59:17: warning[SnakeCase]: output name `output_geneCounts` is not snake_case"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:63:17: warning[SnakeCase]: output name `output_SJ` is not snake_case"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 121
 message = "ww-star-deseq2.wdl:6:10: warning[SnakeCase]: workflow name `STAR2Pass` is not snake_case"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L121"
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:73:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_bam`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:74:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_bai`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:75:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_gene_counts`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:76:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_log_final`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:77:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_log_progress`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:78:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_log`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:79:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_SJ`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:80:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_rnaseqc`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:87:6: warning[SnakeCase]: task name `FindFastqs` is not snake_case"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 187
 message = "ww-star-deseq2.wdl:9:25: warning[Whitespace]: line contains trailing whitespace"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L187"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 210
+message = "ww-star-deseq2.wdl:10:22: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L210"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 620
+message = "ww-star-deseq2.wdl:25:36: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L620"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 705
+message = "ww-star-deseq2.wdl:30:13: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L705"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 749
+message = "ww-star-deseq2.wdl:31:43: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L749"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 793
+message = "ww-star-deseq2.wdl:32:43: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L793"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 1491
+message = "ww-star-deseq2.wdl:59:17: warning[SnakeCase]: output name `output_geneCounts` is not snake_case"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L1491"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 1735
+message = "ww-star-deseq2.wdl:63:17: warning[SnakeCase]: output name `output_SJ` is not snake_case"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L1735"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 2201
+message = "ww-star-deseq2.wdl:73:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_bam`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L2201"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 2262
+message = "ww-star-deseq2.wdl:74:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_bai`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L2262"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 2341
+message = "ww-star-deseq2.wdl:75:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_gene_counts`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L2341"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 2447
+message = "ww-star-deseq2.wdl:76:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_log_final`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L2447"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 2567
+message = "ww-star-deseq2.wdl:77:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_log_progress`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L2567"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 2668
+message = "ww-star-deseq2.wdl:78:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_log`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L2668"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 2764
+message = "ww-star-deseq2.wdl:79:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_SJ`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L2764"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 2867
+message = "ww-star-deseq2.wdl:80:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_rnaseqc`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L2867"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 3044
+message = "ww-star-deseq2.wdl:87:6: warning[SnakeCase]: task name `FindFastqs` is not snake_case"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L3044"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 3774
+message = "ww-star-deseq2.wdl:119:5: note[MatchingParameterMeta]: task `FindFastqs` has an extraneous parameter metadata key named `r1_locs`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L3774"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 3852
+message = "ww-star-deseq2.wdl:120:5: note[MatchingParameterMeta]: task `FindFastqs` has an extraneous parameter metadata key named `r2_locs`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L3852"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 3998
+message = "ww-star-deseq2.wdl:125:6: warning[SnakeCase]: task name `ConcatenateFastQs` is not snake_case"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L3998"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 4149
+message = "ww-star-deseq2.wdl:133:15: warning[DoubleQuotes]: string defined with single quotes"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L4149"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 4217
+message = "ww-star-deseq2.wdl:134:15: warning[DoubleQuotes]: string defined with single quotes"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L4217"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 4682
+message = "ww-star-deseq2.wdl:153:5: note[MatchingParameterMeta]: task `ConcatenateFastQs` has an extraneous parameter metadata key named `r1fastq`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L4682"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 4730
+message = "ww-star-deseq2.wdl:154:5: note[MatchingParameterMeta]: task `ConcatenateFastQs` has an extraneous parameter metadata key named `r2fastq`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L4730"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 4835
+message = "ww-star-deseq2.wdl:159:6: warning[SnakeCase]: task name `STARalignTwoPass` is not snake_case"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L4835"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 5980
+message = "ww-star-deseq2.wdl:192:10: warning[SnakeCase]: output name `geneCounts` is not snake_case"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L5980"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 6194
+message = "ww-star-deseq2.wdl:196:10: warning[SnakeCase]: output name `SJout` is not snake_case"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L6194"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 6686
+message = "ww-star-deseq2.wdl:212:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `bam`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L6686"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 6759
+message = "ww-star-deseq2.wdl:213:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `bai`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L6759"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 6812
+message = "ww-star-deseq2.wdl:214:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `geneCounts`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L6812"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 6884
+message = "ww-star-deseq2.wdl:215:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `log_final`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L6884"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 6971
+message = "ww-star-deseq2.wdl:216:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `log_progress`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L6971"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 7039
+message = "ww-star-deseq2.wdl:217:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `log`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L7039"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 7102
+message = "ww-star-deseq2.wdl:218:5: note[MatchingParameterMeta]: task `STARalignTwoPass` has an extraneous parameter metadata key named `SJout`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L7102"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 7406
+message = "ww-star-deseq2.wdl:225:6: warning[SnakeCase]: task name `RNASeQC` is not snake_case"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L7406"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+line_no = 8135
+message = "ww-star-deseq2.wdl:255:5: note[MatchingParameterMeta]: task `RNASeQC` has an extraneous parameter metadata key named `rnaseqc_metrics`"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L8135"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:136:13: warning[Whitespace]: line contains trailing whitespace"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:145:13: warning[Whitespace]: line contains trailing whitespace"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:19:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `batchFile`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:19:10: warning[SnakeCase]: input name `batchFile` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:20:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `bedLocation`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:20:10: warning[SnakeCase]: input name `bedLocation` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:217:1: warning[Whitespace]: line contains only whitespace"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:21:12: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_name`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:22:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_fasta`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:23:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_fasta_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:240:76: warning[Whitespace]: line contains trailing whitespace"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:242:17: warning[SnakeCase]: output name `GATK_vcf` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:243:17: warning[SnakeCase]: output name `SAM_vcf` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:244:17: warning[SnakeCase]: output name `Mutect_Vcf` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:245:17: warning[SnakeCase]: output name `Mutect_VcfIndex` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:246:17: warning[SnakeCase]: output name `Mutect_AnnotatedVcf` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:247:17: warning[SnakeCase]: output name `Mutect_AnnotatedTable` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:248:17: warning[SnakeCase]: output name `GATK_annotated_vcf` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:249:17: warning[SnakeCase]: output name `GATK_annotated` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:24:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_dict`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:250:17: warning[SnakeCase]: output name `SAM_annotated_vcf` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:251:17: warning[SnakeCase]: output name `SAM_annotated` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:252:17: warning[SnakeCase]: output name `panelQC` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:253:17: warning[SnakeCase]: output name `PicardQC` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:254:17: warning[SnakeCase]: output name `PicardQCpertarget` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:255:17: warning[SnakeCase]: output name `consensusVariants` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:264:10: warning[MatchingParameterMeta]: task `annovar` is missing a parameter metadata key for input `input_vcf`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:265:12: warning[MatchingParameterMeta]: task `annovar` is missing a parameter metadata key for input `ref_name`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:266:12: warning[MatchingParameterMeta]: task `annovar` is missing a parameter metadata key for input `annovar_protocols`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:267:12: warning[MatchingParameterMeta]: task `annovar` is missing a parameter metadata key for input `annovar_operation`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:268:12: warning[MatchingParameterMeta]: task `annovar` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:28:11: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_alt`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:298:6: warning[SnakeCase]: task name `ApplyBaseRecalibrator` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:29:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_amb`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12
 message = "ww-vc-trio.wdl:2:1: note[PreambleComments]: preamble comments cannot come after the version statement"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12
 message = "ww-vc-trio.wdl:2:1: note[PreambleWhitespace]: expected a blank line after the version statement"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:300:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `input_bam`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+line_no = 796
+message = "ww-vc-trio.wdl:19:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `batchFile`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L796"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:301:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `intervals`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+line_no = 796
+message = "ww-vc-trio.wdl:19:10: warning[SnakeCase]: input name `batchFile` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L796"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:301:19: warning[Whitespace]: line contains trailing whitespace"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+line_no = 815
+message = "ww-vc-trio.wdl:20:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `bedLocation`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L815"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:302:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `input_bam_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+line_no = 815
+message = "ww-vc-trio.wdl:20:10: warning[SnakeCase]: input name `bedLocation` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L815"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:303:12: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `base_file_name`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+line_no = 838
+message = "ww-vc-trio.wdl:21:12: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_name`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L838"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:304:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `dbSNP_vcf`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+line_no = 856
+message = "ww-vc-trio.wdl:22:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_fasta`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L856"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:304:10: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+line_no = 875
+message = "ww-vc-trio.wdl:23:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_fasta_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L875"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:305:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `dbSNP_vcf_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+line_no = 900
+message = "ww-vc-trio.wdl:24:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_dict`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L900"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:305:10: warning[SnakeCase]: input name `dbSNP_vcf_index` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+line_no = 1139
+message = "ww-vc-trio.wdl:28:11: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_alt`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1139"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:306:17: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `known_indels_sites_VCFs`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+line_no = 1156
+message = "ww-vc-trio.wdl:29:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_amb`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1156"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:306:17: warning[SnakeCase]: input name `known_indels_sites_VCFs` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:307:17: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `known_indels_sites_indices`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:308:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `ref_dict`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:309:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `ref_fasta`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1173
 message = "ww-vc-trio.wdl:30:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_ann`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1173"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:310:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `ref_fasta_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:311:12: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1190
 message = "ww-vc-trio.wdl:31:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_bwt`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1190"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1207
 message = "ww-vc-trio.wdl:32:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_pac`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1207"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1224
 message = "ww-vc-trio.wdl:33:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `ref_sa`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1224"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:342:10: warning[SnakeCase]: output name `sortOrder` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1240
 message = "ww-vc-trio.wdl:34:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `dbSNP_vcf`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1240"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1240
 message = "ww-vc-trio.wdl:34:10: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1240"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:353:6: warning[SnakeCase]: task name `bcftoolsMpileup` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:355:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `input_bam`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:356:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `input_bam_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:357:12: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `base_file_name`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:358:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `sorted_bed`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:359:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `ref_dict`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1259
 message = "ww-vc-trio.wdl:35:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `dbSNP_vcf_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1259"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1259
 message = "ww-vc-trio.wdl:35:10: warning[SnakeCase]: input name `dbSNP_vcf_index` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1259"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:360:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `ref_fasta`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:361:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `ref_fasta_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:362:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `dbSNP_vcf`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:362:10: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:363:12: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1291
 message = "ww-vc-trio.wdl:36:17: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `known_indels_sites_VCFs`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1291"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1291
 message = "ww-vc-trio.wdl:36:17: warning[SnakeCase]: input name `known_indels_sites_VCFs` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1291"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1331
 message = "ww-vc-trio.wdl:37:17: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `known_indels_sites_indices`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1331"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1367
 message = "ww-vc-trio.wdl:38:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `af_only_gnomad`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1367"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:392:6: warning[SnakeCase]: task name `bedToolsQC` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:394:10: warning[MatchingParameterMeta]: task `bedToolsQC` is missing a parameter metadata key for input `input_bam`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:395:10: warning[MatchingParameterMeta]: task `bedToolsQC` is missing a parameter metadata key for input `bed_file`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:396:10: warning[MatchingParameterMeta]: task `bedToolsQC` is missing a parameter metadata key for input `genome_sort_order`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:397:12: warning[MatchingParameterMeta]: task `bedToolsQC` is missing a parameter metadata key for input `base_file_name`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:398:12: warning[MatchingParameterMeta]: task `bedToolsQC` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1391
 message = "ww-vc-trio.wdl:39:10: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `af_only_gnomad_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1391"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:409:10: warning[SnakeCase]: output name `meanQC` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1621
 message = "ww-vc-trio.wdl:41:12: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `annovar_protocols`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1621"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:420:6: warning[SnakeCase]: task name `BwaMem` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:422:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `input_fastq`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:423:12: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `base_file_name`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:424:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_fasta`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:425:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_fasta_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:426:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_dict`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:427:11: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_alt`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:428:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_amb`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:429:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_ann`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1650
 message = "ww-vc-trio.wdl:42:12: warning[MatchingParameterMeta]: workflow `ww_vc_trio` is missing a parameter metadata key for input `annovar_operation`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1650"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:430:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_bwt`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:431:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_pac`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:432:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_sa`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:433:9: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `threads`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:434:12: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:456:6: warning[SnakeCase]: task name `CollectHsMetrics` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:458:10: warning[MatchingParameterMeta]: task `CollectHsMetrics` is missing a parameter metadata key for input `input_bam`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:459:12: warning[MatchingParameterMeta]: task `CollectHsMetrics` is missing a parameter metadata key for input `base_file_name`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1689
 message = "ww-vc-trio.wdl:45:17: warning[SnakeCase]: private declaration name `batchInfo` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1689"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:460:10: warning[MatchingParameterMeta]: task `CollectHsMetrics` is missing a parameter metadata key for input `ref_fasta`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:461:10: warning[MatchingParameterMeta]: task `CollectHsMetrics` is missing a parameter metadata key for input `ref_fasta_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:462:10: warning[MatchingParameterMeta]: task `CollectHsMetrics` is missing a parameter metadata key for input `intervals`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:463:12: warning[MatchingParameterMeta]: task `CollectHsMetrics` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1792
 message = "ww-vc-trio.wdl:47:10: warning[SnakeCase]: private declaration name `GATKDocker` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1792"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:481:10: warning[SnakeCase]: output name `picardMetrics` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:482:10: warning[SnakeCase]: output name `picardPerTarget` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1846
 message = "ww-vc-trio.wdl:48:10: warning[SnakeCase]: private declaration name `bwaDocker` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1846"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:492:6: warning[SnakeCase]: task name `consensusProcessingR` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:494:10: warning[MatchingParameterMeta]: task `consensusProcessingR` is missing a parameter metadata key for input `GATKVars`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:494:10: warning[SnakeCase]: input name `GATKVars` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:495:10: warning[MatchingParameterMeta]: task `consensusProcessingR` is missing a parameter metadata key for input `SAMVars`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:495:10: warning[SnakeCase]: input name `SAMVars` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:496:10: warning[MatchingParameterMeta]: task `consensusProcessingR` is missing a parameter metadata key for input `MutectVars`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:496:10: warning[SnakeCase]: input name `MutectVars` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:497:12: warning[MatchingParameterMeta]: task `consensusProcessingR` is missing a parameter metadata key for input `base_file_name`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:498:12: warning[MatchingParameterMeta]: task `consensusProcessingR` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1897
 message = "ww-vc-trio.wdl:49:10: warning[SnakeCase]: private declaration name `bedtoolsDocker` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1897"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1948
 message = "ww-vc-trio.wdl:49:61: warning[Whitespace]: line contains trailing whitespace"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1948"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:507:10: warning[SnakeCase]: output name `consensusTSV` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 1959
 message = "ww-vc-trio.wdl:50:10: warning[SnakeCase]: private declaration name `bcftoolsDocker` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L1959"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:518:6: warning[SnakeCase]: task name `HaplotypeCaller` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 2018
 message = "ww-vc-trio.wdl:51:10: warning[SnakeCase]: private declaration name `annovarDocker` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L2018"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:520:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `input_bam`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:521:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `input_bam_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:522:12: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `base_file_name`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:523:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `intervals`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:524:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `ref_dict`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:525:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `ref_fasta`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:526:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `ref_fasta_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:527:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `dbSNP_vcf`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:527:10: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:528:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `dbSNP_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:528:10: warning[SnakeCase]: input name `dbSNP_index` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:529:12: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 2082
 message = "ww-vc-trio.wdl:52:10: warning[SnakeCase]: private declaration name `RDocker` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L2082"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 2134
 message = "ww-vc-trio.wdl:54:7: warning[SnakeCase]: private declaration name `bwaThreads` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L2134"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:558:6: warning[SnakeCase]: task name `MergeBamAlignment` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:560:10: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `unmapped_bam`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:561:10: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `aligned_bam`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:562:12: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `base_file_name`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:563:10: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `ref_fasta`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:564:10: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `ref_fasta_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:565:10: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `ref_dict`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:566:12: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:596:6: warning[SnakeCase]: task name `Mutect2TumorOnly` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:598:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `input_bam`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:599:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `input_bam_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:600:12: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `base_file_name`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:601:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `intervals`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:602:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `ref_dict`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:603:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `ref_fasta`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:604:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `ref_fasta_index`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:605:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `genomeReference`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:605:10: warning[SnakeCase]: input name `genomeReference` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:606:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `genomeReferenceIndex`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:606:10: warning[SnakeCase]: input name `genomeReferenceIndex` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:607:12: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:643:6: warning[SnakeCase]: task name `SamToFastq` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:645:10: warning[MatchingParameterMeta]: task `SamToFastq` is missing a parameter metadata key for input `input_bam`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:646:12: warning[MatchingParameterMeta]: task `SamToFastq` is missing a parameter metadata key for input `base_file_name`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:647:12: warning[MatchingParameterMeta]: task `SamToFastq` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 2350
 message = "ww-vc-trio.wdl:64:12: warning[SnakeCase]: private declaration name `sampleName` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L2350"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 2396
 message = "ww-vc-trio.wdl:65:12: warning[SnakeCase]: private declaration name `molecularID` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L2396"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 2436
 message = "ww-vc-trio.wdl:66:10: warning[SnakeCase]: private declaration name `sampleBam` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L2436"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:680:6: warning[SnakeCase]: task name `SortBed` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:682:10: warning[MatchingParameterMeta]: task `SortBed` is missing a parameter metadata key for input `unsorted_bed`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:683:10: warning[MatchingParameterMeta]: task `SortBed` is missing a parameter metadata key for input `ref_dict`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:684:12: warning[MatchingParameterMeta]: task `SortBed` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:709:6: warning[SnakeCase]: task name `MarkDuplicates` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:711:10: warning[MatchingParameterMeta]: task `MarkDuplicates` is missing a parameter metadata key for input `input_bam`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:712:12: warning[MatchingParameterMeta]: task `MarkDuplicates` is missing a parameter metadata key for input `output_bam_basename`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:713:12: warning[MatchingParameterMeta]: task `MarkDuplicates` is missing a parameter metadata key for input `metrics_filename`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:714:12: warning[MatchingParameterMeta]: task `MarkDuplicates` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:745:6: warning[SnakeCase]: task name `SortSam` is not snake_case"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:747:10: warning[MatchingParameterMeta]: task `SortSam` is missing a parameter metadata key for input `input_bam`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:748:12: warning[MatchingParameterMeta]: task `SortSam` is missing a parameter metadata key for input `base_file_name`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:749:12: warning[MatchingParameterMeta]: task `SortSam` is missing a parameter metadata key for input `docker`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:771:2: warning[EndingNewline]: multiple empty lines at the end of file"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 3269
 message = "ww-vc-trio.wdl:96:1: warning[Whitespace]: line contains only whitespace"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L3269"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 4611
+message = "ww-vc-trio.wdl:136:13: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L4611"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 4893
+message = "ww-vc-trio.wdl:145:13: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L4893"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 7153
+message = "ww-vc-trio.wdl:217:1: warning[Whitespace]: line contains only whitespace"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L7153"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 7903
+message = "ww-vc-trio.wdl:240:76: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L7903"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 7997
+message = "ww-vc-trio.wdl:242:17: warning[SnakeCase]: output name `GATK_vcf` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L7997"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8051
+message = "ww-vc-trio.wdl:243:17: warning[SnakeCase]: output name `SAM_vcf` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8051"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8104
+message = "ww-vc-trio.wdl:244:17: warning[SnakeCase]: output name `Mutect_Vcf` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8104"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8161
+message = "ww-vc-trio.wdl:245:17: warning[SnakeCase]: output name `Mutect_VcfIndex` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8161"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8229
+message = "ww-vc-trio.wdl:246:17: warning[SnakeCase]: output name `Mutect_AnnotatedVcf` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8229"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8303
+message = "ww-vc-trio.wdl:247:17: warning[SnakeCase]: output name `Mutect_AnnotatedTable` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8303"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8381
+message = "ww-vc-trio.wdl:248:17: warning[SnakeCase]: output name `GATK_annotated_vcf` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8381"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8457
+message = "ww-vc-trio.wdl:249:17: warning[SnakeCase]: output name `GATK_annotated` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8457"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8531
+message = "ww-vc-trio.wdl:250:17: warning[SnakeCase]: output name `SAM_annotated_vcf` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8531"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8600
+message = "ww-vc-trio.wdl:251:17: warning[SnakeCase]: output name `SAM_annotated` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8600"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8667
+message = "ww-vc-trio.wdl:252:17: warning[SnakeCase]: output name `panelQC` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8667"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8711
+message = "ww-vc-trio.wdl:253:17: warning[SnakeCase]: output name `PicardQC` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8711"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8769
+message = "ww-vc-trio.wdl:254:17: warning[SnakeCase]: output name `PicardQCpertarget` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8769"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8838
+message = "ww-vc-trio.wdl:255:17: warning[SnakeCase]: output name `consensusVariants` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8838"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 8995
+message = "ww-vc-trio.wdl:264:10: warning[MatchingParameterMeta]: task `annovar` is missing a parameter metadata key for input `input_vcf`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L8995"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 9016
+message = "ww-vc-trio.wdl:265:12: warning[MatchingParameterMeta]: task `annovar` is missing a parameter metadata key for input `ref_name`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L9016"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 9036
+message = "ww-vc-trio.wdl:266:12: warning[MatchingParameterMeta]: task `annovar` is missing a parameter metadata key for input `annovar_protocols`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L9036"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 9065
+message = "ww-vc-trio.wdl:267:12: warning[MatchingParameterMeta]: task `annovar` is missing a parameter metadata key for input `annovar_operation`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L9065"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 9094
+message = "ww-vc-trio.wdl:268:12: warning[MatchingParameterMeta]: task `annovar` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L9094"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10015
+message = "ww-vc-trio.wdl:298:6: warning[SnakeCase]: task name `ApplyBaseRecalibrator` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10015"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10058
+message = "ww-vc-trio.wdl:300:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `input_bam`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10058"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10077
+message = "ww-vc-trio.wdl:301:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `intervals`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10077"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10086
+message = "ww-vc-trio.wdl:301:19: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10086"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10097
+message = "ww-vc-trio.wdl:302:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `input_bam_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10097"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10124
+message = "ww-vc-trio.wdl:303:12: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `base_file_name`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10124"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10148
+message = "ww-vc-trio.wdl:304:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `dbSNP_vcf`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10148"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10148
+message = "ww-vc-trio.wdl:304:10: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10148"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10167
+message = "ww-vc-trio.wdl:305:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `dbSNP_vcf_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10167"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10167
+message = "ww-vc-trio.wdl:305:10: warning[SnakeCase]: input name `dbSNP_vcf_index` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10167"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10199
+message = "ww-vc-trio.wdl:306:17: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `known_indels_sites_VCFs`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10199"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10199
+message = "ww-vc-trio.wdl:306:17: warning[SnakeCase]: input name `known_indels_sites_VCFs` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10199"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10239
+message = "ww-vc-trio.wdl:307:17: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `known_indels_sites_indices`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10239"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10275
+message = "ww-vc-trio.wdl:308:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `ref_dict`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10275"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10293
+message = "ww-vc-trio.wdl:309:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `ref_fasta`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10293"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10312
+message = "ww-vc-trio.wdl:310:10: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `ref_fasta_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10312"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 10339
+message = "ww-vc-trio.wdl:311:12: warning[MatchingParameterMeta]: task `ApplyBaseRecalibrator` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L10339"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 11391
+message = "ww-vc-trio.wdl:342:10: warning[SnakeCase]: output name `sortOrder` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L11391"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 11551
+message = "ww-vc-trio.wdl:353:6: warning[SnakeCase]: task name `bcftoolsMpileup` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L11551"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 11588
+message = "ww-vc-trio.wdl:355:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `input_bam`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L11588"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 11607
+message = "ww-vc-trio.wdl:356:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `input_bam_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L11607"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 11634
+message = "ww-vc-trio.wdl:357:12: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `base_file_name`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L11634"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 11658
+message = "ww-vc-trio.wdl:358:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `sorted_bed`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L11658"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 11678
+message = "ww-vc-trio.wdl:359:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `ref_dict`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L11678"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 11696
+message = "ww-vc-trio.wdl:360:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `ref_fasta`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L11696"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 11715
+message = "ww-vc-trio.wdl:361:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `ref_fasta_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L11715"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 11740
+message = "ww-vc-trio.wdl:362:10: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `dbSNP_vcf`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L11740"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 11740
+message = "ww-vc-trio.wdl:362:10: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L11740"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 11761
+message = "ww-vc-trio.wdl:363:12: warning[MatchingParameterMeta]: task `bcftoolsMpileup` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L11761"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12313
+message = "ww-vc-trio.wdl:392:6: warning[SnakeCase]: task name `bedToolsQC` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12313"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12345
+message = "ww-vc-trio.wdl:394:10: warning[MatchingParameterMeta]: task `bedToolsQC` is missing a parameter metadata key for input `input_bam`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12345"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12364
+message = "ww-vc-trio.wdl:395:10: warning[MatchingParameterMeta]: task `bedToolsQC` is missing a parameter metadata key for input `bed_file`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12364"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12382
+message = "ww-vc-trio.wdl:396:10: warning[MatchingParameterMeta]: task `bedToolsQC` is missing a parameter metadata key for input `genome_sort_order`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12382"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12411
+message = "ww-vc-trio.wdl:397:12: warning[MatchingParameterMeta]: task `bedToolsQC` is missing a parameter metadata key for input `base_file_name`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12411"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12437
+message = "ww-vc-trio.wdl:398:12: warning[MatchingParameterMeta]: task `bedToolsQC` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12437"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12750
+message = "ww-vc-trio.wdl:409:10: warning[SnakeCase]: output name `meanQC` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12750"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12894
+message = "ww-vc-trio.wdl:420:6: warning[SnakeCase]: task name `BwaMem` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12894"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12922
+message = "ww-vc-trio.wdl:422:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `input_fastq`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12922"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12945
+message = "ww-vc-trio.wdl:423:12: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `base_file_name`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12945"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12969
+message = "ww-vc-trio.wdl:424:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_fasta`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12969"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 12988
+message = "ww-vc-trio.wdl:425:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_fasta_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L12988"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13013
+message = "ww-vc-trio.wdl:426:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_dict`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13013"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13032
+message = "ww-vc-trio.wdl:427:11: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_alt`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13032"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13049
+message = "ww-vc-trio.wdl:428:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_amb`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13049"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13066
+message = "ww-vc-trio.wdl:429:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_ann`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13066"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13083
+message = "ww-vc-trio.wdl:430:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_bwt`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13083"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13100
+message = "ww-vc-trio.wdl:431:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_pac`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13100"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13117
+message = "ww-vc-trio.wdl:432:10: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `ref_sa`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13117"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13132
+message = "ww-vc-trio.wdl:433:9: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `threads`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13132"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13151
+message = "ww-vc-trio.wdl:434:12: warning[MatchingParameterMeta]: task `BwaMem` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13151"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13548
+message = "ww-vc-trio.wdl:456:6: warning[SnakeCase]: task name `CollectHsMetrics` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13548"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13586
+message = "ww-vc-trio.wdl:458:10: warning[MatchingParameterMeta]: task `CollectHsMetrics` is missing a parameter metadata key for input `input_bam`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13586"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13607
+message = "ww-vc-trio.wdl:459:12: warning[MatchingParameterMeta]: task `CollectHsMetrics` is missing a parameter metadata key for input `base_file_name`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13607"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13631
+message = "ww-vc-trio.wdl:460:10: warning[MatchingParameterMeta]: task `CollectHsMetrics` is missing a parameter metadata key for input `ref_fasta`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13631"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13650
+message = "ww-vc-trio.wdl:461:10: warning[MatchingParameterMeta]: task `CollectHsMetrics` is missing a parameter metadata key for input `ref_fasta_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13650"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13675
+message = "ww-vc-trio.wdl:462:10: warning[MatchingParameterMeta]: task `CollectHsMetrics` is missing a parameter metadata key for input `intervals`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13675"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 13696
+message = "ww-vc-trio.wdl:463:12: warning[MatchingParameterMeta]: task `CollectHsMetrics` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L13696"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14180
+message = "ww-vc-trio.wdl:481:10: warning[SnakeCase]: output name `picardMetrics` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14180"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14244
+message = "ww-vc-trio.wdl:482:10: warning[SnakeCase]: output name `picardPerTarget` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14244"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14382
+message = "ww-vc-trio.wdl:492:6: warning[SnakeCase]: task name `consensusProcessingR` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14382"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14424
+message = "ww-vc-trio.wdl:494:10: warning[MatchingParameterMeta]: task `consensusProcessingR` is missing a parameter metadata key for input `GATKVars`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14424"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14424
+message = "ww-vc-trio.wdl:494:10: warning[SnakeCase]: input name `GATKVars` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14424"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14442
+message = "ww-vc-trio.wdl:495:10: warning[MatchingParameterMeta]: task `consensusProcessingR` is missing a parameter metadata key for input `SAMVars`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14442"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14442
+message = "ww-vc-trio.wdl:495:10: warning[SnakeCase]: input name `SAMVars` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14442"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14459
+message = "ww-vc-trio.wdl:496:10: warning[MatchingParameterMeta]: task `consensusProcessingR` is missing a parameter metadata key for input `MutectVars`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14459"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14459
+message = "ww-vc-trio.wdl:496:10: warning[SnakeCase]: input name `MutectVars` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14459"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14481
+message = "ww-vc-trio.wdl:497:12: warning[MatchingParameterMeta]: task `consensusProcessingR` is missing a parameter metadata key for input `base_file_name`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14481"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14507
+message = "ww-vc-trio.wdl:498:12: warning[MatchingParameterMeta]: task `consensusProcessingR` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14507"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14683
+message = "ww-vc-trio.wdl:507:10: warning[SnakeCase]: output name `consensusTSV` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14683"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14839
+message = "ww-vc-trio.wdl:518:6: warning[SnakeCase]: task name `HaplotypeCaller` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14839"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14876
+message = "ww-vc-trio.wdl:520:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `input_bam`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14876"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14895
+message = "ww-vc-trio.wdl:521:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `input_bam_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14895"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14922
+message = "ww-vc-trio.wdl:522:12: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `base_file_name`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14922"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14946
+message = "ww-vc-trio.wdl:523:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `intervals`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14946"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14965
+message = "ww-vc-trio.wdl:524:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `ref_dict`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14965"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 14983
+message = "ww-vc-trio.wdl:525:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `ref_fasta`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L14983"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15002
+message = "ww-vc-trio.wdl:526:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `ref_fasta_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15002"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15027
+message = "ww-vc-trio.wdl:527:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `dbSNP_vcf`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15027"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15027
+message = "ww-vc-trio.wdl:527:10: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15027"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15046
+message = "ww-vc-trio.wdl:528:10: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `dbSNP_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15046"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15046
+message = "ww-vc-trio.wdl:528:10: warning[SnakeCase]: input name `dbSNP_index` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15046"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15069
+message = "ww-vc-trio.wdl:529:12: warning[MatchingParameterMeta]: task `HaplotypeCaller` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15069"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15675
+message = "ww-vc-trio.wdl:558:6: warning[SnakeCase]: task name `MergeBamAlignment` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15675"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15714
+message = "ww-vc-trio.wdl:560:10: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `unmapped_bam`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15714"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15736
+message = "ww-vc-trio.wdl:561:10: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `aligned_bam`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15736"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15759
+message = "ww-vc-trio.wdl:562:12: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `base_file_name`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15759"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15783
+message = "ww-vc-trio.wdl:563:10: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `ref_fasta`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15783"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15802
+message = "ww-vc-trio.wdl:564:10: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `ref_fasta_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15802"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15827
+message = "ww-vc-trio.wdl:565:10: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `ref_dict`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15827"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 15847
+message = "ww-vc-trio.wdl:566:12: warning[MatchingParameterMeta]: task `MergeBamAlignment` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L15847"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 16496
+message = "ww-vc-trio.wdl:596:6: warning[SnakeCase]: task name `Mutect2TumorOnly` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L16496"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 16534
+message = "ww-vc-trio.wdl:598:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `input_bam`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L16534"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 16553
+message = "ww-vc-trio.wdl:599:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `input_bam_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L16553"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 16580
+message = "ww-vc-trio.wdl:600:12: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `base_file_name`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L16580"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 16604
+message = "ww-vc-trio.wdl:601:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `intervals`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L16604"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 16623
+message = "ww-vc-trio.wdl:602:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `ref_dict`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L16623"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 16641
+message = "ww-vc-trio.wdl:603:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `ref_fasta`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L16641"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 16660
+message = "ww-vc-trio.wdl:604:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `ref_fasta_index`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L16660"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 16685
+message = "ww-vc-trio.wdl:605:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `genomeReference`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L16685"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 16685
+message = "ww-vc-trio.wdl:605:10: warning[SnakeCase]: input name `genomeReference` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L16685"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 16710
+message = "ww-vc-trio.wdl:606:10: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `genomeReferenceIndex`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L16710"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 16710
+message = "ww-vc-trio.wdl:606:10: warning[SnakeCase]: input name `genomeReferenceIndex` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L16710"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 16742
+message = "ww-vc-trio.wdl:607:12: warning[MatchingParameterMeta]: task `Mutect2TumorOnly` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L16742"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 17594
+message = "ww-vc-trio.wdl:643:6: warning[SnakeCase]: task name `SamToFastq` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L17594"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 17626
+message = "ww-vc-trio.wdl:645:10: warning[MatchingParameterMeta]: task `SamToFastq` is missing a parameter metadata key for input `input_bam`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L17626"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 17647
+message = "ww-vc-trio.wdl:646:12: warning[MatchingParameterMeta]: task `SamToFastq` is missing a parameter metadata key for input `base_file_name`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L17647"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 17673
+message = "ww-vc-trio.wdl:647:12: warning[MatchingParameterMeta]: task `SamToFastq` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L17673"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 18458
+message = "ww-vc-trio.wdl:680:6: warning[SnakeCase]: task name `SortBed` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L18458"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 18487
+message = "ww-vc-trio.wdl:682:10: warning[MatchingParameterMeta]: task `SortBed` is missing a parameter metadata key for input `unsorted_bed`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L18487"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 18509
+message = "ww-vc-trio.wdl:683:10: warning[MatchingParameterMeta]: task `SortBed` is missing a parameter metadata key for input `ref_dict`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L18509"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 18529
+message = "ww-vc-trio.wdl:684:12: warning[MatchingParameterMeta]: task `SortBed` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L18529"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 19016
+message = "ww-vc-trio.wdl:709:6: warning[SnakeCase]: task name `MarkDuplicates` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L19016"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 19052
+message = "ww-vc-trio.wdl:711:10: warning[MatchingParameterMeta]: task `MarkDuplicates` is missing a parameter metadata key for input `input_bam`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L19052"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 19073
+message = "ww-vc-trio.wdl:712:12: warning[MatchingParameterMeta]: task `MarkDuplicates` is missing a parameter metadata key for input `output_bam_basename`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L19073"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 19104
+message = "ww-vc-trio.wdl:713:12: warning[MatchingParameterMeta]: task `MarkDuplicates` is missing a parameter metadata key for input `metrics_filename`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L19104"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 19132
+message = "ww-vc-trio.wdl:714:12: warning[MatchingParameterMeta]: task `MarkDuplicates` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L19132"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 20184
+message = "ww-vc-trio.wdl:745:6: warning[SnakeCase]: task name `SortSam` is not snake_case"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L20184"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 20213
+message = "ww-vc-trio.wdl:747:10: warning[MatchingParameterMeta]: task `SortSam` is missing a parameter metadata key for input `input_bam`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L20213"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 20234
+message = "ww-vc-trio.wdl:748:12: warning[MatchingParameterMeta]: task `SortSam` is missing a parameter metadata key for input `base_file_name`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L20234"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 20260
+message = "ww-vc-trio.wdl:749:12: warning[MatchingParameterMeta]: task `SortSam` is missing a parameter metadata key for input `docker`"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L20260"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+line_no = 20671
+message = "ww-vc-trio.wdl:771:2: warning[EndingNewline]: multiple empty lines at the end of file"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L20671"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2222
 message = "read_group.wdl:32:12: warning[SnakeCase]: struct member name `ID` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2222"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2237
 message = "read_group.wdl:33:13: warning[SnakeCase]: struct member name `BC` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2237"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2252
 message = "read_group.wdl:34:13: warning[SnakeCase]: struct member name `CN` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2252"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2267
 message = "read_group.wdl:35:13: warning[SnakeCase]: struct member name `DS` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2267"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2282
 message = "read_group.wdl:36:13: warning[SnakeCase]: struct member name `DT` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2282"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2297
 message = "read_group.wdl:37:13: warning[SnakeCase]: struct member name `FO` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2297"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2312
 message = "read_group.wdl:38:13: warning[SnakeCase]: struct member name `KS` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2312"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2327
 message = "read_group.wdl:39:13: warning[SnakeCase]: struct member name `LB` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2327"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2342
 message = "read_group.wdl:40:13: warning[SnakeCase]: struct member name `PG` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2342"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2354
 message = "read_group.wdl:41:10: warning[SnakeCase]: struct member name `PI` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2354"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2369
 message = "read_group.wdl:42:13: warning[SnakeCase]: struct member name `PL` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2369"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2384
 message = "read_group.wdl:43:13: warning[SnakeCase]: struct member name `PM` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2384"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2399
 message = "read_group.wdl:44:13: warning[SnakeCase]: struct member name `PU` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2399"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+line_no = 2414
 message = "read_group.wdl:45:13: warning[SnakeCase]: struct member name `SM` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2414"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
+line_no = 4235
 message = "gatk4.wdl:107:14: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L4235"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
+line_no = 4258
 message = "gatk4.wdl:108:14: warning[SnakeCase]: input name `dbSNP_vcf_index` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L4258"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
+line_no = 9685
 message = "gatk4.wdl:249:14: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L9685"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
+line_no = 9708
 message = "gatk4.wdl:250:14: warning[SnakeCase]: input name `dbSNP_vcf_index` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L9708"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:552:13: warning[SnakeCase]: input name `out_QS_conversion_add` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:553:13: warning[SnakeCase]: input name `out_sam_attr_IH_start` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:555:13: warning[SnakeCase]: input name `out_sam_flag_OR` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:556:13: warning[SnakeCase]: input name `out_sam_flag_AND` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:564:13: warning[SnakeCase]: input name `score_gap_GCAG` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:565:13: warning[SnakeCase]: input name `score_gap_ATAC` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:597:13: warning[SnakeCase]: input name `chim_score_junction_nonGTAG` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
+line_no = 3469
 message = "star.wdl:61:13: warning[SnakeCase]: input name `genome_SA_index_n_bases` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L3469"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
+line_no = 3510
 message = "star.wdl:62:13: warning[SnakeCase]: input name `genome_SA_sparse_d` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L3510"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
+line_no = 34129
+message = "star.wdl:552:13: warning[SnakeCase]: input name `out_QS_conversion_add` is not snake_case"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L34129"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+line_no = 34167
+message = "star.wdl:553:13: warning[SnakeCase]: input name `out_sam_attr_IH_start` is not snake_case"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L34167"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+line_no = 34243
+message = "star.wdl:555:13: warning[SnakeCase]: input name `out_sam_flag_OR` is not snake_case"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L34243"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+line_no = 34275
+message = "star.wdl:556:13: warning[SnakeCase]: input name `out_sam_flag_AND` is not snake_case"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L34275"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+line_no = 34584
+message = "star.wdl:564:13: warning[SnakeCase]: input name `score_gap_GCAG` is not snake_case"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L34584"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+line_no = 34616
+message = "star.wdl:565:13: warning[SnakeCase]: input name `score_gap_ATAC` is not snake_case"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L34616"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+line_no = 35830
+message = "star.wdl:597:13: warning[SnakeCase]: input name `chim_score_junction_nonGTAG` is not snake_case"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L35830"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+line_no = 46663
 message = "star.wdl:818:9: warning[SnakeCase]: struct member name `GT_AG_and_CT_AC_motif` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L46663"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
+line_no = 46693
 message = "star.wdl:819:9: warning[SnakeCase]: struct member name `GC_AG_and_CT_GC_motif` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L46693"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
+line_no = 46723
 message = "star.wdl:820:9: warning[SnakeCase]: struct member name `AT_AC_and_GT_AT_motif` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L46723"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:101:15: warning[SnakeCase]: output name `dbSNP_vcf` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:102:15: warning[SnakeCase]: output name `dbSNP_vcf_index` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+line_no = 1882
 message = "gatk-reference.wdl:40:16: warning[SnakeCase]: input name `dbSNP_vcf_url` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl/#L1882"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+line_no = 1911
 message = "gatk-reference.wdl:41:16: warning[SnakeCase]: input name `dbSNP_vcf_name` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl/#L1911"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+line_no = 1942
 message = "gatk-reference.wdl:42:17: warning[SnakeCase]: input name `dbSNP_vcf_index_url` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl/#L1942"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+line_no = 1978
 message = "gatk-reference.wdl:43:17: warning[SnakeCase]: input name `dbSNP_vcf_index_name` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl/#L1978"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+line_no = 3687
+message = "gatk-reference.wdl:101:15: warning[SnakeCase]: output name `dbSNP_vcf` is not snake_case"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl/#L3687"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+line_no = 3735
+message = "gatk-reference.wdl:102:15: warning[SnakeCase]: output name `dbSNP_vcf_index` is not snake_case"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl/#L3735"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+line_no = 7618
 message = "rnaseq-core.wdl:138:13: warning[SnakeCase]: input name `chim_score_junction_nonGTAG` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/rnaseq/rnaseq-core.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/rnaseq/rnaseq-core.wdl/#L7618"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+line_no = 1862
 message = "rnaseq-variant-calling.wdl:42:14: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/rnaseq/rnaseq-variant-calling.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/rnaseq/rnaseq-variant-calling.wdl/#L1862"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+line_no = 1885
 message = "rnaseq-variant-calling.wdl:43:14: warning[SnakeCase]: input name `dbSNP_vcf_index` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/rnaseq/rnaseq-variant-calling.wdl"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/rnaseq/rnaseq-variant-calling.wdl/#L1885"
