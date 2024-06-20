@@ -228,12 +228,13 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                         .context("failed to write diagnostic")?;
 
                     assert!(
-                        actual.insert(
+                        actual.insert((
+                            diagnostic.labels().next().map(|l| l.span().start()),
                             std::str::from_utf8(buffer.as_slice())
                                 .context("diagnostic should be UTF-8")?
                                 .trim()
                                 .to_string()
-                        )
+                        ))
                     );
                 }
             }
@@ -241,14 +242,13 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             // As the list of diagnostics has been sorted by document identifier, do
             // a binary search and collect the matching messages
             let diagnostics = config.inner().diagnostics();
-            let doc_id = document_identifier.to_string();
-            let expected: IndexSet<String> = diagnostics
-                .binary_search_by_key(&doc_id, |d| d.document().to_string())
+            let expected: IndexSet<(Option<usize>, String)> = diagnostics
+                .binary_search_by_key(&document_identifier, |d| d.document().clone())
                 .map(|mut start_index| {
                     // As binary search may return any matching index, back up until we find the
                     // start of the range
                     for i in (0..start_index).rev() {
-                        if diagnostics[i].document().to_string() != doc_id {
+                        if diagnostics[i].document() != &document_identifier {
                             break;
                         }
 
@@ -258,8 +258,11 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                     diagnostics[start_index..]
                         .iter()
                         .map_while(|d| {
-                            if d.document().to_string() == doc_id {
-                                Some(d.message().to_string())
+                            if d.document() == &document_identifier {
+                                Some((
+                                    d.line_no(),
+                                    d.message().to_string())
+                                )
                             } else {
                                 None
                             }
@@ -335,18 +338,20 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             continue;
         }
 
-        for message in messages {
+        let hash = config
+            .inner()
+            .repositories()
+            .get(identifier.repository())
+            .unwrap()
+            .commit_hash()
+            .clone()
+            .unwrap();
+        for (line_no, message) in messages {
             diagnostics.push(config::inner::Diagnostic::new(
                 identifier.clone(),
                 message,
-                config
-                    .inner()
-                    .repositories()
-                    .get(&identifier.repository().clone())
-                    .unwrap()
-                    .commit_hash()
-                    .clone()
-                    .unwrap(),
+                hash.clone(),
+                line_no,
             ));
         }
     }

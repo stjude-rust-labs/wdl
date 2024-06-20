@@ -18,6 +18,8 @@ use crate::repository::RawHash;
 pub struct Diagnostic {
     /// The identifier of the document containing the diagnostic.
     document: document::Identifier,
+    /// The line number of the diagnostic.
+    line_no: Option<usize>,
     /// The short-form diagnostic message.
     message: String,
     /// Permalink to the source of the diagnostic.
@@ -26,15 +28,26 @@ pub struct Diagnostic {
 
 impl Diagnostic {
     /// Creates a new diagnostic for the given document identifier and message.
-    pub fn new(document: document::Identifier, message: String, hash: RawHash) -> Self {
+    pub fn new(
+        document: document::Identifier,
+        message: String,
+        hash: RawHash,
+        line_no: Option<usize>,
+    ) -> Self {
         let url = format!(
             "https://github.com/{}/blob/{}{}",
             document.repository(),
             hash,
             document.path()
         );
+        let url = if let Some(line_no) = line_no {
+            format!("{}/#L{}", url, line_no)
+        } else {
+            url
+        };
         Self {
             document,
+            line_no,
             message,
             permalink: Some(url),
         }
@@ -48,6 +61,16 @@ impl Diagnostic {
     /// Gets the diagnostic message.
     pub fn message(&self) -> &str {
         &self.message
+    }
+
+    /// Gets the line number of the diagnostic.
+    pub fn line_no(&self) -> Option<usize> {
+        self.line_no
+    }
+
+    /// Gets the permalink to the source of the diagnostic.
+    pub fn permalink(&self) -> Option<&str> {
+        self.permalink.as_deref()
     }
 }
 
