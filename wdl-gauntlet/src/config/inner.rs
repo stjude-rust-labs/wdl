@@ -70,8 +70,8 @@ impl Diagnostic {
     /// If the line number can't be parsed, it defaults to 1.
     pub fn line_no(&self) -> usize {
         self.permalink
-            .rsplitn(2, '#')
-            .nth(1)
+            .rsplit_once('#')
+            .map(|x| x.1)
             .get_or_insert("1")
             .parse::<usize>()
             .unwrap_or(1)
