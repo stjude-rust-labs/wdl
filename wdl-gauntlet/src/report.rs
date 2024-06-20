@@ -16,14 +16,14 @@ pub struct UnmatchedStatus {
     ///
     /// These are the diagnostics that were in the config but were not
     /// emitted by the parser/validator.
-    pub missing: IndexSet<(Option<usize>, String)>,
+    pub missing: IndexSet<(String, usize)>,
     /// The unexpected set of diagnostics.
     ///
     /// These are the diagnostics that were not in the configuration but
     /// were emitted by the parser/validator.
-    pub unexpected: IndexSet<(Option<usize>, String)>,
+    pub unexpected: IndexSet<(String, usize)>,
     /// The set of all diagnostics that were emitted.
-    pub all: IndexSet<(Option<usize>, String)>,
+    pub all: IndexSet<(String, usize)>,
 }
 
 /// The status of a single parsing test.
@@ -36,7 +36,7 @@ pub enum Status {
     /// The document had diagnostics, but the diagnostics exactly matched what
     /// was already expected in the configuration, meaning that this
     /// [`Status`] is considered successful.
-    DiagnosticsMatched(IndexSet<(Option<usize>, String)>),
+    DiagnosticsMatched(IndexSet<(String, usize)>),
 
     /// The document had diagnostics, but they did not match what was expected
     /// in the configuration.
@@ -222,11 +222,11 @@ impl<T: std::io::Write> Report<T> {
 
             writeln!(self.inner, "{id}", id = id.path().italic())?;
 
-            for (_, diagnostic) in &status.unexpected {
+            for (diagnostic, _) in &status.unexpected {
                 writeln!(self.inner, "❌ {diagnostic}")?;
             }
 
-            for (_, diagnostic) in &status.missing {
+            for (diagnostic, _) in &status.missing {
                 writeln!(self.inner, "🔄️ {diagnostic}")?;
             }
         }
