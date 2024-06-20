@@ -18,12 +18,11 @@ use crate::repository::RawHash;
 pub struct Diagnostic {
     /// The identifier of the document containing the diagnostic.
     document: document::Identifier,
-    /// The line number of the diagnostic.
-    line_no: Option<usize>,
     /// The short-form diagnostic message.
     message: String,
     /// Permalink to the source of the diagnostic.
-    permalink: Option<String>,
+    #[serde(default)]
+    permalink: String,
 }
 
 impl Diagnostic {
@@ -47,9 +46,8 @@ impl Diagnostic {
         };
         Self {
             document,
-            line_no,
             message,
-            permalink: Some(url),
+            permalink: url,
         }
     }
 
@@ -63,14 +61,20 @@ impl Diagnostic {
         &self.message
     }
 
-    /// Gets the line number of the diagnostic.
-    pub fn line_no(&self) -> Option<usize> {
-        self.line_no
+    /// Gets the permalink to the source of the diagnostic.
+    pub fn permalink(&self) -> &str {
+        &self.permalink
     }
 
-    /// Gets the permalink to the source of the diagnostic.
-    pub fn permalink(&self) -> Option<&str> {
-        self.permalink.as_deref()
+    /// Gets the line number of the diagnostic.
+    /// If the line number can't be parsed, it defaults to 1.
+    pub fn line_no(&self) -> usize {
+        self.permalink
+            .rsplitn(2, '#')
+            .nth(1)
+            .get_or_insert("1")
+            .parse::<usize>()
+            .unwrap_or(1)
     }
 }
 

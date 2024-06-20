@@ -15,6 +15,7 @@ use std::time::Instant;
 use anyhow::Context;
 use anyhow::Result;
 use clap::Parser;
+use codespan_reporting::files::Files;
 use codespan_reporting::files::SimpleFile;
 use codespan_reporting::term;
 use codespan_reporting::term::termcolor::Buffer;
@@ -227,13 +228,20 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                     term::emit(&mut buffer, &config, &file, &diagnostic.to_codespan())
                         .context("failed to write diagnostic")?;
 
+                    let byte_start = diagnostic
+                        .labels()
+                        .next()
+                        .map(|l| l.span().start())
+                        .unwrap_or_default();
+                    // The `+1` here is magic.
+                    let line_no = file.line_index((), byte_start).unwrap_or_default() + 1;
                     assert!(
                         actual.insert((
-                            diagnostic.labels().next().map(|l| l.span().start()),
                             std::str::from_utf8(buffer.as_slice())
                                 .context("diagnostic should be UTF-8")?
                                 .trim()
-                                .to_string()
+                                .to_string(),
+                            line_no
                         ))
                     );
                 }
@@ -242,7 +250,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             // As the list of diagnostics has been sorted by document identifier, do
             // a binary search and collect the matching messages
             let diagnostics = config.inner().diagnostics();
-            let expected: IndexSet<(Option<usize>, String)> = diagnostics
+            let expected: IndexSet<(String, usize)> = diagnostics
                 .binary_search_by_key(&document_identifier, |d| d.document().clone())
                 .map(|mut start_index| {
                     // As binary search may return any matching index, back up until we find the
@@ -259,7 +267,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                         .iter()
                         .map_while(|d| {
                             if d.document() == &document_identifier {
-                                Some((d.line_no(), d.message().to_string()))
+                                Some((d.message().to_string(), d.line_no()))
                             } else {
                                 None
                             }
@@ -343,12 +351,12 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             .commit_hash()
             .clone()
             .unwrap();
-        for (line_no, message) in messages {
+        for (message, line_no) in messages {
             diagnostics.push(config::inner::Diagnostic::new(
                 identifier.clone(),
                 message,
                 hash.clone(),
-                line_no,
+                Some(line_no),
             ));
         }
     }
