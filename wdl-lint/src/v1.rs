@@ -11,6 +11,7 @@ mod ending_newline;
 mod import_placement;
 mod matching_parameter_meta;
 mod missing_metas;
+mod missing_output;
 mod missing_runtime;
 mod no_curly_commands;
 mod pascal_case;
@@ -25,6 +26,7 @@ pub use ending_newline::*;
 pub use import_placement::*;
 pub use matching_parameter_meta::*;
 pub use missing_metas::*;
+pub use missing_output::*;
 pub use missing_runtime::*;
 pub use no_curly_commands::*;
 pub use pascal_case::*;
@@ -77,6 +79,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(ImportPlacementRule),
         Box::new(PascalCaseRule),
         Box::new(MissingMetasRule),
+        Box::new(MissingOutputRule),
     ];
 
     // Ensure all the rule ids are unique and pascal case
