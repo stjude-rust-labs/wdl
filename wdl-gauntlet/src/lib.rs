@@ -250,7 +250,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             // As the list of diagnostics has been sorted by document identifier, do
             // a binary search and collect the matching messages
             let diagnostics = config.inner().diagnostics();
-            let expected: IndexSet<(String, usize)> = diagnostics
+            let expected: IndexSet<String> = diagnostics
                 .binary_search_by_key(&document_identifier, |d| d.document().clone())
                 .map(|mut start_index| {
                     // As binary search may return any matching index, back up until we find the
@@ -267,7 +267,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                         .iter()
                         .map_while(|d| {
                             if d.document() == &document_identifier {
-                                Some((d.message().to_string(), d.line_no()))
+                                Some(d.message().to_string())
                             } else {
                                 None
                             }
@@ -277,9 +277,8 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                 .unwrap_or_default();
 
             let actual_messages: IndexSet<_> = actual.iter().map(|(m, _)| m.clone()).collect();
-            let expected_messages: IndexSet<_> = expected.iter().map(|(m, _)| m.clone()).collect();
-            let unexpected = &actual_messages - &expected_messages;
-            let missing = &expected_messages - &actual_messages;
+            let unexpected = &actual_messages - &expected;
+            let missing = &expected - &actual_messages;
 
             let status = if !unexpected.is_empty() || !missing.is_empty() {
                 Status::DiagnosticsUnmatched(
@@ -351,13 +350,13 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             .get(identifier.repository())
             .unwrap()
             .commit_hash()
-            .clone()
+            .as_ref()
             .unwrap();
         for (message, line_no) in messages {
             diagnostics.push(config::inner::Diagnostic::new(
                 identifier.clone(),
                 message,
-                hash.clone(),
+                &hash,
                 Some(line_no),
             ));
         }

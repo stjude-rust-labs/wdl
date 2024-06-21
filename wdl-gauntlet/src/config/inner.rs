@@ -30,7 +30,7 @@ impl Diagnostic {
     pub fn new(
         document: document::Identifier,
         message: String,
-        hash: RawHash,
+        hash: &RawHash,
         line_no: Option<usize>,
     ) -> Self {
         let url = format!(
@@ -64,17 +64,6 @@ impl Diagnostic {
     /// Gets the permalink to the source of the diagnostic.
     pub fn permalink(&self) -> &str {
         &self.permalink
-    }
-
-    /// Gets the line number of the diagnostic.
-    /// If the line number can't be parsed, it defaults to 1.
-    pub fn line_no(&self) -> usize {
-        self.permalink
-            .rsplit_once('#')
-            .map(|x| x.1)
-            .get_or_insert("1")
-            .parse::<usize>()
-            .unwrap_or(1)
     }
 }
 
