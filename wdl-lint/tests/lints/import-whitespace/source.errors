@@ -1,33 +1,27 @@
-note[ImportWhitespace]: No blank lines allowed between imports
-  ┌─ tests/lints/import-whitespace/source.wdl:6:25
+note[ImportWhitespace]: blank lines are not allowed between imports
+  ┌─ tests/lints/import-whitespace/source.wdl:7:1
   │  
-6 │   import "bar.wdl"    # OK
-  │ ╭────────────────────────^
-7 │ │ 
+7 │ ╭ 
 8 │ │ import "baz.wdl"    # BAD
   │ ╰^
   │  
-  = fix: Delete this whitespace.
+  = fix: remove any blank lines between imports
 
-note[ImportWhitespace]: No blank lines allowed between imports
-   ┌─ tests/lints/import-whitespace/source.wdl:8:26
+note[ImportWhitespace]: blank lines are not allowed between imports
+   ┌─ tests/lints/import-whitespace/source.wdl:9:1
    │  
- 8 │   import "baz.wdl"    # BAD
-   │ ╭─────────────────────────^
- 9 │ │ 
+ 9 │ ╭ 
 10 │ │ import "huh.wdl"    # BAD
    │ ╰^
    │  
-   = fix: Delete this whitespace.
+   = fix: remove any blank lines between imports
 
-note[ImportWhitespace]: No blank lines allowed between imports
-   ┌─ tests/lints/import-whitespace/source.wdl:14:37
+note[ImportWhitespace]: blank lines are not allowed between imports
+   ┌─ tests/lints/import-whitespace/source.wdl:15:1
    │  
-14 │   # a comment and a blank is still BAD
-   │ ╭────────────────────────────────────^
-15 │ │ 
+15 │ ╭ 
 16 │ │ import "wah.wdl"    # BAD
    │ ╰^
    │  
-   = fix: Delete this whitespace.
+   = fix: remove any blank lines between imports
 

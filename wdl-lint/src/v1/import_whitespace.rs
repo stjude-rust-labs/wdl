@@ -6,6 +6,7 @@ use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Span;
+use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
@@ -82,18 +83,30 @@ impl Visitor for ImportWhitespaceVisitor {
             return;
         }
 
-        let last_whitespace = stmt.syntax().prev_sibling_or_token().and_then(SyntaxElement::into_token);
+        let last_whitespace = stmt
+            .syntax()
+            .prev_sibling_or_token()
+            .and_then(SyntaxElement::into_token);
 
         if let Some(token) = last_whitespace {
             if token.kind() == SyntaxKind::Whitespace {
-                let mut num_lines = 0;
-                lines_with_offset(token.text()).for_each(|_| {
-                    num_lines += 1;
-                });
+                let mut too_many_lines = false;
+                let mut second_line_start = None;
+                for (i, (_, _, next)) in lines_with_offset(token.text()).enumerate() {
+                    if i == 0 {
+                        second_line_start = Some(next);
+                    } else if i > 0 {
+                        too_many_lines = true;
+                        break;
+                    }
+                }
 
-                if num_lines > 1 {
+                if too_many_lines {
                     let span = token.text_range().to_span();
-                    state.add(bad_import_whitespace(span));
+                    state.add(bad_import_whitespace(Span::new(
+                        span.start() + second_line_start.expect("should have a second line start"),
+                        span.len() - second_line_start.expect("should have a second line start"),
+                    )));
                 }
             }
         };
