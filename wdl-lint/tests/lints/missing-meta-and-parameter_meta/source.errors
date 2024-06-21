@@ -1,0 +1,16 @@
+note[MissingMetas]: workflow `test` is missing both meta and parameter_meta sections
+  ┌─ tests/lints/missing-meta-and-parameter_meta/source.wdl:5:10
+  │
+5 │ workflow test {
+  │          ^^^^ this workflow is missing both meta and parameter_meta sections
+  │
+  = fix: add meta and parameter_meta sections to the workflow
+
+warning[EndingNewline]: missing newline at the end of the file
+   ┌─ tests/lints/missing-meta-and-parameter_meta/source.wdl:15:1
+   │
+15 │ }
+   │ ^ expected a newline to follow this
+   │
+   = fix: add an empty line at the end of the file
+
