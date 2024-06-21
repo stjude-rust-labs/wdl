@@ -93,9 +93,9 @@ impl Rule for MissingMetasRule {
     }
 
     fn explanation(&self) -> &'static str {
-        "It's important that WDL code is well-documented. Every task and worklfow should have both \
-         a meta and parameter_meta section. (Tasks without an `input` section are permitted to \
-         skip the `parameter_meta` section.)"
+        "It's important that WDL code is well-documented. Every task and workflow should have both \
+         a meta and parameter_meta section. Tasks without an `input` section are permitted to \
+         skip the `parameter_meta` section."
     }
 
     fn tags(&self) -> TagSet {
@@ -126,9 +126,9 @@ impl Visitor for MissingMetasVisitor {
 
         let inputs_present = task.inputs().next().is_some();
 
-        if task.metadata().next().is_none()
+        if inputs_present
+            && task.metadata().next().is_none()
             && task.parameter_metadata().next().is_none()
-            && inputs_present
         {
             state.add(missing_sections(
                 task.name().as_str(),
@@ -142,7 +142,7 @@ impl Visitor for MissingMetasVisitor {
                 Context::Task,
                 task.name().span(),
             ));
-        } else if task.parameter_metadata().next().is_none() && inputs_present {
+        } else if inputs_present && task.parameter_metadata().next().is_none() {
             state.add(missing_section(
                 task.name().as_str(),
                 Section::ParameterMeta,
@@ -156,7 +156,7 @@ impl Visitor for MissingMetasVisitor {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        workflow: &wdl_ast::v1::WorkflowDefinition,
+        workflow: &WorkflowDefinition,
     ) {
         if reason == VisitReason::Exit {
             return;
@@ -164,9 +164,9 @@ impl Visitor for MissingMetasVisitor {
 
         let inputs_present = workflow.inputs().next().is_some();
 
-        if workflow.metadata().next().is_none()
+        if inputs_present
+            && workflow.metadata().next().is_none()
             && workflow.parameter_metadata().next().is_none()
-            && inputs_present
         {
             state.add(missing_sections(
                 workflow.name().as_str(),
@@ -180,7 +180,7 @@ impl Visitor for MissingMetasVisitor {
                 Context::Workflow,
                 workflow.name().span(),
             ));
-        } else if workflow.parameter_metadata().next().is_none() && inputs_present {
+        } else if inputs_present && workflow.parameter_metadata().next().is_none() {
             state.add(missing_section(
                 workflow.name().as_str(),
                 Section::ParameterMeta,

@@ -100,7 +100,7 @@ impl Visitor for MissingOutputVisitor {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        workflow: &wdl_ast::v1::WorkflowDefinition,
+        workflow: &WorkflowDefinition,
     ) {
         if reason == VisitReason::Exit {
             return;
