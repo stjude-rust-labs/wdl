@@ -83,32 +83,38 @@ impl Visitor for ImportWhitespaceVisitor {
             return;
         }
 
-        let last_whitespace = stmt
+        let mut prev_token = stmt
             .syntax()
             .prev_sibling_or_token()
             .and_then(SyntaxElement::into_token);
 
-        if let Some(token) = last_whitespace {
+        while let Some(token) = prev_token {
             if token.kind() == SyntaxKind::Whitespace {
-                let mut too_many_lines = false;
+                let mut should_warn = false;
                 let mut second_line_start = None;
                 for (i, (_, _, next)) in lines_with_offset(token.text()).enumerate() {
                     if i == 0 {
                         second_line_start = Some(next);
-                    } else if i > 0 {
-                        too_many_lines = true;
+                    } else if i == 1 {
+                        should_warn = true;
+                    } else if i == 2 {
+                        should_warn = false;
                         break;
                     }
                 }
 
-                if too_many_lines {
+                if should_warn {
                     let span = token.text_range().to_span();
                     state.add(bad_import_whitespace(Span::new(
                         span.start() + second_line_start.expect("should have a second line start"),
                         span.len() - second_line_start.expect("should have a second line start"),
                     )));
                 }
+            } else if token.kind() != SyntaxKind::Comment {
+                // We've backed into non-trivia, so we're done.
+                break;
             }
-        };
+            prev_token = token.prev_token();
+        }
     }
 }
