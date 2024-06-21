@@ -20,10 +20,10 @@ const ID: &str = "ImportWhitespace";
 
 /// Creates a bad import whitespace diagnostic.
 fn bad_import_whitespace(span: Span) -> Diagnostic {
-    Diagnostic::note("No blank lines allowed between imports")
+    Diagnostic::note("blank lines are not allowed between imports")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("Delete this whitespace.")
+        .with_fix("remove any blank lines between imports")
 }
 
 /// Detects whitespace between imports.
@@ -82,7 +82,7 @@ impl Visitor for ImportWhitespaceVisitor {
             return;
         }
 
-        let last_whitespace = stmt.syntax().prev_sibling_or_token().unwrap().into_token();
+        let last_whitespace = stmt.syntax().prev_sibling_or_token().and_then(SyntaxElement::into_token);
 
         if let Some(token) = last_whitespace {
             if token.kind() == SyntaxKind::Whitespace {
