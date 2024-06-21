@@ -16,12 +16,12 @@ pub struct UnmatchedStatus {
     ///
     /// These are the diagnostics that were in the config but were not
     /// emitted by the parser/validator.
-    pub missing: IndexSet<(String, usize)>,
+    pub missing: IndexSet<String>,
     /// The unexpected set of diagnostics.
     ///
     /// These are the diagnostics that were not in the configuration but
     /// were emitted by the parser/validator.
-    pub unexpected: IndexSet<(String, usize)>,
+    pub unexpected: IndexSet<String>,
     /// The set of all diagnostics that were emitted.
     pub all: IndexSet<(String, usize)>,
 }
@@ -222,11 +222,11 @@ impl<T: std::io::Write> Report<T> {
 
             writeln!(self.inner, "{id}", id = id.path().italic())?;
 
-            for (diagnostic, _) in &status.unexpected {
+            for diagnostic in &status.unexpected {
                 writeln!(self.inner, "❌ {diagnostic}")?;
             }
 
-            for (diagnostic, _) in &status.missing {
+            for diagnostic in &status.missing {
                 writeln!(self.inner, "🔄️ {diagnostic}")?;
             }
         }
