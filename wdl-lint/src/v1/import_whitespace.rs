@@ -82,22 +82,20 @@ impl Visitor for ImportWhitespaceVisitor {
             return;
         }
 
-        stmt.syntax()
-            .prev_sibling_or_token()
-            .unwrap()
-            .into_token()
-            .map(|token| {
-                if token.kind() == SyntaxKind::Whitespace {
-                    let mut num_lines = 0;
-                    lines_with_offset(token.text()).for_each(|_| {
-                        num_lines += 1;
-                    });
+        let last_whitespace = stmt.syntax().prev_sibling_or_token().unwrap().into_token();
 
-                    if num_lines > 1 {
-                        let span = token.text_range().to_span();
-                        state.add(bad_import_whitespace(span));
-                    }
+        if let Some(token) = last_whitespace {
+            if token.kind() == SyntaxKind::Whitespace {
+                let mut num_lines = 0;
+                lines_with_offset(token.text()).for_each(|_| {
+                    num_lines += 1;
+                });
+
+                if num_lines > 1 {
+                    let span = token.text_range().to_span();
+                    state.add(bad_import_whitespace(span));
                 }
-            });
+            }
+        };
     }
 }
