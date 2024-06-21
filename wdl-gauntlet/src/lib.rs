@@ -6,7 +6,6 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
-use std::ops::Sub;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process;
@@ -279,8 +278,8 @@ pub async fn gauntlet(args: Args) -> Result<()> {
 
             let actual_messages: IndexSet<_> = actual.iter().map(|(m, _)| m.clone()).collect();
             let expected_messages: IndexSet<_> = expected.iter().map(|(m, _)| m.clone()).collect();
-            let unexpected = actual_messages.sub(&expected_messages);
-            let missing = expected_messages.sub(&actual_messages);
+            let unexpected = &actual_messages - &expected_messages;
+            let missing = &expected_messages - &actual_messages;
 
             let status = if !unexpected.is_empty() || !missing.is_empty() {
                 Status::DiagnosticsUnmatched(
