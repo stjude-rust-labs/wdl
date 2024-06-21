@@ -356,7 +356,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             diagnostics.push(config::inner::Diagnostic::new(
                 identifier.clone(),
                 message,
-                &hash,
+                hash,
                 Some(line_no),
             ));
         }
