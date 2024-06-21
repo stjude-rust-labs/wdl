@@ -3,8 +3,8 @@
 use std::fmt;
 
 use wdl_ast::v1::TaskDefinition;
-use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::v1::Visitor;
+use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -95,8 +95,8 @@ impl Rule for MissingMetasRule {
 
     fn explanation(&self) -> &'static str {
         "It's important that WDL code is well-documented. Every task and workflow should have both \
-         a meta and parameter_meta section. Tasks without an `input` section are permitted to \
-         skip the `parameter_meta` section."
+         a meta and parameter_meta section. Tasks without an `input` section are permitted to skip \
+         the `parameter_meta` section."
     }
 
     fn tags(&self) -> TagSet {
