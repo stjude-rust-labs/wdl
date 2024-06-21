@@ -94,9 +94,9 @@ impl Rule for MissingMetasRule {
     }
 
     fn explanation(&self) -> &'static str {
-        "It is important that WDL code is well-documented. Every task and workflow should have both \
-         a meta and parameter_meta section. Tasks without an `input` section are permitted to skip \
-         the `parameter_meta` section."
+        "It is important that WDL code is well-documented. Every task and workflow should have \
+         both a meta and parameter_meta section. Tasks without an `input` section are permitted to \
+         skip the `parameter_meta` section."
     }
 
     fn tags(&self) -> TagSet {
