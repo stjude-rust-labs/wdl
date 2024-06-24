@@ -56,7 +56,7 @@ impl Rule for ImportWhitespaceRule {
     }
 
     fn description(&self) -> &'static str {
-        "Ensures that there is no extraneous whitespace between imports."
+        "Ensures that there is no extraneous whitespace between or within imports."
     }
 
     fn explanation(&self) -> &'static str {
