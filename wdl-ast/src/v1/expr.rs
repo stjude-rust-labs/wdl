@@ -2227,26 +2227,22 @@ task test {
         // Seventh declaration
         assert_eq!(decls[6].ty().to_string(), "Int");
         assert_eq!(decls[6].name().as_str(), "g");
-        assert!(
-            decls[6]
-                .expr()
-                .unwrap_literal()
-                .unwrap_integer()
-                .value()
-                .is_none(),
-        );
+        assert!(decls[6]
+            .expr()
+            .unwrap_literal()
+            .unwrap_integer()
+            .value()
+            .is_none(),);
 
         // Eighth declaration
         assert_eq!(decls[7].ty().to_string(), "Int");
         assert_eq!(decls[7].name().as_str(), "h");
-        assert!(
-            decls[7]
-                .expr()
-                .unwrap_literal()
-                .unwrap_integer()
-                .value()
-                .is_none()
-        );
+        assert!(decls[7]
+            .expr()
+            .unwrap_literal()
+            .unwrap_integer()
+            .value()
+            .is_none());
 
         // Use a visitor to visit the in-bound literal integers in the tree
         struct MyVisitor(Vec<Option<i64>>);
@@ -2406,14 +2402,12 @@ task test {
         // Eighth declaration
         assert_eq!(decls[7].ty().to_string(), "Float");
         assert_eq!(decls[7].name().as_str(), "h");
-        assert!(
-            decls[7]
-                .expr()
-                .unwrap_literal()
-                .unwrap_float()
-                .value()
-                .is_none()
-        );
+        assert!(decls[7]
+            .expr()
+            .unwrap_literal()
+            .unwrap_float()
+            .value()
+            .is_none());
 
         // Use a visitor to visit all the literal floats in the tree
         struct MyVisitor(Vec<f64>);
@@ -3703,15 +3697,13 @@ task test {
         // First declaration
         assert_eq!(decls[0].ty().to_string(), "Boolean");
         assert_eq!(decls[0].name().as_str(), "a");
-        assert!(
-            decls[0]
-                .expr()
-                .unwrap_logical_not()
-                .operand()
-                .unwrap_literal()
-                .unwrap_boolean()
-                .value()
-        );
+        assert!(decls[0]
+            .expr()
+            .unwrap_logical_not()
+            .operand()
+            .unwrap_literal()
+            .unwrap_boolean()
+            .value());
 
         // Second declaration
         assert_eq!(decls[1].ty().to_string(), "Boolean");
