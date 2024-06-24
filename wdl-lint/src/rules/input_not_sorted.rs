@@ -17,11 +17,11 @@ use crate::TagSet;
 const ID: &str = "InputSorting";
 
 /// Creates a "input not sorted" diagnostic.
-fn input_not_sorted(span: Span, ty: String) -> Diagnostic {
+fn input_not_sorted(span: Span, sorted_inputs: String) -> Diagnostic {
     Diagnostic::warning("input not sorted")
         .with_rule(ID)
         .with_label(format!("input section must be sorted"), span)
-        .with_fix(format!("sort input statements as: \n{}", ty))
+        .with_fix(format!("sort input statements as: \n{}", sorted_inputs))
 }
 
 /// Detects unsorted input declarations.
@@ -71,8 +71,6 @@ impl Visitor for InputNotSortedVisitor {
         let mut sorted_decls = decls.clone();
         sorted_decls.sort();
 
-        println!("{:?}", decls);
-        //println!("{:?}", sorted_decls);
         let input_string: String = sorted_decls
             .clone()
             .into_iter()

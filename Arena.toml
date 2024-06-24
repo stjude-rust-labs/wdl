@@ -132,6 +132,11 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+message = "ww-star-deseq2.wdl:126:3: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L126"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
 message = "ww-star-deseq2.wdl:133:15: warning[DoubleQuotes]: string defined with single quotes"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L133"
 
@@ -302,6 +307,11 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+message = "ww-star-deseq2.wdl:7:3: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L7"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
 message = "ww-star-deseq2.wdl:80:5: note[MatchingParameterMeta]: workflow `STAR2Pass` has an extraneous parameter metadata key named `output_rnaseqc`"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L80"
 
@@ -334,6 +344,11 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:17:10: note[MissingMetas]: workflow `ww_vc_trio` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L17"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+message = "ww-vc-trio.wdl:18:3: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L18"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
@@ -442,6 +457,11 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+message = "ww-vc-trio.wdl:299:3: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L299"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:2:1: note[PreambleComments]: preamble comments cannot come after the version statement"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L2"
 
@@ -492,6 +512,11 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+message = "ww-vc-trio.wdl:354:3: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L354"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:35:10: warning[SnakeCase]: input name `dbSNP_vcf_index` is not snake_case"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L35"
 
@@ -532,6 +557,11 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+message = "ww-vc-trio.wdl:421:3: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L421"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:456:6: note[MissingMetas]: task `CollectHsMetrics` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L456"
 
@@ -539,6 +569,11 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:456:6: warning[SnakeCase]: task name `CollectHsMetrics` is not snake_case"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L456"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+message = "ww-vc-trio.wdl:457:3: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L457"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
@@ -622,6 +657,11 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+message = "ww-vc-trio.wdl:519:3: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L519"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:51:10: warning[SnakeCase]: private declaration name `annovarDocker` is not snake_case"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L51"
 
@@ -657,6 +697,11 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+message = "ww-vc-trio.wdl:559:3: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L559"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:596:6: note[MissingMetas]: task `Mutect2TumorOnly` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L596"
 
@@ -664,6 +709,11 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:596:6: warning[SnakeCase]: task name `Mutect2TumorOnly` is not snake_case"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L596"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+message = "ww-vc-trio.wdl:597:3: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L597"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
@@ -812,6 +862,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fc
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:100:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L100"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:107:14: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
 permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L107"
 
@@ -822,6 +877,16 @@ permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fc
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:168:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L168"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:242:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L242"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:249:14: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
 permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L249"
 
@@ -829,6 +894,21 @@ permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fc
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:250:14: warning[SnakeCase]: input name `dbSNP_vcf_index` is not snake_case"
 permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L250"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:320:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L320"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:1013:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/picard.wdl/#L1013"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:947:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/picard.wdl/#L947"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
@@ -891,6 +971,31 @@ message = "star.wdl:820:9: warning[SnakeCase]: struct member name `AT_AC_and_GT_
 permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L820"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
+message = "dnaseq-core.wdl:36:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/dnaseq/dnaseq-core.wdl/#L36"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
+message = "dnaseq-standard-fastq.wdl:117:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L117"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
+message = "dnaseq-standard-fastq.wdl:36:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L36"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
+message = "dnaseq-standard.wdl:34:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/dnaseq/dnaseq-standard.wdl/#L34"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
+message = "samtools-merge.wdl:21:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/general/samtools-merge.wdl/#L21"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
 message = "gatk-reference.wdl:101:15: warning[SnakeCase]: output name `dbSNP_vcf` is not snake_case"
 permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl/#L101"
@@ -899,6 +1004,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fc
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
 message = "gatk-reference.wdl:102:15: warning[SnakeCase]: output name `dbSNP_vcf_index` is not snake_case"
 permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl/#L102"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "gatk-reference.wdl:36:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl/#L36"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
@@ -921,9 +1031,19 @@ message = "gatk-reference.wdl:43:17: warning[SnakeCase]: input name `dbSNP_vcf_i
 permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/gatk-reference.wdl/#L43"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
+message = "make-qc-reference.wdl:61:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/reference/make-qc-reference.wdl/#L61"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
 message = "rnaseq-core.wdl:138:13: warning[SnakeCase]: input name `chim_score_junction_nonGTAG` is not snake_case"
 permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/rnaseq/rnaseq-core.wdl/#L138"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "rnaseq-variant-calling.wdl:33:5: warning[InputSorting]: input not sorted"
+permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/rnaseq/rnaseq-variant-calling.wdl/#L33"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
