@@ -63,11 +63,11 @@ impl Rule for ImportWhitespaceRule {
         "Imports should be grouped together without any whitespace between them. Each import \
          statement should be contained to one line. No whitespace should come before the start of \
          each import statement. One literal space should be between the `import` keyword and the \
-         import path. If the `as` keyword is present, it should be separated from the import path \
-         by one space and the alias should be separated from the `as` keyword by one space. If \
-         separation between imports is needed, it should be done with one or more comments \
-         labelling groups of imports. Extraneous whitespace between and within imports makes code \
-         harder to parse and understand."
+         import path. If the `alias` or `as` keywords are present, they should be separated from \
+         the previous and next words by exactly one space. If separation between imports is \
+         needed, it should be done with one or more comments labelling groups of imports. \
+         Extraneous whitespace between and within imports makes code harder to parse and \
+         understand."
     }
 
     fn tags(&self) -> TagSet {
