@@ -159,8 +159,7 @@ impl Ord for ArrayType {
             return std::cmp::Ordering::Less;
         } else if !self.is_non_empty() && other.is_non_empty() {
             return std::cmp::Ordering::Greater;
-        }
-        else {
+        } else {
             self.element_type().cmp(&other.element_type())
         }
     }
@@ -471,7 +470,8 @@ impl PartialOrd for PrimitiveType {
 impl Ord for PrimitiveType {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         //self.kind().cmp(&other.kind())
-        self.primitive_type_index().cmp(&other.primitive_type_index())
+        self.primitive_type_index()
+            .cmp(&other.primitive_type_index())
     }
 }
 
@@ -581,23 +581,19 @@ impl Type {
     fn type_index(&self) -> usize {
         match self {
             Type::Map(_) => 5,
-            Type::Array(a) => {
-                match a.is_non_empty() {
-                    true => 1,
-                    false => 2,
-                }
+            Type::Array(a) => match a.is_non_empty() {
+                true => 1,
+                false => 2,
             },
             Type::Pair(_) => 6,
             Type::Object(_) => 4,
             Type::Ref(_) => 3,
-            Type::Primitive(p) => {
-                match p.kind() {
-                    PrimitiveTypeKind::Boolean => 8,
-                    PrimitiveTypeKind::Integer => 10,
-                    PrimitiveTypeKind::Float => 9,
-                    PrimitiveTypeKind::String => 7,
-                    PrimitiveTypeKind::File => 0,
-                }
+            Type::Primitive(p) => match p.kind() {
+                PrimitiveTypeKind::Boolean => 8,
+                PrimitiveTypeKind::Integer => 10,
+                PrimitiveTypeKind::Float => 9,
+                PrimitiveTypeKind::String => 7,
+                PrimitiveTypeKind::File => 0,
             },
         }
     }
@@ -675,24 +671,29 @@ impl Ord for Type {
     }
 }
 
-fn compare_types (a: &Type, b: &Type) -> std::cmp::Ordering {
+fn compare_types(a: &Type, b: &Type) -> std::cmp::Ordering {
     // Check Array, Map, and Pair for sub-types
     if matches!(a, Type::Map(_)) && matches!(b, Type::Map(_)) {
-        a.clone().unwrap_map_type().cmp(&b.clone().unwrap_map_type())
-    }
-    else if matches!(a, Type::Array(_)) && matches!(b, Type::Array(_)) {
-        a.clone().unwrap_array_type().cmp(&b.clone().unwrap_array_type())
-    }
-    else if matches!(a, Type::Pair(_)) && matches!(b, Type::Pair(_)) {
-        a.clone().unwrap_pair_type().cmp(&b.clone().unwrap_pair_type())
-    }
-    else if matches!(a, Type::Ref(_)) && matches!(b, Type::Ref(_)) {
-        a.clone().unwrap_type_ref().cmp(&b.clone().unwrap_type_ref())
-    }
-    else if matches!(a, Type::Object(_)) && matches!(b, Type::Object(_)) {
-        a.clone().unwrap_object_type().cmp(&b.clone().unwrap_object_type())
-    }
-    else {
+        a.clone()
+            .unwrap_map_type()
+            .cmp(&b.clone().unwrap_map_type())
+    } else if matches!(a, Type::Array(_)) && matches!(b, Type::Array(_)) {
+        a.clone()
+            .unwrap_array_type()
+            .cmp(&b.clone().unwrap_array_type())
+    } else if matches!(a, Type::Pair(_)) && matches!(b, Type::Pair(_)) {
+        a.clone()
+            .unwrap_pair_type()
+            .cmp(&b.clone().unwrap_pair_type())
+    } else if matches!(a, Type::Ref(_)) && matches!(b, Type::Ref(_)) {
+        a.clone()
+            .unwrap_type_ref()
+            .cmp(&b.clone().unwrap_type_ref())
+    } else if matches!(a, Type::Object(_)) && matches!(b, Type::Object(_)) {
+        a.clone()
+            .unwrap_object_type()
+            .cmp(&b.clone().unwrap_object_type())
+    } else {
         a.type_index().cmp(&b.type_index())
     }
 }
@@ -847,17 +848,13 @@ impl Decl {
     /// Define an ordering for declarations.
     fn decl_index(&self) -> usize {
         match self {
-            Self::Bound(b) => {
-                match b.ty().is_optional() {
-                    true => 2,
-                    false => 3,
-                }
+            Self::Bound(b) => match b.ty().is_optional() {
+                true => 2,
+                false => 3,
             },
-            Self::Unbound(u) => {
-                match u.ty().is_optional() {
-                    true => 1,
-                    false => 0,
-                }
+            Self::Unbound(u) => match u.ty().is_optional() {
+                true => 1,
+                false => 0,
             },
         }
     }
@@ -906,14 +903,18 @@ impl Ord for Decl {
     }
 }
 
-fn compare_decl (a: &Decl, b: &Decl) -> std::cmp::Ordering {
-    if matches!(a, Decl::Bound(_)) && matches!(b, Decl::Bound(_)) && a.ty().is_optional() == b.ty().is_optional() {
+fn compare_decl(a: &Decl, b: &Decl) -> std::cmp::Ordering {
+    if matches!(a, Decl::Bound(_))
+        && matches!(b, Decl::Bound(_))
+        && a.ty().is_optional() == b.ty().is_optional()
+    {
         a.ty().cmp(&b.ty())
-    }
-    else if matches!(a, Decl::Unbound(_)) && matches!(b, Decl::Unbound(_)) && a.ty().is_optional() == b.ty().is_optional() {
+    } else if matches!(a, Decl::Unbound(_))
+        && matches!(b, Decl::Unbound(_))
+        && a.ty().is_optional() == b.ty().is_optional()
+    {
         a.ty().cmp(&b.ty())
-    }
-    else {
+    } else {
         a.decl_index().cmp(&b.decl_index())
     }
 }

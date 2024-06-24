@@ -2,12 +2,12 @@
 
 use wdl_ast::span_of;
 use wdl_ast::v1::InputSection;
-use wdl_ast::Visitor;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Span;
 use wdl_ast::VisitReason;
+use wdl_ast::Visitor;
 
 use crate::Rule;
 use crate::Tag;
@@ -55,7 +55,7 @@ struct InputNotSortedVisitor;
 
 impl Visitor for InputNotSortedVisitor {
     type State = Diagnostics;
-    
+
     fn input_section(
         &mut self,
         state: &mut Self::State,
@@ -74,24 +74,22 @@ impl Visitor for InputNotSortedVisitor {
         let input_string: String = sorted_decls
             .clone()
             .into_iter()
-            .map(|decl| {
-                decl.syntax().text().to_string() + "\n"
-            })
+            .map(|decl| decl.syntax().text().to_string() + "\n")
             .collect::<String>();
         let mut errors = 0;
 
-        decls.into_iter().zip(sorted_decls.into_iter()).for_each(|(decl, sorted_decl)| {
-            if decl != sorted_decl {
-                errors += 1;
-            }
-        });
+        decls
+            .into_iter()
+            .zip(sorted_decls.into_iter())
+            .for_each(|(decl, sorted_decl)| {
+                if decl != sorted_decl {
+                    errors += 1;
+                }
+            });
         if errors > 0 {
             state.add(
                 //input_not_sorted(decl.name().span(),
-                input_not_sorted(
-                    span_of(input),
-                    input_string,
-                )
+                input_not_sorted(span_of(input), input_string),
             );
         }
     }
