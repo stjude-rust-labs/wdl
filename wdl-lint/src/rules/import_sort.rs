@@ -107,7 +107,7 @@ impl Visitor for ImportSortVisitor {
             if let Some(prev) = prev_import {
                 if import.text().to_string() < prev.text().to_string() {
                     state.add(import_not_sorted(import.text_range().to_span()));
-                    return; // Only report one sorting diagnositc at a time.
+                    return; // Only report one sorting diagnostic at a time.
                 }
             }
             prev_import = Some(import);

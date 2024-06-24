@@ -42,7 +42,7 @@ fn improper_whitespace_within_import(span: Span) -> Diagnostic {
 fn improper_whitespace_before_import(span: Span) -> Diagnostic {
     Diagnostic::note("improper whitespace before import statement")
         .with_rule(ID)
-        .with_label("this space should not be there", span)
+        .with_label("extraneous whitespace should not be there", span)
         .with_fix("use minimal whitespace before import statements")
 }
 
