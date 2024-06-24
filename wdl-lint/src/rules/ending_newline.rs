@@ -41,7 +41,7 @@ fn multiple_ending_newline(span: Span, count: usize) -> Diagnostic {
 }
 
 /// Detects missing newline at the end of the document.
-#[derive(Debug, Clone, Copy)]
+#[derive(Default, Debug, Clone, Copy)]
 pub struct EndingNewlineRule;
 
 impl Rule for EndingNewlineRule {
@@ -68,6 +68,8 @@ impl Visitor for EndingNewlineRule {
     fn document(&mut self, state: &mut Self::State, reason: VisitReason, doc: &Document) {
         if reason == VisitReason::Enter {
             // We only process on exit so that it's one of the last diagnostics emitted
+            // Reset the visitor upon document entry
+            *self = Default::default();
             return;
         }
 

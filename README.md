@@ -90,7 +90,7 @@ the `wdl` family of crates.
 The `wdl` CLI tool can be run with the following command:
 
 ```bash
-cargo run --bin wdl --features binaries -- $ARGS
+cargo run --bin wdl --features cli -- $ARGS
 ```
 
 Where `$ARGS` are the command line arguments to the `wdl` CLI tool.
