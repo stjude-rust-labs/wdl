@@ -76,7 +76,7 @@ impl fmt::Display for MapType {
 
 impl PartialOrd for MapType {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.types().partial_cmp(&other.types())
+        Some(self.cmp(other))
     }
 }
 
@@ -149,16 +149,16 @@ impl fmt::Display for ArrayType {
 
 impl PartialOrd for ArrayType {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.element_type().partial_cmp(&other.element_type())
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for ArrayType {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         if self.is_non_empty() && !other.is_non_empty() {
-            return std::cmp::Ordering::Less;
+            std::cmp::Ordering::Less
         } else if !self.is_non_empty() && other.is_non_empty() {
-            return std::cmp::Ordering::Greater;
+            std::cmp::Ordering::Greater
         } else {
             self.element_type().cmp(&other.element_type())
         }
@@ -225,7 +225,7 @@ impl fmt::Display for PairType {
 
 impl PartialOrd for PairType {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.types().partial_cmp(&other.types())
+        Some(self.cmp(other))
     }
 }
 
@@ -285,8 +285,8 @@ impl fmt::Display for ObjectType {
 }
 
 impl PartialOrd for ObjectType {
-    fn partial_cmp(&self, _: &Self) -> Option<std::cmp::Ordering> {
-        Some(std::cmp::Ordering::Equal)
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
     }
 }
 
@@ -352,8 +352,8 @@ impl fmt::Display for TypeRef {
 }
 
 impl PartialOrd for TypeRef {
-    fn partial_cmp(&self, _: &Self) -> Option<std::cmp::Ordering> {
-        Some(std::cmp::Ordering::Equal)
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
     }
 }
 
@@ -463,13 +463,12 @@ impl fmt::Display for PrimitiveType {
 
 impl PartialOrd for PrimitiveType {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.kind().partial_cmp(&other.kind())
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for PrimitiveType {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        //self.kind().cmp(&other.kind())
         self.primitive_type_index()
             .cmp(&other.primitive_type_index())
     }
@@ -659,18 +658,17 @@ impl fmt::Display for Type {
 
 impl PartialOrd for Type {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        //Some(self.type_index().cmp(&other.type_index()))
-        Some(compare_types(self, other))
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for Type {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        //self.type_index().cmp(&other.type_index())
         compare_types(self, other)
     }
 }
 
+/// Compare all variants of Type.
 fn compare_types(a: &Type, b: &Type) -> std::cmp::Ordering {
     // Check Array, Map, and Pair for sub-types
     if matches!(a, Type::Map(_)) && matches!(b, Type::Map(_)) {
@@ -891,27 +889,24 @@ impl AstNode for Decl {
 
 impl PartialOrd for Decl {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        //Some(self.decl_index().cmp(&other.decl_index()))
-        Some(compare_decl(self, other))
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for Decl {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        //self.decl_index().cmp(&other.decl_index())
         compare_decl(self, other)
     }
 }
 
+/// Compare all variants of Decl.
 fn compare_decl(a: &Decl, b: &Decl) -> std::cmp::Ordering {
-    if matches!(a, Decl::Bound(_))
+    if (matches!(a, Decl::Bound(_))
         && matches!(b, Decl::Bound(_))
-        && a.ty().is_optional() == b.ty().is_optional()
-    {
-        a.ty().cmp(&b.ty())
-    } else if matches!(a, Decl::Unbound(_))
-        && matches!(b, Decl::Unbound(_))
-        && a.ty().is_optional() == b.ty().is_optional()
+        && a.ty().is_optional() == b.ty().is_optional())
+        || (matches!(a, Decl::Unbound(_))
+            && matches!(b, Decl::Unbound(_))
+            && a.ty().is_optional() == b.ty().is_optional())
     {
         a.ty().cmp(&b.ty())
     } else {

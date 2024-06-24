@@ -20,7 +20,7 @@ const ID: &str = "InputSorting";
 fn input_not_sorted(span: Span, sorted_inputs: String) -> Diagnostic {
     Diagnostic::warning("input not sorted")
         .with_rule(ID)
-        .with_label(format!("input section must be sorted"), span)
+        .with_label("input section must be sorted".to_string(), span)
         .with_fix(format!("sort input statements as: \n{}", sorted_inputs))
 }
 
@@ -80,7 +80,7 @@ impl Visitor for InputNotSortedVisitor {
 
         decls
             .into_iter()
-            .zip(sorted_decls.into_iter())
+            .zip(sorted_decls)
             .for_each(|(decl, sorted_decl)| {
                 if decl != sorted_decl {
                     errors += 1;
