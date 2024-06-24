@@ -671,28 +671,13 @@ impl Ord for Type {
 /// Compare all variants of Type.
 fn compare_types(a: &Type, b: &Type) -> std::cmp::Ordering {
     // Check Array, Map, and Pair for sub-types
-    if matches!(a, Type::Map(_)) && matches!(b, Type::Map(_)) {
-        a.clone()
-            .unwrap_map_type()
-            .cmp(&b.clone().unwrap_map_type())
-    } else if matches!(a, Type::Array(_)) && matches!(b, Type::Array(_)) {
-        a.clone()
-            .unwrap_array_type()
-            .cmp(&b.clone().unwrap_array_type())
-    } else if matches!(a, Type::Pair(_)) && matches!(b, Type::Pair(_)) {
-        a.clone()
-            .unwrap_pair_type()
-            .cmp(&b.clone().unwrap_pair_type())
-    } else if matches!(a, Type::Ref(_)) && matches!(b, Type::Ref(_)) {
-        a.clone()
-            .unwrap_type_ref()
-            .cmp(&b.clone().unwrap_type_ref())
-    } else if matches!(a, Type::Object(_)) && matches!(b, Type::Object(_)) {
-        a.clone()
-            .unwrap_object_type()
-            .cmp(&b.clone().unwrap_object_type())
-    } else {
-        a.type_index().cmp(&b.type_index())
+    match (a, b) {
+        (Type::Map(a), Type::Map(b)) => a.cmp(b),
+        (Type::Array(a), Type::Array(b)) => a.cmp(b),
+        (Type::Pair(a), Type::Pair(b)) => a.cmp(b),
+        (Type::Ref(a), Type::Ref(b)) => a.cmp(b),
+        (Type::Object(a), Type::Object(b)) => a.cmp(b),
+        _ => a.type_index().cmp(&b.type_index()),
     }
 }
 
