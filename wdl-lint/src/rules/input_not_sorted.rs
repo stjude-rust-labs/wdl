@@ -38,9 +38,9 @@ impl Rule for InputNotSortedRule {
     }
 
     fn explanation(&self) -> &'static str {
-        "Each input declaration section should be sorted. Enforces an opinionated sorting. First \
+        "Each input declaration section should be sorted. This rule enforces an opinionated sorting. First \
          sorts by 1. required inputs, 2. optional inputs without defaults, 3. optional inputs with \
-         defaults, and 4. non-optional inputs with a default value. Then by the type: 1. File, 2. \
+         defaults, and 4. inputs with a default value. Then by the type: 1. File, 2. \
          Array[*]+, 3. Array[*], 4. struct, 5. Object, 6. Map[*, *], 7. Pair[*, *], 8. String, 9. \
          Boolean, 10. Float, 11. Int. For ordering of the same compound type (Array[*], Map[*, *], \
          Pair[*, *]), drop the outermost type (Array, Map, etc.) and recursively apply above \
