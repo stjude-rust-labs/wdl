@@ -11,7 +11,7 @@ note[ImportWhitespace]: improper whitespace before import statement
   ┌─ tests/lints/between-import-whitespace/source.wdl:8:1
   │
 8 │     import "foo.wdl"   # BAD
-  │ ^^^^ this space should not be there
+  │ ^^^^ extraneous whitespace should not be there
   │
   = fix: use minimal whitespace before import statements
 
