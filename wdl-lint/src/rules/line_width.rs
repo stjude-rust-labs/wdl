@@ -34,16 +34,18 @@ impl Rule for LineWidthRule {
     }
 
     fn description(&self) -> &'static str {
-        "Ensures that lines do not exceed a certain width."
+        "Ensures that lines do not exceed a certain width. That width is currently set to 90 \
+         characters."
     }
 
     fn explanation(&self) -> &'static str {
         "Lines should not exceed a certain width to make it easier to read and understand the \
-         code. This rule ensures that lines do not exceed a certain width."
+         code. Code within the either the meta or parameter meta sections is not checked. Comments \
+         are included in the line width check. The current maximum width is 90 characters."
     }
 
     fn tags(&self) -> TagSet {
-        TagSet::new(&[Tag::Style, Tag::Clarity])
+        TagSet::new(&[Tag::Style, Tag::Clarity, Tag::Spacing])
     }
 
     fn visitor(&self) -> Box<dyn Visitor<State = Diagnostics>> {
