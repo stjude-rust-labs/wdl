@@ -10,15 +10,12 @@ use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
 
-/// The maximum width of a line.
-const MAX_WIDTH: usize = 90;
-
 /// The identifier for the line width rule.
 const ID: &str = "LineWidth";
 
 /// Creates a diagnostic for when a line exceeds the maximum width.
-fn line_too_long(span: Span) -> Diagnostic {
-    Diagnostic::note(format!("line exceeds maximum width of {}", MAX_WIDTH))
+fn line_too_long(span: Span, max_width: usize) -> Diagnostic {
+    Diagnostic::note(format!("line exceeds maximum width of {}", max_width))
         .with_rule(ID)
         .with_highlight(span)
         .with_fix("split the line into multiple lines")
@@ -26,7 +23,14 @@ fn line_too_long(span: Span) -> Diagnostic {
 
 /// Detects lines that exceed a certain width.
 #[derive(Debug, Clone, Copy)]
-pub struct LineWidthRule;
+pub struct LineWidthRule(usize);
+
+/// Implements the default line width rule.
+impl Default for LineWidthRule {
+    fn default() -> Self {
+        Self(90)
+    }
+}
 
 impl Rule for LineWidthRule {
     fn id(&self) -> &'static str {
@@ -49,13 +53,15 @@ impl Rule for LineWidthRule {
     }
 
     fn visitor(&self) -> Box<dyn Visitor<State = Diagnostics>> {
-        Box::new(LineWidthVisitor::default())
+        Box::new(LineWidthVisitor::new(self.0))
     }
 }
 
 /// A visitor that detects lines that exceed a certain width.
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy)]
 struct LineWidthVisitor {
+    /// The maximum width of a line.
+    max_width: usize,
     /// The offset of the previous newline.
     prev_newline_offset: usize,
     /// Whether we are in a section that should be ignored.
@@ -63,6 +69,15 @@ struct LineWidthVisitor {
 }
 
 impl LineWidthVisitor {
+    /// Creates a new line width visitor.
+    fn new(max_width: usize) -> Self {
+        Self {
+            max_width,
+            prev_newline_offset: 0,
+            should_ignore: false,
+        }
+    }
+
     /// Detects lines that exceed a certain width.
     fn detect_line_too_long(&mut self, state: &mut Diagnostics, text: &str, start: usize) {
         let mut cur_newline_offset = start;
@@ -74,11 +89,14 @@ impl LineWidthVisitor {
                     return;
                 }
 
-                if cur_newline_offset - self.prev_newline_offset > MAX_WIDTH {
-                    state.add(line_too_long(Span::new(
-                        self.prev_newline_offset,
-                        cur_newline_offset - self.prev_newline_offset,
-                    )));
+                if cur_newline_offset - self.prev_newline_offset > self.max_width {
+                    state.add(line_too_long(
+                        Span::new(
+                            self.prev_newline_offset,
+                            cur_newline_offset - self.prev_newline_offset,
+                        ),
+                        self.max_width,
+                    ));
                 }
                 self.prev_newline_offset = cur_newline_offset + 1;
             }
