@@ -87,10 +87,7 @@ impl Visitor for InputNotSortedVisitor {
                 }
             });
         if errors > 0 {
-            state.add(
-                //input_not_sorted(decl.name().span(),
-                input_not_sorted(span_of(input), input_string),
-            );
+            state.add(input_not_sorted(span_of(input), input_string));
         }
     }
 }
