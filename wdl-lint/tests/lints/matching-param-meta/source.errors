@@ -1,3 +1,11 @@
+note[LineWidth]: line exceeds maximum width of 90
+  ┌─ tests/lints/matching-param-meta/source.wdl:1:1
+  │
+1 │ ## This is a test for checking for missing and extraneous entries in a `parameter_meta` section.
+  │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │
+  = fix: split the line into multiple lines
+
 warning[MatchingParameterMeta]: task `t` is missing a parameter metadata key for input `does_not_exist`
   ┌─ tests/lints/matching-param-meta/source.wdl:9:16
   │
