@@ -124,14 +124,14 @@ impl ExceptVisitor {
                     // Next trim the end
                     let trimmed: &str = trimmed_start.trim_end();
 
-                    // Calculate the span based off the current offset and how much whitespace was
-                    // trimmed
-                    let span = Span::new(
-                        start + offset + (id.len() - trimmed_start.len()),
-                        trimmed.len(),
-                    );
-
                     if !self.visitors.contains_key(trimmed) && !self.global.contains(trimmed) {
+                        // Calculate the span based off the current offset and how much whitespace
+                        // was trimmed
+                        let span = Span::new(
+                            start + offset + (id.len() - trimmed_start.len()),
+                            trimmed.len(),
+                        );
+
                         state.add(unknown_rule(trimmed, span));
                     } else {
                         set.insert(trimmed.to_string());
