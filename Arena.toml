@@ -888,42 +888,42 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:129:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L129"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L129"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:12:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L12"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L12"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:13:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L13"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L13"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:14:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L14"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L14"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:173:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L173"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L173"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:182:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L182"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L182"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:206:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L206"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L206"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:2:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L2"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L2"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
@@ -968,7 +968,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0a
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:3:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L3"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L3"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
@@ -1003,77 +1003,77 @@ permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0a
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:7:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L7"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L7"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:8:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/data_structures/read_group.wdl/#L8"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L8"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:140:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/arriba.wdl/#L140"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L140"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:143:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/arriba.wdl/#L143"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L143"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:174:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/arriba.wdl/#L174"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L174"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:193:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/arriba.wdl/#L193"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L193"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:195:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/arriba.wdl/#L195"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L195"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:257:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/arriba.wdl/#L257"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L257"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:263:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/arriba.wdl/#L263"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L263"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/bwa.wdl"
 message = "bwa.wdl:242:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/bwa.wdl/#L242"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/bwa.wdl/#L242"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/cellranger.wdl"
 message = "cellranger.wdl:3:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/cellranger.wdl/#L3"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/cellranger.wdl/#L3"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/cellranger.wdl"
 message = "cellranger.wdl:61:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/cellranger.wdl/#L61"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/cellranger.wdl/#L61"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/cellranger.wdl"
 message = "cellranger.wdl:62:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/cellranger.wdl/#L62"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/cellranger.wdl/#L62"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/estimate.wdl"
 message = "estimate.wdl:39:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/estimate.wdl/#L39"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/estimate.wdl/#L39"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/fastqc.wdl"
 message = "fastqc.wdl:59:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/fastqc.wdl/#L59"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/fastqc.wdl/#L59"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
@@ -1088,17 +1088,17 @@ permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0a
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:117:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L117"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L117"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:122:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L122"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L122"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:186:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L186"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L186"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
@@ -1113,62 +1113,62 @@ permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0a
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:259:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L259"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L259"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:264:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L264"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L264"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:42:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/gatk4.wdl/#L42"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L42"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:118:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/htseq.wdl/#L118"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/htseq.wdl/#L118"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:159:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/htseq.wdl/#L159"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/htseq.wdl/#L159"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:184:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/htseq.wdl/#L184"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/htseq.wdl/#L184"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:94:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/htseq.wdl/#L94"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/htseq.wdl/#L94"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:96:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/htseq.wdl/#L96"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/htseq.wdl/#L96"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
 message = "ngsderive.wdl:257:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/ngsderive.wdl/#L257"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/ngsderive.wdl/#L257"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
 message = "ngsderive.wdl:259:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/ngsderive.wdl/#L259"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/ngsderive.wdl/#L259"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
 message = "picard.wdl:1032:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/picard.wdl/#L1032"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/picard.wdl/#L1032"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/qualimap.wdl"
 message = "qualimap.wdl:81:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/qualimap.wdl/#L81"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/qualimap.wdl/#L81"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
@@ -1218,22 +1218,22 @@ permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0a
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
 message = "star.wdl:694:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L694"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L694"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
 message = "star.wdl:695:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L695"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L695"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
 message = "star.wdl:701:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L701"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L701"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
 message = "star.wdl:734:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/star.wdl/#L734"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L734"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
@@ -1253,142 +1253,142 @@ permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0a
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:613:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L613"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L613"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:618:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L618"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L618"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:637:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L637"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L637"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:649:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L649"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L649"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:693:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L693"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L693"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:706:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L706"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L706"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:717:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L717"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L717"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:718:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L718"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L718"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:719:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L719"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L719"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:720:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L720"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L720"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:721:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L721"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L721"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:722:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L722"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L722"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:723:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L723"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L723"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:725:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L725"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L725"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:726:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L726"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L726"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:728:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/tools/util.wdl/#L728"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L728"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
 message = "chipseq-standard.wdl:10:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/chipseq/chipseq-standard.wdl/#L10"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L10"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
 message = "chipseq-standard.wdl:11:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/chipseq/chipseq-standard.wdl/#L11"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L11"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
 message = "chipseq-standard.wdl:12:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/chipseq/chipseq-standard.wdl/#L12"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L12"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
 message = "dnaseq-core.wdl:115:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/dnaseq/dnaseq-core.wdl/#L115"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/dnaseq/dnaseq-core.wdl/#L115"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
 message = "dnaseq-standard-fastq.wdl:134:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L134"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L134"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
 message = "dnaseq-standard-fastq.wdl:51:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L51"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L51"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
 message = "alignment-post.wdl:6:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/general/alignment-post.wdl/#L6"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L6"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:24:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/general/samtools-merge.wdl/#L24"
+message = "samtools-merge.wdl:23:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L23"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
 message = "samtools-merge.wdl:35:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/general/samtools-merge.wdl/#L35"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L35"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
 message = "quality-check-standard.wdl:110:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/qc/quality-check-standard.wdl/#L110"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L110"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
 message = "quality-check-standard.wdl:150:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/qc/quality-check-standard.wdl/#L150"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L150"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
 message = "quality-check-standard.wdl:435:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/qc/quality-check-standard.wdl/#L435"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L435"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
@@ -1438,37 +1438,37 @@ permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0a
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:28:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L28"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L28"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:29:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L29"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L29"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:32:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L32"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L32"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:35:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L35"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L35"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:36:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L36"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L36"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:37:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L37"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L37"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:38:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L38"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L38"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
@@ -1483,44 +1483,44 @@ permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0a
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:18:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/scrnaseq-standard.wdl/#L18"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L18"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:19:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/scrnaseq-standard.wdl/#L19"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L19"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:22:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/scrnaseq-standard.wdl/#L22"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L22"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:25:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/scrnaseq-standard.wdl/#L25"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L25"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:26:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/scrnaseq-standard.wdl/#L26"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L26"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:27:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/scrnaseq-standard.wdl/#L27"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L27"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:28:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/scrnaseq-standard.wdl/#L28"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L28"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:40:10: note[MissingMetas]: workflow `scrnaseq_standard` is missing a `meta` section"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/scrnaseq-standard.wdl/#L40"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L40"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:5:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/46a77b33c99c1952396fcaaf0845f1fb5a015987/workflows/scrnaseq/scrnaseq-standard.wdl/#L5"
+permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L5"
