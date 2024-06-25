@@ -8,11 +8,11 @@ be out of sync with released packages.
 
 | Name                             | Tags                          | Description                                                                           |
 |:---------------------------------|:------------------------------|:--------------------------------------------------------------------------------------|
-| `CallInputSpacing`               | Style, Clarity, Spacing       | Ensures proper spacing for call inputs      |
+| `CallInputSpacing`               | Style, Clarity, Spacing       | Ensures proper spacing for call inputs                                                |
 | `CommandSectionMixedIndentation` | Clarity, Correctness, Spacing | Ensures that lines within a command do not mix spaces and tabs.                       |
 | `DoubleQuotes`                   | Clarity, Style                | Ensures that strings are defined using double quotes.                                 |
 | `EndingNewline`                  | Spacing, Style                | Ensures that documents end with a single newline character.                           |
-| `ImportPlacement`                | Clarity                       | Ensures that imports are placed between the version statement and any document items. |
+| `ImportPlacement`                | Clarity, Sorting              | Ensures that imports are placed between the version statement and any document items. |
 | `ImportSort`                     | Clarity, Style                | Ensures that imports are sorted lexicographically.                                    |
 | `ImportWhitespace`               | Clarity, Style, Spacing       | Ensures that there is no extraneous whitespace between or within imports.             |
 | `InconsistentNewlines`           | Clarity, Style                | Ensures that newlines are used consistently within the file.                          |
