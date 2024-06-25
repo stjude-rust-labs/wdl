@@ -8,6 +8,7 @@ be out of sync with released packages.
 
 | Name                             | Tags                          | Description                                                                           |
 |:---------------------------------|:------------------------------|:--------------------------------------------------------------------------------------|
+| `CallInputSpacing`               | Style, Clarity, Spacing       | Ensures proper spacing for call inputs      |
 | `CommandSectionMixedIndentation` | Clarity, Correctness, Spacing | Ensures that lines within a command do not mix spaces and tabs.                       |
 | `DoubleQuotes`                   | Clarity, Style                | Ensures that strings are defined using double quotes.                                 |
 | `EndingNewline`                  | Spacing, Style                | Ensures that documents end with a single newline character.                           |
@@ -17,6 +18,7 @@ be out of sync with released packages.
 | `InconsistentNewlines`           | Clarity, Style                | Ensures that newlines are used consistently within the file.                          |
 | `InputNotSorted`                 | Style                         | Ensures that input declarations are sorted                                            |
 | `InputSpacing`                   | Style, Clarity, Spacing       | Ensures proper spacing for call inputs                                                |
+| `LineWidth`                      | Clarity, Spacing, Style       | Ensures that lines do not exceed a certain width.                                     |
 | `MatchingParameterMeta`          | Completeness                  | Ensures that inputs have a matching entry in a `parameter_meta` section.              |
 | `MissingRuntime`                 | Completeness, Portability     | Ensures that tasks have a runtime section.                                            |
 | `MissingMetas`                   | Completeness, Clarity         | Ensures that tasks have both a meta and a parameter_meta section.                     |
@@ -27,5 +29,4 @@ be out of sync with released packages.
 | `PreambleWhitespace`             | Spacing, Style                | Ensures that documents have correct whitespace in the preamble.                       |
 | `SnakeCase`                      | Clarity, Naming, Style        | Ensures that tasks, workflows, and variables are defined with snake_case names.       |
 | `Whitespace`                     | Spacing, Style                | Ensures that a document does not contain undesired whitespace.                        |
-| `LineWidth`                      | Clarity, Spacing, Style       | Ensures that lines do not exceed a certain width.                                     |
 

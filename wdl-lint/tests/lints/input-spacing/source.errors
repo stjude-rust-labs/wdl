@@ -1,4 +1,4 @@
-warning[InputSpacing]: input not properly spaced
+warning[CallInputSpacing]: input not properly spaced
    ┌─ tests/lints/input-spacing/source.wdl:11:14
    │
 11 │     call bar {
@@ -6,7 +6,7 @@ warning[InputSpacing]: input not properly spaced
    │
    = fix: input keyword must be separated from the opening brace ("{") by a single space
 
-warning[InputSpacing]: input keyword may not be preceded by a newline
+warning[CallInputSpacing]: input keyword may not be preceded by a newline
    ┌─ tests/lints/input-spacing/source.wdl:11:15
    │  
 11 │       call bar {
@@ -16,7 +16,7 @@ warning[InputSpacing]: input keyword may not be preceded by a newline
    │  
    = fix: input keyword must be separated from the opening brace ("{") by a single space with no newlines
 
-warning[InputSpacing]: call inputs assignments must be surrounded with whitespace
+warning[CallInputSpacing]: call inputs assignments must be surrounded with whitespace
    ┌─ tests/lints/input-spacing/source.wdl:12:17
    │
 12 │         input: a="something"
@@ -24,7 +24,7 @@ warning[InputSpacing]: call inputs assignments must be surrounded with whitespac
    │
    = fix: surround '=' with whitespace on each side
 
-warning[InputSpacing]: input not properly spaced
+warning[CallInputSpacing]: input not properly spaced
    ┌─ tests/lints/input-spacing/source.wdl:17:21
    │
 17 │     call bar as ba2 {input:
@@ -32,7 +32,7 @@ warning[InputSpacing]: input not properly spaced
    │
    = fix: input keyword must be separated from the opening brace ("{") by a single space
 
-warning[InputSpacing]: call inputs assignments must be surrounded with whitespace
+warning[CallInputSpacing]: call inputs assignments must be surrounded with whitespace
    ┌─ tests/lints/input-spacing/source.wdl:18:10
    │
 18 │         a="something", b="somethingelse"
@@ -40,7 +40,7 @@ warning[InputSpacing]: call inputs assignments must be surrounded with whitespac
    │
    = fix: surround '=' with whitespace on each side
 
-warning[InputSpacing]: call inputs must be separated by newline
+warning[CallInputSpacing]: call inputs must be separated by newline
    ┌─ tests/lints/input-spacing/source.wdl:18:24
    │
 18 │         a="something", b="somethingelse"
@@ -48,7 +48,7 @@ warning[InputSpacing]: call inputs must be separated by newline
    │
    = fix: add newline before the input
 
-warning[InputSpacing]: call inputs assignments must be surrounded with whitespace
+warning[CallInputSpacing]: call inputs assignments must be surrounded with whitespace
    ┌─ tests/lints/input-spacing/source.wdl:18:25
    │
 18 │         a="something", b="somethingelse"

@@ -1,5 +1,6 @@
 //! Module for the lint rules.
 
+mod call_input_spacing;
 mod command_mixed_indentation;
 mod double_quotes;
 mod ending_newline;
@@ -8,7 +9,6 @@ mod import_sort;
 mod import_whitespace;
 mod inconsistent_newlines;
 mod input_not_sorted;
-mod input_spacing;
 mod line_width;
 mod matching_parameter_meta;
 mod missing_metas;
@@ -21,6 +21,7 @@ mod preamble_whitespace;
 mod snake_case;
 mod whitespace;
 
+pub use call_input_spacing::*;
 pub use command_mixed_indentation::*;
 pub use double_quotes::*;
 pub use ending_newline::*;
@@ -29,7 +30,6 @@ pub use import_sort::*;
 pub use import_whitespace::*;
 pub use inconsistent_newlines::*;
 pub use input_not_sorted::*;
-pub use input_spacing::*;
 pub use line_width::*;
 pub use matching_parameter_meta::*;
 pub use missing_metas::*;

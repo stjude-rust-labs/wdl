@@ -15,10 +15,10 @@ use crate::Tag;
 use crate::TagSet;
 
 /// The identifier for the input not sorted rule.
-const ID: &str = "InputSpacing";
+const ID: &str = "CallInputSpacing";
 
 /// Creates a "input spacing" diagnostic.
-fn input_spacing(span: Span) -> Diagnostic {
+fn call_input_spacing(span: Span) -> Diagnostic {
     Diagnostic::warning("input not properly spaced")
         .with_rule(ID)
         .with_highlight(span)
@@ -29,7 +29,7 @@ fn input_spacing(span: Span) -> Diagnostic {
 }
 
 /// Creates an input keyword preceding newline diagnostic.
-fn input_keyword_preceding_newline(span: Span) -> Diagnostic {
+fn call_input_keyword_preceding_newline(span: Span) -> Diagnostic {
     Diagnostic::warning("input keyword may not be preceded by a newline")
         .with_rule(ID)
         .with_highlight(span)
@@ -40,7 +40,7 @@ fn input_keyword_preceding_newline(span: Span) -> Diagnostic {
 }
 
 /// Creates an input call spacing diagnostic.
-fn input_call_spacing(span: Span) -> Diagnostic {
+fn call_input_missing_newline(span: Span) -> Diagnostic {
     Diagnostic::warning("call inputs must be separated by newline")
         .with_rule(ID)
         .with_highlight(span)
@@ -57,9 +57,9 @@ fn call_input_assignment(span: Span) -> Diagnostic {
 
 /// Detects unsorted input declarations.
 #[derive(Debug, Clone, Copy)]
-pub struct InputSpacingRule;
+pub struct CallInputSpacingRule;
 
-impl Rule for InputSpacingRule {
+impl Rule for CallInputSpacingRule {
     fn id(&self) -> &'static str {
         ID
     }
@@ -81,14 +81,14 @@ impl Rule for InputSpacingRule {
     }
 
     fn visitor(&self) -> Box<dyn Visitor<State = Diagnostics>> {
-        Box::new(InputSpacingVisitor)
+        Box::new(CallInputSpacingVisitor)
     }
 }
 
-/// Implements the visitor for the input spacing rule.
-struct InputSpacingVisitor;
+/// Implements the visitor for the call input spacing rule.
+struct CallInputSpacingVisitor;
 
-impl Visitor for InputSpacingVisitor {
+impl Visitor for CallInputSpacingVisitor {
     type State = Diagnostics;
 
     fn call_statement(
@@ -116,18 +116,18 @@ impl Visitor for InputSpacingVisitor {
                     match next.kind() {
                         SyntaxKind::Whitespace => {
                             if next.to_string() != " " {
-                                state.add(input_spacing(c.text_range().to_span()));
+                                state.add(call_input_spacing(c.text_range().to_span()));
                             } else {
                                 match next.next_sibling_or_token().unwrap().kind() {
                                     SyntaxKind::InputKeyword => {}
                                     _ => {
-                                        state.add(input_spacing(c.text_range().to_span()));
+                                        state.add(call_input_spacing(c.text_range().to_span()));
                                     }
                                 }
                             }
                         }
                         _ => {
-                            state.add(input_spacing(c.text_range().to_span()));
+                            state.add(call_input_spacing(c.text_range().to_span()));
                         }
                     }
                 }
@@ -138,7 +138,9 @@ impl Visitor for InputSpacingVisitor {
                 SyntaxKind::Whitespace => {
                     if c.to_string().contains("\n") {
                         if !input_seen {
-                            state.add(input_keyword_preceding_newline(c.text_range().to_span()));
+                            state.add(call_input_keyword_preceding_newline(
+                                c.text_range().to_span(),
+                            ));
                         } else {
                             newline_seen += 1;
                         }
@@ -149,7 +151,7 @@ impl Visitor for InputSpacingVisitor {
                         // Empty lines will be detected by the Whitespace rule
                         newline_seen = 0;
                     } else if inputs > 1 {
-                        state.add(input_call_spacing(c.text_range().to_span()));
+                        state.add(call_input_missing_newline(c.text_range().to_span()));
                     }
 
                     if c.to_string().contains("=") && !c.to_string().contains(" = ") {
