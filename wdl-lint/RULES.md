@@ -16,6 +16,7 @@ be out of sync with released packages.
 | `ImportWhitespace`               | Clarity, Style, Spacing       | Ensures that there is no extraneous whitespace between or within imports.             |
 | `InconsistentNewlines`           | Clarity, Style                | Ensures that newlines are used consistently within the file.                          |
 | `InputNotSorted`                 | Style                         | Ensures that input declarations are sorted                                            |
+| `InputSpacing`                   | Style, Clarity, Spacing       | Ensures proper spacing for call inputs                                                |
 | `MatchingParameterMeta`          | Completeness                  | Ensures that inputs have a matching entry in a `parameter_meta` section.              |
 | `MissingRuntime`                 | Completeness, Portability     | Ensures that tasks have a runtime section.                                            |
 | `MissingMetas`                   | Completeness, Clarity         | Ensures that tasks have both a meta and a parameter_meta section.                     |
