@@ -50,7 +50,7 @@ impl Rule for InputNotSortedRule {
     }
 
     fn tags(&self) -> TagSet {
-        TagSet::new(&[Tag::Style, Tag::Clarity])
+        TagSet::new(&[Tag::Style, Tag::Clarity, Tag::Sorting])
     }
 
     fn visitor(&self) -> Box<dyn Visitor<State = Diagnostics>> {
