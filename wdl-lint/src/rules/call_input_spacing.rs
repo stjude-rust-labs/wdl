@@ -136,7 +136,7 @@ impl Visitor for CallInputSpacingVisitor {
                     newline_seen = 0;
                 }
                 SyntaxKind::Whitespace => {
-                    if c.to_string().contains("\n") {
+                    if c.to_string().contains('\n') {
                         if !input_seen {
                             state.add(call_input_keyword_preceding_newline(
                                 c.text_range().to_span(),
@@ -154,7 +154,7 @@ impl Visitor for CallInputSpacingVisitor {
                         state.add(call_input_missing_newline(c.text_range().to_span()));
                     }
 
-                    if c.to_string().contains("=") && !c.to_string().contains(" = ") {
+                    if c.to_string().contains('=') && !c.to_string().contains(" = ") {
                         let i = c.to_string().find('=').unwrap();
                         state.add(call_input_assignment(Span::new(
                             c.text_range().to_span().start() + i,
