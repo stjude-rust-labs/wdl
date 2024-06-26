@@ -1,13 +1,12 @@
 //! A lint rule for ensuring that newlines are consistent.
 
-use wdl_ast::AstNode;
+use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Span;
-use wdl_ast::SyntaxKind;
-use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
+use wdl_ast::Whitespace;
 
 use crate::Rule;
 use crate::Tag;
@@ -20,7 +19,7 @@ const ID: &str = "InconsistentNewlines";
 fn inconsistent_newlines(span: Span) -> Diagnostic {
     Diagnostic::note("inconsistent newlines detected")
         .with_rule(ID)
-        .with_highlight(span)
+        .with_label("the first occurrence of a mismatched newline is here", span)
         .with_fix("use either \"\\n\" or \"\\r\\n\" consistently in the file")
 }
 
@@ -47,37 +46,51 @@ impl Rule for InconsistentNewlinesRule {
     }
 
     fn visitor(&self) -> Box<dyn Visitor<State = Diagnostics>> {
-        Box::new(InconsistentNewlinesVisitor)
+        Box::new(InconsistentNewlinesVisitor::default())
     }
 }
 
 /// Implements the visitor for the import sort rule.
-struct InconsistentNewlinesVisitor;
+struct InconsistentNewlinesVisitor {
+    /// The number of carriage returns in the file.
+    carriage_return: u32,
+    /// The number of newlines in the file.
+    newline: u32,
+    /// Location of first inconsistent newline.
+    first_inconsistent: Option<Span>,
+}
+
+/// Implements the default inconsistent newlines visitor.
+impl Default for InconsistentNewlinesVisitor {
+    fn default() -> Self {
+        Self {
+            carriage_return: 0,
+            newline: 0,
+            first_inconsistent: None,
+        }
+    }
+}
 
 impl Visitor for InconsistentNewlinesVisitor {
     type State = Diagnostics;
 
-    fn document(&mut self, state: &mut Self::State, reason: VisitReason, doc: &wdl_ast::Document) {
-        if reason == VisitReason::Exit {
-            return;
+    fn document(&mut self, state: &mut Self::State, reason: VisitReason, _doc: &wdl_ast::Document) {
+        if reason == VisitReason::Exit && self.newline > 0 && self.carriage_return > 0 {
+            state.add(inconsistent_newlines(self.first_inconsistent.unwrap()));
         }
+    }
 
-        let mut newline = 0;
-        let mut carriage_return = 0;
-
-        doc.syntax()
-            .children_with_tokens()
-            .filter(|c| c.kind() == SyntaxKind::Whitespace)
-            .for_each(|w| {
-                if w.to_string().contains("\r\n") {
-                    carriage_return += 1;
-                } else if w.to_string().contains('\n') {
-                    newline += 1;
-                }
-            });
-
-        if newline > 0 && carriage_return > 0 {
-            state.add(inconsistent_newlines(doc.syntax().text_range().to_span()));
+    fn whitespace(&mut self, _state: &mut Self::State, whitespace: &Whitespace) {
+        if whitespace.as_str().contains("\r\n") {
+            self.carriage_return += 1;
+            if self.newline > 0 && self.first_inconsistent.is_none() {
+                self.first_inconsistent = Some(whitespace.span());
+            }
+        } else if whitespace.as_str().contains('\n') {
+            self.newline += 1;
+            if self.carriage_return > 0 && self.first_inconsistent.is_none() {
+                self.first_inconsistent = Some(whitespace.span());
+            }
         }
     }
 }

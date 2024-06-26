@@ -1,14 +1,11 @@
 note[InconsistentNewlines]: inconsistent newlines detected
-   ┌─ tests/lints/inconsistent-newlines/source.wdl:1:1
-   │  
- 1 │ ╭ #@ except: EndingNewline,PreambleWhitespace,MissingMetas,MissingOutput
- 2 │ │ ## This is a test of the `InconsistentNewlines` lint
- 3 │ │ ## Note that due an inexact path separator replacement in the tests,
- 4 │ │ ## error messages in the baseline will show `/<escape>` instead of `/<escape>`.
-   · │
-10 │ │ 
-11 │ │ 
-   │ ╰^
-   │  
-   = fix: use either "/n" or "/r/n" consistently in the file
+  ┌─ tests/lints/inconsistent-newlines/source.wdl:6:12
+  │  
+6 │   version 1.1
+  │ ╭───────────^
+7 │ │ 
+8 │ │ workflow foo {}
+  │ ╰^ the first occurrence of a mismatched newline is here
+  │  
+  = fix: use either "/n" or "/r/n" consistently in the file
 
