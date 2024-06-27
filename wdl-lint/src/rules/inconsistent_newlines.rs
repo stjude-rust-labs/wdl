@@ -81,15 +81,15 @@ impl Visitor for InconsistentNewlinesVisitor {
     }
 
     fn whitespace(&mut self, _state: &mut Self::State, whitespace: &Whitespace) {
-        if whitespace.as_str().contains("\r\n") {
+        if let Some(pos) = whitespace.as_str().find("\r\n") {
             self.carriage_return += 1;
             if self.newline > 0 && self.first_inconsistent.is_none() {
-                self.first_inconsistent = Some(whitespace.span());
+                self.first_inconsistent = Some(Span::new(whitespace.span().start() + pos, 2));
             }
-        } else if whitespace.as_str().contains('\n') {
+        } else if let Some(pos) = whitespace.as_str().find('\n') {
             self.newline += 1;
             if self.carriage_return > 0 && self.first_inconsistent.is_none() {
-                self.first_inconsistent = Some(whitespace.span());
+                self.first_inconsistent = Some(Span::new(whitespace.span().start() + pos, 1));
             }
         }
     }
