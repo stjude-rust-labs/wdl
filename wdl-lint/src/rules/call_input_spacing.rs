@@ -79,16 +79,9 @@ impl Rule for CallInputSpacingRule {
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Style, Tag::Clarity, Tag::Spacing])
     }
-
-    fn visitor(&self) -> Box<dyn Visitor<State = Diagnostics>> {
-        Box::new(CallInputSpacingVisitor)
-    }
 }
 
-/// Implements the visitor for the call input spacing rule.
-struct CallInputSpacingVisitor;
-
-impl Visitor for CallInputSpacingVisitor {
+impl Visitor for CallInputSpacingRule {
     type State = Diagnostics;
 
     fn call_statement(
