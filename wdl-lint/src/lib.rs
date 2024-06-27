@@ -99,7 +99,6 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(rules::InputNotSortedRule),
         Box::new(rules::LineWidthRule::default()),
         Box::new(rules::InconsistentNewlinesRule),
-        Box::new(rules::InputSpacingRule),
         Box::new(rules::CallInputSpacingRule),
     ];
 
