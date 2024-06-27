@@ -17,7 +17,7 @@ use crate::TagSet;
 /// The identifier for the input not sorted rule.
 const ID: &str = "CallInputSpacing";
 
-/// Creates a "input spacing" diagnostic.
+/// Creates a input spacing diagnostic.
 fn call_input_spacing(span: Span) -> Diagnostic {
     Diagnostic::warning("input not properly spaced")
         .with_rule(ID)
@@ -123,7 +123,8 @@ impl Visitor for CallInputSpacingRule {
                                 }
                             }
                         }
-                        _ => { // Opening brace is followed by something other than whitespace
+                        _ => {
+                            // Opening brace is followed by something other than whitespace
                             state.add(call_input_spacing(c.text_range().to_span()));
                         }
                     }
