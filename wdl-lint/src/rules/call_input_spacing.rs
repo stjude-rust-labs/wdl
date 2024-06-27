@@ -114,10 +114,14 @@ impl Visitor for CallInputSpacingVisitor {
                 SyntaxKind::OpenBrace => {
                     let next = c.next_sibling_or_token().unwrap();
                     match next.kind() {
+                        // The opening brace of a call block must be followed by exactly one space,
+                        // the input keyword, a colon and a newline
                         SyntaxKind::Whitespace => {
                             if next.to_string() != " " {
+                                // Check for a single space
                                 state.add(call_input_spacing(c.text_range().to_span()));
                             } else {
+                                // Check for the input keyword
                                 match next.next_sibling_or_token().unwrap().kind() {
                                     SyntaxKind::InputKeyword => {}
                                     _ => {
@@ -126,7 +130,7 @@ impl Visitor for CallInputSpacingVisitor {
                                 }
                             }
                         }
-                        _ => {
+                        _ => { // Opening brace is followed by something other than whitespace
                             state.add(call_input_spacing(c.text_range().to_span()));
                         }
                     }
@@ -138,6 +142,7 @@ impl Visitor for CallInputSpacingVisitor {
                 SyntaxKind::Whitespace => {
                     if c.to_string().contains('\n') {
                         if !input_seen {
+                            // Newlines are not allowed before the input keyword
                             state.add(call_input_keyword_preceding_newline(
                                 c.text_range().to_span(),
                             ));
@@ -148,12 +153,15 @@ impl Visitor for CallInputSpacingVisitor {
                 }
                 SyntaxKind::CallInputItemNode => {
                     if newline_seen > 0 {
+                        // Reset newlines seen, since this is an input
                         // Empty lines will be detected by the Whitespace rule
                         newline_seen = 0;
                     } else if inputs > 1 {
+                        // Only check for newlines if there are multiple inputs
                         state.add(call_input_missing_newline(c.text_range().to_span()));
                     }
 
+                    // Check for assignment spacing
                     if c.to_string().contains('=') && !c.to_string().contains(" = ") {
                         let i = c.to_string().find('=').unwrap();
                         state.add(call_input_assignment(Span::new(
