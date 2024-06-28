@@ -92,23 +92,13 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dc
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:35:112: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L35"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "ww-fastq-to-cram.wdl:35:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L35"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:35:31: warning[CallInputSpacing]: input not properly spaced"
+message = "ww-fastq-to-cram.wdl:35:31: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L35"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:48:116: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L48"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
@@ -117,17 +107,12 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dc
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:48:26: warning[CallInputSpacing]: input not properly spaced"
+message = "ww-fastq-to-cram.wdl:48:26: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L48"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:56:23: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L56"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:56:67: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-fastq-to-cram.wdl:56:23: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L56"
 
 [[diagnostics]]
@@ -292,12 +277,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:23:21: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L23"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:23:22: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-star-deseq2.wdl:23:21: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L23"
 
 [[diagnostics]]
@@ -322,12 +302,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:29:28: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L29"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:29:29: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-star-deseq2.wdl:29:28: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L29"
 
 [[diagnostics]]
@@ -367,12 +342,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:36:27: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L36"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:36:28: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-star-deseq2.wdl:36:27: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L36"
 
 [[diagnostics]]
@@ -402,12 +372,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:45:18: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L45"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:45:19: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-star-deseq2.wdl:45:18: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L45"
 
 [[diagnostics]]
@@ -512,32 +477,17 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:110:25: warning[CallInputSpacing]: input not properly spaced"
+message = "ww-vc-trio.wdl:110:25: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L110"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:110:26: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L110"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:32: warning[CallInputSpacing]: input not properly spaced"
+message = "ww-vc-trio.wdl:119:32: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L119"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:33: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L119"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:135:21: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L135"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:135:22: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-vc-trio.wdl:135:21: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L135"
 
 [[diagnostics]]
@@ -547,12 +497,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:144:27: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L144"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:144:28: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-vc-trio.wdl:144:27: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L144"
 
 [[diagnostics]]
@@ -562,22 +507,12 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:155:26: warning[CallInputSpacing]: input not properly spaced"
+message = "ww-vc-trio.wdl:155:26: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L155"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:155:27: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L155"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:170:27: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L170"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:170:28: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-vc-trio.wdl:170:27: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L170"
 
 [[diagnostics]]
@@ -587,12 +522,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:185:26: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L185"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:185:27: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-vc-trio.wdl:185:26: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L185"
 
 [[diagnostics]]
@@ -602,12 +532,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:199:33: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L199"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:199:34: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-vc-trio.wdl:199:33: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L199"
 
 [[diagnostics]]
@@ -617,12 +542,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:209:36: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L209"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:209:37: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-vc-trio.wdl:209:36: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L209"
 
 [[diagnostics]]
@@ -637,22 +557,12 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:219:39: warning[CallInputSpacing]: input not properly spaced"
+message = "ww-vc-trio.wdl:219:39: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L219"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:219:40: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L219"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:228:31: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L228"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:228:32: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-vc-trio.wdl:228:31: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L228"
 
 [[diagnostics]]
@@ -1027,12 +937,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:57:16: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L57"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:57:17: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-vc-trio.wdl:57:16: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L57"
 
 [[diagnostics]]
@@ -1127,12 +1032,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:72:21: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L72"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:72:22: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-vc-trio.wdl:72:21: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L72"
 
 [[diagnostics]]
@@ -1157,12 +1057,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:17: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L80"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:18: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-vc-trio.wdl:80:17: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L80"
 
 [[diagnostics]]
@@ -1172,12 +1067,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:98:28: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L98"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:98:29: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "ww-vc-trio.wdl:98:28: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a904fc83f4e67821550e/ww-vc-trio.wdl/#L98"
 
 [[diagnostics]]
@@ -2287,26 +2177,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0a
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:233:48: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L233"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:234:38: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L234"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:272:74: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L272"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:273:54: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L273"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
 message = "quality-check-standard.wdl:310:12: warning[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
 permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L310"
 
@@ -2482,72 +2352,37 @@ permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0a
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:50:42: warning[CallInputSpacing]: input not properly spaced"
+message = "gatk-reference.wdl:50:42: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L50"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:50:43: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L50"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:57:25: warning[CallInputSpacing]: input not properly spaced"
+message = "gatk-reference.wdl:57:25: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L57"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:57:26: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L57"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:62:44: warning[CallInputSpacing]: input not properly spaced"
+message = "gatk-reference.wdl:62:44: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L62"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:62:45: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L62"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:67:33: warning[CallInputSpacing]: input not properly spaced"
+message = "gatk-reference.wdl:67:33: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L67"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:67:34: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L67"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:74:43: warning[CallInputSpacing]: input not properly spaced"
+message = "gatk-reference.wdl:74:43: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L74"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:74:44: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L74"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:82:41: warning[CallInputSpacing]: input not properly spaced"
+message = "gatk-reference.wdl:82:41: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L82"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:82:42: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L82"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:90:41: warning[CallInputSpacing]: input not properly spaced"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L90"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:90:42: warning[CallInputSpacing]: input keyword may not be preceded by a newline"
+message = "gatk-reference.wdl:90:41: warning[CallInputSpacing]: call input keyword not properly spaced"
 permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L90"
 
 [[diagnostics]]

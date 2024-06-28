@@ -7,20 +7,12 @@ note[MissingMetas]: workflow `test` is missing both meta and parameter_meta sect
   = fix: add meta and parameter_meta sections to the workflow
 
 warning[CallInputSpacing]: input not properly spaced
-  ┌─ tests/lints/missing-meta-and-parameter_meta/source.wdl:9:20
-  │
-9 │     call test_task {
-  │                    ^
-  │
-  = fix: input keyword must be separated from the opening brace ("{") by a single space
-
-warning[CallInputSpacing]: input keyword may not be preceded by a newline
-   ┌─ tests/lints/missing-meta-and-parameter_meta/source.wdl:9:21
+   ┌─ tests/lints/missing-meta-and-parameter_meta/source.wdl:9:20
    │  
  9 │       call test_task {
    │ ╭────────────────────^
 10 │ │         input: input_file = input_file
    │ ╰────────^
    │  
-   = fix: input keyword must be separated from the opening brace ("{") by a single space with no newlines
+   = fix: input keyword must be separated from the opening brace ("{") by a single space
 
