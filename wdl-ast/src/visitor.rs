@@ -24,7 +24,6 @@
 use rowan::WalkEvent;
 
 use crate::v1::BoundDecl;
-use crate::v1::CallInputItem;
 use crate::v1::CallStatement;
 use crate::v1::CommandSection;
 use crate::v1::CommandText;

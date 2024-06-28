@@ -162,14 +162,22 @@ impl Visitor for CallInputSpacingRule {
         });
 
         // Check for assignment spacing
-        call.inputs().for_each(|input|{
-            if input.syntax().to_string().contains('=') && !input.syntax().to_string().contains(" = ") {
-                let i = input.syntax().to_string().find('=').unwrap();
-                state.add(call_input_assignment(Span::new(
-                    input.syntax().text_range().to_span().start() + i,
-                    1,
-                )));
-            }
+        call.inputs().for_each(|input| {
+            input
+                .syntax()
+                .children_with_tokens()
+                .find(|c| c.kind() == SyntaxKind::Assignment)
+                .map(|c| {
+                    match (
+                        c.next_sibling_or_token().unwrap().kind(),
+                        c.prev_sibling_or_token().unwrap().kind(),
+                    ) {
+                        (SyntaxKind::Whitespace, SyntaxKind::Whitespace) => {}
+                        _ => {
+                            state.add(call_input_assignment(c.text_range().to_span()));
+                        }
+                    }
+                });
         });
     }
 }
