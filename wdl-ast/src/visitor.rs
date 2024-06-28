@@ -227,7 +227,7 @@ pub trait Visitor: Send + Sync {
         state: &mut Self::State,
         reason: VisitReason,
         node: &CallInputItem,
-    ){
+    ) {
     }
 }
 
