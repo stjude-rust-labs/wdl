@@ -1,5 +1,6 @@
 //! A lint rule for spacing of call inputs.
 
+use wdl_ast::v1::CallInputItem;
 use wdl_ast::v1::CallStatement;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
@@ -70,10 +71,12 @@ impl Rule for CallInputSpacingRule {
 
     fn explanation(&self) -> &'static str {
         "When making calls from a workflow, it is more readable and easier to edit if the supplied \
-         inputs are each on their own line. This does inflate the line count of a WDL document, \
-         but it is worth it for the consistent readability. An exception can be made (but does not \
-         have to be made), for calls with only a single parameter. In those cases, it is \
-         permissable to keep the input on the same line as the call."
+         inputs are each on their own line. When there is more than one input to a call statement, \
+         the `input:` keyword should follow the opening brace ({) and a single space, then each \
+         input specification should occupy its own line. This does inflate the line count of a WDL \
+         document, but it is worth it for the consistent readability. An exception can be made \
+         (but does not have to be made), for calls with only a single parameter. In those cases, \
+         it is permissable to keep the input on the same line as the call."
     }
 
     fn tags(&self) -> TagSet {
@@ -154,18 +157,30 @@ impl Visitor for CallInputSpacingRule {
                         // Only check for newlines if there are multiple inputs
                         state.add(call_input_missing_newline(c.text_range().to_span()));
                     }
-
-                    // Check for assignment spacing
-                    if c.to_string().contains('=') && !c.to_string().contains(" = ") {
-                        let i = c.to_string().find('=').unwrap();
-                        state.add(call_input_assignment(Span::new(
-                            c.text_range().to_span().start() + i,
-                            1,
-                        )));
-                    }
                 }
                 _ => {}
             }
         });
     }
+
+    fn call_input_item(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        node: &CallInputItem,
+    )
+    {
+        if reason == VisitReason::Exit {
+            return;
+        }
+        // Check for assignment spacing
+        if node.syntax().to_string().contains('=') && !node.syntax().to_string().contains(" = ") {
+            let i = node.syntax().to_string().find('=').unwrap();
+            state.add(call_input_assignment(Span::new(
+                node.syntax().text_range().to_span().start() + i,
+                1,
+            )));
+        }
+    }
+
 }
