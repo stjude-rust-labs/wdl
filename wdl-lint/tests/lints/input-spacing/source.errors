@@ -1,4 +1,4 @@
-warning[CallInputSpacing]: input not properly spaced
+warning[CallInputSpacing]: call input keyword not properly spaced
    ┌─ tests/lints/input-spacing/source.wdl:11:14
    │  
 11 │       call bar {
@@ -16,7 +16,7 @@ warning[CallInputSpacing]: call inputs assignments must be surrounded with white
    │
    = fix: surround '=' with whitespace on each side
 
-warning[CallInputSpacing]: input not properly spaced
+warning[CallInputSpacing]: call input keyword not properly spaced
    ┌─ tests/lints/input-spacing/source.wdl:17:21
    │
 17 │     call bar as ba2 {input:
