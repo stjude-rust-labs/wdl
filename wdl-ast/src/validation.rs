@@ -335,15 +335,4 @@ impl Visitor for Validator {
             visitor.call_statement(state, reason, stmt);
         }
     }
-
-    fn call_input_item(
-        &mut self,
-        state: &mut Self::State,
-        reason: VisitReason,
-        node: &v1::CallInputItem,
-    ) {
-        for visitor in self.visitors.iter_mut() {
-            visitor.call_input_item(state, reason, node);
-        }
-    }
 }

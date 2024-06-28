@@ -1,6 +1,5 @@
 //! A lint rule for spacing of call inputs.
 
-use wdl_ast::v1::CallInputItem;
 use wdl_ast::v1::CallStatement;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
@@ -161,26 +160,16 @@ impl Visitor for CallInputSpacingRule {
                 _ => {}
             }
         });
-    }
 
-    fn call_input_item(
-        &mut self,
-        state: &mut Self::State,
-        reason: VisitReason,
-        node: &CallInputItem,
-    )
-    {
-        if reason == VisitReason::Exit {
-            return;
-        }
         // Check for assignment spacing
-        if node.syntax().to_string().contains('=') && !node.syntax().to_string().contains(" = ") {
-            let i = node.syntax().to_string().find('=').unwrap();
-            state.add(call_input_assignment(Span::new(
-                node.syntax().text_range().to_span().start() + i,
-                1,
-            )));
-        }
+        call.inputs().for_each(|input|{
+            if input.syntax().to_string().contains('=') && !input.syntax().to_string().contains(" = ") {
+                let i = input.syntax().to_string().find('=').unwrap();
+                state.add(call_input_assignment(Span::new(
+                    input.syntax().text_range().to_span().start() + i,
+                    1,
+                )));
+            }
+        });
     }
-
 }

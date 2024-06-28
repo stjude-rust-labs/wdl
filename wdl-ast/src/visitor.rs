@@ -220,15 +220,6 @@ pub trait Visitor: Send + Sync {
         stmt: &CallStatement,
     ) {
     }
-
-    /// Visits a call input item in a workflow.
-    fn call_input_item(
-        &mut self,
-        state: &mut Self::State,
-        reason: VisitReason,
-        node: &CallInputItem,
-    ) {
-    }
 }
 
 /// Used to visit each descendant node of the given root in a preorder
@@ -389,11 +380,9 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, state: &mut V::State, visitor
             }
             SyntaxKind::CallTargetNode
             | SyntaxKind::CallAliasNode
-            | SyntaxKind::CallAfterNode => {
+            | SyntaxKind::CallAfterNode
+            | SyntaxKind::CallInputItemNode => {
                 // Skip these nodes as they're part of a call statement
-            }
-            SyntaxKind::CallInputItemNode => {
-                visitor.call_input_item(state, reason, &CallInputItem(element.into_node().unwrap()))
             }
             SyntaxKind::Abandoned | SyntaxKind::MAX => {
                 unreachable!("node should not exist in the tree")
