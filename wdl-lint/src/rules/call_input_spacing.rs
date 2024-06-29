@@ -26,7 +26,6 @@ fn call_input_keyword_spacing(span: Span) -> Diagnostic {
         .with_highlight(span)
         .with_fix(
             "input keyword must be separated from the opening brace (\"{\") by a single space"
-                .to_string(),
         )
 }
 

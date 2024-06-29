@@ -529,7 +529,7 @@ impl AstNode for CallAfter {
 
 /// Represents an input item in a call statement.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct CallInputItem(pub(crate) SyntaxNode);
+pub struct CallInputItem(SyntaxNode);
 
 impl CallInputItem {
     /// Gets the name of the input.
