@@ -1,7 +1,5 @@
 //! A lint rule for spacing of call inputs.
 
-use std::borrow::Borrow;
-
 use wdl_ast::v1::CallStatement;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
@@ -21,17 +19,23 @@ const ID: &str = "CallInputSpacing";
 
 /// Creates a input spacing diagnostic.
 fn call_input_keyword_spacing(span: Span) -> Diagnostic {
-    Diagnostic::warning("call input keyword not properly spaced")
+    Diagnostic::note("call input keyword not properly spaced")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix(
-            "input keyword must be separated from the opening brace (\"{\") by a single space"
-        )
+        .with_fix("add a single space prior to the input keyword")
+}
+
+/// Creates an incorrect call input whitespace diagnostic.
+fn call_input_incorrect_spacing(span: Span) -> Diagnostic {
+    Diagnostic::note("call input not properly spaced")
+        .with_rule(ID)
+        .with_highlight(span)
+        .with_fix("change this whitespace to a single space")
 }
 
 /// Creates an input call spacing diagnostic.
 fn call_input_missing_newline(span: Span) -> Diagnostic {
-    Diagnostic::warning("call inputs must be separated by newline")
+    Diagnostic::note("call inputs must be separated by newline")
         .with_rule(ID)
         .with_highlight(span)
         .with_fix("add newline before the input")
@@ -39,7 +43,7 @@ fn call_input_missing_newline(span: Span) -> Diagnostic {
 
 /// Creates call input assignment diagnostic.
 fn call_input_assignment(span: Span) -> Diagnostic {
-    Diagnostic::warning("call inputs assignments must be surrounded with whitespace")
+    Diagnostic::note("call inputs assignments must be surrounded with whitespace")
         .with_rule(ID)
         .with_highlight(span)
         .with_fix("surround '=' with whitespace on each side")
@@ -93,42 +97,23 @@ impl Visitor for CallInputSpacingRule {
         }
 
         // Check for "{ input:" spacing
-        let mut spacing_errors = 0;
-        let input_keyword = call
+        if let Some(input_keyword) = call
             .syntax()
             .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::InputKeyword);
-
-        if let Some(rbrace) = call
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::OpenBrace)
+            .find(|c| c.kind() == SyntaxKind::InputKeyword)
         {
-            match input_keyword.borrow() {
-                Some(t) => {
-                    if let Some(next) = rbrace.next_sibling_or_token() {
-                        if next.as_token().expect("should be a token").text().eq(" ") {
-                            if let Some(second) = next.next_sibling_or_token() {
-                                if second != *t {
-                                    spacing_errors += 1;
-                                }
-                            }
-                        } else {
-                            spacing_errors += 1;
-                        }
-                    }
+            if let Some(whitespace) = input_keyword.prev_sibling_or_token() {
+                if whitespace.kind() != SyntaxKind::Whitespace {
+                    // If there is no whitespace before the input keyword
+                    state.add(call_input_keyword_spacing(
+                        input_keyword.text_range().to_span(),
+                    ));
+                } else if !whitespace.as_token().unwrap().text().eq(" ") {
+                    // If there is anything other than one whitespace before the input keyword
+                    state.add(call_input_incorrect_spacing(
+                        whitespace.text_range().to_span(),
+                    ));
                 }
-                None => {
-                    // input keyword will be optional in the future
-                }
-            }
-            if spacing_errors > 0 {
-                state.add(call_input_keyword_spacing(Span::new(
-                    rbrace.text_range().to_span().start(),
-                    input_keyword.unwrap().text_range().to_span().start()
-                        - rbrace.text_range().to_span().end()
-                        + 1,
-                )));
             }
         }
 
