@@ -12,7 +12,7 @@ commit_hash = "ee08634f28810e5d6fd1a904fc83f4e67821550e"
 
 [repositories."stjudecloud/workflows"]
 identifier = "stjudecloud/workflows"
-commit_hash = "f67825369c2459e4b5a0ae970873e462af33d7b0"
+commit_hash = "efdca837bc35fe5647de6aa95989652a5a9648dc"
 filters = ["/template/task-templates.wdl"]
 
 [[diagnostics]]
@@ -1072,1990 +1072,430 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/ee08634f28810e5d6fd1a90
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:129:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L129"
+message = "read_group.wdl:12:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L12"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:12:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L12"
+message = "read_group.wdl:130:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L130"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:13:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L13"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L13"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:14:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L14"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L14"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:173:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L173"
+message = "read_group.wdl:174:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L174"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:182:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L182"
+message = "read_group.wdl:183:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L183"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:206:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L206"
+message = "read_group.wdl:207:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L207"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:2:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L2"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:32:12: warning[SnakeCase]: struct member name `ID` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L32"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:33:13: warning[SnakeCase]: struct member name `BC` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L33"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:34:13: warning[SnakeCase]: struct member name `CN` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L34"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:35:13: warning[SnakeCase]: struct member name `DS` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L35"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:36:13: warning[SnakeCase]: struct member name `DT` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L36"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:37:13: warning[SnakeCase]: struct member name `FO` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L37"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:38:13: warning[SnakeCase]: struct member name `KS` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L38"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:39:13: warning[SnakeCase]: struct member name `LB` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L39"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L2"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:3:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L3"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:40:13: warning[SnakeCase]: struct member name `PG` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L40"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:41:10: warning[SnakeCase]: struct member name `PI` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L41"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:42:13: warning[SnakeCase]: struct member name `PL` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L42"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:43:13: warning[SnakeCase]: struct member name `PM` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L43"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:44:13: warning[SnakeCase]: struct member name `PU` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L44"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:45:13: warning[SnakeCase]: struct member name `SM` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L45"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L3"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:7:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L7"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L7"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:8:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/data_structures/read_group.wdl/#L8"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L8"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:140:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L140"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/arriba.wdl/#L140"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:143:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L143"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/arriba.wdl/#L143"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:174:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L174"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/arriba.wdl/#L174"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:193:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L193"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/arriba.wdl/#L193"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:195:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L195"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/arriba.wdl/#L195"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:257:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L257"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/arriba.wdl/#L257"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:263:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/arriba.wdl/#L263"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/arriba.wdl/#L263"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/bwa.wdl"
 message = "bwa.wdl:242:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/bwa.wdl/#L242"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/bwa.wdl/#L242"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/cellranger.wdl"
 message = "cellranger.wdl:3:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/cellranger.wdl/#L3"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/cellranger.wdl/#L3"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/cellranger.wdl"
 message = "cellranger.wdl:61:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/cellranger.wdl/#L61"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/cellranger.wdl/#L61"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/cellranger.wdl"
 message = "cellranger.wdl:62:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/cellranger.wdl/#L62"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/cellranger.wdl/#L62"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/estimate.wdl"
 message = "estimate.wdl:39:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/estimate.wdl/#L39"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/estimate.wdl/#L39"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/fastqc.wdl"
 message = "fastqc.wdl:59:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/fastqc.wdl/#L59"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/fastqc.wdl/#L59"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:106:14: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L106"
+message = "gatk4.wdl:119:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L119"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:107:14: warning[SnakeCase]: input name `dbSNP_vcf_index` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L107"
+message = "gatk4.wdl:124:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L124"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:117:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L117"
+message = "gatk4.wdl:188:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L188"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:122:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L122"
+message = "gatk4.wdl:263:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L263"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:186:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L186"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:249:14: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L249"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:250:14: warning[SnakeCase]: input name `dbSNP_vcf_index` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L250"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:259:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L259"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:264:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L264"
+message = "gatk4.wdl:268:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L268"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:42:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/gatk4.wdl/#L42"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L42"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:118:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/htseq.wdl/#L118"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/htseq.wdl/#L118"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:159:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/htseq.wdl/#L159"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/htseq.wdl/#L159"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:184:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/htseq.wdl/#L184"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/htseq.wdl/#L184"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:94:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/htseq.wdl/#L94"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/htseq.wdl/#L94"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:96:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/htseq.wdl/#L96"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/htseq.wdl/#L96"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
 message = "ngsderive.wdl:257:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/ngsderive.wdl/#L257"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L257"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
 message = "ngsderive.wdl:259:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/ngsderive.wdl/#L259"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L259"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
 message = "picard.wdl:1032:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/picard.wdl/#L1032"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L1032"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/qualimap.wdl"
 message = "qualimap.wdl:81:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/qualimap.wdl/#L81"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/qualimap.wdl/#L81"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:552:13: warning[SnakeCase]: input name `out_QS_conversion_add` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L552"
+message = "star.wdl:703:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/star.wdl/#L703"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:553:13: warning[SnakeCase]: input name `out_sam_attr_IH_start` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L553"
+message = "star.wdl:704:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/star.wdl/#L704"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:555:13: warning[SnakeCase]: input name `out_sam_flag_OR` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L555"
+message = "star.wdl:710:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/star.wdl/#L710"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:556:13: warning[SnakeCase]: input name `out_sam_flag_AND` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L556"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:564:13: warning[SnakeCase]: input name `score_gap_GCAG` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L564"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:565:13: warning[SnakeCase]: input name `score_gap_ATAC` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L565"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:597:13: warning[SnakeCase]: input name `chim_score_junction_nonGTAG` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L597"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:61:13: warning[SnakeCase]: input name `genome_SA_index_n_bases` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L61"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:62:13: warning[SnakeCase]: input name `genome_SA_sparse_d` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L62"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:694:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L694"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:695:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L695"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:701:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L701"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:734:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L734"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:818:9: warning[SnakeCase]: struct member name `GT_AG_and_CT_AC_motif` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L818"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:819:9: warning[SnakeCase]: struct member name `GC_AG_and_CT_GC_motif` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L819"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:820:9: warning[SnakeCase]: struct member name `AT_AC_and_GT_AT_motif` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/star.wdl/#L820"
+message = "star.wdl:743:1: note[LineWidth]: line exceeds maximum width of 90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/star.wdl/#L743"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:613:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L613"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L613"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:618:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L618"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L618"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:637:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L637"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L637"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:649:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L649"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L649"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:693:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L693"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L693"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:706:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L706"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L706"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:717:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L717"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L717"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:718:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L718"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L718"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:719:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L719"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L719"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:720:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L720"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L720"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:721:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L721"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L721"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:722:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L722"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L722"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:723:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L723"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L723"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:725:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L725"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L725"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:726:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L726"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L726"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:728:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/tools/util.wdl/#L728"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:100:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L100"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:101:30: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L101"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:106:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L106"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:107:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L107"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L728"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
 message = "chipseq-standard.wdl:10:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L10"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:114:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L114"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:119:13: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L119"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/chipseq/chipseq-standard.wdl/#L10"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
 message = "chipseq-standard.wdl:11:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L11"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:120:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L120"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:124:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L124"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:125:19: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L125"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:128:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L128"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:129:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L129"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/chipseq/chipseq-standard.wdl/#L11"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
 message = "chipseq-standard.wdl:12:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L12"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:131:42: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L131"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:134:13: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L134"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:138:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L138"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:139:18: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L139"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:140:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L140"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:49:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L49"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:55:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L55"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:56:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L56"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:57:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L57"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:63:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L63"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:64:24: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L64"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:68:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L68"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:69:19: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L69"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:70:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L70"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:74:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L74"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:78:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L78"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:79:18: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L79"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:84:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L84"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:87:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L87"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:88:24: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L88"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:89:24: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L89"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:90:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/chipseq/chipseq-standard.wdl/#L90"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/chipseq/chipseq-standard.wdl/#L12"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
 message = "dnaseq-core.wdl:115:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/dnaseq/dnaseq-core.wdl/#L115"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/dnaseq/dnaseq-core.wdl/#L115"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
 message = "dnaseq-standard-fastq.wdl:134:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L134"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L134"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
 message = "dnaseq-standard-fastq.wdl:51:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L51"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:44:49: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L44"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:48:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L48"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:49:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L49"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:53:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L53"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:54:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L54"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:55:29: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L55"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:56:20: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L56"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:57:35: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L57"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:62:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L62"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L51"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
 message = "alignment-post.wdl:6:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L6"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:73:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L73"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:74:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L74"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:79:42: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L79"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:81:47: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/alignment-post.wdl/#L81"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:28:42: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/bam-to-fastqs.wdl/#L28"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:29:34: note[CallInputSpacing]: call inputs must be separated by newline"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/bam-to-fastqs.wdl/#L29"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:29:37: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/bam-to-fastqs.wdl/#L29"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:29:43: note[CallInputSpacing]: call inputs must be separated by newline"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/bam-to-fastqs.wdl/#L29"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:29:56: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/bam-to-fastqs.wdl/#L29"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:32:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/bam-to-fastqs.wdl/#L32"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:33:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/bam-to-fastqs.wdl/#L33"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:34:24: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/bam-to-fastqs.wdl/#L34"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:35:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/bam-to-fastqs.wdl/#L35"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:43:27: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/bam-to-fastqs.wdl/#L43"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:44:27: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/bam-to-fastqs.wdl/#L44"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/general/alignment-post.wdl/#L6"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
 message = "samtools-merge.wdl:23:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L23"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/general/samtools-merge.wdl/#L23"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
 message = "samtools-merge.wdl:35:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L35"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:43:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L43"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:44:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L44"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:45:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L45"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:46:27: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L46"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:47:30: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L47"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:51:17: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L51"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:52:19: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L52"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:53:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L53"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:54:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L54"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:55:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L55"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:56:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L56"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:62:17: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L62"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:63:19: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L63"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:64:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L64"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:65:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L65"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:66:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/general/samtools-merge.wdl/#L66"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:47:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/markdups-post.wdl/#L47"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:48:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/markdups-post.wdl/#L48"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:51:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/markdups-post.wdl/#L51"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:52:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/markdups-post.wdl/#L52"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:56:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/markdups-post.wdl/#L56"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:57:18: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/markdups-post.wdl/#L57"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:58:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/markdups-post.wdl/#L58"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:62:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/markdups-post.wdl/#L62"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:63:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/markdups-post.wdl/#L63"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:64:25: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/markdups-post.wdl/#L64"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:65:19: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/markdups-post.wdl/#L65"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/general/samtools-merge.wdl/#L35"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
 message = "quality-check-standard.wdl:110:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L110"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:141:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L141"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:143:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L143"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:144:24: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L144"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/qc/quality-check-standard.wdl/#L110"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
 message = "quality-check-standard.wdl:150:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L150"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:155:65: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L155"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:157:60: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L157"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:158:77: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L158"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:162:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L162"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:163:19: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L163"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:164:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L164"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:165:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L165"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:169:20: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L169"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:170:30: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L170"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:189:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L189"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:190:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L190"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:191:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L191"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:192:20: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L192"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:193:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L193"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:197:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L197"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:198:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L198"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:201:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L201"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:202:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L202"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:205:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L205"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:206:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L206"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:207:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L207"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:210:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L210"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:211:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L211"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:214:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L214"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:215:18: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L215"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:216:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L216"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:219:18: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L219"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:220:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L220"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:221:18: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L221"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:224:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L224"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:225:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L225"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:226:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L226"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:229:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L229"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:230:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L230"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:310:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L310"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:311:18: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L311"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:312:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L312"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:316:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L316"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:317:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L317"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:318:25: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L318"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:319:19: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L319"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:325:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L325"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:326:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L326"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:327:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L327"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:328:19: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L328"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:331:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L331"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:332:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L332"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:333:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L333"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:334:25: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L334"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:337:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L337"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:338:19: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L338"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:339:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L339"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:340:24: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L340"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:341:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L341"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:382:20: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L382"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:421:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L421"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:422:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L422"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/qc/quality-check-standard.wdl/#L150"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
 message = "quality-check-standard.wdl:435:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/qc/quality-check-standard.wdl/#L435"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/bwa-db-build.wdl"
-message = "bwa-db-build.wdl:31:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/bwa-db-build.wdl/#L31"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/bwa-db-build.wdl"
-message = "bwa-db-build.wdl:32:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/bwa-db-build.wdl/#L32"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/bwa-db-build.wdl"
-message = "bwa-db-build.wdl:33:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/bwa-db-build.wdl/#L33"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/bwa-db-build.wdl"
-message = "bwa-db-build.wdl:34:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/bwa-db-build.wdl/#L34"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/bwa-db-build.wdl"
-message = "bwa-db-build.wdl:37:24: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/bwa-db-build.wdl/#L37"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:101:15: warning[SnakeCase]: output name `dbSNP_vcf` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L101"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:102:15: warning[SnakeCase]: output name `dbSNP_vcf_index` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L102"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:42:16: warning[SnakeCase]: input name `dbSNP_vcf_url` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L42"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:43:16: warning[SnakeCase]: input name `dbSNP_vcf_name` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L43"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:44:17: warning[SnakeCase]: input name `dbSNP_vcf_index_url` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L44"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:45:17: warning[SnakeCase]: input name `dbSNP_vcf_index_name` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L45"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:50:43: note[CallInputSpacing]: call input not properly spaced"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L50"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:57:26: note[CallInputSpacing]: call input not properly spaced"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L57"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:62:45: note[CallInputSpacing]: call input not properly spaced"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L62"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:67:34: note[CallInputSpacing]: call input not properly spaced"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L67"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:74:44: note[CallInputSpacing]: call input not properly spaced"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L74"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:82:42: note[CallInputSpacing]: call input not properly spaced"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L82"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:90:42: note[CallInputSpacing]: call input not properly spaced"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/gatk-reference.wdl/#L90"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:109:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L109"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:110:25: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L110"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:111:25: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L111"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:115:52: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L115"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:119:25: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L119"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:120:20: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L120"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:128:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L128"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:129:20: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L129"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:134:17: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L134"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:139:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L139"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:90:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L90"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:91:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L91"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:92:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L92"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:95:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L95"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:96:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L96"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:97:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/make-qc-reference.wdl/#L97"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:40:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/star-db-build.wdl/#L40"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:41:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/star-db-build.wdl/#L41"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:42:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/star-db-build.wdl/#L42"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:43:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/star-db-build.wdl/#L43"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:46:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/star-db-build.wdl/#L46"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:47:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/star-db-build.wdl/#L47"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:48:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/star-db-build.wdl/#L48"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:49:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/star-db-build.wdl/#L49"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:52:24: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/star-db-build.wdl/#L52"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:53:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/reference/star-db-build.wdl/#L53"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/ESTIMATE.wdl"
-message = "ESTIMATE.wdl:28:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/ESTIMATE.wdl/#L28"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/ESTIMATE.wdl"
-message = "ESTIMATE.wdl:29:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/ESTIMATE.wdl/#L29"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/ESTIMATE.wdl"
-message = "ESTIMATE.wdl:32:29: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/ESTIMATE.wdl/#L32"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:138:13: warning[SnakeCase]: input name `chim_score_junction_nonGTAG` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L138"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:158:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L158"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:175:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L175"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:176:24: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L176"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:177:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L177"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:178:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L178"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:179:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L179"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:180:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L180"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:184:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L184"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:185:18: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L185"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:186:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L186"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:190:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L190"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:191:18: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L191"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:192:19: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L192"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:200:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L200"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:201:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L201"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:202:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L202"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:203:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-core.wdl/#L203"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:110:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L110"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:111:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L111"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:112:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L112"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:116:83: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L116"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:125:31: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L125"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:126:31: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L126"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:135:31: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L135"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:136:31: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L136"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:137:29: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L137"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:153:27: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L153"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:154:27: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L154"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:155:20: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L155"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:156:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L156"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:157:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L157"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:158:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L158"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:159:24: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L159"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:160:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L160"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:161:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L161"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:162:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L162"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:163:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L163"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:164:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L164"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:102:27: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L102"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:103:27: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L103"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:106:20: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L106"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:107:15: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L107"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:108:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L108"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:109:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L109"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:110:24: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L110"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:111:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L111"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:112:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L112"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:113:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L113"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:114:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L114"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:115:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L115"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:71:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L71"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:72:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L72"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:73:23: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L73"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:78:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L78"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:84:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L84"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:85:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L85"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:86:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L86"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:92:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L92"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:93:24: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L93"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:96:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L96"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:97:19: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L97"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:98:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-standard.wdl/#L98"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
-message = "rnaseq-variant-calling.wdl:40:14: warning[SnakeCase]: input name `dbSNP_vcf` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-variant-calling.wdl/#L40"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
-message = "rnaseq-variant-calling.wdl:41:14: warning[SnakeCase]: input name `dbSNP_vcf_index` is not snake_case"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/rnaseq/rnaseq-variant-calling.wdl/#L41"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/qc/quality-check-standard.wdl/#L435"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:28:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L28"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L28"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:29:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L29"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L29"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:32:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L32"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L32"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:35:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L35"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L35"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:36:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L36"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L36"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:37:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L37"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L37"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:38:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L38"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:47:10: note[MissingMetas]: workflow `cell_ranger_bam_to_fastqs` is missing a `meta` section"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L47"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:64:42: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L64"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:66:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L66"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:67:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L67"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:68:21: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L68"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:69:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L69"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:70:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L70"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:74:27: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L74"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:75:27: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L75"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:87:6: note[MissingMetas]: task `parse_input` is missing a `meta` section"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L87"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L38"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:18:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L18"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/scrnaseq-standard.wdl/#L18"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:19:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L19"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/scrnaseq-standard.wdl/#L19"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:22:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L22"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/scrnaseq-standard.wdl/#L22"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:25:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L25"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/scrnaseq-standard.wdl/#L25"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:26:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L26"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/scrnaseq-standard.wdl/#L26"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:27:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L27"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/scrnaseq-standard.wdl/#L27"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:28:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L28"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:40:10: note[MissingMetas]: workflow `scrnaseq_standard` is missing a `meta` section"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L40"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/scrnaseq-standard.wdl/#L28"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:5:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L5"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:63:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L63"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:69:16: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L69"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:70:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L70"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:71:26: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L71"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:77:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L77"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:78:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L78"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:82:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L82"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:83:29: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L83"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:84:11: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L84"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:85:22: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L85"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:87:42: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L87"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:89:12: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L89"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:90:18: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L90"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:91:19: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L91"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:94:47: note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace"
-permalink = "https://github.com/stjudecloud/workflows/blob/f67825369c2459e4b5a0ae970873e462af33d7b0/workflows/scrnaseq/scrnaseq-standard.wdl/#L94"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/scrnaseq-standard.wdl/#L5"
