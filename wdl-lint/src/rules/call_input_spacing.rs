@@ -109,7 +109,7 @@ impl Visitor for CallInputSpacingRule {
                         input_keyword.text_range().to_span(),
                     ));
                 } else if !whitespace.as_token().unwrap().text().eq(" ") {
-                    // If there is anything other than one whitespace before the input keyword
+                    // If there is anything other than one space before the input keyword
                     state.add(call_input_incorrect_spacing(
                         whitespace.text_range().to_span(),
                     ));
