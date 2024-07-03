@@ -6,7 +6,6 @@ use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Span;
 use wdl_ast::SyntaxKind;
-use wdl_ast::SyntaxNode;
 use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -89,17 +88,11 @@ impl Visitor for ImportSortRule {
             return;
         }
 
-        let imports = doc
-            .syntax()
-            .children_with_tokens()
-            .filter(|c| c.kind() == SyntaxKind::ImportStatementNode)
-            .map(|c| c.into_node().unwrap());
-
-        let mut prev_import: Option<SyntaxNode> = None;
-        for import in imports {
+        let mut prev_import: Option<ImportStatement> = None;
+        for import in doc.ast().as_v1().unwrap().imports() {
             if let Some(prev) = prev_import {
-                if import.text().to_string() < prev.text().to_string() {
-                    state.add(import_not_sorted(import.text_range().to_span()));
+                if import.syntax().to_string() < prev.syntax().to_string() {
+                    state.add(import_not_sorted(import.syntax().text_range().to_span()));
                     return; // Only report one sorting diagnostic at a time.
                 }
             }
