@@ -27,6 +27,7 @@ be out of sync with released packages.
 | `PascalCase`                     | Clarity, Naming, Style        | Ensures that structs are defined with PascalCase names.                               |
 | `PreambleComments`               | Clarity, Spacing, Style       | Ensures that documents have correct comments in the preamble.                         |
 | `PreambleWhitespace`             | Spacing, Style                | Ensures that documents have correct whitespace in the preamble.                       |
+| `SectionOrdering`                | Sorting, Style                | Ensures that sections within tasks and workflows are sorted.                          |
 | `SnakeCase`                      | Clarity, Naming, Style        | Ensures that tasks, workflows, and variables are defined with snake_case names.       |
 | `Whitespace`                     | Spacing, Style                | Ensures that a document does not contain undesired whitespace.                        |
 

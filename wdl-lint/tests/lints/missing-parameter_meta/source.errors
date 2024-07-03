@@ -6,3 +6,11 @@ note[MissingMetas]: workflow `test` is missing a `parameter_meta` section
   │
   = fix: add a `parameter_meta` section to the workflow
 
+note[SectionOrdering]: sections are not in order for workflow test
+  ┌─ tests/lints/missing-parameter_meta/source.wdl:3:10
+  │
+3 │ workflow test {
+  │          ^^^^
+  │
+  = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `output`
+

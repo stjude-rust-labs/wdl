@@ -27,6 +27,11 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dc
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "ww-fastq-to-cram.wdl:134:6: note[SectionOrdering]: sections are not in order for task ValidateCram"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L134"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "ww-fastq-to-cram.wdl:134:6: warning[SnakeCase]: task name `ValidateCram` is not snake_case"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L134"
 
@@ -52,6 +57,11 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dc
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "ww-fastq-to-cram.wdl:170:6: note[SectionOrdering]: sections are not in order for task MergeBamsToCram"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L170"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "ww-fastq-to-cram.wdl:170:6: warning[SnakeCase]: task name `MergeBamsToCram` is not snake_case"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L170"
 
@@ -73,6 +83,11 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dc
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "ww-fastq-to-cram.wdl:23:10: note[MissingMetas]: workflow `PairedFastqsToUnmappedCram` is missing a `meta` section"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L23"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "ww-fastq-to-cram.wdl:23:10: note[SectionOrdering]: sections are not in order for workflow PairedFastqsToUnmappedCram"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L23"
 
 [[diagnostics]]
@@ -147,6 +162,11 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dc
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "ww-fastq-to-cram.wdl:83:6: note[SectionOrdering]: sections are not in order for task FastqToUnmappedBam"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L83"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "ww-fastq-to-cram.wdl:83:6: warning[SnakeCase]: task name `FastqToUnmappedBam` is not snake_case"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/7dd6c4c7c8c9fc6dcd4eb5ff8f3262cd26d5e7cc/ww-fastq-to-cram.wdl/#L83"
 
@@ -168,6 +188,11 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
 message = "ww-star-deseq2.wdl:125:6: note[MissingMetas]: task `ConcatenateFastQs` is missing a `meta` section"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L125"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+message = "ww-star-deseq2.wdl:125:6: note[SectionOrdering]: sections are not in order for task ConcatenateFastQs"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L125"
 
 [[diagnostics]]
@@ -203,6 +228,11 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
 message = "ww-star-deseq2.wdl:159:6: note[MissingMetas]: task `STARalignTwoPass` is missing a `meta` section"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L159"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+message = "ww-star-deseq2.wdl:159:6: note[SectionOrdering]: sections are not in order for task STARalignTwoPass"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L159"
 
 [[diagnostics]]
@@ -268,6 +298,11 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
 message = "ww-star-deseq2.wdl:225:6: note[MissingMetas]: task `RNASeQC` is missing a `meta` section"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L225"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+message = "ww-star-deseq2.wdl:225:6: note[SectionOrdering]: sections are not in order for task RNASeQC"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L225"
 
 [[diagnostics]]
@@ -412,6 +447,11 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+message = "ww-star-deseq2.wdl:6:10: note[SectionOrdering]: sections are not in order for workflow STAR2Pass"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L6"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
 message = "ww-star-deseq2.wdl:6:10: warning[SnakeCase]: workflow name `STAR2Pass` is not snake_case"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L6"
 
@@ -463,6 +503,11 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
 message = "ww-star-deseq2.wdl:87:6: note[MissingMetas]: task `FindFastqs` is missing a `meta` section"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L87"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+message = "ww-star-deseq2.wdl:87:6: note[SectionOrdering]: sections are not in order for task FindFastqs"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/3de83fa91db1b2d1b0d91dfc20e3ca71303c8d15/ww-star-deseq2.wdl/#L87"
 
 [[diagnostics]]
@@ -1261,6 +1306,11 @@ message = "picard.wdl:1032:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L1032"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:342:6: note[SectionOrdering]: sections are not in order for task merge_sam_files"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L342"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/tools/qualimap.wdl"
 message = "qualimap.wdl:81:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/qualimap.wdl/#L81"
@@ -1459,6 +1509,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:38:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L38"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
+message = "10x-bam-to-fastqs.wdl:97:6: note[SectionOrdering]: sections are not in order for task parse_input"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L97"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"

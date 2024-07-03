@@ -6,6 +6,14 @@ warning[SnakeCase]: workflow name `BadWorkflow` is not snake_case
   │
   = fix: replace `BadWorkflow` with `bad_workflow`
 
+note[SectionOrdering]: sections are not in order for workflow BadWorkflow
+  ┌─ tests/lints/snake-case/source.wdl:5:10
+  │
+5 │ workflow BadWorkflow {
+  │          ^^^^^^^^^^^
+  │
+  = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `output`
+
 warning[SnakeCase]: private declaration name `badPrivateDecl` is not snake_case
   ┌─ tests/lints/snake-case/source.wdl:8:11
   │
@@ -22,6 +30,14 @@ warning[SnakeCase]: task name `BadTask` is not snake_case
    │
    = fix: replace `BadTask` with `bad_task`
 
+note[SectionOrdering]: sections are not in order for task BadTask
+   ┌─ tests/lints/snake-case/source.wdl:13:6
+   │
+13 │ task BadTask {
+   │      ^^^^^^^
+   │
+   = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `runtime`
+
 warning[SnakeCase]: input name `BadInput` is not snake_case
    ┌─ tests/lints/snake-case/source.wdl:17:16
    │
@@ -37,6 +53,14 @@ warning[SnakeCase]: output name `badOut` is not snake_case
    │              ^^^^^^ this name must be snake_case
    │
    = fix: replace `badOut` with `bad_out`
+
+note[SectionOrdering]: sections are not in order for task good_task
+   ┌─ tests/lints/snake-case/source.wdl:35:6
+   │
+35 │ task good_task {
+   │      ^^^^^^^^^
+   │
+   = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `runtime`
 
 warning[SnakeCase]: struct member name `bAdFiElD` is not snake_case
    ┌─ tests/lints/snake-case/source.wdl:59:12

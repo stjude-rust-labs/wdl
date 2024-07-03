@@ -1,3 +1,11 @@
+note[SectionOrdering]: sections are not in order for task bad
+  ┌─ tests/lints/curly-command/source.wdl:5:6
+  │
+5 │ task bad {
+  │      ^^^
+  │
+  = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `runtime`
+
 warning[NoCurlyCommands]: task `bad` uses curly braces in command section
    ┌─ tests/lints/curly-command/source.wdl:10:5
    │
@@ -5,4 +13,12 @@ warning[NoCurlyCommands]: task `bad` uses curly braces in command section
    │     ^^^^^^^ this command section uses curly braces
    │
    = fix: instead of curly braces, use heredoc syntax (<<<>>>>) for command sections
+
+note[SectionOrdering]: sections are not in order for task good
+   ┌─ tests/lints/curly-command/source.wdl:17:6
+   │
+17 │ task good {
+   │      ^^^^
+   │
+   = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `runtime`
 

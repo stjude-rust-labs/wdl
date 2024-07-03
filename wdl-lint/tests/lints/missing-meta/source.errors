@@ -6,3 +6,11 @@ note[MissingMetas]: task `test` is missing a `meta` section
   │
   = fix: add a `meta` section to the task
 
+note[SectionOrdering]: sections are not in order for task test
+  ┌─ tests/lints/missing-meta/source.wdl:3:6
+  │
+3 │ task test {
+  │      ^^^^
+  │
+  = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `runtime`
+

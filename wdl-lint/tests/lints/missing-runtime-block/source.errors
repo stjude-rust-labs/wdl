@@ -6,3 +6,19 @@ warning[MissingRuntime]: task `bad` is missing a runtime section
   │
   = fix: add a runtime section to the task
 
+note[SectionOrdering]: sections are not in order for task bad
+  ┌─ tests/lints/missing-runtime-block/source.wdl:5:6
+  │
+5 │ task bad {
+  │      ^^^
+  │
+  = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `runtime`
+
+note[SectionOrdering]: sections are not in order for task good
+   ┌─ tests/lints/missing-runtime-block/source.wdl:11:6
+   │
+11 │ task good {
+   │      ^^^^
+   │
+   = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `runtime`
+

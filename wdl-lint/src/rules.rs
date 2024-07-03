@@ -18,6 +18,7 @@ mod no_curly_commands;
 mod pascal_case;
 mod preamble_comments;
 mod preamble_whitespace;
+mod section_order;
 mod snake_case;
 mod whitespace;
 
@@ -39,5 +40,6 @@ pub use no_curly_commands::*;
 pub use pascal_case::*;
 pub use preamble_comments::*;
 pub use preamble_whitespace::*;
+pub use section_order::*;
 pub use snake_case::*;
 pub use whitespace::*;

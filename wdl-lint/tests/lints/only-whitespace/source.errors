@@ -25,6 +25,14 @@ warning[Whitespace]: more than one blank line in a row
    │  
    = fix: remove the unnecessary blank lines
 
+note[SectionOrdering]: sections are not in order for workflow test
+   ┌─ tests/lints/only-whitespace/source.wdl:12:10
+   │
+12 │ workflow test {    
+   │          ^^^^
+   │
+   = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `output`
+
 warning[Whitespace]: line contains trailing whitespace
    ┌─ tests/lints/only-whitespace/source.wdl:12:16
    │
