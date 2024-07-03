@@ -51,7 +51,11 @@ impl Rule for SectionOrderingRule {
     }
 
     fn explanation(&self) -> &'static str {
-        ""
+        "For workflows, the following sections must be present and in this order: meta, \
+         parameter_meta, input, (body), output. \"(body)\" represents all calls and declarations.
+
+        For tasks, the following sections must be present and in this order: meta, parameter_meta, \
+         input, (private declarations), command, output, runtime"
     }
 
     fn tags(&self) -> TagSet {
@@ -130,9 +134,21 @@ impl Visitor for SectionOrderingRule {
         if let Some(inputs) = workflow.inputs().next() {
             sections.push(inputs.syntax().text_range().to_span().start());
         }
+
+        // Collect all calls and declarations
+        // Ensure they are between inputs and outputs.
+        // Internal ordering does not matter.
+        let mut calls_and_declarations: Vec<usize> = Vec::new();
         workflow.declarations().for_each(|f| {
-            sections.push(f.syntax().text_range().to_span().start());
+            calls_and_declarations.push(f.syntax().text_range().to_span().start());
         });
+        workflow.statements().for_each(|f| {
+            calls_and_declarations.push(f.syntax().text_range().to_span().start());
+        });
+
+        calls_and_declarations.sort();
+        sections.append(&mut calls_and_declarations);
+
         if let Some(outputs) = workflow.outputs().next() {
             sections.push(outputs.syntax().text_range().to_span().start());
         }
