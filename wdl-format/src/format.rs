@@ -4,10 +4,14 @@ use std::collections::HashMap;
 
 use anyhow::bail;
 use anyhow::Result;
+use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::ImportStatement;
+use wdl_ast::v1::InputSection;
 use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::v1::WorkflowDefinition;
+use wdl_ast::v1::WorkflowItem;
 use wdl_ast::AstChildren;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
@@ -299,7 +303,9 @@ fn format_imports(imports: AstChildren<ImportStatement>) -> String {
             }
         }
 
-        val.push_str(&format_inline_comment(&SyntaxElement::Node(import.syntax().clone())));
+        val.push_str(&format_inline_comment(&SyntaxElement::Node(
+            import.syntax().clone(),
+        )));
         val.push_str(NEWLINE);
 
         import_map.insert(key, val);
@@ -319,8 +325,20 @@ fn format_imports(imports: AstChildren<ImportStatement>) -> String {
 }
 
 /// Format a meta section.
-fn format_meta_section(meta: MetadataSection) -> String {
+fn format_meta_section(meta: Option<MetadataSection>) -> String {
     let mut result = String::new();
+
+    if meta.is_none() {
+        result.push_str(INDENT);
+        result.push_str("meta {");
+        result.push_str(NEWLINE);
+        result.push_str(INDENT);
+        result.push('}');
+        result.push_str(NEWLINE);
+        return result;
+    }
+    let meta = meta.unwrap();
+
     result.push_str(&format_preceeding_comments(
         &meta,
         SyntaxKind::MetadataSectionNode,
@@ -329,7 +347,12 @@ fn format_meta_section(meta: MetadataSection) -> String {
 
     result.push_str(INDENT);
     result.push_str("meta {");
-    result.push_str(&format_inline_comment(&meta.syntax().first_child_or_token().expect("Metadata section should have a child")));
+    result.push_str(&format_inline_comment(
+        &meta
+            .syntax()
+            .first_child_or_token()
+            .expect("Metadata section should have a child"),
+    ));
     result.push_str(NEWLINE);
 
     for item in meta.items() {
@@ -343,12 +366,132 @@ fn format_meta_section(meta: MetadataSection) -> String {
         result.push_str(item.name().as_str());
         result.push_str(": ");
         result.push_str(&item.value().syntax().to_string());
-        result.push_str(&format_inline_comment(&SyntaxElement::Node(item.syntax().clone())));
+        result.push_str(&format_inline_comment(&SyntaxElement::Node(
+            item.syntax().clone(),
+        )));
         result.push_str(NEWLINE);
     }
     result.push_str(INDENT);
     result.push('}');
-    result.push_str(&format_inline_comment(&meta.syntax().last_child_or_token().expect("Metadata section should have a child")));
+    result.push_str(&format_inline_comment(
+        &meta
+            .syntax()
+            .last_child_or_token()
+            .expect("Metadata section should have a child"),
+    ));
+    result.push_str(NEWLINE);
+    result
+}
+
+/// Format a parameter meta section.
+/// TODO: refactor to share code with `format_meta_section`.
+fn format_parameter_meta_section(parameter_meta: Option<ParameterMetadataSection>) -> String {
+    let mut result = String::new();
+
+    if parameter_meta.is_none() {
+        result.push_str(INDENT);
+        result.push_str("parameter_meta {");
+        result.push_str(NEWLINE);
+        result.push_str(INDENT);
+        result.push('}');
+        result.push_str(NEWLINE);
+        return result;
+    }
+    let parameter_meta = parameter_meta.unwrap();
+
+    result.push_str(&format_preceeding_comments(
+        &parameter_meta,
+        SyntaxKind::ParameterMetadataSectionNode,
+        1,
+    ));
+
+    result.push_str(INDENT);
+    result.push_str("parameter_meta {");
+    result.push_str(&format_inline_comment(
+        &parameter_meta
+            .syntax()
+            .first_child_or_token()
+            .expect("Parameter metadata section should have a child"),
+    ));
+    result.push_str(NEWLINE);
+
+    for item in parameter_meta.items() {
+        result.push_str(&format_preceeding_comments(
+            &item,
+            SyntaxKind::MetadataObjectItemNode,
+            2,
+        ));
+        result.push_str(INDENT);
+        result.push_str(INDENT);
+        result.push_str(item.name().as_str());
+        result.push_str(": ");
+        result.push_str(&item.value().syntax().to_string());
+        result.push_str(&format_inline_comment(&SyntaxElement::Node(
+            item.syntax().clone(),
+        )));
+        result.push_str(NEWLINE);
+    }
+    result.push_str(INDENT);
+    result.push('}');
+    result.push_str(&format_inline_comment(
+        &parameter_meta
+            .syntax()
+            .last_child_or_token()
+            .expect("Parameter metadata section should have a child"),
+    ));
+    result.push_str(NEWLINE);
+    result
+}
+
+/// Format an input section.
+fn format_input_section(input: Option<InputSection>) -> String {
+    let mut result = String::new();
+
+    if input.is_none() {
+        result.push_str(INDENT);
+        result.push_str("input {");
+        result.push_str(NEWLINE);
+        result.push_str(INDENT);
+        result.push('}');
+        result.push_str(NEWLINE);
+        return result;
+    }
+    let input = input.unwrap();
+
+    result.push_str(&format_preceeding_comments(
+        &input,
+        SyntaxKind::InputSectionNode,
+        1,
+    ));
+
+    result.push_str(INDENT);
+    result.push_str("input {");
+    result.push_str(&format_inline_comment(
+        &input
+            .syntax()
+            .first_child_or_token()
+            .expect("Input section should have a child"),
+    ));
+    result.push_str(NEWLINE);
+
+    for item in input.declarations() {
+        result.push_str(&format_preceeding_comments(&item, item.syntax().kind(), 2));
+        result.push_str(INDENT);
+        result.push_str(INDENT);
+        result.push_str(&item.syntax().to_string()); // TODO: Format the declaration
+        result.push_str(&format_inline_comment(&SyntaxElement::Node(
+            item.syntax().clone(),
+        )));
+        result.push_str(NEWLINE);
+    }
+    result.push_str(INDENT);
+    result.push('}');
+    result.push_str(&format_inline_comment(
+        &input
+            .syntax()
+            .last_child_or_token()
+            .expect("Input section should have a child"),
+    ));
     result.push_str(NEWLINE);
     result
 }
@@ -365,10 +508,48 @@ fn format_workflow(workflow_def: WorkflowDefinition) -> String {
     result.push_str("workflow ");
     result.push_str(workflow_def.name().as_str());
     result.push_str(" {");
-    result.push_str(&format_inline_comment(&workflow_def.syntax().first_child_or_token().expect("Workflow definition should have a child")));
+    result.push_str(&format_inline_comment(
+        &workflow_def
+            .syntax()
+            .first_child_or_token()
+            .expect("Workflow definition should have a child"),
+    ));
     result.push_str(NEWLINE);
-    if let Some(meta) = workflow_def.metadata().next() {
-        result.push_str(&format_meta_section(meta));
+
+    result.push_str(&format_meta_section(workflow_def.metadata().next()));
+    result.push_str(NEWLINE);
+
+    result.push_str(&format_parameter_meta_section(
+        workflow_def.parameter_metadata().next(),
+    ));
+    result.push_str(NEWLINE);
+
+    result.push_str(&format_input_section(workflow_def.inputs().next()));
+    result.push_str(NEWLINE);
+
+    for item in workflow_def.items() {
+        match item {
+            WorkflowItem::Call(call) => {
+                // TODO
+            }
+            WorkflowItem::Conditional(conditional) => {
+                // TODO
+            }
+            WorkflowItem::Scatter(scatter) => {
+                // TODO
+            }
+            WorkflowItem::Declaration(decl) => {
+                // TODO
+            }
+            WorkflowItem::Metadata(_)
+            | WorkflowItem::ParameterMetadata(_)
+            | WorkflowItem::Input(_) => {
+                // Already handled
+            }
+            WorkflowItem::Output(_) => {
+                // TODO
+            }
+        }
     }
 
     result.push('}');
@@ -438,7 +619,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "## preamble comment\n\nversion 1.1\n# weird comment\n\nworkflow test {\n}\n"
+             "## preamble comment\n\nversion 1.1\n# weird comment\n\nworkflow test {\n    meta {\n    }\n\n    parameter_meta {\n    }\n\n    input {\n    }\n\n}\n"
         );
     }
 
@@ -446,7 +627,7 @@ mod tests {
     fn test_format_without_comments() {
         let code = "version 1.1\nworkflow test {}";
         let formatted = format_document(code).unwrap();
-        assert_eq!(formatted, "version 1.1\n\nworkflow test {\n}\n");
+        assert_eq!(formatted, "version 1.1\n\nworkflow test {\n    meta {\n    }\n\n    parameter_meta {\n    }\n\n    input {\n    }\n\n}\n");
     }
 
     #[test]
@@ -466,10 +647,11 @@ mod tests {
             formatted,
             "version 1.1\n\nimport \"fileA.wdl\" as bar  # after fileA\n     alias qux as Qux\n# \
              this comment belongs to fileB\nimport \"fileB.wdl\" as foo  # also fileB\n# this \
-             comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n"
+             comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n    meta {\n    \
+             }\n\n    parameter_meta {\n    }\n\n    input {\n    }\n\n}\n"
         );
     }
-    
+
     #[test]
     fn test_format_with_metadata() {
         let code = "
@@ -486,7 +668,32 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {  # workflow comment\n    # meta comment\n    meta {\n        author: \"me\"  # author comment\n        # email comment\n        email: \"me@stjude.org\"\n    }\n}\n"
+            "version 1.1\n\nworkflow test {  # workflow comment\n    # meta comment\n    meta {\n        author: \"me\"  # author comment\n        # email comment\n        email: \"me@stjude.org\"\n    }\n\n    parameter_meta {\n    }\n\n    input {\n    }\n\n}\n"
+        );
+    }
+
+    #[test]
+    fn test_format_with_parameter_metadata() {
+        let code = "
+        version 1.1
+        # workflow comment
+        workflow test {
+            input {
+            String foo
+            }
+        # parameter_meta comment
+            parameter_meta { # parameter_meta comment
+            foo: \"bar\" # foo comment
+            }
+    }
+        
+            ";
+        let formatted = format_document(code).unwrap();
+        assert_eq!(
+            formatted,
+            "version 1.1\n\n# workflow comment\nworkflow test {\n    meta {\n    }\n\n    # \
+             parameter_meta comment\n    parameter_meta {  # parameter_meta comment\n        foo: \
+             \"bar\"  # foo comment\n    }\n\n    input {\n        String foo\n    }\n\n}\n"
         );
     }
 }
