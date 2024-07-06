@@ -21,43 +21,38 @@ use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::Validator;
 use wdl_ast::VersionStatement;
-use wdl_ast::WorkflowDescriptionLanguage;
 
 const NEWLINE: &str = "\n";
 const INDENT: &str = "    ";
 const INLINE_COMMENT_SPACE: &str = "  ";
 
 /// Format comments that preceed a node.
-fn format_preceeding_comments(
-    node: &impl AstNode<Language = WorkflowDescriptionLanguage>,
-    root_kind: SyntaxKind,
-    num_indents: usize,
-) -> String {
+fn format_preceeding_comments(element: &SyntaxElement, num_indents: usize) -> String {
     // This walks _backwards_ through the syntax tree to find comments
     // so we must collect them in a vector and later reverse them to get them in the
     // correct order.
     let mut preceeding_comments = Vec::new();
-    let mut processed_root = false;
 
-    for sibling in node.syntax().siblings_with_tokens(Direction::Prev) {
-        match sibling.kind() {
+    let mut prev = element.prev_sibling_or_token();
+    while let Some(cur) = prev {
+        match cur.kind() {
             SyntaxKind::Comment => {
-                // Ensure this comment "belongs" to the node.
-                // A preceeding comment on a blank line is considered to belong to the node.
+                // Ensure this comment "belongs" to the root element.
+                // A preceeding comment on a blank line is considered to belong to the element.
                 // Othewise, the comment "belongs" to whatever
                 // else is on that line.
-                if let Some(cur) = sibling.prev_sibling_or_token() {
-                    match cur.kind() {
+                if let Some(before_cur) = cur.prev_sibling_or_token() {
+                    match before_cur.kind() {
                         SyntaxKind::Whitespace => {
-                            if cur.as_token().unwrap().text().contains('\n') {
-                                // The 'sibling' comment is on is on its own line.
-                                // It "belongs" to the current node.
+                            if before_cur.as_token().unwrap().text().contains('\n') {
+                                // The 'cur' comment is on is on its own line.
+                                // It "belongs" to the current element.
                                 preceeding_comments
-                                    .push(sibling.as_token().unwrap().text().trim().to_string());
+                                    .push(cur.as_token().unwrap().text().trim().to_string());
                             }
                         }
                         _ => {
-                            // The 'sibling' comment is on the same line as this
+                            // The 'cur' comment is on the same line as this
                             // token. It "belongs"
                             // to whatever is currently being processed.
                         }
@@ -65,20 +60,14 @@ fn format_preceeding_comments(
                 }
             }
             SyntaxKind::Whitespace => {
-                // Skip whitespace
-            }
-            root_kind => {
-                if processed_root {
-                    // This must be a different element of the same kind as the root
-                    break;
-                }
-                processed_root = true;
+                // Ignore
             }
             _ => {
-                // We've backed up past any trivia, so we can stop
+                // We've backed up to non-trivia, so we can stop
                 break;
             }
         }
+        prev = cur.prev_sibling_or_token()
     }
 
     let mut result = String::new();
@@ -92,20 +81,20 @@ fn format_preceeding_comments(
     result
 }
 
-/// Format a comment on the same line as a node.
-/// 'after_comment' is the text to insert _if any comments are found_.
-/// 'instead_of_comment' is the text to insert _if no comments are found_.
-/// Note that a newline is _always_ inserted after the comment.
+/// Format a comment on the same line as an element.
+/// 'after_comment' is the text to insert _if a comment is found_.
+/// 'instead_of_comment' is the text to insert _if no comment is found_.
+/// Note that a newline is _always_ inserted after a found comment.
 /// If no comments are found and 'instead_of_comment' is empty, this function
 /// will return an empty string.
 fn format_inline_comment(
-    node: &SyntaxElement,
+    element: &SyntaxElement,
     after_comment: &str,
     instead_of_comment: &str,
 ) -> String {
     let mut result = String::new();
-    let mut sibling = node.next_sibling_or_token();
-    while let Some(cur) = sibling {
+    let mut next = element.next_sibling_or_token();
+    while let Some(cur) = next {
         match cur.kind() {
             SyntaxKind::Comment => {
                 result.push_str(INLINE_COMMENT_SPACE);
@@ -125,7 +114,7 @@ fn format_inline_comment(
                 break;
             }
         }
-        sibling = cur.next_sibling_or_token();
+        next = cur.next_sibling_or_token();
     }
     if result.is_empty() {
         result.push_str(instead_of_comment);
@@ -135,18 +124,19 @@ fn format_inline_comment(
 
 /// Format a version statement.
 fn format_version_statement(version_statement: VersionStatement) -> String {
-    let mut result = String::new();
     // Collect comments that preceed the version statement
     // Note as this must be the first element in the document,
     // the logic is simpler than the 'format_preceeding_comments' function.
+    // We are walking backwards through the syntax tree, so we must collect
+    // the comments in a vector and reverse them to get them in the correct order.
+    let mut preceeding_comments = Vec::new();
     for sibling in version_statement
         .syntax()
         .siblings_with_tokens(Direction::Prev)
     {
         match sibling.kind() {
             SyntaxKind::Comment => {
-                result.push_str(sibling.as_token().unwrap().text().trim());
-                result.push_str(NEWLINE);
+                preceeding_comments.push(sibling.as_token().unwrap().text().trim().to_string());
             }
             SyntaxKind::Whitespace => {
                 // Ignore
@@ -158,6 +148,12 @@ fn format_version_statement(version_statement: VersionStatement) -> String {
                 unreachable!("Unexpected syntax kind: {:?}", sibling.kind());
             }
         }
+    }
+
+    let mut result = String::new();
+    for comment in preceeding_comments.iter().rev() {
+        result.push_str(comment);
+        result.push_str(NEWLINE);
     }
 
     let mut trailing_comment = String::new();
@@ -216,8 +212,7 @@ fn format_imports(imports: AstChildren<ImportStatement>) -> String {
         let mut val = String::new();
 
         val.push_str(&format_preceeding_comments(
-            &import,
-            SyntaxKind::ImportStatementNode,
+            &SyntaxElement::Node(import.syntax().clone()),
             0,
         ));
 
@@ -361,62 +356,81 @@ fn format_imports(imports: AstChildren<ImportStatement>) -> String {
 /// Format a meta section.
 fn format_meta_section(meta: Option<MetadataSection>) -> String {
     let mut result = String::new();
+    let next_indent_level = format!("{}{}", INDENT, INDENT);
 
     if meta.is_none() {
-        result.push_str(INDENT);
-        result.push_str("meta {");
-        result.push_str(NEWLINE);
-        result.push_str(INDENT);
-        result.push('}');
-        result.push_str(NEWLINE);
+        // result.push_str(INDENT);
+        // result.push_str("meta {");
+        // result.push_str(NEWLINE);
+        // result.push_str(INDENT);
+        // result.push('}');
+        // result.push_str(NEWLINE);
         return result;
     }
     let meta = meta.unwrap();
 
     result.push_str(&format_preceeding_comments(
-        &meta,
-        SyntaxKind::MetadataSectionNode,
+        &SyntaxElement::Node(meta.syntax().clone()),
         1,
     ));
 
-    result.push_str(INDENT);
-    result.push_str("meta {");
-    result.push_str(&format_inline_comment(
-        &meta
-            .syntax()
-            .first_child_or_token()
-            .expect("Metadata section should have a child"),
-        "",
-        NEWLINE,
-    ));
-
-    for item in meta.items() {
-        result.push_str(&format_preceeding_comments(
-            &item,
-            SyntaxKind::MetadataObjectItemNode,
-            2,
-        ));
-        result.push_str(INDENT);
-        result.push_str(INDENT);
-        result.push_str(item.name().as_str());
-        result.push_str(": ");
-        result.push_str(&item.value().syntax().to_string());
-        result.push_str(&format_inline_comment(
-            &SyntaxElement::Node(item.syntax().clone()),
-            "",
-            NEWLINE,
-        ));
+    for child in meta.syntax().children_with_tokens() {
+        match child.kind() {
+            SyntaxKind::MetaKeyword => {
+                // This should always be the first child processed
+                result.push_str(INDENT);
+                result.push_str("meta");
+                result.push_str(&format_inline_comment(&child, INDENT, " "));
+                let mut next = child.next_sibling_or_token();
+                while let Some(cur) = next {
+                    match cur.kind() {
+                        SyntaxKind::OpenBrace => {
+                            result.push('{');
+                            result.push_str(&format_inline_comment(&cur, "", NEWLINE));
+                        }
+                        SyntaxKind::Whitespace => {
+                            // Ignore
+                        }
+                        SyntaxKind::Comment => {
+                            // This will be handled by a call to either
+                            // 'format_preceeding_comments'
+                            // or 'format_inline_comment'.
+                        }
+                        SyntaxKind::MetadataObjectItemNode => {
+                            result.push_str(&format_preceeding_comments(&cur, 2));
+                            result.push_str(&next_indent_level);
+                            result.push_str(&cur.to_string());
+                            result.push_str(&format_inline_comment(&cur, "", NEWLINE));
+                        }
+                        SyntaxKind::CloseBrace => {
+                            // Should always be last child processed
+                            result.push_str(INDENT);
+                            result.push('}');
+                            result.push_str(&format_inline_comment(&cur, "", NEWLINE));
+                        }
+                        _ => {
+                            unreachable!("Unexpected syntax kind: {:?}", cur.kind());
+                        }
+                    }
+                    next = cur.next_sibling_or_token();
+                }
+            }
+            SyntaxKind::Whitespace => {
+                // Ignore
+            }
+            SyntaxKind::OpenBrace
+            | SyntaxKind::MetadataObjectItemNode
+            | SyntaxKind::Comment
+            | SyntaxKind::CloseBrace => {
+                // Handled by the meta keyword
+            }
+            _ => {
+                unreachable!("Unexpected syntax kind: {:?}", child.kind());
+            }
+        }
     }
-    result.push_str(INDENT);
-    result.push('}');
-    result.push_str(&format_inline_comment(
-        &meta
-            .syntax()
-            .last_child_or_token()
-            .expect("Metadata section should have a child"),
-        "",
-        NEWLINE,
-    ));
+
+    result.push_str(NEWLINE);
     result
 }
 
@@ -424,62 +438,81 @@ fn format_meta_section(meta: Option<MetadataSection>) -> String {
 /// TODO: refactor to share code with `format_meta_section`.
 fn format_parameter_meta_section(parameter_meta: Option<ParameterMetadataSection>) -> String {
     let mut result = String::new();
+    let next_indent_level = format!("{}{}", INDENT, INDENT);
 
     if parameter_meta.is_none() {
-        result.push_str(INDENT);
-        result.push_str("parameter_meta {");
-        result.push_str(NEWLINE);
-        result.push_str(INDENT);
-        result.push('}');
-        result.push_str(NEWLINE);
+        // result.push_str(INDENT);
+        // result.push_str("parameter_meta {");
+        // result.push_str(NEWLINE);
+        // result.push_str(INDENT);
+        // result.push('}');
+        // result.push_str(NEWLINE);
         return result;
     }
     let parameter_meta = parameter_meta.unwrap();
 
     result.push_str(&format_preceeding_comments(
-        &parameter_meta,
-        SyntaxKind::ParameterMetadataSectionNode,
+        &SyntaxElement::Node(parameter_meta.syntax().clone()),
         1,
     ));
 
-    result.push_str(INDENT);
-    result.push_str("parameter_meta {");
-    result.push_str(&format_inline_comment(
-        &parameter_meta
-            .syntax()
-            .first_child_or_token()
-            .expect("Parameter metadata section should have a child"),
-        "",
-        NEWLINE,
-    ));
-
-    for item in parameter_meta.items() {
-        result.push_str(&format_preceeding_comments(
-            &item,
-            SyntaxKind::MetadataObjectItemNode,
-            2,
-        ));
-        result.push_str(INDENT);
-        result.push_str(INDENT);
-        result.push_str(item.name().as_str());
-        result.push_str(": ");
-        result.push_str(&item.value().syntax().to_string());
-        result.push_str(&format_inline_comment(
-            &SyntaxElement::Node(item.syntax().clone()),
-            "",
-            NEWLINE,
-        ));
+    for child in parameter_meta.syntax().children_with_tokens() {
+        match child.kind() {
+            SyntaxKind::ParameterMetaKeyword => {
+                // This should always be the first child processed
+                result.push_str(INDENT);
+                result.push_str("parameter_meta");
+                result.push_str(&format_inline_comment(&child, INDENT, " "));
+                let mut next = child.next_sibling_or_token();
+                while let Some(cur) = next {
+                    match cur.kind() {
+                        SyntaxKind::OpenBrace => {
+                            result.push('{');
+                            result.push_str(&format_inline_comment(&cur, "", NEWLINE));
+                        }
+                        SyntaxKind::Whitespace => {
+                            // Ignore
+                        }
+                        SyntaxKind::Comment => {
+                            // This will be handled by a call to either
+                            // 'format_preceeding_comments'
+                            // or 'format_inline_comment'.
+                        }
+                        SyntaxKind::MetadataObjectItemNode => {
+                            result.push_str(&format_preceeding_comments(&cur, 2));
+                            result.push_str(&next_indent_level);
+                            result.push_str(&cur.to_string());
+                            result.push_str(&format_inline_comment(&cur, "", NEWLINE));
+                        }
+                        SyntaxKind::CloseBrace => {
+                            // Should always be last child processed
+                            result.push_str(INDENT);
+                            result.push('}');
+                            result.push_str(&format_inline_comment(&cur, "", NEWLINE));
+                        }
+                        _ => {
+                            unreachable!("Unexpected syntax kind: {:?}", cur.kind());
+                        }
+                    }
+                    next = cur.next_sibling_or_token();
+                }
+            }
+            SyntaxKind::Whitespace => {
+                // Ignore
+            }
+            SyntaxKind::OpenBrace
+            | SyntaxKind::MetadataObjectItemNode
+            | SyntaxKind::Comment
+            | SyntaxKind::CloseBrace => {
+                // Handled by the parameter meta keyword
+            }
+            _ => {
+                unreachable!("Unexpected syntax kind: {:?}", child.kind());
+            }
+        }
     }
-    result.push_str(INDENT);
-    result.push('}');
-    result.push_str(&format_inline_comment(
-        &parameter_meta
-            .syntax()
-            .last_child_or_token()
-            .expect("Parameter metadata section should have a child"),
-        "",
-        NEWLINE,
-    ));
+
+    result.push_str(NEWLINE);
     result
 }
 
@@ -488,19 +521,18 @@ fn format_input_section(input: Option<InputSection>) -> String {
     let mut result = String::new();
 
     if input.is_none() {
-        result.push_str(INDENT);
-        result.push_str("input {");
-        result.push_str(NEWLINE);
-        result.push_str(INDENT);
-        result.push('}');
-        result.push_str(NEWLINE);
+        // result.push_str(INDENT);
+        // result.push_str("input {");
+        // result.push_str(NEWLINE);
+        // result.push_str(INDENT);
+        // result.push('}');
+        // result.push_str(NEWLINE);
         return result;
     }
     let input = input.unwrap();
 
     result.push_str(&format_preceeding_comments(
-        &input,
-        SyntaxKind::InputSectionNode,
+        &SyntaxElement::Node(input.syntax().clone()),
         1,
     ));
 
@@ -516,7 +548,10 @@ fn format_input_section(input: Option<InputSection>) -> String {
     ));
 
     for item in input.declarations() {
-        result.push_str(&format_preceeding_comments(&item, item.syntax().kind(), 2));
+        result.push_str(&format_preceeding_comments(
+            &SyntaxElement::Node(item.syntax().clone()),
+            2,
+        ));
         result.push_str(INDENT);
         result.push_str(INDENT);
         result.push_str(&item.syntax().to_string()); // TODO: Format the declaration
@@ -542,8 +577,7 @@ fn format_input_section(input: Option<InputSection>) -> String {
 fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
     let mut result = String::new();
     result.push_str(&format_preceeding_comments(
-        &call,
-        SyntaxKind::CallStatementNode,
+        &SyntaxElement::Node(call.syntax().clone()),
         num_indents,
     ));
 
@@ -575,14 +609,34 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
 
     if let Some(alias) = call.alias() {
         result.push_str("as");
-        result.push_str(&format_inline_comment(
-            &alias
-                .syntax()
-                .first_child_or_token()
-                .expect("Call alias should have a child"),
-            &next_indent_level,
-            " ",
-        ));
+
+        for child in alias.syntax().children_with_tokens() {
+            match child.kind() {
+                SyntaxKind::AsKeyword => {
+                    // This should always be the first child processed
+                    result.push_str("as");
+                    result.push_str(&format_inline_comment(
+                        &child,
+                        &next_indent_level,
+                        " ",
+                    ));
+                }
+                SyntaxKind::Ident => {
+                    result.push_str(child.as_token().unwrap().text());
+                }
+                SyntaxKind::Whitespace => {
+                    // Ignore
+                }
+                SyntaxKind::Comment => {
+                    // This will be handled by a call to either
+                    // 'format_preceeding_comments'
+                    // or 'format_inline_comment'.
+                }
+                _ => {
+                    unreachable!("Unexpected syntax kind: {:?}", child.kind());
+                }
+            }
+        }
         result.push_str(alias.name().as_str()); // TODO inline comments
         result.push_str(" ");
     }
@@ -603,8 +657,7 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
 
     for input in call.inputs() {
         result.push_str(&format_preceeding_comments(
-            &input,
-            SyntaxKind::CallInputItemNode,
+            &SyntaxElement::Node(input.syntax().clone()),
             num_indents + 1,
         ));
 
@@ -638,8 +691,7 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
 fn format_workflow(workflow_def: WorkflowDefinition) -> String {
     let mut result = String::new();
     result.push_str(&format_preceeding_comments(
-        &workflow_def,
-        SyntaxKind::WorkflowDefinitionNode,
+        &SyntaxElement::Node(workflow_def.syntax().clone()),
         0,
     ));
 
@@ -656,12 +708,10 @@ fn format_workflow(workflow_def: WorkflowDefinition) -> String {
     ));
 
     result.push_str(&format_meta_section(workflow_def.metadata().next()));
-    result.push_str(NEWLINE);
 
     result.push_str(&format_parameter_meta_section(
         workflow_def.parameter_metadata().next(),
     ));
-    result.push_str(NEWLINE);
 
     result.push_str(&format_input_section(workflow_def.inputs().next()));
     result.push_str(NEWLINE);
@@ -761,7 +811,7 @@ mod tests {
         assert_eq!(
             formatted,
             "## preamble comment\n\nversion 1.1  # inline comment\n# weird comment\n\nworkflow \
-             test {\n    meta {\n    }\n\n    parameter_meta {\n    }\n\n    input {\n    }\n\n}\n"
+             test {\n    input {\n    }\n\n}\n"
         );
     }
 
@@ -769,7 +819,10 @@ mod tests {
     fn test_format_without_comments() {
         let code = "version 1.1\nworkflow test {}";
         let formatted = format_document(code).unwrap();
-        assert_eq!(formatted, "version 1.1\n\nworkflow test {\n    meta {\n    }\n\n    parameter_meta {\n    }\n\n    input {\n    }\n\n}\n");
+        assert_eq!(
+            formatted,
+            "version 1.1\n\nworkflow test {\n    input {\n    }\n\n}\n"
+        );
     }
 
     #[test]
@@ -779,7 +832,7 @@ mod tests {
 
         # this comment belongs to fileB
         import \"fileB.wdl\" as foo # also fileB
-        import \"fileA.wdl\" as bar # after fileA
+        import \"fileA.wdl\" as bar # middle of fileA
             alias qux as Qux
         workflow test {}
         # this comment belongs to fileC
@@ -787,15 +840,15 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nimport \"fileA.wdl\" as bar  # after fileA\n     alias qux as Qux\n# \
-             this comment belongs to fileB\nimport \"fileB.wdl\" as foo  # also fileB\n# this \
-             comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n    meta {\n    \
-             }\n\n    parameter_meta {\n    }\n\n    input {\n    }\n\n}\n"
+            "version 1.1\n\nimport \"fileA.wdl\" as bar  # middle of fileA\n     alias qux as \
+             Qux\n# this comment belongs to fileB\nimport \"fileB.wdl\" as foo  # also fileB\n# \
+             this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n    input \
+             {\n    }\n\n}\n"
         );
     }
 
     #[test]
-    fn test_format_with_metadata() {
+    fn test_format_with_meta() {
         let code = "
         version 1.1
 
@@ -810,7 +863,9 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {\n    # meta comment\n    meta {\n        author: \"me\"  # author comment\n        # email comment\n        email: \"me@stjude.org\"\n    }\n\n    parameter_meta {\n    }\n\n    input {\n    }\n\n}\n"
+            "version 1.1\n\nworkflow test {\n    # meta comment\n    meta {\n        author: \
+             \"me\"  # author comment\n        # email comment\n        email: \
+             \"me@stjude.org\"\n    }\n\n    input {\n    }\n\n}\n"
         );
     }
 
@@ -833,7 +888,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\n# workflow comment\nworkflow test {\n    meta {\n    }\n\n    # parameter_meta comment\n    parameter_meta {\n        foo: \"bar\"  # foo comment\n    }\n\n    input {\n        String foo\n    }\n\n}\n"
+            "version 1.1\n\n# workflow comment\nworkflow test {\n    # parameter_meta comment\n    parameter_meta {  # parameter_meta comment\n        foo: \"bar\"  # foo comment\n    }\n\n    input {\n        String foo\n    }\n\n}\n"
         );
     }
 
@@ -853,7 +908,8 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {\n    meta {\n    }\n\n    parameter_meta {\n    }\n\n    input {\n        # foo comment\n        String foo  # another foo comment\n        Int # mid-bar comment\n        bar\n    }\n\n}\n"
+            "version 1.1\n\nworkflow test {\n    input {\n        # foo comment\n        String \
+             foo  # another foo comment\n        Int # mid-bar comment\n        bar\n    }\n\n}\n"
         );
     }
 
@@ -877,7 +933,10 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {\n    meta {\n    }\n\n    parameter_meta {\n    }\n\n    input {\n    }\n\n    # foo comment\n    call foo { input:\n    }\n    # bar comment\n    call bar as baz { input:\n    }\n    call qux  # mid-qux comment 1\n        after baz { input:\n    }\n    call lorem after ipsum { input:\n    }\n}\n"
+            "version 1.1\n\nworkflow test {\n    input {\n    }\n\n    # foo comment\n    call \
+             foo { input:\n    }\n    # bar comment\n    call bar as baz { input:\n    }\n    \
+             call qux  # mid-qux comment 1\n        after baz { input:\n    }\n    call lorem \
+             after ipsum { input:\n    }\n}\n"
         );
     }
 }
