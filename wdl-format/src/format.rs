@@ -571,6 +571,8 @@ fn format_input_section(input: Option<InputSection>) -> String {
         "",
         NEWLINE,
     ));
+
+    result.push_str(NEWLINE);
     result
 }
 
@@ -604,86 +606,214 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
     result.push_str(&format_inline_comment(
         &SyntaxElement::Node(call.target().syntax().clone()),
         &next_indent_level,
-        " ",
+        "",
     ));
 
     if let Some(alias) = call.alias() {
-        result.push_str("as");
-
         for child in alias.syntax().children_with_tokens() {
             match child.kind() {
                 SyntaxKind::AsKeyword => {
                     // This should always be the first child processed
+                    if !result.ends_with(INDENT) {
+                        result.push(' ');
+                    }
                     result.push_str("as");
-                    result.push_str(&format_inline_comment(
-                        &child,
-                        &next_indent_level,
-                        " ",
-                    ));
+                    result.push_str(&format_inline_comment(&child, &next_indent_level, ""))
                 }
                 SyntaxKind::Ident => {
+                    // This will be the last child processed which means it won't have any "next"
+                    // siblings. So we go up a level and check if there are
+                    // siblings of the 'CallAliasNode'.
+                    if !result.ends_with(INDENT) {
+                        result.push(' ');
+                    }
                     result.push_str(child.as_token().unwrap().text());
+                    result.push_str(&format_inline_comment(
+                        &SyntaxElement::Node(alias.syntax().clone()),
+                        &next_indent_level,
+                        "",
+                    ));
                 }
                 SyntaxKind::Whitespace => {
                     // Ignore
                 }
                 SyntaxKind::Comment => {
-                    // This will be handled by a call to either
-                    // 'format_preceeding_comments'
-                    // or 'format_inline_comment'.
+                    // Any comment on the same line as the 'AsKeyword' or 'Ident'
+                    // will be handled by a 'format_inline_comment' call.
+                    // Check if this comment is on it's own line. If so, it should be
+                    // included in the result.
+                    if let Some(before_child) = child.prev_sibling_or_token() {
+                        match before_child.kind() {
+                            SyntaxKind::Whitespace => {
+                                if before_child.as_token().unwrap().text().contains('\n') {
+                                    if !result.ends_with(INDENT) {
+                                        result.push_str(INLINE_COMMENT_SPACE);
+                                    }
+                                    result.push_str(child.as_token().unwrap().text().trim());
+                                    result.push_str(NEWLINE);
+                                    result.push_str(&next_indent_level);
+                                }
+                            }
+                            _ => {
+                                // The comment is on the same line as the
+                                // 'AsKeyword' or 'Ident'
+                                // and will be handled by a
+                                // 'format_inline_comment' call.
+                            }
+                        }
+                    }
                 }
                 _ => {
                     unreachable!("Unexpected syntax kind: {:?}", child.kind());
                 }
             }
         }
-        result.push_str(alias.name().as_str()); // TODO inline comments
-        result.push_str(" ");
     }
+
     for after in call.after() {
-        result.push_str("after "); // TODO inline comments
-        result.push_str(after.name().as_str()); // TODO inline comments
-        result.push_str(" ");
-    }
-    result.push_str("{ input:");
-    result.push_str(&format_inline_comment(
-        &call
-            .syntax()
-            .first_child_or_token()
-            .expect("Call statement should have a child"),
-        "",
-        NEWLINE,
-    ));
-
-    for input in call.inputs() {
-        result.push_str(&format_preceeding_comments(
-            &SyntaxElement::Node(input.syntax().clone()),
-            num_indents + 1,
-        ));
-
-        result.push_str(&next_indent_level);
-        result.push_str(input.name().as_str());
-        if let Some(expr) = input.expr() {
-            result.push_str(" = ");
-            result.push_str(&expr.syntax().to_string()); // TODO format expressions
+        for child in after.syntax().children_with_tokens() {
+            match child.kind() {
+                SyntaxKind::AfterKeyword => {
+                    // This should always be the first child processed
+                    if !result.ends_with(INDENT) {
+                        result.push(' ');
+                    }
+                    result.push_str("after");
+                    result.push_str(&format_inline_comment(&child, &next_indent_level, ""));
+                }
+                SyntaxKind::Ident => {
+                    // This will be the last child processed which means it won't have any "next"
+                    // siblings. So we go up a level and check if there are
+                    // siblings of the 'CallAfterNode'.
+                    if !result.ends_with(INDENT) {
+                        result.push(' ');
+                    }
+                    result.push_str(child.as_token().unwrap().text());
+                    result.push_str(&format_inline_comment(
+                        &SyntaxElement::Node(after.syntax().clone()),
+                        &next_indent_level,
+                        "",
+                    ));
+                }
+                SyntaxKind::Whitespace => {
+                    // Ignore
+                }
+                SyntaxKind::Comment => {
+                    // Any comment on the same line as 'AfterKeyword' or 'Ident'
+                    // will be handled by a 'format_inline_comment' call.
+                    // Check if this comment is on it's own line. If so, it should be
+                    // included in the result.
+                    if let Some(before_child) = child.prev_sibling_or_token() {
+                        match before_child.kind() {
+                            SyntaxKind::Whitespace => {
+                                if before_child.as_token().unwrap().text().contains('\n') {
+                                    if !result.ends_with(INDENT) {
+                                        result.push_str(INLINE_COMMENT_SPACE);
+                                    }
+                                    result.push_str(child.as_token().unwrap().text().trim());
+                                    result.push_str(NEWLINE);
+                                    result.push_str(&next_indent_level);
+                                }
+                            }
+                            _ => {
+                                // The comment is on the same line as
+                                // 'AfterKeyword' or 'Ident'
+                                // and will be handled by a
+                                // 'format_inline_comment' call.
+                            }
+                        }
+                    }
+                }
+                _ => {
+                    unreachable!("Unexpected syntax kind: {:?}", child.kind());
+                }
+            }
         }
-        result.push_str(&format_inline_comment(
-            &SyntaxElement::Node(input.syntax().clone()),
-            "",
-            NEWLINE,
-        ));
     }
 
-    result.push_str(&cur_indent_level);
-    result.push('}');
-    result.push_str(&format_inline_comment(
-        &call
-            .syntax()
-            .last_child_or_token()
-            .expect("Call statement should have a child"),
-        "",
-        NEWLINE,
-    ));
+    for child in call.syntax().children_with_tokens() {
+        match child.kind() {
+            SyntaxKind::CallKeyword
+            | SyntaxKind::CallTargetNode
+            | SyntaxKind::CallAfterNode
+            | SyntaxKind::CallAliasNode => {
+                // Handled above
+            }
+            SyntaxKind::OpenBrace => {
+                if !result.ends_with(INDENT) {
+                    result.push(' ');
+                }
+                result.push('{');
+                result.push_str(&format_inline_comment(&child, &next_indent_level, ""));
+            }
+            SyntaxKind::InputKeyword => {
+                if !result.ends_with(INDENT) {
+                    result.push(' ');
+                }
+                result.push_str("input");
+                result.push_str(&format_inline_comment(&child, &next_indent_level, ""));
+            }
+            SyntaxKind::Colon => {
+                result.push(':');
+                result.push_str(&format_inline_comment(&child, "", NEWLINE));
+            }
+            SyntaxKind::CallInputItemNode => {
+                result.push_str(&format_preceeding_comments(&child, num_indents + 1));
+                result.push_str(&next_indent_level);
+                result.push_str(&child.to_string());
+                result.push_str(&format_inline_comment(&child, "", NEWLINE));
+            }
+            SyntaxKind::CloseBrace => {
+                // Should be last processed
+                if !result.ends_with(INDENT) {
+                    result.push_str(&cur_indent_level);
+                }
+                result.push('}');
+                result.push_str(&format_inline_comment(
+                    &SyntaxElement::Node(call.syntax().clone()),
+                    "",
+                    NEWLINE,
+                ));
+            }
+            SyntaxKind::Whitespace => {
+                // Ignore
+            }
+            SyntaxKind::Comment => {
+                // Any comment on the same line as an element in this match statement
+                // will be handled by a call to 'format_inline_comment'.
+                // Check if this comment is on it's own line. If so, it should be
+                // included in the result.
+                if let Some(before_child) = child.prev_sibling_or_token() {
+                    match before_child.kind() {
+                        SyntaxKind::Whitespace => {
+                            if before_child.as_token().unwrap().text().contains('\n') {
+                                if result.ends_with(NEWLINE) {
+                                    result.push_str(&next_indent_level);
+                                } else if !result.ends_with(INDENT) {
+                                    result.push_str(INLINE_COMMENT_SPACE);
+                                }
+                                result.push_str(child.as_token().unwrap().text().trim());
+                                result.push_str(NEWLINE);
+                            }
+                        }
+                        _ => {
+                            // The comment is on the same line as another
+                            // element and will be
+                            // handled by a 'format_inline_comment'
+                            // call.
+                        }
+                    }
+                }
+            }
+            _ => {
+                unreachable!("Unexpected syntax kind: {:?}", child.kind());
+            }
+        }
+    }
+    if !result.ends_with(NEWLINE) {
+        result.push_str(NEWLINE);
+    }
+
     result
 }
 
@@ -714,7 +844,6 @@ fn format_workflow(workflow_def: WorkflowDefinition) -> String {
     ));
 
     result.push_str(&format_input_section(workflow_def.inputs().next()));
-    result.push_str(NEWLINE);
 
     let mut indent_level = 1;
     for item in workflow_def.items() {
@@ -811,7 +940,7 @@ mod tests {
         assert_eq!(
             formatted,
             "## preamble comment\n\nversion 1.1  # inline comment\n# weird comment\n\nworkflow \
-             test {\n    input {\n    }\n\n}\n"
+             test {\n}\n"
         );
     }
 
@@ -819,10 +948,7 @@ mod tests {
     fn test_format_without_comments() {
         let code = "version 1.1\nworkflow test {}";
         let formatted = format_document(code).unwrap();
-        assert_eq!(
-            formatted,
-            "version 1.1\n\nworkflow test {\n    input {\n    }\n\n}\n"
-        );
+        assert_eq!(formatted, "version 1.1\n\nworkflow test {\n}\n");
     }
 
     #[test]
@@ -842,8 +968,7 @@ mod tests {
             formatted,
             "version 1.1\n\nimport \"fileA.wdl\" as bar  # middle of fileA\n     alias qux as \
              Qux\n# this comment belongs to fileB\nimport \"fileB.wdl\" as foo  # also fileB\n# \
-             this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n    input \
-             {\n    }\n\n}\n"
+             this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n"
         );
     }
 
@@ -865,7 +990,7 @@ mod tests {
             formatted,
             "version 1.1\n\nworkflow test {\n    # meta comment\n    meta {\n        author: \
              \"me\"  # author comment\n        # email comment\n        email: \
-             \"me@stjude.org\"\n    }\n\n    input {\n    }\n\n}\n"
+             \"me@stjude.org\"\n    }\n\n}\n"
         );
     }
 
@@ -924,19 +1049,16 @@ mod tests {
 
         # bar comment
         call bar as baz
-        call qux # mid-qux comment 1
-        # vanishing comment 1
-        after baz # also vanishes 2
-        call lorem after ipsum { input: # vanishing comment 3
+        call qux # mid-qux inline comment
+        # mid-qux full-line comment
+        after baz # after qux
+        call lorem after ipsum { input: # after input token
         }
         }";
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {\n    input {\n    }\n\n    # foo comment\n    call \
-             foo { input:\n    }\n    # bar comment\n    call bar as baz { input:\n    }\n    \
-             call qux  # mid-qux comment 1\n        after baz { input:\n    }\n    call lorem \
-             after ipsum { input:\n    }\n}\n"
+            "version 1.1\n\nworkflow test {\n    # foo comment\n    call foo\n    # bar comment\n    call bar as baz\n    call qux  # mid-qux inline comment\n        after baz  # mid-qux full-line comment\n    call lorem after ipsum { input:  # after input token\n    }\n}\n"
         );
     }
 }
