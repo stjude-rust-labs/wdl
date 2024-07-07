@@ -1,15 +1,18 @@
 //! A module for formatting WDL code.
 
 use std::collections::HashMap;
+use std::result;
 
 use anyhow::bail;
 use anyhow::Result;
 use wdl_ast::v1::CallStatement;
+use wdl_ast::v1::ConditionalStatement;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::ImportStatement;
 use wdl_ast::v1::InputSection;
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::ParameterMetadataSection;
+use wdl_ast::v1::ScatterStatement;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::v1::WorkflowItem;
 use wdl_ast::AstChildren;
@@ -44,11 +47,11 @@ fn format_preceeding_comments(element: &SyntaxElement, num_indents: usize) -> St
                 if let Some(before_cur) = cur.prev_sibling_or_token() {
                     match before_cur.kind() {
                         SyntaxKind::Whitespace => {
-                            if before_cur.as_token().unwrap().text().contains('\n') {
+                            if before_cur.to_string().contains('\n') {
                                 // The 'cur' comment is on is on its own line.
                                 // It "belongs" to the current element.
-                                preceeding_comments
-                                    .push(cur.as_token().unwrap().text().trim().to_string());
+                                let trimmed_comment = cur.clone().to_string().trim().to_owned();
+                                preceeding_comments.push(trimmed_comment);
                             }
                         }
                         _ => {
@@ -98,13 +101,13 @@ fn format_inline_comment(
         match cur.kind() {
             SyntaxKind::Comment => {
                 result.push_str(INLINE_COMMENT_SPACE);
-                result.push_str(cur.as_token().unwrap().text().trim());
+                result.push_str(cur.to_string().trim());
                 result.push_str(NEWLINE);
                 result.push_str(after_comment);
                 break;
             }
             SyntaxKind::Whitespace => {
-                if cur.as_token().unwrap().text().contains('\n') {
+                if cur.to_string().contains('\n') {
                     // We've looked ahead past the current line, so we can stop
                     break;
                 }
@@ -136,7 +139,7 @@ fn format_version_statement(version_statement: VersionStatement) -> String {
     {
         match sibling.kind() {
             SyntaxKind::Comment => {
-                preceeding_comments.push(sibling.as_token().unwrap().text().trim().to_string());
+                preceeding_comments.push(sibling.to_string().trim().to_owned());
             }
             SyntaxKind::Whitespace => {
                 // Ignore
@@ -171,7 +174,7 @@ fn format_version_statement(version_statement: VersionStatement) -> String {
             SyntaxKind::Comment => {
                 // This comment is in the middle of the version statement
                 // It will be moved to after the version statement
-                trailing_comment.push_str(child.as_token().unwrap().text().trim());
+                trailing_comment.push_str(child.to_string().trim());
                 trailing_comment.push_str(NEWLINE);
             }
             SyntaxKind::Whitespace => {
@@ -231,7 +234,7 @@ fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                                             val.push('"');
                                         }
                                         SyntaxKind::LiteralStringText => {
-                                            val.push_str(string_part.as_token().unwrap().text());
+                                            val.push_str(&string_part.to_string());
                                         }
                                         _ => {
                                             unreachable!(
@@ -246,7 +249,7 @@ fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                                 val.push_str(" as ");
                             }
                             SyntaxKind::Ident => {
-                                val.push_str(cur.as_token().unwrap().text());
+                                val.push_str(&cur.to_string());
                             }
                             SyntaxKind::ImportAliasNode => {
                                 cur.as_node().unwrap().children_with_tokens().for_each(
@@ -256,7 +259,7 @@ fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                                             val.push_str(" alias ");
                                         }
                                         SyntaxKind::Ident => {
-                                            val.push_str(alias_part.as_token().unwrap().text());
+                                            val.push_str(&alias_part.to_string());
                                         }
                                         SyntaxKind::AsKeyword => {
                                             val.push_str(" as ");
@@ -274,9 +277,7 @@ fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                                                 val.push(' ');
                                             }
                                             val.push(' ');
-                                            val.push_str(
-                                                alias_part.as_token().unwrap().text().trim(),
-                                            );
+                                            val.push_str(alias_part.to_string().trim());
                                             val.push_str(NEWLINE);
                                             val.push_str(INDENT);
                                         }
@@ -299,7 +300,7 @@ fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                                     val.push(' ');
                                 }
                                 val.push(' ');
-                                val.push_str(cur.as_token().unwrap().text().trim());
+                                val.push_str(cur.to_string().trim());
                                 val.push_str(NEWLINE);
                                 val.push_str(INDENT);
                             }
@@ -578,11 +579,6 @@ fn format_input_section(input: Option<InputSection>) -> String {
 
 fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
     let mut result = String::new();
-    result.push_str(&format_preceeding_comments(
-        &SyntaxElement::Node(call.syntax().clone()),
-        num_indents,
-    ));
-
     let mut cur_indent_level = String::new();
     let mut next_indent_level = String::new();
     for _ in 0..num_indents {
@@ -591,6 +587,10 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
     }
     next_indent_level.push_str(INDENT);
 
+    result.push_str(&format_preceeding_comments(
+        &SyntaxElement::Node(call.syntax().clone()),
+        num_indents,
+    ));
     result.push_str(&cur_indent_level);
     result.push_str("call");
     result.push_str(&format_inline_comment(
@@ -627,7 +627,7 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                     if !result.ends_with(INDENT) {
                         result.push(' ');
                     }
-                    result.push_str(child.as_token().unwrap().text());
+                    result.push_str(&child.to_string());
                     result.push_str(&format_inline_comment(
                         &SyntaxElement::Node(alias.syntax().clone()),
                         &next_indent_level,
@@ -635,7 +635,12 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                     ));
                 }
                 SyntaxKind::Whitespace => {
-                    // Ignore
+                    // If this whitespace contains 2 or more newlines, we should include a single
+                    // blank line in the result
+                    let newline_count = child.to_string().matches(NEWLINE).count();
+                    if newline_count >= 2 {
+                        result.push_str(&format!("{}{}", NEWLINE, NEWLINE));
+                    }
                 }
                 SyntaxKind::Comment => {
                     // Any comment on the same line as the 'AsKeyword' or 'Ident'
@@ -645,11 +650,11 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                     if let Some(before_child) = child.prev_sibling_or_token() {
                         match before_child.kind() {
                             SyntaxKind::Whitespace => {
-                                if before_child.as_token().unwrap().text().contains('\n') {
+                                if before_child.to_string().contains('\n') {
                                     if !result.ends_with(INDENT) {
                                         result.push_str(INLINE_COMMENT_SPACE);
                                     }
-                                    result.push_str(child.as_token().unwrap().text().trim());
+                                    result.push_str(child.to_string().trim());
                                     result.push_str(NEWLINE);
                                     result.push_str(&next_indent_level);
                                 }
@@ -688,7 +693,7 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                     if !result.ends_with(INDENT) {
                         result.push(' ');
                     }
-                    result.push_str(child.as_token().unwrap().text());
+                    result.push_str(&child.to_string());
                     result.push_str(&format_inline_comment(
                         &SyntaxElement::Node(after.syntax().clone()),
                         &next_indent_level,
@@ -696,7 +701,12 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                     ));
                 }
                 SyntaxKind::Whitespace => {
-                    // Ignore
+                    // If this whitespace contains 2 or more newlines, we should include a single
+                    // blank line in the result
+                    let newline_count = child.to_string().matches(NEWLINE).count();
+                    if newline_count >= 2 {
+                        result.push_str(&format!("{}{}", NEWLINE, NEWLINE));
+                    }
                 }
                 SyntaxKind::Comment => {
                     // Any comment on the same line as 'AfterKeyword' or 'Ident'
@@ -706,11 +716,11 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                     if let Some(before_child) = child.prev_sibling_or_token() {
                         match before_child.kind() {
                             SyntaxKind::Whitespace => {
-                                if before_child.as_token().unwrap().text().contains('\n') {
+                                if before_child.to_string().contains('\n') {
                                     if !result.ends_with(INDENT) {
                                         result.push_str(INLINE_COMMENT_SPACE);
                                     }
-                                    result.push_str(child.as_token().unwrap().text().trim());
+                                    result.push_str(child.to_string().trim());
                                     result.push_str(NEWLINE);
                                     result.push_str(&next_indent_level);
                                 }
@@ -776,7 +786,12 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                 ));
             }
             SyntaxKind::Whitespace => {
-                // Ignore
+                // If this whitespace contains 2 or more newlines, we should include a single
+                // blank line in the result
+                let newline_count = child.to_string().matches(NEWLINE).count();
+                if newline_count >= 2 {
+                    result.push_str(&format!("{}{}", NEWLINE, NEWLINE));
+                }
             }
             SyntaxKind::Comment => {
                 // Any comment on the same line as an element in this match statement
@@ -786,13 +801,13 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                 if let Some(before_child) = child.prev_sibling_or_token() {
                     match before_child.kind() {
                         SyntaxKind::Whitespace => {
-                            if before_child.as_token().unwrap().text().contains('\n') {
+                            if before_child.to_string().contains('\n') {
                                 if result.ends_with(NEWLINE) {
                                     result.push_str(&next_indent_level);
                                 } else if !result.ends_with(INDENT) {
                                     result.push_str(INLINE_COMMENT_SPACE);
                                 }
-                                result.push_str(child.as_token().unwrap().text().trim());
+                                result.push_str(child.to_string().trim());
                                 result.push_str(NEWLINE);
                             }
                         }
@@ -812,6 +827,321 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
     }
     if !result.ends_with(NEWLINE) {
         result.push_str(NEWLINE);
+    }
+
+    result
+}
+
+/// Format a conditional statement.
+fn format_conditional(conditional: ConditionalStatement, num_indents: usize) -> String {
+    let mut result = String::new();
+    let mut cur_indent_level = String::new();
+    let mut next_indent_level = String::new();
+    for _ in 0..num_indents {
+        cur_indent_level.push_str(INDENT);
+        next_indent_level.push_str(INDENT);
+    }
+    next_indent_level.push_str(INDENT);
+
+    result.push_str(&format_preceeding_comments(
+        &SyntaxElement::Node(conditional.syntax().clone()),
+        num_indents,
+    ));
+
+    for child in conditional.syntax().children_with_tokens() {
+        match child.kind() {
+            SyntaxKind::IfKeyword => {
+                // This should always be the first child processed
+                result.push_str(&cur_indent_level);
+                result.push_str("if");
+                result.push_str(&format_inline_comment(&child, &next_indent_level, ""));
+            }
+            SyntaxKind::OpenParen => {
+                let mut paren_on_same_line = true;
+                if !result.ends_with(INDENT) {
+                    result.push(' ');
+                }
+                result.push('(');
+                result.push_str(&format_inline_comment(&child, &next_indent_level, ""));
+                let conditional_expr = conditional.expr().syntax().to_string();
+                if conditional_expr.contains('\n') {
+                    paren_on_same_line = false;
+                }
+                result.push_str(&conditional_expr);
+                result.push_str(&format_inline_comment(
+                    &SyntaxElement::Node(conditional.expr().syntax().clone()),
+                    &cur_indent_level,
+                    "",
+                ));
+                if !paren_on_same_line && result.ends_with(&conditional_expr) {
+                    // No comments were added after the multi-line conditional expression
+                    // So let's start a new line with the proper indentation
+                    result.push_str(NEWLINE);
+                    result.push_str(&cur_indent_level)
+                }
+                result.push(')');
+            }
+            SyntaxKind::CloseParen => {
+                // A close paren was added by the OpenParen match arm
+                // But comments of that token will be handled here
+                result.push_str(&format_inline_comment(&child, &cur_indent_level, ""));
+            }
+            SyntaxKind::OpenBrace => {
+                if result.ends_with(')') {
+                    result.push_str(" ");
+                }
+                result.push('{');
+                result.push_str(&format_inline_comment(&child, "", NEWLINE));
+            }
+            SyntaxKind::CallStatementNode => {
+                result.push_str(&format_call_statement(
+                    CallStatement::cast(child.as_node().unwrap().clone()).unwrap(),
+                    num_indents + 1,
+                ));
+            }
+            SyntaxKind::ConditionalStatementNode => {
+                result.push_str(&format_conditional(
+                    ConditionalStatement::cast(child.as_node().unwrap().clone()).unwrap(),
+                    num_indents + 1,
+                ));
+            }
+            SyntaxKind::ScatterStatementNode => {
+                result.push_str(&format_scatter(
+                    ScatterStatement::cast(child.as_node().unwrap().clone()).unwrap(),
+                    num_indents + 1,
+                ));
+            }
+            SyntaxKind::BoundDeclNode | SyntaxKind::UnboundDeclNode => {
+                // TODO
+            }
+            SyntaxKind::Whitespace => {
+                // If this whitespace contains 2 or more newlines, we should include a single
+                // blank line in the result
+                let newline_count = child.to_string().matches(NEWLINE).count();
+                if newline_count >= 2 {
+                    result.push_str(&format!("{}{}", NEWLINE, NEWLINE));
+                }
+            }
+            SyntaxKind::Comment => {
+                // Any comment on the same line as a prior element in this match statement
+                // will be handled by a 'format_inline_comment' call.
+                // Check if this comment is on it's own line. If so, it should be
+                // included in the result.
+                if let Some(before_child) = child.prev_sibling_or_token() {
+                    match before_child.kind() {
+                        SyntaxKind::Whitespace => {
+                            if before_child.to_string().contains('\n') {
+                                if !result.ends_with(INDENT) {
+                                    if result.ends_with(NEWLINE) {
+                                        // TODO: Some cases might call for different indentation
+                                        // How to detect this?
+                                        result.push_str(&next_indent_level);
+                                    } else {
+                                        result.push_str(INLINE_COMMENT_SPACE);
+                                    }
+                                }
+                                result.push_str(child.to_string().trim());
+                                result.push_str(NEWLINE);
+                            }
+                        }
+                        _ => {
+                            // The comment is on the same line as
+                            // another element
+                            // and will be handled by a
+                            // 'format_inline_comment' call.
+                        }
+                    }
+                }
+            }
+            SyntaxKind::CloseBrace => {
+                // Should be last processed
+                if result.ends_with(NEWLINE) {
+                    result.push_str(&cur_indent_level);
+                } else {
+                    result.push_str(NEWLINE);
+                    result.push_str(&cur_indent_level);
+                }
+                result.push('}');
+                result.push_str(&format_inline_comment(
+                    &SyntaxElement::Node(conditional.syntax().clone()),
+                    "",
+                    NEWLINE,
+                ));
+            }
+            _ => {
+                // Should be part of the conditional expression
+            }
+        }
+    }
+
+    result
+}
+
+/// Format a scatter statement
+fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
+    let mut result = String::new();
+    let mut cur_indent_level = String::new();
+    let mut next_indent_level = String::new();
+    for _ in 0..num_indents {
+        cur_indent_level.push_str(INDENT);
+        next_indent_level.push_str(INDENT);
+    }
+    next_indent_level.push_str(INDENT);
+
+    result.push_str(&format_preceeding_comments(
+        &SyntaxElement::Node(scatter.syntax().clone()),
+        num_indents,
+    ));
+
+    let mut paren_on_same_line = true;
+    for child in scatter.syntax().children_with_tokens() {
+        match child.kind() {
+            SyntaxKind::ScatterKeyword => {
+                // This should always be the first child processed
+                result.push_str(&cur_indent_level);
+                result.push_str("scatter");
+                result.push_str(&format_inline_comment(&child, &next_indent_level, ""));
+            }
+            SyntaxKind::OpenParen => {
+                if !result.ends_with(INDENT) {
+                    result.push(' ');
+                }
+                result.push('(');
+                result.push_str(&format_inline_comment(&child, &next_indent_level, ""));
+                if !result.ends_with('(') {
+                    paren_on_same_line = false;
+                }
+
+                result.push_str(scatter.variable().as_str());
+                result.push_str(&format_inline_comment(
+                    &SyntaxElement::Token(scatter.variable().syntax().clone()),
+                    &next_indent_level,
+                    "",
+                ));
+                if !result.ends_with(&scatter.variable().as_str()) {
+                    paren_on_same_line = false;
+                }
+            }
+            SyntaxKind::InKeyword => {
+                if !result.ends_with(INDENT) {
+                    result.push(' ');
+                }
+                result.push_str("in");
+                result.push_str(&format_inline_comment(&child, &next_indent_level, " "));
+                if result.ends_with(INDENT) {
+                    paren_on_same_line = false;
+                }
+
+                let scatter_expr = scatter.expr().syntax().to_string();
+                if scatter_expr.contains('\n') {
+                    paren_on_same_line = false;
+                }
+                result.push_str(&scatter_expr);
+                result.push_str(&format_inline_comment(
+                    &SyntaxElement::Node(scatter.expr().syntax().clone()),
+                    &cur_indent_level,
+                    "",
+                ));
+                if !paren_on_same_line && result.ends_with(&scatter_expr) {
+                    // No comments were added after the scatter expression (which would reset the
+                    // indentation) So let's start a new line with the proper
+                    // indentation
+                    result.push_str(NEWLINE);
+                    result.push_str(&cur_indent_level)
+                }
+                result.push(')');
+            }
+            SyntaxKind::CloseParen => {
+                // A close paren was added by the InKeyword match arm
+                // But comments of that token will be handled here
+                result.push_str(&format_inline_comment(&child, &cur_indent_level, ""));
+            }
+            SyntaxKind::OpenBrace => {
+                if result.ends_with(')') {
+                    result.push_str(" ");
+                }
+                result.push('{');
+                result.push_str(&format_inline_comment(&child, "", NEWLINE));
+            }
+            SyntaxKind::CallStatementNode => {
+                result.push_str(&format_call_statement(
+                    CallStatement::cast(child.as_node().unwrap().clone()).unwrap(),
+                    num_indents + 1,
+                ));
+            }
+            SyntaxKind::ConditionalStatementNode => {
+                result.push_str(&format_conditional(
+                    ConditionalStatement::cast(child.as_node().unwrap().clone()).unwrap(),
+                    num_indents + 1,
+                ));
+            }
+            SyntaxKind::ScatterStatementNode => {
+                result.push_str(&format_scatter(
+                    ScatterStatement::cast(child.as_node().unwrap().clone()).unwrap(),
+                    num_indents + 1,
+                ));
+            }
+            SyntaxKind::BoundDeclNode | SyntaxKind::UnboundDeclNode => {
+                // TODO
+            }
+            SyntaxKind::Whitespace => {
+                // If this whitespace contains 2 or more newlines, we should include a single
+                // blank line in the result
+                let newline_count = child.to_string().matches(NEWLINE).count();
+                if newline_count >= 2 {
+                    result.push_str(&format!("{}{}", NEWLINE, NEWLINE));
+                }
+            }
+            SyntaxKind::Comment => {
+                // Any comment on the same line as a prior element in this match statement
+                // will be handled by a 'format_inline_comment' call.
+                // Check if this comment is on it's own line. If so, it should be
+                // included in the result.
+                if let Some(before_child) = child.prev_sibling_or_token() {
+                    match before_child.kind() {
+                        SyntaxKind::Whitespace => {
+                            if before_child.to_string().contains('\n') {
+                                if !result.ends_with(INDENT) {
+                                    if result.ends_with(NEWLINE) {
+                                        // TODO: Some cases might call for different indentation
+                                        // How to detect this?
+                                        result.push_str(&next_indent_level);
+                                    } else {
+                                        result.push_str(INLINE_COMMENT_SPACE);
+                                    }
+                                }
+                                result.push_str(child.to_string().trim());
+                                result.push_str(NEWLINE);
+                            }
+                        }
+                        _ => {
+                            // The comment is on the same line as
+                            // another element
+                            // and will be handled by a
+                            // 'format_inline_comment' call.
+                        }
+                    }
+                }
+            }
+            SyntaxKind::CloseBrace => {
+                // Should be last processed
+                if result.ends_with(NEWLINE) {
+                    result.push_str(&cur_indent_level);
+                } else {
+                    result.push_str(NEWLINE);
+                    result.push_str(&cur_indent_level);
+                }
+                result.push('}');
+                result.push_str(&format_inline_comment(
+                    &SyntaxElement::Node(scatter.syntax().clone()),
+                    "",
+                    NEWLINE,
+                ));
+            }
+            _ => {
+                // Should be part of the scatter expression
+            }
+        }
     }
 
     result
@@ -845,17 +1175,17 @@ fn format_workflow(workflow_def: WorkflowDefinition) -> String {
 
     result.push_str(&format_input_section(workflow_def.inputs().next()));
 
-    let mut indent_level = 1;
+    let indent_level = 1;
     for item in workflow_def.items() {
         match item {
             WorkflowItem::Call(call) => {
                 result.push_str(&format_call_statement(call, indent_level));
             }
             WorkflowItem::Conditional(conditional) => {
-                // TODO
+                result.push_str(&format_conditional(conditional, indent_level));
             }
             WorkflowItem::Scatter(scatter) => {
-                // TODO
+                result.push_str(&format_scatter(scatter, indent_level));
             }
             WorkflowItem::Declaration(decl) => {
                 // TODO
@@ -916,10 +1246,10 @@ pub fn format_document(code: &str) -> Result<String> {
             DocumentItem::Workflow(workflow_def) => {
                 result.push_str(&format_workflow(workflow_def));
             }
-            DocumentItem::Task(_task_def) => {
+            DocumentItem::Task(task_def) => {
                 // TODO: Format the task
             }
-            DocumentItem::Struct(_struct_def) => {
+            DocumentItem::Struct(struct_def) => {
                 // TODO: Format the struct type
             }
         }
@@ -1059,6 +1389,35 @@ mod tests {
         assert_eq!(
             formatted,
             "version 1.1\n\nworkflow test {\n    # foo comment\n    call foo\n    # bar comment\n    call bar as baz\n    call qux  # mid-qux inline comment\n        after baz  # mid-qux full-line comment\n    call lorem after ipsum { input:  # after input token\n    }\n}\n"
+        );
+    }
+
+    #[test]
+    fn test_format_with_conditionals_and_scatters() {
+        let code = "
+        version 1.1
+
+        workflow test {
+        if (true) {
+        call foo
+        scatter (abc in bar) {
+        if (false) {
+        call bar
+        }
+        if (a >
+        b) {
+        scatter (x in [
+        1, 2, 3
+        ]) {
+        call baz
+    }}
+    }}
+        }";
+        let formatted = format_document(code).unwrap();
+        assert_eq!(
+            formatted,
+            "version 1.1\n\nworkflow test {\n    if (true) {\n        call foo\n    }\n    if \
+             (false) {\n        call bar\n    }\n}\n"
         );
     }
 }
