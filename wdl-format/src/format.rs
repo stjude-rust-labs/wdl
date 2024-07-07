@@ -131,6 +131,7 @@ fn format_meta_section(meta: Option<MetadataSection>) -> String {
     ));
 
     for child in meta.syntax().children_with_tokens() {
+        // TODO this logic can be simplified
         match child.kind() {
             SyntaxKind::MetaKeyword => {
                 // This should always be the first child processed
@@ -273,6 +274,7 @@ fn format_parameter_meta_section(parameter_meta: Option<ParameterMetadataSection
 /// Format an input section.
 fn format_input_section(input: Option<InputSection>) -> String {
     let mut result = String::new();
+    let next_indent_level = format!("{}{}", INDENT, INDENT);
 
     if input.is_none() {
         // result.push_str(INDENT);
@@ -306,8 +308,7 @@ fn format_input_section(input: Option<InputSection>) -> String {
             &SyntaxElement::Node(item.syntax().clone()),
             2,
         ));
-        result.push_str(INDENT);
-        result.push_str(INDENT);
+        result.push_str(&next_indent_level);
         result.push_str(&item.syntax().to_string()); // TODO: Format the declaration
         result.push_str(&format_inline_comment(
             &SyntaxElement::Node(item.syntax().clone()),
@@ -318,10 +319,8 @@ fn format_input_section(input: Option<InputSection>) -> String {
     result.push_str(INDENT);
     result.push('}');
     result.push_str(&format_inline_comment(
-        &input
-            .syntax()
-            .last_child_or_token()
-            .expect("Input section should have a child"),
+        &SyntaxElement::Node(input
+            .syntax().clone()),
         "",
         NEWLINE,
     ));
@@ -441,7 +440,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {  # workflow comment\n    # meta comment\n    meta {\n        author: \"me\"  # author comment\n        # email comment\n        email: \"me@stjude.org\"\n    }\n}\n\n"
+            "version 1.1\n\nworkflow test {  # workflow comment\n    # meta comment\n    meta {\n        author: \"me\"  # author comment\n        # email comment\n        email: \"me@stjude.org\"\n    }\n\n}\n\n"
         );
     }
 
@@ -464,7 +463,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\n# workflow comment\nworkflow test {\n    # parameter_meta comment\n    parameter_meta {  # parameter_meta comment\n        foo: \"bar\"  # foo comment\n    }\n    input {\n        String foo\n    }\n}\n\n"
+             "version 1.1\n\n# workflow comment\nworkflow test {\n    # parameter_meta comment\n    parameter_meta {  # parameter_meta comment\n        foo: \"bar\"  # foo comment\n    }\n\n    input {\n        String foo\n    }\n\n}\n\n"
         );
     }
 
@@ -484,8 +483,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {\n    input {\n        # foo comment\n        String \
-             foo  # another foo comment\n        Int # mid-bar comment\n        bar\n    }\n}\n\n"
+             "version 1.1\n\nworkflow test {\n    input {\n        # foo comment\n        String foo  # another foo comment\n        Int # mid-bar comment\n        bar\n    }\n\n}\n\n"
         );
     }
 
@@ -509,7 +507,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {\n    # foo comment\n    call foo\n    # bar comment\n    call bar as baz\n    call qux  # mid-qux inline comment\n        after baz  # mid-qux full-line comment\n    call lorem after ipsum { input:  # after input token\n    }\n}\n\n"
+            "version 1.1\n\nworkflow test {\n    # foo comment\n    call foo\n    # bar comment\n    call bar as baz\n    call qux  # mid-qux inline comment\n        after baz  # mid-qux full-line comment\n    call lorem after ipsum { input:  # after input token\n    }\n\n}\n\n"
         );
     }
 
@@ -537,7 +535,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {\n    if (true) {\n        call foo\n        scatter (abc in bar) {\n            if (false) {\n                call bar\n            }\n            if (a >\n        b\n            ) {\n                scatter (x in [\n        1, 2, 3\n        ]\n                ) {\n                    call baz\n                }\n            }\n        }\n    }\n}\n\n"
+            "version 1.1\n\nworkflow test {\n    if (true) {\n        call foo\n        scatter (abc in bar) {\n            if (false) {\n                call bar\n            }\n            if (a >\n        b\n            ) {\n                scatter (x in [\n        1, 2, 3\n        ]\n                ) {\n                    call baz\n                }\n            }\n        }\n    }\n\n}\n\n"
         );
     }
 
@@ -558,12 +556,22 @@ mod tests {
         : # 10
         \"what a nightmare\" # 11
         } # 12
+        parameter_meta # 13
+        { # 14
+        foo # 15
+        : # 16
+        \"bar\" # 17
+        } # 18
+        input # 19
+        { # 20
+        String # 21
+        foo # 22
+        } # 23
         }";
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\n# preamble comment\n\nworkflow test {  # workflow comment\n    # meta \
-             comment\n    meta {  # meta open brace comment\n    }\n}\n"
+             "# preamble one\n# preamble two\n\nversion 1.1  # 2\n# 1\n\n# 3\nworkflow  # 4\n    test  # 5\n{  # 6\n    meta  # 7\n    {  # 8\n        description # 9\n        : # 10\n        \"what a nightmare\"  # 11\n    }\n\n    parameter_meta  # 13\n    {  # 14\n        foo # 15\n        : # 16\n        \"bar\"  # 17\n    }\n\n    input {  # 19\n        String # 21\n        foo  # 22\n    }  # 23\n\n}\n\n"
         );
     }
 }
