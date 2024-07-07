@@ -687,11 +687,26 @@ pub fn format_workflow(workflow_def: WorkflowDefinition) -> String {
         }
     }
 
-    result.push_str(&meta_section_str);
-    result.push_str(&parameter_meta_section_str);
-    result.push_str(&input_section_str);
-    result.push_str(&body_str);
-    result.push_str(&output_section_str);
+    if !meta_section_str.is_empty() {
+        result.push_str(&meta_section_str);
+        result.push_str(NEWLINE);
+    }
+    if !parameter_meta_section_str.is_empty() {
+        result.push_str(&parameter_meta_section_str);
+        result.push_str(NEWLINE);
+    }
+    if !input_section_str.is_empty() {
+        result.push_str(&input_section_str);
+        result.push_str(NEWLINE);
+    }
+    if !body_str.is_empty() {
+        result.push_str(&body_str);
+        result.push_str(NEWLINE);
+    }
+    if !output_section_str.is_empty() {
+        result.push_str(&output_section_str);
+        result.push_str(NEWLINE);
+    }
     result.push_str(&closing_brace);
 
     result
