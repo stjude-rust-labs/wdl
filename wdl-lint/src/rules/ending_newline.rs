@@ -1,5 +1,6 @@
 //! A lint rule for newlines at the end of the document.
 
+use wdl_ast::Ast;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -73,8 +74,8 @@ impl Visitor for EndingNewlineRule {
             return;
         }
 
-        // Don't run on a document without a version statement.
-        if doc.version_statement().is_none() {
+        // Don't run on a document without a supported version
+        if matches!(doc.ast(), Ast::Unsupported) {
             return;
         }
 
