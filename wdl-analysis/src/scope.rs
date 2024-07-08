@@ -370,7 +370,7 @@ impl Struct {
     }
 
     /// Gets a member of the struct by name.
-    pub fn member(&self, name: &str) -> Option<&GreenNode> {
+    pub fn get_member(&self, name: &str) -> Option<&GreenNode> {
         self.members.get(name).map(|(_, n)| n)
     }
 
@@ -570,7 +570,7 @@ impl DocumentScope {
     }
 
     /// Gets a namespace in the document scope by name.
-    pub fn namespace(&self, name: &str) -> Option<&Namespace> {
+    pub fn get_namespace(&self, name: &str) -> Option<&Namespace> {
         self.namespaces.get(name)
     }
 
@@ -580,12 +580,12 @@ impl DocumentScope {
     }
 
     /// Gets a task scope in the document scope by name.
-    pub fn task_scope(&self, name: &str) -> Option<&Scope> {
+    pub fn get_task_scope(&self, name: &str) -> Option<&Scope> {
         self.tasks.get(name).map(|s| &s.scope)
     }
 
     /// Gets the workflow scope in the document scope.
-    pub fn workflow_scope(&self) -> Option<&Scope> {
+    pub fn get_workflow_scope(&self) -> Option<&Scope> {
         self.workflow.as_ref().map(|s| &s.scope)
     }
 
@@ -595,12 +595,12 @@ impl DocumentScope {
     }
 
     /// Gets a struct in the document scope by name.
-    pub fn struct_scope(&self, name: &str) -> Option<&Struct> {
+    pub fn get_struct(&self, name: &str) -> Option<&Struct> {
         self.structs.get(name)
     }
 
     /// Finds the deepest scope based on a position within the document.
-    pub fn find_scope(&self, position: usize) -> Option<&Scope> {
+    pub fn find_scope_by_position(&self, position: usize) -> Option<&Scope> {
         let context = match self
             .scopes
             .binary_search_by_key(&position, |(s, _)| s.start())
