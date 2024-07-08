@@ -20,6 +20,7 @@ use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
 use wdl::ast::Diagnostic;
 use wdl::ast::Document;
+use wdl::ast::SyntaxNode;
 use wdl::ast::Validator;
 use wdl::lint::LintVisitor;
 use wdl_analysis::AnalysisEngine;
@@ -91,8 +92,17 @@ async fn analyze(path: &Path, lint: bool) -> Result<Vec<AnalysisResult>> {
             None => result.diagnostics().into(),
         };
 
-        emit_diagnostics(&path, result.source().unwrap_or(""), &diagnostics)?;
-        count += diagnostics.len();
+        if !diagnostics.is_empty() {
+            emit_diagnostics(
+                &path,
+                &result
+                    .root()
+                    .map(|n| SyntaxNode::new_root(n.clone()).text().to_string())
+                    .unwrap_or(String::new()),
+                &diagnostics,
+            )?;
+            count += diagnostics.len();
+        }
     }
 
     engine.shutdown().await;

@@ -36,6 +36,7 @@ use pretty_assertions::StrComparison;
 use wdl_analysis::AnalysisEngine;
 use wdl_analysis::AnalysisResult;
 use wdl_ast::Diagnostic;
+use wdl_ast::SyntaxNode;
 
 fn find_tests() -> Vec<PathBuf> {
     // Check for filter arguments consisting of test names
@@ -119,15 +120,21 @@ fn compare_results(test: &Path, results: Vec<AnalysisResult>) -> Result<()> {
             None => result.diagnostics().into(),
         };
 
-        let file = SimpleFile::new(path, result.source().unwrap_or(""));
-        for diagnostic in diagnostics.as_ref() {
-            term::emit(
-                &mut buffer,
-                &Config::default(),
-                &file,
-                &diagnostic.to_codespan(),
-            )
-            .expect("should emit");
+        if !diagnostics.is_empty() {
+            let source = result
+                .root()
+                .map(|n| SyntaxNode::new_root(n.clone()).text().to_string())
+                .unwrap_or(String::new());
+            let file = SimpleFile::new(path, &source);
+            for diagnostic in diagnostics.as_ref() {
+                term::emit(
+                    &mut buffer,
+                    &Config::default(),
+                    &file,
+                    &diagnostic.to_codespan(),
+                )
+                .expect("should emit");
+            }
         }
     }
 

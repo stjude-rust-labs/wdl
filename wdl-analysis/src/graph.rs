@@ -200,10 +200,6 @@ impl Default for AnalysisState {
 pub(crate) struct Document {
     /// The identifier of the analyzed document.
     pub id: Arc<DocumentId>,
-    /// The source of the document.
-    ///
-    /// This is `None` if we failed to read the document's source.
-    pub source: Option<Arc<str>>,
     /// The root node of the document.
     ///
     /// If `None`, it means we failed to read the document's source.
@@ -226,7 +222,6 @@ impl Document {
     pub fn new(id: Arc<DocumentId>, gc_root: bool) -> Self {
         Self {
             id,
-            source: None,
             root: None,
             error: None,
             state: Default::default(),
@@ -237,14 +232,12 @@ impl Document {
     /// Creates a new document from the result of a parse.
     pub fn from_parse(
         id: Arc<DocumentId>,
-        source: String,
         root: GreenNode,
         diagnostics: Vec<Diagnostic>,
         gc_root: bool,
     ) -> Self {
         Self {
             id,
-            source: Some(source.into()),
             root: Some(root),
             error: None,
             state: AnalysisState::InProgress(InProgressAnalysisState {
@@ -259,7 +252,6 @@ impl Document {
     pub fn from_error(id: Arc<DocumentId>, error: anyhow::Error, gc_root: bool) -> Self {
         Self {
             id,
-            source: None,
             root: None,
             error: Some(Arc::new(error)),
             state: Default::default(),
@@ -322,7 +314,6 @@ impl DocumentGraph {
         for (id, other_index) in other.indexes {
             let Document {
                 id: _,
-                source,
                 root,
                 error,
                 state,
@@ -336,7 +327,6 @@ impl DocumentGraph {
                     let existing = &mut self.inner[*index];
                     *existing = Document {
                         id,
-                        source: mem::take(source),
                         root: mem::take(root),
                         error: mem::take(error),
                         state: mem::take(state),
@@ -356,7 +346,6 @@ impl DocumentGraph {
                 None => {
                     let document = Document {
                         id: id.clone(),
-                        source: mem::take(source),
                         root: mem::take(root),
                         error: mem::take(error),
                         state: mem::take(state),

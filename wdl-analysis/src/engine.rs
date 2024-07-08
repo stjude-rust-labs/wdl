@@ -108,10 +108,6 @@ struct AnalysisRequest {
 pub struct AnalysisResult {
     /// The id of the analyzed document.
     id: Arc<DocumentId>,
-    /// The source of the document.
-    ///
-    /// This is `None` if the document failed to be read.
-    source: Option<Arc<str>>,
     /// The root node of the document.
     ///
     /// This is `None` if the document failed to be read.
@@ -132,7 +128,6 @@ impl AnalysisResult {
         let state = document.state.completed();
         Self {
             id: document.id.clone(),
-            source: document.source.clone(),
             root: document.root.clone(),
             error: document.error.clone(),
             diagnostics: state.diagnostics.clone(),
@@ -143,13 +138,6 @@ impl AnalysisResult {
     /// Gets the identifier of the document that was analyzed.
     pub fn id(&self) -> &DocumentId {
         &self.id
-    }
-
-    /// Gets the source of the document.
-    ///
-    /// Returns `None` if the document could not be read.
-    pub fn source(&self) -> Option<&str> {
-        self.source.as_deref()
     }
 
     /// Gets the root node of the document that was analyzed.
@@ -504,8 +492,8 @@ impl AnalysisEngine {
             VALIDATOR.with_borrow_mut(|v| {
                 let validator = v.get_or_insert_with(|| validator.map(|v| v()).unwrap_or_default());
                 match Self::parse(&handle, &client, Some(validator), &id) {
-                    Ok((source, root, diagnostics)) => {
-                        Document::from_parse(id, source, root, diagnostics, requested)
+                    Ok((root, diagnostics)) => {
+                        Document::from_parse(id, root, diagnostics, requested)
                     }
                     Err(e) => {
                         log::warn!("{e:#}");
@@ -531,7 +519,7 @@ impl AnalysisEngine {
         client: &Client,
         validator: Option<&mut Validator>,
         id: &DocumentId,
-    ) -> Result<(String, GreenNode, Vec<Diagnostic>)> {
+    ) -> Result<(GreenNode, Vec<Diagnostic>)> {
         let source = match id {
             DocumentId::Path(path) => fs::read_to_string(path)?,
             DocumentId::Uri(uri) => match uri.scheme() {
@@ -550,7 +538,7 @@ impl AnalysisEngine {
         };
 
         let (node, diagnostics) = Self::parse_source(id, &source, validator);
-        Ok((source, node, diagnostics))
+        Ok((node, diagnostics))
     }
 
     /// Parses the given source and validates the result with the given
