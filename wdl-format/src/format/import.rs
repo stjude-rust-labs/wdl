@@ -22,9 +22,6 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
     for import in imports {
         let mut key = String::new();
         let mut val = String::new();
-        // Process alias clauses separately
-        // to ensure they are written at the end of the import statement
-        let mut alias_clauses = String::new();
 
         for child in import.syntax().children_with_tokens() {
             match child.kind() {
@@ -86,53 +83,53 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                                     |alias_part| match alias_part.kind() {
                                         SyntaxKind::AliasKeyword => {
                                             // This should always be the first child processed
-                                            alias_clauses.push_str(&format_preceeding_comments(
+                                            val.push_str(&format_preceeding_comments(
                                                 &cur, // Parent node
                                                 1, false,
                                             ));
-                                            alias_clauses.push_str(INDENT);
-                                            alias_clauses.push_str("alias");
-                                            alias_clauses.push_str(&format_inline_comment(
+                                            val.push_str(INDENT);
+                                            val.push_str("alias");
+                                            val.push_str(&format_inline_comment(
                                                 &alias_part,
                                                 INDENT,
                                                 "",
                                             ));
                                         }
                                         SyntaxKind::Ident => {
-                                            alias_clauses.push_str(&format_preceeding_comments(
+                                            val.push_str(&format_preceeding_comments(
                                                 &alias_part,
                                                 1,
                                                 true,
                                             ));
-                                            if !alias_clauses.ends_with(INDENT) {
-                                                alias_clauses.push(' ');
+                                            if !val.ends_with(INDENT) {
+                                                val.push(' ');
                                             }
-                                            alias_clauses.push_str(&alias_part.to_string());
+                                            val.push_str(&alias_part.to_string());
                                             if !second_ident_of_clause {
-                                                alias_clauses.push_str(&format_inline_comment(
+                                                val.push_str(&format_inline_comment(
                                                     &alias_part,
                                                     INDENT,
                                                     "",
                                                 ));
                                                 second_ident_of_clause = true;
                                             } else {
-                                                alias_clauses.push_str(&format_inline_comment(
+                                                val.push_str(&format_inline_comment(
                                                     &SyntaxElement::Node(import.syntax().clone()), // Parent's parent node
                                                     "", NEWLINE,
                                                 ));
                                             }
                                         }
                                         SyntaxKind::AsKeyword => {
-                                            alias_clauses.push_str(&format_preceeding_comments(
+                                            val.push_str(&format_preceeding_comments(
                                                 &alias_part,
                                                 1,
                                                 false,
                                             ));
-                                            if !alias_clauses.ends_with(INDENT) {
-                                                alias_clauses.push(' ');
+                                            if !val.ends_with(INDENT) {
+                                                val.push(' ');
                                             }
-                                            alias_clauses.push_str("as");
-                                            alias_clauses.push_str(&format_inline_comment(
+                                            val.push_str("as");
+                                            val.push_str(&format_inline_comment(
                                                 &alias_part,
                                                 INDENT,
                                                 "",
@@ -193,14 +190,6 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                 }
             }
         }
-
-        val.push_str(&alias_clauses);
-
-        // val.push_str(&format_inline_comment(
-        //     &SyntaxElement::Node(import.syntax().clone()),
-        //     "",
-        //     NEWLINE,
-        // ));
 
         import_map.insert(key, val);
     }
