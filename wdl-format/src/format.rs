@@ -19,8 +19,6 @@ use wdl_ast::VersionStatement;
 pub const NEWLINE: &str = "\n";
 /// Indentation constant used for formatting.
 pub const INDENT: &str = "    ";
-/// Inline comment space constant used for formatting.
-pub const INLINE_COMMENT_SPACE: &str = "  ";
 
 mod comments;
 mod import;
@@ -125,10 +123,10 @@ fn format_meta_section(meta: Option<MetadataSection>) -> String {
     }
     let meta = meta.unwrap();
 
-    result.push_str(&format_preceeding_comments(
-        &SyntaxElement::Node(meta.syntax().clone()),
-        1,
-    ));
+    // result.push_str(&format_preceeding_comments(
+    //     &SyntaxElement::Node(meta.syntax().clone()),
+    //     1,
+    // ));
 
     for child in meta.syntax().children_with_tokens() {
         // TODO this logic can be simplified
@@ -154,7 +152,7 @@ fn format_meta_section(meta: Option<MetadataSection>) -> String {
                             // or 'format_inline_comment'.
                         }
                         SyntaxKind::MetadataObjectItemNode => {
-                            result.push_str(&format_preceeding_comments(&cur, 2));
+                            // result.push_str(&format_preceeding_comments(&cur, 2));
                             result.push_str(&next_indent_level);
                             result.push_str(&cur.to_string());
                             result.push_str(&format_inline_comment(&cur, "", NEWLINE));
@@ -207,10 +205,10 @@ fn format_parameter_meta_section(parameter_meta: Option<ParameterMetadataSection
     }
     let parameter_meta = parameter_meta.unwrap();
 
-    result.push_str(&format_preceeding_comments(
-        &SyntaxElement::Node(parameter_meta.syntax().clone()),
-        1,
-    ));
+    // result.push_str(&format_preceeding_comments(
+    //     &SyntaxElement::Node(parameter_meta.syntax().clone()),
+    //     1,
+    // ));
 
     for child in parameter_meta.syntax().children_with_tokens() {
         match child.kind() {
@@ -235,7 +233,7 @@ fn format_parameter_meta_section(parameter_meta: Option<ParameterMetadataSection
                             // or 'format_inline_comment'.
                         }
                         SyntaxKind::MetadataObjectItemNode => {
-                            result.push_str(&format_preceeding_comments(&cur, 2));
+                            // result.push_str(&format_preceeding_comments(&cur, 2));
                             result.push_str(&next_indent_level);
                             result.push_str(&cur.to_string());
                             result.push_str(&format_inline_comment(&cur, "", NEWLINE));
@@ -287,10 +285,10 @@ fn format_input_section(input: Option<InputSection>) -> String {
     }
     let input = input.unwrap();
 
-    result.push_str(&format_preceeding_comments(
-        &SyntaxElement::Node(input.syntax().clone()),
-        1,
-    ));
+    // result.push_str(&format_preceeding_comments(
+    //     &SyntaxElement::Node(input.syntax().clone()),
+    //     1,
+    // ));
 
     result.push_str(INDENT);
     result.push_str("input {");
@@ -304,10 +302,10 @@ fn format_input_section(input: Option<InputSection>) -> String {
     ));
 
     for item in input.declarations() {
-        result.push_str(&format_preceeding_comments(
-            &SyntaxElement::Node(item.syntax().clone()),
-            2,
-        ));
+        // result.push_str(&format_preceeding_comments(
+        //     &SyntaxElement::Node(item.syntax().clone()),
+        //     2,
+        // ));
         result.push_str(&next_indent_level);
         result.push_str(&item.syntax().to_string()); // TODO: Format the declaration
         result.push_str(&format_inline_comment(
@@ -319,8 +317,7 @@ fn format_input_section(input: Option<InputSection>) -> String {
     result.push_str(INDENT);
     result.push('}');
     result.push_str(&format_inline_comment(
-        &SyntaxElement::Node(input
-            .syntax().clone()),
+        &SyntaxElement::Node(input.syntax().clone()),
         "",
         NEWLINE,
     ));
@@ -386,8 +383,18 @@ mod tests {
 
     #[test]
     fn test_format_with_comments() {
-        let code = "\n\n    ## preamble comment  \nversion # weird comment\n1.1 # inline \
-                    comment\nworkflow test {}";
+        let code = "version 1.0
+
+# foo
+import \"foo.wdl\" # foo again
+# bar
+import # ew
+\"bar.wdl\"
+
+workflow test {}
+import \"foo.wdl\" as not_foo
+# qux
+import \"qux.wdl\"";
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
@@ -410,17 +417,24 @@ mod tests {
 
         # this comment belongs to fileB
         import \"fileB.wdl\" as foo # also fileB
-        import \"fileA.wdl\" as bar # middle of fileA
-            alias qux as Qux
+        # fileA 0
+        import # fileA 1
+        # fileA 1.1
+        # fileA 1.2
+        \"fileA.wdl\" # fileA 2
+        as # fileA 3
+        bar # fileA 4
+            alias # fileA 5
+            qux # fileA 6 
+            as # fileA 7
+            Qux # fileA 8
         workflow test {}
         # this comment belongs to fileC
         import \"fileC.wdl\"";
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nimport \"fileA.wdl\" as bar  # middle of fileA\n     alias qux as \
-             Qux\n# this comment belongs to fileB\nimport \"fileB.wdl\" as foo  # also fileB\n# \
-             this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n\n"
+            "version 1.1\n\n# fileA 0\nimport  # fileA 1\n    # fileA 1.1\n    # fileA 1.2\n    \"fileA.wdl\"  # fileA 2\n    as  # fileA 3\n    bar  # fileA 4\n    alias  # fileA 5\n    qux  # fileA 6\n    as  # fileA 7\n    Qux  # fileA 8\n# this comment belongs to fileB\nimport \"fileB.wdl\"\n    as foo\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n\n"
         );
     }
 
@@ -483,7 +497,9 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-             "version 1.1\n\nworkflow test {\n    input {\n        # foo comment\n        String foo  # another foo comment\n        Int # mid-bar comment\n        bar\n    }\n\n}\n\n"
+            "version 1.1\n\nworkflow test {\n    input {\n        # foo comment\n        String \
+             foo  # another foo comment\n        Int # mid-bar comment\n        bar\n    \
+             }\n\n}\n\n"
         );
     }
 
@@ -567,11 +583,36 @@ mod tests {
         String # 21
         foo # 22
         } # 23
-        }";
+        if # 24
+        ( # 25
+        true # 26
+        ) # 27
+        { # 28
+         scatter # 29
+         ( # 30
+            x # 31
+            in # 32
+            [1,2,3] # 33
+            ) # 34
+            { # 35
+            call # 36
+            task # 37
+            as # 38
+            task_alias # 39
+            after # 40
+            cows_come_home # 41
+            } # 42
+    } # 43
+    } # 44
+        ";
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-             "# preamble one\n# preamble two\n\nversion 1.1  # 2\n# 1\n\n# 3\nworkflow  # 4\n    test  # 5\n{  # 6\n    meta  # 7\n    {  # 8\n        description # 9\n        : # 10\n        \"what a nightmare\"  # 11\n    }\n\n    parameter_meta  # 13\n    {  # 14\n        foo # 15\n        : # 16\n        \"bar\"  # 17\n    }\n\n    input {  # 19\n        String # 21\n        foo  # 22\n    }  # 23\n\n}\n\n"
+            "# preamble one\n# preamble two\n\nversion 1.1  # 2\n# 1\n\n# 3\nworkflow  # 4\n    \
+             test  # 5\n{  # 6\n    meta  # 7\n    {  # 8\n        description # 9\n        : # \
+             10\n        \"what a nightmare\"  # 11\n    }\n\n    parameter_meta  # 13\n    {  # \
+             14\n        foo # 15\n        : # 16\n        \"bar\"  # 17\n    }\n\n    input {  # \
+             19\n        String # 21\n        foo  # 22\n    }  # 23\n\n}\n\n"
         );
     }
 }

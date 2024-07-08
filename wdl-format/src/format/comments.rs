@@ -1,21 +1,34 @@
 /// Format comments in a WDL file.
 /// All comments will be treated as either "preceeding" or "inline" comments.
 /// A preceeding comment is a comment that appears on a line before an element,
-/// and it should be moved _with_ that element when formatting. An inline
-/// comment is a comment that appears on the same line as an element, and it
-/// should be moved _after_ that element when formatting.
+/// if and only if that element is the first element of its line. Preceeding
+/// comments should always appear, without any blank lines, immediately before
+/// the element they are commenting on. Preceeding comments should be indented
+/// to the same level as the element they are commenting on. An inline
+/// comment is a comment that appears on the same line as an element, if and
+/// only if that element is the last element of its line. Inline comments should
+/// always appear immediately after the element they are commenting on.
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 
 use super::INDENT;
-use super::INLINE_COMMENT_SPACE;
 use super::NEWLINE;
 
+/// Inline comment space constant used for formatting.
+pub const INLINE_COMMENT_SPACE: &str = "  ";
+
 /// Format comments that preceed a node.
-/// If no comments are found this returns an empty string.
-/// Else it returns a string with the comments formatted with specified
-/// indentation.
-pub fn format_preceeding_comments(element: &SyntaxElement, num_indents: usize) -> String {
+/// If no comments are found this returns an empty string (regardless of the
+/// value of 'trailing_indent'). 'trailing_indent' can be used to change the
+/// start and end of the string. If 'false', the string will start with
+/// 'num_indents' worth of indentation before the first comment and end in a
+/// newline. If 'true', the string will not start with any whitespace (i.e.
+/// beginning with '#') and will end with 'num_indents' worth of indentation.
+pub fn format_preceeding_comments(
+    element: &SyntaxElement,
+    num_indents: usize,
+    trailing_indent: bool,
+) -> String {
     // This walks _backwards_ through the syntax tree to find comments
     // so we must collect them in a vector and later reverse them to get them in the
     // correct order.
@@ -59,12 +72,19 @@ pub fn format_preceeding_comments(element: &SyntaxElement, num_indents: usize) -
     }
 
     let mut result = String::new();
-    for comment in preceeding_comments.iter().rev() {
-        for _ in 0..num_indents {
-            result.push_str(INDENT);
+    for (i, comment) in preceeding_comments.iter().rev().enumerate() {
+        if (i > 0 && trailing_indent) || !trailing_indent {
+            for _ in 0..num_indents {
+                result.push_str(INDENT);
+            }
         }
         result.push_str(comment);
         result.push_str(NEWLINE);
+    }
+    if !preceeding_comments.is_empty() && trailing_indent {
+        for _ in 0..num_indents {
+            result.push_str(INDENT);
+        }
     }
     result
 }
@@ -98,7 +118,7 @@ pub fn format_inline_comment(
                 }
             }
             _ => {
-                // Something is between the node and the end of the line
+                // Something is between the element and the end of the line
                 break;
             }
         }
