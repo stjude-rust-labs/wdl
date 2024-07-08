@@ -73,6 +73,11 @@ impl Visitor for EndingNewlineRule {
             return;
         }
 
+        // Don't run on a document without a version statement.
+        if doc.version_statement().is_none() {
+            return;
+        }
+
         // Get the last token in the document and see if it's whitespace
         match doc.syntax().last_child_or_token() {
             Some(last) if last.kind() == SyntaxKind::Whitespace => {
