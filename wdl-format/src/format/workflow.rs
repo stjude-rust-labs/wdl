@@ -14,7 +14,6 @@ use super::format_input_section;
 use super::format_meta_section;
 use super::format_parameter_meta_section;
 use super::INDENT;
-use super::INLINE_COMMENT_SPACE;
 use super::NEWLINE;
 
 fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
@@ -27,10 +26,10 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
     }
     next_indent_level.push_str(INDENT);
 
-    result.push_str(&format_preceeding_comments(
-        &SyntaxElement::Node(call.syntax().clone()),
-        num_indents,
-    ));
+    // result.push_str(&format_preceeding_comments(
+    //     &SyntaxElement::Node(call.syntax().clone()),
+    //     num_indents,
+    // ));
     result.push_str(&cur_indent_level);
     result.push_str("call");
     result.push_str(&format_inline_comment(
@@ -92,7 +91,7 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                             SyntaxKind::Whitespace => {
                                 if before_child.to_string().contains('\n') {
                                     if !result.ends_with(INDENT) {
-                                        result.push_str(INLINE_COMMENT_SPACE);
+                                        // result.push_str(INLINE_COMMENT_SPACE);
                                     }
                                     result.push_str(child.to_string().trim());
                                     result.push_str(NEWLINE);
@@ -158,7 +157,7 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                             SyntaxKind::Whitespace => {
                                 if before_child.to_string().contains('\n') {
                                     if !result.ends_with(INDENT) {
-                                        result.push_str(INLINE_COMMENT_SPACE);
+                                        // result.push_str(INLINE_COMMENT_SPACE);
                                     }
                                     result.push_str(child.to_string().trim());
                                     result.push_str(NEWLINE);
@@ -208,7 +207,7 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                 result.push_str(&format_inline_comment(&child, "", NEWLINE));
             }
             SyntaxKind::CallInputItemNode => {
-                result.push_str(&format_preceeding_comments(&child, num_indents + 1));
+                // result.push_str(&format_preceeding_comments(&child, num_indents + 1));
                 result.push_str(&next_indent_level);
                 result.push_str(&child.to_string());
                 result.push_str(&format_inline_comment(&child, "", NEWLINE));
@@ -245,7 +244,7 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                                 if result.ends_with(NEWLINE) {
                                     result.push_str(&next_indent_level);
                                 } else if !result.ends_with(INDENT) {
-                                    result.push_str(INLINE_COMMENT_SPACE);
+                                    // result.push_str(INLINE_COMMENT_SPACE);
                                 }
                                 result.push_str(child.to_string().trim());
                                 result.push_str(NEWLINE);
@@ -283,10 +282,10 @@ fn format_conditional(conditional: ConditionalStatement, num_indents: usize) -> 
     }
     next_indent_level.push_str(INDENT);
 
-    result.push_str(&format_preceeding_comments(
-        &SyntaxElement::Node(conditional.syntax().clone()),
-        num_indents,
-    ));
+    // result.push_str(&format_preceeding_comments(
+    //     &SyntaxElement::Node(conditional.syntax().clone()),
+    //     num_indents,
+    // ));
 
     for child in conditional.syntax().children_with_tokens() {
         match child.kind() {
@@ -377,7 +376,7 @@ fn format_conditional(conditional: ConditionalStatement, num_indents: usize) -> 
                                         // How to detect this?
                                         result.push_str(&next_indent_level);
                                     } else {
-                                        result.push_str(INLINE_COMMENT_SPACE);
+                                        // result.push_str(INLINE_COMMENT_SPACE);
                                     }
                                 }
                                 result.push_str(child.to_string().trim());
@@ -428,10 +427,10 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
     }
     next_indent_level.push_str(INDENT);
 
-    result.push_str(&format_preceeding_comments(
-        &SyntaxElement::Node(scatter.syntax().clone()),
-        num_indents,
-    ));
+    // result.push_str(&format_preceeding_comments(
+    //     &SyntaxElement::Node(scatter.syntax().clone()),
+    //     num_indents,
+    // ));
 
     let mut paren_on_same_line = true;
     for child in scatter.syntax().children_with_tokens() {
@@ -547,7 +546,7 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
                                         // How to detect this?
                                         result.push_str(&next_indent_level);
                                     } else {
-                                        result.push_str(INLINE_COMMENT_SPACE);
+                                        // result.push_str(INLINE_COMMENT_SPACE);
                                     }
                                 }
                                 result.push_str(child.to_string().trim());
@@ -590,10 +589,10 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
 /// Format a workflow definition.
 pub fn format_workflow(workflow_def: WorkflowDefinition) -> String {
     let mut result = String::new();
-    result.push_str(&format_preceeding_comments(
-        &SyntaxElement::Node(workflow_def.syntax().clone()),
-        0,
-    ));
+    // result.push_str(&format_preceeding_comments(
+    //     &SyntaxElement::Node(workflow_def.syntax().clone()),
+    //     0,
+    // ));
 
     let mut meta_section_str = String::new();
     let mut parameter_meta_section_str = String::new();
