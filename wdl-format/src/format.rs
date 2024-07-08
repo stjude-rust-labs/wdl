@@ -434,7 +434,11 @@ import \"qux.wdl\"";
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\n# fileA 0\nimport  # fileA 1\n    # fileA 1.1\n    # fileA 1.2\n    \"fileA.wdl\"  # fileA 2\n    as  # fileA 3\n    bar  # fileA 4\n    alias  # fileA 5\n    qux  # fileA 6\n    as  # fileA 7\n    Qux  # fileA 8\n# this comment belongs to fileB\nimport \"fileB.wdl\"\n    as foo\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n\n"
+            "version 1.1\n\n# fileA 0\nimport  # fileA 1\n    # fileA 1.1\n    # fileA 1.2\n    \
+             \"fileA.wdl\"  # fileA 2\n    as  # fileA 3\n    bar  # fileA 4\n    alias  # fileA \
+             5\n    qux  # fileA 6\n    as  # fileA 7\n    Qux  # fileA 8\n# this comment belongs \
+             to fileB\nimport \"fileB.wdl\"\n    as foo\n# this comment belongs to fileC\nimport \
+             \"fileC.wdl\"\n\nworkflow test {\n}\n\n"
         );
     }
 
@@ -450,8 +454,9 @@ import \"qux.wdl\"";
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nimport \"fileB.wdl\" as foo\nimport \"fileA.wdl\" as bar\n\nworkflow \
-             test {\n}\n\nimport \"fileC.wdl\"\n\n"
+            "version 1.1\n\nimport \"fileA.wdl\"\n    as bar\n    alias cows as horses\nimport \
+             \"fileB.wdl\"\n    as foo\nimport \"fileC.wdl\"\n    alias qux as Qux\n\nworkflow \
+             test {\n}\n\n"
         );
     }
 
