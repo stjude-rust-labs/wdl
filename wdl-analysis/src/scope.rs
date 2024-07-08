@@ -431,6 +431,11 @@ impl Scope {
         self.names.iter()
     }
 
+    /// Gets a name within the scope.
+    pub fn get_name(&self, name: &str) -> Option<&ScopedName> {
+        self.names.get(name)
+    }
+
     /// Gets the child scopes of this scope.
     ///
     /// Child scopes may exist in workflows when conditional or scatter
