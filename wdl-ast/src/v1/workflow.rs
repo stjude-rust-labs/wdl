@@ -143,7 +143,7 @@ impl AstNode for WorkflowItem {
             SyntaxKind::ScatterStatementNode => Some(Self::Scatter(ScatterStatement(syntax))),
             SyntaxKind::CallStatementNode => Some(Self::Call(CallStatement(syntax))),
             SyntaxKind::MetadataSectionNode => Some(Self::Metadata(MetadataSection(syntax))),
-            SyntaxKind::ParameterMetaKeyword => {
+            SyntaxKind::ParameterMetadataSectionNode => {
                 Some(Self::ParameterMetadata(ParameterMetadataSection(syntax)))
             }
             SyntaxKind::BoundDeclNode => Some(Self::Declaration(BoundDecl(syntax))),
@@ -578,7 +578,7 @@ mod test {
 
     #[test]
     fn workflows() {
-        let parse = Document::parse(
+        let (document, diagnostics) = Document::parse(
             r#"
 version 1.1
 
@@ -622,7 +622,7 @@ workflow test {
 "#,
         );
 
-        let document = parse.into_result().expect("there should be no errors");
+        assert!(diagnostics.is_empty());
         let ast = document.ast();
         let ast = ast.as_v1().expect("should be a V1 AST");
         let workflows: Vec<_> = ast.workflows().collect();
@@ -913,6 +913,8 @@ workflow test {
 
         impl Visitor for MyVisitor {
             type State = ();
+
+            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
 
             fn workflow_definition(
                 &mut self,
