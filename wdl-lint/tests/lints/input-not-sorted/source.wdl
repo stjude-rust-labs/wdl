@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing
+#@ except: DeprecatedObject, DescriptionMissing, SectionOrdering
 
 version 1.1
 
