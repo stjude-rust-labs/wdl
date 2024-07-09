@@ -7,6 +7,7 @@ use wdl_ast::v1::WorkflowItem;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
+use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -23,7 +24,10 @@ fn workflow_section_order(span: Span, name: &str) -> Diagnostic {
     Diagnostic::note(format!("sections are not in order for workflow {}", name))
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("order as `meta`, `parameter_meta`, `input`, private declarations, `output`")
+        .with_fix(
+            "order as `meta`, `parameter_meta`, `input`, private declarations/calls/scatters, \
+             `output`",
+        )
 }
 
 /// Creates a task section order diagnostic.
@@ -38,7 +42,7 @@ fn task_section_order(span: Span, name: &str) -> Diagnostic {
 }
 
 /// Detects section ordering issues.
-#[derive(Debug, Clone, Copy)]
+#[derive(Default, Debug, Clone, Copy)]
 pub struct SectionOrderingRule;
 
 impl Rule for SectionOrderingRule {
@@ -63,20 +67,39 @@ impl Rule for SectionOrderingRule {
     }
 }
 
+/// Track the encountered sections.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum State {
+    /// The start state.
     Start,
+    /// The meta section.
     Meta,
+    /// The parameter_meta section.
     ParameterMeta,
+    /// The input section.
     Input,
+    /// The declaration section. Overloaded to include call and scatter
+    /// statements in workflows.
     Decl,
+    /// The command section.
     Command,
+    /// The output section.
     Output,
+    /// The runtime section.
     Runtime,
 }
 
 impl Visitor for SectionOrderingRule {
     type State = Diagnostics;
+
+    fn document(&mut self, _: &mut Self::State, reason: VisitReason, _: &Document) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+
+        // Reset the visitor upon document entry
+        *self = Default::default();
+    }
 
     fn task_definition(
         &mut self,
