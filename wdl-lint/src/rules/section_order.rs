@@ -125,7 +125,6 @@ impl Visitor for SectionOrderingRule {
         let mut sections: Vec<usize> = Vec::new();
 
         if let Some(meta) = workflow.metadata().next() {
-            println!("{:?}", meta);
             sections.push(meta.syntax().text_range().to_span().start());
         }
         if let Some(parameter_meta) = workflow.parameter_metadata().next() {
