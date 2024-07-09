@@ -589,10 +589,11 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
 /// Format a workflow definition.
 pub fn format_workflow(workflow_def: WorkflowDefinition) -> String {
     let mut result = String::new();
-    // result.push_str(&format_preceeding_comments(
-    //     &SyntaxElement::Node(workflow_def.syntax().clone()),
-    //     0,
-    // ));
+    result.push_str(&format_preceeding_comments(
+        &SyntaxElement::Node(workflow_def.syntax().clone()),
+        0,
+        false,
+    ));
 
     let mut meta_section_str = String::new();
     let mut parameter_meta_section_str = String::new();
@@ -605,13 +606,16 @@ pub fn format_workflow(workflow_def: WorkflowDefinition) -> String {
             SyntaxKind::WorkflowKeyword => {
                 // This should always be the first child processed
                 result.push_str("workflow");
-                result.push_str(&format_inline_comment(&child, INDENT, " "));
-
+                result.push_str(&format_inline_comment(&child, INDENT, ""));
+                result.push_str(&format_preceeding_comments(&SyntaxElement::Token(workflow_def.name().syntax().clone()), 1, true));
+                if !result.ends_with(INDENT) {
+                    result.push(' ');
+                }
                 result.push_str(workflow_def.name().as_str());
                 result.push_str(&format_inline_comment(
                     &SyntaxElement::Token(workflow_def.name().syntax().clone()),
                     "",
-                    " ",
+                    "",
                 ));
             }
             SyntaxKind::Ident => {
@@ -619,6 +623,10 @@ pub fn format_workflow(workflow_def: WorkflowDefinition) -> String {
                 // It's handled by the WorkflowKeyword match arm
             }
             SyntaxKind::OpenBrace => {
+                result.push_str(&format_preceeding_comments(&child, 0, false));
+                if !result.ends_with(NEWLINE) {
+                    result.push(' ');
+                }
                 result.push('{');
                 result.push_str(&format_inline_comment(&child, "", NEWLINE));
             }
@@ -628,6 +636,11 @@ pub fn format_workflow(workflow_def: WorkflowDefinition) -> String {
                 // will not be siblings of the 'child' element,
                 // so we will go up a level and check the siblings of the
                 // 'WorkflowDefinitionNode'.
+                result.push_str(&format_preceeding_comments(
+                    &child,
+                    0,
+                    false,
+                ));
                 if !result.ends_with(NEWLINE) {
                     result.push_str(NEWLINE);
                 }
