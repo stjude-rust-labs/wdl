@@ -25,7 +25,10 @@ const ID: &str = "SectionOrdering";
 fn workflow_section_order(span: Span, name: &str, problem_span: Span) -> Diagnostic {
     Diagnostic::note(format!("sections are not in order for workflow `{name}`"))
         .with_rule(ID)
-        .with_label("this workflow contains sections that are out of order", span)
+        .with_label(
+            "this workflow contains sections that are out of order",
+            span,
+        )
         .with_label("this section is out of order", problem_span)
         .with_fix(
             "order as `meta`, `parameter_meta`, `input`, private declarations/calls/scatters, \
