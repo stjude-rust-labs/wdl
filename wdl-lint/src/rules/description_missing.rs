@@ -1,6 +1,7 @@
 //! A lint rule to ensure a description is included in `meta` sections.
 
 use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::TaskOrWorkflow;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -19,8 +20,13 @@ use crate::TagSet;
 const ID: &str = "DescriptionMissing";
 
 /// Creates a description missing diagnostic.
-fn description_missing(span: Span) -> Diagnostic {
-    Diagnostic::note("this section is missing a description key")
+fn description_missing(span: Span, context: TaskOrWorkflow) -> Diagnostic {
+    let (ty, name) = match context {
+        TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
+        TaskOrWorkflow::Workflow(w) => ("workflow", w.name().as_str().to_string()),
+    };
+
+    Diagnostic::note(format!("{ty} `{name}` is missing a description key"))
         .with_rule(ID)
         .with_highlight(span)
         .with_fix("add a `description` key to this meta section")
@@ -85,6 +91,7 @@ impl Visitor for DescriptionMissingRule {
                     .unwrap()
                     .text_range()
                     .to_span(),
+                section.parent(),
             ));
         }
     }
