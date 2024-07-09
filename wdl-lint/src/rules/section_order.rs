@@ -4,11 +4,13 @@ use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::TaskItem;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::v1::WorkflowItem;
+use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
+use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
@@ -20,10 +22,11 @@ use crate::TagSet;
 const ID: &str = "SectionOrdering";
 
 /// Creates a workflow section order diagnostic.
-fn workflow_section_order(span: Span, name: &str) -> Diagnostic {
+fn workflow_section_order(span: Span, name: &str, problem_span: Span) -> Diagnostic {
     Diagnostic::note(format!("sections are not in order for workflow {}", name))
         .with_rule(ID)
         .with_highlight(span)
+        .with_label("first problematic section", problem_span)
         .with_fix(
             "order as `meta`, `parameter_meta`, `input`, private declarations/calls/scatters, \
              `output`",
@@ -31,10 +34,11 @@ fn workflow_section_order(span: Span, name: &str) -> Diagnostic {
 }
 
 /// Creates a task section order diagnostic.
-fn task_section_order(span: Span, name: &str) -> Diagnostic {
+fn task_section_order(span: Span, name: &str, problem_span: Span) -> Diagnostic {
     Diagnostic::note(format!("sections are not in order for task {}", name))
         .with_rule(ID)
         .with_highlight(span)
+        .with_label("first problematic section", problem_span)
         .with_fix(
             "order as `meta`, `parameter_meta`, `input`, private declarations, `command`, \
              `output`, `runtime`",
@@ -136,7 +140,11 @@ impl Visitor for SectionOrderingRule {
                     encountered = State::Runtime;
                 }
                 _ => {
-                    state.add(task_section_order(task.name().span(), task.name().as_str()));
+                    state.add(task_section_order(
+                        task.name().span(),
+                        task.name().as_str(),
+                        item.syntax().first_token().unwrap().text_range().to_span(),
+                    ));
                     break;
                 }
             }
@@ -177,6 +185,7 @@ impl Visitor for SectionOrderingRule {
                     state.add(workflow_section_order(
                         workflow.name().span(),
                         workflow.name().as_str(),
+                        item.syntax().first_token().unwrap().text_range().to_span(),
                     ));
                     break;
                 }

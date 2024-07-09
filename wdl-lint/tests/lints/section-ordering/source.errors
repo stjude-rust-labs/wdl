@@ -3,6 +3,9 @@ note[SectionOrdering]: sections are not in order for workflow foo
   │
 5 │ workflow foo {
   │          ^^^
+  ·
+9 │     parameter_meta {}
+  │     -------------- first problematic section
   │
   = fix: order as `meta`, `parameter_meta`, `input`, private declarations/calls/scatters, `output`
 
@@ -11,6 +14,9 @@ note[SectionOrdering]: sections are not in order for task bar
    │
 16 │ task bar {
    │      ^^^
+   ·
+19 │     parameter_meta {}
+   │     -------------- first problematic section
    │
    = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `runtime`
 
