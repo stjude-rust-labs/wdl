@@ -23,10 +23,10 @@ const ID: &str = "SectionOrdering";
 
 /// Creates a workflow section order diagnostic.
 fn workflow_section_order(span: Span, name: &str, problem_span: Span) -> Diagnostic {
-    Diagnostic::note(format!("sections are not in order for workflow {}", name))
+    Diagnostic::note(format!("sections are not in order for workflow `{name}`"))
         .with_rule(ID)
-        .with_highlight(span)
-        .with_label("first problematic section", problem_span)
+        .with_label("this workflow contains sections that are out of order", span)
+        .with_label("this section is out of order", problem_span)
         .with_fix(
             "order as `meta`, `parameter_meta`, `input`, private declarations/calls/scatters, \
              `output`",
@@ -35,10 +35,10 @@ fn workflow_section_order(span: Span, name: &str, problem_span: Span) -> Diagnos
 
 /// Creates a task section order diagnostic.
 fn task_section_order(span: Span, name: &str, problem_span: Span) -> Diagnostic {
-    Diagnostic::note(format!("sections are not in order for task {}", name))
+    Diagnostic::note(format!("sections are not in order for task `{name}`"))
         .with_rule(ID)
-        .with_highlight(span)
-        .with_label("first problematic section", problem_span)
+        .with_label("this task contains sections that are out of order", span)
+        .with_label("this section is out of order", problem_span)
         .with_fix(
             "order as `meta`, `parameter_meta`, `input`, private declarations, `command`, \
              `output`, `runtime`",
