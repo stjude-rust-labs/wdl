@@ -8,6 +8,7 @@ use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
+use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
@@ -40,7 +41,7 @@ fn missing_outputs_in_meta(span: Span) -> Diagnostic {
 }
 
 /// Detects non-matching outputs.
-#[derive(Debug, Clone, Copy)]
+#[derive(Default, Debug, Clone, Copy)]
 pub struct NonmatchingOutputRule;
 
 impl Rule for NonmatchingOutputRule {
@@ -99,6 +100,15 @@ fn check_output_meta(state: &mut Diagnostics, meta: &MetadataSection, outputs: &
 
 impl Visitor for NonmatchingOutputRule {
     type State = Diagnostics;
+
+    fn document(&mut self, _: &mut Self::State, reason: VisitReason, _: &Document) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+
+        // Reset the visitor upon document entry
+        *self = Default::default();
+    }
 
     fn workflow_definition(
         &mut self,
