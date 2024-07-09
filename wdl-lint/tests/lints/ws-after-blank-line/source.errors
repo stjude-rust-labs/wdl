@@ -7,11 +7,3 @@ note[PreambleWhitespace]: unnecessary whitespace in document preamble
   │  
   = fix: remove the unnecessary whitespace
 
-warning[NonmatchingOutput]: outputs key missing in meta section
-  ┌─ tests/lints/ws-after-blank-line/source.wdl:7:5
-  │
-7 │     meta {}
-  │     ^^^^
-  │
-  = fix: add outputs key to `meta` section
-

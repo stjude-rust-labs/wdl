@@ -1,11 +1,3 @@
-warning[NonmatchingOutput]: outputs key missing in meta section
-  ┌─ tests/lints/input-spacing/source.wdl:9:5
-  │
-9 │     meta {}
-  │     ^^^^
-  │
-  = fix: add outputs key to `meta` section
-
 note[CallInputSpacing]: call input not properly spaced
    ┌─ tests/lints/input-spacing/source.wdl:13:15
    │  
@@ -55,12 +47,4 @@ note[CallInputSpacing]: call inputs assignments must be surrounded with whitespa
    │                         ^
    │
    = fix: surround '=' with whitespace on each side
-
-warning[NonmatchingOutput]: outputs key missing in meta section
-   ┌─ tests/lints/input-spacing/source.wdl:26:5
-   │
-26 │     meta {}
-   │     ^^^^
-   │
-   = fix: add outputs key to `meta` section
 

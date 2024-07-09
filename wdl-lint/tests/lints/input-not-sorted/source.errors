@@ -1,11 +1,3 @@
-warning[NonmatchingOutput]: outputs key missing in meta section
-  ┌─ tests/lints/input-not-sorted/source.wdl:9:5
-  │
-9 │     meta {}
-  │     ^^^^
-  │
-  = fix: add outputs key to `meta` section
-
 warning[InputSorting]: input not sorted
    ┌─ tests/lints/input-not-sorted/source.wdl:36:5
    │  
@@ -41,14 +33,6 @@ warning[InputSorting]: input not sorted
      Int? e
      Int? f = 2
      String g = "hello"
-
-warning[NonmatchingOutput]: outputs key missing in meta section
-   ┌─ tests/lints/input-not-sorted/source.wdl:62:5
-   │
-62 │     meta {}
-   │     ^^^^
-   │
-   = fix: add outputs key to `meta` section
 
 warning[InputSorting]: input not sorted
     ┌─ tests/lints/input-not-sorted/source.wdl:87:5

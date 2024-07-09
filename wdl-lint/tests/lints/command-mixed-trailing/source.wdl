@@ -1,4 +1,4 @@
-#@ except: NoCurlyCommands, DescriptionMissing
+#@ except: DescriptionMissing, NoCurlyCommands
 ## This is a test of having mixed _trailing_ indentation in command sections.
 ## There should be no warnings from the `CommandSectionMixedIndentation` rule.
 

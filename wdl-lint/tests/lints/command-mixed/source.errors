@@ -1,11 +1,3 @@
-warning[NonmatchingOutput]: outputs key missing in meta section
-  ┌─ tests/lints/command-mixed/source.wdl:7:5
-  │
-7 │     meta {}
-  │     ^^^^
-  │
-  = fix: add outputs key to `meta` section
-
 warning[CommandSectionMixedIndentation]: mixed indentation within a command
    ┌─ tests/lints/command-mixed/source.wdl:11:3
    │
@@ -15,14 +7,6 @@ warning[CommandSectionMixedIndentation]: mixed indentation within a command
    │         ^ indented with tabs until this space
    │
    = fix: use the same whitespace character for indentation
-
-warning[NonmatchingOutput]: outputs key missing in meta section
-   ┌─ tests/lints/command-mixed/source.wdl:19:5
-   │
-19 │     meta {}
-   │     ^^^^
-   │
-   = fix: add outputs key to `meta` section
 
 warning[CommandSectionMixedIndentation]: mixed indentation within a command
    ┌─ tests/lints/command-mixed/source.wdl:23:3

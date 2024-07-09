@@ -1,11 +1,3 @@
-warning[NonmatchingOutput]: outputs key missing in meta section
-  ┌─ tests/lints/double-quotes/source.wdl:6:5
-  │
-6 │     meta {}
-  │     ^^^^
-  │
-  = fix: add outputs key to `meta` section
-
 warning[DoubleQuotes]: string defined with single quotes
    ┌─ tests/lints/double-quotes/source.wdl:10:18
    │

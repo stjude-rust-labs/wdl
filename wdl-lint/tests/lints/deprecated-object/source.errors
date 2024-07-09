@@ -1,3 +1,11 @@
+warning[NonmatchingOutput]: outputs key missing in meta section
+  ┌─ tests/lints/deprecated-object/source.wdl:7:5
+  │
+7 │     meta {}
+  │     ^^^^
+  │
+  = fix: add outputs key to `meta` section
+
 note[DeprecatedObject]: use of a deprecated `Object` type
    ┌─ tests/lints/deprecated-object/source.wdl:10:9
    │

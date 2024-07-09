@@ -124,7 +124,9 @@ impl Visitor for NonmatchingOutputRule {
         if let Some(meta) = workflow.metadata().next() {
             // If the `output` section is missing, the MissingOutput rule will handle it.
             if let Some(output) = workflow.outputs().next() {
-                check_output_meta(state, &meta, &output);
+                if output.declarations().count() > 0 {
+                    check_output_meta(state, &meta, &output);
+                }
             }
         }
     }
@@ -143,7 +145,9 @@ impl Visitor for NonmatchingOutputRule {
         if let Some(meta) = task.metadata().next() {
             // If the `output` section is missing, the MissingOutput rule will handle it.
             if let Some(output) = task.outputs().next() {
-                check_output_meta(state, &meta, &output);
+                if output.declarations().count() > 0 {
+                    check_output_meta(state, &meta, &output);
+                }
             }
         }
     }

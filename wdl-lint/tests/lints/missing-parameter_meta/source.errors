@@ -6,11 +6,3 @@ note[MissingMetas]: workflow `test` is missing a `parameter_meta` section
   │
   = fix: add a `parameter_meta` section to the workflow
 
-warning[NonmatchingOutput]: outputs key missing in meta section
-  ┌─ tests/lints/missing-parameter_meta/source.wdl:6:5
-  │
-6 │     meta {}
-  │     ^^^^
-  │
-  = fix: add outputs key to `meta` section
-
