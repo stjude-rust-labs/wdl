@@ -1,13 +1,13 @@
 //! A lint rule for section ordering.
 
 use wdl_ast::v1::TaskDefinition;
+use wdl_ast::v1::TaskItem;
 use wdl_ast::v1::WorkflowDefinition;
-use wdl_ast::AstNode;
+use wdl_ast::v1::WorkflowItem;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Span;
-use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
@@ -63,6 +63,18 @@ impl Rule for SectionOrderingRule {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum State {
+    Start,
+    Meta,
+    ParameterMeta,
+    Input,
+    Decl,
+    Command,
+    Output,
+    Runtime,
+}
+
 impl Visitor for SectionOrderingRule {
     type State = Diagnostics;
 
@@ -76,39 +88,35 @@ impl Visitor for SectionOrderingRule {
             return;
         }
 
-        let mut sections: Vec<usize> = Vec::new();
-
-        if let Some(meta) = task.metadata().next() {
-            sections.push(meta.syntax().text_range().to_span().start());
-        }
-        if let Some(parameter_meta) = task.parameter_metadata().next() {
-            sections.push(parameter_meta.syntax().text_range().to_span().start());
-        }
-        if let Some(inputs) = task.inputs().next() {
-            sections.push(inputs.syntax().text_range().to_span().start());
-        }
-        task.declarations().for_each(|f| {
-            sections.push(f.syntax().text_range().to_span().start());
-        });
-        if let Some(command) = task.commands().next() {
-            sections.push(command.syntax().text_range().to_span().start());
-        }
-        if let Some(outputs) = task.outputs().next() {
-            sections.push(outputs.syntax().text_range().to_span().start());
-        }
-        if let Some(runtime) = task.runtimes().next() {
-            sections.push(runtime.syntax().text_range().to_span().start());
-        }
-
-        let mut sorted_sections: Vec<usize> = sections.clone();
-        sorted_sections.sort();
-
-        if sections
-            .iter()
-            .zip(sorted_sections.iter())
-            .any(|(a, b)| a != b)
-        {
-            state.add(task_section_order(task.name().span(), task.name().as_str()));
+        let mut encountered = State::Start;
+        for item in task.items() {
+            match item {
+                TaskItem::Metadata(_) if encountered <= State::Meta => {
+                    encountered = State::Meta;
+                }
+                TaskItem::ParameterMetadata(_) if encountered <= State::ParameterMeta => {
+                    encountered = State::ParameterMeta;
+                }
+                TaskItem::Input(_) if encountered <= State::Input => {
+                    encountered = State::Input;
+                }
+                TaskItem::Declaration(_) if encountered <= State::Decl => {
+                    encountered = State::Decl;
+                }
+                TaskItem::Command(_) if encountered <= State::Command => {
+                    encountered = State::Command;
+                }
+                TaskItem::Output(_) if encountered <= State::Output => {
+                    encountered = State::Output;
+                }
+                TaskItem::Runtime(_) if encountered <= State::Runtime => {
+                    encountered = State::Runtime;
+                }
+                _ => {
+                    state.add(task_section_order(task.name().span(), task.name().as_str()));
+                    break;
+                }
+            }
         }
     }
 
@@ -122,48 +130,34 @@ impl Visitor for SectionOrderingRule {
             return;
         }
 
-        let mut sections: Vec<usize> = Vec::new();
-
-        if let Some(meta) = workflow.metadata().next() {
-            sections.push(meta.syntax().text_range().to_span().start());
-        }
-        if let Some(parameter_meta) = workflow.parameter_metadata().next() {
-            sections.push(parameter_meta.syntax().text_range().to_span().start());
-        }
-        if let Some(inputs) = workflow.inputs().next() {
-            sections.push(inputs.syntax().text_range().to_span().start());
-        }
-
-        // Collect all calls and declarations
-        // Ensure they are between inputs and outputs.
-        // Internal ordering does not matter.
-        let mut calls_and_declarations: Vec<usize> = Vec::new();
-        workflow.declarations().for_each(|f| {
-            calls_and_declarations.push(f.syntax().text_range().to_span().start());
-        });
-        workflow.statements().for_each(|f| {
-            calls_and_declarations.push(f.syntax().text_range().to_span().start());
-        });
-
-        calls_and_declarations.sort();
-        sections.append(&mut calls_and_declarations);
-
-        if let Some(outputs) = workflow.outputs().next() {
-            sections.push(outputs.syntax().text_range().to_span().start());
-        }
-
-        let mut sorted_sections: Vec<usize> = sections.clone();
-        sorted_sections.sort();
-
-        if sections
-            .iter()
-            .zip(sorted_sections.iter())
-            .any(|(a, b)| a != b)
-        {
-            state.add(workflow_section_order(
-                workflow.name().span(),
-                workflow.name().as_str(),
-            ));
+        let mut encountered = State::Start;
+        for item in workflow.items() {
+            match item {
+                WorkflowItem::Metadata(_) if encountered <= State::Meta => {
+                    encountered = State::Meta;
+                }
+                WorkflowItem::ParameterMetadata(_) if encountered <= State::ParameterMeta => {
+                    encountered = State::ParameterMeta;
+                }
+                WorkflowItem::Input(_) if encountered <= State::Input => {
+                    encountered = State::Input;
+                }
+                WorkflowItem::Declaration(_) | WorkflowItem::Call(_) | WorkflowItem::Scatter(_)
+                    if encountered <= State::Decl =>
+                {
+                    encountered = State::Decl;
+                }
+                WorkflowItem::Output(_) if encountered <= State::Output => {
+                    encountered = State::Output;
+                }
+                _ => {
+                    state.add(workflow_section_order(
+                        workflow.name().span(),
+                        workflow.name().as_str(),
+                    ));
+                    break;
+                }
+            }
         }
     }
 }
