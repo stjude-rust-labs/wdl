@@ -62,7 +62,7 @@ impl Rule for NonmatchingOutputRule {
     }
 
     fn tags(&self) -> TagSet {
-        TagSet::new(&[Tag::Spacing, Tag::Style])
+        TagSet::new(&[Tag::Completeness])
     }
 }
 
