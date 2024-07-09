@@ -26,7 +26,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   allowing a validator to be reused between documents ([#110](https://github.com/stjude-rust-labs/wdl/pull/110)).
 * Moved the `PartialOrd` implementation for types into the `InputSorting` rule.
 
-
 ## 0.3.0 - 06-28-2024
 
 ### Added
