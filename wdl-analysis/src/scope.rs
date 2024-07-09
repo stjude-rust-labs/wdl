@@ -20,6 +20,7 @@ use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNode;
 use wdl_ast::ToSpan;
+use wdl_ast::Version;
 
 use crate::DocumentId;
 use crate::State;
@@ -118,11 +119,23 @@ fn import_failure(uri: &str, error: &anyhow::Error, span: Span) -> Diagnostic {
 }
 
 /// Creates an "incompatible import" diagnostic
-fn incompatible_import(version: &str, span: Span) -> Diagnostic {
-    Diagnostic::error(format!(
-        "imported document has incompatible version `{version}`"
-    ))
-    .with_highlight(span)
+fn incompatible_import(
+    import_version: &str,
+    import_span: Span,
+    importer_version: &Version,
+) -> Diagnostic {
+    Diagnostic::error("imported document has incompatible version")
+        .with_label(
+            format!("the imported document is version `{import_version}`"),
+            import_span,
+        )
+        .with_label(
+            format!(
+                "the importing document is version `{version}`",
+                version = importer_version.as_str()
+            ),
+            importer_version.span(),
+        )
 }
 
 /// Creates an "import missing version" diagnostic
@@ -544,13 +557,7 @@ impl DocumentScope {
                 for item in ast.items() {
                     match item {
                         v1::DocumentItem::Import(import) => {
-                            scope.add_namespace(
-                                state,
-                                &import,
-                                id,
-                                version.as_str(),
-                                &mut diagnostics,
-                            );
+                            scope.add_namespace(state, &import, id, &version, &mut diagnostics);
                         }
                         v1::DocumentItem::Struct(s) => {
                             scope.add_struct(&s, &mut diagnostics);
@@ -649,7 +656,7 @@ impl DocumentScope {
         state: &State,
         import: &ImportStatement,
         importer_id: &DocumentId,
-        importer_version: &str,
+        importer_version: &Version,
         diagnostics: &mut Vec<Diagnostic>,
     ) {
         // Start by resolving the import to its document scope
@@ -1180,7 +1187,7 @@ impl DocumentScope {
         state: &State,
         stmt: &v1::ImportStatement,
         importer_id: &DocumentId,
-        importer_version: &str,
+        importer_version: &Version,
     ) -> Result<(Arc<DocumentId>, Arc<DocumentScope>), Diagnostic> {
         let uri = stmt.uri();
         let span = uri.syntax().text_range().to_span();
@@ -1235,9 +1242,13 @@ impl DocumentScope {
         match root.version_statement() {
             Some(stmt) => {
                 let our_version = stmt.version();
-                if matches!((our_version.as_str().split('.').next(), importer_version.split('.').next()), (Some(our_major), Some(their_major)) if our_major != their_major)
+                if matches!((our_version.as_str().split('.').next(), importer_version.as_str().split('.').next()), (Some(our_major), Some(their_major)) if our_major != their_major)
                 {
-                    return Err(incompatible_import(our_version.as_str(), span));
+                    return Err(incompatible_import(
+                        our_version.as_str(),
+                        span,
+                        importer_version,
+                    ));
                 }
             }
             None => {
