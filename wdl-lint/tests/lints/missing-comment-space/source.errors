@@ -6,3 +6,11 @@ note[PreambleComments]: preamble comments must start with `##` followed by a spa
   │
   = fix: change each preamble comment to start with `##` followed by a space
 
+warning[NonmatchingOutput]: outputs key missing in meta section
+  ┌─ tests/lints/missing-comment-space/source.wdl:9:5
+  │
+9 │     meta {}
+  │     ^^^^
+  │
+  = fix: add outputs key to `meta` section
+

@@ -14,3 +14,11 @@ note[PreambleComments]: preamble comments must start with `##` followed by a spa
   │
   = fix: change each preamble comment to start with `##` followed by a space
 
+warning[NonmatchingOutput]: outputs key missing in meta section
+  ┌─ tests/lints/too-many-pounds-preamble/source.wdl:8:5
+  │
+8 │     meta {}
+  │     ^^^^
+  │
+  = fix: add outputs key to `meta` section
+

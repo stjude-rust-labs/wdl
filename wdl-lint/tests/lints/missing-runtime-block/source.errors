@@ -6,3 +6,19 @@ warning[MissingRuntime]: task `bad` is missing a runtime section
   │
   = fix: add a runtime section to the task
 
+warning[NonmatchingOutput]: outputs key missing in meta section
+  ┌─ tests/lints/missing-runtime-block/source.wdl:6:5
+  │
+6 │     meta {}
+  │     ^^^^
+  │
+  = fix: add outputs key to `meta` section
+
+warning[NonmatchingOutput]: outputs key missing in meta section
+   ┌─ tests/lints/missing-runtime-block/source.wdl:12:5
+   │
+12 │     meta {}
+   │     ^^^^
+   │
+   = fix: add outputs key to `meta` section
+

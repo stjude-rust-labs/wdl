@@ -6,6 +6,14 @@ warning[SnakeCase]: workflow name `BadWorkflow` is not snake_case
   │
   = fix: replace `BadWorkflow` with `bad_workflow`
 
+warning[NonmatchingOutput]: outputs key missing in meta section
+  ┌─ tests/lints/snake-case/source.wdl:6:5
+  │
+6 │     meta {}
+  │     ^^^^
+  │
+  = fix: add outputs key to `meta` section
+
 warning[SnakeCase]: private declaration name `badPrivateDecl` is not snake_case
   ┌─ tests/lints/snake-case/source.wdl:8:11
   │
@@ -22,6 +30,14 @@ warning[SnakeCase]: task name `BadTask` is not snake_case
    │
    = fix: replace `BadTask` with `bad_task`
 
+warning[NonmatchingOutput]: outputs key missing in meta section
+   ┌─ tests/lints/snake-case/source.wdl:14:5
+   │
+14 │     meta {}
+   │     ^^^^
+   │
+   = fix: add outputs key to `meta` section
+
 warning[SnakeCase]: input name `BadInput` is not snake_case
    ┌─ tests/lints/snake-case/source.wdl:17:16
    │
@@ -37,6 +53,14 @@ warning[SnakeCase]: output name `badOut` is not snake_case
    │              ^^^^^^ this name must be snake_case
    │
    = fix: replace `badOut` with `bad_out`
+
+warning[NonmatchingOutput]: outputs key missing in meta section
+   ┌─ tests/lints/snake-case/source.wdl:36:5
+   │
+36 │     meta {}
+   │     ^^^^
+   │
+   = fix: add outputs key to `meta` section
 
 warning[SnakeCase]: struct member name `bAdFiElD` is not snake_case
    ┌─ tests/lints/snake-case/source.wdl:59:12

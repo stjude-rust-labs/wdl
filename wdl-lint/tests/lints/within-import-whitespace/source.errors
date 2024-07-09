@@ -70,3 +70,11 @@ note[ImportSort]: comments are not allowed within an import statement
    │
    = fix: remove the comment from the import statement
 
+warning[NonmatchingOutput]: outputs key missing in meta section
+   ┌─ tests/lints/within-import-whitespace/source.wdl:16:5
+   │
+16 │     meta {}
+   │     ^^^^
+   │
+   = fix: add outputs key to `meta` section
+

@@ -6,3 +6,11 @@ note[PreambleWhitespace]: expected a blank line after the version statement
   │
   = fix: add a blank line immediately after the version statement
 
+warning[NonmatchingOutput]: outputs key missing in meta section
+  ┌─ tests/lints/missing-blank-line-after-version/source.wdl:5:5
+  │
+5 │     meta {}
+  │     ^^^^
+  │
+  = fix: add outputs key to `meta` section
+

@@ -41,6 +41,14 @@ warning[Whitespace]: line contains only whitespace
    │
    = fix: remove the whitespace from this line
 
+warning[NonmatchingOutput]: outputs key missing in meta section
+   ┌─ tests/lints/only-whitespace/source.wdl:14:5
+   │
+14 │     meta {}
+   │     ^^^^
+   │
+   = fix: add outputs key to `meta` section
+
 warning[Whitespace]: line contains trailing whitespace
    ┌─ tests/lints/only-whitespace/source.wdl:17:18
    │

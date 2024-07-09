@@ -1,3 +1,11 @@
+warning[NonmatchingOutput]: outputs key missing in meta section
+  ┌─ tests/lints/matching-param-meta/source.wdl:7:5
+  │
+7 │     meta {}
+  │     ^^^^
+  │
+  = fix: add outputs key to `meta` section
+
 warning[MatchingParameterMeta]: task `t` is missing a parameter metadata key for input `does_not_exist`
    ┌─ tests/lints/matching-param-meta/source.wdl:10:16
    │
@@ -13,6 +21,14 @@ note[MatchingParameterMeta]: task `t` has an extraneous parameter metadata key n
    │         ^^^^^ this key does not correspond to any input declaration
    │
    = fix: remove the extraneous parameter metadata entry
+
+warning[NonmatchingOutput]: outputs key missing in meta section
+   ┌─ tests/lints/matching-param-meta/source.wdl:31:5
+   │
+31 │     meta {}
+   │     ^^^^
+   │
+   = fix: add outputs key to `meta` section
 
 warning[MatchingParameterMeta]: workflow `w` is missing a parameter metadata key for input `does_not_exist`
    ┌─ tests/lints/matching-param-meta/source.wdl:35:16

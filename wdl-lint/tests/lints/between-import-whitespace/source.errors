@@ -51,3 +51,11 @@ warning[Whitespace]: more than one blank line in a row
    │  
    = fix: remove the unnecessary blank lines
 
+warning[NonmatchingOutput]: outputs key missing in meta section
+   ┌─ tests/lints/between-import-whitespace/source.wdl:22:5
+   │
+22 │     meta {}
+   │     ^^^^
+   │
+   = fix: add outputs key to `meta` section
+
