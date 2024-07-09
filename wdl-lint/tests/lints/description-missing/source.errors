@@ -1,8 +1,8 @@
-note[DescriptionMissing]: description key missing in meta section
+note[DescriptionMissing]: this section is missing a description key
   ┌─ tests/lints/description-missing/source.wdl:6:5
   │
 6 │     meta {}
   │     ^^^^
   │
-  = fix: add a `description` key to the meta section
+  = fix: add a `description` key to this meta section
 

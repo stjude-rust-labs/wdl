@@ -20,10 +20,10 @@ const ID: &str = "DescriptionMissing";
 
 /// Creates a description missing diagnostic.
 fn description_missing(span: Span) -> Diagnostic {
-    Diagnostic::note("description key missing in meta section")
+    Diagnostic::note("this section is missing a description key")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("add a `description` key to the meta section")
+        .with_fix("add a `description` key to this meta section")
 }
 
 /// Detects unsorted input declarations.
