@@ -1,3 +1,11 @@
+note[DescriptionMissing]: description key missing in meta section
+  ┌─ tests/lints/multiple-eof-newline/source.wdl:6:5
+  │
+6 │     meta {}
+  │     ^^^^
+  │
+  = fix: add a description to the meta section
+
 warning[EndingNewline]: multiple empty lines at the end of file
    ┌─ tests/lints/multiple-eof-newline/source.wdl:9:2
    │  

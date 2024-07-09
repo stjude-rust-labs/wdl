@@ -6,3 +6,11 @@ warning[MissingOutput]: workflow `test` is missing an output section
   │
   = fix: add an output section to the workflow
 
+note[DescriptionMissing]: description key missing in meta section
+  ┌─ tests/lints/missing-output/source.wdl:4:5
+  │
+4 │     meta {}
+  │     ^^^^
+  │
+  = fix: add a description to the meta section
+

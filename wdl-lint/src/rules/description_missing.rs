@@ -1,0 +1,81 @@
+//! A lint rule for to ensure description is included in meta sections.
+
+use wdl_ast::v1::MetadataSection;
+use wdl_ast::AstNode;
+use wdl_ast::AstToken;
+use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
+use wdl_ast::Span;
+use wdl_ast::ToSpan;
+use wdl_ast::VisitReason;
+use wdl_ast::Visitor;
+
+use crate::Rule;
+use crate::Tag;
+use crate::TagSet;
+
+/// The identifier for the description missing rule.
+const ID: &str = "DescriptionMissing";
+
+/// Creates a description missing diagnostic.
+fn description_missing(span: Span) -> Diagnostic {
+    Diagnostic::note("description key missing in meta section")
+        .with_rule(ID)
+        .with_highlight(span)
+        .with_fix("add a description to the meta section")
+}
+
+/// Detects unsorted input declarations.
+#[derive(Debug, Clone, Copy)]
+pub struct DescriptionMissingRule;
+
+impl Rule for DescriptionMissingRule {
+    fn id(&self) -> &'static str {
+        ID
+    }
+
+    fn description(&self) -> &'static str {
+        "Ensures that a description is present for each meta section."
+    }
+
+    fn explanation(&self) -> &'static str {
+        "Each task or workflow should have a description in the meta section. This description \
+         should be an explanation of the task or workflow. This description should be written in \
+         active voice and complete sentences. More detailed information can be included in the \
+         `help` key."
+    }
+
+    fn tags(&self) -> TagSet {
+        TagSet::new(&[Tag::Completeness])
+    }
+}
+
+impl Visitor for DescriptionMissingRule {
+    type State = Diagnostics;
+
+    fn metadata_section(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        section: &MetadataSection,
+    ) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+
+        let description = section
+            .items()
+            .find(|entry| entry.name().syntax().to_string() == "description");
+
+        if description.is_none() {
+            state.add(description_missing(
+                section
+                    .syntax()
+                    .first_token()
+                    .unwrap()
+                    .text_range()
+                    .to_span(),
+            ));
+        }
+    }
+}

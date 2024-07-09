@@ -26,3 +26,11 @@ note[PreambleComments]: preamble comments cannot come after the version statemen
    │
    = fix: change each comment to start with `#` followed by a space
 
+note[DescriptionMissing]: description key missing in meta section
+   ┌─ tests/lints/preamble-comment-after-version/source.wdl:20:5
+   │
+20 │     meta {}
+   │     ^^^^
+   │
+   = fix: add a description to the meta section
+

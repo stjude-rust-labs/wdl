@@ -1,3 +1,11 @@
+note[DescriptionMissing]: description key missing in meta section
+  ┌─ tests/lints/input-spacing/source.wdl:9:5
+  │
+9 │     meta {}
+  │     ^^^^
+  │
+  = fix: add a description to the meta section
+
 note[CallInputSpacing]: call input not properly spaced
    ┌─ tests/lints/input-spacing/source.wdl:11:15
    │  
@@ -47,4 +55,12 @@ note[CallInputSpacing]: call inputs assignments must be surrounded with whitespa
    │                         ^
    │
    = fix: surround '=' with whitespace on each side
+
+note[DescriptionMissing]: description key missing in meta section
+   ┌─ tests/lints/input-spacing/source.wdl:26:5
+   │
+26 │     meta {}
+   │     ^^^^
+   │
+   = fix: add a description to the meta section
 

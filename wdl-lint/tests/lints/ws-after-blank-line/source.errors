@@ -7,3 +7,11 @@ note[PreambleWhitespace]: unnecessary whitespace in document preamble
   │  
   = fix: remove the unnecessary whitespace
 
+note[DescriptionMissing]: description key missing in meta section
+  ┌─ tests/lints/ws-after-blank-line/source.wdl:7:5
+  │
+7 │     meta {}
+  │     ^^^^
+  │
+  = fix: add a description to the meta section
+

@@ -1,3 +1,11 @@
+note[DescriptionMissing]: description key missing in meta section
+  ┌─ tests/lints/input-not-sorted/source.wdl:9:5
+  │
+9 │     meta {}
+  │     ^^^^
+  │
+  = fix: add a description to the meta section
+
 warning[InputSorting]: input not sorted
    ┌─ tests/lints/input-not-sorted/source.wdl:34:5
    │  
@@ -33,6 +41,14 @@ warning[InputSorting]: input not sorted
      Int? e
      Int? f = 2
      String g = "hello"
+
+note[DescriptionMissing]: description key missing in meta section
+   ┌─ tests/lints/input-not-sorted/source.wdl:62:5
+   │
+62 │     meta {}
+   │     ^^^^
+   │
+   = fix: add a description to the meta section
 
 warning[InputSorting]: input not sorted
     ┌─ tests/lints/input-not-sorted/source.wdl:85:5

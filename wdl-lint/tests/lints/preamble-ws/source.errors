@@ -14,3 +14,11 @@ note[PreambleWhitespace]: expected a blank line before the version statement
   │
   = fix: add a blank line between the last preamble comment and the version statement
 
+note[DescriptionMissing]: description key missing in meta section
+  ┌─ tests/lints/preamble-ws/source.wdl:5:5
+  │
+5 │     meta {}
+  │     ^^^^
+  │
+  = fix: add a description to the meta section
+
