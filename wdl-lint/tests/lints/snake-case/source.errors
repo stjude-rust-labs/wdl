@@ -22,14 +22,6 @@ warning[SnakeCase]: task name `BadTask` is not snake_case
    │
    = fix: replace `BadTask` with `bad_task`
 
-warning[NonmatchingOutput]: outputs key missing in meta section
-   ┌─ tests/lints/snake-case/source.wdl:15:5
-   │
-15 │     meta {}
-   │     ^^^^
-   │
-   = fix: add outputs key to `meta` section
-
 warning[SnakeCase]: input name `BadInput` is not snake_case
    ┌─ tests/lints/snake-case/source.wdl:18:16
    │
@@ -45,14 +37,6 @@ warning[SnakeCase]: output name `badOut` is not snake_case
    │              ^^^^^^ this name must be snake_case
    │
    = fix: replace `badOut` with `bad_out`
-
-warning[NonmatchingOutput]: outputs key missing in meta section
-   ┌─ tests/lints/snake-case/source.wdl:37:5
-   │
-37 │     meta {}
-   │     ^^^^
-   │
-   = fix: add outputs key to `meta` section
 
 warning[SnakeCase]: struct member name `bAdFiElD` is not snake_case
    ┌─ tests/lints/snake-case/source.wdl:60:12

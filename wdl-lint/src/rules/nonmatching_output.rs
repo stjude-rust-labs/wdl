@@ -23,21 +23,20 @@ const ID: &str = "NonmatchingOutput";
 
 /// Creates a "non-matching output" diagnostic.
 fn nonmatching_output(span: Span, name: String) -> Diagnostic {
-    Diagnostic::warning("output is missing from meta section")
+    Diagnostic::warning(format!("output `{name}` is missing from `meta` section"))
         .with_rule(ID)
         .with_highlight(span)
         .with_fix(format!(
-            "add output ({:?}) key to outputs documentation in `meta` section",
-            name
+            "add output (`{name}`) key to `outputs` documentation in `meta` section"
         ))
 }
 
 /// Creates a missing outputs in meta diagnostic.
 fn missing_outputs_in_meta(span: Span) -> Diagnostic {
-    Diagnostic::warning("outputs key missing in meta section")
+    Diagnostic::warning("`outputs` key missing in `meta` section")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("add outputs key to `meta` section")
+        .with_fix("add `outputs` key to `meta` section")
 }
 
 /// Detects non-matching outputs.

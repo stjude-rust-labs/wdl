@@ -1117,7 +1117,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/flag_filter.wdl"
-message = "flag_filter.wdl:125:5: warning[NonmatchingOutput]: outputs key missing in meta section"
+message = "flag_filter.wdl:125:5: warning[NonmatchingOutput]: `outputs` key missing in `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/flag_filter.wdl/#L125"
 
 [[diagnostics]]
@@ -1217,7 +1217,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/cellranger.wdl"
-message = "cellranger.wdl:102:5: warning[NonmatchingOutput]: outputs key missing in meta section"
+message = "cellranger.wdl:102:5: warning[NonmatchingOutput]: `outputs` key missing in `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/cellranger.wdl/#L102"
 
 [[diagnostics]]
@@ -1237,7 +1237,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/cellranger.wdl"
-message = "cellranger.wdl:9:5: warning[NonmatchingOutput]: outputs key missing in meta section"
+message = "cellranger.wdl:9:5: warning[NonmatchingOutput]: `outputs` key missing in `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/cellranger.wdl/#L9"
 
 [[diagnostics]]
@@ -1252,7 +1252,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/fq.wdl"
-message = "fq.wdl:91:16: warning[NonmatchingOutput]: output is missing from meta section"
+message = "fq.wdl:91:16: warning[NonmatchingOutput]: output `check` is missing from `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/fq.wdl/#L91"
 
 [[diagnostics]]
@@ -1312,12 +1312,12 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/librarian.wdl"
-message = "librarian.wdl:6:5: warning[NonmatchingOutput]: outputs key missing in meta section"
+message = "librarian.wdl:6:5: warning[NonmatchingOutput]: `outputs` key missing in `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/librarian.wdl/#L6"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
-message = "ngsderive.wdl:133:16: warning[NonmatchingOutput]: output is missing from meta section"
+message = "ngsderive.wdl:133:16: warning[NonmatchingOutput]: output `instrument_string` is missing from `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L133"
 
 [[diagnostics]]
@@ -1332,7 +1332,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
-message = "ngsderive.wdl:80:16: warning[NonmatchingOutput]: output is missing from meta section"
+message = "ngsderive.wdl:80:16: warning[NonmatchingOutput]: output `strandedness_string` is missing from `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L80"
 
 [[diagnostics]]
@@ -1342,18 +1342,18 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
-message = "picard.wdl:822:5: warning[NonmatchingOutput]: outputs key missing in meta section"
+message = "picard.wdl:342:6: note[SectionOrdering]: sections are not in order for task `merge_sam_files`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L342"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:822:5: warning[NonmatchingOutput]: `outputs` key missing in `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L822"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
-message = "picard.wdl:982:21: warning[NonmatchingOutput]: output is missing from meta section"
+message = "picard.wdl:982:21: warning[NonmatchingOutput]: output `interval_lists_scatter` is missing from `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L982"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/picard.wdl"
-message = "picard.wdl:342:6: note[SectionOrdering]: sections are not in order for task `merge_sam_files`"
-permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L342"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/qualimap.wdl"
@@ -1362,42 +1362,42 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/qualimap.wdl"
-message = "qualimap.wdl:94:5: warning[NonmatchingOutput]: outputs key missing in meta section"
+message = "qualimap.wdl:94:5: warning[NonmatchingOutput]: `outputs` key missing in `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/qualimap.wdl/#L94"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/sambamba.wdl"
-message = "sambamba.wdl:219:14: warning[NonmatchingOutput]: output is missing from meta section"
+message = "sambamba.wdl:219:14: warning[NonmatchingOutput]: output `duplicate_marked_bam_index` is missing from `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L219"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/sambamba.wdl"
-message = "sambamba.wdl:220:14: warning[NonmatchingOutput]: output is missing from meta section"
+message = "sambamba.wdl:220:14: warning[NonmatchingOutput]: output `markdup_log` is missing from `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L220"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/samtools.wdl"
-message = "samtools.wdl:1069:5: warning[NonmatchingOutput]: outputs key missing in meta section"
+message = "samtools.wdl:1069:5: warning[NonmatchingOutput]: `outputs` key missing in `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L1069"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/samtools.wdl"
-message = "samtools.wdl:1170:5: warning[NonmatchingOutput]: outputs key missing in meta section"
+message = "samtools.wdl:1170:5: warning[NonmatchingOutput]: `outputs` key missing in `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L1170"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/samtools.wdl"
-message = "samtools.wdl:423:5: warning[NonmatchingOutput]: outputs key missing in meta section"
+message = "samtools.wdl:423:5: warning[NonmatchingOutput]: `outputs` key missing in `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L423"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/samtools.wdl"
-message = "samtools.wdl:45:5: warning[NonmatchingOutput]: outputs key missing in meta section"
+message = "samtools.wdl:45:5: warning[NonmatchingOutput]: `outputs` key missing in `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L45"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/samtools.wdl"
-message = "samtools.wdl:777:5: warning[NonmatchingOutput]: outputs key missing in meta section"
+message = "samtools.wdl:777:5: warning[NonmatchingOutput]: `outputs` key missing in `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L777"
 
 [[diagnostics]]
@@ -1422,7 +1422,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:136:23: warning[NonmatchingOutput]: output is missing from meta section"
+message = "util.wdl:136:23: warning[NonmatchingOutput]: output `split_strings` is missing from `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L136"
 
 [[diagnostics]]
@@ -1452,7 +1452,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:695:5: warning[NonmatchingOutput]: outputs key missing in meta section"
+message = "util.wdl:695:5: warning[NonmatchingOutput]: `outputs` key missing in `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L695"
 
 [[diagnostics]]
@@ -1602,12 +1602,12 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:453:14: warning[NonmatchingOutput]: output is missing from meta section"
+message = "quality-check-standard.wdl:453:14: warning[NonmatchingOutput]: output `inferred_endedness` is missing from `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/qc/quality-check-standard.wdl/#L453"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:492:28: warning[NonmatchingOutput]: output is missing from meta section"
+message = "quality-check-standard.wdl:492:28: warning[NonmatchingOutput]: output `intermediate_files` is missing from `meta` section"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/qc/quality-check-standard.wdl/#L492"
 
 [[diagnostics]]
@@ -1672,13 +1672,13 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:98:5: warning[NonmatchingOutput]: outputs key missing in meta section"
-permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L98"
+message = "10x-bam-to-fastqs.wdl:97:6: note[SectionOrdering]: sections are not in order for task `parse_input`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L97"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:97:6: note[SectionOrdering]: sections are not in order for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L97"
+message = "10x-bam-to-fastqs.wdl:98:5: warning[NonmatchingOutput]: `outputs` key missing in `meta` section"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L98"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"

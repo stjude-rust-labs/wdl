@@ -24,7 +24,7 @@ commit_hash = "1e32078d3b57dcb2291534d0caa30f600d40967e"
 
 [repositories."broadinstitute/warp"]
 identifier = "broadinstitute/warp"
-commit_hash = "5584cdbd609db03e3f053ddf3e995c89aa237cdb"
+commit_hash = "e49ffbcd72b138ad4dc6ec62c847943908e4abf9"
 
 [repositories."chanzuckerberg/czid-workflows"]
 identifier = "chanzuckerberg/czid-workflows"
@@ -382,21 +382,6 @@ message = "BuildHaplotypeMap.wdl:17:1: error: a WDL document must start with a v
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/1e32078d3b57dcb2291534d0caa30f600d40967e/HaplotypeMap/BuildHaplotypeMap.wdl/#L17"
 
 [[diagnostics]]
-document = "broadinstitute/palantir-workflows:/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl"
-message = "IsoformDiscoveryBenchmark.wdl:147:13: error: conflicting scatter variable name `gtf`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/1e32078d3b57dcb2291534d0caa30f600d40967e/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L147"
-
-[[diagnostics]]
-document = "broadinstitute/warp:/pipelines/broad/dna_seq/somatic/single_sample/wgs/gdc_genome/GDCWholeGenomeSomaticSingleSample.wdl"
-message = "GDCWholeGenomeSomaticSingleSample.wdl:672:14: error: conflicting scatter variable name `ubam`"
-permalink = "https://github.com/broadinstitute/warp/blob/5584cdbd609db03e3f053ddf3e995c89aa237cdb/pipelines/broad/dna_seq/somatic/single_sample/wgs/gdc_genome/GDCWholeGenomeSomaticSingleSample.wdl/#L672"
-
-[[diagnostics]]
-document = "broadinstitute/warp:/pipelines/skylab/scATAC/scATAC.wdl"
-message = "scATAC.wdl:203:9: error: duplicate key `cpu` in runtime section"
-permalink = "https://github.com/broadinstitute/warp/blob/5584cdbd609db03e3f053ddf3e995c89aa237cdb/pipelines/skylab/scATAC/scATAC.wdl/#L203"
-
-[[diagnostics]]
 document = "broadinstitute/warp:/pipelines/skylab/scATAC/scATAC.wdl"
 message = "scATAC.wdl:203:9: error: duplicate key `cpu` in runtime section"
 permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec62c847943908e4abf9/pipelines/skylab/scATAC/scATAC.wdl/#L203"
@@ -404,27 +389,27 @@ permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec6
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/GermlineVariantDiscovery.wdl"
 message = "GermlineVariantDiscovery.wdl:137:32: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/5584cdbd609db03e3f053ddf3e995c89aa237cdb/tasks/broad/GermlineVariantDiscovery.wdl/#L137"
+permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec62c847943908e4abf9/tasks/broad/GermlineVariantDiscovery.wdl/#L137"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/GermlineVariantDiscovery.wdl"
 message = "GermlineVariantDiscovery.wdl:65:32: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/5584cdbd609db03e3f053ddf3e995c89aa237cdb/tasks/broad/GermlineVariantDiscovery.wdl/#L65"
+permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec62c847943908e4abf9/tasks/broad/GermlineVariantDiscovery.wdl/#L65"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl"
 message = "UltimaGenomicsWholeGenomeGermlineTasks.wdl:814:27: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/5584cdbd609db03e3f053ddf3e995c89aa237cdb/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L814"
+permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec62c847943908e4abf9/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L814"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl"
 message = "UltimaGenomicsWholeGenomeGermlineTasks.wdl:866:27: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/5584cdbd609db03e3f053ddf3e995c89aa237cdb/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L866"
+permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec62c847943908e4abf9/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L866"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tests/cemba/pr/CheckCembaOutputs.wdl"
 message = "CheckCembaOutputs.wdl:1:1: error: a WDL document must start with a version statement"
-permalink = "https://github.com/broadinstitute/warp/blob/5584cdbd609db03e3f053ddf3e995c89aa237cdb/tests/cemba/pr/CheckCembaOutputs.wdl/#L1"
+permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec62c847943908e4abf9/tests/cemba/pr/CheckCembaOutputs.wdl/#L1"
 
 [[diagnostics]]
 document = "chanzuckerberg/czid-workflows:/workflows/index-generation/index-generation.wdl"
