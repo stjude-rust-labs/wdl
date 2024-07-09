@@ -1,7 +1,7 @@
 # Rules
 
-This table documents all implemented `wdl` lint rules implemented on the `main` 
-branch of the `stjude-rust-labs/wdl` repository. Note that the information may 
+This table documents all implemented `wdl` lint rules implemented on the `main`
+branch of the `stjude-rust-labs/wdl` repository. Note that the information may
 be out of sync with released packages.
 
 ## Lint Rules
@@ -10,6 +10,7 @@ be out of sync with released packages.
 |:---------------------------------|:------------------------------|:--------------------------------------------------------------------------------------|
 | `CallInputSpacing`               | Style, Clarity, Spacing       | Ensures proper spacing for call inputs                                                |
 | `CommandSectionMixedIndentation` | Clarity, Correctness, Spacing | Ensures that lines within a command do not mix spaces and tabs.                       |
+| `DeprecatedObject`               | Deprecated                    | Ensures that the deprecated `Object` construct is not used.                           |
 | `DoubleQuotes`                   | Clarity, Style                | Ensures that strings are defined using double quotes.                                 |
 | `EndingNewline`                  | Spacing, Style                | Ensures that documents end with a single newline character.                           |
 | `ImportPlacement`                | Clarity, Sorting              | Ensures that imports are placed between the version statement and any document items. |
