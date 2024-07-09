@@ -1,4 +1,4 @@
-//! A lint rule for to ensure description is included in meta sections.
+//! A lint rule to ensure a description is included in `meta` sections.
 
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::AstNode;
@@ -22,7 +22,7 @@ fn description_missing(span: Span) -> Diagnostic {
     Diagnostic::note("description key missing in meta section")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("add a description to the meta section")
+        .with_fix("add a `description` key to the meta section")
 }
 
 /// Detects unsorted input declarations.
