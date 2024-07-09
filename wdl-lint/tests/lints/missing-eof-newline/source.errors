@@ -7,9 +7,9 @@ warning[NonmatchingOutput]: outputs key missing in meta section
   = fix: add outputs key to `meta` section
 
 warning[EndingNewline]: missing newline at the end of the file
-  ┌─ tests/lints/missing-eof-newline/source.wdl:8:1
+  ┌─ tests/lints/missing-eof-newline/source.wdl:9:1
   │
-8 │ }
+9 │ }
   │ ^ expected a newline to follow this
   │
   = fix: add an empty line at the end of the file

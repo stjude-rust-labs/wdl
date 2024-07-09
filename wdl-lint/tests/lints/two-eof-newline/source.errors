@@ -7,12 +7,12 @@ warning[NonmatchingOutput]: outputs key missing in meta section
   = fix: add outputs key to `meta` section
 
 warning[EndingNewline]: multiple empty lines at the end of file
-  ┌─ tests/lints/two-eof-newline/source.wdl:8:2
-  │  
-8 │   }
-  │ ╭─^
-9 │ │ 
-  │ ╰^ duplicate newline here
-  │  
-  = fix: remove all but one empty line at the end of the file
+   ┌─ tests/lints/two-eof-newline/source.wdl:9:2
+   │  
+ 9 │   }
+   │ ╭─^
+10 │ │ 
+   │ ╰^ duplicate newline here
+   │  
+   = fix: remove all but one empty line at the end of the file
 

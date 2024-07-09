@@ -91,6 +91,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(rules::CallInputSpacingRule),
         Box::new(rules::SectionOrderingRule),
         Box::new(rules::DeprecatedObjectRule),
+        Box::new(rules::DescriptionMissingRule),
         Box::new(rules::NonmatchingOutputRule),
     ];
 
