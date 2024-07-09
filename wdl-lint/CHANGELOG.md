@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Added the `NonmatchingOutput` lint rule.
+* Added the `NonmatchingOutput` lint rule ([#114](https://github.com/stjude-rust-labs/wdl/pull/114)).
 
 ## 0.3.0 - 06-28-2024
 
