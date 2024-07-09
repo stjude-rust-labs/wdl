@@ -1,4 +1,4 @@
-#@ except: DeprecatedObject
+#@ except: DeprecatedObject, SectionOrdering
 
 version 1.1
 

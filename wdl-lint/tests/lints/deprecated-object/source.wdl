@@ -1,4 +1,4 @@
-#@ except: MissingMetas
+#@ except: MissingMetas, SectionOrdering
 ## This is a test of the `DeprecatedObject` lint
 
 version 1.1

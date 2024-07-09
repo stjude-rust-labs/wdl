@@ -1,16 +1,18 @@
+note[PreambleWhitespace]: expected a blank line before the version statement
+  ┌─ tests/lints/missing-meta/source.wdl:1:27
+  │  
+1 │   #@ except: SectionOrdering
+  │ ╭──────────────────────────^
+2 │ │ version 1.0
+  │ ╰^
+  │  
+  = fix: add a blank line between the last preamble comment and the version statement
+
 note[MissingMetas]: task `test` is missing a `meta` section
-  ┌─ tests/lints/missing-meta/source.wdl:3:6
+  ┌─ tests/lints/missing-meta/source.wdl:4:6
   │
-3 │ task test {
+4 │ task test {
   │      ^^^^ this task is missing a `meta` section
   │
   = fix: add a `meta` section to the task
-
-note[SectionOrdering]: sections are not in order for task test
-  ┌─ tests/lints/missing-meta/source.wdl:3:6
-  │
-3 │ task test {
-  │      ^^^^
-  │
-  = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `runtime`
 
