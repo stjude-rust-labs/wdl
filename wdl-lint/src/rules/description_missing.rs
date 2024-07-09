@@ -40,7 +40,7 @@ impl Rule for DescriptionMissingRule {
 
     fn explanation(&self) -> &'static str {
         "Each task or workflow should have a description in the meta section. This description \
-         should be an explanation of the task or workflow. This description should be written in \
+         should be an explanation of the task or workflow. The description should be written in \
          active voice and complete sentences. More detailed information can be included in the \
          `help` key."
     }
