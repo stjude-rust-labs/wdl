@@ -1,11 +1,3 @@
-note[DescriptionMissing]: description key missing in meta section
-  ┌─ tests/lints/command-mixed-spaces-first/source.wdl:7:5
-  │
-7 │     meta {}
-  │     ^^^^
-  │
-  = fix: add a description to the meta section
-
 warning[CommandSectionMixedIndentation]: mixed indentation within a command
    ┌─ tests/lints/command-mixed-spaces-first/source.wdl:12:1
    │
@@ -16,14 +8,6 @@ warning[CommandSectionMixedIndentation]: mixed indentation within a command
    │ ^^^^ indented with spaces until this tab
    │
    = fix: use the same whitespace character for indentation
-
-note[DescriptionMissing]: description key missing in meta section
-   ┌─ tests/lints/command-mixed-spaces-first/source.wdl:20:5
-   │
-20 │     meta {}
-   │     ^^^^
-   │
-   = fix: add a description to the meta section
 
 warning[CommandSectionMixedIndentation]: mixed indentation within a command
    ┌─ tests/lints/command-mixed-spaces-first/source.wdl:25:1

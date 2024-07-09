@@ -1,3 +1,5 @@
+#@ except: DescriptionMissing
+
 version 1.1
 
 struct Mystruct {

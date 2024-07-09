@@ -1,16 +1,8 @@
 note[PreambleComments]: preamble comments must start with `##` followed by a space
-  ┌─ tests/lints/missing-comment-space/source.wdl:1:1
+  ┌─ tests/lints/missing-comment-space/source.wdl:2:1
   │
-1 │ ##This preamble comment is missing a space.
+2 │ ##This preamble comment is missing a space.
   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   │
   = fix: change each preamble comment to start with `##` followed by a space
-
-note[DescriptionMissing]: description key missing in meta section
-  ┌─ tests/lints/missing-comment-space/source.wdl:9:5
-  │
-9 │     meta {}
-  │     ^^^^
-  │
-  = fix: add a description to the meta section
 

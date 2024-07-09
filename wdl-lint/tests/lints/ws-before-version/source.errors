@@ -1,19 +1,18 @@
 note[PreambleWhitespace]: unnecessary whitespace in document preamble
-  ┌─ tests/lints/ws-before-version/source.wdl:1:1
+  ┌─ tests/lints/ws-before-version/source.wdl:2:1
+  │
+2 │     
+  │ ^^^^
+  │
+  = fix: remove the unnecessary whitespace
+
+note[PreambleWhitespace]: unnecessary whitespace in document preamble
+  ┌─ tests/lints/ws-before-version/source.wdl:3:1
   │  
-1 │ ╭     
-2 │ │ 
-3 │ │   
-4 │ │     version 1.1
+3 │ ╭ 
+4 │ │   
+5 │ │     version 1.1
   │ ╰────^
   │  
   = fix: remove the unnecessary whitespace
-
-note[DescriptionMissing]: description key missing in meta section
-  ┌─ tests/lints/ws-before-version/source.wdl:9:5
-  │
-9 │     meta {}
-  │     ^^^^
-  │
-  = fix: add a description to the meta section
 

@@ -1,8 +1,0 @@
-note[DescriptionMissing]: description key missing in meta section
-  ┌─ tests/lints/one-eof-newline/source.wdl:7:5
-  │
-7 │     meta {}
-  │     ^^^^
-  │
-  = fix: add a description to the meta section
-

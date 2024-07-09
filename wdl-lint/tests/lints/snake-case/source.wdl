@@ -1,3 +1,4 @@
+#@ except: DescriptionMissing
 ## Test SnakeCase rule
 
 version 1.0
