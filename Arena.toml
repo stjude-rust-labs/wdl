@@ -1116,6 +1116,16 @@ message = "ww-vc-trio.wdl:98:29: note[CallInputSpacing]: call input not properly
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L98"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/data_structures/flag_filter.wdl"
+message = "flag_filter.wdl:116:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/flag_filter.wdl/#L116"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/data_structures/flag_filter.wdl"
+message = "flag_filter.wdl:116:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/flag_filter.wdl/#L116"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:12:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L12"
@@ -1129,6 +1139,16 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:13:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L13"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "read_group.wdl:140:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L140"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "read_group.wdl:140:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L140"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
@@ -1162,8 +1182,28 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "read_group.wdl:420:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L420"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "read_group.wdl:420:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L420"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:7:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L7"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "read_group.wdl:89:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L89"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/data_structures/read_group.wdl"
+message = "read_group.wdl:89:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/data_structures/read_group.wdl/#L89"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
@@ -1197,6 +1237,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:225:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/arriba.wdl/#L225"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
 message = "arriba.wdl:257:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/arriba.wdl/#L257"
 
@@ -1206,9 +1251,49 @@ message = "arriba.wdl:263:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/arriba.wdl/#L263"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:275:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/arriba.wdl/#L275"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:324:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/arriba.wdl/#L324"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:374:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/arriba.wdl/#L374"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:188:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/bwa.wdl/#L188"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/tools/bwa.wdl"
 message = "bwa.wdl:242:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/bwa.wdl/#L242"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:283:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/bwa.wdl/#L283"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:335:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/bwa.wdl/#L335"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:87:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/bwa.wdl/#L87"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/cellranger.wdl"
+message = "cellranger.wdl:157:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/cellranger.wdl/#L157"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/cellranger.wdl"
@@ -1226,14 +1311,44 @@ message = "cellranger.wdl:62:1: note[LineWidth]: line exceeds maximum width of 9
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/cellranger.wdl/#L62"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/cellranger.wdl"
+message = "cellranger.wdl:92:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/cellranger.wdl/#L92"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/deeptools.wdl"
+message = "deeptools.wdl:67:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/deeptools.wdl/#L67"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/tools/estimate.wdl"
 message = "estimate.wdl:39:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/estimate.wdl/#L39"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/estimate.wdl"
+message = "estimate.wdl:50:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/estimate.wdl/#L50"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/tools/fastqc.wdl"
 message = "fastqc.wdl:59:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/fastqc.wdl/#L59"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fastqc.wdl"
+message = "fastqc.wdl:63:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/fastqc.wdl/#L63"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:170:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/fq.wdl/#L170"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:94:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/fq.wdl/#L94"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
@@ -1247,8 +1362,33 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:131:28: warning[DeprecatedPlaceholderOption]: use of the deprecated `sep` placeholder option"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L131"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:139:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L139"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:139:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L139"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:188:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L188"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:202:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L202"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:202:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L202"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
@@ -1262,13 +1402,58 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:284:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L284"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:284:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L284"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:357:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L357"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:357:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L357"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:42:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L42"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:470:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L470"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:470:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L470"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:65:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L65"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:65:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L65"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:118:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/htseq.wdl/#L118"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:128:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/htseq.wdl/#L128"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
@@ -1282,6 +1467,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:198:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/htseq.wdl/#L198"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:94:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/htseq.wdl/#L94"
 
@@ -1289,6 +1479,66 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:96:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/htseq.wdl/#L96"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:115:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/kraken2.wdl/#L115"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:172:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/kraken2.wdl/#L172"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:280:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/kraken2.wdl/#L280"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:395:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/kraken2.wdl/#L395"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:41:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/kraken2.wdl/#L41"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/librarian.wdl"
+message = "librarian.wdl:49:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `container`, `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/librarian.wdl/#L49"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/librarian.wdl"
+message = "librarian.wdl:52:9: warning[RuntimeSectionKeys]: the `docker` runtime key has been deprecated in favor of `container`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/librarian.wdl/#L52"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/md5sum.wdl"
+message = "md5sum.wdl:39:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/md5sum.wdl/#L39"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/mosdepth.wdl"
+message = "mosdepth.wdl:67:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/mosdepth.wdl/#L67"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/multiqc.wdl"
+message = "multiqc.wdl:66:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/multiqc.wdl/#L66"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:136:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L136"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:200:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L200"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
@@ -1301,9 +1551,54 @@ message = "ngsderive.wdl:259:1: note[LineWidth]: line exceeds maximum width of 9
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L259"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:276:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L276"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:364:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L364"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:446:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L446"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:84:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L84"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
 message = "picard.wdl:1032:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L1032"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:1042:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L1042"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:1042:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L1042"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:125:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L125"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:251:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L251"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:334:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L334"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
@@ -1311,9 +1606,209 @@ message = "picard.wdl:342:6: note[SectionOrdering]: sections are not in order fo
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L342"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:415:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L415"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:490:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L490"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:554:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L554"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:617:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L617"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:689:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L689"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:753:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L753"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:813:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L813"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:868:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L868"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:914:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L914"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:914:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L914"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:986:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L986"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:986:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L986"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/qualimap.wdl"
+message = "qualimap.wdl:151:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/qualimap.wdl/#L151"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/tools/qualimap.wdl"
 message = "qualimap.wdl:81:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/qualimap.wdl/#L81"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/qualimap.wdl"
+message = "qualimap.wdl:85:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/qualimap.wdl/#L85"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:113:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L113"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:113:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L113"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:168:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L168"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:168:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L168"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:223:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L223"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:223:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L223"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:280:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L280"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:280:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L280"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:53:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L53"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:53:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L53"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:1059:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L1059"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:1160:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L1160"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:1280:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L1280"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:1326:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L1326"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:1326:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L1326"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:146:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L146"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:206:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L206"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:264:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L264"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:36:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L36"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:412:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L412"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:507:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L507"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:609:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L609"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:694:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L694"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:767:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L767"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:961:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/samtools.wdl/#L961"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:126:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/star.wdl/#L126"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
@@ -1336,6 +1831,46 @@ message = "star.wdl:743:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/star.wdl/#L743"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:814:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/star.wdl/#L814"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:139:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L139"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:239:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L239"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:276:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L276"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:323:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L323"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:365:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L365"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:424:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L424"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:42:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L42"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:613:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L613"
@@ -1354,6 +1889,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:649:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L649"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:684:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L684"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
@@ -1416,6 +1956,21 @@ message = "util.wdl:728:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L728"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:759:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L759"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:819:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `gpu` and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L819"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:98:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L98"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
 message = "chipseq-standard.wdl:10:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/chipseq/chipseq-standard.wdl/#L10"
@@ -1447,6 +2002,16 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
+message = "dnaseq-standard-fastq.wdl:143:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L143"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
+message = "dnaseq-standard-fastq.wdl:143:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L143"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
 message = "dnaseq-standard-fastq.wdl:51:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L51"
 
@@ -1459,6 +2024,16 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
 message = "dnaseq-standard.wdl:11:10: note[SectionOrdering]: sections are not in order for workflow `dnaseq_standard_experimental`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/dnaseq/dnaseq-standard.wdl/#L11"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
+message = "dnaseq-standard.wdl:126:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/dnaseq/dnaseq-standard.wdl/#L126"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
+message = "dnaseq-standard.wdl:126:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/dnaseq/dnaseq-standard.wdl/#L126"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
@@ -1506,6 +2081,16 @@ message = "quality-check-standard.wdl:435:1: note[LineWidth]: line exceeds maxim
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/qc/quality-check-standard.wdl/#L435"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:549:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/qc/quality-check-standard.wdl/#L549"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:549:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/qc/quality-check-standard.wdl/#L549"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
 message = "gatk-reference.wdl:7:10: note[SectionOrdering]: sections are not in order for workflow `gatk_reference`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/reference/gatk-reference.wdl/#L7"
@@ -1522,6 +2107,16 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
+message = "rnaseq-standard.wdl:179:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/rnaseq/rnaseq-standard.wdl/#L179"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
+message = "rnaseq-standard.wdl:179:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/rnaseq/rnaseq-standard.wdl/#L179"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
 message = "rnaseq-standard.wdl:9:10: note[SectionOrdering]: sections are not in order for workflow `rnaseq_standard`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/rnaseq/rnaseq-standard.wdl/#L9"
 
@@ -1529,6 +2124,16 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
 message = "rnaseq-variant-calling.wdl:6:10: note[SectionOrdering]: sections are not in order for workflow `rnaseq_variant_calling`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/rnaseq/rnaseq-variant-calling.wdl/#L6"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
+message = "10x-bam-to-fastqs.wdl:127:5: note[RuntimeSectionKeys]: the following runtime keys are recommended by the WDL v1.1 specification: `cpu`, `disks`, `gpu`, and `returnCodes`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L127"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
+message = "10x-bam-to-fastqs.wdl:127:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L127"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
