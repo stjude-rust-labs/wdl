@@ -385,6 +385,17 @@ impl Visitor for LintVisitor {
         }
     }
 
+    fn placeholder(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        placeholder: &v1::Placeholder,
+    ) {
+        self.each_enabled_rule(state, reason, placeholder.syntax(), |state, rule| {
+            rule.placeholder(state, reason, placeholder)
+        });
+    }
+
     fn conditional_statement(
         &mut self,
         state: &mut Self::State,

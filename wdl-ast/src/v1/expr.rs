@@ -1071,7 +1071,7 @@ impl AstToken for StringText {
 
 /// Represents a placeholder in a string or command.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Placeholder(SyntaxNode);
+pub struct Placeholder(pub(crate) SyntaxNode);
 
 impl Placeholder {
     /// Returns whether or not placeholder has a tilde (`~`) opening.

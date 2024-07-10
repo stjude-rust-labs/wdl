@@ -35,6 +35,7 @@ use crate::v1::MetadataObject;
 use crate::v1::MetadataSection;
 use crate::v1::OutputSection;
 use crate::v1::ParameterMetadataSection;
+use crate::v1::Placeholder;
 use crate::v1::RuntimeSection;
 use crate::v1::ScatterStatement;
 use crate::v1::StringText;
@@ -196,6 +197,15 @@ pub trait Visitor: Send + Sync {
 
     /// Visits a string text token in a literal string node.
     fn string_text(&mut self, state: &mut Self::State, text: &StringText) {}
+
+    /// Visits a placeholder node.
+    fn placeholder(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        placeholder: &Placeholder,
+    ) {
+    }
 
     /// Visits a conditional statement node in a workflow.
     fn conditional_statement(
@@ -362,8 +372,10 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, state: &mut V::State, visitor
             | SyntaxKind::AccessExprNode) => {
                 unreachable!("`{k:?}` should be handled by `Expr::can_cast`")
             }
-            SyntaxKind::PlaceholderNode
-            | SyntaxKind::PlaceholderSepOptionNode
+            SyntaxKind::PlaceholderNode => {
+                visitor.placeholder(state, reason, &Placeholder(element.into_node().unwrap()))
+            }
+            SyntaxKind::PlaceholderSepOptionNode
             | SyntaxKind::PlaceholderDefaultOptionNode
             | SyntaxKind::PlaceholderTrueFalseOptionNode => {
                 // Skip these nodes as they're part of a placeholder

@@ -92,6 +92,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(rules::SectionOrderingRule),
         Box::new(rules::DeprecatedObjectRule),
         Box::new(rules::DescriptionMissingRule),
+        Box::new(rules::DeprecatedPlaceholderOptionRule),
     ];
 
     // Ensure all the rule ids are unique and pascal case

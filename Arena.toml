@@ -17,6 +17,11 @@ filters = ["/template/task-templates.wdl"]
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "ww-fastq-to-cram.wdl:100:18: warning[DeprecatedPlaceholderOption]: use of a deprecated `sep` placeholder option"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L100"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "ww-fastq-to-cram.wdl:129:5: note[MatchingParameterMeta]: task `FastqToUnmappedBam` has an extraneous parameter metadata key named `unmapped_bam`"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L129"
 
@@ -64,6 +69,11 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "ww-fastq-to-cram.wdl:170:6: warning[SnakeCase]: task name `MergeBamsToCram` is not snake_case"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L170"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "ww-fastq-to-cram.wdl:182:41: warning[DeprecatedPlaceholderOption]: use of a deprecated `sep` placeholder option"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L182"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
@@ -171,6 +181,11 @@ message = "ww-fastq-to-cram.wdl:83:6: warning[SnakeCase]: task name `FastqToUnma
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L83"
 
 [[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "ww-fastq-to-cram.wdl:99:17: warning[DeprecatedPlaceholderOption]: use of a deprecated `sep` placeholder option"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L99"
+
+[[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
 message = "ww-star-deseq2.wdl:10:22: warning[Whitespace]: line contains trailing whitespace"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697c3f707f073177ddde7013/ww-star-deseq2.wdl/#L10"
@@ -207,8 +222,18 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+message = "ww-star-deseq2.wdl:133:11: warning[DeprecatedPlaceholderOption]: use of a deprecated `sep` placeholder option"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697c3f707f073177ddde7013/ww-star-deseq2.wdl/#L133"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
 message = "ww-star-deseq2.wdl:133:15: warning[DoubleQuotes]: string defined with single quotes"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697c3f707f073177ddde7013/ww-star-deseq2.wdl/#L133"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+message = "ww-star-deseq2.wdl:134:11: warning[DeprecatedPlaceholderOption]: use of a deprecated `sep` placeholder option"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697c3f707f073177ddde7013/ww-star-deseq2.wdl/#L134"
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
@@ -742,6 +767,11 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+message = "ww-vc-trio.wdl:322:25: warning[DeprecatedPlaceholderOption]: use of a deprecated `sep` placeholder option"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L322"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:336:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L336"
 
@@ -1244,6 +1274,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:124:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L124"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:131:28: warning[DeprecatedPlaceholderOption]: use of a deprecated `sep` placeholder option"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/gatk4.wdl/#L131"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
