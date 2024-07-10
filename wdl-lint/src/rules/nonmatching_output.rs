@@ -3,6 +3,7 @@
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::TaskDefinition;
+use wdl_ast::v1::TaskOrWorkflow;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
@@ -22,21 +23,35 @@ use crate::TagSet;
 const ID: &str = "NonmatchingOutput";
 
 /// Creates a "non-matching output" diagnostic.
-fn nonmatching_output(span: Span, name: String) -> Diagnostic {
-    Diagnostic::warning(format!("output `{name}` is missing from `meta` section"))
-        .with_rule(ID)
-        .with_highlight(span)
-        .with_fix(format!(
-            "add output (`{name}`) key to `outputs` documentation in `meta` section"
-        ))
+fn nonmatching_output(span: Span, name: String, context: TaskOrWorkflow) -> Diagnostic {
+    let (ty, item_name) = match context {
+        TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
+        TaskOrWorkflow::Workflow(w) => ("workflow", w.name().as_str().to_string()),
+    };
+
+    Diagnostic::warning(format!(
+        "output `{name}` is missing from `meta` section in {ty} `{item_name}`"
+    ))
+    .with_rule(ID)
+    .with_highlight(span)
+    .with_fix(format!(
+        "add output (`{name}`) key to `outputs` documentation in `meta` section"
+    ))
 }
 
 /// Creates a missing outputs in meta diagnostic.
-fn missing_outputs_in_meta(span: Span) -> Diagnostic {
-    Diagnostic::warning("`outputs` key missing in `meta` section")
-        .with_rule(ID)
-        .with_highlight(span)
-        .with_fix("add `outputs` key to `meta` section")
+fn missing_outputs_in_meta(span: Span, context: TaskOrWorkflow) -> Diagnostic {
+    let (ty, name) = match context {
+        TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
+        TaskOrWorkflow::Workflow(w) => ("workflow", w.name().as_str().to_string()),
+    };
+
+    Diagnostic::warning(format!(
+        "`outputs` key missing in `meta` section in {ty} `{name}`"
+    ))
+    .with_rule(ID)
+    .with_highlight(span)
+    .with_fix("add `outputs` key to `meta` section")
 }
 
 /// Detects non-matching outputs.
@@ -67,7 +82,12 @@ impl Rule for NonmatchingOutputRule {
 }
 
 /// Check each output key exists in the outputs key within the `meta` section.
-fn check_output_meta(state: &mut Diagnostics, meta: &MetadataSection, outputs: &OutputSection) {
+fn check_output_meta(
+    state: &mut Diagnostics,
+    meta: &MetadataSection,
+    outputs: &OutputSection,
+    context: TaskOrWorkflow,
+) {
     // Get the output section from the meta section.
     if let Some(meta_outputs_key) = meta
         .items()
@@ -87,12 +107,14 @@ fn check_output_meta(state: &mut Diagnostics, meta: &MetadataSection, outputs: &
                 state.add(nonmatching_output(
                     o.name().span(),
                     o.name().as_str().to_string(),
+                    context.clone(),
                 ));
             }
         });
     } else {
         state.add(missing_outputs_in_meta(
             meta.syntax().first_token().unwrap().text_range().to_span(),
+            context,
         ));
     }
 }
@@ -124,7 +146,12 @@ impl Visitor for NonmatchingOutputRule {
             // If the `output` section is missing, the MissingOutput rule will handle it.
             if let Some(output) = workflow.outputs().next() {
                 if output.declarations().count() > 0 {
-                    check_output_meta(state, &meta, &output);
+                    check_output_meta(
+                        state,
+                        &meta,
+                        &output,
+                        TaskOrWorkflow::Workflow(workflow.clone()),
+                    );
                 }
             }
         }
@@ -145,7 +172,7 @@ impl Visitor for NonmatchingOutputRule {
             // If the `output` section is missing, the MissingOutput rule will handle it.
             if let Some(output) = task.outputs().next() {
                 if output.declarations().count() > 0 {
-                    check_output_meta(state, &meta, &output);
+                    check_output_meta(state, &meta, &output, TaskOrWorkflow::Task(task.clone()));
                 }
             }
         }

@@ -1,4 +1,4 @@
-warning[NonmatchingOutput]: `outputs` key missing in `meta` section
+warning[NonmatchingOutput]: `outputs` key missing in `meta` section in task `bar`
    ┌─ tests/lints/nonmatching-output/source.wdl:18:5
    │
 18 │     meta {}
@@ -6,7 +6,7 @@ warning[NonmatchingOutput]: `outputs` key missing in `meta` section
    │
    = fix: add `outputs` key to `meta` section
 
-warning[NonmatchingOutput]: output `t` is missing from `meta` section
+warning[NonmatchingOutput]: output `t` is missing from `meta` section in task `baz`
    ┌─ tests/lints/nonmatching-output/source.wdl:34:16
    │
 34 │         String t = "world"

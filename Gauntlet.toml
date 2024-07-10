@@ -20,7 +20,7 @@ commit_hash = "4536dd2c6719b86f4c50348f0ce354818260cadb"
 
 [repositories."broadinstitute/palantir-workflows"]
 identifier = "broadinstitute/palantir-workflows"
-commit_hash = "1e32078d3b57dcb2291534d0caa30f600d40967e"
+commit_hash = "4e7fdfa7992dd1bf4c4721e77c81e4d7b8ecf4fe"
 
 [repositories."broadinstitute/warp"]
 identifier = "broadinstitute/warp"
@@ -379,7 +379,7 @@ permalink = "https://github.com/biowdl/tasks/blob/2bf875300d90a3c9c8d670b3d99026
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/HaplotypeMap/BuildHaplotypeMap.wdl"
 message = "BuildHaplotypeMap.wdl:17:1: error: a WDL document must start with a version statement"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/1e32078d3b57dcb2291534d0caa30f600d40967e/HaplotypeMap/BuildHaplotypeMap.wdl/#L17"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/4e7fdfa7992dd1bf4c4721e77c81e4d7b8ecf4fe/HaplotypeMap/BuildHaplotypeMap.wdl/#L17"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/pipelines/skylab/scATAC/scATAC.wdl"
