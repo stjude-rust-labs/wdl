@@ -18,7 +18,7 @@ note[SectionOrdering]: sections are not in order for task `bar`
 19 │     parameter_meta {}
    │     -------------- this section is out of order
    │
-   = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `requirements/runtime`
+   = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `requirements`/`runtime`
 
 note[SectionOrdering]: sections are not in order for task `qux`
    ┌─ tests/lints/section-ordering/source.wdl:29:6
@@ -29,5 +29,5 @@ note[SectionOrdering]: sections are not in order for task `qux`
 31 │     meta {}
    │     ---- this section is out of order
    │
-   = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `requirements/runtime`
+   = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `requirements`/`runtime`
 
