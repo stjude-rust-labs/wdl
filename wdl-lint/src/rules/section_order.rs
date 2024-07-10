@@ -44,7 +44,7 @@ fn task_section_order(span: Span, name: &str, problem_span: Span) -> Diagnostic 
         .with_label("this section is out of order", problem_span)
         .with_fix(
             "order as `meta`, `parameter_meta`, `input`, private declarations, `command`, \
-             `output`, `requirements/runtime`",
+             `output`, `requirements`/`runtime`",
         )
 }
 
