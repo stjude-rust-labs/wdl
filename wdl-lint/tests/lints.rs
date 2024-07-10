@@ -126,7 +126,13 @@ fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), String> {
         )
     })?;
 
-    let (document, diagnostics) = Document::parse(&source);
+    let (document, mut diagnostics) = Document::parse(&source);
+
+    // NOTE: sorting of diagnostics is required to ensure a
+    // deterministic output order when comparing expected versus
+    // actual errors.
+    diagnostics.sort();
+
     if !diagnostics.is_empty() {
         compare_result(
             &path.with_extension("errors"),
@@ -138,7 +144,13 @@ fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), String> {
         validator.add_visitor(LintVisitor::default());
         let errors = match validator.validate(&document) {
             Ok(()) => String::new(),
-            Err(diagnostics) => format_diagnostics(&diagnostics, &path, &source),
+            Err(mut diagnostics) => {
+                // NOTE: sorting of diagnostics is required to ensure a
+                // deterministic output order when comparing expected versus
+                // actual lint warnings.
+                diagnostics.sort();
+                format_diagnostics(&diagnostics, &path, &source)
+            }
         };
         compare_result(&path.with_extension("errors"), &errors, true)?;
     }

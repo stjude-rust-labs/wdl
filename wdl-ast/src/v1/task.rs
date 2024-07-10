@@ -592,7 +592,7 @@ impl AstNode for RuntimeSection {
 
 /// Represents an item in a runtime section.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct RuntimeItem(SyntaxNode);
+pub struct RuntimeItem(pub(crate) SyntaxNode);
 
 impl RuntimeItem {
     /// Gets the name of the runtime item.

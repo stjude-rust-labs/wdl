@@ -37,6 +37,7 @@ use crate::v1::OutputSection;
 use crate::v1::ParameterMetadataSection;
 use crate::v1::Placeholder;
 use crate::v1::RequirementsSection;
+use crate::v1::RuntimeItem;
 use crate::v1::RuntimeSection;
 use crate::v1::ScatterStatement;
 use crate::v1::StringText;
@@ -168,6 +169,9 @@ pub trait Visitor: Send + Sync {
         section: &RuntimeSection,
     ) {
     }
+
+    /// Visits a runtime item node.
+    fn runtime_item(&mut self, state: &mut Self::State, reason: VisitReason, item: &RuntimeItem) {}
 
     /// Visits a metadata section node.
     fn metadata_section(
@@ -325,7 +329,7 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, state: &mut V::State, visitor
                 &RuntimeSection(element.into_node().unwrap()),
             ),
             SyntaxKind::RuntimeItemNode => {
-                // Skip this node as it's part of a runtime section
+                visitor.runtime_item(state, reason, &RuntimeItem(element.into_node().unwrap()))
             }
             SyntaxKind::MetadataSectionNode => visitor.metadata_section(
                 state,

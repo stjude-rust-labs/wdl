@@ -28,7 +28,7 @@ commit_hash = "e49ffbcd72b138ad4dc6ec62c847943908e4abf9"
 
 [repositories."chanzuckerberg/czid-workflows"]
 identifier = "chanzuckerberg/czid-workflows"
-commit_hash = "a7c54be041e9fbd4cfdd9fac99226e6b4f6f3bfd"
+commit_hash = "b7c97a87d995a31d85bb6c8ee780fdf33d5bc176"
 
 [repositories."getwilds/ww-fastq-to-cram"]
 identifier = "getwilds/ww-fastq-to-cram"
@@ -414,4 +414,4 @@ permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec6
 [[diagnostics]]
 document = "chanzuckerberg/czid-workflows:/workflows/index-generation/index-generation.wdl"
 message = "index-generation.wdl:1:9: error: unsupported WDL version `development`"
-permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/a7c54be041e9fbd4cfdd9fac99226e6b4f6f3bfd/workflows/index-generation/index-generation.wdl/#L1"
+permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/b7c97a87d995a31d85bb6c8ee780fdf33d5bc176/workflows/index-generation/index-generation.wdl/#L1"

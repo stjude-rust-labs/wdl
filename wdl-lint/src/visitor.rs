@@ -330,6 +330,17 @@ impl Visitor for LintVisitor {
         });
     }
 
+    fn runtime_item(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        item: &v1::RuntimeItem,
+    ) {
+        self.each_enabled_rule(state, reason, item.syntax(), |state, rule| {
+            rule.runtime_item(state, reason, item)
+        });
+    }
+
     fn metadata_section(
         &mut self,
         state: &mut Self::State,

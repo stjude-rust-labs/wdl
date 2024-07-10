@@ -55,11 +55,13 @@ pub use wdl_grammar::ToSpan;
 pub use wdl_grammar::WorkflowDescriptionLanguage;
 
 pub mod v1;
+pub mod version;
 
 mod validation;
 mod visitor;
 
 pub use validation::*;
+pub use version::SupportedVersion;
 pub use visitor::*;
 
 /// Gets a token of a given parent that can cast to the given type.

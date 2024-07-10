@@ -3,10 +3,13 @@
 use wdl_ast::span_of;
 use wdl_ast::v1::Placeholder;
 use wdl_ast::v1::PlaceholderOption;
+use wdl_ast::version::V1;
+use wdl_ast::AstToken as _;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
+use wdl_ast::SupportedVersion;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
@@ -56,7 +59,10 @@ fn deprecated_true_false_placeholder_option(span: Span) -> Diagnostic {
 
 /// Detects the use of a deprecated placeholder option.
 #[derive(Debug, Default, Clone, Copy)]
-pub struct DeprecatedPlaceholderOptionRule;
+pub struct DeprecatedPlaceholderOptionRule {
+    /// The detected version of the current document.
+    version: Option<SupportedVersion>,
+}
 
 impl Rule for DeprecatedPlaceholderOptionRule {
     fn id(&self) -> &'static str {
@@ -68,11 +74,18 @@ impl Rule for DeprecatedPlaceholderOptionRule {
     }
 
     fn explanation(&self) -> &'static str {
-        "Expression placeholder options are deprecated and will be removed in the next major WDL \
-         release. `sep` placeholder options, `true/false` placeholder options, and `default` \
-         placeholder options should be replaced by the `sep()` standard library function, \
-         `if`/`else` statements, and the `select_first()` 
-         standard library function respectively."
+        "Expression placeholder were deprecated in WDL v1.1. and will be removed in the \
+         next major WDL version.
+
+         - `sep` placeholder options should be replaced by the `sep()` standard library \
+           function.
+         - `true/false` placeholder options should be replaced with `if`/`else` \
+            statements.
+         - `default` placeholder options should be replaced by the `select_first()` \
+            standard library function.
+
+         This rule only evaluates for WDL V1 documents with a version of v1.1 or later, \
+         as this reflects when the deprecation was introduced."
     }
 
     fn tags(&self) -> TagSet {
@@ -83,13 +96,18 @@ impl Rule for DeprecatedPlaceholderOptionRule {
 impl Visitor for DeprecatedPlaceholderOptionRule {
     type State = Diagnostics;
 
-    fn document(&mut self, _: &mut Self::State, reason: VisitReason, _: &Document) {
+    fn document(&mut self, _: &mut Self::State, reason: VisitReason, document: &Document) {
         if reason == VisitReason::Exit {
             return;
         }
 
-        // Reset the visitor upon document entry
+        // Reset the visitor upon document entry.
         *self = Default::default();
+
+        // NOTE: this rule is dependent on the version of the WDL document.
+        self.version = document
+            .version_statement()
+            .and_then(|s| s.version().as_str().parse().ok());
     }
 
     fn placeholder(
@@ -99,6 +117,21 @@ impl Visitor for DeprecatedPlaceholderOptionRule {
         placeholder: &Placeholder,
     ) {
         if reason == VisitReason::Exit {
+            return;
+        }
+
+        let version = match self
+            .version
+            .expect("document version should be known at this point")
+        {
+            SupportedVersion::V1(v) => v,
+            // NOTE: this rule is not supported for non-V1 WDL documents.
+            _ => return,
+        };
+
+        if version < V1::One {
+            // NOTE: this rule does not support any WDL V1 documents before
+            // WDL v1.1.
             return;
         }
 

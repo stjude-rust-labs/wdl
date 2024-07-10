@@ -1,5 +1,6 @@
-#@ except: DescriptionMissing
-## This is a test of the `DeprecatedPlaceholderOption` lint
+#@ except: DescriptionMissing,RuntimeSectionKeys
+##
+## This is a test of the `DeprecatedPlaceholderOption` lint.
 
 version 1.1
 

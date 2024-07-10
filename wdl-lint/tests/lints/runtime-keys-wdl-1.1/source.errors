@@ -1,0 +1,64 @@
+note[RuntimeSectionKeys]: the `container` runtime key is recommended by the WDL v1.1 specification
+  ┌─ tests/lints/runtime-keys-wdl-1.1/source.wdl:9:5
+  │
+9 │     runtime {} # Missing every recommended runtime key, so many keys should be
+  │     ^^^^^^^^^^
+  │
+  = fix: include an entry for the `container` key in the `runtime` section
+
+note[RuntimeSectionKeys]: the `cpu` runtime key is recommended by the WDL v1.1 specification
+  ┌─ tests/lints/runtime-keys-wdl-1.1/source.wdl:9:5
+  │
+9 │     runtime {} # Missing every recommended runtime key, so many keys should be
+  │     ^^^^^^^^^^
+  │
+  = fix: include an entry for the `cpu` key in the `runtime` section
+
+note[RuntimeSectionKeys]: the `disks` runtime key is recommended by the WDL v1.1 specification
+  ┌─ tests/lints/runtime-keys-wdl-1.1/source.wdl:9:5
+  │
+9 │     runtime {} # Missing every recommended runtime key, so many keys should be
+  │     ^^^^^^^^^^
+  │
+  = fix: include an entry for the `disks` key in the `runtime` section
+
+note[RuntimeSectionKeys]: the `gpu` runtime key is recommended by the WDL v1.1 specification
+  ┌─ tests/lints/runtime-keys-wdl-1.1/source.wdl:9:5
+  │
+9 │     runtime {} # Missing every recommended runtime key, so many keys should be
+  │     ^^^^^^^^^^
+  │
+  = fix: include an entry for the `gpu` key in the `runtime` section
+
+note[RuntimeSectionKeys]: the `maxRetries` runtime key is recommended by the WDL v1.1 specification
+  ┌─ tests/lints/runtime-keys-wdl-1.1/source.wdl:9:5
+  │
+9 │     runtime {} # Missing every recommended runtime key, so many keys should be
+  │     ^^^^^^^^^^
+  │
+  = fix: include an entry for the `maxRetries` key in the `runtime` section
+
+note[RuntimeSectionKeys]: the `memory` runtime key is recommended by the WDL v1.1 specification
+  ┌─ tests/lints/runtime-keys-wdl-1.1/source.wdl:9:5
+  │
+9 │     runtime {} # Missing every recommended runtime key, so many keys should be
+  │     ^^^^^^^^^^
+  │
+  = fix: include an entry for the `memory` key in the `runtime` section
+
+note[RuntimeSectionKeys]: the `returnCodes` runtime key is recommended by the WDL v1.1 specification
+  ┌─ tests/lints/runtime-keys-wdl-1.1/source.wdl:9:5
+  │
+9 │     runtime {} # Missing every recommended runtime key, so many keys should be
+  │     ^^^^^^^^^^
+  │
+  = fix: include an entry for the `returnCodes` key in the `runtime` section
+
+warning[RuntimeSectionKeys]: the `foo` runtime key is not reserved in the WDL v1.1 specification; therefore, its inclusion in the `runtime` section is deprecated
+   ┌─ tests/lints/runtime-keys-wdl-1.1/source.wdl:49:9
+   │
+49 │         foo: "bar"
+   │         ^^^
+   │
+   = fix: if a reserved key name was intended, correct the spelling; otherwise, remove the key
+

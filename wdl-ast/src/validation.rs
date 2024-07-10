@@ -252,6 +252,17 @@ impl Visitor for Validator {
         }
     }
 
+    fn runtime_item(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        item: &v1::RuntimeItem,
+    ) {
+        for visitor in self.visitors.iter_mut() {
+            visitor.runtime_item(state, reason, item);
+        }
+    }
+
     fn metadata_section(
         &mut self,
         state: &mut Self::State,

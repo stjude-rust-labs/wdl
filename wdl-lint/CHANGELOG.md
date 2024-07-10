@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added the `DeprecatedObject` lint rule ([#112](https://github.com/stjude-rust-labs/wdl/pull/112)).
 * Added the `DescriptionMissing` lint rule ([#113](https://github.com/stjude-rust-labs/wdl/pull/113)).
 * Added the `DeprecatedPlaceholderOption` lint rule ([#112](https://github.com/stjude-rust-labs/wdl/pull/115)).
+* Added the `RuntimeSectionKeys` lint rule ([#119](https://github.com/stjude-rust-labs/wdl/pull/119)).
 
 ### Fixed
 
