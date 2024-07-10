@@ -1,5 +1,6 @@
 //! A lint rule to ensure each output is documented in `meta`.
 
+use indexmap::IndexMap;
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::TaskDefinition;
@@ -23,7 +24,7 @@ use crate::TagSet;
 const ID: &str = "NonmatchingOutput";
 
 /// Creates a "non-matching output" diagnostic.
-fn nonmatching_output(span: Span, name: String, context: TaskOrWorkflow) -> Diagnostic {
+fn nonmatching_output(span: Span, name: &str, context: &TaskOrWorkflow) -> Diagnostic {
     let (ty, item_name) = match context {
         TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
         TaskOrWorkflow::Workflow(w) => ("workflow", w.name().as_str().to_string()),
@@ -40,7 +41,7 @@ fn nonmatching_output(span: Span, name: String, context: TaskOrWorkflow) -> Diag
 }
 
 /// Creates a missing outputs in meta diagnostic.
-fn missing_outputs_in_meta(span: Span, context: TaskOrWorkflow) -> Diagnostic {
+fn missing_outputs_in_meta(span: Span, context: &TaskOrWorkflow) -> Diagnostic {
     let (ty, name) = match context {
         TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
         TaskOrWorkflow::Workflow(w) => ("workflow", w.name().as_str().to_string()),
@@ -52,6 +53,40 @@ fn missing_outputs_in_meta(span: Span, context: TaskOrWorkflow) -> Diagnostic {
     .with_rule(ID)
     .with_highlight(span)
     .with_fix("add `outputs` key to `meta` section")
+}
+
+/// Creates a diagnostic for extra `meta` entries.
+fn extra_output_in_meta(span: Span, name: &str, context: &TaskOrWorkflow) -> Diagnostic {
+    let (ty, item_name) = match context {
+        TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
+        TaskOrWorkflow::Workflow(w) => ("workflow", w.name().as_str().to_string()),
+    };
+
+    Diagnostic::warning(format!(
+        "`{name}` appears in `outputs` section of {ty} `{item_name}` but is not a declared \
+         `output`"
+    ))
+    .with_rule(ID)
+    .with_highlight(span)
+    .with_fix(format!(
+        "remove `{name}` from `outputs` key in `meta` section"
+    ))
+}
+
+/// Creates a diagnostic for out-of-order entries.
+fn out_of_order(span: Span, output_span: Span, context: &TaskOrWorkflow) -> Diagnostic {
+    let (ty, item_name) = match context {
+        TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
+        TaskOrWorkflow::Workflow(w) => ("workflow", w.name().as_str().to_string()),
+    };
+
+    Diagnostic::warning(format!(
+        "`outputs` section of `meta` for {ty} `{item_name}` is out of order"
+    ))
+    .with_rule(ID)
+    .with_highlight(span)
+    .with_highlight(output_span)
+    .with_fix("the `outputs` keys of `meta` section must match the order in `output`")
 }
 
 /// Detects non-matching outputs.
@@ -72,8 +107,7 @@ impl Rule for NonmatchingOutputRule {
          the task/workflow. These must match exactly. i.e. for each named output of a task or \
          workflow, there should be an entry under meta.output with that same name. Additionally, \
          these entries should be in the same order (that order is up to the developer to decide). \
-         No extraneous output entries are allowed. There should not be any blank lines inside the \
-         entire meta section."
+         No extraneous output entries are allowed."
     }
 
     fn tags(&self) -> TagSet {
@@ -93,28 +127,63 @@ fn check_output_meta(
         .items()
         .find(|entry| entry.name().syntax().to_string() == "outputs")
     {
-        let meta_outputs: Vec<_> = meta_outputs_key
+        let actual: IndexMap<_, _> = meta_outputs_key
             .value()
             .unwrap_object()
             .items()
-            .map(|entry| entry.name().syntax().to_string())
+            .map(|entry| {
+                (
+                    entry.name().syntax().to_string(),
+                    entry.syntax().text_range().to_span(),
+                )
+            })
             .collect();
 
         // Get the declared outputs.
-        outputs.declarations().for_each(|o| {
-            let name = o.name().as_str().to_string();
-            if !meta_outputs.contains(&name) {
-                state.add(nonmatching_output(
-                    o.name().span(),
-                    o.name().as_str().to_string(),
-                    context.clone(),
-                ));
+        let expected: IndexMap<_, _> = outputs
+            .declarations()
+            .map(|d| {
+                (
+                    d.name().syntax().to_string(),
+                    d.syntax().text_range().to_span(),
+                )
+            })
+            .collect();
+
+        let mut extra_found = false;
+
+        // Check for entries missing from `meta`.
+        for (name, span) in &expected {
+            if !actual.contains_key(name) {
+                if !extra_found {
+                    extra_found = true;
+                }
+                state.add(nonmatching_output(*span, name, &context));
             }
-        });
+        }
+
+        // Check for extra entries in `meta`.
+        for (name, span) in &actual {
+            if !expected.contains_key(name) {
+                if !extra_found {
+                    extra_found = true;
+                }
+                state.add(extra_output_in_meta(*span, name, &context));
+            }
+        }
+
+        // Check for out-of-order entries.
+        if !extra_found && !actual.keys().eq(expected.keys()) {
+            state.add(out_of_order(
+                meta_outputs_key.syntax().text_range().to_span(),
+                outputs.syntax().text_range().to_span(),
+                &context,
+            ));
+        }
     } else {
         state.add(missing_outputs_in_meta(
             meta.syntax().first_token().unwrap().text_range().to_span(),
-            context,
+            &context,
         ));
     }
 }

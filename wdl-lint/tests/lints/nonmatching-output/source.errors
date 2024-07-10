@@ -7,10 +7,35 @@ warning[NonmatchingOutput]: `outputs` key missing in `meta` section in task `bar
    = fix: add `outputs` key to `meta` section
 
 warning[NonmatchingOutput]: output `t` is missing from `meta` section in task `baz`
-   ┌─ tests/lints/nonmatching-output/source.wdl:34:16
+   ┌─ tests/lints/nonmatching-output/source.wdl:34:9
    │
 34 │         String t = "world"
-   │                ^
+   │         ^^^^^^^^^^^^^^^^^^
    │
    = fix: add output (`t`) key to `outputs` documentation in `meta` section
+
+warning[NonmatchingOutput]: `outputs` section of `meta` for task `qux` is out of order
+   ┌─ tests/lints/nonmatching-output/source.wdl:40:9
+   │    
+40 │ ╭           outputs: {
+41 │ │               t: "t",
+42 │ │               s: "s",
+43 │ │           }
+   │ ╰───────────^
+   · │  
+46 │   ╭     output {
+47 │   │         String s = "hello"
+48 │   │         String t = "world"
+49 │   │     }
+   │   ╰─────'
+   │    
+   = fix: the `outputs` keys of `meta` section must match the order in `output`
+
+warning[NonmatchingOutput]: `v` appears in `outputs` section of task `quux` but is not a declared `output`
+   ┌─ tests/lints/nonmatching-output/source.wdl:57:13
+   │
+57 │             v: "v"
+   │             ^^^^^^
+   │
+   = fix: remove `v` from `outputs` key in `meta` section
 

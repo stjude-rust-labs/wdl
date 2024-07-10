@@ -34,3 +34,32 @@ task baz {
         String t = "world"
     }
 }
+
+task qux {
+    meta {
+        outputs: {
+            t: "t",
+            s: "s",
+        }
+    }
+    command <<< >>>
+    output {
+        String s = "hello"
+        String t = "world"
+    }
+}
+
+task quux {
+    meta {
+        outputs: {
+            s: "s",
+            t: "t",
+            v: "v"
+        }
+    }
+    command <<< >>>
+    output {
+        String s = "hello"
+        String t = "world"
+    }
+}

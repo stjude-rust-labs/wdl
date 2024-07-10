@@ -1252,8 +1252,18 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/fq.wdl"
-message = "fq.wdl:91:16: warning[NonmatchingOutput]: output `check` is missing from `meta` section in task `fqlint`"
+message = "fq.wdl:10:13: warning[NonmatchingOutput]: `validated_read2` appears in `outputs` section of task `fqlint` but is not a declared `output`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/fq.wdl/#L10"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:91:9: warning[NonmatchingOutput]: output `check` is missing from `meta` section in task `fqlint`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/fq.wdl/#L91"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:9:13: warning[NonmatchingOutput]: `validated_read1` appears in `outputs` section of task `fqlint` but is not a declared `output`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/fq.wdl/#L9"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
@@ -1317,8 +1327,18 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
-message = "ngsderive.wdl:133:16: warning[NonmatchingOutput]: output `instrument_string` is missing from `meta` section in task `instrument`"
+message = "ngsderive.wdl:10:13: warning[NonmatchingOutput]: `strandedness` appears in `outputs` section of task `strandedness` but is not a declared `output`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L10"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:133:9: warning[NonmatchingOutput]: output `instrument_string` is missing from `meta` section in task `instrument`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L133"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:211:9: warning[NonmatchingOutput]: `outputs` section of `meta` for task `encoding` is out of order"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L211"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
@@ -1332,13 +1352,18 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
-message = "ngsderive.wdl:80:16: warning[NonmatchingOutput]: output `strandedness_string` is missing from `meta` section in task `strandedness`"
+message = "ngsderive.wdl:80:9: warning[NonmatchingOutput]: output `strandedness_string` is missing from `meta` section in task `strandedness`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/ngsderive.wdl/#L80"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
 message = "picard.wdl:1032:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L1032"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:142:13: warning[NonmatchingOutput]: `validated_bam` appears in `outputs` section of task `validate_bam` but is not a declared `output`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L142"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
@@ -1352,7 +1377,12 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
-message = "picard.wdl:982:21: warning[NonmatchingOutput]: output `interval_lists_scatter` is missing from `meta` section in task `scatter_interval_list`"
+message = "picard.wdl:927:13: warning[NonmatchingOutput]: `out` appears in `outputs` section of task `scatter_interval_list` but is not a declared `output`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L927"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:982:9: warning[NonmatchingOutput]: output `interval_lists_scatter` is missing from `meta` section in task `scatter_interval_list`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/picard.wdl/#L982"
 
 [[diagnostics]]
@@ -1367,12 +1397,17 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/sambamba.wdl"
-message = "sambamba.wdl:219:14: warning[NonmatchingOutput]: output `duplicate_marked_bam_index` is missing from `meta` section in task `markdup`"
+message = "sambamba.wdl:182:13: warning[NonmatchingOutput]: `mark_duplicates_metrics` appears in `outputs` section of task `markdup` but is not a declared `output`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L182"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:219:9: warning[NonmatchingOutput]: output `duplicate_marked_bam_index` is missing from `meta` section in task `markdup`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L219"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/sambamba.wdl"
-message = "sambamba.wdl:220:14: warning[NonmatchingOutput]: output `markdup_log` is missing from `meta` section in task `markdup`"
+message = "sambamba.wdl:220:9: warning[NonmatchingOutput]: output `markdup_log` is missing from `meta` section in task `markdup`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/sambamba.wdl/#L220"
 
 [[diagnostics]]
@@ -1422,7 +1457,12 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:136:23: warning[NonmatchingOutput]: output `split_strings` is missing from `meta` section in task `split_string`"
+message = "util.wdl:112:13: warning[NonmatchingOutput]: `split_string` appears in `outputs` section of task `split_string` but is not a declared `output`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L112"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:136:9: warning[NonmatchingOutput]: output `split_strings` is missing from `meta` section in task `split_string`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/tools/util.wdl/#L136"
 
 [[diagnostics]]
@@ -1602,13 +1642,23 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:453:14: warning[NonmatchingOutput]: output `inferred_endedness` is missing from `meta` section in workflow `quality_check`"
+message = "quality-check-standard.wdl:453:9: warning[NonmatchingOutput]: output `inferred_endedness` is missing from `meta` section in workflow `quality_check`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/qc/quality-check-standard.wdl/#L453"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:492:28: warning[NonmatchingOutput]: output `intermediate_files` is missing from `meta` section in workflow `quality_check`"
+message = "quality-check-standard.wdl:492:9: warning[NonmatchingOutput]: output `intermediate_files` is missing from `meta` section in workflow `quality_check`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/qc/quality-check-standard.wdl/#L492"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:500:13: warning[NonmatchingOutput]: `check` appears in `outputs` section of task `parse_input` but is not a declared `output`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/qc/quality-check-standard.wdl/#L500"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:73:13: warning[NonmatchingOutput]: `IntermediateFiles` appears in `outputs` section of workflow `quality_check` but is not a declared `output`"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/qc/quality-check-standard.wdl/#L73"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
@@ -1619,6 +1669,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6
 document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
 message = "make-qc-reference.wdl:6:10: note[SectionOrdering]: sections are not in order for workflow `make_qc_reference`"
 permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/reference/make-qc-reference.wdl/#L6"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
+message = "make-qc-reference.wdl:9:9: warning[NonmatchingOutput]: `outputs` section of `meta` for workflow `make_qc_reference` is out of order"
+permalink = "https://github.com/stjudecloud/workflows/blob/efdca837bc35fe5647de6aa95989652a5a9648dc/workflows/reference/make-qc-reference.wdl/#L9"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
