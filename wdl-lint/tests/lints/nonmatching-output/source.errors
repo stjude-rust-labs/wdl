@@ -1,0 +1,16 @@
+warning[NonmatchingOutput]: `outputs` key missing in `meta` section
+   ┌─ tests/lints/nonmatching-output/source.wdl:18:5
+   │
+18 │     meta {}
+   │     ^^^^
+   │
+   = fix: add `outputs` key to `meta` section
+
+warning[NonmatchingOutput]: output `t` is missing from `meta` section
+   ┌─ tests/lints/nonmatching-output/source.wdl:34:16
+   │
+34 │         String t = "world"
+   │                ^
+   │
+   = fix: add output (`t`) key to `outputs` documentation in `meta` section
+
