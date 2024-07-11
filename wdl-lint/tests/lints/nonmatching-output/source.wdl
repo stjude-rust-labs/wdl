@@ -2,6 +2,7 @@
 
 version 1.1
 
+# This task is OK
 task foo {
     meta {
         outputs: {
@@ -14,6 +15,7 @@ task foo {
     }
 }
 
+# This task should trigger a warning for missing `meta.outputs`.
 task bar {
     meta {}
     command <<< >>>
@@ -22,6 +24,7 @@ task bar {
     }
 }
 
+# This task should trigger a warning for `t` missing in `meta.outputs`.
 task baz {
     meta {
         outputs: {
@@ -35,6 +38,7 @@ task baz {
     }
 }
 
+# This task should trigger a warning for `meta.outputs` being out-of-order.
 task qux {
     meta {
         outputs: {
@@ -49,6 +53,7 @@ task qux {
     }
 }
 
+# This task should trigger a warning for the extra `v` in `meta.outputs`.
 task quux {
     meta {
         outputs: {
@@ -64,6 +69,8 @@ task quux {
     }
 }
 
+# This task should trigger a warning for `outputs` being non-object.
+# Also warnings for `s`, `t`, and `v` not in `meta.outputs`.
 task corge {
     meta {
         outputs: "string"
@@ -76,23 +83,22 @@ task corge {
     }
 }
 
+# This task should not trigger any warnings.
 task grault {
     meta {}
     command <<< >>>
     output {} # There should be no warnings here.
 }
 
-#@ except: NonmatchingOutput
+# This task should not trigger a warning due to `#@ except`.
 task garply {
-    # This doesn't work
-    #@ except: NonmatchingOutput
+    # except works here
     meta {
-        # Neither does this
-        #@ except: NonmatchingOutput
+        # except doesn't work here. In fact, this triggers a missing "outputs" warning.
         outputs: {
             s: "s",
             t: "t",
-            # Nor this
+            # This also works
             #@ except: NonmatchingOutput
             v: "v"
         }
@@ -104,8 +110,27 @@ task garply {
     }
 }
 
-# This works
-#@ except: NonmatchingOutput
+# This task should not trigger a warning due to `#@ except`.
+task garply2 {
+    # except works here
+    #@ except: NonmatchingOutput
+    meta {
+        # except doesn't work here. In fact, this triggers a missing "outputs" warning.
+        outputs: {
+            s: "s",
+            t: "t",
+            # This also works
+            v: "v"
+        }
+    }
+    command <<< >>>
+    output {
+        String s = "hello"
+        String t = "world"
+    }
+}
+
+# This task should not trigger a warning due to `#@ except`.
 task waldo {
     meta {
         outputs: {
@@ -114,13 +139,44 @@ task waldo {
         }
     }
     command <<< >>>
-    # This doesn't work either
+    # except works here
+    output {
+        String s = "hello"
+        String t = "world"
+        # Also here
+        #@ except: NonmatchingOutput
+        String v = "!"
+    }
+}
+
+# This should not trigger any warnings.
+task waldo2 {
+    meta {
+        outputs: {
+            s: "s",
+            t: "t",
+        }
+    }
+    command <<< >>>
+    # except works here
     #@ except: NonmatchingOutput
     output {
         String s = "hello"
         String t = "world"
-        # This doesn't work
-        #@ except: NonmatchingOutput
+        # Also here
         String v = "!"
     }
+}
+
+# This should trigger a warning to the extra `s`, `t`, and `v` in `meta.outputs`.
+task quuux {
+    meta {
+        outputs: {
+            s: "s",
+            t: "t",
+            v: "v"
+        }
+    }
+    command <<< >>>
+    output {}
 }

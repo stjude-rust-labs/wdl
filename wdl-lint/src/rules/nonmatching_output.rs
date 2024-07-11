@@ -5,7 +5,6 @@ use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::MetadataValue;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::TaskDefinition;
-use wdl_ast::v1::TaskOrWorkflow;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
@@ -25,14 +24,9 @@ use crate::TagSet;
 const ID: &str = "NonmatchingOutput";
 
 /// Creates a "non-matching output" diagnostic.
-fn nonmatching_output(span: Span, name: &str, context: &TaskOrWorkflow) -> Diagnostic {
-    let (ty, item_name) = match context {
-        TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
-        TaskOrWorkflow::Workflow(w) => ("workflow", w.name().as_str().to_string()),
-    };
-
+fn nonmatching_output(span: Span, name: &str, item_name: String, ty: String) -> Diagnostic {
     Diagnostic::warning(format!(
-        "output `{name}` is missing from `meta` section in {ty} `{item_name}`"
+        "output `{name}` is missing from `meta.outputs` section in {ty} `{item_name}`"
     ))
     .with_rule(ID)
     .with_highlight(span)
@@ -42,14 +36,9 @@ fn nonmatching_output(span: Span, name: &str, context: &TaskOrWorkflow) -> Diagn
 }
 
 /// Creates a missing outputs in meta diagnostic.
-fn missing_outputs_in_meta(span: Span, context: &TaskOrWorkflow) -> Diagnostic {
-    let (ty, name) = match context {
-        TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
-        TaskOrWorkflow::Workflow(w) => ("workflow", w.name().as_str().to_string()),
-    };
-
+fn missing_outputs_in_meta(span: Span, item_name: String, ty: String) -> Diagnostic {
     Diagnostic::warning(format!(
-        "`outputs` key missing in `meta` section for the {ty} `{name}`"
+        "`outputs` key missing in `meta` section for the {ty} `{item_name}`"
     ))
     .with_rule(ID)
     .with_highlight(span)
@@ -57,12 +46,7 @@ fn missing_outputs_in_meta(span: Span, context: &TaskOrWorkflow) -> Diagnostic {
 }
 
 /// Creates a diagnostic for extra `meta.outputs` entries.
-fn extra_output_in_meta(span: Span, name: &str, context: &TaskOrWorkflow) -> Diagnostic {
-    let (ty, item_name) = match context {
-        TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
-        TaskOrWorkflow::Workflow(w) => ("workflow", w.name().as_str().to_string()),
-    };
-
+fn extra_output_in_meta(span: Span, name: &str, item_name: String, ty: String) -> Diagnostic {
     Diagnostic::warning(format!(
         "`{name}` appears in `outputs` section of the {ty} `{item_name}` but is not a declared \
          `output`"
@@ -75,12 +59,7 @@ fn extra_output_in_meta(span: Span, name: &str, context: &TaskOrWorkflow) -> Dia
 }
 
 /// Creates a diagnostic for out-of-order entries.
-fn out_of_order(span: Span, output_span: Span, context: &TaskOrWorkflow) -> Diagnostic {
-    let (ty, item_name) = match context {
-        TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
-        TaskOrWorkflow::Workflow(w) => ("workflow", w.name().as_str().to_string()),
-    };
-
+fn out_of_order(span: Span, output_span: Span, item_name: String, ty: String) -> Diagnostic {
     Diagnostic::warning(format!(
         "`outputs` section of `meta` for the {ty} `{item_name}` is out of order"
     ))
@@ -88,17 +67,12 @@ fn out_of_order(span: Span, output_span: Span, context: &TaskOrWorkflow) -> Diag
     .with_highlight(span)
     .with_highlight(output_span)
     .with_fix(
-        "ensure the keys within `meta.outputs` have the same order as they appear in `outputs`",
+        "ensure the keys within `meta.outputs` have the same order as they appear in `output`",
     )
 }
 
 /// Creates a diagnostic for non-object `meta.outputs` entries.
-fn non_object_meta_outputs(span: Span, context: &TaskOrWorkflow) -> Diagnostic {
-    let (ty, item_name) = match context {
-        TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
-        TaskOrWorkflow::Workflow(w) => ("workflow", w.name().as_str().to_string()),
-    };
-
+fn non_object_meta_outputs(span: Span, item_name: String, ty: String) -> Diagnostic {
     Diagnostic::warning(format!(
         "`outputs` key in `meta` section for the {ty} `{item_name}` is not an object"
     ))
@@ -108,8 +82,23 @@ fn non_object_meta_outputs(span: Span, context: &TaskOrWorkflow) -> Diagnostic {
 }
 
 /// Detects non-matching outputs.
-#[derive(Default, Debug, Clone, Copy)]
-pub struct NonmatchingOutputRule;
+#[derive(Default, Debug, Clone)]
+pub struct NonmatchingOutputRule {
+    /// The span of the `meta` section.
+    current_meta_span: Option<Span>,
+    /// The span of the `meta.outputs` section.
+    current_meta_outputs_span: Option<Span>,
+    /// The span of the `output` section.
+    current_output_span: Option<Span>,
+    /// The keys seen in `meta.outputs`.
+    meta_outputs_keys: IndexMap<String, Span>,
+    /// The keys seen in `output`.
+    output_keys: IndexMap<String, Span>,
+    /// The context type.
+    ty: Option<String>,
+    /// The item name.
+    name: Option<String>,
+}
 
 impl Rule for NonmatchingOutputRule {
     fn id(&self) -> &'static str {
@@ -134,82 +123,49 @@ impl Rule for NonmatchingOutputRule {
 }
 
 /// Check each output key exists in the `outputs` key within the `meta` section.
-fn check_output_meta(
-    state: &mut Diagnostics,
-    meta: &MetadataSection,
-    output: &OutputSection,
-    context: TaskOrWorkflow,
-) {
-    // Get the `outputs` entries from the `meta` section.
-    if let Some(meta_outputs_key) = meta
-        .items()
-        .find(|entry| entry.name().as_str() == "outputs")
-    {
-        match meta_outputs_key.value() {
-            MetadataValue::Object(o) => {
-                let actual: IndexMap<_, _> = o
-                    .items()
-                    .map(|entry| {
-                        (
-                            entry.name().syntax().to_string(),
-                            entry.syntax().text_range().to_span(),
-                        )
-                    })
-                    .collect();
-
-                // Get the declared outputs.
-                let expected: IndexMap<_, _> = output
-                    .declarations()
-                    .map(|d| {
-                        (
-                            d.name().syntax().to_string(),
-                            d.syntax().text_range().to_span(),
-                        )
-                    })
-                    .collect();
-
-                let mut extra_found = false;
-
-                // Check for entries missing from `meta`.
-                for (name, span) in &expected {
-                    if !actual.contains_key(name) {
-                        if !extra_found {
-                            extra_found = true;
-                        }
-                        state.add(nonmatching_output(*span, name, &context));
-                    }
-                }
-
-                // Check for extra entries in `meta`.
-                for (name, span) in &actual {
-                    if !expected.contains_key(name) {
-                        if !extra_found {
-                            extra_found = true;
-                        }
-                        state.add(extra_output_in_meta(*span, name, &context));
-                    }
-                }
-
-                // Check for out-of-order entries.
-                if !extra_found && !actual.keys().eq(expected.keys()) {
-                    state.add(out_of_order(
-                        meta_outputs_key.syntax().text_range().to_span(),
-                        output.syntax().text_range().to_span(),
-                        &context,
-                    ));
-                }
+fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule) {
+    let mut extra_found = false;
+    // Check for entries missing from `meta`.
+    for (name, span) in &rule.output_keys {
+        if !rule.meta_outputs_keys.contains_key(name) {
+            if !extra_found {
+                extra_found = true;
             }
-            _ => {
-                state.add(non_object_meta_outputs(
-                    meta_outputs_key.syntax().text_range().to_span(),
-                    &context,
+            if let Some(_) = rule.current_meta_span {
+                state.add(nonmatching_output(
+                    *span,
+                    name,
+                    rule.name.clone().unwrap(),
+                    rule.ty.clone().unwrap(),
                 ));
             }
         }
-    } else {
-        state.add(missing_outputs_in_meta(
-            meta.syntax().first_token().unwrap().text_range().to_span(),
-            &context,
+    }
+
+    // Check for extra entries in `meta`.
+    for (name, span) in &rule.meta_outputs_keys {
+        if !rule.output_keys.contains_key(name) {
+            if !extra_found {
+                extra_found = true;
+            }
+            if let Some(_) = rule.current_output_span {
+                state.add(extra_output_in_meta(
+                    *span,
+                    name,
+                    rule.name.clone().unwrap(),
+                    rule.ty.clone().unwrap(),
+                ));
+            }
+        }
+    }
+
+    // Check for out-of-order entries.
+    if !extra_found && !rule.meta_outputs_keys.keys().eq(rule.output_keys.keys()) {
+        state.add(out_of_order(
+            rule.current_meta_outputs_span.unwrap(),
+            rule.current_output_span.unwrap(),
+            rule.name.clone().unwrap(),
+            rule.ty.clone().unwrap(),
         ));
     }
 }
@@ -232,22 +188,31 @@ impl Visitor for NonmatchingOutputRule {
         reason: VisitReason,
         workflow: &WorkflowDefinition,
     ) {
-        if reason == VisitReason::Exit {
-            return;
-        }
-
-        // If the `meta` section is missing, the MissingMeta rule will handle it.
-        if let Some(meta) = workflow.metadata().next() {
-            // If the `output` section is missing, the MissingOutput rule will handle it.
-            if let Some(output) = workflow.outputs().next() {
-                if output.declarations().count() > 0 {
-                    check_output_meta(
-                        state,
-                        &meta,
-                        &output,
-                        TaskOrWorkflow::Workflow(workflow.clone()),
-                    );
+        match reason {
+            VisitReason::Enter => {
+                self.name = Some(workflow.name().as_str().to_string());
+                self.ty = Some("workflow".to_string());
+            }
+            VisitReason::Exit => {
+                if self.current_meta_span.is_some()
+                    && self.current_meta_outputs_span.is_none()
+                    && self.output_keys.len() > 0
+                {
+                    state.add(missing_outputs_in_meta(
+                        self.current_meta_span.unwrap(),
+                        self.name.clone().unwrap(),
+                        self.ty.clone().unwrap(),
+                    ));
+                } else {
+                    check_matching(state, self);
                 }
+
+                self.name = None;
+                self.current_meta_outputs_span = None;
+                self.current_meta_span = None;
+                self.current_output_span = None;
+                self.output_keys.clear();
+                self.meta_outputs_keys.clear();
             }
         }
     }
@@ -258,18 +223,121 @@ impl Visitor for NonmatchingOutputRule {
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
+        match reason {
+            VisitReason::Enter => {
+                self.name = Some(task.name().as_str().to_string());
+                self.ty = Some("task".to_string());
+            }
+            VisitReason::Exit => {
+                if self.current_meta_span.is_some()
+                    && self.current_meta_outputs_span.is_none()
+                    && self.output_keys.len() > 0
+                {
+                    state.add(missing_outputs_in_meta(
+                        self.current_meta_span.unwrap(),
+                        self.name.clone().unwrap(),
+                        self.ty.clone().unwrap(),
+                    ));
+                } else {
+                    check_matching(state, self);
+                }
+
+                self.current_meta_outputs_span = None;
+                self.current_meta_span = None;
+                self.current_output_span = None;
+                self.output_keys.clear();
+                self.meta_outputs_keys.clear();
+            }
+        }
+    }
+
+    fn metadata_section(
+        &mut self,
+        _state: &mut Self::State,
+        reason: VisitReason,
+        section: &MetadataSection,
+    ) {
+        match reason {
+            VisitReason::Enter => {
+                self.current_meta_span = Some(section.syntax().text_range().to_span());
+            }
+            VisitReason::Exit => {
+                return;
+            }
+        }
+    }
+
+    fn output_section(
+        &mut self,
+        _state: &mut Self::State,
+        reason: VisitReason,
+        section: &OutputSection,
+    ) {
+        if reason == VisitReason::Enter {
+            self.current_output_span = Some(section.syntax().text_range().to_span());
+        }
+    }
+
+    fn bound_decl(
+        &mut self,
+        _state: &mut Self::State,
+        reason: VisitReason,
+        decl: &wdl_ast::v1::BoundDecl,
+    ) {
+        if reason == VisitReason::Enter {
+            if let Some(output) = &self.current_output_span {
+                let decl_span = decl.syntax().text_range().to_span();
+                if decl_span.start() > output.start() && decl_span.end() < output.end() {
+                    self.output_keys.insert(
+                        decl.name().as_str().to_string(),
+                        decl.syntax().text_range().to_span(),
+                    );
+                }
+            }
+        }
+    }
+
+    fn metadata_object_item(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        item: &wdl_ast::v1::MetadataObjectItem,
+    ) {
         if reason == VisitReason::Exit {
             return;
         }
-
-        // If the `meta` section is missing, the MissingMeta rule will handle it.
-        if let Some(meta) = task.metadata().next() {
-            // If the `output` section is missing, the MissingOutput rule will handle it.
-            if let Some(output) = task.outputs().next() {
-                if output.declarations().count() > 0 {
-                    check_output_meta(state, &meta, &output, TaskOrWorkflow::Task(task.clone()));
+        match self.current_meta_span {
+            Some(_meta_span) => {
+                if item.name().as_str() == "outputs" {
+                    self.current_meta_outputs_span = Some(item.syntax().text_range().to_span());
+                    match item.value() {
+                        MetadataValue::Object(_obj) => {}
+                        _ => {
+                            state.add(non_object_meta_outputs(
+                                item.syntax().text_range().to_span(),
+                                self.name.clone().unwrap(),
+                                self.ty.clone().unwrap(),
+                            ));
+                        }
+                    }
+                } else {
+                    match self.current_meta_outputs_span {
+                        Some(meta_outputs_span) => {
+                            let span = item.syntax().text_range().to_span();
+                            if span.start() > meta_outputs_span.start()
+                                && span.end() < meta_outputs_span.end()
+                            {
+                                self.meta_outputs_keys.insert(
+                                    item.name().as_str().to_string(),
+                                    item.syntax().text_range().to_span(),
+                                );
+                            }
+                        }
+                        None => {}
+                    }
                 }
             }
+            None => {}
         }
     }
 }
