@@ -48,14 +48,14 @@ fn missing_outputs_in_meta(span: Span, context: &TaskOrWorkflow) -> Diagnostic {
     };
 
     Diagnostic::warning(format!(
-        "`outputs` key missing in `meta` section in {ty} `{name}`"
+        "`outputs` key missing in `meta` section for the {ty} `{name}`"
     ))
     .with_rule(ID)
     .with_highlight(span)
-    .with_fix("add `outputs` key to `meta` section")
+    .with_fix("add an `outputs` key to `meta` section describing the outputs")
 }
 
-/// Creates a diagnostic for extra `meta` entries.
+/// Creates a diagnostic for extra `meta.outputs` entries.
 fn extra_output_in_meta(span: Span, name: &str, context: &TaskOrWorkflow) -> Diagnostic {
     let (ty, item_name) = match context {
         TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
@@ -63,13 +63,13 @@ fn extra_output_in_meta(span: Span, name: &str, context: &TaskOrWorkflow) -> Dia
     };
 
     Diagnostic::warning(format!(
-        "`{name}` appears in `outputs` section of {ty} `{item_name}` but is not a declared \
+        "`{name}` appears in `outputs` section of the {ty} `{item_name}` but is not a declared \
          `output`"
     ))
     .with_rule(ID)
     .with_highlight(span)
     .with_fix(format!(
-        "remove `{name}` from `outputs` key in `meta` section"
+        "ensure the output exists or remove the `{name}` key from `meta.outputs`"
     ))
 }
 
@@ -81,12 +81,12 @@ fn out_of_order(span: Span, output_span: Span, context: &TaskOrWorkflow) -> Diag
     };
 
     Diagnostic::warning(format!(
-        "`outputs` section of `meta` for {ty} `{item_name}` is out of order"
+        "`outputs` section of `meta` for the {ty} `{item_name}` is out of order"
     ))
     .with_rule(ID)
     .with_highlight(span)
     .with_highlight(output_span)
-    .with_fix("the `outputs` keys of `meta` section must match the order in `output`")
+    .with_fix("ensure the keys within `meta.outputs` have the same order as they appear in `outputs`")
 }
 
 /// Detects non-matching outputs.
@@ -99,13 +99,13 @@ impl Rule for NonmatchingOutputRule {
     }
 
     fn description(&self) -> &'static str {
-        "Ensures that each output field is documented in the meta section."
+        "Ensures that each output field is documented in the meta section under `meta.outputs`."
     }
 
     fn explanation(&self) -> &'static str {
-        "The meta section should have an output key and keys with descriptions for each output of \
+        "The meta section should have an `outputs` key and keys with descriptions for each output of \
          the task/workflow. These must match exactly. i.e. for each named output of a task or \
-         workflow, there should be an entry under meta.output with that same name. Additionally, \
+         workflow, there should be an entry under `meta.outputs` with that same name. Additionally, \
          these entries should be in the same order (that order is up to the developer to decide). \
          No extraneous output entries are allowed."
     }
