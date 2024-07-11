@@ -1,9 +1,9 @@
 /// Format comments in a WDL file.
-/// All comments will be treated as either "preceeding" or "inline" comments.
-/// A preceeding comment is a comment that appears on a line before an element,
-/// if and only if that element is the first element of its line. Preceeding
+/// All comments will be treated as either "preceding" or "inline" comments.
+/// A preceding comment is a comment that appears on a line before an element,
+/// if and only if that element is the first element of its line. preceding
 /// comments should always appear, without any blank lines, immediately before
-/// the element they are commenting on. Preceeding comments should be indented
+/// the element they are commenting on. preceding comments should be indented
 /// to the same level as the element they are commenting on. An inline
 /// comment is a comment that appears on the same line as an element, if and
 /// only if that element is the last element of its line. Inline comments should
@@ -18,28 +18,30 @@ use super::NEWLINE;
 pub const INLINE_COMMENT_SPACE: &str = "  ";
 
 /// Format comments that preceed a node.
+///
 /// If no comments are found this returns an empty string (regardless of the
-/// value of 'trailing_indent'). 'trailing_indent' can be used to change the
-/// start and end of the string. If 'false', the string will start with
-/// 'num_indents' worth of indentation before the first comment and end in a
-/// newline. If 'true', the string will not start with any whitespace (i.e.
-/// beginning with '#') and will end with 'num_indents' worth of indentation.
-pub fn format_preceeding_comments(
+/// value of 'newline_needed' or 'trailing_indent'). 'newline_needed' is used
+/// to determine if a newline should be inserted before the comments. If
+/// 'trailing_indent' is true, 'num_indents' will be inserted at the end of the
+/// result. If 'trailing_indent' is false, the result string will end in a
+/// newline.
+pub fn format_preceding_comments(
     element: &SyntaxElement,
     num_indents: usize,
+    newline_needed: bool,
     trailing_indent: bool,
 ) -> String {
     // This walks _backwards_ through the syntax tree to find comments
     // so we must collect them in a vector and later reverse them to get them in the
     // correct order.
-    let mut preceeding_comments = Vec::new();
+    let mut preceding_comments = Vec::new();
 
     let mut prev = element.prev_sibling_or_token();
     while let Some(cur) = prev {
         match cur.kind() {
             SyntaxKind::Comment => {
                 // Ensure this comment "belongs" to the root element.
-                // A preceeding comment on a blank line is considered to belong to the element.
+                // A preceding comment on a blank line is considered to belong to the element.
                 // Othewise, the comment "belongs" to whatever
                 // else is on that line.
                 if let Some(before_cur) = cur.prev_sibling_or_token() {
@@ -49,7 +51,7 @@ pub fn format_preceeding_comments(
                                 // The 'cur' comment is on is on its own line.
                                 // It "belongs" to the current element.
                                 let trimmed_comment = cur.clone().to_string().trim().to_owned();
-                                preceeding_comments.push(trimmed_comment);
+                                preceding_comments.push(trimmed_comment);
                             }
                         }
                         _ => {
@@ -72,16 +74,20 @@ pub fn format_preceeding_comments(
     }
 
     let mut result = String::new();
-    for (i, comment) in preceeding_comments.iter().rev().enumerate() {
-        if (i > 0 && trailing_indent) || !trailing_indent {
-            for _ in 0..num_indents {
-                result.push_str(INDENT);
-            }
+    if preceding_comments.is_empty() {
+        return result;
+    }
+    if newline_needed {
+        result.push_str(NEWLINE);
+    }
+    for comment in preceding_comments.iter().rev() {
+        for _ in 0..num_indents {
+            result.push_str(INDENT);
         }
         result.push_str(comment);
         result.push_str(NEWLINE);
     }
-    if !preceeding_comments.is_empty() && trailing_indent {
+    if trailing_indent {
         for _ in 0..num_indents {
             result.push_str(INDENT);
         }
@@ -90,16 +96,12 @@ pub fn format_preceeding_comments(
 }
 
 /// Format a comment on the same line as an element.
-/// 'after_comment' is the text to insert _if a comment is found_.
-/// 'instead_of_comment' is the text to insert _if no comment is found_.
-/// Note that a newline is _always_ inserted after a found comment.
-/// If no comments are found and 'instead_of_comment' is empty, this function
-/// will return an empty string.
-pub fn format_inline_comment(
-    element: &SyntaxElement,
-    after_comment: &str,
-    instead_of_comment: &str,
-) -> String {
+///
+/// If no comments are found this returns an empty string unless
+/// 'newline_needed' is true. If a comment is found, this will return the
+/// comment with a newline. If a comment is not found, but 'newline_needed' is
+/// true, this will return a newline. Else it will return the empty string.
+pub fn format_inline_comment(element: &SyntaxElement, newline_needed: bool) -> String {
     let mut result = String::new();
     let mut next = element.next_sibling_or_token();
     while let Some(cur) = next {
@@ -108,7 +110,6 @@ pub fn format_inline_comment(
                 result.push_str(INLINE_COMMENT_SPACE);
                 result.push_str(cur.to_string().trim());
                 result.push_str(NEWLINE);
-                result.push_str(after_comment);
                 break;
             }
             SyntaxKind::Whitespace => {
@@ -124,8 +125,8 @@ pub fn format_inline_comment(
         }
         next = cur.next_sibling_or_token();
     }
-    if result.is_empty() {
-        result.push_str(instead_of_comment);
+    if result.is_empty() && newline_needed {
+        result.push_str(NEWLINE);
     }
     result
 }
