@@ -8,7 +8,7 @@ use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 
 use super::comments::format_inline_comment;
-use super::comments::format_preceeding_comments;
+use super::comments::format_preceding_comments;
 use super::INDENT;
 use super::NEWLINE;
 
@@ -19,176 +19,171 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
     // name. The value is the formatted import statement with any found
     // comments.
     let mut import_map: HashMap<String, String> = HashMap::new();
+    let one_indent = INDENT;
+    let two_indents = INDENT.repeat(2);
     for import in imports {
         let mut key = String::new();
         let mut val = String::new();
 
-        for child in import.syntax().children_with_tokens() {
-            match child.kind() {
-                SyntaxKind::ImportKeyword => {
-                    // This should always be the first child processed
-                    val.push_str(&format_preceeding_comments(
-                        &SyntaxElement::Node(import.syntax().clone()),
-                        0,
-                        false,
-                    ));
-                    val.push_str("import");
-                    val.push_str(&format_inline_comment(&child, INDENT, ""));
-                    let mut next = child.next_sibling_or_token();
-                    while let Some(cur) = next {
-                        match cur.kind() {
-                            SyntaxKind::LiteralStringNode => {
-                                val.push_str(&format_preceeding_comments(&cur, 1, true));
-                                if !val.ends_with(INDENT) {
-                                    val.push(' ');
-                                }
-                                cur.as_node().unwrap().children_with_tokens().for_each(
-                                    |string_part| match string_part.kind() {
-                                        SyntaxKind::DoubleQuote | SyntaxKind::SingleQuote => {
-                                            val.push('"');
-                                        }
-                                        SyntaxKind::LiteralStringText => {
-                                            key.push_str(&string_part.to_string());
-                                            val.push_str(&string_part.to_string());
-                                        }
-                                        _ => {
-                                            unreachable!(
-                                                "Unexpected syntax kind: {:?}",
-                                                child.kind()
-                                            );
-                                        }
-                                    },
-                                );
-                                val.push_str(&format_inline_comment(&cur, "", NEWLINE));
+        val.push_str(&format_preceding_comments(
+            &SyntaxElement::Node(import.syntax().clone()),
+            0,
+            false,
+            false,
+        ));
+
+        val.push_str("import");
+        let import_keyword = import.syntax().first_token().unwrap();
+        val.push_str(&format_inline_comment(
+            &SyntaxElement::Token(import_keyword.clone()),
+            false,
+        ));
+        let mut next = import_keyword.next_sibling_or_token();
+        while let Some(cur) = next {
+            match cur.kind() {
+                SyntaxKind::LiteralStringNode => {
+                    let mut newline_needed = false;
+                    if !val.ends_with(NEWLINE) {
+                        newline_needed = true;
+                    }
+                    val.push_str(&format_preceding_comments(&cur, 1, newline_needed, false));
+                    if val.ends_with("import") {
+                        val.push(' ');
+                    } else if val.ends_with(NEWLINE) {
+                        val.push_str(one_indent);
+                    }
+                    cur.as_node()
+                        .unwrap()
+                        .children_with_tokens()
+                        .for_each(|string_part| match string_part.kind() {
+                            SyntaxKind::DoubleQuote | SyntaxKind::SingleQuote => {
+                                val.push('"');
                             }
-                            SyntaxKind::AsKeyword => {
-                                val.push_str(&format_preceeding_comments(&cur, 1, false));
-                                val.push_str(INDENT);
-                                val.push_str("as");
-                                val.push_str(&format_inline_comment(&cur, INDENT, ""));
+                            SyntaxKind::LiteralStringText => {
+                                key.push_str(&string_part.to_string());
+                                val.push_str(&string_part.to_string());
+                            }
+                            _ => {
+                                unreachable!("Unexpected syntax kind: {:?}", cur.kind());
+                            }
+                        });
+                    val.push_str(&format_inline_comment(&cur, true));
+                }
+                SyntaxKind::AsKeyword => {
+                    val.push_str(&format_preceding_comments(&cur, 1, false, false));
+                    val.push_str(one_indent);
+                    val.push_str("as");
+                    val.push_str(&format_inline_comment(&cur, false));
+                }
+                SyntaxKind::Ident => {
+                    key.push_str(&cur.to_string());
+
+                    let mut newline_needed = false;
+                    if !val.ends_with(NEWLINE) {
+                        newline_needed = true;
+                    }
+                    val.push_str(&format_preceding_comments(&cur, 2, newline_needed, false));
+                    if val.ends_with("as") {
+                        val.push(' ');
+                    } else if val.ends_with(NEWLINE) {
+                        val.push_str(&two_indents);
+                    }
+                    val.push_str(&cur.to_string());
+                    val.push_str(&format_inline_comment(&cur, true));
+                }
+                SyntaxKind::ImportAliasNode => {
+                    let mut second_ident_of_clause = false;
+                    cur.as_node()
+                        .unwrap()
+                        .children_with_tokens()
+                        .for_each(|alias_part| match alias_part.kind() {
+                            SyntaxKind::AliasKeyword => {
+                                // This should always be the first child processed
+                                val.push_str(&format_preceding_comments(
+                                    &cur, // Parent node
+                                    1, false, false,
+                                ));
+                                val.push_str(one_indent);
+                                val.push_str("alias");
+                                val.push_str(&format_inline_comment(&alias_part, false));
                             }
                             SyntaxKind::Ident => {
-                                key.push_str(&cur.to_string());
-
-                                val.push_str(&format_preceeding_comments(&cur, 1, true));
-                                if !val.ends_with(INDENT) {
+                                let mut newline_needed = false;
+                                if !val.ends_with(NEWLINE) {
+                                    newline_needed = true;
+                                }
+                                val.push_str(&format_preceding_comments(
+                                    &alias_part,
+                                    2,
+                                    newline_needed,
+                                    true,
+                                ));
+                                if val.ends_with("alias") || val.ends_with("as") {
+                                    val.push(' ');
+                                } else if val.ends_with(NEWLINE) {
+                                    val.push_str(&two_indents);
+                                }
+                                val.push_str(&alias_part.to_string());
+                                if !second_ident_of_clause {
+                                    val.push_str(&format_inline_comment(&alias_part, false));
+                                    second_ident_of_clause = true;
+                                } else {
+                                    val.push_str(&format_inline_comment(
+                                                    &SyntaxElement::Node(import.syntax().clone()), // Parent's parent node
+                                                    true,
+                                                ));
+                                }
+                            }
+                            SyntaxKind::AsKeyword => {
+                                let mut newline_needed = false;
+                                if !val.ends_with(NEWLINE) {
+                                    newline_needed = true;
+                                }
+                                val.push_str(&format_preceding_comments(
+                                    &alias_part,
+                                    2,
+                                    newline_needed,
+                                    false,
+                                ));
+                                if val.ends_with(NEWLINE) {
+                                    val.push_str(&two_indents);
+                                } else {
                                     val.push(' ');
                                 }
-                                val.push_str(&cur.to_string());
-                                val.push_str(&format_inline_comment(&cur, "", NEWLINE));
+                                val.push_str("as");
+                                val.push_str(&format_inline_comment(&alias_part, false));
                             }
                             SyntaxKind::ImportAliasNode => {
-                                let mut second_ident_of_clause = false;
-                                cur.as_node().unwrap().children_with_tokens().for_each(
-                                    |alias_part| match alias_part.kind() {
-                                        SyntaxKind::AliasKeyword => {
-                                            // This should always be the first child processed
-                                            val.push_str(&format_preceeding_comments(
-                                                &cur, // Parent node
-                                                1, false,
-                                            ));
-                                            val.push_str(INDENT);
-                                            val.push_str("alias");
-                                            val.push_str(&format_inline_comment(
-                                                &alias_part,
-                                                INDENT,
-                                                "",
-                                            ));
-                                        }
-                                        SyntaxKind::Ident => {
-                                            val.push_str(&format_preceeding_comments(
-                                                &alias_part,
-                                                1,
-                                                true,
-                                            ));
-                                            if !val.ends_with(INDENT) {
-                                                val.push(' ');
-                                            }
-                                            val.push_str(&alias_part.to_string());
-                                            if !second_ident_of_clause {
-                                                val.push_str(&format_inline_comment(
-                                                    &alias_part,
-                                                    INDENT,
-                                                    "",
-                                                ));
-                                                second_ident_of_clause = true;
-                                            } else {
-                                                val.push_str(&format_inline_comment(
-                                                    &SyntaxElement::Node(import.syntax().clone()), // Parent's parent node
-                                                    "", NEWLINE,
-                                                ));
-                                            }
-                                        }
-                                        SyntaxKind::AsKeyword => {
-                                            val.push_str(&format_preceeding_comments(
-                                                &alias_part,
-                                                1,
-                                                false,
-                                            ));
-                                            if !val.ends_with(INDENT) {
-                                                val.push(' ');
-                                            }
-                                            val.push_str("as");
-                                            val.push_str(&format_inline_comment(
-                                                &alias_part,
-                                                INDENT,
-                                                "",
-                                            ));
-                                        }
-                                        SyntaxKind::ImportAliasNode => {
-                                            // Ignore the root node
-                                        }
-                                        SyntaxKind::Whitespace => {
-                                            // Ignore
-                                        }
-                                        SyntaxKind::Comment => {
-                                            // This comment will be included by
-                                            // a call to '
-                                            // format_preceeding_comments' or
-                                            // 'format_inline_comment'
-                                            // in another match arm
-                                        }
-                                        _ => {
-                                            unreachable!(
-                                                "Unexpected syntax kind: {:?}",
-                                                alias_part.kind()
-                                            );
-                                        }
-                                    },
-                                );
+                                // Ignore the root node
                             }
                             SyntaxKind::Whitespace => {
                                 // Ignore
                             }
                             SyntaxKind::Comment => {
-                                // This comment will be included by a call to
+                                // This comment will be included by
+                                // a call to '
+                                // format_preceding_comments' or
                                 // 'format_inline_comment'
                                 // in another match arm
                             }
                             _ => {
-                                unreachable!("Unexpected syntax kind: {:?}", cur.kind());
+                                unreachable!("Unexpected syntax kind: {:?}", alias_part.kind());
                             }
-                        }
-                        next = cur.next_sibling_or_token();
-                    }
+                        });
                 }
                 SyntaxKind::Whitespace => {
                     // Ignore
                 }
-                SyntaxKind::ImportStatementNode => {
-                    // Ignore the root node
-                }
-                SyntaxKind::LiteralStringNode
-                | SyntaxKind::Comment
-                | SyntaxKind::AsKeyword
-                | SyntaxKind::Ident
-                | SyntaxKind::ImportAliasNode => {
-                    // Handled by the import keyword
+                SyntaxKind::Comment => {
+                    // This comment will be included by a call to
+                    // 'format_inline_comment'
+                    // in another match arm
                 }
                 _ => {
-                    unreachable!("Unexpected syntax kind: {:?}", child.kind());
+                    unreachable!("Unexpected syntax kind: {:?}", cur.kind());
                 }
             }
+            next = cur.next_sibling_or_token();
         }
 
         import_map.insert(key, val);
