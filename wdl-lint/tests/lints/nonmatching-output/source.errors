@@ -1,10 +1,10 @@
-warning[NonmatchingOutput]: `outputs` key missing in `meta` section in task `bar`
+warning[NonmatchingOutput]: `outputs` key missing in `meta` section for the task `bar`
    ┌─ tests/lints/nonmatching-output/source.wdl:18:5
    │
 18 │     meta {}
    │     ^^^^
    │
-   = fix: add `outputs` key to `meta` section
+   = fix: add an `outputs` key to `meta` section describing the outputs
 
 warning[NonmatchingOutput]: output `t` is missing from `meta` section in task `baz`
    ┌─ tests/lints/nonmatching-output/source.wdl:34:9
@@ -12,9 +12,9 @@ warning[NonmatchingOutput]: output `t` is missing from `meta` section in task `b
 34 │         String t = "world"
    │         ^^^^^^^^^^^^^^^^^^
    │
-   = fix: add output (`t`) key to `outputs` documentation in `meta` section
+   = fix: add a description of output `t` to documentation in `meta.outputs`
 
-warning[NonmatchingOutput]: `outputs` section of `meta` for task `qux` is out of order
+warning[NonmatchingOutput]: `outputs` section of `meta` for the task `qux` is out of order
    ┌─ tests/lints/nonmatching-output/source.wdl:40:9
    │    
 40 │ ╭           outputs: {
@@ -29,13 +29,21 @@ warning[NonmatchingOutput]: `outputs` section of `meta` for task `qux` is out of
 49 │   │     }
    │   ╰─────'
    │    
-   = fix: the `outputs` keys of `meta` section must match the order in `output`
+   = fix: ensure the keys within `meta.outputs` have the same order as they appear in `outputs`
 
-warning[NonmatchingOutput]: `v` appears in `outputs` section of task `quux` but is not a declared `output`
+warning[NonmatchingOutput]: `v` appears in `outputs` section of the task `quux` but is not a declared `output`
    ┌─ tests/lints/nonmatching-output/source.wdl:57:13
    │
 57 │             v: "v"
    │             ^^^^^^
    │
-   = fix: remove `v` from `outputs` key in `meta` section
+   = fix: ensure the output exists or remove the `v` key from `meta.outputs`
+
+warning[NonmatchingOutput]: `outputs` key in `meta` section for the task `corge` is not an object
+   ┌─ tests/lints/nonmatching-output/source.wdl:69:9
+   │
+69 │         outputs: "string"
+   │         ^^^^^^^^^^^^^^^^^
+   │
+   = fix: ensure `meta.outputs` is an object containing descriptions for each output
 

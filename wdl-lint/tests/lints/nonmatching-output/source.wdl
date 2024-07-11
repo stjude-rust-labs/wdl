@@ -63,3 +63,15 @@ task quux {
         String t = "world"
     }
 }
+
+task corge {
+    meta {
+        outputs: "string"
+    }
+    command <<< >>>
+    output {
+        String s = "hello"
+        String t = "world"
+        String v = "!"
+    }
+}

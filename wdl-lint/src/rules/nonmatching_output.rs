@@ -2,6 +2,7 @@
 
 use indexmap::IndexMap;
 use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::MetadataValue;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::TaskOrWorkflow;
@@ -86,7 +87,24 @@ fn out_of_order(span: Span, output_span: Span, context: &TaskOrWorkflow) -> Diag
     .with_rule(ID)
     .with_highlight(span)
     .with_highlight(output_span)
-    .with_fix("ensure the keys within `meta.outputs` have the same order as they appear in `outputs`")
+    .with_fix(
+        "ensure the keys within `meta.outputs` have the same order as they appear in `outputs`",
+    )
+}
+
+/// Creates a diagnostic for non-object `meta.outputs` entries.
+fn non_object_meta_outputs(span: Span, context: &TaskOrWorkflow) -> Diagnostic {
+    let (ty, item_name) = match context {
+        TaskOrWorkflow::Task(t) => ("task", t.name().as_str().to_string()),
+        TaskOrWorkflow::Workflow(w) => ("workflow", w.name().as_str().to_string()),
+    };
+
+    Diagnostic::warning(format!(
+        "`outputs` key in `meta` section for the {ty} `{item_name}` is not an object"
+    ))
+    .with_rule(ID)
+    .with_highlight(span)
+    .with_fix("ensure `meta.outputs` is an object containing descriptions for each output")
 }
 
 /// Detects non-matching outputs.
@@ -103,11 +121,11 @@ impl Rule for NonmatchingOutputRule {
     }
 
     fn explanation(&self) -> &'static str {
-        "The meta section should have an `outputs` key and keys with descriptions for each output of \
-         the task/workflow. These must match exactly. i.e. for each named output of a task or \
-         workflow, there should be an entry under `meta.outputs` with that same name. Additionally, \
-         these entries should be in the same order (that order is up to the developer to decide). \
-         No extraneous output entries are allowed."
+        "The meta section should have an `outputs` key and keys with descriptions for each output \
+         of the task/workflow. These must match exactly. i.e. for each named output of a task or \
+         workflow, there should be an entry under `meta.outputs` with that same name. \
+         Additionally, these entries should be in the same order (that order is up to the \
+         developer to decide). No extraneous output entries are allowed."
     }
 
     fn tags(&self) -> TagSet {
@@ -127,58 +145,66 @@ fn check_output_meta(
         .items()
         .find(|entry| entry.name().as_str() == "outputs")
     {
-        let actual: IndexMap<_, _> = meta_outputs_key
-            .value()
-            .unwrap_object()
-            .items()
-            .map(|entry| {
-                (
-                    entry.name().syntax().to_string(),
-                    entry.syntax().text_range().to_span(),
-                )
-            })
-            .collect();
+        match meta_outputs_key.value() {
+            MetadataValue::Object(o) => {
+                let actual: IndexMap<_, _> = o
+                    .items()
+                    .map(|entry| {
+                        (
+                            entry.name().syntax().to_string(),
+                            entry.syntax().text_range().to_span(),
+                        )
+                    })
+                    .collect();
 
-        // Get the declared outputs.
-        let expected: IndexMap<_, _> = outputs
-            .declarations()
-            .map(|d| {
-                (
-                    d.name().syntax().to_string(),
-                    d.syntax().text_range().to_span(),
-                )
-            })
-            .collect();
+                // Get the declared outputs.
+                let expected: IndexMap<_, _> = outputs
+                    .declarations()
+                    .map(|d| {
+                        (
+                            d.name().syntax().to_string(),
+                            d.syntax().text_range().to_span(),
+                        )
+                    })
+                    .collect();
 
-        let mut extra_found = false;
+                let mut extra_found = false;
 
-        // Check for entries missing from `meta`.
-        for (name, span) in &expected {
-            if !actual.contains_key(name) {
-                if !extra_found {
-                    extra_found = true;
+                // Check for entries missing from `meta`.
+                for (name, span) in &expected {
+                    if !actual.contains_key(name) {
+                        if !extra_found {
+                            extra_found = true;
+                        }
+                        state.add(nonmatching_output(*span, name, &context));
+                    }
                 }
-                state.add(nonmatching_output(*span, name, &context));
-            }
-        }
 
-        // Check for extra entries in `meta`.
-        for (name, span) in &actual {
-            if !expected.contains_key(name) {
-                if !extra_found {
-                    extra_found = true;
+                // Check for extra entries in `meta`.
+                for (name, span) in &actual {
+                    if !expected.contains_key(name) {
+                        if !extra_found {
+                            extra_found = true;
+                        }
+                        state.add(extra_output_in_meta(*span, name, &context));
+                    }
                 }
-                state.add(extra_output_in_meta(*span, name, &context));
-            }
-        }
 
-        // Check for out-of-order entries.
-        if !extra_found && !actual.keys().eq(expected.keys()) {
-            state.add(out_of_order(
-                meta_outputs_key.syntax().text_range().to_span(),
-                outputs.syntax().text_range().to_span(),
-                &context,
-            ));
+                // Check for out-of-order entries.
+                if !extra_found && !actual.keys().eq(expected.keys()) {
+                    state.add(out_of_order(
+                        meta_outputs_key.syntax().text_range().to_span(),
+                        outputs.syntax().text_range().to_span(),
+                        &context,
+                    ));
+                }
+            }
+            _ => {
+                state.add(non_object_meta_outputs(
+                    meta_outputs_key.syntax().text_range().to_span(),
+                    &context,
+                ));
+            }
         }
     } else {
         state.add(missing_outputs_in_meta(

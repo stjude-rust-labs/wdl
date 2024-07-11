@@ -24,11 +24,11 @@ commit_hash = "4e7fdfa7992dd1bf4c4721e77c81e4d7b8ecf4fe"
 
 [repositories."broadinstitute/warp"]
 identifier = "broadinstitute/warp"
-commit_hash = "e49ffbcd72b138ad4dc6ec62c847943908e4abf9"
+commit_hash = "e52f2c1aabdb88b565c132e5587d05b91c4e6c0f"
 
 [repositories."chanzuckerberg/czid-workflows"]
 identifier = "chanzuckerberg/czid-workflows"
-commit_hash = "a7c54be041e9fbd4cfdd9fac99226e6b4f6f3bfd"
+commit_hash = "b7c97a87d995a31d85bb6c8ee780fdf33d5bc176"
 
 [repositories."getwilds/ww-fastq-to-cram"]
 identifier = "getwilds/ww-fastq-to-cram"
@@ -384,34 +384,34 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/4e7fdfa79
 [[diagnostics]]
 document = "broadinstitute/warp:/pipelines/skylab/scATAC/scATAC.wdl"
 message = "scATAC.wdl:203:9: error: duplicate key `cpu` in runtime section"
-permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec62c847943908e4abf9/pipelines/skylab/scATAC/scATAC.wdl/#L203"
+permalink = "https://github.com/broadinstitute/warp/blob/e52f2c1aabdb88b565c132e5587d05b91c4e6c0f/pipelines/skylab/scATAC/scATAC.wdl/#L203"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/GermlineVariantDiscovery.wdl"
 message = "GermlineVariantDiscovery.wdl:137:32: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec62c847943908e4abf9/tasks/broad/GermlineVariantDiscovery.wdl/#L137"
+permalink = "https://github.com/broadinstitute/warp/blob/e52f2c1aabdb88b565c132e5587d05b91c4e6c0f/tasks/broad/GermlineVariantDiscovery.wdl/#L137"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/GermlineVariantDiscovery.wdl"
 message = "GermlineVariantDiscovery.wdl:65:32: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec62c847943908e4abf9/tasks/broad/GermlineVariantDiscovery.wdl/#L65"
+permalink = "https://github.com/broadinstitute/warp/blob/e52f2c1aabdb88b565c132e5587d05b91c4e6c0f/tasks/broad/GermlineVariantDiscovery.wdl/#L65"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl"
 message = "UltimaGenomicsWholeGenomeGermlineTasks.wdl:814:27: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec62c847943908e4abf9/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L814"
+permalink = "https://github.com/broadinstitute/warp/blob/e52f2c1aabdb88b565c132e5587d05b91c4e6c0f/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L814"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl"
 message = "UltimaGenomicsWholeGenomeGermlineTasks.wdl:866:27: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec62c847943908e4abf9/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L866"
+permalink = "https://github.com/broadinstitute/warp/blob/e52f2c1aabdb88b565c132e5587d05b91c4e6c0f/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L866"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tests/cemba/pr/CheckCembaOutputs.wdl"
 message = "CheckCembaOutputs.wdl:1:1: error: a WDL document must start with a version statement"
-permalink = "https://github.com/broadinstitute/warp/blob/e49ffbcd72b138ad4dc6ec62c847943908e4abf9/tests/cemba/pr/CheckCembaOutputs.wdl/#L1"
+permalink = "https://github.com/broadinstitute/warp/blob/e52f2c1aabdb88b565c132e5587d05b91c4e6c0f/tests/cemba/pr/CheckCembaOutputs.wdl/#L1"
 
 [[diagnostics]]
 document = "chanzuckerberg/czid-workflows:/workflows/index-generation/index-generation.wdl"
 message = "index-generation.wdl:1:9: error: unsupported WDL version `development`"
-permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/a7c54be041e9fbd4cfdd9fac99226e6b4f6f3bfd/workflows/index-generation/index-generation.wdl/#L1"
+permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/b7c97a87d995a31d85bb6c8ee780fdf33d5bc176/workflows/index-generation/index-generation.wdl/#L1"
