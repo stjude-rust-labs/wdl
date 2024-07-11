@@ -115,17 +115,17 @@ impl Rule for NonmatchingOutputRule {
     }
 }
 
-/// Check each output key exists in the outputs key within the `meta` section.
+/// Check each output key exists in the `outputs` key within the `meta` section.
 fn check_output_meta(
     state: &mut Diagnostics,
     meta: &MetadataSection,
     outputs: &OutputSection,
     context: TaskOrWorkflow,
 ) {
-    // Get the output section from the meta section.
+    // Get the `outputs` entries from the `meta` section.
     if let Some(meta_outputs_key) = meta
         .items()
-        .find(|entry| entry.name().syntax().to_string() == "outputs")
+        .find(|entry| entry.name().as_str() == "outputs")
     {
         let actual: IndexMap<_, _> = meta_outputs_key
             .value()
