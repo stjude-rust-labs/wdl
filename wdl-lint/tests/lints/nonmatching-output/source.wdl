@@ -81,3 +81,46 @@ task grault {
     command <<< >>>
     output {} # There should be no warnings here.
 }
+
+#@ except: NonmatchingOutput
+task garply {
+    # This doesn't work
+    #@ except: NonmatchingOutput
+    meta {
+        # Neither does this
+        #@ except: NonmatchingOutput
+        outputs: {
+            s: "s",
+            t: "t",
+            # Nor this
+            #@ except: NonmatchingOutput
+            v: "v"
+        }
+    }
+    command <<< >>>
+    output {
+        String s = "hello"
+        String t = "world"
+    }
+}
+
+# This works
+#@ except: NonmatchingOutput
+task waldo {
+    meta {
+        outputs: {
+            s: "s",
+            t: "t",
+        }
+    }
+    command <<< >>>
+    # This doesn't work either
+    #@ except: NonmatchingOutput
+    output {
+        String s = "hello"
+        String t = "world"
+        # This doesn't work
+        #@ except: NonmatchingOutput
+        String v = "!"
+    }
+}
