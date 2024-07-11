@@ -75,3 +75,9 @@ task corge {
         String v = "!"
     }
 }
+
+task grault {
+    meta {}
+    command <<< >>>
+    output {} # There should be no warnings here.
+}
