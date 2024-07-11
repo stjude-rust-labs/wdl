@@ -1,5 +1,6 @@
 //! Module for the lint rules.
 
+mod blanks_between_elements;
 mod call_input_spacing;
 mod command_mixed_indentation;
 mod deprecated_object;
@@ -28,6 +29,7 @@ mod snake_case;
 mod todo;
 mod whitespace;
 
+pub use blanks_between_elements::*;
 pub use call_input_spacing::*;
 pub use command_mixed_indentation::*;
 pub use deprecated_object::*;
