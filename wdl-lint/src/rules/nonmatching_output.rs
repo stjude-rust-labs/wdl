@@ -36,7 +36,7 @@ fn nonmatching_output(span: Span, name: &str, context: &TaskOrWorkflow) -> Diagn
     .with_rule(ID)
     .with_highlight(span)
     .with_fix(format!(
-        "add output (`{name}`) key to `outputs` documentation in `meta` section"
+        "add a description of output `{name}` to documentation in `meta.outputs`"
     ))
 }
 
