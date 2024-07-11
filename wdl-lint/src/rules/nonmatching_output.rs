@@ -137,7 +137,7 @@ impl Rule for NonmatchingOutputRule {
 fn check_output_meta(
     state: &mut Diagnostics,
     meta: &MetadataSection,
-    outputs: &OutputSection,
+    output: &OutputSection,
     context: TaskOrWorkflow,
 ) {
     // Get the `outputs` entries from the `meta` section.
@@ -158,7 +158,7 @@ fn check_output_meta(
                     .collect();
 
                 // Get the declared outputs.
-                let expected: IndexMap<_, _> = outputs
+                let expected: IndexMap<_, _> = output
                     .declarations()
                     .map(|d| {
                         (
@@ -194,7 +194,7 @@ fn check_output_meta(
                 if !extra_found && !actual.keys().eq(expected.keys()) {
                     state.add(out_of_order(
                         meta_outputs_key.syntax().text_range().to_span(),
-                        outputs.syntax().text_range().to_span(),
+                        output.syntax().text_range().to_span(),
                         &context,
                     ));
                 }
