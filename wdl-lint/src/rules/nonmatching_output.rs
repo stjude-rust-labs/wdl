@@ -24,7 +24,7 @@ use crate::TagSet;
 const ID: &str = "NonmatchingOutput";
 
 /// Creates a "non-matching output" diagnostic.
-fn nonmatching_output(span: Span, name: &str, item_name: String, ty: String) -> Diagnostic {
+fn nonmatching_output(span: Span, name: &str, item_name: String, ty: &str) -> Diagnostic {
     Diagnostic::warning(format!(
         "output `{name}` is missing from `meta.outputs` section in {ty} `{item_name}`"
     ))
@@ -36,7 +36,7 @@ fn nonmatching_output(span: Span, name: &str, item_name: String, ty: String) -> 
 }
 
 /// Creates a missing outputs in meta diagnostic.
-fn missing_outputs_in_meta(span: Span, item_name: String, ty: String) -> Diagnostic {
+fn missing_outputs_in_meta(span: Span, item_name: String, ty: &str) -> Diagnostic {
     Diagnostic::warning(format!(
         "`outputs` key missing in `meta` section for the {ty} `{item_name}`"
     ))
@@ -46,7 +46,7 @@ fn missing_outputs_in_meta(span: Span, item_name: String, ty: String) -> Diagnos
 }
 
 /// Creates a diagnostic for extra `meta.outputs` entries.
-fn extra_output_in_meta(span: Span, name: &str, item_name: String, ty: String) -> Diagnostic {
+fn extra_output_in_meta(span: Span, name: &str, item_name: String, ty: &str) -> Diagnostic {
     Diagnostic::warning(format!(
         "`{name}` appears in `outputs` section of the {ty} `{item_name}` but is not a declared \
          `output`"
@@ -59,7 +59,7 @@ fn extra_output_in_meta(span: Span, name: &str, item_name: String, ty: String) -
 }
 
 /// Creates a diagnostic for out-of-order entries.
-fn out_of_order(span: Span, output_span: Span, item_name: String, ty: String) -> Diagnostic {
+fn out_of_order(span: Span, output_span: Span, item_name: String, ty: &str) -> Diagnostic {
     Diagnostic::warning(format!(
         "`outputs` section of `meta` for the {ty} `{item_name}` is out of order"
     ))
@@ -72,7 +72,7 @@ fn out_of_order(span: Span, output_span: Span, item_name: String, ty: String) ->
 }
 
 /// Creates a diagnostic for non-object `meta.outputs` entries.
-fn non_object_meta_outputs(span: Span, item_name: String, ty: String) -> Diagnostic {
+fn non_object_meta_outputs(span: Span, item_name: String, ty: &str) -> Diagnostic {
     Diagnostic::warning(format!(
         "`outputs` key in `meta` section for the {ty} `{item_name}` is not an object"
     ))
@@ -83,7 +83,7 @@ fn non_object_meta_outputs(span: Span, item_name: String, ty: String) -> Diagnos
 
 /// Detects non-matching outputs.
 #[derive(Default, Debug, Clone)]
-pub struct NonmatchingOutputRule {
+pub struct NonmatchingOutputRule<'a> {
     /// The span of the `meta` section.
     current_meta_span: Option<Span>,
     /// The span of the `meta.outputs` section.
@@ -95,12 +95,14 @@ pub struct NonmatchingOutputRule {
     /// The keys seen in `output`.
     output_keys: IndexMap<String, Span>,
     /// The context type.
-    ty: Option<String>,
+    ty: Option<&'a str>,
     /// The item name.
     name: Option<String>,
+    /// Prior objects
+    prior_objects: Vec<String>,
 }
 
-impl Rule for NonmatchingOutputRule {
+impl<'a> Rule for NonmatchingOutputRule<'a> {
     fn id(&self) -> &'static str {
         ID
     }
@@ -123,7 +125,7 @@ impl Rule for NonmatchingOutputRule {
 }
 
 /// Check each output key exists in the `outputs` key within the `meta` section.
-fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule) {
+fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule<'_>) {
     let mut extra_found = false;
     // Check for entries missing from `meta`.
     for (name, span) in &rule.output_keys {
@@ -131,12 +133,12 @@ fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule) {
             if !extra_found {
                 extra_found = true;
             }
-            if let Some(_) = rule.current_meta_span {
+            if rule.current_meta_span.is_some() {
                 state.add(nonmatching_output(
                     *span,
                     name,
                     rule.name.clone().unwrap(),
-                    rule.ty.clone().unwrap(),
+                    rule.ty.unwrap(),
                 ));
             }
         }
@@ -148,12 +150,12 @@ fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule) {
             if !extra_found {
                 extra_found = true;
             }
-            if let Some(_) = rule.current_output_span {
+            if rule.current_output_span.is_some() {
                 state.add(extra_output_in_meta(
                     *span,
                     name,
                     rule.name.clone().unwrap(),
-                    rule.ty.clone().unwrap(),
+                    rule.ty.unwrap(),
                 ));
             }
         }
@@ -165,12 +167,12 @@ fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule) {
             rule.current_meta_outputs_span.unwrap(),
             rule.current_output_span.unwrap(),
             rule.name.clone().unwrap(),
-            rule.ty.clone().unwrap(),
+            rule.ty.unwrap(),
         ));
     }
 }
 
-impl Visitor for NonmatchingOutputRule {
+impl<'a> Visitor for NonmatchingOutputRule<'a> {
     type State = Diagnostics;
 
     fn document(&mut self, _: &mut Self::State, reason: VisitReason, _: &Document) {
@@ -191,17 +193,17 @@ impl Visitor for NonmatchingOutputRule {
         match reason {
             VisitReason::Enter => {
                 self.name = Some(workflow.name().as_str().to_string());
-                self.ty = Some("workflow".to_string());
+                self.ty = Some("workflow");
             }
             VisitReason::Exit => {
                 if self.current_meta_span.is_some()
                     && self.current_meta_outputs_span.is_none()
-                    && self.output_keys.len() > 0
+                    && !self.output_keys.is_empty()
                 {
                     state.add(missing_outputs_in_meta(
                         self.current_meta_span.unwrap(),
                         self.name.clone().unwrap(),
-                        self.ty.clone().unwrap(),
+                        self.ty.unwrap(),
                     ));
                 } else {
                     check_matching(state, self);
@@ -226,17 +228,17 @@ impl Visitor for NonmatchingOutputRule {
         match reason {
             VisitReason::Enter => {
                 self.name = Some(task.name().as_str().to_string());
-                self.ty = Some("task".to_string());
+                self.ty = Some("task");
             }
             VisitReason::Exit => {
                 if self.current_meta_span.is_some()
                     && self.current_meta_outputs_span.is_none()
-                    && self.output_keys.len() > 0
+                    && !self.output_keys.is_empty()
                 {
                     state.add(missing_outputs_in_meta(
                         self.current_meta_span.unwrap(),
                         self.name.clone().unwrap(),
-                        self.ty.clone().unwrap(),
+                        self.ty.unwrap(),
                     ));
                 } else {
                     check_matching(state, self);
@@ -261,9 +263,7 @@ impl Visitor for NonmatchingOutputRule {
             VisitReason::Enter => {
                 self.current_meta_span = Some(section.syntax().text_range().to_span());
             }
-            VisitReason::Exit => {
-                return;
-            }
+            VisitReason::Exit => {}
         }
     }
 
@@ -303,41 +303,43 @@ impl Visitor for NonmatchingOutputRule {
         reason: VisitReason,
         item: &wdl_ast::v1::MetadataObjectItem,
     ) {
-        if reason == VisitReason::Exit {
-            return;
-        }
-        match self.current_meta_span {
-            Some(_meta_span) => {
-                if item.name().as_str() == "outputs" {
-                    self.current_meta_outputs_span = Some(item.syntax().text_range().to_span());
-                    match item.value() {
-                        MetadataValue::Object(_obj) => {}
-                        _ => {
-                            state.add(non_object_meta_outputs(
-                                item.syntax().text_range().to_span(),
-                                self.name.clone().unwrap(),
-                                self.ty.clone().unwrap(),
-                            ));
-                        }
-                    }
-                } else {
-                    match self.current_meta_outputs_span {
-                        Some(meta_outputs_span) => {
-                            let span = item.syntax().text_range().to_span();
-                            if span.start() > meta_outputs_span.start()
-                                && span.end() < meta_outputs_span.end()
-                            {
-                                self.meta_outputs_keys.insert(
-                                    item.name().as_str().to_string(),
-                                    item.syntax().text_range().to_span(),
-                                );
-                            }
-                        }
-                        None => {}
-                    }
+        match reason {
+            VisitReason::Exit => {
+                if let MetadataValue::Object(_) = item.value() {
+                    self.prior_objects.pop();
                 }
             }
-            None => {}
+            VisitReason::Enter => {
+                if let Some(_meta_span) = self.current_meta_span {
+                    if item.name().as_str() == "outputs" {
+                        self.current_meta_outputs_span = Some(item.syntax().text_range().to_span());
+                        match item.value() {
+                            MetadataValue::Object(_) => {}
+                            _ => {
+                                state.add(non_object_meta_outputs(
+                                    item.syntax().text_range().to_span(),
+                                    self.name.clone().unwrap(),
+                                    self.ty.unwrap(),
+                                ));
+                            }
+                        }
+                    } else if let Some(meta_outputs_span) = self.current_meta_outputs_span {
+                        let span = item.syntax().text_range().to_span();
+                        if span.start() > meta_outputs_span.start()
+                            && span.end() < meta_outputs_span.end()
+                            && self.prior_objects.last().unwrap() == "outputs"
+                        {
+                            self.meta_outputs_keys.insert(
+                                item.name().as_str().to_string(),
+                                item.syntax().text_range().to_span(),
+                            );
+                        }
+                    }
+                }
+                if let MetadataValue::Object(_) = item.value() {
+                    self.prior_objects.push(item.name().as_str().to_string());
+                }
+            }
         }
     }
 }

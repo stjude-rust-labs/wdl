@@ -24,11 +24,11 @@ commit_hash = "4e7fdfa7992dd1bf4c4721e77c81e4d7b8ecf4fe"
 
 [repositories."broadinstitute/warp"]
 identifier = "broadinstitute/warp"
-commit_hash = "e52f2c1aabdb88b565c132e5587d05b91c4e6c0f"
+commit_hash = "b8a753edd8e761a835164cc7b84f136c7fbe51d1"
 
 [repositories."chanzuckerberg/czid-workflows"]
 identifier = "chanzuckerberg/czid-workflows"
-commit_hash = "b7c97a87d995a31d85bb6c8ee780fdf33d5bc176"
+commit_hash = "ee513b4b7a79c5a8fe359c6bf6a6b15db33591ab"
 
 [repositories."getwilds/ww-fastq-to-cram"]
 identifier = "getwilds/ww-fastq-to-cram"
@@ -49,7 +49,7 @@ filters = ["/template/task-templates.wdl"]
 
 [repositories."theiagen/public_health_bioinformatics"]
 identifier = "theiagen/public_health_bioinformatics"
-commit_hash = "59ee38708ffdfc5dbbdd2f0df3ab02064570447a"
+commit_hash = "23552eaa4e151bc34745af3b90ff7b13154addd1"
 
 [[diagnostics]]
 document = "aws-samples/amazon-omics-tutorials:/example-workflows/gatk-best-practices/workflows/somatic-snps-and-indels/mutec2.wdl"
@@ -384,34 +384,34 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/4e7fdfa79
 [[diagnostics]]
 document = "broadinstitute/warp:/pipelines/skylab/scATAC/scATAC.wdl"
 message = "scATAC.wdl:203:9: error: duplicate key `cpu` in runtime section"
-permalink = "https://github.com/broadinstitute/warp/blob/e52f2c1aabdb88b565c132e5587d05b91c4e6c0f/pipelines/skylab/scATAC/scATAC.wdl/#L203"
+permalink = "https://github.com/broadinstitute/warp/blob/b8a753edd8e761a835164cc7b84f136c7fbe51d1/pipelines/skylab/scATAC/scATAC.wdl/#L203"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/GermlineVariantDiscovery.wdl"
 message = "GermlineVariantDiscovery.wdl:137:32: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/e52f2c1aabdb88b565c132e5587d05b91c4e6c0f/tasks/broad/GermlineVariantDiscovery.wdl/#L137"
+permalink = "https://github.com/broadinstitute/warp/blob/b8a753edd8e761a835164cc7b84f136c7fbe51d1/tasks/broad/GermlineVariantDiscovery.wdl/#L137"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/GermlineVariantDiscovery.wdl"
 message = "GermlineVariantDiscovery.wdl:65:32: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/e52f2c1aabdb88b565c132e5587d05b91c4e6c0f/tasks/broad/GermlineVariantDiscovery.wdl/#L65"
+permalink = "https://github.com/broadinstitute/warp/blob/b8a753edd8e761a835164cc7b84f136c7fbe51d1/tasks/broad/GermlineVariantDiscovery.wdl/#L65"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl"
 message = "UltimaGenomicsWholeGenomeGermlineTasks.wdl:814:27: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/e52f2c1aabdb88b565c132e5587d05b91c4e6c0f/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L814"
+permalink = "https://github.com/broadinstitute/warp/blob/b8a753edd8e761a835164cc7b84f136c7fbe51d1/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L814"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl"
 message = "UltimaGenomicsWholeGenomeGermlineTasks.wdl:866:27: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/e52f2c1aabdb88b565c132e5587d05b91c4e6c0f/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L866"
+permalink = "https://github.com/broadinstitute/warp/blob/b8a753edd8e761a835164cc7b84f136c7fbe51d1/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L866"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tests/cemba/pr/CheckCembaOutputs.wdl"
 message = "CheckCembaOutputs.wdl:1:1: error: a WDL document must start with a version statement"
-permalink = "https://github.com/broadinstitute/warp/blob/e52f2c1aabdb88b565c132e5587d05b91c4e6c0f/tests/cemba/pr/CheckCembaOutputs.wdl/#L1"
+permalink = "https://github.com/broadinstitute/warp/blob/b8a753edd8e761a835164cc7b84f136c7fbe51d1/tests/cemba/pr/CheckCembaOutputs.wdl/#L1"
 
 [[diagnostics]]
 document = "chanzuckerberg/czid-workflows:/workflows/index-generation/index-generation.wdl"
 message = "index-generation.wdl:1:9: error: unsupported WDL version `development`"
-permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/b7c97a87d995a31d85bb6c8ee780fdf33d5bc176/workflows/index-generation/index-generation.wdl/#L1"
+permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/ee513b4b7a79c5a8fe359c6bf6a6b15db33591ab/workflows/index-generation/index-generation.wdl/#L1"

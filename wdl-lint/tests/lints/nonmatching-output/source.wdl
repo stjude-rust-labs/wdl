@@ -180,3 +180,20 @@ task quuux {
     command <<< >>>
     output {}
 }
+
+# This should not trigger a warning.
+task quuuux {
+    meta {
+        outputs: {
+            # another comment
+            s: {
+                # adding a comment
+                description: "s"
+            },
+        }
+    }
+    command <<< >>>
+    output {
+        String s = "string"
+    }
+}
