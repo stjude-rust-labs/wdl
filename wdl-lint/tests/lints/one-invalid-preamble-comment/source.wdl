@@ -1,4 +1,4 @@
-#@ except: PreambleWhitespace, DescriptionMissing
+#@ except: BlanksBetweenElements, DescriptionMissing, PreambleWhitespace
 # This is a test of having one big invalid preamble comment.
 #
 

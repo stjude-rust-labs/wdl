@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, SectionOrdering, RuntimeSectionKeys
+#@ except: BlanksBetweenElements, DescriptionMissing, SectionOrdering, RuntimeSectionKeys
 
 version 1.1
 

@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing
+#@ except: BlanksBetweenElements, DescriptionMissing
 ## This is a test of the missing EOF newline lint
 ## `source.errors` should be empty
 

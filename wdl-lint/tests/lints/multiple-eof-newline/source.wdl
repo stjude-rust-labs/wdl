@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing
+#@ except: BlanksBetweenElements, DescriptionMissing
 ## This is a test of multiple EOF newlines lint
 
 version 1.1

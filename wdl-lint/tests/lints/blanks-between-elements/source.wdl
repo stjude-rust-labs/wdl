@@ -1,24 +1,35 @@
-#@ except: DescriptionMissing, InputSorting, MissingMetas, MissingOutput, MissingRuntime
+#@ except: DescriptionMissing, InputSorting, LineWidth, MissingMetas, MissingOutput, MissingRuntime, Whitespace
 
 version 1.1
 
 import "baz"
-import "qux"
+import "qux" # following whitespace duplication is caught be Whitespace rule
 
 
 workflow foo {
+
     meta {}
     parameter_meta {}
     input {}
 
-    String s = "hello"
+    String p = "pip"
+
+    
+    String q = "bar" # The following whitespace is allowable between private declarations
+
+    String r = "world"
+    String s = "hello" # following whitespace duplication is caught be Whitespace rule
+
 
     call bar { input:
         s = s
-    }
+    } # following whitespace duplication is caught be Whitespace rule
 
 
     call bar as baz { input:
+        s = s
+    }
+    call bar as qux { input: # Calls must be separated by whitespace.
         s = s
     }
 }
