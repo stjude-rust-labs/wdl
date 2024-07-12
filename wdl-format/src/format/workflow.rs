@@ -3,6 +3,7 @@ use wdl_ast::v1::CallStatement;
 use wdl_ast::v1::ConditionalStatement;
 use wdl_ast::v1::ScatterStatement;
 use wdl_ast::v1::WorkflowDefinition;
+use wdl_ast::v1::WorkflowItem;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::SyntaxElement;
@@ -741,109 +742,81 @@ pub fn format_workflow(workflow_def: WorkflowDefinition) -> String {
         false,
         false,
     ));
+    result.push_str("workflow");
+    result.push_str(&format_inline_comment(
+        &workflow_def
+            .syntax()
+            .first_child_or_token()
+            .expect("Workflow definition should have a child"),
+        false,
+    ));
+
+    result.push_str(&format_preceding_comments(
+        &SyntaxElement::Token(workflow_def.name().syntax().clone()),
+        1,
+        false,
+        false,
+    ));
+    if result.ends_with("workflow") {
+        result.push(' ');
+    } else {
+        result.push_str(INDENT);
+    }
+    result.push_str(workflow_def.name().as_str());
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Token(workflow_def.name().syntax().clone()),
+        false,
+    ));
+
+    let open_brace = workflow_def
+        .syntax()
+        .children_with_tokens()
+        .find(|c| c.kind() == SyntaxKind::OpenBrace)
+        .expect("Workflow definition should have an open brace");
+    result.push_str(&format_preceding_comments(
+        &open_brace,
+        0,
+        false,
+        false,
+    ));
+    if result.ends_with(NEWLINE) {
+        result.push_str(INDENT);
+    } else {
+        result.push(' ');
+    }
+    result.push('{');
+    result.push_str(&format_inline_comment(&open_brace, true));
 
     let mut meta_section_str = String::new();
     let mut parameter_meta_section_str = String::new();
     let mut input_section_str = String::new();
     let mut body_str = String::new();
     let mut output_section_str = String::new();
-    let mut closing_brace = String::new();
-    for child in workflow_def.syntax().children_with_tokens() {
-        match child.kind() {
-            SyntaxKind::WorkflowKeyword => {
-                // This should always be the first child processed
-                result.push_str("workflow");
-                result.push_str(&format_inline_comment(&child, false));
-                result.push_str(&format_preceding_comments(
-                    &SyntaxElement::Token(workflow_def.name().syntax().clone()),
-                    1,
-                    true,
-                    false,
-                ));
-                if result.ends_with("workflow") {
-                    result.push(' ');
-                } else if result.ends_with(NEWLINE) {
-                    result.push_str(INDENT);
-                }
-                result.push_str(workflow_def.name().as_str());
-                result.push_str(&format_inline_comment(
-                    &SyntaxElement::Token(workflow_def.name().syntax().clone()),
-                    false,
-                ));
+    for item in workflow_def.items() {
+        match item {
+            WorkflowItem::Metadata(m) => {
+                meta_section_str.push_str(&format_meta_section(m));
             }
-            SyntaxKind::Ident => {
-                // This is the name of the workflow
-                // It's handled by the WorkflowKeyword match arm
+            WorkflowItem::ParameterMetadata(pm) => {
+                parameter_meta_section_str.push_str(&format_parameter_meta_section(pm));
             }
-            SyntaxKind::OpenBrace => {
-                result.push_str(&format_preceding_comments(&child, 0, false, false));
-                if !result.ends_with(NEWLINE) {
-                    result.push(' ');
-                }
-                result.push('{');
-                result.push_str(&format_inline_comment(&child, true));
+            WorkflowItem::Input(i) => {
+                input_section_str.push_str(&format_input_section(i));
             }
-            SyntaxKind::CloseBrace => {
-                result.push_str(&format_preceding_comments(&child, 0, false, false));
-                if !result.ends_with(NEWLINE) {
-                    result.push_str(NEWLINE);
-                }
-                closing_brace.push('}');
-
-                // Should always be last child processed
-                // As such any comments on the same line as this token
-                // will not be siblings of the 'child' element,
-                // so we will go up a level and check the siblings of the
-                // 'WorkflowDefinitionNode'.
-                closing_brace.push_str(&format_inline_comment(
-                    &SyntaxElement::Node(workflow_def.syntax().clone()),
-                    true,
-                ));
-                closing_brace.push_str(NEWLINE); // should always be two newlines
+            WorkflowItem::Output(o) => {
+                output_section_str.push_str(&format_output_section(o));
             }
-            SyntaxKind::MetadataSectionNode => {
-                meta_section_str.push_str(&format_meta_section(workflow_def.metadata().next()));
+            WorkflowItem::Call(c) => {
+                body_str.push_str(&format_call_statement(c, 1));
             }
-            SyntaxKind::ParameterMetadataSectionNode => {
-                parameter_meta_section_str.push_str(&format_parameter_meta_section(
-                    workflow_def.parameter_metadata().next(),
-                ));
+            WorkflowItem::Conditional(c) => {
+                body_str.push_str(&format_conditional(c, 1));
             }
-            SyntaxKind::InputSectionNode => {
-                input_section_str.push_str(&format_input_section(workflow_def.inputs().next()));
+            WorkflowItem::Scatter(s) => {
+                body_str.push_str(&format_scatter(s, 1));
             }
-            SyntaxKind::OutputSectionNode => {
-                output_section_str.push_str(&format_output_section(workflow_def.outputs().next()));
-            }
-            SyntaxKind::CallStatementNode => {
-                body_str.push_str(&format_call_statement(
-                    CallStatement::cast(child.as_node().unwrap().clone()).unwrap(),
-                    1,
-                ));
-            }
-            SyntaxKind::ConditionalStatementNode => {
-                body_str.push_str(&format_conditional(
-                    ConditionalStatement::cast(child.as_node().unwrap().clone()).unwrap(),
-                    1,
-                ));
-            }
-            SyntaxKind::ScatterStatementNode => {
-                body_str.push_str(&format_scatter(
-                    ScatterStatement::cast(child.as_node().unwrap().clone()).unwrap(),
-                    1,
-                ));
-            }
-            SyntaxKind::BoundDeclNode | SyntaxKind::UnboundDeclNode => {
-                // TODO
-            }
-            SyntaxKind::Whitespace => {
-                // How to respect blank lines?
-            }
-            SyntaxKind::Comment => {
-                // This comment should be handled by another match arm
-            }
-            _ => {
-                unreachable!("Unexpected syntax kind: {:?}", child.kind());
+            WorkflowItem::Declaration(d) => {
+                body_str.push_str(&format_declaration(&Decl::Bound(d), 1, false));
             }
         }
     }
@@ -868,7 +841,24 @@ pub fn format_workflow(workflow_def: WorkflowDefinition) -> String {
         result.push_str(&output_section_str);
         result.push_str(NEWLINE);
     }
-    result.push_str(&closing_brace);
+
+    let close_brace = workflow_def
+        .syntax()
+        .children_with_tokens()
+        .find(|c| c.kind() == SyntaxKind::CloseBrace)
+        .expect("Workflow definition should have a close brace");
+    result.push_str(&format_preceding_comments(
+        &close_brace,
+        0,
+        false,
+        false,
+    ));
+    if !result.ends_with(NEWLINE) {
+        result.push_str(NEWLINE);
+    }
+    result.push('}');
+    result.push_str(&format_inline_comment(&close_brace, true));
+    result.push_str(NEWLINE);
 
     result
 }

@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 use anyhow::bail;
 use anyhow::Result;
+use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::InputSection;
 use wdl_ast::v1::MetadataSection;
@@ -141,19 +142,8 @@ fn format_metadata_children(item: &SyntaxElement) -> String {
 }
 
 /// Format a meta section.
-fn format_meta_section(meta: Option<MetadataSection>) -> String {
+fn format_meta_section(meta: MetadataSection) -> String {
     let mut result = String::new();
-
-    if meta.is_none() {
-        // result.push_str(INDENT);
-        // result.push_str("meta {");
-        // result.push_str(NEWLINE);
-        // result.push_str(INDENT);
-        // result.push('}');
-        // result.push_str(NEWLINE);
-        return result;
-    }
-    let meta = meta.unwrap();
 
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(meta.syntax().clone()),
@@ -195,19 +185,8 @@ fn format_meta_section(meta: Option<MetadataSection>) -> String {
 }
 
 /// Format a parameter meta section.
-fn format_parameter_meta_section(parameter_meta: Option<ParameterMetadataSection>) -> String {
+fn format_parameter_meta_section(parameter_meta: ParameterMetadataSection) -> String {
     let mut result = String::new();
-
-    if parameter_meta.is_none() {
-        // result.push_str(INDENT);
-        // result.push_str("parameter_meta {");
-        // result.push_str(NEWLINE);
-        // result.push_str(INDENT);
-        // result.push('}');
-        // result.push_str(NEWLINE);
-        return result;
-    }
-    let parameter_meta = parameter_meta.unwrap();
 
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(parameter_meta.syntax().clone()),
@@ -249,21 +228,8 @@ fn format_parameter_meta_section(parameter_meta: Option<ParameterMetadataSection
 }
 
 /// Format an input section.
-fn format_input_section(input: Option<InputSection>) -> String {
+fn format_input_section(input: InputSection) -> String {
     let mut result = String::new();
-
-    if input.is_none() {
-        // result.push_str(INDENT);
-        // result.push_str("input {");
-        // result.push_str(NEWLINE);
-        // result.push_str(INDENT);
-        // result.push('}');
-        // result.push_str(NEWLINE);
-        return result;
-    }
-    let input = input.unwrap();
-    let one_indent = INDENT;
-    let two_indents = INDENT.repeat(2);
 
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(input.syntax().clone()),
@@ -272,7 +238,7 @@ fn format_input_section(input: Option<InputSection>) -> String {
         false,
     ));
 
-    result.push_str(one_indent);
+    result.push_str(INDENT);
     result.push_str("input");
     let input_keyword = input
         .syntax()
@@ -289,26 +255,18 @@ fn format_input_section(input: Option<InputSection>) -> String {
         .expect("input section should have an open brace");
     result.push_str(&format_preceding_comments(&open_brace, 1, false, false));
     if result.ends_with(NEWLINE) {
-        result.push_str(one_indent);
+        result.push_str(INDENT);
     } else {
         result.push(' ');
     }
     result.push('{');
     result.push_str(&format_inline_comment(&open_brace, true));
 
-    for item in input.declarations() {
-        result.push_str(&format_preceding_comments(
-            &SyntaxElement::Node(item.syntax().clone()),
-            2,
-            false,
-            false,
-        ));
-        result.push_str(&two_indents);
-        result.push_str(&item.syntax().to_string()); // TODO: Format the declaration
-        result.push_str(&format_inline_comment(
-            &SyntaxElement::Node(item.syntax().clone()),
-            true,
-        ));
+    for decl in input.declarations() {
+        result.push_str(&format_declaration(&decl, 2, false));
+        if !result.ends_with(NEWLINE) {
+            result.push_str(NEWLINE);
+        }
     }
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Token(
@@ -321,7 +279,7 @@ fn format_input_section(input: Option<InputSection>) -> String {
         false,
         false,
     ));
-    result.push_str(one_indent);
+    result.push_str(INDENT);
     result.push('}');
     result.push_str(&format_inline_comment(
         &SyntaxElement::Node(input.syntax().clone()),
@@ -332,14 +290,8 @@ fn format_input_section(input: Option<InputSection>) -> String {
 }
 
 /// Format an output section.
-fn format_output_section(output: Option<OutputSection>) -> String {
+fn format_output_section(output: OutputSection) -> String {
     let mut result = String::new();
-    if output.is_none() {
-        return result;
-    }
-    let output = output.unwrap();
-    let one_indent = INDENT;
-    let two_indents = INDENT.repeat(2);
 
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(output.syntax().clone()),
@@ -348,7 +300,7 @@ fn format_output_section(output: Option<OutputSection>) -> String {
         false,
     ));
 
-    result.push_str(one_indent);
+    result.push_str(INDENT);
     result.push_str("output");
     let output_keyword = output
         .syntax()
@@ -365,26 +317,18 @@ fn format_output_section(output: Option<OutputSection>) -> String {
         .expect("output section should have an open brace");
     result.push_str(&format_preceding_comments(&open_brace, 1, false, false));
     if result.ends_with(NEWLINE) {
-        result.push_str(one_indent);
+        result.push_str(INDENT);
     } else {
         result.push(' ');
     }
     result.push('{');
     result.push_str(&format_inline_comment(&open_brace, true));
 
-    for item in output.declarations() {
-        result.push_str(&format_preceding_comments(
-            &SyntaxElement::Node(item.syntax().clone()),
-            2,
-            false,
-            false,
-        ));
-        result.push_str(&two_indents);
-        result.push_str(&item.syntax().to_string()); // TODO: Format the declaration
-        result.push_str(&format_inline_comment(
-            &SyntaxElement::Node(item.syntax().clone()),
-            true,
-        ));
+    for decl in output.declarations() {
+        result.push_str(&format_declaration(&Decl::Bound(decl), 2, false));
+        if !result.ends_with(NEWLINE) {
+            result.push_str(NEWLINE);
+        }
     }
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Token(
@@ -397,11 +341,91 @@ fn format_output_section(output: Option<OutputSection>) -> String {
         false,
         false,
     ));
-    result.push_str(one_indent);
+    result.push_str(INDENT);
     result.push('}');
     result.push_str(&format_inline_comment(
         &SyntaxElement::Node(output.syntax().clone()),
         true,
+    ));
+
+    result
+}
+
+/// Format a declaration.
+fn format_declaration(declaration: &Decl, num_indents: usize, inline: bool) -> String {
+    let mut result = String::new();
+    let next_indent_level = num_indents + 1;
+    let cur_indents = INDENT.repeat(num_indents);
+    let next_indents = INDENT.repeat(next_indent_level);
+
+    result.push_str(&format_preceding_comments(
+        &SyntaxElement::Node(declaration.syntax().clone()),
+        num_indents,
+        !inline,
+        false,
+    ));
+    if result.ends_with(NEWLINE) {
+        result.push_str(&cur_indents);
+    } else if inline {
+        result.push(' ');
+    }
+    result.push_str(&cur_indents);
+
+    result.push_str(&declaration.ty().to_string());
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Node(declaration.ty().syntax().clone()),
+        false,
+    ));
+
+    result.push_str(&format_preceding_comments(
+        &SyntaxElement::Token(declaration.name().syntax().clone()),
+        next_indent_level,
+        false,
+        false,
+    ));
+    if result.ends_with(NEWLINE) {
+        result.push_str(&next_indents);
+    } else {
+        result.push(' ');
+    }
+    result.push_str(&declaration.name().as_str());
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Token(declaration.name().syntax().clone()),
+        false,
+    ));
+
+    if let Some(expr) = declaration.expr() {
+        let equal_sign = declaration
+            .syntax()
+            .children_with_tokens()
+            .find(|c| c.kind() == SyntaxKind::Equal)
+            .expect("Bound declaration should have an equal sign");
+
+        result.push_str(&format_preceding_comments(
+            &equal_sign,
+            next_indent_level,
+            false,
+            false,
+        ));
+        if result.ends_with(NEWLINE) {
+            result.push_str(&next_indents);
+        } else {
+            result.push(' ');
+        }
+        result.push_str("=");
+        result.push_str(&format_inline_comment(&equal_sign, false));
+
+        result.push_str(&format_preceding_comments(
+            &SyntaxElement::Node(expr.syntax().clone()),
+            next_indent_level,
+            false,
+            false,
+        ));
+        result.push_str(&expr.syntax().to_string());
+    }
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Node(declaration.syntax().clone()),
+        false,
     ));
 
     result
@@ -717,7 +741,7 @@ mod tests {
     }
 
     #[test]
-    fn test_format_with_comment_inline_comments() {
+    fn test_format_with_inline_comments() {
         let code = "
         # preamble one
         # preamble two
