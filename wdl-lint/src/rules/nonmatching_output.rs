@@ -24,7 +24,7 @@ use crate::TagSet;
 const ID: &str = "NonmatchingOutput";
 
 /// Creates a "non-matching output" diagnostic.
-fn nonmatching_output(span: Span, name: &str, item_name: String, ty: &str) -> Diagnostic {
+fn nonmatching_output(span: Span, name: &str, item_name: &str, ty: &str) -> Diagnostic {
     Diagnostic::warning(format!(
         "output `{name}` is missing from `meta.outputs` section in {ty} `{item_name}`"
     ))
@@ -36,7 +36,7 @@ fn nonmatching_output(span: Span, name: &str, item_name: String, ty: &str) -> Di
 }
 
 /// Creates a missing outputs in meta diagnostic.
-fn missing_outputs_in_meta(span: Span, item_name: String, ty: &str) -> Diagnostic {
+fn missing_outputs_in_meta(span: Span, item_name: &str, ty: &str) -> Diagnostic {
     Diagnostic::warning(format!(
         "`outputs` key missing in `meta` section for the {ty} `{item_name}`"
     ))
@@ -46,7 +46,7 @@ fn missing_outputs_in_meta(span: Span, item_name: String, ty: &str) -> Diagnosti
 }
 
 /// Creates a diagnostic for extra `meta.outputs` entries.
-fn extra_output_in_meta(span: Span, name: &str, item_name: String, ty: &str) -> Diagnostic {
+fn extra_output_in_meta(span: Span, name: &str, item_name: &str, ty: &str) -> Diagnostic {
     Diagnostic::warning(format!(
         "`{name}` appears in `outputs` section of the {ty} `{item_name}` but is not a declared \
          `output`"
@@ -59,7 +59,7 @@ fn extra_output_in_meta(span: Span, name: &str, item_name: String, ty: &str) -> 
 }
 
 /// Creates a diagnostic for out-of-order entries.
-fn out_of_order(span: Span, output_span: Span, item_name: String, ty: &str) -> Diagnostic {
+fn out_of_order(span: Span, output_span: Span, item_name: &str, ty: &str) -> Diagnostic {
     Diagnostic::warning(format!(
         "`outputs` section of `meta` for the {ty} `{item_name}` is out of order"
     ))
@@ -72,7 +72,7 @@ fn out_of_order(span: Span, output_span: Span, item_name: String, ty: &str) -> D
 }
 
 /// Creates a diagnostic for non-object `meta.outputs` entries.
-fn non_object_meta_outputs(span: Span, item_name: String, ty: &str) -> Diagnostic {
+fn non_object_meta_outputs(span: Span, item_name: &str, ty: &str) -> Diagnostic {
     Diagnostic::warning(format!(
         "`outputs` key in `meta` section for the {ty} `{item_name}` is not an object"
     ))
@@ -137,8 +137,8 @@ fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule<'_>)
                 state.add(nonmatching_output(
                     *span,
                     name,
-                    rule.name.clone().unwrap(),
-                    rule.ty.unwrap(),
+                    rule.name.as_deref().expect("should have a name"),
+                    rule.ty.expect("should have a type"),
                 ));
             }
         }
@@ -154,8 +154,8 @@ fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule<'_>)
                 state.add(extra_output_in_meta(
                     *span,
                     name,
-                    rule.name.clone().unwrap(),
-                    rule.ty.unwrap(),
+                    rule.name.as_deref().expect("should have a name"),
+                    rule.ty.expect("should have a type"),
                 ));
             }
         }
@@ -164,10 +164,10 @@ fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule<'_>)
     // Check for out-of-order entries.
     if exact_match && !rule.meta_outputs_keys.keys().eq(rule.output_keys.keys()) {
         state.add(out_of_order(
-            rule.current_meta_outputs_span.unwrap(),
-            rule.current_output_span.unwrap(),
-            rule.name.clone().unwrap(),
-            rule.ty.unwrap(),
+            rule.current_meta_outputs_span.expect("should have a `meta.outputs` span"),
+            rule.current_output_span.expect("should have an `output` span"),
+            rule.name.as_deref().expect("should have a name"),
+            rule.ty.expect("should have a type"),
         ));
     }
 }
@@ -201,9 +201,9 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
                     && !self.output_keys.is_empty()
                 {
                     state.add(missing_outputs_in_meta(
-                        self.current_meta_span.unwrap(),
-                        self.name.clone().unwrap(),
-                        self.ty.unwrap(),
+                        self.current_meta_span.expect("should have a `meta` span"),
+                        self.name.as_deref().expect("should have a name"),
+                        self.ty.expect("should have a type"),
                     ));
                 } else {
                     check_matching(state, self);
@@ -236,9 +236,9 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
                     && !self.output_keys.is_empty()
                 {
                     state.add(missing_outputs_in_meta(
-                        self.current_meta_span.unwrap(),
-                        self.name.clone().unwrap(),
-                        self.ty.unwrap(),
+                        self.current_meta_span.expect("should have a `meta` span"),
+                        self.name.as_deref().expect("should have a name"),
+                        self.ty.expect("should have a type"),
                     ));
                 } else {
                     check_matching(state, self);
@@ -318,8 +318,8 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
                             _ => {
                                 state.add(non_object_meta_outputs(
                                     item.syntax().text_range().to_span(),
-                                    self.name.clone().unwrap(),
-                                    self.ty.unwrap(),
+                                    self.name.as_deref().expect("should have a name"),
+                                    self.ty.expect("should have a type"),
                                 ));
                             }
                         }
@@ -327,7 +327,7 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
                         let span = item.syntax().text_range().to_span();
                         if span.start() > meta_outputs_span.start()
                             && span.end() < meta_outputs_span.end()
-                            && self.prior_objects.last().unwrap() == "outputs"
+                            && self.prior_objects.last().expect("should have seen `meta.outputs`") == "outputs"
                         {
                             self.meta_outputs_keys.insert(
                                 item.name().as_str().to_string(),
