@@ -18,6 +18,7 @@ use colored::Colorize;
 use wdl::ast::Diagnostic;
 use wdl::ast::Document;
 use wdl::ast::Validator;
+use wdl::format::format::format_document;
 use wdl::lint::LintVisitor;
 
 /// Emits the given diagnostics to the output stream.
@@ -161,6 +162,39 @@ impl LintCommand {
     }
 }
 
+/// Formats a WDL source file.
+#[derive(Args)]
+#[clap(disable_version_flag = true)]
+pub struct FormatCommand {
+    /// The path to the source WDL file.
+    #[clap(value_name = "PATH")]
+    pub path: PathBuf,
+}
+
+impl FormatCommand {
+    fn exec(self) -> Result<()> {
+        let source = read_source(&self.path)?;
+        let formatted = format_document(&source);
+        match formatted {
+            Ok(formatted) => {
+                if source != formatted {
+                    println!("{}", formatted);
+                }
+                Ok(())
+            }
+            Err(diagnostics) => {
+                emit_diagnostics(&self.path, &source, &diagnostics)?;
+
+                bail!(
+                    "aborting due to previous {count} diagnostic{s}",
+                    count = diagnostics.len(),
+                    s = if diagnostics.len() == 1 { "" } else { "s" }
+                );
+            }
+        }
+    }
+}
+
 /// A tool for parsing, validating, and linting WDL source code.
 #[derive(Parser)]
 #[clap(
@@ -173,6 +207,7 @@ enum App {
     Parse(ParseCommand),
     Check(CheckCommand),
     Lint(LintCommand),
+    Format(FormatCommand),
 }
 
 fn main() -> Result<()> {
@@ -180,6 +215,7 @@ fn main() -> Result<()> {
         App::Parse(cmd) => cmd.exec(),
         App::Check(cmd) => cmd.exec(),
         App::Lint(cmd) => cmd.exec(),
+        App::Format(cmd) => cmd.exec(),
     } {
         eprintln!(
             "{error}: {e:?}",

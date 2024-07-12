@@ -1,18 +1,21 @@
 //! A module for formatting WDL code.
 
+use std::sync::Arc;
+
 use anyhow::bail;
 use anyhow::Result;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::InputSection;
 use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
+use wdl_ast::Diagnostic;
 use wdl_ast::Direction;
 use wdl_ast::Document;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::SyntaxTree;
 use wdl_ast::Validator;
 use wdl_ast::VersionStatement;
 
@@ -99,15 +102,12 @@ fn format_version_statement(version_statement: VersionStatement) -> String {
 /// Format the inner portion of a meta/parameter_meta section.
 fn format_metadata_children(item: &SyntaxElement) -> String {
     let mut result = String::new();
-    let cur_indent_level = INDENT;
-    let next_indent_level = format!("{}{}", INDENT, INDENT);
+    let one_indent = INDENT;
+    let two_indents = INDENT.repeat(2);
 
     match item.kind() {
         SyntaxKind::OpenBrace => {
-            result.push_str(&format_preceding_comments(&item, 1, false, true));
-            if !result.ends_with(INDENT) {
-                result.push(' ');
-            }
+            // Preceding comments handled by outer function
             result.push('{');
             result.push_str(&format_inline_comment(&item, true));
         }
@@ -121,16 +121,17 @@ fn format_metadata_children(item: &SyntaxElement) -> String {
         }
         SyntaxKind::MetadataObjectItemNode => {
             result.push_str(&format_preceding_comments(&item, 2, false, false));
-            result.push_str(&next_indent_level);
+            result.push_str(&two_indents);
             result.push_str(&item.to_string());
             result.push_str(&format_inline_comment(&item, true));
         }
         SyntaxKind::CloseBrace => {
             // Should always be last child processed
             result.push_str(&format_preceding_comments(&item, 1, false, true));
-            result.push_str(cur_indent_level);
+            result.push_str(one_indent);
             result.push('}');
-            result.push_str(&format_inline_comment(&item, true));
+            // Potential inline comment has to be handled by outer function
+            // because it must be called using the parent node.
         }
         _ => {
             unreachable!("Unexpected syntax kind: {:?}", item.kind());
@@ -153,7 +154,6 @@ fn format_meta_section(meta: Option<MetadataSection>) -> String {
         return result;
     }
     let meta = meta.unwrap();
-    let cur_indent_level = INDENT;
 
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(meta.syntax().clone()),
@@ -162,7 +162,7 @@ fn format_meta_section(meta: Option<MetadataSection>) -> String {
         false,
     ));
 
-    result.push_str(cur_indent_level);
+    result.push_str(INDENT);
     result.push_str("meta");
     let meta_keyword = meta.syntax().first_token().unwrap();
     result.push_str(&format_inline_comment(
@@ -172,9 +172,24 @@ fn format_meta_section(meta: Option<MetadataSection>) -> String {
 
     let mut next = meta_keyword.next_sibling_or_token();
     while let Some(cur) = next {
+        // Whitespace preceding the OpenBrace child requires special handling
+        // because it relies on context not available to the 'format_metadata_children'
+        // function.
+        if cur.kind() == SyntaxKind::OpenBrace {
+            result.push_str(&format_preceding_comments(&cur, 1, false, false));
+            if result.ends_with(NEWLINE) {
+                result.push_str(INDENT);
+            } else {
+                result.push(' ');
+            }
+        }
         result.push_str(&format_metadata_children(&cur));
         next = cur.next_sibling_or_token();
     }
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Node(meta.syntax().clone()),
+        true,
+    ));
 
     result
 }
@@ -193,7 +208,6 @@ fn format_parameter_meta_section(parameter_meta: Option<ParameterMetadataSection
         return result;
     }
     let parameter_meta = parameter_meta.unwrap();
-    let cur_indent_level = INDENT;
 
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(parameter_meta.syntax().clone()),
@@ -202,16 +216,34 @@ fn format_parameter_meta_section(parameter_meta: Option<ParameterMetadataSection
         false,
     ));
 
-    result.push_str(cur_indent_level);
+    result.push_str(INDENT);
     result.push_str("parameter_meta");
     let parameter_meta_keyword = parameter_meta.syntax().first_token().unwrap();
-    result.push_str(&format_inline_comment(&SyntaxElement::Token(parameter_meta_keyword.clone()), false));
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Token(parameter_meta_keyword.clone()),
+        false,
+    ));
 
     let mut next = parameter_meta_keyword.next_sibling_or_token();
     while let Some(cur) = next {
+        // Whitespace preceding the OpenBrace child requires special handling
+        // because it relies on context not available to the 'format_metadata_children'
+        // function.
+        if cur.kind() == SyntaxKind::OpenBrace {
+            result.push_str(&format_preceding_comments(&cur, 1, false, false));
+            if result.ends_with(NEWLINE) {
+                result.push_str(INDENT);
+            } else {
+                result.push(' ');
+            }
+        }
         result.push_str(&format_metadata_children(&cur));
         next = cur.next_sibling_or_token();
     }
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Node(parameter_meta.syntax().clone()),
+        true,
+    ));
 
     result
 }
@@ -230,8 +262,8 @@ fn format_input_section(input: Option<InputSection>) -> String {
         return result;
     }
     let input = input.unwrap();
-    let cur_indent_level = INDENT;
-    let next_indent_level = format!("{}{}", INDENT, INDENT);
+    let one_indent = INDENT;
+    let two_indents = INDENT.repeat(2);
 
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(input.syntax().clone()),
@@ -240,14 +272,14 @@ fn format_input_section(input: Option<InputSection>) -> String {
         false,
     ));
 
-    result.push_str(cur_indent_level);
+    result.push_str(one_indent);
     result.push_str("input");
-    let input_token = input
+    let input_keyword = input
         .syntax()
         .first_token()
         .expect("input section should have a token");
     result.push_str(&format_inline_comment(
-        &SyntaxElement::Token(input_token.clone()),
+        &SyntaxElement::Token(input_keyword.clone()),
         false,
     ));
     let open_brace = input
@@ -255,8 +287,10 @@ fn format_input_section(input: Option<InputSection>) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenBrace)
         .expect("input section should have an open brace");
-    result.push_str(&format_preceding_comments(&open_brace, 1, false, true));
-    if !result.ends_with(INDENT) {
+    result.push_str(&format_preceding_comments(&open_brace, 1, false, false));
+    if result.ends_with(NEWLINE) {
+        result.push_str(one_indent);
+    } else {
         result.push(' ');
     }
     result.push('{');
@@ -269,7 +303,7 @@ fn format_input_section(input: Option<InputSection>) -> String {
             false,
             false,
         ));
-        result.push_str(&next_indent_level);
+        result.push_str(&two_indents);
         result.push_str(&item.syntax().to_string()); // TODO: Format the declaration
         result.push_str(&format_inline_comment(
             &SyntaxElement::Node(item.syntax().clone()),
@@ -287,7 +321,7 @@ fn format_input_section(input: Option<InputSection>) -> String {
         false,
         false,
     ));
-    result.push_str(cur_indent_level);
+    result.push_str(one_indent);
     result.push('}');
     result.push_str(&format_inline_comment(
         &SyntaxElement::Node(input.syntax().clone()),
@@ -297,14 +331,87 @@ fn format_input_section(input: Option<InputSection>) -> String {
     result
 }
 
+/// Format an output section.
+fn format_output_section(output: Option<OutputSection>) -> String {
+    let mut result = String::new();
+    if output.is_none() {
+        return result;
+    }
+    let output = output.unwrap();
+    let one_indent = INDENT;
+    let two_indents = INDENT.repeat(2);
+
+    result.push_str(&format_preceding_comments(
+        &SyntaxElement::Node(output.syntax().clone()),
+        1,
+        false,
+        false,
+    ));
+
+    result.push_str(one_indent);
+    result.push_str("output");
+    let output_keyword = output
+        .syntax()
+        .first_token()
+        .expect("output section should have a token");
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Token(output_keyword.clone()),
+        false,
+    ));
+    let open_brace = output
+        .syntax()
+        .children_with_tokens()
+        .find(|c| c.kind() == SyntaxKind::OpenBrace)
+        .expect("output section should have an open brace");
+    result.push_str(&format_preceding_comments(&open_brace, 1, false, false));
+    if result.ends_with(NEWLINE) {
+        result.push_str(one_indent);
+    } else {
+        result.push(' ');
+    }
+    result.push('{');
+    result.push_str(&format_inline_comment(&open_brace, true));
+
+    for item in output.declarations() {
+        result.push_str(&format_preceding_comments(
+            &SyntaxElement::Node(item.syntax().clone()),
+            2,
+            false,
+            false,
+        ));
+        result.push_str(&two_indents);
+        result.push_str(&item.syntax().to_string()); // TODO: Format the declaration
+        result.push_str(&format_inline_comment(
+            &SyntaxElement::Node(item.syntax().clone()),
+            true,
+        ));
+    }
+    result.push_str(&format_preceding_comments(
+        &SyntaxElement::Token(
+            output
+                .syntax()
+                .last_token()
+                .expect("output section should have a token"),
+        ),
+        0,
+        false,
+        false,
+    ));
+    result.push_str(one_indent);
+    result.push('}');
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Node(output.syntax().clone()),
+        true,
+    ));
+
+    result
+}
+
 /// Format a WDL document.
-pub fn format_document(code: &str) -> Result<String> {
+pub fn format_document(code: &str) -> Result<String, Arc<[Diagnostic]>> {
     let parse = Document::parse(code).into_result();
     if let Err(diagnostics) = parse {
-        for diagnostic in diagnostics.into_iter() {
-            eprintln!("{}", diagnostic.message());
-        }
-        bail!("The document is not valid, so it cannot be formatted.")
+        return Err(diagnostics);
     }
     let document = parse.unwrap();
     let validator = Validator::default();
@@ -312,12 +419,7 @@ pub fn format_document(code: &str) -> Result<String> {
         Ok(_) => {
             // The document is valid, so we can format it.
         }
-        Err(diagnostics) => {
-            for diagnostic in diagnostics.into_iter() {
-                eprintln!("{}", diagnostic.message());
-            }
-            bail!("The document is not valid, so it cannot be formatted.")
-        }
+        Err(diagnostics) => return Err(diagnostics),
     }
 
     let mut result = String::new();
@@ -383,10 +485,15 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\n# fileA 1\nimport\n    # fileA 2.1\n    # fileA 2.2\n    \"fileA.wdl\"\n    # fileA 3\n    as\n        # fileA 4\n        bar\n    # fileA 5\n    alias\n        # fileA 6\n        qux\n        # fileA 7\n        as\n        # fileA 8\n        Qux\n# this comment belongs to fileB\nimport \"fileB.wdl\"\n    as foo\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n\n"
+            "version 1.1\n\n# fileA 1\nimport\n    # fileA 2.1\n    # fileA 2.2\n    \
+             \"fileA.wdl\"\n    # fileA 3\n    as\n        # fileA 4\n        bar\n    # fileA \
+             5\n    alias\n        # fileA 6\n        qux\n        # fileA 7\n        as\n        \
+             # fileA 8\n        Qux\n# this comment belongs to fileB\nimport \"fileB.wdl\"\n    \
+             as foo\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test \
+             {\n}\n\n"
         );
     }
-    
+
     #[test]
     fn test_format_with_imports_and_inline_comments() {
         let code = "
@@ -489,7 +596,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-             "version 1.1\n\nworkflow test {  # workflow comment\n    # meta comment\n    meta  # also meta comment\n    # open brace\n    {  # open brace\n        # author comment\n        author: \"me\"  # author comment\n        # email comment\n        email: \"me@stjude.org\"  # email comment\n    }\n\n}\n\n"
+             "version 1.1\n\nworkflow test {  # workflow comment\n    # meta comment\n    meta  # also meta comment\n    # open brace\n    {  # open brace\n        # author comment\n        author: \"me\"  # author comment\n        # email comment\n        email: \"me@stjude.org\"  # email comment\n    }  # trailing comment\n\n}\n\n"
         );
     }
 
@@ -508,7 +615,8 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {\n    meta {\n        author: \"me\"\n        email: \"me@stjude.org\"\n    }\n\n}\n\n"
+            "version 1.1\n\nworkflow test {\n    meta {\n        author: \"me\"\n        email: \
+             \"me@stjude.org\"\n    }\n\n}\n\n"
         );
     }
     #[test]
@@ -564,19 +672,20 @@ mod tests {
         workflow test {
         # foo comment
         call foo
-
         # bar comment
         call bar as baz
         call qux # mid-qux inline comment
         # mid-qux full-line comment
         after baz # after qux
         call lorem after ipsum { input: # after input token
+        bazam,
+        bam = select_bam
         }
         }";
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {\n    # foo comment\n    call foo\n    # bar comment\n    call bar as baz\n    call qux  # mid-qux inline comment\n        after baz  # mid-qux full-line comment\n    call lorem after ipsum { input:  # after input token\n    }\n\n}\n\n"
+            "version 1.1\n\nworkflow test {\n    # foo comment\n    call foo\n    # bar comment\n    call bar as baz\n    call qux  # mid-qux inline comment\n        # mid-qux full-line comment\n        after baz  # after qux\n    call lorem after ipsum { input:  # after input token\n        bazam,\n        bam = select_bam\n    }\n\n}\n\n"
         );
     }
 
@@ -592,11 +701,10 @@ mod tests {
         if (false) {
         call bar
         }
-        if (a >
-        b) {
-        scatter (x in [
-        1, 2, 3
-        ]) {
+        if (
+        a > b # expr comment
+        ) {
+        scatter (x in [1, 2, 3]) {
         call baz
     }}
     }}
@@ -604,68 +712,65 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {\n    if (true) {\n        call foo\n        scatter (abc in bar) {\n            if (false) {\n                call bar\n            }\n            if (a >\n        b\n            ) {\n                scatter (x in [\n        1, 2, 3\n        ]\n                ) {\n                    call baz\n                }\n            }\n        }\n    }\n\n}\n\n"
+            "version 1.1\n\nworkflow test {\n    if (true) {\n        call foo\n        scatter (abc in bar) {\n            if (false) {\n                call bar\n            }\n            if (a > b  # expr comment\n            ) {\n                scatter (x in [1, 2, 3]) {\n                    call baz\n                }\n            }\n        }\n    }\n\n}\n\n"
         );
     }
 
     #[test]
-    fn test_format_with_comment_between_every_token() {
+    fn test_format_with_comment_inline_comments() {
         let code = "
         # preamble one
         # preamble two
         version # 1
         1.1 # 2
-        # 3
-        workflow # 4
-        test # 5
-        { # 6
-        meta # 7
-        { # 8
-        description # 9
-        : # 10
-        \"what a nightmare\" # 11
-        } # 12
-        parameter_meta # 13
-        { # 14
-        foo # 15
-        : # 16
-        \"bar\" # 17
-        } # 18
-        input # 19
-        { # 20
-        String # 21
-        foo # 22
-        } # 23
-        if # 24
-        ( # 25
-        true # 26
-        ) # 27
-        { # 28
-         scatter # 29
-         ( # 30
-            x # 31
-            in # 32
-            [1,2,3] # 33
-            ) # 34
-            { # 35
-            call # 36
-            task # 37
-            as # 38
-            task_alias # 39
-            after # 40
-            cows_come_home # 41
-            } # 42
-    } # 43
+        workflow # 3
+        test # 4
+        { # 5
+        meta # 6
+        { # 7
+        # 8
+        # 9
+        description # 10
+        : # 11
+        \"what a nightmare\" # 12
+        } # 13
+        parameter_meta # 14
+        { # 15
+        foo # 16
+        : # 17
+        \"bar\" # 18
+        } # 19
+        input # 20
+        { # 21
+        String # 22
+        foo # 23
+        } # 24
+        if # 25
+        ( # 26
+        true # 27
+        ) # 28
+        { # 29
+         scatter # 30
+         ( # 31
+            x # 32
+            in # 33
+            [1,2,3] # 34
+            ) # 35
+            { # 36
+            call # 37
+            task # 38
+            as # 39
+            task_alias # 40
+            after # 41
+            cows_come_home # 42
+            } # 43
     } # 44
+    } # 45
         ";
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "# preamble one\n# preamble two\n\nversion 1.1  # 2\n# 1\n\n# 3\nworkflow  # 4\n    \
-             test  # 5\n{  # 6\n    meta  # 7\n    {  # 8\n        description # 9\n        : # \
-             10\n        \"what a nightmare\"  # 11\n    }\n\n    parameter_meta  # 13\n    {  # \
-             14\n        foo # 15\n        : # 16\n        \"bar\"  # 17\n    }\n\n    input {  # \
-             19\n        String # 21\n        foo  # 22\n    }  # 23\n\n}\n\n"
+            "# preamble one\n# preamble two\n\nversion  # 1\n    1.1  # 2\n\nworkflow  # 3\n    test  # 4\n{  # 5\n    meta  # 6\n    {  # 7\n        # 8\n        # 9\n        description # 10\n        : # 11\n        \"what a nightmare\"  # 12\n    }  # 13\n\n    parameter_meta  # 14\n    {  # 15\n        foo # 16\n        : # 17\n        \"bar\"  # 18\n    }  # 19\n\n    input  # 20\n    {  # 21\n        String # 22\n        foo  # 23\n    }  # 24\n\n    if  # 25\n    (  # 26\n        true  # 27\n    )  # 28\n    {  # 29\n        scatter  # 30\n        (  # 31\n            x  # 32\n            in  # 33\n            [1,2,3]  # 34\n        )  # 35\n        {  # 36\n            call  # 37\n                task  # 38\n                as  # 39\n                task_alias  # 40\n                after  # 41\n                cows_come_home  # 42\n        }  # 43\n    }  # 44\n\n}  # 45\n\n"
         );
     }
 }
