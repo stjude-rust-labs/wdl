@@ -164,8 +164,10 @@ fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule<'_>)
     // Check for out-of-order entries.
     if exact_match && !rule.meta_outputs_keys.keys().eq(rule.output_keys.keys()) {
         state.add(out_of_order(
-            rule.current_meta_outputs_span.expect("should have a `meta.outputs` span"),
-            rule.current_output_span.expect("should have an `output` span"),
+            rule.current_meta_outputs_span
+                .expect("should have a `meta.outputs` span"),
+            rule.current_output_span
+                .expect("should have an `output` span"),
             rule.name.as_deref().expect("should have a name"),
             rule.ty.expect("should have a type"),
         ));
@@ -327,7 +329,11 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
                         let span = item.syntax().text_range().to_span();
                         if span.start() > meta_outputs_span.start()
                             && span.end() < meta_outputs_span.end()
-                            && self.prior_objects.last().expect("should have seen `meta.outputs`") == "outputs"
+                            && self
+                                .prior_objects
+                                .last()
+                                .expect("should have seen `meta.outputs`")
+                                == "outputs"
                         {
                             self.meta_outputs_keys.insert(
                                 item.name().as_str().to_string(),
