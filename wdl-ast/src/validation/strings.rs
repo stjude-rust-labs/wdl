@@ -1,9 +1,11 @@
 //! Validation of string literals in an AST.
 
+use rowan::ast::AstNode;
 use wdl_grammar::lexer::v1::EscapeToken;
 use wdl_grammar::lexer::v1::Logos;
 
-use crate::v1::StringText;
+use crate::v1;
+use crate::v1::LiteralStringKind;
 use crate::AstToken;
 use crate::Diagnostic;
 use crate::Diagnostics;
@@ -139,11 +141,20 @@ impl Visitor for LiteralTextVisitor {
         *self = Default::default();
     }
 
-    fn string_text(&mut self, state: &mut Self::State, text: &StringText) {
-        check_text(
-            state,
-            text.syntax().text_range().start().into(),
-            text.as_str(),
-        );
+    fn string_text(&mut self, state: &mut Self::State, text: &v1::StringText) {
+        let string = v1::LiteralString::cast(text.syntax().parent().expect("should have a parent"))
+            .expect("node should cast");
+        match string.kind() {
+            LiteralStringKind::SingleQuoted | LiteralStringKind::DoubleQuoted => {
+                check_text(
+                    state,
+                    text.syntax().text_range().start().into(),
+                    text.as_str(),
+                );
+            }
+            LiteralStringKind::Multiline => {
+                // Don't check the text of multiline strings
+            }
+        }
     }
 }
