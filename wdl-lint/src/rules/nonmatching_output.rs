@@ -126,12 +126,12 @@ impl<'a> Rule for NonmatchingOutputRule<'a> {
 
 /// Check each output key exists in the `outputs` key within the `meta` section.
 fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule<'_>) {
-    let mut extra_found = false;
-    // Check for entries missing from `meta`.
+    let mut exact_match = true;
+    // Check for expected entries missing from `meta.outputs`.
     for (name, span) in &rule.output_keys {
         if !rule.meta_outputs_keys.contains_key(name) {
-            if !extra_found {
-                extra_found = true;
+            if exact_match {
+                exact_match = false;
             }
             if rule.current_meta_span.is_some() {
                 state.add(nonmatching_output(
@@ -144,11 +144,11 @@ fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule<'_>)
         }
     }
 
-    // Check for extra entries in `meta`.
+    // Check for extra entries in `meta.outputs`.
     for (name, span) in &rule.meta_outputs_keys {
         if !rule.output_keys.contains_key(name) {
-            if !extra_found {
-                extra_found = true;
+            if exact_match {
+                exact_match = false;
             }
             if rule.current_output_span.is_some() {
                 state.add(extra_output_in_meta(
@@ -162,7 +162,7 @@ fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule<'_>)
     }
 
     // Check for out-of-order entries.
-    if !extra_found && !rule.meta_outputs_keys.keys().eq(rule.output_keys.keys()) {
+    if exact_match && !rule.meta_outputs_keys.keys().eq(rule.output_keys.keys()) {
         state.add(out_of_order(
             rule.current_meta_outputs_span.unwrap(),
             rule.current_output_span.unwrap(),
