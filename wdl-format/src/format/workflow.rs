@@ -773,15 +773,8 @@ pub fn format_workflow(workflow_def: WorkflowDefinition) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenBrace)
         .expect("Workflow definition should have an open brace");
-    result.push_str(&format_preceding_comments(
-        &open_brace,
-        0,
-        false,
-        false,
-    ));
-    if result.ends_with(NEWLINE) {
-        result.push_str(INDENT);
-    } else {
+    result.push_str(&format_preceding_comments(&open_brace, 0, false, false));
+    if !result.ends_with(NEWLINE) {
         result.push(' ');
     }
     result.push('{');
@@ -816,7 +809,7 @@ pub fn format_workflow(workflow_def: WorkflowDefinition) -> String {
                 body_str.push_str(&format_scatter(s, 1));
             }
             WorkflowItem::Declaration(d) => {
-                body_str.push_str(&format_declaration(&Decl::Bound(d), 1, false));
+                body_str.push_str(&format_declaration(&Decl::Bound(d), 1));
             }
         }
     }
@@ -847,17 +840,15 @@ pub fn format_workflow(workflow_def: WorkflowDefinition) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::CloseBrace)
         .expect("Workflow definition should have a close brace");
-    result.push_str(&format_preceding_comments(
-        &close_brace,
-        0,
-        false,
-        false,
-    ));
+    result.push_str(&format_preceding_comments(&close_brace, 0, false, false));
     if !result.ends_with(NEWLINE) {
         result.push_str(NEWLINE);
     }
     result.push('}');
-    result.push_str(&format_inline_comment(&close_brace, true));
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Node(workflow_def.syntax().clone()),
+        true,
+    ));
     result.push_str(NEWLINE);
 
     result

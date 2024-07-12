@@ -2,7 +2,6 @@
 
 use std::sync::Arc;
 
-use anyhow::bail;
 use anyhow::Result;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
@@ -263,7 +262,7 @@ fn format_input_section(input: InputSection) -> String {
     result.push_str(&format_inline_comment(&open_brace, true));
 
     for decl in input.declarations() {
-        result.push_str(&format_declaration(&decl, 2, false));
+        result.push_str(&format_declaration(&decl, 2));
         if !result.ends_with(NEWLINE) {
             result.push_str(NEWLINE);
         }
@@ -325,7 +324,7 @@ fn format_output_section(output: OutputSection) -> String {
     result.push_str(&format_inline_comment(&open_brace, true));
 
     for decl in output.declarations() {
-        result.push_str(&format_declaration(&Decl::Bound(decl), 2, false));
+        result.push_str(&format_declaration(&Decl::Bound(decl), 2));
         if !result.ends_with(NEWLINE) {
             result.push_str(NEWLINE);
         }
@@ -352,7 +351,7 @@ fn format_output_section(output: OutputSection) -> String {
 }
 
 /// Format a declaration.
-fn format_declaration(declaration: &Decl, num_indents: usize, inline: bool) -> String {
+fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
     let mut result = String::new();
     let next_indent_level = num_indents + 1;
     let cur_indents = INDENT.repeat(num_indents);
@@ -361,14 +360,9 @@ fn format_declaration(declaration: &Decl, num_indents: usize, inline: bool) -> S
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(declaration.syntax().clone()),
         num_indents,
-        !inline,
+        false,
         false,
     ));
-    if result.ends_with(NEWLINE) {
-        result.push_str(&cur_indents);
-    } else if inline {
-        result.push(' ');
-    }
     result.push_str(&cur_indents);
 
     result.push_str(&declaration.ty().to_string());
@@ -398,7 +392,7 @@ fn format_declaration(declaration: &Decl, num_indents: usize, inline: bool) -> S
         let equal_sign = declaration
             .syntax()
             .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::Equal)
+            .find(|c| c.kind() == SyntaxKind::Assignment)
             .expect("Bound declaration should have an equal sign");
 
         result.push_str(&format_preceding_comments(
@@ -421,6 +415,11 @@ fn format_declaration(declaration: &Decl, num_indents: usize, inline: bool) -> S
             false,
             false,
         ));
+        if result.ends_with(NEWLINE) {
+            result.push_str(&next_indents);
+        } else {
+            result.push(' ');
+        }
         result.push_str(&expr.syntax().to_string());
     }
     result.push_str(&format_inline_comment(
@@ -683,7 +682,7 @@ mod tests {
         assert_eq!(
             formatted,
             "version 1.1\n\nworkflow test {\n    input {\n        # foo comment\n        String \
-             foo  # another foo comment\n        Int # mid-bar comment\n        bar\n    \
+             foo  # another foo comment\n        Int  # mid-bar comment\n            bar\n    \
              }\n\n}\n\n"
         );
     }
@@ -794,7 +793,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "# preamble one\n# preamble two\n\nversion  # 1\n    1.1  # 2\n\nworkflow  # 3\n    test  # 4\n{  # 5\n    meta  # 6\n    {  # 7\n        # 8\n        # 9\n        description # 10\n        : # 11\n        \"what a nightmare\"  # 12\n    }  # 13\n\n    parameter_meta  # 14\n    {  # 15\n        foo # 16\n        : # 17\n        \"bar\"  # 18\n    }  # 19\n\n    input  # 20\n    {  # 21\n        String # 22\n        foo  # 23\n    }  # 24\n\n    if  # 25\n    (  # 26\n        true  # 27\n    )  # 28\n    {  # 29\n        scatter  # 30\n        (  # 31\n            x  # 32\n            in  # 33\n            [1,2,3]  # 34\n        )  # 35\n        {  # 36\n            call  # 37\n                task  # 38\n                as  # 39\n                task_alias  # 40\n                after  # 41\n                cows_come_home  # 42\n        }  # 43\n    }  # 44\n\n}  # 45\n\n"
+            "# preamble one\n# preamble two\n\nversion  # 1\n    1.1  # 2\n\nworkflow  # 3\n    test  # 4\n{  # 5\n    meta  # 6\n    {  # 7\n        # 8\n        # 9\n        description # 10\n        : # 11\n        \"what a nightmare\"  # 12\n    }  # 13\n\n    parameter_meta  # 14\n    {  # 15\n        foo # 16\n        : # 17\n        \"bar\"  # 18\n    }  # 19\n\n    input  # 20\n    {  # 21\n        String  # 22\n            foo  # 23\n    }  # 24\n\n    if  # 25\n    (  # 26\n        true  # 27\n    )  # 28\n    {  # 29\n        scatter  # 30\n        (  # 31\n            x  # 32\n            in  # 33\n            [1,2,3]  # 34\n        )  # 35\n        {  # 36\n            call  # 37\n                task  # 38\n                as  # 39\n                task_alias  # 40\n                after  # 41\n                cows_come_home  # 42\n        }  # 43\n    }  # 44\n\n}  # 45\n\n"
         );
     }
 }
