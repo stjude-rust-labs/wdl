@@ -84,8 +84,6 @@ fn format_version_statement(version_statement: VersionStatement) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Token(version_statement.version().syntax().clone()),
         1,
-        false,
-        false,
     ));
     if result.ends_with("version") {
         result.push(' ');
@@ -123,14 +121,14 @@ fn format_metadata_children(item: &SyntaxElement) -> String {
             // or 'format_inline_comment'.
         }
         SyntaxKind::MetadataObjectItemNode => {
-            result.push_str(&format_preceding_comments(&item, 2, false, false));
+            result.push_str(&format_preceding_comments(&item, 2));
             result.push_str(&two_indents);
             result.push_str(&item.to_string());
             result.push_str(&format_inline_comment(&item, true));
         }
         SyntaxKind::CloseBrace => {
             // Should always be last child processed
-            result.push_str(&format_preceding_comments(&item, 1, false, true));
+            result.push_str(&format_preceding_comments(&item, 1));
             result.push_str(one_indent);
             result.push('}');
             // Potential inline comment has to be handled by outer function
@@ -150,8 +148,6 @@ fn format_meta_section(meta: MetadataSection) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(meta.syntax().clone()),
         1,
-        false,
-        false,
     ));
 
     result.push_str(INDENT);
@@ -168,7 +164,7 @@ fn format_meta_section(meta: MetadataSection) -> String {
         // because it relies on context not available to the 'format_metadata_children'
         // function.
         if cur.kind() == SyntaxKind::OpenBrace {
-            result.push_str(&format_preceding_comments(&cur, 1, false, false));
+            result.push_str(&format_preceding_comments(&cur, 1));
             if result.ends_with(NEWLINE) {
                 result.push_str(INDENT);
             } else {
@@ -193,8 +189,6 @@ fn format_parameter_meta_section(parameter_meta: ParameterMetadataSection) -> St
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(parameter_meta.syntax().clone()),
         1,
-        false,
-        false,
     ));
 
     result.push_str(INDENT);
@@ -211,7 +205,7 @@ fn format_parameter_meta_section(parameter_meta: ParameterMetadataSection) -> St
         // because it relies on context not available to the 'format_metadata_children'
         // function.
         if cur.kind() == SyntaxKind::OpenBrace {
-            result.push_str(&format_preceding_comments(&cur, 1, false, false));
+            result.push_str(&format_preceding_comments(&cur, 1));
             if result.ends_with(NEWLINE) {
                 result.push_str(INDENT);
             } else {
@@ -236,8 +230,6 @@ fn format_input_section(input: InputSection) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(input.syntax().clone()),
         1,
-        false,
-        false,
     ));
 
     result.push_str(INDENT);
@@ -255,7 +247,7 @@ fn format_input_section(input: InputSection) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenBrace)
         .expect("input section should have an open brace");
-    result.push_str(&format_preceding_comments(&open_brace, 1, false, false));
+    result.push_str(&format_preceding_comments(&open_brace, 1));
     if result.ends_with(NEWLINE) {
         result.push_str(INDENT);
     } else {
@@ -278,8 +270,6 @@ fn format_input_section(input: InputSection) -> String {
                 .expect("input section should have a token"),
         ),
         0,
-        false,
-        false,
     ));
     result.push_str(INDENT);
     result.push('}');
@@ -298,8 +288,6 @@ fn format_output_section(output: OutputSection) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(output.syntax().clone()),
         1,
-        false,
-        false,
     ));
 
     result.push_str(INDENT);
@@ -317,7 +305,7 @@ fn format_output_section(output: OutputSection) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenBrace)
         .expect("output section should have an open brace");
-    result.push_str(&format_preceding_comments(&open_brace, 1, false, false));
+    result.push_str(&format_preceding_comments(&open_brace, 1));
     if result.ends_with(NEWLINE) {
         result.push_str(INDENT);
     } else {
@@ -340,8 +328,6 @@ fn format_output_section(output: OutputSection) -> String {
                 .expect("output section should have a token"),
         ),
         0,
-        false,
-        false,
     ));
     result.push_str(INDENT);
     result.push('}');
@@ -363,8 +349,6 @@ fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(declaration.syntax().clone()),
         num_indents,
-        false,
-        false,
     ));
     result.push_str(&cur_indents);
 
@@ -377,8 +361,6 @@ fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Token(declaration.name().syntax().clone()),
         next_indent_level,
-        false,
-        false,
     ));
     if result.ends_with(NEWLINE) {
         result.push_str(&next_indents);
@@ -398,12 +380,7 @@ fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
             .find(|c| c.kind() == SyntaxKind::Assignment)
             .expect("Bound declaration should have an equal sign");
 
-        result.push_str(&format_preceding_comments(
-            &equal_sign,
-            next_indent_level,
-            false,
-            false,
-        ));
+        result.push_str(&format_preceding_comments(&equal_sign, next_indent_level));
         if result.ends_with(NEWLINE) {
             result.push_str(&next_indents);
         } else {
@@ -415,8 +392,6 @@ fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
         result.push_str(&format_preceding_comments(
             &SyntaxElement::Node(expr.syntax().clone()),
             next_indent_level,
-            false,
-            false,
         ));
         if result.ends_with(NEWLINE) {
             result.push_str(&next_indents);
@@ -444,8 +419,6 @@ fn format_struct_definition(struct_def: &StructDefinition) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(struct_def.syntax().clone()),
         0,
-        false,
-        false,
     ));
     result.push_str("struct");
     let struct_keyword = struct_def
@@ -460,8 +433,6 @@ fn format_struct_definition(struct_def: &StructDefinition) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Token(struct_def.name().syntax().clone()),
         1,
-        false,
-        false,
     ));
     if result.ends_with(NEWLINE) {
         result.push_str(INDENT);
@@ -479,7 +450,7 @@ fn format_struct_definition(struct_def: &StructDefinition) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenBrace)
         .expect("struct definition should have an open brace");
-    result.push_str(&format_preceding_comments(&open_brace, 0, false, false));
+    result.push_str(&format_preceding_comments(&open_brace, 0));
     if !result.ends_with(NEWLINE) {
         result.push(' ');
     }
@@ -495,7 +466,7 @@ fn format_struct_definition(struct_def: &StructDefinition) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::CloseBrace)
         .expect("struct definition should have a close brace");
-    result.push_str(&format_preceding_comments(&close_brace, 0, false, true));
+    result.push_str(&format_preceding_comments(&close_brace, 0));
     result.push('}');
     result.push_str(&format_inline_comment(&close_brace, true));
 

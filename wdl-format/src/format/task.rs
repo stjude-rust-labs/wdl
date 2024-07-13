@@ -22,8 +22,6 @@ fn format_command_section(command: CommandSection) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(command.syntax().clone()),
         0,
-        false,
-        false,
     ));
     result.push_str(INDENT);
     result.push_str("command");
@@ -41,12 +39,7 @@ fn format_command_section(command: CommandSection) -> String {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::OpenHeredoc)
             .expect("Command section should have an open heredoc");
-        result.push_str(&format_preceding_comments(
-            &open_heredoc,
-            1,
-            false,
-            false,
-        ));
+        result.push_str(&format_preceding_comments(&open_heredoc, 1));
         if result.ends_with(NEWLINE) {
             result.push_str(INDENT);
         } else {
@@ -60,12 +53,7 @@ fn format_command_section(command: CommandSection) -> String {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::OpenBrace)
             .expect("Command section should have an open brace");
-        result.push_str(&format_preceding_comments(
-            &open_brace,
-            1,
-            false,
-            false,
-        ));
+        result.push_str(&format_preceding_comments(&open_brace, 1));
         if !result.ends_with(NEWLINE) {
             result.push(' ');
         } else {
@@ -118,8 +106,6 @@ fn format_runtime_section(runtime: RuntimeSection) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(runtime.syntax().clone()),
         1,
-        false,
-        false,
     ));
     result.push_str(one_indent);
     result.push_str("runtime");
@@ -136,12 +122,7 @@ fn format_runtime_section(runtime: RuntimeSection) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenBrace)
         .expect("Runtime section should have an open brace");
-    result.push_str(&format_preceding_comments(
-        &open_brace,
-        1,
-        false,
-        false,
-    ));
+    result.push_str(&format_preceding_comments(&open_brace, 1));
     if !result.ends_with(NEWLINE) {
         result.push(' ');
     } else {
@@ -154,8 +135,6 @@ fn format_runtime_section(runtime: RuntimeSection) -> String {
         result.push_str(&format_preceding_comments(
             &SyntaxElement::Node(item.syntax().clone()),
             2,
-            false,
-            false,
         ));
         result.push_str(&two_indents);
         result.push_str(item.name().as_str());
@@ -169,20 +148,13 @@ fn format_runtime_section(runtime: RuntimeSection) -> String {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::Colon)
             .expect("Runtime item should have a colon");
-        result.push_str(&format_preceding_comments(
-            &colon,
-            2,
-            false,
-            false,
-        ));
+        result.push_str(&format_preceding_comments(&colon, 2));
         result.push(':');
         result.push_str(&format_inline_comment(&colon, false));
 
         result.push_str(&format_preceding_comments(
             &SyntaxElement::Node(item.expr().syntax().clone()),
             2,
-            false,
-            false,
         ));
         if result.ends_with(NEWLINE) {
             result.push_str(&two_indents);
@@ -201,12 +173,7 @@ fn format_runtime_section(runtime: RuntimeSection) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::CloseBrace)
         .expect("Runtime section should have a close brace");
-    result.push_str(&format_preceding_comments(
-        &close_brace,
-        1,
-        false,
-        false,
-    ));
+    result.push_str(&format_preceding_comments(&close_brace, 1));
     if !result.ends_with(NEWLINE) {
         result.push_str(NEWLINE);
     }
@@ -223,8 +190,6 @@ pub fn format_task(task_def: &TaskDefinition) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(task_def.syntax().clone()),
         0,
-        false,
-        false,
     ));
     result.push_str("task");
     result.push_str(&format_inline_comment(
@@ -238,8 +203,6 @@ pub fn format_task(task_def: &TaskDefinition) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Token(task_def.name().syntax().clone()),
         1,
-        false,
-        false,
     ));
     if result.ends_with("task") {
         result.push(' ');
@@ -257,12 +220,7 @@ pub fn format_task(task_def: &TaskDefinition) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenBrace)
         .expect("Task definition should have an open brace");
-    result.push_str(&format_preceding_comments(
-        &open_brace,
-        0,
-        false,
-        false,
-    ));
+    result.push_str(&format_preceding_comments(&open_brace, 0));
     if !result.ends_with(NEWLINE) {
         result.push(' ');
     }
@@ -339,12 +297,7 @@ pub fn format_task(task_def: &TaskDefinition) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::CloseBrace)
         .expect("Task definition should have a close brace");
-    result.push_str(&format_preceding_comments(
-        &close_brace,
-        0,
-        false,
-        false,
-    ));
+    result.push_str(&format_preceding_comments(&close_brace, 0));
     if !result.ends_with(NEWLINE) {
         result.push_str(NEWLINE);
     }
