@@ -230,8 +230,48 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                 false,
                 false,
             ));
+
             result.push_str(&next_indents);
-            result.push_str(&item.syntax().to_string()); // TODO: format inputs
+            result.push_str(item.name().as_str());
+            result.push_str(&format_inline_comment(
+                &SyntaxElement::Token(item.name().syntax().clone()),
+                false,
+            ));
+
+            if let Some(expr) = item.expr() {
+                let equal_sign = item
+                    .syntax()
+                    .children_with_tokens()
+                    .find(|c| c.kind() == SyntaxKind::Assignment)
+                    .expect("Call input should have an equal sign");
+                result.push_str(&format_preceding_comments(
+                    &equal_sign,
+                    next_num_indents,
+                    false,
+                    false,
+                ));
+                if result.ends_with(NEWLINE) {
+                    result.push_str(&next_indents);
+                } else {
+                    result.push(' ');
+                }
+                result.push('=');
+                result.push_str(&format_inline_comment(&equal_sign, false));
+
+                result.push_str(&format_preceding_comments(
+                    &SyntaxElement::Node(expr.syntax().clone()),
+                    next_num_indents,
+                    false,
+                    false,
+                ));
+                if !result.ends_with(NEWLINE) {
+                    result.push(' ');
+                } else {
+                    result.push_str(&next_indents);
+                }
+                result.push_str(&expr.syntax().to_string()); // TODO: format expressions
+            }
+
             result.push_str(&format_inline_comment(
                 &SyntaxElement::Node(item.syntax().clone()),
                 false,
@@ -485,7 +525,7 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
         &SyntaxElement::Token(scatter.variable().syntax().clone()),
         false,
     ));
-    
+
     let in_keyword = scatter
         .syntax()
         .children_with_tokens()
@@ -615,7 +655,7 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
 }
 
 /// Format a workflow definition.
-pub fn format_workflow(workflow_def: WorkflowDefinition) -> String {
+pub fn format_workflow(workflow_def: &WorkflowDefinition) -> String {
     let mut result = String::new();
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(workflow_def.syntax().clone()),

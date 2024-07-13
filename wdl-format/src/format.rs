@@ -9,6 +9,7 @@ use wdl_ast::v1::InputSection;
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
+use wdl_ast::v1::StructDefinition;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -26,11 +27,13 @@ pub const INDENT: &str = "    ";
 
 mod comments;
 mod import;
+mod task;
 mod workflow;
 
 use comments::format_inline_comment;
 use comments::format_preceding_comments;
 use import::format_imports;
+use task::format_task;
 use workflow::format_workflow;
 
 /// Format a version statement.
@@ -434,6 +437,71 @@ fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
     result
 }
 
+/// Format a struct definition
+fn format_struct_definition(struct_def: &StructDefinition) -> String {
+    let mut result = String::new();
+
+    result.push_str(&format_preceding_comments(
+        &SyntaxElement::Node(struct_def.syntax().clone()),
+        0,
+        false,
+        false,
+    ));
+    result.push_str("struct");
+    let struct_keyword = struct_def
+        .syntax()
+        .first_token()
+        .expect("struct definition should have a token");
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Token(struct_keyword.clone()),
+        false,
+    ));
+
+    result.push_str(&format_preceding_comments(
+        &SyntaxElement::Token(struct_def.name().syntax().clone()),
+        1,
+        false,
+        false,
+    ));
+    if result.ends_with(NEWLINE) {
+        result.push_str(INDENT);
+    } else {
+        result.push(' ');
+    }
+    result.push_str(struct_def.name().as_str());
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Token(struct_def.name().syntax().clone()),
+        false,
+    ));
+
+    let open_brace = struct_def
+        .syntax()
+        .children_with_tokens()
+        .find(|c| c.kind() == SyntaxKind::OpenBrace)
+        .expect("struct definition should have an open brace");
+    result.push_str(&format_preceding_comments(&open_brace, 0, false, false));
+    if !result.ends_with(NEWLINE) {
+        result.push(' ');
+    }
+    result.push('{');
+    result.push_str(&format_inline_comment(&open_brace, true));
+
+    for decl in struct_def.members() {
+        result.push_str(&format_declaration(&Decl::Unbound(decl), 1));
+    }
+
+    let close_brace = struct_def
+        .syntax()
+        .children_with_tokens()
+        .find(|c| c.kind() == SyntaxKind::CloseBrace)
+        .expect("struct definition should have a close brace");
+    result.push_str(&format_preceding_comments(&close_brace, 0, false, true));
+    result.push('}');
+    result.push_str(&format_inline_comment(&close_brace, true));
+
+    result
+}
+
 /// Format a WDL document.
 pub fn format_document(code: &str) -> Result<String, Arc<[Diagnostic]>> {
     let parse = Document::parse(code).into_result();
@@ -464,13 +532,13 @@ pub fn format_document(code: &str) -> Result<String, Arc<[Diagnostic]>> {
                 // Imports have already been formatted
             }
             DocumentItem::Workflow(workflow_def) => {
-                result.push_str(&format_workflow(workflow_def));
+                result.push_str(&format_workflow(&workflow_def));
             }
             DocumentItem::Task(task_def) => {
-                // TODO: Format the task
+                result.push_str(&format_task(&task_def));
             }
             DocumentItem::Struct(struct_def) => {
-                // TODO: Format the struct type
+                result.push_str(&format_struct_definition(&struct_def));
             }
         };
     });
