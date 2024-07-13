@@ -28,8 +28,6 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
         val.push_str(&format_preceding_comments(
             &SyntaxElement::Node(import.syntax().clone()),
             0,
-            false,
-            false,
         ));
 
         val.push_str("import");
@@ -42,11 +40,7 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
         while let Some(cur) = next {
             match cur.kind() {
                 SyntaxKind::LiteralStringNode => {
-                    let mut newline_needed = false;
-                    if !val.ends_with(NEWLINE) {
-                        newline_needed = true;
-                    }
-                    val.push_str(&format_preceding_comments(&cur, 1, newline_needed, false));
+                    val.push_str(&format_preceding_comments(&cur, 1));
                     if val.ends_with("import") {
                         val.push(' ');
                     } else if val.ends_with(NEWLINE) {
@@ -70,7 +64,7 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                     val.push_str(&format_inline_comment(&cur, true));
                 }
                 SyntaxKind::AsKeyword => {
-                    val.push_str(&format_preceding_comments(&cur, 1, false, false));
+                    val.push_str(&format_preceding_comments(&cur, 1));
                     val.push_str(one_indent);
                     val.push_str("as");
                     val.push_str(&format_inline_comment(&cur, false));
@@ -78,14 +72,10 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                 SyntaxKind::Ident => {
                     key.push_str(&cur.to_string());
 
-                    let mut newline_needed = false;
-                    if !val.ends_with(NEWLINE) {
-                        newline_needed = true;
-                    }
-                    val.push_str(&format_preceding_comments(&cur, 2, newline_needed, false));
+                    val.push_str(&format_preceding_comments(&cur, 2));
                     if val.ends_with("as") {
                         val.push(' ');
-                    } else if val.ends_with(NEWLINE) {
+                    } else {
                         val.push_str(&two_indents);
                     }
                     val.push_str(&cur.to_string());
@@ -101,26 +91,17 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                                 // This should always be the first child processed
                                 val.push_str(&format_preceding_comments(
                                     &cur, // Parent node
-                                    1, false, false,
+                                    1,
                                 ));
                                 val.push_str(one_indent);
                                 val.push_str("alias");
                                 val.push_str(&format_inline_comment(&alias_part, false));
                             }
                             SyntaxKind::Ident => {
-                                let mut newline_needed = false;
-                                if !val.ends_with(NEWLINE) {
-                                    newline_needed = true;
-                                }
-                                val.push_str(&format_preceding_comments(
-                                    &alias_part,
-                                    2,
-                                    newline_needed,
-                                    true,
-                                ));
+                                val.push_str(&format_preceding_comments(&alias_part, 2));
                                 if val.ends_with("alias") || val.ends_with("as") {
                                     val.push(' ');
-                                } else if val.ends_with(NEWLINE) {
+                                } else {
                                     val.push_str(&two_indents);
                                 }
                                 val.push_str(&alias_part.to_string());
@@ -135,16 +116,7 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                                 }
                             }
                             SyntaxKind::AsKeyword => {
-                                let mut newline_needed = false;
-                                if !val.ends_with(NEWLINE) {
-                                    newline_needed = true;
-                                }
-                                val.push_str(&format_preceding_comments(
-                                    &alias_part,
-                                    2,
-                                    newline_needed,
-                                    false,
-                                ));
+                                val.push_str(&format_preceding_comments(&alias_part, 2));
                                 if val.ends_with(NEWLINE) {
                                     val.push_str(&two_indents);
                                 } else {
@@ -176,7 +148,7 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                 }
                 SyntaxKind::Comment => {
                     // This comment will be included by a call to
-                    // 'format_inline_comment'
+                    // 'format_inline_comment' or 'format_preceding_comments'
                     // in another match arm
                 }
                 _ => {
