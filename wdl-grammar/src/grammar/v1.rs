@@ -80,11 +80,16 @@ const OUTPUT_ITEM_RECOVERY_SET: TokenSet =
 const RUNTIME_SECTION_RECOVERY_SET: TokenSet =
     ANY_IDENT.union(TokenSet::new(&[Token::CloseBrace as u8]));
 
+/// The recovery set for requirements items.
+const REQUIREMENTS_SECTION_RECOVERY_SET: TokenSet =
+    ANY_IDENT.union(TokenSet::new(&[Token::CloseBrace as u8]));
+
 /// The expected set of tokens in a task definition.
 const TASK_ITEM_EXPECTED_SET: TokenSet = TYPE_EXPECTED_SET.union(TokenSet::new(&[
     Token::InputKeyword as u8,
     Token::CommandKeyword as u8,
     Token::OutputKeyword as u8,
+    Token::RequirementsKeyword as u8,
     Token::RuntimeKeyword as u8,
     Token::MetaKeyword as u8,
     Token::ParameterMetaKeyword as u8,
@@ -216,6 +221,7 @@ const INFIX_OPERATOR_EXPECTED_SET: TokenSet = TokenSet::new(&[
     Token::Plus as u8,
     Token::Minus as u8,
     Token::Asterisk as u8,
+    Token::Exponentiation as u8,
     Token::Slash as u8,
     Token::Percent as u8,
     Token::Equal as u8,
@@ -264,6 +270,7 @@ const ANY_IDENT: TokenSet = TokenSet::new(&[
     Token::Ident as u8,
     Token::ArrayTypeKeyword as u8,
     Token::BooleanTypeKeyword as u8,
+    Token::DirectoryTypeKeyword as u8,
     Token::FileTypeKeyword as u8,
     Token::FloatTypeKeyword as u8,
     Token::IntTypeKeyword as u8,
@@ -278,6 +285,7 @@ const ANY_IDENT: TokenSet = TokenSet::new(&[
     Token::CommandKeyword as u8,
     Token::ElseKeyword as u8,
     Token::FalseKeyword as u8,
+    Token::HintsKeyword as u8,
     Token::IfKeyword as u8,
     Token::InKeyword as u8,
     Token::ImportKeyword as u8,
@@ -288,6 +296,7 @@ const ANY_IDENT: TokenSet = TokenSet::new(&[
     Token::ObjectKeyword as u8,
     Token::OutputKeyword as u8,
     Token::ParameterMetaKeyword as u8,
+    Token::RequirementsKeyword as u8,
     Token::RuntimeKeyword as u8,
     Token::ScatterKeyword as u8,
     Token::StructKeyword as u8,
@@ -296,9 +305,6 @@ const ANY_IDENT: TokenSet = TokenSet::new(&[
     Token::TrueKeyword as u8,
     Token::VersionKeyword as u8,
     Token::WorkflowKeyword as u8,
-    Token::ReservedDirectoryTypeKeyword as u8,
-    Token::ReservedHintsKeyword as u8,
-    Token::ReservedRequirementsKeyword as u8,
 ]);
 
 /// A helper for parsing matching tokens.
@@ -598,6 +604,7 @@ fn task_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Dia
         Some((Token::CommandKeyword, _)) => command_section(parser, marker),
         Some((Token::OutputKeyword, _)) => output_section(parser, marker),
         Some((Token::RuntimeKeyword, _)) => runtime_section(parser, marker),
+        Some((Token::RequirementsKeyword, _)) => requirements_section(parser, marker),
         Some((Token::MetaKeyword, _)) => metadata_section(parser, marker),
         Some((Token::ParameterMetaKeyword, _)) => parameter_metadata_section(parser, marker),
         Some((t, _)) if TYPE_EXPECTED_SET.contains(t.into_raw()) => bound_decl(parser, marker),
@@ -910,13 +917,42 @@ fn runtime_section(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marke
     Ok(())
 }
 
-/// Parses a runtime item in a runtime section.
+/// Parses an item in a runtime section.
 fn runtime_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
     expected_in!(parser, marker, ANY_IDENT, "runtime key");
     parser.update_last_token_kind(SyntaxKind::Ident);
     expected!(parser, marker, Token::Colon);
     expected_fn!(parser, marker, expr);
     marker.complete(parser, SyntaxKind::RuntimeItemNode);
+    Ok(())
+}
+
+/// Parses a requirements section in a task.
+fn requirements_section(
+    parser: &mut Parser<'_>,
+    marker: Marker,
+) -> Result<(), (Marker, Diagnostic)> {
+    parser.require(Token::RequirementsKeyword);
+    braced!(parser, marker, |parser| {
+        parser.delimited(
+            None,
+            UNTIL_CLOSE_BRACE,
+            REQUIREMENTS_SECTION_RECOVERY_SET,
+            requirements_item,
+        );
+        Ok(())
+    });
+    marker.complete(parser, SyntaxKind::RequirementsSectionNode);
+    Ok(())
+}
+
+/// Parses an item in a requirements section.
+fn requirements_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
+    expected_in!(parser, marker, ANY_IDENT, "requirements key");
+    parser.update_last_token_kind(SyntaxKind::Ident);
+    expected!(parser, marker, Token::Colon);
+    expected_fn!(parser, marker, expr);
+    marker.complete(parser, SyntaxKind::RequirementsItemNode);
     Ok(())
 }
 
@@ -1478,7 +1514,7 @@ fn call_target(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, D
     expected_in!(parser, marker, ANY_IDENT, "call target name");
     parser.update_last_token_kind(SyntaxKind::Ident);
 
-    if parser.next_if(Token::Dot) {
+    while parser.next_if(Token::Dot) {
         expected_in!(parser, marker, ANY_IDENT, "call target name");
         parser.update_last_token_kind(SyntaxKind::Ident);
     }
@@ -1880,8 +1916,8 @@ fn prefix_precedence(token: Token) -> (u8, SyntaxKind, Associativity) {
     use Associativity::*;
     use SyntaxKind::*;
     match token {
-        Token::Exclamation => (7, LogicalNotExprNode, Right),
-        Token::Minus => (7, NegationExprNode, Right),
+        Token::Exclamation => (8, LogicalNotExprNode, Right),
+        Token::Minus => (8, NegationExprNode, Right),
         // As paren expression is ambiguous with a pair literal expression,
         // this is handled in `atom_expr`
         // Token::OpenParen => 11,
@@ -1909,6 +1945,7 @@ fn infix_precedence(token: Token) -> (u8, SyntaxKind, Associativity) {
         Token::Asterisk => (6, MultiplicationExprNode, Left),
         Token::Slash => (6, DivisionExprNode, Left),
         Token::Percent => (6, ModuloExprNode, Left),
+        Token::Exponentiation => (7, ExponentiationExprNode, Left),
         _ => panic!("unknown infix operator token"),
     }
 }
@@ -1919,9 +1956,9 @@ fn infix_precedence(token: Token) -> (u8, SyntaxKind, Associativity) {
 fn postfix_precedence(token: Token) -> u8 {
     // All postfix operators are left-associative
     match token {
-        Token::OpenParen => 8,
-        Token::OpenBracket => 9,
-        Token::Dot => 10,
+        Token::OpenParen => 9,
+        Token::OpenBracket => 10,
+        Token::Dot => 11,
         _ => panic!("unknown postfix operator token"),
     }
 }

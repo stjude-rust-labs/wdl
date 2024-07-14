@@ -116,11 +116,11 @@ pub enum SyntaxKind {
     VersionKeyword,
     /// The `workflow` keyword token.
     WorkflowKeyword,
-    /// The reserved `Directory` type keyword token.
+    /// The 1.2 `Directory` type keyword token.
     DirectoryTypeKeyword,
-    /// The reserved `hints` keyword token.
+    /// The 1.2 `hints` keyword token.
     HintsKeyword,
-    /// The reserved `requirements` keyword token.
+    /// The 1.2 `requirements` keyword token.
     RequirementsKeyword,
     /// The `{` symbol token.
     OpenBrace,
@@ -154,6 +154,8 @@ pub enum SyntaxKind {
     LogicalAnd,
     /// The `*` symbol token.
     Asterisk,
+    /// The `**` symbol token.
+    Exponentiation,
     /// The `/` symbol token.
     Slash,
     /// The `%` symbol token.
@@ -212,6 +214,10 @@ pub enum SyntaxKind {
     OutputSectionNode,
     /// Represents a command section node.
     CommandSectionNode,
+    /// Represents a requirements section node.
+    RequirementsSectionNode,
+    /// Represents a requirements item node.
+    RequirementsItemNode,
     /// Represents a runtime section node.
     RuntimeSectionNode,
     /// Represents a runtime item node.
@@ -302,6 +308,8 @@ pub enum SyntaxKind {
     DivisionExprNode,
     /// Represents a modulo expression node.
     ModuloExprNode,
+    /// Represents a exponentiation expr node.
+    ExponentiationExprNode,
     /// Represents a call expression node.'
     CallExprNode,
     /// Represents an index expression node.

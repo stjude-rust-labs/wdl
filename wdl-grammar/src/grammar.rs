@@ -81,7 +81,7 @@ pub fn document(source: &str, mut parser: PreambleParser<'_>) -> (Vec<Event>, Ve
                     // version is supported by this implementation
                     let version: &str = &source[span.start()..span.end()];
                     match version {
-                        "1.0" | "1.1" => {
+                        "1.0" | "1.1" | "1.2" => {
                             let mut parser = parser.morph();
                             v1::items(&mut parser);
                             root.complete(&mut parser, SyntaxKind::RootNode);
@@ -108,6 +108,9 @@ pub fn document(source: &str, mut parser: PreambleParser<'_>) -> (Vec<Event>, Ve
             if let Some((_, span)) = found {
                 diagnostic =
                     diagnostic.with_label("a version statement must come before this", span);
+            } else {
+                // This highlight will show the last position in the file
+                diagnostic = diagnostic.with_highlight(Span::new(usize::MAX - 1, 1));
             }
 
             (parser, diagnostic)
