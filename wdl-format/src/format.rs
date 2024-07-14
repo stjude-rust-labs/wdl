@@ -4,6 +4,7 @@ use anyhow::Result;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::InputSection;
+use wdl_ast::v1::MetadataObjectItem;
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
@@ -100,43 +101,55 @@ fn format_version_statement(version_statement: VersionStatement) -> String {
 }
 
 /// Format the inner portion of a meta/parameter_meta section.
-fn format_metadata_children(item: &SyntaxElement) -> String {
+fn format_metadata_item(item: &MetadataObjectItem) -> String {
     let mut result = String::new();
-    let one_indent = INDENT;
     let two_indents = INDENT.repeat(2);
+    let three_indents = INDENT.repeat(3);
 
-    match item.kind() {
-        SyntaxKind::OpenBrace => {
-            // Preceding comments handled by outer function
-            result.push('{');
-            result.push_str(&format_inline_comment(&item, true));
-        }
-        SyntaxKind::Whitespace => {
-            // Ignore
-        }
-        SyntaxKind::Comment => {
-            // This will be handled by a call to either
-            // 'format_preceding_comments'
-            // or 'format_inline_comment'.
-        }
-        SyntaxKind::MetadataObjectItemNode => {
-            result.push_str(&format_preceding_comments(&item, 2, false));
-            result.push_str(&two_indents);
-            result.push_str(&item.to_string());
-            result.push_str(&format_inline_comment(&item, true));
-        }
-        SyntaxKind::CloseBrace => {
-            // Should always be last child processed
-            result.push_str(&format_preceding_comments(&item, 1, false));
-            result.push_str(one_indent);
-            result.push('}');
-            // Potential inline comment has to be handled by outer function
-            // because it must be called using the parent node.
-        }
-        _ => {
-            unreachable!("Unexpected syntax kind: {:?}", item.kind());
-        }
+    result.push_str(&format_preceding_comments(
+        &SyntaxElement::Node(item.syntax().clone()),
+        2,
+        false,
+    ));
+    result.push_str(&two_indents);
+    result.push_str(&item.name().as_str());
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Token(item.name().syntax().clone()),
+        false,
+    ));
+
+    let colon = item
+        .syntax()
+        .children_with_tokens()
+        .find(|c| c.kind() == SyntaxKind::Colon)
+        .expect("metadata item should have a colon");
+    result.push_str(&format_preceding_comments(
+        &colon,
+        1,
+        !result.ends_with(NEWLINE),
+    ));
+    if result.ends_with(NEWLINE) {
+        result.push_str(&three_indents);
     }
+    result.push(':');
+    result.push_str(&format_inline_comment(&colon, false));
+
+    result.push_str(&format_preceding_comments(
+        &SyntaxElement::Node(item.value().syntax().clone()),
+        1,
+        !result.ends_with(NEWLINE),
+    ));
+    if result.ends_with(NEWLINE) {
+        result.push_str(&three_indents);
+    } else {
+        result.push(' ');
+    }
+    result.push_str(&item.value().syntax().to_string());
+    result.push_str(&format_inline_comment(
+        &SyntaxElement::Node(item.syntax().clone()),
+        true,
+    ));
+
     result
 }
 
@@ -158,26 +171,37 @@ fn format_meta_section(meta: MetadataSection) -> String {
         false,
     ));
 
-    let mut next = meta_keyword.next_sibling_or_token();
-    while let Some(cur) = next {
-        // Whitespace preceding the OpenBrace child requires special handling
-        // because it relies on context not available to the 'format_metadata_children'
-        // function.
-        if cur.kind() == SyntaxKind::OpenBrace {
-            result.push_str(&format_preceding_comments(
-                &cur,
-                1,
-                !result.ends_with(NEWLINE),
-            ));
-            if result.ends_with(NEWLINE) {
-                result.push_str(INDENT);
-            } else {
-                result.push(' ');
-            }
-        }
-        result.push_str(&format_metadata_children(&cur));
-        next = cur.next_sibling_or_token();
+    let open_brace = meta
+        .syntax()
+        .children_with_tokens()
+        .find(|c| c.kind() == SyntaxKind::OpenBrace)
+        .expect("metadata section should have an open brace");
+    result.push_str(&format_preceding_comments(
+        &open_brace,
+        1,
+        !result.ends_with(NEWLINE),
+    ));
+    if result.ends_with(NEWLINE) {
+        result.push_str(INDENT);
+    } else {
+        result.push(' ');
     }
+    result.push('{');
+    result.push_str(&format_inline_comment(&open_brace, true));
+
+    for item in meta.items() {
+        result.push_str(&format_metadata_item(&item));
+    }
+
+    let close_brace = meta
+        .syntax()
+        .children_with_tokens()
+        .find(|c| c.kind() == SyntaxKind::CloseBrace)
+        .expect("metadata section should have a close brace");
+    result.push_str(&format_preceding_comments(&close_brace, 0, false));
+    result.push_str(INDENT);
+    result.push('}');
+
     result.push_str(&format_inline_comment(
         &SyntaxElement::Node(meta.syntax().clone()),
         true,
@@ -204,26 +228,37 @@ fn format_parameter_meta_section(parameter_meta: ParameterMetadataSection) -> St
         false,
     ));
 
-    let mut next = parameter_meta_keyword.next_sibling_or_token();
-    while let Some(cur) = next {
-        // Whitespace preceding the OpenBrace child requires special handling
-        // because it relies on context not available to the 'format_metadata_children'
-        // function.
-        if cur.kind() == SyntaxKind::OpenBrace {
-            result.push_str(&format_preceding_comments(
-                &cur,
-                1,
-                !result.ends_with(NEWLINE),
-            ));
-            if result.ends_with(NEWLINE) {
-                result.push_str(INDENT);
-            } else {
-                result.push(' ');
-            }
-        }
-        result.push_str(&format_metadata_children(&cur));
-        next = cur.next_sibling_or_token();
+    let open_brace = parameter_meta
+        .syntax()
+        .children_with_tokens()
+        .find(|c| c.kind() == SyntaxKind::OpenBrace)
+        .expect("parameter metadata section should have an open brace");
+    result.push_str(&format_preceding_comments(
+        &open_brace,
+        1,
+        !result.ends_with(NEWLINE),
+    ));
+    if result.ends_with(NEWLINE) {
+        result.push_str(INDENT);
+    } else {
+        result.push(' ');
     }
+    result.push('{');
+    result.push_str(&format_inline_comment(&open_brace, true));
+
+    for item in parameter_meta.items() {
+        result.push_str(&format_metadata_item(&item));
+    }
+
+    let close_brace = parameter_meta
+        .syntax()
+        .children_with_tokens()
+        .find(|c| c.kind() == SyntaxKind::CloseBrace)
+        .expect("parameter metadata section should have a close brace");
+    result.push_str(&format_preceding_comments(&close_brace, 0, false));
+    result.push_str(INDENT);
+    result.push('}');
+
     result.push_str(&format_inline_comment(
         &SyntaxElement::Node(parameter_meta.syntax().clone()),
         true,
@@ -871,7 +906,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "# preamble one\n# preamble two\n\nversion  # 1\n    1.1  # 2\n\nworkflow  # 3\n    test  # 4\n{  # 5\n    meta  # 6\n    {  # 7\n        # 8\n        # 9\n        description # 10\n        : # 11\n        \"what a nightmare\"  # 12\n    }  # 13\n\n    parameter_meta  # 14\n    {  # 15\n        foo # 16\n        : # 17\n        \"bar\"  # 18\n    }  # 19\n\n    input  # 20\n    {  # 21\n        String  # 22\n            foo  # 23\n    }  # 24\n\n    if  # 25\n    (  # 26\n        true  # 27\n    )  # 28\n    {  # 29\n        scatter  # 30\n        (  # 31\n            x  # 32\n            in  # 33\n            [1,2,3]  # 34\n        )  # 35\n        {  # 36\n            call  # 37\n                task  # 38\n                as  # 39\n                task_alias  # 40\n                after  # 41\n                cows_come_home  # 42\n        }  # 43\n    }  # 44\n}  # 45\n"
+            "# preamble one\n# preamble two\n\nversion  # 1\n    1.1  # 2\n\nworkflow  # 3\n    test  # 4\n{  # 5\n    meta  # 6\n    {  # 7\n        # 8\n        # 9\n        description  # 10\n            :  # 11\n            \"what a nightmare\"  # 12\n    }  # 13\n\n    parameter_meta  # 14\n    {  # 15\n        foo  # 16\n            :  # 17\n            \"bar\"  # 18\n    }  # 19\n\n    input  # 20\n    {  # 21\n        String  # 22\n            foo  # 23\n    }  # 24\n\n    if  # 25\n    (  # 26\n        true  # 27\n    )  # 28\n    {  # 29\n        scatter  # 30\n        (  # 31\n            x  # 32\n            in  # 33\n            [1,2,3]  # 34\n        )  # 35\n        {  # 36\n            call  # 37\n                task  # 38\n                as  # 39\n                task_alias  # 40\n                after  # 41\n                cows_come_home  # 42\n        }  # 43\n    }  # 44\n}  # 45\n"
         );
     }
 }
