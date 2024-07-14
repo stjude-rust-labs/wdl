@@ -1,5 +1,5 @@
 //! Format comments in a WDL file.
-//! 
+//!
 //! All comments will be treated as either "preceding" or "inline" comments.
 //! A preceding comment is a comment that appears on a line before an element,
 //! if and only if that element is the first element of its line. preceding
