@@ -25,6 +25,7 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(call.syntax().clone()),
         num_indents,
+        false,
     ));
     result.push_str(&cur_indents);
     result.push_str("call");
@@ -39,6 +40,7 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(call.target().syntax().clone()),
         next_num_indents,
+        !result.ends_with(NEWLINE),
     ));
     if result.ends_with("call") {
         result.push(' ');
@@ -55,7 +57,11 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
         for child in alias.syntax().children_with_tokens() {
             match child.kind() {
                 SyntaxKind::AsKeyword => {
-                    result.push_str(&format_preceding_comments(&child, next_num_indents));
+                    result.push_str(&format_preceding_comments(
+                        &child,
+                        next_num_indents,
+                        !result.ends_with(NEWLINE),
+                    ));
                     if result.ends_with(NEWLINE) {
                         result.push_str(&next_indents);
                     } else {
@@ -65,7 +71,11 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                     result.push_str(&format_inline_comment(&child, false))
                 }
                 SyntaxKind::Ident => {
-                    result.push_str(&format_preceding_comments(&child, next_num_indents));
+                    result.push_str(&format_preceding_comments(
+                        &child,
+                        next_num_indents,
+                        !result.ends_with(NEWLINE),
+                    ));
                     if result.ends_with(NEWLINE) {
                         result.push_str(&next_indents);
                     } else {
@@ -101,6 +111,7 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                     result.push_str(&format_preceding_comments(
                         &SyntaxElement::Node(after.syntax().clone()),
                         next_num_indents,
+                        !result.ends_with(NEWLINE),
                     ));
                     if result.ends_with(NEWLINE) {
                         result.push_str(&next_indents);
@@ -111,7 +122,11 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                     result.push_str(&format_inline_comment(&child, false));
                 }
                 SyntaxKind::Ident => {
-                    result.push_str(&format_preceding_comments(&child, next_num_indents));
+                    result.push_str(&format_preceding_comments(
+                        &child,
+                        next_num_indents,
+                        !result.ends_with(NEWLINE),
+                    ));
                     if result.ends_with(NEWLINE) {
                         result.push_str(&next_indents);
                     } else {
@@ -148,7 +163,11 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::OpenBrace)
             .expect("Call statement should have an open brace");
-        result.push_str(&format_preceding_comments(&open_brace, next_num_indents));
+        result.push_str(&format_preceding_comments(
+            &open_brace,
+            next_num_indents,
+            !result.ends_with(NEWLINE),
+        ));
         if result.ends_with(NEWLINE) {
             result.push_str(&next_indents);
         } else {
@@ -162,7 +181,11 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::InputKeyword)
             .expect("Call statement should have an input keyword");
-        result.push_str(&format_preceding_comments(&input_keyword, next_num_indents));
+        result.push_str(&format_preceding_comments(
+            &input_keyword,
+            next_num_indents,
+            !result.ends_with(NEWLINE),
+        ));
         if result.ends_with(NEWLINE) {
             result.push_str(&next_indents);
         } else {
@@ -176,7 +199,11 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::Colon)
             .expect("Call statement should have a colon");
-        result.push_str(&format_preceding_comments(&colon, next_num_indents));
+        result.push_str(&format_preceding_comments(
+            &colon,
+            next_num_indents,
+            !result.ends_with(NEWLINE),
+        ));
         if result.ends_with(NEWLINE) {
             result.push_str(&next_indents);
         }
@@ -191,6 +218,7 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
             result.push_str(&format_preceding_comments(
                 &SyntaxElement::Node(item.syntax().clone()),
                 next_num_indents,
+                false,
             ));
 
             result.push_str(&next_indents);
@@ -206,7 +234,11 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                     .children_with_tokens()
                     .find(|c| c.kind() == SyntaxKind::Assignment)
                     .expect("Call input should have an equal sign");
-                result.push_str(&format_preceding_comments(&equal_sign, next_num_indents));
+                result.push_str(&format_preceding_comments(
+                    &equal_sign,
+                    next_num_indents,
+                    !result.ends_with(NEWLINE),
+                ));
                 if result.ends_with(NEWLINE) {
                     result.push_str(&next_indents);
                 } else {
@@ -218,6 +250,7 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                 result.push_str(&format_preceding_comments(
                     &SyntaxElement::Node(expr.syntax().clone()),
                     next_num_indents,
+                    false,
                 ));
                 if !result.ends_with(NEWLINE) {
                     result.push(' ');
@@ -233,7 +266,11 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
             ));
 
             if let Some(cur_comma) = commas.next() {
-                result.push_str(&format_preceding_comments(&cur_comma, next_num_indents));
+                result.push_str(&format_preceding_comments(
+                    &cur_comma,
+                    next_num_indents,
+                    !result.ends_with(NEWLINE),
+                ));
                 result.push(',');
                 result.push_str(&format_inline_comment(&cur_comma, false));
             } else {
@@ -249,13 +286,8 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::CloseBrace)
             .expect("Call statement should have a close brace");
-        result.push_str(&format_preceding_comments(&close_brace, num_indents));
-        if result.ends_with(NEWLINE) {
-            result.push_str(&cur_indents);
-        } else {
-            result.push_str(NEWLINE);
-            result.push_str(&cur_indents);
-        }
+        result.push_str(&format_preceding_comments(&close_brace, num_indents, false));
+        result.push_str(&cur_indents);
         result.push('}');
     }
 
@@ -277,6 +309,7 @@ fn format_conditional(conditional: ConditionalStatement, num_indents: usize) -> 
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(conditional.syntax().clone()),
         num_indents,
+        false,
     ));
 
     let if_keyword = conditional
@@ -293,24 +326,29 @@ fn format_conditional(conditional: ConditionalStatement, num_indents: usize) -> 
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenParen)
         .expect("Conditional statement should have an open paren");
-    result.push_str(&format_preceding_comments(&open_paren, num_indents));
+    result.push_str(&format_preceding_comments(
+        &open_paren,
+        num_indents,
+        !result.ends_with(NEWLINE),
+    ));
     if result.ends_with(NEWLINE) {
         result.push_str(&cur_indents);
     } else {
         result.push(' ');
     }
     result.push('(');
-    result.push_str(&format_inline_comment(&open_paren, false));
     let mut paren_on_same_line = true;
-    if result.ends_with(NEWLINE) {
-        paren_on_same_line = false;
-        result.push_str(&next_indents);
-    }
+    result.push_str(&format_inline_comment(&open_paren, false));
 
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(conditional.expr().syntax().clone()),
         next_num_indents,
+        !result.ends_with(NEWLINE),
     ));
+    if result.ends_with(NEWLINE) {
+        paren_on_same_line = false;
+        result.push_str(&next_indents);
+    }
     let conditional_expr = conditional.expr().syntax().to_string();
     if conditional_expr.contains('\n') {
         paren_on_same_line = false;
@@ -326,7 +364,11 @@ fn format_conditional(conditional: ConditionalStatement, num_indents: usize) -> 
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::CloseParen)
         .expect("Conditional statement should have a close paren");
-    result.push_str(&format_preceding_comments(&close_paren, num_indents));
+    result.push_str(&format_preceding_comments(
+        &close_paren,
+        num_indents,
+        !result.ends_with(NEWLINE),
+    ));
     if !paren_on_same_line && result.ends_with(&conditional_expr) {
         // No comments were added after the multi-line conditional expression
         // So let's start a new line with the proper indentation
@@ -343,7 +385,11 @@ fn format_conditional(conditional: ConditionalStatement, num_indents: usize) -> 
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenBrace)
         .expect("Conditional statement should have an open brace");
-    result.push_str(&format_preceding_comments(&open_brace, next_num_indents));
+    result.push_str(&format_preceding_comments(
+        &open_brace,
+        next_num_indents,
+        !result.ends_with(NEWLINE),
+    ));
     if result.ends_with(')') {
         result.push(' ');
     } else {
@@ -374,13 +420,8 @@ fn format_conditional(conditional: ConditionalStatement, num_indents: usize) -> 
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::CloseBrace)
         .expect("Conditional statement should have a close brace");
-    result.push_str(&format_preceding_comments(&close_brace, num_indents));
-    if result.ends_with(NEWLINE) {
-        result.push_str(&cur_indents);
-    } else {
-        result.push_str(NEWLINE);
-        result.push_str(&cur_indents);
-    }
+    result.push_str(&format_preceding_comments(&close_brace, num_indents, false));
+    result.push_str(&cur_indents);
     result.push('}');
     result.push_str(&format_inline_comment(
         &SyntaxElement::Node(conditional.syntax().clone()),
@@ -400,6 +441,7 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(scatter.syntax().clone()),
         num_indents,
+        false,
     ));
 
     let scatter_keyword = scatter
@@ -416,7 +458,11 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenParen)
         .expect("Scatter statement should have an open paren");
-    result.push_str(&format_preceding_comments(&open_paren, num_indents));
+    result.push_str(&format_preceding_comments(
+        &open_paren,
+        num_indents,
+        !result.ends_with(NEWLINE),
+    ));
     if result.ends_with(NEWLINE) {
         result.push_str(&cur_indents);
     } else {
@@ -428,6 +474,7 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Token(scatter.variable().syntax().clone()),
         next_num_indents,
+        !result.ends_with(NEWLINE),
     ));
     if result.ends_with(NEWLINE) {
         result.push_str(&next_indents);
@@ -443,7 +490,11 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::InKeyword)
         .expect("Scatter statement should have an in keyword");
-    result.push_str(&format_preceding_comments(&in_keyword, next_num_indents));
+    result.push_str(&format_preceding_comments(
+        &in_keyword,
+        next_num_indents,
+        !result.ends_with(NEWLINE),
+    ));
 
     if result.ends_with(NEWLINE) {
         result.push_str(&next_indents);
@@ -462,6 +513,7 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(scatter.expr().syntax().clone()),
         next_num_indents,
+        !result.ends_with(NEWLINE),
     ));
     if result.ends_with(NEWLINE) {
         result.push_str(&next_indents);
@@ -479,7 +531,11 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::CloseParen)
         .expect("Scatter statement should have a close paren");
-    result.push_str(&format_preceding_comments(&close_paren, num_indents));
+    result.push_str(&format_preceding_comments(
+        &close_paren,
+        num_indents,
+        !result.ends_with(NEWLINE),
+    ));
     if !paren_on_same_line && result.ends_with(&scatter_expr) {
         // No comments were added after the scatter expression (which would reset the
         // indentation) So let's start a new line with the proper
@@ -497,7 +553,11 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenBrace)
         .expect("Scatter statement should have an open brace");
-    result.push_str(&format_preceding_comments(&open_brace, next_num_indents));
+    result.push_str(&format_preceding_comments(
+        &open_brace,
+        next_num_indents,
+        !result.ends_with(NEWLINE),
+    ));
     if result.ends_with(')') {
         result.push(' ');
     } else {
@@ -528,7 +588,7 @@ fn format_scatter(scatter: ScatterStatement, num_indents: usize) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::CloseBrace)
         .expect("Scatter statement should have a close brace");
-    result.push_str(&format_preceding_comments(&close_brace, num_indents));
+    result.push_str(&format_preceding_comments(&close_brace, num_indents, false));
     if result.ends_with(NEWLINE) {
         result.push_str(&cur_indents);
     } else {
@@ -550,6 +610,7 @@ pub fn format_workflow(workflow_def: &WorkflowDefinition) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(workflow_def.syntax().clone()),
         0,
+        false,
     ));
     result.push_str("workflow");
     result.push_str(&format_inline_comment(
@@ -563,6 +624,7 @@ pub fn format_workflow(workflow_def: &WorkflowDefinition) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Token(workflow_def.name().syntax().clone()),
         1,
+        !result.ends_with(NEWLINE),
     ));
     if result.ends_with("workflow") {
         result.push(' ');
@@ -580,7 +642,11 @@ pub fn format_workflow(workflow_def: &WorkflowDefinition) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenBrace)
         .expect("Workflow definition should have an open brace");
-    result.push_str(&format_preceding_comments(&open_brace, 0));
+    result.push_str(&format_preceding_comments(
+        &open_brace,
+        0,
+        !result.ends_with(NEWLINE),
+    ));
     if !result.ends_with(NEWLINE) {
         result.push(' ');
     }
@@ -648,7 +714,7 @@ pub fn format_workflow(workflow_def: &WorkflowDefinition) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::CloseBrace)
         .expect("Workflow definition should have a close brace");
-    result.push_str(&format_preceding_comments(&close_brace, 0));
+    result.push_str(&format_preceding_comments(&close_brace, 0, false));
     if !result.ends_with(NEWLINE) {
         result.push_str(NEWLINE);
     }

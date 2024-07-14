@@ -41,6 +41,7 @@ fn format_version_statement(version_statement: VersionStatement) -> String {
     // the logic is simpler than the 'format_preceding_comments' function.
     // We are walking backwards through the syntax tree, so we must collect
     // the comments in a vector and reverse them to get them in the correct order.
+    // TODO: Is the above true?
     let mut preceding_comments = Vec::new();
     for sibling in version_statement
         .syntax()
@@ -82,6 +83,7 @@ fn format_version_statement(version_statement: VersionStatement) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Token(version_statement.version().syntax().clone()),
         1,
+        !result.ends_with(NEWLINE),
     ));
     if result.ends_with("version") {
         result.push(' ');
@@ -118,14 +120,14 @@ fn format_metadata_children(item: &SyntaxElement) -> String {
             // or 'format_inline_comment'.
         }
         SyntaxKind::MetadataObjectItemNode => {
-            result.push_str(&format_preceding_comments(&item, 2));
+            result.push_str(&format_preceding_comments(&item, 2, false));
             result.push_str(&two_indents);
             result.push_str(&item.to_string());
             result.push_str(&format_inline_comment(&item, true));
         }
         SyntaxKind::CloseBrace => {
             // Should always be last child processed
-            result.push_str(&format_preceding_comments(&item, 1));
+            result.push_str(&format_preceding_comments(&item, 1, false));
             result.push_str(one_indent);
             result.push('}');
             // Potential inline comment has to be handled by outer function
@@ -145,6 +147,7 @@ fn format_meta_section(meta: MetadataSection) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(meta.syntax().clone()),
         1,
+        false,
     ));
 
     result.push_str(INDENT);
@@ -161,7 +164,11 @@ fn format_meta_section(meta: MetadataSection) -> String {
         // because it relies on context not available to the 'format_metadata_children'
         // function.
         if cur.kind() == SyntaxKind::OpenBrace {
-            result.push_str(&format_preceding_comments(&cur, 1));
+            result.push_str(&format_preceding_comments(
+                &cur,
+                1,
+                !result.ends_with(NEWLINE),
+            ));
             if result.ends_with(NEWLINE) {
                 result.push_str(INDENT);
             } else {
@@ -186,6 +193,7 @@ fn format_parameter_meta_section(parameter_meta: ParameterMetadataSection) -> St
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(parameter_meta.syntax().clone()),
         1,
+        false,
     ));
 
     result.push_str(INDENT);
@@ -202,7 +210,11 @@ fn format_parameter_meta_section(parameter_meta: ParameterMetadataSection) -> St
         // because it relies on context not available to the 'format_metadata_children'
         // function.
         if cur.kind() == SyntaxKind::OpenBrace {
-            result.push_str(&format_preceding_comments(&cur, 1));
+            result.push_str(&format_preceding_comments(
+                &cur,
+                1,
+                !result.ends_with(NEWLINE),
+            ));
             if result.ends_with(NEWLINE) {
                 result.push_str(INDENT);
             } else {
@@ -227,6 +239,7 @@ fn format_input_section(input: InputSection) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(input.syntax().clone()),
         1,
+        false,
     ));
 
     result.push_str(INDENT);
@@ -239,12 +252,17 @@ fn format_input_section(input: InputSection) -> String {
         &SyntaxElement::Token(input_keyword.clone()),
         false,
     ));
+
     let open_brace = input
         .syntax()
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenBrace)
         .expect("input section should have an open brace");
-    result.push_str(&format_preceding_comments(&open_brace, 1));
+    result.push_str(&format_preceding_comments(
+        &open_brace,
+        1,
+        !result.ends_with(NEWLINE),
+    ));
     if result.ends_with(NEWLINE) {
         result.push_str(INDENT);
     } else {
@@ -255,10 +273,8 @@ fn format_input_section(input: InputSection) -> String {
 
     for decl in input.declarations() {
         result.push_str(&format_declaration(&decl, 2));
-        if !result.ends_with(NEWLINE) {
-            result.push_str(NEWLINE);
-        }
     }
+
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Token(
             input
@@ -267,6 +283,7 @@ fn format_input_section(input: InputSection) -> String {
                 .expect("input section should have a token"),
         ),
         0,
+        false,
     ));
     result.push_str(INDENT);
     result.push('}');
@@ -285,6 +302,7 @@ fn format_output_section(output: OutputSection) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(output.syntax().clone()),
         1,
+        false,
     ));
 
     result.push_str(INDENT);
@@ -302,7 +320,11 @@ fn format_output_section(output: OutputSection) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenBrace)
         .expect("output section should have an open brace");
-    result.push_str(&format_preceding_comments(&open_brace, 1));
+    result.push_str(&format_preceding_comments(
+        &open_brace,
+        1,
+        !result.ends_with(NEWLINE),
+    ));
     if result.ends_with(NEWLINE) {
         result.push_str(INDENT);
     } else {
@@ -313,10 +335,8 @@ fn format_output_section(output: OutputSection) -> String {
 
     for decl in output.declarations() {
         result.push_str(&format_declaration(&Decl::Bound(decl), 2));
-        if !result.ends_with(NEWLINE) {
-            result.push_str(NEWLINE);
-        }
     }
+
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Token(
             output
@@ -325,6 +345,7 @@ fn format_output_section(output: OutputSection) -> String {
                 .expect("output section should have a token"),
         ),
         0,
+        false,
     ));
     result.push_str(INDENT);
     result.push('}');
@@ -346,6 +367,7 @@ fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(declaration.syntax().clone()),
         num_indents,
+        false,
     ));
     result.push_str(&cur_indents);
 
@@ -358,6 +380,7 @@ fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Token(declaration.name().syntax().clone()),
         next_indent_level,
+        !result.ends_with(NEWLINE),
     ));
     if result.ends_with(NEWLINE) {
         result.push_str(&next_indents);
@@ -377,7 +400,11 @@ fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
             .find(|c| c.kind() == SyntaxKind::Assignment)
             .expect("Bound declaration should have an equal sign");
 
-        result.push_str(&format_preceding_comments(&equal_sign, next_indent_level));
+        result.push_str(&format_preceding_comments(
+            &equal_sign,
+            next_indent_level,
+            !result.ends_with(NEWLINE),
+        ));
         if result.ends_with(NEWLINE) {
             result.push_str(&next_indents);
         } else {
@@ -389,6 +416,7 @@ fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
         result.push_str(&format_preceding_comments(
             &SyntaxElement::Node(expr.syntax().clone()),
             next_indent_level,
+            !result.ends_with(NEWLINE),
         ));
         if result.ends_with(NEWLINE) {
             result.push_str(&next_indents);
@@ -399,12 +427,8 @@ fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
     }
     result.push_str(&format_inline_comment(
         &SyntaxElement::Node(declaration.syntax().clone()),
-        false,
+        true,
     ));
-
-    if !result.ends_with(NEWLINE) {
-        result.push_str(NEWLINE);
-    }
 
     result
 }
@@ -416,6 +440,7 @@ fn format_struct_definition(struct_def: &StructDefinition) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Node(struct_def.syntax().clone()),
         0,
+        false,
     ));
     result.push_str("struct");
     let struct_keyword = struct_def
@@ -430,6 +455,7 @@ fn format_struct_definition(struct_def: &StructDefinition) -> String {
     result.push_str(&format_preceding_comments(
         &SyntaxElement::Token(struct_def.name().syntax().clone()),
         1,
+        !result.ends_with(NEWLINE),
     ));
     if result.ends_with(NEWLINE) {
         result.push_str(INDENT);
@@ -447,7 +473,11 @@ fn format_struct_definition(struct_def: &StructDefinition) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::OpenBrace)
         .expect("struct definition should have an open brace");
-    result.push_str(&format_preceding_comments(&open_brace, 0));
+    result.push_str(&format_preceding_comments(
+        &open_brace,
+        0,
+        !result.ends_with(NEWLINE),
+    ));
     if !result.ends_with(NEWLINE) {
         result.push(' ');
     }
@@ -463,7 +493,7 @@ fn format_struct_definition(struct_def: &StructDefinition) -> String {
         .children_with_tokens()
         .find(|c| c.kind() == SyntaxKind::CloseBrace)
         .expect("struct definition should have a close brace");
-    result.push_str(&format_preceding_comments(&close_brace, 0));
+    result.push_str(&format_preceding_comments(&close_brace, 0, false));
     result.push('}');
     result.push_str(&format_inline_comment(&close_brace, true));
 
@@ -626,7 +656,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\n# fileA 1.1\nimport  # fileA 1.2\n    # fileA 2.1\n    # fileA 2.2\n    \"fileA.wdl\"  # fileA 2.3\n    # fileA 3.1\n    as  # fileA 3.2\n        # fileA 4.1\n        bar  # fileA 4.2\n    # fileA 5.1\n    alias  # fileA 5.2\n        # fileA 6.1\n        qux  # fileA 6.2\n        # fileA 7.1\n        as  # fileA 7.2\n        # fileA 8.1\n        Qux  # fileA 8.2\n# this comment belongs to fileB\nimport \"fileB.wdl\"\n    as foo\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n"
+            "version 1.1\n\n# fileA 1.1\nimport  # fileA 1.2\n    # fileA 2.1\n    # fileA 2.2\n    \"fileA.wdl\"  # fileA 2.3\n    # fileA 3.1\n    as  # fileA 3.2\n        # fileA 4.1\n        bar  # fileA 4.2\n    # fileA 5.1\n    alias  # fileA 5.2\n        # fileA 6.1\n        qux  # fileA 6.2\n        # fileA 7.1\n        as  # fileA 7.2\n        # fileA 8.1\n        Qux  # fileA 8.2\n# this comment belongs to fileB\nimport \"fileB.wdl\"\n    as foo  # also fileB\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n"
         );
     }
 
