@@ -249,7 +249,7 @@ impl FormatCommand {
         match formatted {
             Ok(formatted) => {
                 if source != formatted {
-                    println!("{}", formatted);
+                    print!("{}", formatted);
                 }
                 Ok(())
             }
