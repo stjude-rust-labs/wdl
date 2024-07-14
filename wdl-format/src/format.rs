@@ -112,7 +112,7 @@ fn format_metadata_item(item: &MetadataObjectItem) -> String {
         false,
     ));
     result.push_str(&two_indents);
-    result.push_str(&item.name().as_str());
+    result.push_str(item.name().as_str());
     result.push_str(&format_inline_comment(
         &SyntaxElement::Token(item.name().syntax().clone()),
         false,
@@ -422,7 +422,7 @@ fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
     } else {
         result.push(' ');
     }
-    result.push_str(&declaration.name().as_str());
+    result.push_str(declaration.name().as_str());
     result.push_str(&format_inline_comment(
         &SyntaxElement::Token(declaration.name().syntax().clone()),
         false,
@@ -445,7 +445,7 @@ fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
         } else {
             result.push(' ');
         }
-        result.push_str("=");
+        result.push('=');
         result.push_str(&format_inline_comment(&equal_sign, false));
 
         result.push_str(&format_preceding_comments(
