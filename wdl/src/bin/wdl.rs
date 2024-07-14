@@ -254,7 +254,7 @@ impl FormatCommand {
                 Ok(())
             }
             Err(diagnostics) => {
-                emit_diagnostics(&self.path, &source, &diagnostics)?;
+                emit_diagnostics(&self.path.to_string_lossy(), &source, &diagnostics)?;
 
                 bail!(
                     "aborting due to previous {count} diagnostic{s}",

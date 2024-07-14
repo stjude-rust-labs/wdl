@@ -178,7 +178,10 @@ impl Visitor for SectionOrderingRule {
                 WorkflowItem::Input(_) if encountered <= State::Input => {
                     encountered = State::Input;
                 }
-                WorkflowItem::Declaration(_) | WorkflowItem::Call(_) | WorkflowItem::Scatter(_)
+                WorkflowItem::Declaration(_)
+                | WorkflowItem::Call(_)
+                | WorkflowItem::Scatter(_)
+                | WorkflowItem::Conditional(_)
                     if encountered <= State::Decl =>
                 {
                     encountered = State::Decl;
