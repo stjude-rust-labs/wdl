@@ -1,4 +1,4 @@
-/// Format a workflow definition.
+//! Format a workflow definition.
 use wdl_ast::v1::CallStatement;
 use wdl_ast::v1::ConditionalStatement;
 use wdl_ast::v1::ScatterStatement;
@@ -16,6 +16,7 @@ use super::INDENT;
 use super::NEWLINE;
 use super::*;
 
+/// Format a call statement.
 fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
     let mut result = String::new();
     let next_num_indents = num_indents + 1;

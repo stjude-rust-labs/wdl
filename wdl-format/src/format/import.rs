@@ -1,4 +1,5 @@
-/// This module contains the functions for formatting import statements.
+//! This module contains the functions for formatting import statements.
+
 use std::collections::HashMap;
 
 use wdl_ast::v1::ImportStatement;

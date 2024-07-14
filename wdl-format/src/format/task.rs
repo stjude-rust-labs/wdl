@@ -1,4 +1,4 @@
-/// Format a task definition.
+//! Format a task definition.
 use wdl_ast::v1::CommandPart;
 use wdl_ast::v1::CommandSection;
 use wdl_ast::v1::RuntimeSection;

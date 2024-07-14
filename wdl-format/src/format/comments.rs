@@ -1,13 +1,14 @@
-/// Format comments in a WDL file.
-/// All comments will be treated as either "preceding" or "inline" comments.
-/// A preceding comment is a comment that appears on a line before an element,
-/// if and only if that element is the first element of its line. preceding
-/// comments should always appear, without any blank lines, immediately before
-/// the element they are commenting on. preceding comments should be indented
-/// to the same level as the element they are commenting on. An inline
-/// comment is a comment that appears on the same line as an element, if and
-/// only if that element is the last element of its line. Inline comments should
-/// always appear immediately after the element they are commenting on.
+//! Format comments in a WDL file.
+//! All comments will be treated as either "preceding" or "inline" comments.
+//! A preceding comment is a comment that appears on a line before an element,
+//! if and only if that element is the first element of its line. preceding
+//! comments should always appear, without any blank lines, immediately before
+//! the element they are commenting on. preceding comments should be indented
+//! to the same level as the element they are commenting on. An inline
+//! comment is a comment that appears on the same line as an element, if and
+//! only if that element is the last element of its line. Inline comments should
+//! always appear immediately after the element they are commenting on.
+
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 
