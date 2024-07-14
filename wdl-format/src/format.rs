@@ -96,7 +96,6 @@ fn format_version_statement(version_statement: VersionStatement) -> String {
         true,
     ));
 
-    result.push_str(NEWLINE);
     result
 }
 
@@ -492,6 +491,7 @@ pub fn format_document(code: &str) -> Result<String, Arc<[Diagnostic]>> {
     result.push_str(&format_version_statement(
         document.version_statement().unwrap(),
     ));
+    result.push_str(NEWLINE);
 
     let ast = document.ast();
     let ast = ast.as_v1().unwrap();
@@ -503,12 +503,21 @@ pub fn format_document(code: &str) -> Result<String, Arc<[Diagnostic]>> {
                 // Imports have already been formatted
             }
             DocumentItem::Workflow(workflow_def) => {
+                if !result.ends_with(&NEWLINE.repeat(2)) {
+                    result.push_str(NEWLINE);
+                }
                 result.push_str(&format_workflow(&workflow_def));
             }
             DocumentItem::Task(task_def) => {
+                if !result.ends_with(&NEWLINE.repeat(2)) {
+                    result.push_str(NEWLINE);
+                }
                 result.push_str(&format_task(&task_def));
             }
             DocumentItem::Struct(struct_def) => {
+                if !result.ends_with(&NEWLINE.repeat(2)) {
+                    result.push_str(NEWLINE);
+                }
                 result.push_str(&format_struct_definition(&struct_def));
             }
         };
@@ -555,8 +564,7 @@ mod tests {
              \"fileA.wdl\"\n    # fileA 3\n    as\n        # fileA 4\n        bar\n    # fileA \
              5\n    alias\n        # fileA 6\n        qux\n        # fileA 7\n        as\n        \
              # fileA 8\n        Qux\n# this comment belongs to fileB\nimport \"fileB.wdl\"\n    \
-             as foo\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test \
-             {\n}\n\n"
+             as foo\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n"
         );
     }
 
@@ -580,7 +588,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.0\n\nimport  # fileA 1\n    \"fileA.wdl\"  # fileA 2\n    as  # fileA 3\n        bar  # fileA 4\n    alias  # fileA 5\n        qux  # fileA 6\n        as  # fileA 7\n        Qux  # fileA 8\nimport \"fileB.wdl\"\n    as foo\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n\n",
+            "version 1.0\n\nimport  # fileA 1\n    \"fileA.wdl\"  # fileA 2\n    as  # fileA 3\n        bar  # fileA 4\n    alias  # fileA 5\n        qux  # fileA 6\n        as  # fileA 7\n        Qux  # fileA 8\nimport \"fileB.wdl\"\n    as foo  # fileB\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n",
         );
     }
 
@@ -588,7 +596,7 @@ mod tests {
     fn test_format_without_comments() {
         let code = "version 1.1\nworkflow test {}";
         let formatted = format_document(code).unwrap();
-        assert_eq!(formatted, "version 1.1\n\nworkflow test {\n}\n\n");
+        assert_eq!(formatted, "version 1.1\n\nworkflow test {\n}\n");
     }
 
     #[test]
@@ -621,7 +629,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\n# fileA 1.1\nimport  # fileA 1.2\n    # fileA 2.1\n    # fileA 2.2\n    \"fileA.wdl\"  # fileA 2.3\n    # fileA 3.1\n    as  # fileA 3.2\n        # fileA 4.1\n        bar  # fileA 4.2\n    # fileA 5.1\n    alias  # fileA 5.2\n        # fileA 6.1\n        qux  # fileA 6.2\n        # fileA 7.1\n        as  # fileA 7.2\n        # fileA 8.1\n        Qux  # fileA 8.2\n# this comment belongs to fileB\nimport \"fileB.wdl\"\n    as foo\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n\n"
+            "version 1.1\n\n# fileA 1.1\nimport  # fileA 1.2\n    # fileA 2.1\n    # fileA 2.2\n    \"fileA.wdl\"  # fileA 2.3\n    # fileA 3.1\n    as  # fileA 3.2\n        # fileA 4.1\n        bar  # fileA 4.2\n    # fileA 5.1\n    alias  # fileA 5.2\n        # fileA 6.1\n        qux  # fileA 6.2\n        # fileA 7.1\n        as  # fileA 7.2\n        # fileA 8.1\n        Qux  # fileA 8.2\n# this comment belongs to fileB\nimport \"fileB.wdl\"\n    as foo\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n"
         );
     }
 
@@ -639,7 +647,7 @@ mod tests {
             formatted,
             "version 1.1\n\nimport \"fileA.wdl\"\n    as bar\n    alias cows as horses\nimport \
              \"fileB.wdl\"\n    as foo\nimport \"fileC.wdl\"\n    alias qux as Qux\n\nworkflow \
-             test {\n}\n\n"
+             test {\n}\n"
         );
     }
 
@@ -662,7 +670,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-             "version 1.1\n\nworkflow test {  # workflow comment\n    # meta comment\n    meta  # also meta comment\n    # open brace\n    {  # open brace\n        # author comment\n        author: \"me\"  # author comment\n        # email comment\n        email: \"me@stjude.org\"  # email comment\n    }  # trailing comment\n\n}\n\n"
+             "version 1.1\n\nworkflow test {  # workflow comment\n    # meta comment\n    meta  # also meta comment\n    # open brace\n    {  # open brace\n        # author comment\n        author: \"me\"  # author comment\n        # email comment\n        email: \"me@stjude.org\"  # email comment\n    }  # trailing comment\n\n}\n"
         );
     }
 
@@ -682,7 +690,7 @@ mod tests {
         assert_eq!(
             formatted,
             "version 1.1\n\nworkflow test {\n    meta {\n        author: \"me\"\n        email: \
-             \"me@stjude.org\"\n    }\n\n}\n\n"
+             \"me@stjude.org\"\n    }\n\n}\n"
         );
     }
     #[test]
@@ -704,7 +712,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-             "version 1.1\n\n# workflow comment\nworkflow test {\n    # parameter_meta comment\n    parameter_meta {  # parameter_meta comment\n        foo: \"bar\"  # foo comment\n    }\n\n    input {\n        String foo\n    }\n\n}\n\n"
+             "version 1.1\n\n# workflow comment\nworkflow test {\n    # parameter_meta comment\n    parameter_meta {  # parameter_meta comment\n        foo: \"bar\"  # foo comment\n    }\n\n    input {\n        String foo\n    }\n\n}\n"
         );
     }
 
@@ -726,7 +734,7 @@ mod tests {
             formatted,
             "version 1.1\n\nworkflow test {\n    input {\n        # foo comment\n        String \
              foo  # another foo comment\n        Int  # mid-bar comment\n            bar\n    \
-             }\n\n}\n\n"
+             }\n\n}\n"
         );
     }
 
@@ -751,7 +759,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {\n    # foo comment\n    call foo\n    # bar comment\n    call bar as baz\n    call qux  # mid-qux inline comment\n        # mid-qux full-line comment\n        after baz  # after qux\n    call lorem after ipsum { input:  # after input token\n        bazam,\n        bam = select_bam,\n    }\n}\n\n"
+            "version 1.1\n\nworkflow test {\n    # foo comment\n    call foo\n    # bar comment\n    call bar as baz\n    call qux  # mid-qux inline comment\n        # mid-qux full-line comment\n        after baz  # after qux\n    call lorem after ipsum { input:  # after input token\n        bazam,\n        bam = select_bam,\n    }\n}\n"
         );
     }
 
@@ -778,7 +786,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nworkflow test {\n    if (true) {\n        call foo\n        scatter (abc in bar) {\n            if (false) {\n                call bar\n            }\n            if (a > b  # expr comment\n            ) {\n                scatter (x in [1, 2, 3]) {\n                    call baz\n                }\n            }\n        }\n    }\n}\n\n"
+            "version 1.1\n\nworkflow test {\n    if (true) {\n        call foo\n        scatter (abc in bar) {\n            if (false) {\n                call bar\n            }\n            if (a > b  # expr comment\n            ) {\n                scatter (x in [1, 2, 3]) {\n                    call baz\n                }\n            }\n        }\n    }\n}\n"
         );
     }
 
@@ -836,7 +844,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "# preamble one\n# preamble two\n\nversion  # 1\n    1.1  # 2\n\nworkflow  # 3\n    test  # 4\n{  # 5\n    meta  # 6\n    {  # 7\n        # 8\n        # 9\n        description # 10\n        : # 11\n        \"what a nightmare\"  # 12\n    }  # 13\n\n    parameter_meta  # 14\n    {  # 15\n        foo # 16\n        : # 17\n        \"bar\"  # 18\n    }  # 19\n\n    input  # 20\n    {  # 21\n        String  # 22\n            foo  # 23\n    }  # 24\n\n    if  # 25\n    (  # 26\n        true  # 27\n    )  # 28\n    {  # 29\n        scatter  # 30\n        (  # 31\n            x  # 32\n            in  # 33\n            [1,2,3]  # 34\n        )  # 35\n        {  # 36\n            call  # 37\n                task  # 38\n                as  # 39\n                task_alias  # 40\n                after  # 41\n                cows_come_home  # 42\n        }  # 43\n    }  # 44\n}  # 45\n\n"
+            "# preamble one\n# preamble two\n\nversion  # 1\n    1.1  # 2\n\nworkflow  # 3\n    test  # 4\n{  # 5\n    meta  # 6\n    {  # 7\n        # 8\n        # 9\n        description # 10\n        : # 11\n        \"what a nightmare\"  # 12\n    }  # 13\n\n    parameter_meta  # 14\n    {  # 15\n        foo # 16\n        : # 17\n        \"bar\"  # 18\n    }  # 19\n\n    input  # 20\n    {  # 21\n        String  # 22\n            foo  # 23\n    }  # 24\n\n    if  # 25\n    (  # 26\n        true  # 27\n    )  # 28\n    {  # 29\n        scatter  # 30\n        (  # 31\n            x  # 32\n            in  # 33\n            [1,2,3]  # 34\n        )  # 35\n        {  # 36\n            call  # 37\n                task  # 38\n                as  # 39\n                task_alias  # 40\n                after  # 41\n                cows_come_home  # 42\n        }  # 43\n    }  # 44\n}  # 45\n"
         );
     }
 }
