@@ -66,11 +66,12 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                     val.push_str(&format_inline_comment(&cur, false));
                 }
                 SyntaxKind::AsKeyword => {
-                    if !val.ends_with(NEWLINE) {
-                        val.push_str(NEWLINE);
+                    val.push_str(&format_preceding_comments(&cur, 1, !val.ends_with(NEWLINE)));
+                    if val.ends_with(NEWLINE) {
+                        val.push_str(one_indent);
+                    } else {
+                        val.push(' ');
                     }
-                    val.push_str(&format_preceding_comments(&cur, 1, false));
-                    val.push_str(one_indent);
                     val.push_str("as");
                     val.push_str(&format_inline_comment(&cur, false));
                 }
@@ -87,10 +88,7 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                     val.push_str(&format_inline_comment(&cur, false));
                 }
                 SyntaxKind::ImportAliasNode => {
-                    if !val.ends_with(NEWLINE) {
-                        val.push_str(NEWLINE);
-                    }
-                    val.push_str(&format_preceding_comments(&cur, 1, false));
+                    val.push_str(&format_preceding_comments(&cur, 1, !val.ends_with(NEWLINE)));
                     let mut second_ident_of_clause = false;
                     cur.as_node()
                         .unwrap()
@@ -98,8 +96,11 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                         .for_each(|alias_part| match alias_part.kind() {
                             SyntaxKind::AliasKeyword => {
                                 // This should always be the first child processed
-
-                                val.push_str(one_indent);
+                                if val.ends_with(NEWLINE) {
+                                    val.push_str(one_indent);
+                                } else {
+                                    val.push(' ');
+                                }
                                 val.push_str("alias");
                                 val.push_str(&format_inline_comment(&alias_part, false));
                             }
