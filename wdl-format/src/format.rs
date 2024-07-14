@@ -1,7 +1,5 @@
 //! A module for formatting WDL code.
 
-use std::sync::Arc;
-
 use anyhow::Result;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
@@ -473,13 +471,12 @@ fn format_struct_definition(struct_def: &StructDefinition) -> String {
 }
 
 /// Format a WDL document.
-pub fn format_document(code: &str) -> Result<String, Arc<[Diagnostic]>> {
-    let parse = Document::parse(code).into_result();
-    if let Err(diagnostics) = parse {
+pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
+    let (document, diagnostics) = Document::parse(code);
+    if !diagnostics.is_empty() {
         return Err(diagnostics);
     }
-    let document = parse.unwrap();
-    let validator = Validator::default();
+    let mut validator = Validator::default();
     match validator.validate(&document) {
         Ok(_) => {
             // The document is valid, so we can format it.

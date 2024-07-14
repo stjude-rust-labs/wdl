@@ -257,6 +257,9 @@ pub fn format_task(task_def: &TaskDefinition) -> String {
             TaskItem::Runtime(r) => {
                 runtime_section_str.push_str(&format_runtime_section(r));
             }
+            TaskItem::Requirements(r) => {
+                // TODO
+            }
         }
     }
 
