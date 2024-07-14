@@ -39,9 +39,10 @@ use workflow::format_workflow;
 fn format_version_statement(version_statement: VersionStatement) -> String {
     // Collect comments that preceed the version statement.
     // Note as this must be the first element in the document,
-    // the logic is slightly different than the 'format_preceding_comments' function.
-    // We are walking backwards through the syntax tree, so we must collect
-    // the comments in a vector and reverse them to get them in the correct order.
+    // the logic is slightly different than the 'format_preceding_comments'
+    // function. We are walking backwards through the syntax tree, so we must
+    // collect the comments in a vector and reverse them to get them in the
+    // correct order.
     let mut preceding_comments = Vec::new();
     for sibling in version_statement
         .syntax()
