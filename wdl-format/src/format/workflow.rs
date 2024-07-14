@@ -657,7 +657,6 @@ pub fn format_workflow(workflow_def: &WorkflowDefinition) -> String {
         &SyntaxElement::Node(workflow_def.syntax().clone()),
         true,
     ));
-    result.push_str(NEWLINE);
 
     result
 }

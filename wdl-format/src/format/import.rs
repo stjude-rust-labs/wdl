@@ -61,9 +61,12 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                                 unreachable!("Unexpected syntax kind: {:?}", cur.kind());
                             }
                         });
-                    val.push_str(&format_inline_comment(&cur, true));
+                    val.push_str(&format_inline_comment(&cur, false));
                 }
                 SyntaxKind::AsKeyword => {
+                    if !val.ends_with(NEWLINE) {
+                        val.push_str(NEWLINE);
+                    }
                     val.push_str(&format_preceding_comments(&cur, 1));
                     val.push_str(one_indent);
                     val.push_str("as");
@@ -79,9 +82,13 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                         val.push_str(&two_indents);
                     }
                     val.push_str(&cur.to_string());
-                    val.push_str(&format_inline_comment(&cur, true));
+                    val.push_str(&format_inline_comment(&cur, false));
                 }
                 SyntaxKind::ImportAliasNode => {
+                    if !val.ends_with(NEWLINE) {
+                        val.push_str(NEWLINE);
+                    }
+                    val.push_str(&format_preceding_comments(&cur, 1));
                     let mut second_ident_of_clause = false;
                     cur.as_node()
                         .unwrap()
@@ -89,10 +96,7 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                         .for_each(|alias_part| match alias_part.kind() {
                             SyntaxKind::AliasKeyword => {
                                 // This should always be the first child processed
-                                val.push_str(&format_preceding_comments(
-                                    &cur, // Parent node
-                                    1,
-                                ));
+
                                 val.push_str(one_indent);
                                 val.push_str("alias");
                                 val.push_str(&format_inline_comment(&alias_part, false));
@@ -108,12 +112,7 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
                                 if !second_ident_of_clause {
                                     val.push_str(&format_inline_comment(&alias_part, false));
                                     second_ident_of_clause = true;
-                                } else {
-                                    val.push_str(&format_inline_comment(
-                                                    &SyntaxElement::Node(import.syntax().clone()), // Parent's parent node
-                                                    true,
-                                                ));
-                                }
+                                } // else will be handled by outer loop
                             }
                             SyntaxKind::AsKeyword => {
                                 val.push_str(&format_preceding_comments(&alias_part, 2));
@@ -158,6 +157,12 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
             next = cur.next_sibling_or_token();
         }
 
+        let newline_needed = !val.ends_with(NEWLINE);
+        val.push_str(&format_inline_comment(
+            &SyntaxElement::Node(import.syntax().clone()),
+            newline_needed,
+        ));
+
         import_map.insert(key, val);
     }
 
@@ -168,10 +173,6 @@ pub fn format_imports(imports: AstChildren<ImportStatement>) -> String {
     for (_, val) in import_vec {
         result.push_str(&val);
     }
-    if !result.is_empty() {
-        // There should always be a blank line after the imports
-        // (if they are present), so add a second newline here.
-        result.push_str(NEWLINE);
-    }
+
     result
 }

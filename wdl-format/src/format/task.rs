@@ -303,7 +303,6 @@ pub fn format_task(task_def: &TaskDefinition) -> String {
     }
     result.push('}');
     result.push_str(&format_inline_comment(&close_brace, true));
-    result.push_str(NEWLINE);
 
     result
 }
