@@ -19,13 +19,12 @@ pub const INLINE_COMMENT_SPACE: &str = "  ";
 
 /// Format comments that preceed a node.
 ///
-/// If no comments are found this returns an empty string (regardless of the
-/// value of 'newline_needed' or 'trailing_indent'). 'newline_needed' is used
-/// to determine if a newline should be inserted before the comments. If
-/// 'trailing_indent' is true, 'num_indents' will be inserted at the end of the
-/// result. If 'trailing_indent' is false, the result string will end in a
-/// newline.
-pub fn format_preceding_comments(element: &SyntaxElement, num_indents: usize) -> String {
+/// TODO write more
+pub fn format_preceding_comments(
+    element: &SyntaxElement,
+    num_indents: usize,
+    prepend_newline: bool,
+) -> String {
     // This walks _backwards_ through the syntax tree to find comments
     // so we must collect them in a vector and later reverse them to get them in the
     // correct order.
@@ -69,6 +68,9 @@ pub fn format_preceding_comments(element: &SyntaxElement, num_indents: usize) ->
     }
 
     let mut result = String::new();
+    if prepend_newline && !preceding_comments.is_empty() {
+        result.push_str(NEWLINE);
+    }
     for comment in preceding_comments.iter().rev() {
         for _ in 0..num_indents {
             result.push_str(INDENT);
