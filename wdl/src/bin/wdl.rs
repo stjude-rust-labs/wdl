@@ -248,9 +248,7 @@ impl FormatCommand {
         let formatted = format_document(&source);
         match formatted {
             Ok(formatted) => {
-                if source != formatted {
-                    print!("{}", formatted);
-                }
+                print!("{}", formatted);
                 Ok(())
             }
             Err(diagnostics) => {

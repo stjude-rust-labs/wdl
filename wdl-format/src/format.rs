@@ -317,7 +317,7 @@ fn format_input_section(input: InputSection) -> String {
                 .last_token()
                 .expect("input section should have a token"),
         ),
-        0,
+        1,
         false,
     ));
     result.push_str(INDENT);
@@ -379,7 +379,7 @@ fn format_output_section(output: OutputSection) -> String {
                 .last_token()
                 .expect("output section should have a token"),
         ),
-        0,
+        1,
         false,
     ));
     result.push_str(INDENT);
