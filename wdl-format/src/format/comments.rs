@@ -1,4 +1,5 @@
 //! Format comments in a WDL file.
+//! 
 //! All comments will be treated as either "preceding" or "inline" comments.
 //! A preceding comment is a comment that appears on a line before an element,
 //! if and only if that element is the first element of its line. preceding
@@ -20,7 +21,15 @@ pub const INLINE_COMMENT_SPACE: &str = "  ";
 
 /// Format comments that preceed a node.
 ///
-/// TODO write more
+/// This function will return the empty string if no comments are found
+/// (regardless of the value of 'prepend_newline').
+/// This function will format all comments that appear before a node,
+/// so long as those comments are on their own line. If a comment is
+/// found that is not on its own line, this function will stop looking
+/// for comments. This function will return a string with all comments
+/// formatted with the correct indentation and a newline at the end.
+/// If 'prepend_newline' is true, a newline will be prepended to the
+/// formatted comments.
 pub fn format_preceding_comments(
     element: &SyntaxElement,
     num_indents: usize,
