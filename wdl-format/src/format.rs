@@ -458,7 +458,7 @@ fn format_declaration(declaration: &Decl, num_indents: usize) -> String {
         } else {
             result.push(' ');
         }
-        result.push_str(&expr.syntax().to_string());
+        result.push_str(&expr.syntax().to_string()); // TODO: format expressions
     }
     result.push_str(&format_inline_comment(
         &SyntaxElement::Node(declaration.syntax().clone()),
@@ -625,8 +625,8 @@ mod tests {
             "version 1.1\n\n# fileA 1\nimport\n    # fileA 2.1\n    # fileA 2.2\n    \
              \"fileA.wdl\"\n    # fileA 3\n    as\n        # fileA 4\n        bar\n    # fileA \
              5\n    alias\n        # fileA 6\n        qux\n        # fileA 7\n        as\n        \
-             # fileA 8\n        Qux\n# this comment belongs to fileB\nimport \"fileB.wdl\"\n    \
-             as foo\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n"
+             # fileA 8\n        Qux\n# this comment belongs to fileB\nimport \"fileB.wdl\" as \
+             foo\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n"
         );
     }
 
@@ -650,7 +650,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.0\n\nimport  # fileA 1\n    \"fileA.wdl\"  # fileA 2\n    as  # fileA 3\n        bar  # fileA 4\n    alias  # fileA 5\n        qux  # fileA 6\n        as  # fileA 7\n        Qux  # fileA 8\nimport \"fileB.wdl\"\n    as foo  # fileB\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n",
+            "version 1.0\n\nimport  # fileA 1\n    \"fileA.wdl\"  # fileA 2\n    as  # fileA 3\n        bar  # fileA 4\n    alias  # fileA 5\n        qux  # fileA 6\n        as  # fileA 7\n        Qux  # fileA 8\nimport \"fileB.wdl\" as foo  # fileB\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n",
         );
     }
 
@@ -691,7 +691,7 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\n# fileA 1.1\nimport  # fileA 1.2\n    # fileA 2.1\n    # fileA 2.2\n    \"fileA.wdl\"  # fileA 2.3\n    # fileA 3.1\n    as  # fileA 3.2\n        # fileA 4.1\n        bar  # fileA 4.2\n    # fileA 5.1\n    alias  # fileA 5.2\n        # fileA 6.1\n        qux  # fileA 6.2\n        # fileA 7.1\n        as  # fileA 7.2\n        # fileA 8.1\n        Qux  # fileA 8.2\n# this comment belongs to fileB\nimport \"fileB.wdl\"\n    as foo  # also fileB\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n"
+            "version 1.1\n\n# fileA 1.1\nimport  # fileA 1.2\n    # fileA 2.1\n    # fileA 2.2\n    \"fileA.wdl\"  # fileA 2.3\n    # fileA 3.1\n    as  # fileA 3.2\n        # fileA 4.1\n        bar  # fileA 4.2\n    # fileA 5.1\n    alias  # fileA 5.2\n        # fileA 6.1\n        qux  # fileA 6.2\n        # fileA 7.1\n        as  # fileA 7.2\n        # fileA 8.1\n        Qux  # fileA 8.2\n# this comment belongs to fileB\nimport \"fileB.wdl\" as foo  # also fileB\n# this comment belongs to fileC\nimport \"fileC.wdl\"\n\nworkflow test {\n}\n"
         );
     }
 
@@ -707,9 +707,8 @@ mod tests {
         let formatted = format_document(code).unwrap();
         assert_eq!(
             formatted,
-            "version 1.1\n\nimport \"fileA.wdl\"\n    as bar\n    alias cows as horses\nimport \
-             \"fileB.wdl\"\n    as foo\nimport \"fileC.wdl\"\n    alias qux as Qux\n\nworkflow \
-             test {\n}\n"
+            "version 1.1\n\nimport \"fileA.wdl\" as bar alias cows as horses\nimport \
+             \"fileB.wdl\" as foo\nimport \"fileC.wdl\" alias qux as Qux\n\nworkflow test {\n}\n"
         );
     }
 
