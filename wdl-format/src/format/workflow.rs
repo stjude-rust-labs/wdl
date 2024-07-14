@@ -157,7 +157,6 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
     }
 
     let inputs: Vec<_> = call.inputs().collect();
-    // TODO handle inputs of length 1 differently
     if !inputs.is_empty() {
         let open_brace = call
             .syntax()
@@ -209,28 +208,28 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
             result.push_str(&next_indents);
         }
         result.push(':');
-        result.push_str(&format_inline_comment(&colon, true));
+        result.push_str(&format_inline_comment(&colon, false));
 
-        let mut commas = call
-            .syntax()
-            .children_with_tokens()
-            .filter(|c| c.kind() == SyntaxKind::Comma);
-        for item in inputs {
+        if inputs.len() == 1 {
+            let input = &inputs[0];
             result.push_str(&format_preceding_comments(
-                &SyntaxElement::Node(item.syntax().clone()),
+                &SyntaxElement::Node(input.syntax().clone()),
                 next_num_indents,
                 false,
             ));
-
-            result.push_str(&next_indents);
-            result.push_str(item.name().as_str());
+            if result.ends_with(NEWLINE) {
+                result.push_str(&next_indents);
+            } else {
+                result.push(' ');
+            }
+            result.push_str(input.name().as_str());
             result.push_str(&format_inline_comment(
-                &SyntaxElement::Token(item.name().syntax().clone()),
+                &SyntaxElement::Token(input.name().syntax().clone()),
                 false,
             ));
 
-            if let Some(expr) = item.expr() {
-                let equal_sign = item
+            if let Some(expr) = input.expr() {
+                let equal_sign = input
                     .syntax()
                     .children_with_tokens()
                     .find(|c| c.kind() == SyntaxKind::Assignment)
@@ -262,34 +261,108 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
             }
 
             result.push_str(&format_inline_comment(
-                &SyntaxElement::Node(item.syntax().clone()),
+                &SyntaxElement::Node(input.syntax().clone()),
                 false,
             ));
 
-            if let Some(cur_comma) = commas.next() {
-                result.push_str(&format_preceding_comments(
-                    &cur_comma,
-                    next_num_indents,
-                    !result.ends_with(NEWLINE),
-                ));
-                result.push(',');
-                result.push_str(&format_inline_comment(&cur_comma, false));
+            let close_brace = call
+                .syntax()
+                .children_with_tokens()
+                .find(|c| c.kind() == SyntaxKind::CloseBrace)
+                .expect("Call statement should have a close brace");
+            result.push_str(&format_preceding_comments(&close_brace, num_indents, false));
+            if result.ends_with(NEWLINE) {
+                result.push_str(&cur_indents);
             } else {
-                result.push(',');
+                result.push(' ');
             }
+            result.push('}');
+        } else {
+            // Multiple inputs
             if !result.ends_with(NEWLINE) {
                 result.push_str(NEWLINE);
             }
-        }
 
-        let close_brace = call
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::CloseBrace)
-            .expect("Call statement should have a close brace");
-        result.push_str(&format_preceding_comments(&close_brace, num_indents, false));
-        result.push_str(&cur_indents);
-        result.push('}');
+            let mut commas = call
+                .syntax()
+                .children_with_tokens()
+                .filter(|c| c.kind() == SyntaxKind::Comma);
+            for item in inputs {
+                result.push_str(&format_preceding_comments(
+                    &SyntaxElement::Node(item.syntax().clone()),
+                    next_num_indents,
+                    false,
+                ));
+
+                result.push_str(&next_indents);
+                result.push_str(item.name().as_str());
+                result.push_str(&format_inline_comment(
+                    &SyntaxElement::Token(item.name().syntax().clone()),
+                    false,
+                ));
+
+                if let Some(expr) = item.expr() {
+                    let equal_sign = item
+                        .syntax()
+                        .children_with_tokens()
+                        .find(|c| c.kind() == SyntaxKind::Assignment)
+                        .expect("Call input should have an equal sign");
+                    result.push_str(&format_preceding_comments(
+                        &equal_sign,
+                        next_num_indents,
+                        !result.ends_with(NEWLINE),
+                    ));
+                    if result.ends_with(NEWLINE) {
+                        result.push_str(&next_indents);
+                    } else {
+                        result.push(' ');
+                    }
+                    result.push('=');
+                    result.push_str(&format_inline_comment(&equal_sign, false));
+
+                    result.push_str(&format_preceding_comments(
+                        &SyntaxElement::Node(expr.syntax().clone()),
+                        next_num_indents,
+                        false,
+                    ));
+                    if !result.ends_with(NEWLINE) {
+                        result.push(' ');
+                    } else {
+                        result.push_str(&next_indents);
+                    }
+                    result.push_str(&expr.syntax().to_string()); // TODO: format expressions
+                }
+
+                result.push_str(&format_inline_comment(
+                    &SyntaxElement::Node(item.syntax().clone()),
+                    false,
+                ));
+
+                if let Some(cur_comma) = commas.next() {
+                    result.push_str(&format_preceding_comments(
+                        &cur_comma,
+                        next_num_indents,
+                        !result.ends_with(NEWLINE),
+                    ));
+                    result.push(',');
+                    result.push_str(&format_inline_comment(&cur_comma, false));
+                } else {
+                    result.push(',');
+                }
+                if !result.ends_with(NEWLINE) {
+                    result.push_str(NEWLINE);
+                }
+            }
+
+            let close_brace = call
+                .syntax()
+                .children_with_tokens()
+                .find(|c| c.kind() == SyntaxKind::CloseBrace)
+                .expect("Call statement should have a close brace");
+            result.push_str(&format_preceding_comments(&close_brace, num_indents, false));
+            result.push_str(&cur_indents);
+            result.push('}');
+        }
     }
 
     result.push_str(&format_inline_comment(
