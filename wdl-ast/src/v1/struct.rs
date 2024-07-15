@@ -37,7 +37,7 @@ impl StructDefinition {
         children(&self.0)
     }
 
-    /// Gets the parameter sections of the struct.
+    /// Gets the parameter metadata sections of the struct.
     pub fn parameter_metadata(&self) -> AstChildren<ParameterMetadataSection> {
         children(&self.0)
     }
