@@ -52,10 +52,7 @@ enum KeyKind {
 impl KeyKind {
     /// Returns whether a key is recommended to be included.
     pub fn is_recommended(&self) -> bool {
-        match self {
-            KeyKind::Deprecated(_) | KeyKind::ReservedHint => false,
-            KeyKind::Recommended | KeyKind::ReservedMandatory => true,
-        }
+        *self == KeyKind::Recommended
     }
 }
 
@@ -83,7 +80,7 @@ fn keys_v1_1() -> &'static HashMap<&'static str, KeyKind> {
 
     KEYS_V1_1.get_or_init(|| {
         let mut keys = HashMap::new();
-        keys.insert("container", KeyKind::ReservedMandatory);
+        keys.insert("container", KeyKind::Recommended);
         keys.insert("docker", KeyKind::Deprecated("container"));
         keys.insert("cpu", KeyKind::ReservedMandatory);
         keys.insert("memory", KeyKind::ReservedMandatory);
