@@ -146,6 +146,8 @@ impl Visitor for LiteralTextVisitor {
             .expect("node should cast");
         match string.kind() {
             LiteralStringKind::SingleQuoted | LiteralStringKind::DoubleQuoted => {
+                // Check the text of a normal string to ensure escape sequences are correct and
+                // characters that are required to be escaped are actually escaped.
                 check_text(
                     state,
                     text.syntax().text_range().start().into(),
@@ -153,7 +155,11 @@ impl Visitor for LiteralTextVisitor {
                 );
             }
             LiteralStringKind::Multiline => {
-                // Don't check the text of multiline strings
+                // Don't check the text of multiline strings as they are treated
+                // like commands where almost all of the text is literal and the
+                // only escape is escaping the closing `>>>`; the only
+                // difference between a multiline string and a command is how
+                // line continuation whitespace is normalized.
             }
         }
     }

@@ -6,7 +6,7 @@ version 1.2
 workflow ok {
     String ok = <<<
         This is a multi-line string.
-        It may contain either ${<<<dollar>>>} or ${"tilde"} placeholders.
+        It may contain either ${<<<dollar>>>} or ~{"tilde"} placeholders.
         It may contain line continuations \
         And escaped endings \>>>.
     >>>
