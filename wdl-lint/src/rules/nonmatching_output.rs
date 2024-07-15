@@ -74,7 +74,9 @@ fn out_of_order(span: Span, output_span: Span, item_name: &str, ty: &str) -> Dia
 /// Creates a diagnostic for non-object `meta.outputs` entries.
 fn non_object_meta_outputs(span: Span, item_name: &str, ty: &str) -> Diagnostic {
     Diagnostic::warning(format!(
-        "`outputs` key in `meta` section for the {ty} `{item_name}` is not an object"
+        "`outputs` key in `meta` section is reserved for an object with keys corresponding to \
+         declared `output` values. {ty} `{item_name}` has a `meta.outputs` key that is not an \
+         object"
     ))
     .with_rule(ID)
     .with_highlight(span)
@@ -112,11 +114,11 @@ impl<'a> Rule for NonmatchingOutputRule<'a> {
     }
 
     fn explanation(&self) -> &'static str {
-        "The meta section should have an `outputs` key and keys with descriptions for each output \
-         of the task/workflow. These must match exactly. i.e. for each named output of a task or \
-         workflow, there should be an entry under `meta.outputs` with that same name. \
-         Additionally, these entries should be in the same order (that order is up to the \
-         developer to decide). No extraneous `meta.outputs` entries are allowed."
+        "The meta section should have an `outputs` key that is an object and contains keys with \
+         descriptions for each output of the task/workflow. These must match exactly. i.e. for \
+         each named output of a task or workflow, there should be an entry under `meta.outputs` \
+         with that same name. Additionally, these entries should be in the same order (that order \
+         is up to the developer to decide). No extraneous `meta.outputs` entries are allowed."
     }
 
     fn tags(&self) -> TagSet {
