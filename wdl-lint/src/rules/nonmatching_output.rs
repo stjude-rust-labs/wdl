@@ -116,7 +116,7 @@ impl<'a> Rule for NonmatchingOutputRule<'a> {
          of the task/workflow. These must match exactly. i.e. for each named output of a task or \
          workflow, there should be an entry under `meta.outputs` with that same name. \
          Additionally, these entries should be in the same order (that order is up to the \
-         developer to decide). No extraneous output entries are allowed."
+         developer to decide). No extraneous `meta.outputs` entries are allowed."
     }
 
     fn tags(&self) -> TagSet {
@@ -130,9 +130,7 @@ fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule<'_>)
     // Check for expected entries missing from `meta.outputs`.
     for (name, span) in &rule.output_keys {
         if !rule.meta_outputs_keys.contains_key(name) {
-            if exact_match {
-                exact_match = false;
-            }
+            exact_match = false;
             if rule.current_meta_span.is_some() {
                 state.add(nonmatching_output(
                     *span,
@@ -147,9 +145,7 @@ fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule<'_>)
     // Check for extra entries in `meta.outputs`.
     for (name, span) in &rule.meta_outputs_keys {
         if !rule.output_keys.contains_key(name) {
-            if exact_match {
-                exact_match = false;
-            }
+            exact_match = false;
             if rule.current_output_span.is_some() {
                 state.add(extra_output_in_meta(
                     *span,
