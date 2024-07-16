@@ -51,19 +51,3 @@ warning[Whitespace]: more than one blank line in a row
    │  
    = fix: remove the unnecessary blank lines
 
-note[BlanksBetweenElements]: missing blank line
-   ┌─ tests/lints/between-import-whitespace/source.wdl:23:5
-   │
-23 │     meta {}
-   │     ^
-   │
-   = fix: add blank line before this element
-
-note[BlanksBetweenElements]: missing blank line
-   ┌─ tests/lints/between-import-whitespace/source.wdl:24:5
-   │
-24 │     output {}
-   │     ^
-   │
-   = fix: add blank line before this element
-

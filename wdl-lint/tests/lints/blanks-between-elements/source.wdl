@@ -9,9 +9,12 @@ import "qux" # following whitespace duplication is caught be Whitespace rule
 
 # test comment
 workflow foo {
-    # This is OK.
+
+    # This is OK.(but the prior line is not)
+    # So is this.
     meta {}
     parameter_meta {}
+    # what about this comment?
     input {}
 
     String p = "pip"
@@ -38,6 +41,7 @@ workflow foo {
 task bar {
 
     meta {
+        
         description: "bar"
 
         outputs: {
@@ -77,7 +81,7 @@ task bax {
         disks: "50 GB"
         memory: "4 GB"
 
-        docker: "ubuntu:latest"
+        container: "ubuntu:latest"
         
     }
 }
