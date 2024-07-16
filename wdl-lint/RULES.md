@@ -8,6 +8,7 @@ be out of sync with released packages.
 
 | Name                             | Tags                          | Description                                                                           |
 | :------------------------------- | :---------------------------- | :------------------------------------------------------------------------------------ |
+| `BlanksBetweenElements`          | Spacing                       | Ensures proper blank space between elements                                           |
 | `CallInputSpacing`               | Style, Clarity, Spacing       | Ensures proper spacing for call inputs                                                |
 | `CommandSectionMixedIndentation` | Clarity, Correctness, Spacing | Ensures that lines within a command do not mix spaces and tabs.                       |
 | `DeprecatedObject`               | Deprecated                    | Ensures that the deprecated `Object` construct is not used.                           |
