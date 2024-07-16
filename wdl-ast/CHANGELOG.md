@@ -9,10 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Add support for `meta` and `parameter_meta` sections in struct definitions in
+  WDL 1.2 ([#127](https://github.com/stjude-rust-labs/wdl/pull/127)).
+* Add support for omitting `input` keyword in call statement bodies in WDL 1.2
+  ([#125](https://github.com/stjude-rust-labs/wdl/pull/125)).
+* Add support for the `Directory` type in WDL 1.2 ([#124](https://github.com/stjude-rust-labs/wdl/pull/124)).
+* Add support for multi-line strings in WDL 1.2 ([#123](https://github.com/stjude-rust-labs/wdl/pull/123)).
+* Add support for `hints` sections in WDL 1.2 ([#121](https://github.com/stjude-rust-labs/wdl/pull/121)).
+* Add support for `requirements` sections in WDL 1.2 ([#117](https://github.com/stjude-rust-labs/wdl/pull/117)).
 * Add support for the exponentiation operator in WDL 1.2 ([#111](https://github.com/stjude-rust-labs/wdl/pull/111)).
 
 ### Changed
 
+* Removed `Send` and `Sync` constraints from the `Visitor` trait
+  ([#128](https://github.com/stjude-rust-labs/wdl/pull/128)).
 * Changed the API for parsing documents; `Document::parse` now returns
   `(Document, Vec<Diagnostic>)` rather than a `Parse` type ([#110](https://github.com/stjude-rust-labs/wdl/pull/110)).
 * The `Type` enumeration, and friends, in `wdl-ast` no longer implement
@@ -38,7 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* Refactored the `Visitor` trait and validation visitors so that they are not 
+* Refactored the `Visitor` trait and validation visitors so that they are not
   in a `v1` module ([#95](https://github.com/stjude-rust-labs/wdl/pull/95)).
 
 ## 0.3.0 - 06-13-2024
@@ -58,7 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* Removed the old AST implementation in favor of new new parser; this also 
+* Removed the old AST implementation in favor of new new parser; this also
   removes the `experimental` feature from the crate ([#79](https://github.com/stjude-rust-labs/wdl/pull/79)).
 * Removed dependency on `miette` and `thiserror` in the experimental parser,
   re-exported key items from `wdl-grammar`'s experimental parser implementation,

@@ -1,5 +1,7 @@
 //! V1 AST representation for struct definitions.
 
+use super::MetadataSection;
+use super::ParameterMetadataSection;
 use super::UnboundDecl;
 use crate::support::children;
 use crate::token;
@@ -20,8 +22,23 @@ impl StructDefinition {
         token(&self.0).expect("struct should have a name")
     }
 
-    /// Gets the members of the struct.
+    /// Gets the items in the struct definition.
+    pub fn items(&self) -> AstChildren<StructItem> {
+        children(&self.0)
+    }
+
+    /// Gets the member declarations of the struct.
     pub fn members(&self) -> AstChildren<UnboundDecl> {
+        children(&self.0)
+    }
+
+    /// Gets the metadata sections of the struct.
+    pub fn metadata(&self) -> AstChildren<MetadataSection> {
+        children(&self.0)
+    }
+
+    /// Gets the parameter metadata sections of the struct.
+    pub fn parameter_metadata(&self) -> AstChildren<ParameterMetadataSection> {
         children(&self.0)
     }
 }
@@ -51,6 +68,55 @@ impl AstNode for StructDefinition {
     }
 }
 
+/// Represents an item in a struct definition.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum StructItem {
+    /// The item is a member declaration.
+    Member(UnboundDecl),
+    /// The item is a metadata section.
+    Metadata(MetadataSection),
+    /// The item is a parameter meta section.
+    ParameterMetadata(ParameterMetadataSection),
+}
+
+impl AstNode for StructItem {
+    type Language = WorkflowDescriptionLanguage;
+
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        matches!(
+            kind,
+            SyntaxKind::UnboundDeclNode
+                | SyntaxKind::MetadataSectionNode
+                | SyntaxKind::ParameterMetadataSectionNode
+        )
+    }
+
+    fn cast(syntax: SyntaxNode) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match syntax.kind() {
+            SyntaxKind::UnboundDeclNode => Some(Self::Member(UnboundDecl(syntax))),
+            SyntaxKind::MetadataSectionNode => Some(Self::Metadata(MetadataSection(syntax))),
+            SyntaxKind::ParameterMetadataSectionNode => {
+                Some(Self::ParameterMetadata(ParameterMetadataSection(syntax)))
+            }
+            _ => None,
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            Self::Member(m) => &m.0,
+            Self::Metadata(m) => &m.0,
+            Self::ParameterMetadata(m) => &m.0,
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use pretty_assertions::assert_eq;
@@ -58,6 +124,7 @@ mod test {
     use crate::v1::StructDefinition;
     use crate::AstToken;
     use crate::Document;
+    use crate::SupportedVersion;
     use crate::VisitReason;
     use crate::Visitor;
 
@@ -80,6 +147,16 @@ struct PrimitiveTypes {
     String? h
     File i
     File? j
+    Directory k
+    Directory? l
+
+    meta {
+        ok: "good"
+    }
+
+    parameter_meta {
+        a: "foo"
+    }
 }
 
 struct ComplexTypes {
@@ -93,6 +170,15 @@ struct ComplexTypes {
     Object? h
     MyType i
     MyType? j
+    Array[Directory] k
+
+    meta {
+        ok: "good"
+    }
+
+    parameter_meta {
+        a: "foo"
+    }
 }            
 "#,
         );
@@ -109,7 +195,7 @@ struct ComplexTypes {
         // Second struct definition
         assert_eq!(structs[1].name().as_str(), "PrimitiveTypes");
         let members: Vec<_> = structs[1].members().collect();
-        assert_eq!(members.len(), 10);
+        assert_eq!(members.len(), 12);
 
         // First member
         assert_eq!(members[0].name().as_str(), "a");
@@ -161,10 +247,20 @@ struct ComplexTypes {
         assert_eq!(members[9].ty().to_string(), "File?");
         assert!(members[9].ty().is_optional());
 
+        // Eleventh member
+        assert_eq!(members[10].name().as_str(), "k");
+        assert_eq!(members[10].ty().to_string(), "Directory");
+        assert!(!members[10].ty().is_optional());
+
+        // Twelfth member
+        assert_eq!(members[11].name().as_str(), "l");
+        assert_eq!(members[11].ty().to_string(), "Directory?");
+        assert!(members[11].ty().is_optional());
+
         // Third struct definition
         assert_eq!(structs[2].name().as_str(), "ComplexTypes");
         let members: Vec<_> = structs[2].members().collect();
-        assert_eq!(members.len(), 10);
+        assert_eq!(members.len(), 11);
 
         // First member
         assert_eq!(members[0].name().as_str(), "a");
@@ -219,13 +315,25 @@ struct ComplexTypes {
         assert_eq!(members[9].ty().to_string(), "MyType?");
         assert!(members[9].ty().is_optional());
 
+        // Eleventh member
+        assert_eq!(members[10].name().as_str(), "k");
+        assert_eq!(members[10].ty().to_string(), "Array[Directory]");
+        assert!(!members[10].ty().is_optional());
+
         // Use a visitor to count the number of struct definitions in the tree
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn struct_definition(
                 &mut self,

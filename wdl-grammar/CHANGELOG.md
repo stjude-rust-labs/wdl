@@ -9,10 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Add support for `meta` and `parameter_meta` sections in struct definitions in
+  WDL 1.2 ([#127](https://github.com/stjude-rust-labs/wdl/pull/127)).
+* Add support for omitting `input` keyword in call statement bodies in WDL 1.2
+  ([#125](https://github.com/stjude-rust-labs/wdl/pull/125)).
+* Add support for the `Directory` type in WDL 1.2 ([#124](https://github.com/stjude-rust-labs/wdl/pull/124)).
+* Add support for multi-line strings in WDL 1.2 ([#123](https://github.com/stjude-rust-labs/wdl/pull/123)).
+* Add support for `hints` sections in WDL 1.2 ([#121](https://github.com/stjude-rust-labs/wdl/pull/121)).
+* Add support for `requirements` sections in WDL 1.2 ([#117](https://github.com/stjude-rust-labs/wdl/pull/117)).
 * Add support for the exponentiation operator in WDL 1.2 ([#111](https://github.com/stjude-rust-labs/wdl/pull/111)).
 
 ### Fixed
 
+* Made the call target grammar rule more permissible in accepting more than two
+  identifiers; this will still be treated as an error when resolving call
+  statements ([#118](https://github.com/stjude-rust-labs/wdl/pull/118)).
 * The diagnostic for missing a version statement in an empty file now points to
   the last position in the file so that the file that caused the error is
   attached to the diagnostic ([#110](https://github.com/stjude-rust-labs/wdl/pull/110)).

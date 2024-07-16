@@ -2,9 +2,10 @@
 
 pub use logos::Logos;
 
-use crate::grammar::v1::double_quote_interpolate;
-use crate::grammar::v1::interpolate_heredoc_command;
-use crate::grammar::v1::single_quote_interpolate;
+use crate::grammar::v1::interpolate_dq_string;
+use crate::grammar::v1::interpolate_heredoc;
+use crate::grammar::v1::interpolate_sq_string;
+use crate::grammar::v1::HeredocContext;
 use crate::parser::Parser;
 use crate::parser::ParserToken;
 use crate::tree::SyntaxKind;
@@ -150,15 +151,25 @@ pub enum DQStringToken {
     End,
 }
 
-/// Represents a token in a heredoc command (e.g. `<<< hello >>>`).
+/// Represents a token in a heredoc command or multiline string (e.g. `<<< hello
+/// >>>`).
 #[derive(Logos, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(u8)]
-pub enum HeredocCommandToken {
-    /// A start of a placeholder.
+pub enum HeredocToken {
+    /// A start of a placeholder using a dollar sign.
+    ///
+    /// When encountered in a multi-line string, [morph][super::Lexer::morph]
+    /// the lexer to use [Token].
+    ///
+    /// When encountered in a command, treat as literal text.
+    #[token("${")]
+    DollarPlaceholderStart,
+
+    /// A start of a placeholder using a tilde.
     ///
     /// When encountered, [morph][super::Lexer::morph] the lexer to use [Token].
     #[token("~{")]
-    PlaceholderStart,
+    TildePlaceholderStart,
 
     /// The start of an escape sequence.
     ///
@@ -169,8 +180,12 @@ pub enum HeredocCommandToken {
     Escape,
 
     /// A span of literal text.
-    #[regex(r"[^\\~>]+")]
+    #[regex(r"[^\\~$>]+")]
     Text,
+
+    /// A dollar sign that is part of the literal text.
+    #[token("$")]
+    DollarSign,
 
     /// A tilde that is part of the literal text.
     #[token("~")]
@@ -240,9 +255,9 @@ pub enum BraceCommandToken {
 ///
 /// | Token                                                                    | Sub-lexer token       |
 /// |--------------------------------------------------------------------------|-----------------------|
-/// | [SQStringStart][Token::SQStringStart]                                    | [SQStringToken]       |
-/// | [DQStringStart][Token::DQStringStart]                                    | [DQStringToken]       |
-/// | [HeredocCommandStart][Token::HeredocCommandStart]                        | [HeredocCommandToken] |
+/// | [SingleQuote][Token::SingleQuote]                                        | [SQStringToken]       |
+/// | [DoubleQuote][Token::DoubleQuote]                                        | [DQStringToken]       |
+/// | [OpenHeredoc][Token::OpenHeredoc]                                        | [HeredocToken]        |
 /// | [CommandKeyword][Token::CommandKeyword] ~> [OpenBrace][Token::OpenBrace] | [BraceCommandToken]   |
 ///
 /// After the start token is encountered, the [morph][super::Lexer::morph]
@@ -289,24 +304,24 @@ pub enum Token {
     /// When encountered, [morph][super::Lexer::morph] the lexer to use
     /// [SQStringToken].
     #[token("'")]
-    SQStringStart,
+    SingleQuote,
 
     /// A start of a double-quoted string.
     ///
     /// When encountered, [morph][super::Lexer::morph] the lexer to use
     /// [DQStringToken].
     #[token("\"")]
-    DQStringStart,
+    DoubleQuote,
 
-    /// A start of a heredoc command.
+    /// A start of a heredoc command or multiline string.
     ///
     /// When encountered, [morph][super::Lexer::morph] the lexer to use
-    /// [HeredocCommandToken].
+    /// [HeredocToken].
     #[token("<<<")]
-    HeredocCommandStart,
-    /// An end of a heredoc command.
+    OpenHeredoc,
+    /// An end of a heredoc command or multiline string.
     #[token(">>>")]
-    HeredocCommandEnd,
+    CloseHeredoc,
 
     /// The `Array` type keyword.
     #[token("Array")]
@@ -314,6 +329,9 @@ pub enum Token {
     /// The `Boolean` type keyword.
     #[token("Boolean")]
     BooleanTypeKeyword,
+    /// The 1.2 `Directory` type keyword.
+    #[token("Directory")]
+    DirectoryTypeKeyword,
     /// The `File` type keyword.
     #[token("File")]
     FileTypeKeyword,
@@ -356,6 +374,9 @@ pub enum Token {
     /// The `false` keyword.
     #[token("false")]
     FalseKeyword,
+    /// The 1.2 `hints` keyword.
+    #[token("hints")]
+    HintsKeyword,
     /// The `if` keyword.
     #[token("if")]
     IfKeyword,
@@ -386,6 +407,9 @@ pub enum Token {
     /// The `parameter_meta` keyword.
     #[token("parameter_meta")]
     ParameterMetaKeyword,
+    /// The 1.2 `requirements` keyword.
+    #[token("requirements")]
+    RequirementsKeyword,
     /// The `runtime` keyword.
     #[token("runtime")]
     RuntimeKeyword,
@@ -410,16 +434,6 @@ pub enum Token {
     /// The `workflow` keyword.
     #[token("workflow")]
     WorkflowKeyword,
-
-    /// The reserved `Directory` type keyword.
-    #[token("Directory")]
-    ReservedDirectoryTypeKeyword,
-    /// The reserved `hints` keyword.
-    #[token("hints")]
-    ReservedHintsKeyword,
-    /// The reserved `requirements` keyword.
-    #[token("requirements")]
-    ReservedRequirementsKeyword,
 
     /// The `{` symbol.
     #[token("{")]
@@ -516,12 +530,13 @@ impl<'a> ParserToken<'a> for Token {
             Self::Float => SyntaxKind::Float,
             Self::Integer => SyntaxKind::Integer,
             Self::Ident => SyntaxKind::Ident,
-            Self::SQStringStart => SyntaxKind::SingleQuote,
-            Self::DQStringStart => SyntaxKind::DoubleQuote,
-            Self::HeredocCommandStart => SyntaxKind::OpenHeredoc,
-            Self::HeredocCommandEnd => SyntaxKind::CloseHeredoc,
+            Self::SingleQuote => SyntaxKind::SingleQuote,
+            Self::DoubleQuote => SyntaxKind::DoubleQuote,
+            Self::OpenHeredoc => SyntaxKind::OpenHeredoc,
+            Self::CloseHeredoc => SyntaxKind::CloseHeredoc,
             Self::ArrayTypeKeyword => SyntaxKind::ArrayTypeKeyword,
             Self::BooleanTypeKeyword => SyntaxKind::BooleanTypeKeyword,
+            Self::DirectoryTypeKeyword => SyntaxKind::DirectoryTypeKeyword,
             Self::FileTypeKeyword => SyntaxKind::FileTypeKeyword,
             Self::FloatTypeKeyword => SyntaxKind::FloatTypeKeyword,
             Self::IntTypeKeyword => SyntaxKind::IntTypeKeyword,
@@ -536,6 +551,7 @@ impl<'a> ParserToken<'a> for Token {
             Self::CommandKeyword => SyntaxKind::CommandKeyword,
             Self::ElseKeyword => SyntaxKind::ElseKeyword,
             Self::FalseKeyword => SyntaxKind::FalseKeyword,
+            Self::HintsKeyword => SyntaxKind::HintsKeyword,
             Self::IfKeyword => SyntaxKind::IfKeyword,
             Self::InKeyword => SyntaxKind::InKeyword,
             Self::ImportKeyword => SyntaxKind::ImportKeyword,
@@ -546,6 +562,7 @@ impl<'a> ParserToken<'a> for Token {
             Self::ObjectKeyword => SyntaxKind::ObjectKeyword,
             Self::OutputKeyword => SyntaxKind::OutputKeyword,
             Self::ParameterMetaKeyword => SyntaxKind::ParameterMetaKeyword,
+            Self::RequirementsKeyword => SyntaxKind::RequirementsKeyword,
             Self::RuntimeKeyword => SyntaxKind::RuntimeKeyword,
             Self::ScatterKeyword => SyntaxKind::ScatterKeyword,
             Self::StructKeyword => SyntaxKind::StructKeyword,
@@ -554,9 +571,6 @@ impl<'a> ParserToken<'a> for Token {
             Self::TrueKeyword => SyntaxKind::TrueKeyword,
             Self::VersionKeyword => SyntaxKind::VersionKeyword,
             Self::WorkflowKeyword => SyntaxKind::WorkflowKeyword,
-            Self::ReservedDirectoryTypeKeyword => SyntaxKind::DirectoryTypeKeyword,
-            Self::ReservedHintsKeyword => SyntaxKind::HintsKeyword,
-            Self::ReservedRequirementsKeyword => SyntaxKind::RequirementsKeyword,
             Self::OpenBrace => SyntaxKind::OpenBrace,
             Self::CloseBrace => SyntaxKind::CloseBrace,
             Self::OpenBracket => SyntaxKind::OpenBracket,
@@ -603,11 +617,12 @@ impl<'a> ParserToken<'a> for Token {
             Self::Float => "float",
             Self::Integer => "integer",
             Self::Ident => "identifier",
-            Self::SQStringStart | Self::DQStringStart => "string",
-            Self::HeredocCommandStart => "`<<<`",
-            Self::HeredocCommandEnd => "`>>>`",
+            Self::SingleQuote | Self::DoubleQuote => "string",
+            Self::OpenHeredoc => "multi-line string",
+            Self::CloseHeredoc => "`>>>`",
             Self::ArrayTypeKeyword => "`Array` keyword",
             Self::BooleanTypeKeyword => "`Boolean` keyword",
+            Self::DirectoryTypeKeyword => "`Directory` keyword",
             Self::FileTypeKeyword => "`File` keyword",
             Self::FloatTypeKeyword => "`Float` keyword",
             Self::IntTypeKeyword => "`Int` keyword",
@@ -622,6 +637,7 @@ impl<'a> ParserToken<'a> for Token {
             Self::CommandKeyword => "`command` keyword",
             Self::ElseKeyword => "`else` keyword",
             Self::FalseKeyword => "`false` keyword",
+            Self::HintsKeyword => "`hints` keyword",
             Self::IfKeyword => "`if` keyword",
             Self::InKeyword => "`int` keyword",
             Self::ImportKeyword => "`import` keyword",
@@ -632,6 +648,7 @@ impl<'a> ParserToken<'a> for Token {
             Self::ObjectKeyword => "`object` keyword",
             Self::OutputKeyword => "`output` keyword",
             Self::ParameterMetaKeyword => "`parameter_meta` keyword",
+            Self::RequirementsKeyword => "`requirements` keyword",
             Self::RuntimeKeyword => "`runtime` keyword",
             Self::ScatterKeyword => "`scatter` keyword",
             Self::StructKeyword => "`struct` keyword",
@@ -640,9 +657,6 @@ impl<'a> ParserToken<'a> for Token {
             Self::TrueKeyword => "`true` keyword",
             Self::VersionKeyword => "`version` keyword",
             Self::WorkflowKeyword => "`workflow` keyword",
-            Self::ReservedDirectoryTypeKeyword => "reserved `Directory` keyword",
-            Self::ReservedHintsKeyword => "reserved `hints` keyword",
-            Self::ReservedRequirementsKeyword => "reserved `requirements` keyword",
             Self::OpenBrace => "`{`",
             Self::CloseBrace => "`}`",
             Self::OpenBracket => "`[`",
@@ -679,20 +693,22 @@ impl<'a> ParserToken<'a> for Token {
 
     fn recover_interpolation(token: Self, start: Span, parser: &mut Parser<'a, Self>) -> bool {
         match token {
-            Self::SQStringStart => {
-                if let Err(e) = parser.interpolate(|i| single_quote_interpolate(start, true, i)) {
+            Self::SingleQuote => {
+                if let Err(e) = parser.interpolate(|i| interpolate_sq_string(start, true, i)) {
                     parser.diagnostic(e);
                 }
                 true
             }
-            Self::DQStringStart => {
-                if let Err(e) = parser.interpolate(|i| double_quote_interpolate(start, true, i)) {
+            Self::DoubleQuote => {
+                if let Err(e) = parser.interpolate(|i| interpolate_dq_string(start, true, i)) {
                     parser.diagnostic(e);
                 }
                 true
             }
-            Self::HeredocCommandStart => {
-                if let Err(e) = parser.interpolate(|i| interpolate_heredoc_command(start, i)) {
+            Self::OpenHeredoc => {
+                if let Err(e) =
+                    parser.interpolate(|i| interpolate_heredoc(start, HeredocContext::String, i))
+                {
                     parser.diagnostic(e);
                 }
                 true
@@ -942,10 +958,7 @@ foo123_BAR"#,
     #[test]
     fn single_quote_string() {
         let mut lexer = Lexer::<Token>::new(r#"'hello \'~{name}${'!'}\': not \~{a var~$}'"#);
-        assert_eq!(
-            lexer.next().map(map),
-            Some((Ok(Token::SQStringStart), 0..1))
-        );
+        assert_eq!(lexer.next().map(map), Some((Ok(Token::SingleQuote), 0..1)));
 
         let mut lexer = lexer.morph();
         assert_eq!(lexer.next().map(map), Some((Ok(SQStringToken::Text), 1..7)));
@@ -971,7 +984,7 @@ foo123_BAR"#,
         let mut lexer = lexer.morph();
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(Token::SQStringStart), 18..19))
+            Some((Ok(Token::SingleQuote), 18..19))
         );
 
         let mut lexer = lexer.morph();
@@ -1028,10 +1041,7 @@ foo123_BAR"#,
     #[test]
     fn double_quote_string() {
         let mut lexer = Lexer::<Token>::new(r#""hello \"~{name}${"!"}\": not \~{a var~$}""#);
-        assert_eq!(
-            lexer.next().map(map),
-            Some((Ok(Token::DQStringStart), 0..1))
-        );
+        assert_eq!(lexer.next().map(map), Some((Ok(Token::DoubleQuote), 0..1)));
 
         let mut lexer = lexer.morph();
         assert_eq!(lexer.next().map(map), Some((Ok(DQStringToken::Text), 1..7)));
@@ -1057,7 +1067,7 @@ foo123_BAR"#,
         let mut lexer = lexer.morph();
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(Token::DQStringStart), 18..19))
+            Some((Ok(Token::DoubleQuote), 18..19))
         );
 
         let mut lexer = lexer.morph();
@@ -1123,19 +1133,13 @@ foo123_BAR"#,
    still in heredoc~
 >>>"#,
         );
-        assert_eq!(
-            lexer.next().map(map),
-            Some((Ok(Token::HeredocCommandStart), 0..3))
-        );
+        assert_eq!(lexer.next().map(map), Some((Ok(Token::OpenHeredoc), 0..3)));
 
         let mut lexer = lexer.morph();
+        assert_eq!(lexer.next().map(map), Some((Ok(HeredocToken::Text), 3..15)));
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(HeredocCommandToken::Text), 3..15))
-        );
-        assert_eq!(
-            lexer.next().map(map),
-            Some((Ok(HeredocCommandToken::PlaceholderStart), 15..17))
+            Some((Ok(HeredocToken::TildePlaceholderStart), 15..17))
         );
 
         let mut lexer = lexer.morph();
@@ -1145,17 +1149,31 @@ foo123_BAR"#,
         let mut lexer = lexer.morph();
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(HeredocCommandToken::Text), 25..56))
+            Some((Ok(HeredocToken::Text), 25..38))
         );
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(HeredocCommandToken::PlaceholderStart), 56..58))
+            Some((Ok(HeredocToken::DollarPlaceholderStart), 38..40))
+        );
+
+        let mut lexer = lexer.morph();
+        assert_eq!(lexer.next().map(map), Some((Ok(Token::Ident), 40..43)));
+        assert_eq!(lexer.next().map(map), Some((Ok(Token::CloseBrace), 43..44)));
+
+        let mut lexer = lexer.morph();
+        assert_eq!(
+            lexer.next().map(map),
+            Some((Ok(HeredocToken::Text), 44..56))
+        );
+        assert_eq!(
+            lexer.next().map(map),
+            Some((Ok(HeredocToken::TildePlaceholderStart), 56..58))
         );
 
         let mut lexer = lexer.morph();
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(Token::DQStringStart), 58..59))
+            Some((Ok(Token::DoubleQuote), 58..59))
         );
 
         let mut lexer = lexer.morph();
@@ -1174,39 +1192,39 @@ foo123_BAR"#,
         let mut lexer = lexer.morph();
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(HeredocCommandToken::Text), 86..98))
+            Some((Ok(HeredocToken::Text), 86..98))
         );
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(HeredocCommandToken::Escape), 98..100))
+            Some((Ok(HeredocToken::Escape), 98..100))
         );
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(HeredocCommandToken::Text), 100..114))
+            Some((Ok(HeredocToken::Text), 100..114))
         );
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(HeredocCommandToken::Escape), 114..116))
+            Some((Ok(HeredocToken::Escape), 114..116))
         );
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(HeredocCommandToken::DoubleCloseAngle), 116..118))
+            Some((Ok(HeredocToken::DoubleCloseAngle), 116..118))
         );
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(HeredocCommandToken::Text), 118..138))
+            Some((Ok(HeredocToken::Text), 118..138))
         );
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(HeredocCommandToken::Tilde), 138..139))
+            Some((Ok(HeredocToken::Tilde), 138..139))
         );
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(HeredocCommandToken::Text), 139..140))
+            Some((Ok(HeredocToken::Text), 139..140))
         );
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(HeredocCommandToken::End), 140..143))
+            Some((Ok(HeredocToken::End), 140..143))
         );
 
         let mut lexer = lexer.morph::<Token>();
@@ -1273,7 +1291,7 @@ foo123_BAR"#,
         let mut lexer = lexer.morph();
         assert_eq!(
             lexer.next().map(map),
-            Some((Ok(Token::DQStringStart), 64..65))
+            Some((Ok(Token::DoubleQuote), 64..65))
         );
 
         let mut lexer = lexer.morph();
@@ -1355,6 +1373,7 @@ foo123_BAR"#,
             r#"
 Array
 Boolean
+Directory
 File
 Float
 Int
@@ -1371,6 +1390,7 @@ command
 else
 false
 if
+hints
 in
 import
 input
@@ -1379,6 +1399,7 @@ null
 object
 output
 parameter_meta
+requirements
 runtime
 scatter
 struct
@@ -1397,93 +1418,75 @@ workflow"#,
                 (Ok(Whitespace), 6..7),
                 (Ok(BooleanTypeKeyword), 7..14),
                 (Ok(Whitespace), 14..15),
-                (Ok(FileTypeKeyword), 15..19),
-                (Ok(Whitespace), 19..20),
-                (Ok(FloatTypeKeyword), 20..25),
-                (Ok(Whitespace), 25..26),
-                (Ok(IntTypeKeyword), 26..29),
+                (Ok(DirectoryTypeKeyword), 15..24),
+                (Ok(Whitespace), 24..25),
+                (Ok(FileTypeKeyword), 25..29),
                 (Ok(Whitespace), 29..30),
-                (Ok(MapTypeKeyword), 30..33),
-                (Ok(Whitespace), 33..34),
-                (Ok(NoneKeyword), 34..38),
-                (Ok(Whitespace), 38..39),
-                (Ok(ObjectTypeKeyword), 39..45),
-                (Ok(Whitespace), 45..46),
-                (Ok(PairTypeKeyword), 46..50),
-                (Ok(Whitespace), 50..51),
-                (Ok(StringTypeKeyword), 51..57),
-                (Ok(Whitespace), 57..58),
-                (Ok(AfterKeyword), 58..63),
-                (Ok(Whitespace), 63..64),
-                (Ok(AliasKeyword), 64..69),
-                (Ok(Whitespace), 69..70),
-                (Ok(AsKeyword), 70..72),
-                (Ok(Whitespace), 72..73),
-                (Ok(CallKeyword), 73..77),
-                (Ok(Whitespace), 77..78),
-                (Ok(CommandKeyword), 78..85),
-                (Ok(Whitespace), 85..86),
-                (Ok(ElseKeyword), 86..90),
-                (Ok(Whitespace), 90..91),
-                (Ok(FalseKeyword), 91..96),
-                (Ok(Whitespace), 96..97),
-                (Ok(IfKeyword), 97..99),
-                (Ok(Whitespace), 99..100),
-                (Ok(InKeyword), 100..102),
-                (Ok(Whitespace), 102..103),
-                (Ok(ImportKeyword), 103..109),
+                (Ok(FloatTypeKeyword), 30..35),
+                (Ok(Whitespace), 35..36),
+                (Ok(IntTypeKeyword), 36..39),
+                (Ok(Whitespace), 39..40),
+                (Ok(MapTypeKeyword), 40..43),
+                (Ok(Whitespace), 43..44),
+                (Ok(NoneKeyword), 44..48),
+                (Ok(Whitespace), 48..49),
+                (Ok(ObjectTypeKeyword), 49..55),
+                (Ok(Whitespace), 55..56),
+                (Ok(PairTypeKeyword), 56..60),
+                (Ok(Whitespace), 60..61),
+                (Ok(StringTypeKeyword), 61..67),
+                (Ok(Whitespace), 67..68),
+                (Ok(AfterKeyword), 68..73),
+                (Ok(Whitespace), 73..74),
+                (Ok(AliasKeyword), 74..79),
+                (Ok(Whitespace), 79..80),
+                (Ok(AsKeyword), 80..82),
+                (Ok(Whitespace), 82..83),
+                (Ok(CallKeyword), 83..87),
+                (Ok(Whitespace), 87..88),
+                (Ok(CommandKeyword), 88..95),
+                (Ok(Whitespace), 95..96),
+                (Ok(ElseKeyword), 96..100),
+                (Ok(Whitespace), 100..101),
+                (Ok(FalseKeyword), 101..106),
+                (Ok(Whitespace), 106..107),
+                (Ok(IfKeyword), 107..109),
                 (Ok(Whitespace), 109..110),
-                (Ok(InputKeyword), 110..115),
+                (Ok(HintsKeyword), 110..115),
                 (Ok(Whitespace), 115..116),
-                (Ok(MetaKeyword), 116..120),
-                (Ok(Whitespace), 120..121),
-                (Ok(NullKeyword), 121..125),
+                (Ok(InKeyword), 116..118),
+                (Ok(Whitespace), 118..119),
+                (Ok(ImportKeyword), 119..125),
                 (Ok(Whitespace), 125..126),
-                (Ok(ObjectKeyword), 126..132),
-                (Ok(Whitespace), 132..133),
-                (Ok(OutputKeyword), 133..139),
-                (Ok(Whitespace), 139..140),
-                (Ok(ParameterMetaKeyword), 140..154),
-                (Ok(Whitespace), 154..155),
-                (Ok(RuntimeKeyword), 155..162),
-                (Ok(Whitespace), 162..163),
-                (Ok(ScatterKeyword), 163..170),
+                (Ok(InputKeyword), 126..131),
+                (Ok(Whitespace), 131..132),
+                (Ok(MetaKeyword), 132..136),
+                (Ok(Whitespace), 136..137),
+                (Ok(NullKeyword), 137..141),
+                (Ok(Whitespace), 141..142),
+                (Ok(ObjectKeyword), 142..148),
+                (Ok(Whitespace), 148..149),
+                (Ok(OutputKeyword), 149..155),
+                (Ok(Whitespace), 155..156),
+                (Ok(ParameterMetaKeyword), 156..170),
                 (Ok(Whitespace), 170..171),
-                (Ok(StructKeyword), 171..177),
-                (Ok(Whitespace), 177..178),
-                (Ok(TaskKeyword), 178..182),
-                (Ok(Whitespace), 182..183),
-                (Ok(ThenKeyword), 183..187),
-                (Ok(Whitespace), 187..188),
-                (Ok(TrueKeyword), 188..192),
-                (Ok(Whitespace), 192..193),
-                (Ok(VersionKeyword), 193..200),
-                (Ok(Whitespace), 200..201),
-                (Ok(WorkflowKeyword), 201..209),
-            ],
-        );
-    }
-
-    #[test]
-    fn reserved_keywords() {
-        use Token::*;
-
-        let lexer = Lexer::<Token>::new(
-            r#"
-Directory
-hints
-requirements"#,
-        );
-        let tokens: Vec<_> = lexer.map(map).collect();
-        assert_eq!(
-            tokens,
-            &[
-                (Ok(Whitespace), 0..1),
-                (Ok(ReservedDirectoryTypeKeyword), 1..10),
-                (Ok(Whitespace), 10..11),
-                (Ok(ReservedHintsKeyword), 11..16),
-                (Ok(Whitespace), 16..17),
-                (Ok(ReservedRequirementsKeyword), 17..29),
+                (Ok(RequirementsKeyword), 171..183),
+                (Ok(Whitespace), 183..184),
+                (Ok(RuntimeKeyword), 184..191),
+                (Ok(Whitespace), 191..192),
+                (Ok(ScatterKeyword), 192..199),
+                (Ok(Whitespace), 199..200),
+                (Ok(StructKeyword), 200..206),
+                (Ok(Whitespace), 206..207),
+                (Ok(TaskKeyword), 207..211),
+                (Ok(Whitespace), 211..212),
+                (Ok(ThenKeyword), 212..216),
+                (Ok(Whitespace), 216..217),
+                (Ok(TrueKeyword), 217..221),
+                (Ok(Whitespace), 221..222),
+                (Ok(VersionKeyword), 222..229),
+                (Ok(Whitespace), 229..230),
+                (Ok(WorkflowKeyword), 230..238),
             ],
         );
     }
@@ -1492,7 +1495,7 @@ requirements"#,
     fn symbols() {
         use Token::*;
 
-        let lexer = Lexer::<Token>::new(r#"{}[]=:,()?!+-||&&*/%==!=<=>=<>."#);
+        let lexer = Lexer::<Token>::new(r#"{}[]=:,()?!+-||&&*/%==!=<=>=<>.**"#);
         let tokens: Vec<_> = lexer.map(map).collect();
         assert_eq!(
             tokens,
@@ -1522,6 +1525,7 @@ requirements"#,
                 (Ok(Less), 28..29),
                 (Ok(Greater), 29..30),
                 (Ok(Dot), 30..31),
+                (Ok(Exponentiation), 31..33),
             ],
         );
     }

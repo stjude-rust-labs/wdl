@@ -2,6 +2,7 @@
 
 use super::BoundDecl;
 use super::Expr;
+use super::HintsSection;
 use super::InputSection;
 use super::MetadataSection;
 use super::OutputSection;
@@ -58,6 +59,11 @@ impl WorkflowDefinition {
         children(&self.0)
     }
 
+    /// Gets the hints sections of the workflow.
+    pub fn hints(&self) -> AstChildren<HintsSection> {
+        children(&self.0)
+    }
+
     /// Gets the private declarations of the workflow.
     pub fn declarations(&self) -> AstChildren<BoundDecl> {
         children(&self.0)
@@ -106,6 +112,8 @@ pub enum WorkflowItem {
     Metadata(MetadataSection),
     /// The item is a parameter meta section.
     ParameterMetadata(ParameterMetadataSection),
+    /// The item is a hints section.
+    Hints(HintsSection),
     /// The item is a private bound declaration.
     Declaration(BoundDecl),
 }
@@ -126,6 +134,7 @@ impl AstNode for WorkflowItem {
                 | SyntaxKind::CallStatementNode
                 | SyntaxKind::MetadataSectionNode
                 | SyntaxKind::ParameterMetadataSectionNode
+                | SyntaxKind::HintsSectionNode
                 | SyntaxKind::BoundDeclNode
         )
     }
@@ -146,6 +155,7 @@ impl AstNode for WorkflowItem {
             SyntaxKind::ParameterMetadataSectionNode => {
                 Some(Self::ParameterMetadata(ParameterMetadataSection(syntax)))
             }
+            SyntaxKind::HintsSectionNode => Some(Self::Hints(HintsSection(syntax))),
             SyntaxKind::BoundDeclNode => Some(Self::Declaration(BoundDecl(syntax))),
             _ => None,
         }
@@ -160,6 +170,7 @@ impl AstNode for WorkflowItem {
             Self::Call(s) => &s.0,
             Self::Metadata(m) => &m.0,
             Self::ParameterMetadata(m) => &m.0,
+            Self::Hints(h) => &h.0,
             Self::Declaration(d) => &d.0,
         }
     }
@@ -412,21 +423,15 @@ impl AstNode for CallStatement {
 pub struct CallTarget(SyntaxNode);
 
 impl CallTarget {
-    /// Gets the name of the call target.
+    /// Gets an iterator of the names of the call target.
     ///
-    /// The first value is an optional namespace.
-    /// The second value is the call target name.
-    pub fn name(&self) -> (Option<Ident>, Ident) {
-        let mut children = self
-            .0
+    /// The last name in the iteration is considered to be the task or workflow
+    /// being called.
+    pub fn names(&self) -> impl Iterator<Item = Ident> {
+        self.0
             .children_with_tokens()
             .filter_map(SyntaxElement::into_token)
-            .filter_map(Ident::cast);
-        let first = children.next().expect("should be at least one identifier");
-        match children.next() {
-            Some(second) => (Some(first), second),
-            None => (None, first),
-        }
+            .filter_map(Ident::cast)
     }
 }
 
@@ -573,6 +578,7 @@ mod test {
     use super::*;
     use crate::v1::UnboundDecl;
     use crate::Document;
+    use crate::SupportedVersion;
     use crate::VisitReason;
     use crate::Visitor;
 
@@ -615,6 +621,10 @@ workflow test {
         name: {
             help: "a name to greet"
         }
+    }
+
+    hints {
+        foo: "bar"
     }
 
     String x = "private"
@@ -710,9 +720,10 @@ workflow test {
 
         // First inner statement
         let call = inner[0].clone().unwrap_call();
-        let (namespace, target) = call.target().name();
-        assert_eq!(namespace.unwrap().as_str(), "foo");
-        assert_eq!(target.as_str(), "my_task");
+        let names = call.target().names().collect::<Vec<_>>();
+        assert_eq!(names.len(), 2);
+        assert_eq!(names[0].as_str(), "foo");
+        assert_eq!(names[1].as_str(), "my_task");
         assert!(call.alias().is_none());
         assert_eq!(call.after().count(), 0);
         assert_eq!(call.inputs().count(), 0);
@@ -761,9 +772,9 @@ workflow test {
 
         // First inner statement
         let call = inner[0].clone().unwrap_call();
-        let (namespace, target) = call.target().name();
-        assert!(namespace.is_none());
-        assert_eq!(target.as_str(), "my_task");
+        let names = call.target().names().collect::<Vec<_>>();
+        assert_eq!(names.len(), 1);
+        assert_eq!(names[0].as_str(), "my_task");
         assert_eq!(call.alias().unwrap().name().as_str(), "my_task2");
         assert_eq!(call.after().count(), 0);
         let inputs: Vec<_> = call.inputs().collect();
@@ -773,9 +784,8 @@ workflow test {
 
         // Second workflow statement
         let call = statements[1].clone().unwrap_call();
-        let (namespace, target) = call.target().name();
-        assert!(namespace.is_none());
-        assert_eq!(target.as_str(), "my_task");
+        assert_eq!(names.len(), 1);
+        assert_eq!(names[0].as_str(), "my_task");
         assert_eq!(call.alias().unwrap().name().as_str(), "my_task3");
         let after: Vec<_> = call.after().collect();
         assert_eq!(after.len(), 2);
@@ -879,6 +889,26 @@ workflow test {
             "a name to greet"
         );
 
+        // Workflow hints
+        let hints: Vec<_> = workflows[0].hints().collect();
+        assert_eq!(hints.len(), 1);
+
+        // First workflow hints
+        assert_eq!(hints[0].parent().unwrap_workflow().name().as_str(), "test");
+        let items: Vec<_> = hints[0].items().collect();
+        assert_eq!(items.len(), 1);
+        assert_eq!(items[0].name().as_str(), "foo");
+        assert_eq!(
+            items[0]
+                .expr()
+                .unwrap_literal()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "bar"
+        );
+
         // Workflow declarations
         let decls: Vec<_> = workflows[0].declarations().collect();
         assert_eq!(decls.len(), 1);
@@ -914,7 +944,14 @@ workflow test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn workflow_definition(
                 &mut self,

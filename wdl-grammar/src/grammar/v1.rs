@@ -5,7 +5,7 @@ use super::macros::expected_fn;
 use crate::grammar::macros::expected_in;
 use crate::lexer::v1::BraceCommandToken;
 use crate::lexer::v1::DQStringToken;
-use crate::lexer::v1::HeredocCommandToken;
+use crate::lexer::v1::HeredocToken;
 use crate::lexer::v1::SQStringToken;
 use crate::lexer::v1::Token;
 use crate::lexer::TokenSet;
@@ -13,7 +13,8 @@ use crate::parser;
 use crate::parser::expected_found;
 use crate::parser::expected_one_of;
 use crate::parser::unmatched;
-use crate::parser::unterminated_command;
+use crate::parser::unterminated_braced_command;
+use crate::parser::unterminated_heredoc;
 use crate::parser::unterminated_string;
 use crate::parser::CompletedMarker;
 use crate::parser::Event;
@@ -53,6 +54,7 @@ const PRIMITIVE_TYPE_SET: TokenSet = TokenSet::new(&[
     Token::FloatTypeKeyword as u8,
     Token::StringTypeKeyword as u8,
     Token::FileTypeKeyword as u8,
+    Token::DirectoryTypeKeyword as u8,
 ]);
 
 /// A set of tokens for all types.
@@ -65,8 +67,11 @@ const TYPE_EXPECTED_SET: TokenSet = PRIMITIVE_TYPE_SET.union(TokenSet::new(&[
 ]));
 
 /// The recovery set for struct items.
-const STRUCT_ITEM_RECOVERY_SET: TokenSet =
-    TYPE_EXPECTED_SET.union(TokenSet::new(&[Token::CloseBrace as u8]));
+const STRUCT_ITEM_RECOVERY_SET: TokenSet = TYPE_EXPECTED_SET.union(TokenSet::new(&[
+    Token::MetaKeyword as u8,
+    Token::ParameterMetaKeyword as u8,
+    Token::CloseBrace as u8,
+]));
 
 /// The recovery set for input items.
 const INPUT_ITEM_RECOVERY_SET: TokenSet =
@@ -77,14 +82,39 @@ const OUTPUT_ITEM_RECOVERY_SET: TokenSet =
     TYPE_EXPECTED_SET.union(TokenSet::new(&[Token::CloseBrace as u8]));
 
 /// The recovery set for runtime items.
-const RUNTIME_SECTION_RECOVERY_SET: TokenSet =
+const RUNTIME_ITEM_RECOVERY_SET: TokenSet =
     ANY_IDENT.union(TokenSet::new(&[Token::CloseBrace as u8]));
+
+/// The recovery set for requirements items.
+const REQUIREMENTS_ITEM_RECOVERY_SET: TokenSet =
+    ANY_IDENT.union(TokenSet::new(&[Token::CloseBrace as u8]));
+
+/// The recovery set for hints items.
+const HINTS_ITEM_RECOVERY_SET: TokenSet =
+    ANY_IDENT.union(TokenSet::new(&[Token::CloseBrace as u8]));
+
+/// The recovery set for literal input items.
+const LITERAL_INPUT_ITEM_RECOVERY_SET: TokenSet =
+    ANY_IDENT.union(TokenSet::new(&[Token::CloseBrace as u8]));
+
+/// The recovery set for literal output items.
+const LITERAL_OUTPUT_ITEM_RECOVERY_SET: TokenSet =
+    ANY_IDENT.union(TokenSet::new(&[Token::CloseBrace as u8]));
+
+/// The expected names of items in a struct definition.
+const STRUCT_ITEM_EXPECTED_NAMES: &[&str] = &[
+    "metadata section",
+    "parameter metadata section",
+    "struct member declaration",
+];
 
 /// The expected set of tokens in a task definition.
 const TASK_ITEM_EXPECTED_SET: TokenSet = TYPE_EXPECTED_SET.union(TokenSet::new(&[
     Token::InputKeyword as u8,
     Token::CommandKeyword as u8,
     Token::OutputKeyword as u8,
+    Token::RequirementsKeyword as u8,
+    Token::HintsKeyword as u8,
     Token::RuntimeKeyword as u8,
     Token::MetaKeyword as u8,
     Token::ParameterMetaKeyword as u8,
@@ -111,6 +141,7 @@ const WORKFLOW_ITEM_EXPECTED_SET: TokenSet = TYPE_EXPECTED_SET.union(TokenSet::n
     Token::OutputKeyword as u8,
     Token::MetaKeyword as u8,
     Token::ParameterMetaKeyword as u8,
+    Token::HintsKeyword as u8,
     Token::IfKeyword as u8,
     Token::ScatterKeyword as u8,
     Token::CallKeyword as u8,
@@ -152,8 +183,9 @@ const METADATA_VALUE_EXPECTED_SET: TokenSet = TokenSet::new(&[
     Token::Minus as u8,
     Token::Integer as u8,
     Token::Float as u8,
-    Token::SQStringStart as u8,
-    Token::DQStringStart as u8,
+    Token::SingleQuote as u8,
+    Token::DoubleQuote as u8,
+    Token::OpenHeredoc as u8,
     Token::TrueKeyword as u8,
     Token::FalseKeyword as u8,
     Token::OpenBrace as u8,
@@ -193,13 +225,18 @@ const ATOM_EXPECTED_SET: TokenSet = ANY_IDENT.union(TokenSet::new(&[
     Token::Float as u8,
     Token::TrueKeyword as u8,
     Token::FalseKeyword as u8,
-    Token::DQStringStart as u8,
-    Token::SQStringStart as u8,
+    Token::SingleQuote as u8,
+    Token::DoubleQuote as u8,
+    Token::OpenHeredoc as u8,
     Token::OpenBracket as u8,
     Token::OpenBrace as u8,
     Token::OpenParen as u8,
     Token::ObjectKeyword as u8,
     Token::IfKeyword as u8,
+    Token::NoneKeyword as u8,
+    Token::HintsKeyword as u8,
+    Token::InputKeyword as u8,
+    Token::OutputKeyword as u8,
 ]));
 
 /// A token set for prefix operators.
@@ -265,6 +302,7 @@ const ANY_IDENT: TokenSet = TokenSet::new(&[
     Token::Ident as u8,
     Token::ArrayTypeKeyword as u8,
     Token::BooleanTypeKeyword as u8,
+    Token::DirectoryTypeKeyword as u8,
     Token::FileTypeKeyword as u8,
     Token::FloatTypeKeyword as u8,
     Token::IntTypeKeyword as u8,
@@ -279,6 +317,7 @@ const ANY_IDENT: TokenSet = TokenSet::new(&[
     Token::CommandKeyword as u8,
     Token::ElseKeyword as u8,
     Token::FalseKeyword as u8,
+    Token::HintsKeyword as u8,
     Token::IfKeyword as u8,
     Token::InKeyword as u8,
     Token::ImportKeyword as u8,
@@ -289,6 +328,8 @@ const ANY_IDENT: TokenSet = TokenSet::new(&[
     Token::ObjectKeyword as u8,
     Token::OutputKeyword as u8,
     Token::ParameterMetaKeyword as u8,
+    Token::RequirementsKeyword as u8,
+    Token::HintsKeyword as u8,
     Token::RuntimeKeyword as u8,
     Token::ScatterKeyword as u8,
     Token::StructKeyword as u8,
@@ -297,9 +338,6 @@ const ANY_IDENT: TokenSet = TokenSet::new(&[
     Token::TrueKeyword as u8,
     Token::VersionKeyword as u8,
     Token::WorkflowKeyword as u8,
-    Token::ReservedDirectoryTypeKeyword as u8,
-    Token::ReservedHintsKeyword as u8,
-    Token::ReservedRequirementsKeyword as u8,
 ]);
 
 /// A helper for parsing matching tokens.
@@ -406,8 +444,7 @@ fn import_statement(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Mark
     expected_fn!(parser, marker, string);
 
     if parser.next_if(Token::AsKeyword) {
-        expected_in!(parser, marker, ANY_IDENT, "import namespace");
-        parser.update_last_token_kind(SyntaxKind::Ident);
+        expected!(parser, marker, Token::Ident, "import namespace");
     }
 
     while let Some((Token::AliasKeyword, _)) = parser.peek() {
@@ -421,11 +458,9 @@ fn import_statement(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Mark
 /// Parses an import alias.
 fn import_alias(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
     parser.require(Token::AliasKeyword);
-    expected_in!(parser, marker, ANY_IDENT, "source type name");
-    parser.update_last_token_kind(SyntaxKind::Ident);
+    expected!(parser, marker, Token::Ident, "source type name");
     expected!(parser, marker, Token::AsKeyword);
-    expected_in!(parser, marker, ANY_IDENT, "target type name");
-    parser.update_last_token_kind(SyntaxKind::Ident);
+    expected!(parser, marker, Token::Ident, "target type name");
     marker.complete(parser, SyntaxKind::ImportAliasNode);
     Ok(())
 }
@@ -433,14 +468,13 @@ fn import_alias(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, 
 /// Parses a struct definition.
 fn struct_definition(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
     parser.require(Token::StructKeyword);
-    expected_in!(parser, marker, ANY_IDENT, "struct name");
-    parser.update_last_token_kind(SyntaxKind::Ident);
+    expected!(parser, marker, Token::Ident, "struct name");
     braced!(parser, marker, |parser| {
         parser.delimited(
             None,
             UNTIL_CLOSE_BRACE,
             STRUCT_ITEM_RECOVERY_SET,
-            unbound_decl,
+            struct_item,
         );
         Ok(())
     });
@@ -448,11 +482,39 @@ fn struct_definition(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Mar
     Ok(())
 }
 
+/// Parses an item in a struct definition.
+fn struct_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
+    match parser.peek() {
+        Some((Token::MetaKeyword, _)) => metadata_section(parser, marker),
+        Some((Token::ParameterMetaKeyword, _)) => parameter_metadata_section(parser, marker),
+        Some((t, _)) if TYPE_EXPECTED_SET.contains(t.into_raw()) => {
+            struct_member_decl(parser, marker)
+        }
+        found => {
+            let (found, span) = found
+                .map(|(t, s)| (Some(Token::describe(t.into_raw())), s))
+                .unwrap_or_else(|| (None, parser.span()));
+            Err((
+                marker,
+                expected_one_of(STRUCT_ITEM_EXPECTED_NAMES, found, span),
+            ))
+        }
+    }
+}
+
+/// Parses a struct member declaration.
+fn struct_member_decl(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
+    expected_fn!(parser, marker, ty);
+    expected_in!(parser, marker, ANY_IDENT, "struct member name");
+    parser.update_last_token_kind(SyntaxKind::Ident);
+    marker.complete(parser, SyntaxKind::UnboundDeclNode);
+    Ok(())
+}
+
 /// Parses a task definition.
 fn task_definition(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
     parser.require(Token::TaskKeyword);
-    expected_in!(parser, marker, ANY_IDENT, "task name");
-    parser.update_last_token_kind(SyntaxKind::Ident);
+    expected!(parser, marker, Token::Ident, "task name");
     braced!(parser, marker, |parser| {
         parser.delimited(None, UNTIL_CLOSE_BRACE, TASK_ITEM_RECOVERY_SET, task_item);
         Ok(())
@@ -467,8 +529,7 @@ fn workflow_definition(
     marker: Marker,
 ) -> Result<(), (Marker, Diagnostic)> {
     parser.require(Token::WorkflowKeyword);
-    expected_in!(parser, marker, ANY_IDENT, "workflow name");
-    parser.update_last_token_kind(SyntaxKind::Ident);
+    expected!(parser, marker, Token::Ident, "workflow name");
     braced!(parser, marker, |parser| {
         parser.delimited(
             None,
@@ -479,15 +540,6 @@ fn workflow_definition(
         Ok(())
     });
     marker.complete(parser, SyntaxKind::WorkflowDefinitionNode);
-    Ok(())
-}
-
-/// Parses an unbound declaration.
-fn unbound_decl(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
-    expected_fn!(parser, marker, ty);
-    expected_in!(parser, marker, ANY_IDENT, "declaration name");
-    parser.update_last_token_kind(SyntaxKind::Ident);
-    marker.complete(parser, SyntaxKind::UnboundDeclNode);
     Ok(())
 }
 
@@ -582,10 +634,11 @@ fn primitive_type(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker
         marker,
         PRIMITIVE_TYPE_SET,
         "Boolean",
-        "Int",
+        "Directory",
+        "File",
         "Float",
+        "Int",
         "String",
-        "File"
     );
     parser.next_if(Token::QuestionMark);
     marker.complete(parser, SyntaxKind::PrimitiveTypeNode);
@@ -599,9 +652,13 @@ fn task_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Dia
         Some((Token::CommandKeyword, _)) => command_section(parser, marker),
         Some((Token::OutputKeyword, _)) => output_section(parser, marker),
         Some((Token::RuntimeKeyword, _)) => runtime_section(parser, marker),
+        Some((Token::RequirementsKeyword, _)) => requirements_section(parser, marker),
+        Some((Token::HintsKeyword, _)) => hints_section(parser, marker),
         Some((Token::MetaKeyword, _)) => metadata_section(parser, marker),
         Some((Token::ParameterMetaKeyword, _)) => parameter_metadata_section(parser, marker),
-        Some((t, _)) if TYPE_EXPECTED_SET.contains(t.into_raw()) => bound_decl(parser, marker),
+        Some((t, _)) if TYPE_EXPECTED_SET.contains(t.into_raw()) => {
+            bound_decl(parser, marker, false)
+        }
         found => {
             let (found, span) = found
                 .map(|(t, s)| (Some(Token::describe(t.into_raw())), s))
@@ -621,10 +678,13 @@ fn workflow_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker,
         Some((Token::OutputKeyword, _)) => output_section(parser, marker),
         Some((Token::MetaKeyword, _)) => metadata_section(parser, marker),
         Some((Token::ParameterMetaKeyword, _)) => parameter_metadata_section(parser, marker),
+        Some((Token::HintsKeyword, _)) => hints_section(parser, marker),
         Some((Token::IfKeyword, _)) => conditional_statement(parser, marker),
         Some((Token::ScatterKeyword, _)) => scatter_statement(parser, marker),
         Some((Token::CallKeyword, _)) => call_statement(parser, marker),
-        Some((t, _)) if TYPE_EXPECTED_SET.contains(t.into_raw()) => bound_decl(parser, marker),
+        Some((t, _)) if TYPE_EXPECTED_SET.contains(t.into_raw()) => {
+            bound_decl(parser, marker, false)
+        }
         found => {
             let (found, span) = found
                 .map(|(t, s)| (Some(Token::describe(t.into_raw())), s))
@@ -643,7 +703,9 @@ fn workflow_statement(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Ma
         Some((Token::IfKeyword, _)) => conditional_statement(parser, marker),
         Some((Token::ScatterKeyword, _)) => scatter_statement(parser, marker),
         Some((Token::CallKeyword, _)) => call_statement(parser, marker),
-        Some((t, _)) if TYPE_EXPECTED_SET.contains(t.into_raw()) => bound_decl(parser, marker),
+        Some((t, _)) if TYPE_EXPECTED_SET.contains(t.into_raw()) => {
+            bound_decl(parser, marker, false)
+        }
         found => {
             let (found, span) = found
                 .map(|(t, s)| (Some(Token::describe(t.into_raw())), s))
@@ -657,17 +719,17 @@ fn workflow_statement(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Ma
 fn input_section(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
     parser.require(Token::InputKeyword);
     braced!(parser, marker, |parser| {
-        parser.delimited(None, UNTIL_CLOSE_BRACE, INPUT_ITEM_RECOVERY_SET, decl);
+        parser.delimited(None, UNTIL_CLOSE_BRACE, INPUT_ITEM_RECOVERY_SET, input_item);
         Ok(())
     });
     marker.complete(parser, SyntaxKind::InputSectionNode);
     Ok(())
 }
 
-/// Parses a declaration (either bound or unbound).
-fn decl(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
+/// Parses an input item.
+fn input_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
     expected_fn!(parser, marker, ty);
-    expected_in!(parser, marker, ANY_IDENT, "declaration name");
+    expected_in!(parser, marker, ANY_IDENT, "input name");
     parser.update_last_token_kind(SyntaxKind::Ident);
 
     let kind = if parser.next_if(Token::Assignment) {
@@ -695,14 +757,14 @@ fn command_section(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marke
         }
     } else {
         // Not a "braced" command, so it should be a "heredoc" command.
-        let start = match parser.expect(Token::HeredocCommandStart) {
+        let start = match parser.expect(Token::OpenHeredoc) {
             Ok(span) => span,
             Err(e) => return Err((marker, e)),
         };
 
-        if let Err(e) =
-            parser.interpolate(|interpolator| interpolate_heredoc_command(start, interpolator))
-        {
+        if let Err(e) = parser.interpolate(|interpolator| {
+            interpolate_heredoc(start, HeredocContext::Command, interpolator)
+        }) {
             return Err((marker, e));
         }
     }
@@ -784,7 +846,7 @@ fn interpolate_brace_command(
             // Command wasn't terminated
             (
                 interpolator.into_parser(),
-                Err(unterminated_command(
+                Err(unterminated_braced_command(
                     Token::describe(Token::OpenBrace as u8),
                     start,
                 )),
@@ -793,56 +855,90 @@ fn interpolate_brace_command(
     }
 }
 
-/// Interpolates a heredoc command.
-pub(crate) fn interpolate_heredoc_command(
+/// Represents context for a heredoc interpolation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum HeredocContext {
+    /// A heredoc command is being interpolated.
+    Command,
+    /// A multiline string is being interpolated.
+    String,
+    /// A multiline string in a metadata section is being interpolated.
+    MetadataString,
+}
+
+/// Interpolates a heredoc command or multi-line string.
+pub(crate) fn interpolate_heredoc(
     start: Span,
-    mut interpolator: Interpolator<'_, HeredocCommandToken>,
+    context: HeredocContext,
+    mut interpolator: Interpolator<'_, HeredocToken>,
 ) -> (Parser<'_>, Result<(), Diagnostic>) {
+    /// Helper function for parsing an interpolation
+    fn interpolate<'a>(
+        mut interpolator: Interpolator<'a, HeredocToken>,
+        open: Span,
+        text: &mut Option<Span>,
+        context: HeredocContext,
+    ) -> Interpolator<'a, HeredocToken> {
+        // Add any encountered literal text
+        if let Some(span) = text.take() {
+            interpolator.event(Event::Token {
+                kind: if context == HeredocContext::Command {
+                    SyntaxKind::LiteralCommandText
+                } else {
+                    SyntaxKind::LiteralStringText
+                },
+                span,
+            })
+        }
+
+        let marker = interpolator.start();
+        interpolator.event(Event::Token {
+            kind: SyntaxKind::PlaceholderOpen,
+            span: open,
+        });
+
+        // Parse the placeholder expression
+        let mut parser = interpolator.into_parser();
+        if let Err((marker, e)) = placeholder_expr(&mut parser, marker, open) {
+            marker.abandon(&mut parser);
+            parser.recover(
+                e,
+                TokenSet::new(&[Token::CloseBrace as u8, Token::CloseHeredoc as u8]),
+            );
+            parser.next_if(Token::CloseBrace);
+        }
+
+        parser.into_interpolator()
+    }
+
     let mut text = None;
     let mut end = None;
 
     while let Some((Ok(token), span)) = interpolator.next() {
         match token {
-            HeredocCommandToken::PlaceholderStart => {
-                // Add any encountered literal text
-                if let Some(span) = text.take() {
-                    interpolator.event(Event::Token {
-                        kind: SyntaxKind::LiteralCommandText,
-                        span,
-                    })
-                }
-
-                let marker = interpolator.start();
-                interpolator.event(Event::Token {
-                    kind: SyntaxKind::PlaceholderOpen,
-                    span,
-                });
-
-                // Parse the placeholder expression
-                let mut parser = interpolator.into_parser();
-                if let Err((marker, e)) = placeholder_expr(&mut parser, marker, span) {
-                    marker.abandon(&mut parser);
-                    parser.recover(
-                        e,
-                        TokenSet::new(&[Token::CloseBrace as u8, Token::HeredocCommandEnd as u8]),
-                    );
-                    parser.next_if(Token::CloseBrace);
-                }
-
-                interpolator = parser.into_interpolator();
+            HeredocToken::TildePlaceholderStart
+                if matches!(context, HeredocContext::Command | HeredocContext::String) =>
+            {
+                interpolator = interpolate(interpolator, span, &mut text, context);
             }
-            HeredocCommandToken::Escape
-            | HeredocCommandToken::Text
-            | HeredocCommandToken::SingleCloseAngle
-            | HeredocCommandToken::DoubleCloseAngle
-            | HeredocCommandToken::Tilde => {
+            HeredocToken::DollarPlaceholderStart if context == HeredocContext::String => {
+                interpolator = interpolate(interpolator, span, &mut text, context);
+            }
+            HeredocToken::Escape
+            | HeredocToken::Text
+            | HeredocToken::SingleCloseAngle
+            | HeredocToken::DoubleCloseAngle
+            | HeredocToken::Tilde
+            | HeredocToken::DollarSign
+            | HeredocToken::TildePlaceholderStart
+            | HeredocToken::DollarPlaceholderStart => {
                 // Update the span of the text to include this token
                 text = match text {
                     Some(prev) => Some(Span::new(prev.start(), prev.len() + span.len())),
                     None => Some(span),
                 };
             }
-            HeredocCommandToken::End => {
+            HeredocToken::End => {
                 end = Some(span);
                 break;
             }
@@ -851,14 +947,18 @@ pub(crate) fn interpolate_heredoc_command(
 
     if let Some(span) = text.take() {
         interpolator.event(Event::Token {
-            kind: SyntaxKind::LiteralCommandText,
+            kind: if context == HeredocContext::Command {
+                SyntaxKind::LiteralCommandText
+            } else {
+                SyntaxKind::LiteralStringText
+            },
             span,
         })
     }
 
     match end {
         Some(span) => {
-            // Push an end heredoc as we're done interpolating the command
+            // Push a close heredoc as we're done interpolating
             interpolator.event(Event::Token {
                 kind: SyntaxKind::CloseHeredoc,
                 span,
@@ -867,12 +967,13 @@ pub(crate) fn interpolate_heredoc_command(
             (interpolator.into_parser(), Ok(()))
         }
         None => {
-            // Command wasn't terminated
+            // Not terminated
             (
                 interpolator.into_parser(),
-                Err(unterminated_command(
-                    Token::describe(Token::HeredocCommandStart as u8),
+                Err(unterminated_heredoc(
+                    Token::describe(Token::OpenHeredoc as u8),
                     start,
+                    context == HeredocContext::Command,
                 )),
             )
         }
@@ -887,7 +988,7 @@ fn output_section(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker
             None,
             UNTIL_CLOSE_BRACE,
             OUTPUT_ITEM_RECOVERY_SET,
-            bound_decl,
+            |parser, marker| bound_decl(parser, marker, true),
         );
         Ok(())
     });
@@ -902,7 +1003,7 @@ fn runtime_section(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marke
         parser.delimited(
             None,
             UNTIL_CLOSE_BRACE,
-            RUNTIME_SECTION_RECOVERY_SET,
+            RUNTIME_ITEM_RECOVERY_SET,
             runtime_item,
         );
         Ok(())
@@ -911,13 +1012,63 @@ fn runtime_section(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marke
     Ok(())
 }
 
-/// Parses a runtime item in a runtime section.
+/// Parses an item in a runtime section.
 fn runtime_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
     expected_in!(parser, marker, ANY_IDENT, "runtime key");
     parser.update_last_token_kind(SyntaxKind::Ident);
     expected!(parser, marker, Token::Colon);
     expected_fn!(parser, marker, expr);
     marker.complete(parser, SyntaxKind::RuntimeItemNode);
+    Ok(())
+}
+
+/// Parses a requirements section in a task.
+fn requirements_section(
+    parser: &mut Parser<'_>,
+    marker: Marker,
+) -> Result<(), (Marker, Diagnostic)> {
+    parser.require(Token::RequirementsKeyword);
+    braced!(parser, marker, |parser| {
+        parser.delimited(
+            None,
+            UNTIL_CLOSE_BRACE,
+            REQUIREMENTS_ITEM_RECOVERY_SET,
+            requirements_item,
+        );
+        Ok(())
+    });
+    marker.complete(parser, SyntaxKind::RequirementsSectionNode);
+    Ok(())
+}
+
+/// Parses an item in a requirements section.
+fn requirements_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
+    expected_in!(parser, marker, ANY_IDENT, "requirements key");
+    parser.update_last_token_kind(SyntaxKind::Ident);
+    expected!(parser, marker, Token::Colon);
+    expected_fn!(parser, marker, expr);
+    marker.complete(parser, SyntaxKind::RequirementsItemNode);
+    Ok(())
+}
+
+/// Parses a hints section in a task.
+fn hints_section(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
+    parser.require(Token::HintsKeyword);
+    braced!(parser, marker, |parser| {
+        parser.delimited(None, UNTIL_CLOSE_BRACE, HINTS_ITEM_RECOVERY_SET, hints_item);
+        Ok(())
+    });
+    marker.complete(parser, SyntaxKind::HintsSectionNode);
+    Ok(())
+}
+
+/// Parses an item in a hints section or hints literal.
+fn hints_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
+    expected_in!(parser, marker, ANY_IDENT, "hints key");
+    parser.update_last_token_kind(SyntaxKind::Ident);
+    expected!(parser, marker, Token::Colon);
+    expected_fn!(parser, marker, expr);
+    marker.complete(parser, SyntaxKind::HintsItemNode);
     Ok(())
 }
 
@@ -957,12 +1108,16 @@ fn metadata_value(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker
             number(parser, marker, true)?;
             Ok(())
         }
-        Some((Token::SQStringStart, _)) => {
+        Some((Token::SingleQuote, _)) => {
             single_quote_string(parser, marker, false)?;
             Ok(())
         }
-        Some((Token::DQStringStart, _)) => {
+        Some((Token::DoubleQuote, _)) => {
             double_quote_string(parser, marker, false)?;
+            Ok(())
+        }
+        Some((Token::OpenHeredoc, _)) => {
+            multiline_string(parser, marker, false)?;
             Ok(())
         }
         Some((Token::TrueKeyword, _)) | Some((Token::FalseKeyword, _)) => {
@@ -1107,9 +1262,9 @@ fn placeholder_expr(
 }
 
 /// Interpolates a single-quoted string.
-pub(crate) fn single_quote_interpolate(
+pub(crate) fn interpolate_sq_string(
     start: Span,
-    allow_interpolation: bool,
+    allow_placeholders: bool,
     mut interpolator: Interpolator<'_, SQStringToken>,
 ) -> (Parser<'_>, Result<(), Diagnostic>) {
     let mut text = None;
@@ -1117,7 +1272,7 @@ pub(crate) fn single_quote_interpolate(
 
     while let Some((Ok(token), span)) = interpolator.next() {
         match token {
-            SQStringToken::PlaceholderStart if allow_interpolation => {
+            SQStringToken::PlaceholderStart if allow_placeholders => {
                 // Add any encountered literal text
                 if let Some(span) = text.take() {
                     interpolator.event(Event::Token {
@@ -1138,7 +1293,7 @@ pub(crate) fn single_quote_interpolate(
                     marker.abandon(&mut parser);
                     parser.recover(
                         e,
-                        TokenSet::new(&[Token::CloseBrace as u8, Token::SQStringStart as u8]),
+                        TokenSet::new(&[Token::CloseBrace as u8, Token::SingleQuote as u8]),
                     );
                     parser.next_if(Token::CloseBrace);
                 }
@@ -1193,8 +1348,9 @@ fn string(
     marker: Marker,
 ) -> Result<CompletedMarker, (Marker, Diagnostic)> {
     match parser.peek() {
-        Some((Token::SQStringStart, _)) => single_quote_string(parser, marker, true),
-        Some((Token::DQStringStart, _)) => double_quote_string(parser, marker, true),
+        Some((Token::SingleQuote, _)) => single_quote_string(parser, marker, true),
+        Some((Token::DoubleQuote, _)) => double_quote_string(parser, marker, true),
+        Some((Token::OpenHeredoc, _)) => multiline_string(parser, marker, true),
         found => {
             let (found, span) = found
                 .map(|(t, s)| (Some(Token::describe(t.into_raw())), s))
@@ -1208,12 +1364,11 @@ fn string(
 fn single_quote_string(
     parser: &mut Parser<'_>,
     marker: Marker,
-    allow_interpolation: bool,
+    allow_placeholders: bool,
 ) -> Result<CompletedMarker, (Marker, Diagnostic)> {
-    let start = parser.require(Token::SQStringStart);
+    let start = parser.require(Token::SingleQuote);
 
-    if let Err(e) = parser.interpolate(|i| single_quote_interpolate(start, allow_interpolation, i))
-    {
+    if let Err(e) = parser.interpolate(|i| interpolate_sq_string(start, allow_placeholders, i)) {
         return Err((marker, e));
     }
 
@@ -1221,9 +1376,9 @@ fn single_quote_string(
 }
 
 /// Interpolates a double-quoted string.
-pub(crate) fn double_quote_interpolate(
+pub(crate) fn interpolate_dq_string(
     start: Span,
-    allow_interpolation: bool,
+    allow_placeholders: bool,
     mut interpolator: Interpolator<'_, DQStringToken>,
 ) -> (Parser<'_>, Result<(), Diagnostic>) {
     let mut text = None;
@@ -1231,7 +1386,7 @@ pub(crate) fn double_quote_interpolate(
 
     while let Some((Ok(token), span)) = interpolator.next() {
         match token {
-            DQStringToken::PlaceholderStart if allow_interpolation => {
+            DQStringToken::PlaceholderStart if allow_placeholders => {
                 // Add any encountered literal text
                 if let Some(span) = text.take() {
                     interpolator.event(Event::Token {
@@ -1252,7 +1407,7 @@ pub(crate) fn double_quote_interpolate(
                     marker.abandon(&mut parser);
                     parser.recover(
                         e,
-                        TokenSet::new(&[Token::CloseBrace as u8, Token::DQStringStart as u8]),
+                        TokenSet::new(&[Token::CloseBrace as u8, Token::DoubleQuote as u8]),
                     );
                     parser.next_if(Token::CloseBrace);
                 }
@@ -1305,12 +1460,36 @@ pub(crate) fn double_quote_interpolate(
 fn double_quote_string(
     parser: &mut Parser<'_>,
     marker: Marker,
-    allow_interpolation: bool,
+    allow_placeholders: bool,
 ) -> Result<CompletedMarker, (Marker, Diagnostic)> {
-    let start = parser.require(Token::DQStringStart);
+    let start = parser.require(Token::DoubleQuote);
 
-    if let Err(e) = parser.interpolate(|i| double_quote_interpolate(start, allow_interpolation, i))
-    {
+    if let Err(e) = parser.interpolate(|i| interpolate_dq_string(start, allow_placeholders, i)) {
+        return Err((marker, e));
+    }
+
+    Ok(marker.complete(parser, SyntaxKind::LiteralStringNode))
+}
+
+/// Parses a multi-line string.
+fn multiline_string(
+    parser: &mut Parser<'_>,
+    marker: Marker,
+    allow_placeholders: bool,
+) -> Result<CompletedMarker, (Marker, Diagnostic)> {
+    let start = parser.require(Token::OpenHeredoc);
+
+    if let Err(e) = parser.interpolate(|i| {
+        interpolate_heredoc(
+            start,
+            if allow_placeholders {
+                HeredocContext::String
+            } else {
+                HeredocContext::MetadataString
+            },
+            i,
+        )
+    }) {
         return Err((marker, e));
     }
 
@@ -1387,10 +1566,20 @@ fn parameter_metadata_section(
 }
 
 /// Parses a bound declaration.
-fn bound_decl(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
+fn bound_decl(
+    parser: &mut Parser<'_>,
+    marker: Marker,
+    output: bool,
+) -> Result<(), (Marker, Diagnostic)> {
     expected_fn!(parser, marker, ty);
-    expected_in!(parser, marker, ANY_IDENT, "declaration name");
-    parser.update_last_token_kind(SyntaxKind::Ident);
+
+    if output {
+        expected_in!(parser, marker, ANY_IDENT, "output name");
+        parser.update_last_token_kind(SyntaxKind::Ident);
+    } else {
+        expected!(parser, marker, Token::Ident, "declaration name");
+    }
+
     expected!(parser, marker, Token::Assignment);
     expected_fn!(parser, marker, expr);
     marker.complete(parser, SyntaxKind::BoundDeclNode);
@@ -1424,8 +1613,7 @@ fn conditional_statement(
 fn scatter_statement(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
     parser.require(Token::ScatterKeyword);
     paren!(parser, marker, |parser| {
-        parser.expect_in(ANY_IDENT, &["scatter variable name"])?;
-        parser.update_last_token_kind(SyntaxKind::Ident);
+        parser.expect_with_name(Token::Ident, "scatter variable name")?;
         parser.expect(Token::InKeyword)?;
         expected_fn!(parser, expr);
         Ok(())
@@ -1458,8 +1646,10 @@ fn call_statement(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker
 
     if let Some((Token::OpenBrace, _)) = parser.peek() {
         braced!(parser, marker, |parser| {
-            parser.expect(Token::InputKeyword)?;
-            parser.expect(Token::Colon)?;
+            if parser.next_if(Token::InputKeyword) {
+                parser.expect(Token::Colon)?;
+            }
+
             parser.delimited(
                 Some(Token::Comma),
                 UNTIL_CLOSE_BRACE,
@@ -1476,12 +1666,10 @@ fn call_statement(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker
 
 /// Parses a call target (i.e. a qualified name) in a call statement.
 fn call_target(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
-    expected_in!(parser, marker, ANY_IDENT, "call target name");
-    parser.update_last_token_kind(SyntaxKind::Ident);
+    expected!(parser, marker, Token::Ident, "call target name");
 
-    if parser.next_if(Token::Dot) {
-        expected_in!(parser, marker, ANY_IDENT, "call target name");
-        parser.update_last_token_kind(SyntaxKind::Ident);
+    while parser.next_if(Token::Dot) {
+        expected!(parser, marker, Token::Ident, "call target name");
     }
 
     marker.complete(parser, SyntaxKind::CallTargetNode);
@@ -1491,8 +1679,7 @@ fn call_target(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, D
 /// Parses an alias (i.e. `as` clause) in a call statement.
 fn call_alias(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
     parser.require(Token::AsKeyword);
-    expected_in!(parser, marker, ANY_IDENT, "call output name");
-    parser.update_last_token_kind(SyntaxKind::Ident);
+    expected!(parser, marker, Token::Ident, "call output name");
     marker.complete(parser, SyntaxKind::CallAliasNode);
     Ok(())
 }
@@ -1500,8 +1687,7 @@ fn call_alias(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Di
 /// Parses an `after` clause in a call statement.
 fn call_after_clause(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
     parser.require(Token::AfterKeyword);
-    expected_in!(parser, marker, ANY_IDENT, "task name");
-    parser.update_last_token_kind(SyntaxKind::Ident);
+    expected!(parser, marker, Token::Ident, "task name");
     marker.complete(parser, SyntaxKind::CallAfterNode);
     Ok(())
 }
@@ -1653,13 +1839,17 @@ fn atom_expr(
         Token::NoneKeyword => none(parser, marker),
         Token::Float | Token::Integer => number(parser, marker, false),
         Token::TrueKeyword | Token::FalseKeyword => boolean(parser, marker),
-        Token::SQStringStart => single_quote_string(parser, marker, true),
-        Token::DQStringStart => double_quote_string(parser, marker, true),
+        Token::SingleQuote => single_quote_string(parser, marker, true),
+        Token::DoubleQuote => double_quote_string(parser, marker, true),
+        Token::OpenHeredoc => multiline_string(parser, marker, true),
         Token::OpenBracket => array(parser, marker),
         Token::OpenBrace => map(parser, marker),
         Token::OpenParen => pair_or_paren_expr(parser, marker),
         Token::ObjectKeyword => object(parser, marker),
         Token::IfKeyword => if_expr(parser, marker),
+        Token::HintsKeyword => literal_hints(parser, marker),
+        Token::InputKeyword => literal_input(parser, marker),
+        Token::OutputKeyword => literal_output(parser, marker),
         t if ANY_IDENT.contains(t.into_raw()) => literal_struct_or_name_ref(parser, marker),
         _ => unreachable!(),
     }
@@ -1826,6 +2016,108 @@ fn if_expr(
     Ok(marker.complete(parser, SyntaxKind::IfExprNode))
 }
 
+/// Parses a literal hints.
+fn literal_hints(
+    parser: &mut Parser<'_>,
+    marker: Marker,
+) -> Result<CompletedMarker, (Marker, Diagnostic)> {
+    parser.require(Token::HintsKeyword);
+    braced!(parser, marker, |parser| {
+        parser.delimited(
+            None,
+            UNTIL_CLOSE_BRACE,
+            HINTS_ITEM_RECOVERY_SET,
+            literal_hints_item,
+        );
+        Ok(())
+    });
+
+    Ok(marker.complete(parser, SyntaxKind::LiteralHintsNode))
+}
+
+/// Parses a literal hints item.
+fn literal_hints_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
+    expected_in!(parser, marker, ANY_IDENT, "hint key");
+    parser.update_last_token_kind(SyntaxKind::Ident);
+    expected!(parser, marker, Token::Colon);
+    expected_fn!(parser, marker, expr);
+    marker.complete(parser, SyntaxKind::LiteralHintsItemNode);
+    Ok(())
+}
+
+/// Parses a literal input.
+fn literal_input(
+    parser: &mut Parser<'_>,
+    marker: Marker,
+) -> Result<CompletedMarker, (Marker, Diagnostic)> {
+    parser.require(Token::InputKeyword);
+    braced!(parser, marker, |parser| {
+        parser.delimited(
+            None,
+            UNTIL_CLOSE_BRACE,
+            LITERAL_INPUT_ITEM_RECOVERY_SET,
+            literal_input_item,
+        );
+        Ok(())
+    });
+
+    Ok(marker.complete(parser, SyntaxKind::LiteralInputNode))
+}
+
+/// Parses a literal input item.
+fn literal_input_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, Diagnostic)> {
+    expected_in!(parser, marker, ANY_IDENT, "input key");
+    parser.update_last_token_kind(SyntaxKind::Ident);
+
+    while parser.next_if(Token::Dot) {
+        expected_in!(parser, marker, ANY_IDENT, "struct member name");
+        parser.update_last_token_kind(SyntaxKind::Ident);
+    }
+
+    expected!(parser, marker, Token::Colon);
+    expected_fn!(parser, marker, expr);
+    marker.complete(parser, SyntaxKind::LiteralInputItemNode);
+    Ok(())
+}
+
+/// Parses a literal output.
+fn literal_output(
+    parser: &mut Parser<'_>,
+    marker: Marker,
+) -> Result<CompletedMarker, (Marker, Diagnostic)> {
+    parser.require(Token::OutputKeyword);
+    braced!(parser, marker, |parser| {
+        parser.delimited(
+            None,
+            UNTIL_CLOSE_BRACE,
+            LITERAL_OUTPUT_ITEM_RECOVERY_SET,
+            literal_output_item,
+        );
+        Ok(())
+    });
+
+    Ok(marker.complete(parser, SyntaxKind::LiteralOutputNode))
+}
+
+/// Parses a literal output item.
+fn literal_output_item(
+    parser: &mut Parser<'_>,
+    marker: Marker,
+) -> Result<(), (Marker, Diagnostic)> {
+    expected_in!(parser, marker, ANY_IDENT, "output key");
+    parser.update_last_token_kind(SyntaxKind::Ident);
+
+    while parser.next_if(Token::Dot) {
+        expected_in!(parser, marker, ANY_IDENT, "struct member name");
+        parser.update_last_token_kind(SyntaxKind::Ident);
+    }
+
+    expected!(parser, marker, Token::Colon);
+    expected_fn!(parser, marker, expr);
+    marker.complete(parser, SyntaxKind::LiteralOutputItemNode);
+    Ok(())
+}
+
 /// Parses a call expression.
 fn call_expr(
     parser: &mut Parser<'_>,
@@ -1861,7 +2153,7 @@ fn access_expr(
     marker: Marker,
 ) -> Result<CompletedMarker, (Marker, Diagnostic)> {
     parser.require(Token::Dot);
-    expected_in!(parser, marker, ANY_IDENT, "member name");
+    expected_in!(parser, marker, ANY_IDENT, "name");
     parser.update_last_token_kind(SyntaxKind::Ident);
     Ok(marker.complete(parser, SyntaxKind::AccessExprNode))
 }

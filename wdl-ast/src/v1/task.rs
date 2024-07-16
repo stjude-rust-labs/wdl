@@ -8,6 +8,7 @@ use super::LiteralFloat;
 use super::LiteralInteger;
 use super::LiteralString;
 use super::Placeholder;
+use super::StructDefinition;
 use super::WorkflowDefinition;
 use crate::support;
 use crate::support::child;
@@ -50,6 +51,16 @@ impl TaskDefinition {
 
     /// Gets the command sections of the task.
     pub fn commands(&self) -> AstChildren<CommandSection> {
+        children(&self.0)
+    }
+
+    /// Gets the requirements sections of the task.
+    pub fn requirements(&self) -> AstChildren<RequirementsSection> {
+        children(&self.0)
+    }
+
+    /// Gets the hints sections of the task.
+    pub fn hints(&self) -> AstChildren<HintsSection> {
         children(&self.0)
     }
 
@@ -108,6 +119,10 @@ pub enum TaskItem {
     Output(OutputSection),
     /// The item is a command section.
     Command(CommandSection),
+    /// The item is a requirements section.
+    Requirements(RequirementsSection),
+    /// The item is a hints section.
+    Hints(HintsSection),
     /// The item is a runtime section.
     Runtime(RuntimeSection),
     /// The item is a metadata section.
@@ -130,6 +145,8 @@ impl AstNode for TaskItem {
             SyntaxKind::InputSectionNode
                 | SyntaxKind::OutputSectionNode
                 | SyntaxKind::CommandSectionNode
+                | SyntaxKind::RequirementsSectionNode
+                | SyntaxKind::HintsSectionNode
                 | SyntaxKind::RuntimeSectionNode
                 | SyntaxKind::MetadataSectionNode
                 | SyntaxKind::ParameterMetadataSectionNode
@@ -145,6 +162,10 @@ impl AstNode for TaskItem {
             SyntaxKind::InputSectionNode => Some(Self::Input(InputSection(syntax))),
             SyntaxKind::OutputSectionNode => Some(Self::Output(OutputSection(syntax))),
             SyntaxKind::CommandSectionNode => Some(Self::Command(CommandSection(syntax))),
+            SyntaxKind::RequirementsSectionNode => {
+                Some(Self::Requirements(RequirementsSection(syntax)))
+            }
+            SyntaxKind::HintsSectionNode => Some(Self::Hints(HintsSection(syntax))),
             SyntaxKind::RuntimeSectionNode => Some(Self::Runtime(RuntimeSection(syntax))),
             SyntaxKind::MetadataSectionNode => Some(Self::Metadata(MetadataSection(syntax))),
             SyntaxKind::ParameterMetadataSectionNode => {
@@ -160,6 +181,8 @@ impl AstNode for TaskItem {
             Self::Input(i) => &i.0,
             Self::Output(o) => &o.0,
             Self::Command(c) => &c.0,
+            Self::Requirements(r) => &r.0,
+            Self::Hints(h) => &h.0,
             Self::Runtime(r) => &r.0,
             Self::Metadata(m) => &m.0,
             Self::ParameterMetadata(m) => &m.0,
@@ -168,16 +191,27 @@ impl AstNode for TaskItem {
     }
 }
 
-/// Represents either a task or a workflow.
+/// Represents the parent of a section.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum TaskOrWorkflow {
-    /// The item is a task.
+pub enum SectionParent {
+    /// The parent is a task.
     Task(TaskDefinition),
-    /// The item is a workflow.
+    /// The parent is a workflow.
     Workflow(WorkflowDefinition),
+    /// The parent is a struct.
+    Struct(StructDefinition),
 }
 
-impl TaskOrWorkflow {
+impl SectionParent {
+    /// Gets the name of the section parent.
+    pub fn name(&self) -> Ident {
+        match self {
+            Self::Task(t) => t.name(),
+            Self::Workflow(w) => w.name(),
+            Self::Struct(s) => s.name(),
+        }
+    }
+
     /// Unwraps to a task definition.
     ///
     /// # Panics
@@ -201,9 +235,21 @@ impl TaskOrWorkflow {
             _ => panic!("not a workflow definition"),
         }
     }
+
+    /// Unwraps to a struct definition.
+    ///
+    /// # Panics
+    ///
+    /// Panics if it is not a struct definition.
+    pub fn unwrap_struct(self) -> StructDefinition {
+        match self {
+            Self::Struct(def) => def,
+            _ => panic!("not a struct definition"),
+        }
+    }
 }
 
-impl AstNode for TaskOrWorkflow {
+impl AstNode for SectionParent {
     type Language = WorkflowDescriptionLanguage;
 
     fn can_cast(kind: SyntaxKind) -> bool
@@ -212,7 +258,9 @@ impl AstNode for TaskOrWorkflow {
     {
         matches!(
             kind,
-            SyntaxKind::TaskDefinitionNode | SyntaxKind::WorkflowDefinitionNode
+            SyntaxKind::TaskDefinitionNode
+                | SyntaxKind::WorkflowDefinitionNode
+                | SyntaxKind::StructDefinitionNode
         )
     }
 
@@ -223,6 +271,7 @@ impl AstNode for TaskOrWorkflow {
         match node.kind() {
             SyntaxKind::TaskDefinitionNode => Some(Self::Task(TaskDefinition(node))),
             SyntaxKind::WorkflowDefinitionNode => Some(Self::Workflow(WorkflowDefinition(node))),
+            SyntaxKind::StructDefinitionNode => Some(Self::Struct(StructDefinition(node))),
             _ => None,
         }
     }
@@ -231,6 +280,7 @@ impl AstNode for TaskOrWorkflow {
         match self {
             Self::Task(t) => &t.0,
             Self::Workflow(w) => &w.0,
+            Self::Struct(s) => &s.0,
         }
     }
 }
@@ -246,8 +296,8 @@ impl InputSection {
     }
 
     /// Gets the parent of the input section.
-    pub fn parent(&self) -> TaskOrWorkflow {
-        TaskOrWorkflow::cast(self.0.parent().expect("should have a parent"))
+    pub fn parent(&self) -> SectionParent {
+        SectionParent::cast(self.0.parent().expect("should have a parent"))
             .expect("parent should cast")
     }
 }
@@ -288,8 +338,8 @@ impl OutputSection {
     }
 
     /// Gets the parent of the output section.
-    pub fn parent(&self) -> TaskOrWorkflow {
-        TaskOrWorkflow::cast(self.0.parent().expect("should have a parent"))
+    pub fn parent(&self) -> SectionParent {
+        SectionParent::cast(self.0.parent().expect("should have a parent"))
             .expect("parent should cast")
     }
 }
@@ -352,8 +402,8 @@ impl CommandSection {
     }
 
     /// Gets the parent of the command section.
-    pub fn parent(&self) -> TaskDefinition {
-        TaskDefinition::cast(self.0.parent().expect("should have a parent"))
+    pub fn parent(&self) -> SectionParent {
+        SectionParent::cast(self.0.parent().expect("should have a parent"))
             .expect("parent should cast")
     }
 }
@@ -453,6 +503,172 @@ impl CommandPart {
     }
 }
 
+/// Represents a requirements section in a task definition.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RequirementsSection(pub(crate) SyntaxNode);
+
+impl RequirementsSection {
+    /// Gets the items in the requirements section.
+    pub fn items(&self) -> AstChildren<RequirementsItem> {
+        children(&self.0)
+    }
+
+    /// Gets the parent of the requirements section.
+    pub fn parent(&self) -> SectionParent {
+        SectionParent::cast(self.0.parent().expect("should have a parent"))
+            .expect("parent should cast")
+    }
+}
+
+impl AstNode for RequirementsSection {
+    type Language = WorkflowDescriptionLanguage;
+
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        kind == SyntaxKind::RequirementsSectionNode
+    }
+
+    fn cast(syntax: SyntaxNode) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match syntax.kind() {
+            SyntaxKind::RequirementsSectionNode => Some(Self(syntax)),
+            _ => None,
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode {
+        &self.0
+    }
+}
+
+/// Represents an item in a requirements section.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RequirementsItem(SyntaxNode);
+
+impl RequirementsItem {
+    /// Gets the name of the requirements item.
+    pub fn name(&self) -> Ident {
+        token(&self.0).expect("expected an item name")
+    }
+
+    /// Gets the expression of the requirements item.
+    pub fn expr(&self) -> Expr {
+        child(&self.0).expect("expected an item expression")
+    }
+}
+
+impl AstNode for RequirementsItem {
+    type Language = WorkflowDescriptionLanguage;
+
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        kind == SyntaxKind::RequirementsItemNode
+    }
+
+    fn cast(syntax: SyntaxNode) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match syntax.kind() {
+            SyntaxKind::RequirementsItemNode => Some(Self(syntax)),
+            _ => None,
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode {
+        &self.0
+    }
+}
+
+/// Represents a hints section in a task definition.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HintsSection(pub(crate) SyntaxNode);
+
+impl HintsSection {
+    /// Gets the items in the hints section.
+    pub fn items(&self) -> AstChildren<HintsItem> {
+        children(&self.0)
+    }
+
+    /// Gets the parent of the hints section.
+    pub fn parent(&self) -> SectionParent {
+        SectionParent::cast(self.0.parent().expect("should have a parent"))
+            .expect("parent should cast")
+    }
+}
+
+impl AstNode for HintsSection {
+    type Language = WorkflowDescriptionLanguage;
+
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        kind == SyntaxKind::HintsSectionNode
+    }
+
+    fn cast(syntax: SyntaxNode) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match syntax.kind() {
+            SyntaxKind::HintsSectionNode => Some(Self(syntax)),
+            _ => None,
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode {
+        &self.0
+    }
+}
+
+/// Represents an item in a hints section.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct HintsItem(SyntaxNode);
+
+impl HintsItem {
+    /// Gets the name of the hints item.
+    pub fn name(&self) -> Ident {
+        token(&self.0).expect("expected an item name")
+    }
+
+    /// Gets the expression of the hints item.
+    pub fn expr(&self) -> Expr {
+        child(&self.0).expect("expected an item expression")
+    }
+}
+
+impl AstNode for HintsItem {
+    type Language = WorkflowDescriptionLanguage;
+
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        kind == SyntaxKind::HintsItemNode
+    }
+
+    fn cast(syntax: SyntaxNode) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match syntax.kind() {
+            SyntaxKind::HintsItemNode => Some(Self(syntax)),
+            _ => None,
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode {
+        &self.0
+    }
+}
+
 /// Represents a runtime section in a task definition.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RuntimeSection(pub(crate) SyntaxNode);
@@ -464,8 +680,8 @@ impl RuntimeSection {
     }
 
     /// Gets the parent of the runtime section.
-    pub fn parent(&self) -> TaskDefinition {
-        TaskDefinition::cast(self.0.parent().expect("should have a parent"))
+    pub fn parent(&self) -> SectionParent {
+        SectionParent::cast(self.0.parent().expect("should have a parent"))
             .expect("parent should cast")
     }
 }
@@ -497,7 +713,7 @@ impl AstNode for RuntimeSection {
 
 /// Represents an item in a runtime section.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct RuntimeItem(SyntaxNode);
+pub struct RuntimeItem(pub(crate) SyntaxNode);
 
 impl RuntimeItem {
     /// Gets the name of the runtime item.
@@ -547,8 +763,8 @@ impl MetadataSection {
     }
 
     /// Gets the parent of the metadata section.
-    pub fn parent(&self) -> TaskOrWorkflow {
-        TaskOrWorkflow::cast(self.0.parent().expect("should have a parent"))
+    pub fn parent(&self) -> SectionParent {
+        SectionParent::cast(self.0.parent().expect("should have a parent"))
             .expect("parent should cast")
     }
 }
@@ -884,8 +1100,8 @@ impl ParameterMetadataSection {
     }
 
     /// Gets the parent of the parameter metadata section.
-    pub fn parent(&self) -> TaskOrWorkflow {
-        TaskOrWorkflow::cast(self.0.parent().expect("should have a parent"))
+    pub fn parent(&self) -> SectionParent {
+        SectionParent::cast(self.0.parent().expect("should have a parent"))
             .expect("parent should cast")
     }
 }
@@ -920,6 +1136,7 @@ mod test {
     use super::*;
     use crate::v1::UnboundDecl;
     use crate::Document;
+    use crate::SupportedVersion;
     use crate::VisitReason;
     use crate::Visitor;
 
@@ -927,7 +1144,7 @@ mod test {
     fn tasks() {
         let (document, diagnostics) = Document::parse(
             r#"
-version 1.1
+version 1.2
 
 task test {
     input {
@@ -941,6 +1158,14 @@ task test {
     command <<<
         printf "hello, ~{name}!
     >>>
+
+    requirements {
+        container: "baz/qux"
+    }
+
+    hints {
+        foo: "bar"
+    }
 
     runtime {
         container: "foo/bar"
@@ -1032,6 +1257,46 @@ task test {
         );
         assert_eq!(parts[2].clone().unwrap_text().as_str(), "!\n    ");
 
+        // Task requirements
+        let requirements: Vec<_> = tasks[0].requirements().collect();
+        assert_eq!(requirements.len(), 1);
+
+        // First task requirements
+        assert_eq!(requirements[0].parent().name().as_str(), "test");
+        let items: Vec<_> = requirements[0].items().collect();
+        assert_eq!(items.len(), 1);
+        assert_eq!(items[0].name().as_str(), "container");
+        assert_eq!(
+            items[0]
+                .expr()
+                .unwrap_literal()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "baz/qux"
+        );
+
+        // Task hints
+        let hints: Vec<_> = tasks[0].hints().collect();
+        assert_eq!(hints.len(), 1);
+
+        // First task hints
+        assert_eq!(hints[0].parent().unwrap_task().name().as_str(), "test");
+        let items: Vec<_> = hints[0].items().collect();
+        assert_eq!(items.len(), 1);
+        assert_eq!(items[0].name().as_str(), "foo");
+        assert_eq!(
+            items[0]
+                .expr()
+                .unwrap_literal()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "bar"
+        );
+
         // Task runtimes
         let runtimes: Vec<_> = tasks[0].runtimes().collect();
         assert_eq!(runtimes.len(), 1);
@@ -1112,6 +1377,8 @@ task test {
             inputs: usize,
             outputs: usize,
             commands: usize,
+            requirements: usize,
+            hints: usize,
             runtimes: usize,
             metadata: usize,
             param_metadata: usize,
@@ -1122,7 +1389,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn task_definition(
                 &mut self,
@@ -1165,6 +1439,28 @@ task test {
             ) {
                 if reason == VisitReason::Enter {
                     self.commands += 1;
+                }
+            }
+
+            fn requirements_section(
+                &mut self,
+                _: &mut Self::State,
+                reason: VisitReason,
+                _: &RequirementsSection,
+            ) {
+                if reason == VisitReason::Enter {
+                    self.requirements += 1;
+                }
+            }
+
+            fn hints_section(
+                &mut self,
+                _: &mut Self::State,
+                reason: VisitReason,
+                _: &HintsSection,
+            ) {
+                if reason == VisitReason::Enter {
+                    self.hints += 1;
                 }
             }
 
@@ -1220,6 +1516,8 @@ task test {
         assert_eq!(visitor.inputs, 1);
         assert_eq!(visitor.outputs, 1);
         assert_eq!(visitor.commands, 1);
+        assert_eq!(visitor.requirements, 1);
+        assert_eq!(visitor.hints, 1);
         assert_eq!(visitor.runtimes, 1);
         assert_eq!(visitor.metadata, 1);
         assert_eq!(visitor.param_metadata, 1);

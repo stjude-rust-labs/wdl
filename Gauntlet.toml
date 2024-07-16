@@ -389,27 +389,27 @@ permalink = "https://github.com/broadinstitute/warp/blob/b8a753edd8e761a835164cc
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/GermlineVariantDiscovery.wdl"
 message = "GermlineVariantDiscovery.wdl:137:32: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/b8a753edd8e761a835164cc7b84f136c7fbe51d1/tasks/broad/GermlineVariantDiscovery.wdl/#L137"
+permalink = "https://github.com/broadinstitute/warp/blob/0030fa9e09c4ca6e45810ce54b85792a7b77212d/tasks/broad/GermlineVariantDiscovery.wdl/#L137"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/GermlineVariantDiscovery.wdl"
 message = "GermlineVariantDiscovery.wdl:65:32: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/b8a753edd8e761a835164cc7b84f136c7fbe51d1/tasks/broad/GermlineVariantDiscovery.wdl/#L65"
+permalink = "https://github.com/broadinstitute/warp/blob/0030fa9e09c4ca6e45810ce54b85792a7b77212d/tasks/broad/GermlineVariantDiscovery.wdl/#L65"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl"
 message = "UltimaGenomicsWholeGenomeGermlineTasks.wdl:814:27: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/b8a753edd8e761a835164cc7b84f136c7fbe51d1/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L814"
+permalink = "https://github.com/broadinstitute/warp/blob/0030fa9e09c4ca6e45810ce54b85792a7b77212d/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L814"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl"
 message = "UltimaGenomicsWholeGenomeGermlineTasks.wdl:866:27: error: expected string, but found integer"
-permalink = "https://github.com/broadinstitute/warp/blob/b8a753edd8e761a835164cc7b84f136c7fbe51d1/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L866"
+permalink = "https://github.com/broadinstitute/warp/blob/0030fa9e09c4ca6e45810ce54b85792a7b77212d/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L866"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tests/cemba/pr/CheckCembaOutputs.wdl"
 message = "CheckCembaOutputs.wdl:1:1: error: a WDL document must start with a version statement"
-permalink = "https://github.com/broadinstitute/warp/blob/b8a753edd8e761a835164cc7b84f136c7fbe51d1/tests/cemba/pr/CheckCembaOutputs.wdl/#L1"
+permalink = "https://github.com/broadinstitute/warp/blob/0030fa9e09c4ca6e45810ce54b85792a7b77212d/tests/cemba/pr/CheckCembaOutputs.wdl/#L1"
 
 [[diagnostics]]
 document = "chanzuckerberg/czid-workflows:/workflows/index-generation/index-generation.wdl"

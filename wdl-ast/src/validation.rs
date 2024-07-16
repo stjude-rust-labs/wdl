@@ -1,19 +1,20 @@
 //! Validator for WDL documents.
 
-use std::cmp::Ordering;
-
 use super::v1;
 use super::Comment;
 use super::Diagnostic;
 use super::VisitReason;
 use super::Whitespace;
 use crate::Document;
+use crate::SupportedVersion;
 use crate::VersionStatement;
 use crate::Visitor;
 
 mod counts;
+mod exprs;
 mod keys;
 mod numbers;
+mod requirements;
 mod strings;
 mod version;
 
@@ -84,15 +85,7 @@ impl Validator {
         if diagnostics.0.is_empty() {
             Ok(())
         } else {
-            // Sort the diagnostics by start of the primary label
-            diagnostics
-                .0
-                .sort_by(|a, b| match (a.labels().next(), b.labels().next()) {
-                    (None, None) => Ordering::Equal,
-                    (None, Some(_)) => Ordering::Less,
-                    (Some(_), None) => Ordering::Greater,
-                    (Some(a), Some(b)) => a.span().start().cmp(&b.span().start()),
-                });
+            diagnostics.0.sort();
             Err(diagnostics.0)
         }
     }
@@ -108,6 +101,8 @@ impl Default for Validator {
                 Box::<keys::UniqueKeysVisitor>::default(),
                 Box::<numbers::NumberVisitor>::default(),
                 Box::<version::VersionVisitor>::default(),
+                Box::<requirements::RequirementsVisitor>::default(),
+                Box::<exprs::ScopedExprVisitor>::default(),
             ],
         }
     }
@@ -116,9 +111,15 @@ impl Default for Validator {
 impl Visitor for Validator {
     type State = Diagnostics;
 
-    fn document(&mut self, state: &mut Self::State, reason: VisitReason, doc: &Document) {
+    fn document(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        doc: &Document,
+        version: SupportedVersion,
+    ) {
         for visitor in self.visitors.iter_mut() {
-            visitor.document(state, reason, doc);
+            visitor.document(state, reason, doc, version);
         }
     }
 
@@ -228,6 +229,28 @@ impl Visitor for Validator {
         }
     }
 
+    fn requirements_section(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        section: &v1::RequirementsSection,
+    ) {
+        for visitor in self.visitors.iter_mut() {
+            visitor.requirements_section(state, reason, section);
+        }
+    }
+
+    fn hints_section(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        section: &v1::HintsSection,
+    ) {
+        for visitor in self.visitors.iter_mut() {
+            visitor.hints_section(state, reason, section);
+        }
+    }
+
     fn runtime_section(
         &mut self,
         state: &mut Self::State,
@@ -236,6 +259,17 @@ impl Visitor for Validator {
     ) {
         for visitor in self.visitors.iter_mut() {
             visitor.runtime_section(state, reason, section);
+        }
+    }
+
+    fn runtime_item(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        item: &v1::RuntimeItem,
+    ) {
+        for visitor in self.visitors.iter_mut() {
+            visitor.runtime_item(state, reason, item);
         }
     }
 
@@ -309,6 +343,17 @@ impl Visitor for Validator {
     fn string_text(&mut self, state: &mut Self::State, text: &v1::StringText) {
         for visitor in self.visitors.iter_mut() {
             visitor.string_text(state, text);
+        }
+    }
+
+    fn placeholder(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        placeholder: &v1::Placeholder,
+    ) {
+        for visitor in self.visitors.iter_mut() {
+            visitor.placeholder(state, reason, placeholder);
         }
     }
 

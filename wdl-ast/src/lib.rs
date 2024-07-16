@@ -42,10 +42,12 @@ pub use rowan::ast::support;
 pub use rowan::ast::AstChildren;
 pub use rowan::ast::AstNode;
 pub use rowan::Direction;
+pub use wdl_grammar::version;
 pub use wdl_grammar::Diagnostic;
 pub use wdl_grammar::Label;
 pub use wdl_grammar::Severity;
 pub use wdl_grammar::Span;
+pub use wdl_grammar::SupportedVersion;
 pub use wdl_grammar::SyntaxElement;
 pub use wdl_grammar::SyntaxKind;
 pub use wdl_grammar::SyntaxNode;
@@ -210,15 +212,8 @@ impl Document {
     pub fn ast(&self) -> Ast {
         self.version_statement()
             .as_ref()
-            .map(|s| {
-                let v = s.version();
-                match v.as_str() {
-                    "1.0" | "1.1" | "1.2" => {
-                        Ast::V1(v1::Ast::cast(self.0.clone()).expect("root should cast"))
-                    }
-                    _ => Ast::Unsupported,
-                }
-            })
+            .and_then(|s| s.version().as_str().parse::<SupportedVersion>().ok())
+            .map(|_| Ast::V1(v1::Ast::cast(self.0.clone()).expect("root should cast")))
             .unwrap_or(Ast::Unsupported)
     }
 
@@ -395,6 +390,47 @@ impl AstToken for Ident {
     }
 
     fn syntax(&self) -> &SyntaxToken {
+        &self.0
+    }
+}
+
+/// Helper for hashing any AST token on string representation alone.
+///
+/// Normally an AST token's equality and hash implementation work by comparing
+/// the token's element in the AST; thus, two `Ident` tokens with the same name
+/// but different positions in the tree will compare and hash differently.
+#[derive(Debug, Clone)]
+pub struct TokenStrHash<T>(T);
+
+impl<T: AstToken> TokenStrHash<T> {
+    /// Constructs a new token hash for the given token.
+    pub fn new(token: T) -> Self {
+        Self(token)
+    }
+}
+
+impl<T: AstToken> PartialEq for TokenStrHash<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.as_str() == other.0.as_str()
+    }
+}
+
+impl<T: AstToken> Eq for TokenStrHash<T> {}
+
+impl<T: AstToken> std::hash::Hash for TokenStrHash<T> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.0.as_str().hash(state);
+    }
+}
+
+impl<T: AstToken> std::borrow::Borrow<str> for TokenStrHash<T> {
+    fn borrow(&self) -> &str {
+        self.0.as_str()
+    }
+}
+
+impl<T: AstToken> AsRef<T> for TokenStrHash<T> {
+    fn as_ref(&self) -> &T {
         &self.0
     }
 }

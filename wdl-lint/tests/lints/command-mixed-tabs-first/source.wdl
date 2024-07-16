@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, NoCurlyCommands
+#@ except: DescriptionMissing, NoCurlyCommands, RuntimeSectionKeys
 ## This is a test of having tabs before spaces in command sections.
 
 version 1.1

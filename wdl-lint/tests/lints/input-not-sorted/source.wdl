@@ -1,7 +1,8 @@
-#@ except: DeprecatedObject, DescriptionMissing, SectionOrdering
+#@ except: DeprecatedObject, DescriptionMissing, SectionOrdering, RuntimeSectionKeys
 
-version 1.1
+version 1.2
 
+#@ except: MissingMetas
 struct Mystruct {
     String a
     Int b
@@ -32,6 +33,8 @@ workflow foo {
         t: ""
         u: ""
         v: ""
+        w: ""
+        x: ""
     }
     input {
         String g = "hello"
@@ -52,6 +55,8 @@ workflow foo {
         Map[String, Array[Int]]? l
         Map[Int, String]? m
         Map[String, File]? r
+        Directory w
+        Directory? x
         Map[String, File] s
         Pair[String, File] n
         Array[String]+ p
@@ -83,6 +88,8 @@ task bar {
         r: ""
         s: ""
         t: ""
+        w: ""
+        x: ""
     }
     input {
         String g = "hello"
@@ -102,6 +109,8 @@ task bar {
         Map[String, Array[Int]]? l
         Map[Int, String]? m
         Map[String, File]? r
+        Directory w
+        Directory? x
         Map[String, File] s
         Pair[String, File] n
         Array[String]+ p

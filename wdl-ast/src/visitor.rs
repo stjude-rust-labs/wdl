@@ -29,6 +29,7 @@ use crate::v1::CommandSection;
 use crate::v1::CommandText;
 use crate::v1::ConditionalStatement;
 use crate::v1::Expr;
+use crate::v1::HintsSection;
 use crate::v1::ImportStatement;
 use crate::v1::InputSection;
 use crate::v1::MetadataObject;
@@ -36,6 +37,9 @@ use crate::v1::MetadataObjectItem;
 use crate::v1::MetadataSection;
 use crate::v1::OutputSection;
 use crate::v1::ParameterMetadataSection;
+use crate::v1::Placeholder;
+use crate::v1::RequirementsSection;
+use crate::v1::RuntimeItem;
 use crate::v1::RuntimeSection;
 use crate::v1::ScatterStatement;
 use crate::v1::StringText;
@@ -44,8 +48,10 @@ use crate::v1::TaskDefinition;
 use crate::v1::UnboundDecl;
 use crate::v1::WorkflowDefinition;
 use crate::AstNode;
+use crate::AstToken as _;
 use crate::Comment;
 use crate::Document;
+use crate::SupportedVersion;
 use crate::SyntaxKind;
 use crate::SyntaxNode;
 use crate::VersionStatement;
@@ -58,7 +64,7 @@ use crate::Whitespace;
 /// that receives both a [VisitReason::Enter] call and a
 /// matching [VisitReason::Exit] call.
 #[allow(unused_variables)]
-pub trait Visitor: Send + Sync {
+pub trait Visitor {
     /// Represents the external visitation state.
     type State;
 
@@ -67,7 +73,13 @@ pub trait Visitor: Send + Sync {
     /// A visitor must implement this method and response to
     /// `VisitReason::Enter` with resetting any internal state so that a visitor
     /// may be reused between documents.
-    fn document(&mut self, state: &mut Self::State, reason: VisitReason, doc: &Document);
+    fn document(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        doc: &Document,
+        version: SupportedVersion,
+    );
 
     /// Visits a whitespace token.
     fn whitespace(&mut self, state: &mut Self::State, whitespace: &Whitespace) {}
@@ -150,6 +162,24 @@ pub trait Visitor: Send + Sync {
     /// Visits a command text token in a command section node.
     fn command_text(&mut self, state: &mut Self::State, text: &CommandText) {}
 
+    /// Visits a requirements section node.
+    fn requirements_section(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        section: &RequirementsSection,
+    ) {
+    }
+
+    /// Visits a hints section node.
+    fn hints_section(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        section: &HintsSection,
+    ) {
+    }
+
     /// Visits a runtime section node.
     fn runtime_section(
         &mut self,
@@ -158,6 +188,9 @@ pub trait Visitor: Send + Sync {
         section: &RuntimeSection,
     ) {
     }
+
+    /// Visits a runtime item node.
+    fn runtime_item(&mut self, state: &mut Self::State, reason: VisitReason, item: &RuntimeItem) {}
 
     /// Visits a metadata section node.
     fn metadata_section(
@@ -207,6 +240,15 @@ pub trait Visitor: Send + Sync {
     /// Visits a string text token in a literal string node.
     fn string_text(&mut self, state: &mut Self::State, text: &StringText) {}
 
+    /// Visits a placeholder node.
+    fn placeholder(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        placeholder: &Placeholder,
+    ) {
+    }
+
     /// Visits a conditional statement node in a workflow.
     fn conditional_statement(
         &mut self,
@@ -246,7 +288,14 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, state: &mut V::State, visitor
 
         match element.kind() {
             SyntaxKind::RootNode => {
-                visitor.document(state, reason, &Document(element.into_node().unwrap()))
+                let document = Document(element.into_node().unwrap());
+
+                let version = document
+                    .version_statement()
+                    .and_then(|s| s.version().as_str().parse::<SupportedVersion>().ok())
+                    .expect("only WDL documents with supported versions can be visited");
+
+                visitor.document(state, reason, &document, version)
             }
             SyntaxKind::VersionStatementNode => visitor.version_statement(
                 state,
@@ -301,13 +350,24 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, state: &mut V::State, visitor
                 reason,
                 &CommandSection(element.into_node().unwrap()),
             ),
+            SyntaxKind::RequirementsSectionNode => visitor.requirements_section(
+                state,
+                reason,
+                &RequirementsSection(element.into_node().unwrap()),
+            ),
+            SyntaxKind::HintsSectionNode => {
+                visitor.hints_section(state, reason, &HintsSection(element.into_node().unwrap()))
+            }
+            SyntaxKind::RequirementsItemNode => {
+                // Skip this node as it's part of a requirements section
+            }
             SyntaxKind::RuntimeSectionNode => visitor.runtime_section(
                 state,
                 reason,
                 &RuntimeSection(element.into_node().unwrap()),
             ),
             SyntaxKind::RuntimeItemNode => {
-                // Skip this node as it's part of a runtime section
+                visitor.runtime_item(state, reason, &RuntimeItem(element.into_node().unwrap()))
             }
             SyntaxKind::MetadataSectionNode => visitor.metadata_section(
                 state,
@@ -340,7 +400,10 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, state: &mut V::State, visitor
             ),
             SyntaxKind::LiteralMapItemNode
             | SyntaxKind::LiteralObjectItemNode
-            | SyntaxKind::LiteralStructItemNode => {
+            | SyntaxKind::LiteralStructItemNode
+            | SyntaxKind::LiteralHintsItemNode
+            | SyntaxKind::LiteralInputItemNode
+            | SyntaxKind::LiteralOutputItemNode => {
                 // Skip these nodes as they're part of literal expressions
             }
             k @ (SyntaxKind::LiteralIntegerNode
@@ -353,6 +416,9 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, state: &mut V::State, visitor
             | SyntaxKind::LiteralMapNode
             | SyntaxKind::LiteralObjectNode
             | SyntaxKind::LiteralStructNode
+            | SyntaxKind::LiteralHintsNode
+            | SyntaxKind::LiteralInputNode
+            | SyntaxKind::LiteralOutputNode
             | SyntaxKind::ParenthesizedExprNode
             | SyntaxKind::NameRefNode
             | SyntaxKind::IfExprNode
@@ -376,8 +442,10 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, state: &mut V::State, visitor
             | SyntaxKind::AccessExprNode) => {
                 unreachable!("`{k:?}` should be handled by `Expr::can_cast`")
             }
-            SyntaxKind::PlaceholderNode
-            | SyntaxKind::PlaceholderSepOptionNode
+            SyntaxKind::PlaceholderNode => {
+                visitor.placeholder(state, reason, &Placeholder(element.into_node().unwrap()))
+            }
+            SyntaxKind::PlaceholderSepOptionNode
             | SyntaxKind::PlaceholderDefaultOptionNode
             | SyntaxKind::PlaceholderTrueFalseOptionNode => {
                 // Skip these nodes as they're part of a placeholder

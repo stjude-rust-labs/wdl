@@ -474,6 +474,12 @@ pub enum LiteralExpr {
     Struct(LiteralStruct),
     /// The literal is a `None`.
     None(LiteralNone),
+    /// The literal is a `hints`.
+    Hints(LiteralHints),
+    /// The literal is an `input`.
+    Input(LiteralInput),
+    /// The literal is an `output`.
+    Output(LiteralOutput),
 }
 
 impl LiteralExpr {
@@ -596,6 +602,42 @@ impl LiteralExpr {
             _ => panic!("not a literal `None`"),
         }
     }
+
+    /// Unwraps the expression into a literal `hints`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the expression is not a literal `hints`.
+    pub fn unwrap_hints(self) -> LiteralHints {
+        match self {
+            Self::Hints(literal) => literal,
+            _ => panic!("not a literal `hints`"),
+        }
+    }
+
+    /// Unwraps the expression into a literal `input`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the expression is not a literal `input`.
+    pub fn unwrap_input(self) -> LiteralInput {
+        match self {
+            Self::Input(literal) => literal,
+            _ => panic!("not a literal `input`"),
+        }
+    }
+
+    /// Unwraps the expression into a literal `output`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the expression is not a literal `output`.
+    pub fn unwrap_output(self) -> LiteralOutput {
+        match self {
+            Self::Output(literal) => literal,
+            _ => panic!("not a literal `output`"),
+        }
+    }
 }
 
 impl AstNode for LiteralExpr {
@@ -617,6 +659,9 @@ impl AstNode for LiteralExpr {
                 | SyntaxKind::LiteralObjectNode
                 | SyntaxKind::LiteralStructNode
                 | SyntaxKind::LiteralNoneNode
+                | SyntaxKind::LiteralHintsNode
+                | SyntaxKind::LiteralInputNode
+                | SyntaxKind::LiteralOutputNode
         )
     }
 
@@ -635,6 +680,9 @@ impl AstNode for LiteralExpr {
             SyntaxKind::LiteralObjectNode => Some(Self::Object(LiteralObject(syntax))),
             SyntaxKind::LiteralStructNode => Some(Self::Struct(LiteralStruct(syntax))),
             SyntaxKind::LiteralNoneNode => Some(Self::None(LiteralNone(syntax))),
+            SyntaxKind::LiteralHintsNode => Some(Self::Hints(LiteralHints(syntax))),
+            SyntaxKind::LiteralInputNode => Some(Self::Input(LiteralInput(syntax))),
+            SyntaxKind::LiteralOutputNode => Some(Self::Output(LiteralOutput(syntax))),
             _ => None,
         }
     }
@@ -651,6 +699,9 @@ impl AstNode for LiteralExpr {
             Self::Object(o) => &o.0,
             Self::Struct(s) => &s.0,
             Self::None(n) => &n.0,
+            Self::Hints(h) => &h.0,
+            Self::Input(i) => &i.0,
+            Self::Output(o) => &o.0,
         }
     }
 }
@@ -932,21 +983,33 @@ impl AstNode for LiteralFloat {
     }
 }
 
+/// Represents the kind of a literal string.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LiteralStringKind {
+    /// The string is a single quoted string.
+    SingleQuoted,
+    /// The string is a double quoted string.
+    DoubleQuoted,
+    /// The string is a multi-line string.
+    Multiline,
+}
+
 /// Represents a literal string.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LiteralString(pub(super) SyntaxNode);
 
 impl LiteralString {
-    /// Gets the quote character of the literal string.
-    pub fn quote(&self) -> char {
+    /// Gets the kind of the string literal.
+    pub fn kind(&self) -> LiteralStringKind {
         self.0
             .children_with_tokens()
             .find_map(|c| match c.kind() {
-                SyntaxKind::SingleQuote => Some('\''),
-                SyntaxKind::DoubleQuote => Some('"'),
+                SyntaxKind::SingleQuote => Some(LiteralStringKind::SingleQuoted),
+                SyntaxKind::DoubleQuote => Some(LiteralStringKind::DoubleQuoted),
+                SyntaxKind::OpenHeredoc => Some(LiteralStringKind::Multiline),
                 _ => None,
             })
-            .expect("string is missing quote tokens")
+            .expect("string is missing opening token")
     }
 
     /// Gets the parts of the string.
@@ -1071,7 +1134,7 @@ impl AstToken for StringText {
 
 /// Represents a placeholder in a string or command.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Placeholder(SyntaxNode);
+pub struct Placeholder(pub(crate) SyntaxNode);
 
 impl Placeholder {
     /// Returns whether or not placeholder has a tilde (`~`) opening.
@@ -1718,6 +1781,247 @@ impl AstNode for LiteralNone {
     }
 }
 
+/// Represents a literal `hints`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LiteralHints(SyntaxNode);
+
+impl LiteralHints {
+    /// Gets the items of the literal hints.
+    pub fn items(&self) -> AstChildren<LiteralHintsItem> {
+        children(&self.0)
+    }
+}
+
+impl AstNode for LiteralHints {
+    type Language = WorkflowDescriptionLanguage;
+
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        kind == SyntaxKind::LiteralHintsNode
+    }
+
+    fn cast(syntax: SyntaxNode) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match syntax.kind() {
+            SyntaxKind::LiteralHintsNode => Some(Self(syntax)),
+            _ => None,
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode {
+        &self.0
+    }
+}
+
+/// Represents a literal hints item.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LiteralHintsItem(SyntaxNode);
+
+impl LiteralHintsItem {
+    /// Gets the name of the hints item.
+    pub fn name(&self) -> Ident {
+        token(&self.0).expect("expected an item name")
+    }
+
+    /// Gets the expression of the hints item.
+    pub fn expr(&self) -> Expr {
+        child(&self.0).expect("expected an item expression")
+    }
+}
+
+impl AstNode for LiteralHintsItem {
+    type Language = WorkflowDescriptionLanguage;
+
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        kind == SyntaxKind::LiteralHintsItemNode
+    }
+
+    fn cast(syntax: SyntaxNode) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match syntax.kind() {
+            SyntaxKind::LiteralHintsItemNode => Some(Self(syntax)),
+            _ => None,
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode {
+        &self.0
+    }
+}
+
+/// Represents a literal `input`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LiteralInput(SyntaxNode);
+
+impl LiteralInput {
+    /// Gets the items of the literal input.
+    pub fn items(&self) -> AstChildren<LiteralInputItem> {
+        children(&self.0)
+    }
+}
+
+impl AstNode for LiteralInput {
+    type Language = WorkflowDescriptionLanguage;
+
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        kind == SyntaxKind::LiteralInputNode
+    }
+
+    fn cast(syntax: SyntaxNode) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match syntax.kind() {
+            SyntaxKind::LiteralInputNode => Some(Self(syntax)),
+            _ => None,
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode {
+        &self.0
+    }
+}
+
+/// Represents a literal input item.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LiteralInputItem(SyntaxNode);
+
+impl LiteralInputItem {
+    /// Gets the names of the input item.
+    ///
+    /// More than one name indicates a struct member path.
+    pub fn names(&self) -> impl Iterator<Item = Ident> {
+        self.0
+            .children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .filter_map(Ident::cast)
+    }
+
+    /// Gets the expression of the input item.
+    pub fn expr(&self) -> Expr {
+        child(&self.0).expect("expected an item expression")
+    }
+}
+
+impl AstNode for LiteralInputItem {
+    type Language = WorkflowDescriptionLanguage;
+
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        kind == SyntaxKind::LiteralInputItemNode
+    }
+
+    fn cast(syntax: SyntaxNode) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match syntax.kind() {
+            SyntaxKind::LiteralInputItemNode => Some(Self(syntax)),
+            _ => None,
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode {
+        &self.0
+    }
+}
+
+/// Represents a literal `output`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LiteralOutput(SyntaxNode);
+
+impl LiteralOutput {
+    /// Gets the items of the literal output.
+    pub fn items(&self) -> AstChildren<LiteralOutputItem> {
+        children(&self.0)
+    }
+}
+
+impl AstNode for LiteralOutput {
+    type Language = WorkflowDescriptionLanguage;
+
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        kind == SyntaxKind::LiteralOutputNode
+    }
+
+    fn cast(syntax: SyntaxNode) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match syntax.kind() {
+            SyntaxKind::LiteralOutputNode => Some(Self(syntax)),
+            _ => None,
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode {
+        &self.0
+    }
+}
+
+/// Represents a literal output item.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LiteralOutputItem(SyntaxNode);
+
+impl LiteralOutputItem {
+    /// Gets the names of the output item.
+    ///
+    /// More than one name indicates a struct member path.
+    pub fn names(&self) -> impl Iterator<Item = Ident> {
+        self.0
+            .children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .filter_map(Ident::cast)
+    }
+
+    /// Gets the expression of the output item.
+    pub fn expr(&self) -> Expr {
+        child(&self.0).expect("expected an item expression")
+    }
+}
+
+impl AstNode for LiteralOutputItem {
+    type Language = WorkflowDescriptionLanguage;
+
+    fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        kind == SyntaxKind::LiteralOutputItemNode
+    }
+
+    fn cast(syntax: SyntaxNode) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match syntax.kind() {
+            SyntaxKind::LiteralOutputItemNode => Some(Self(syntax)),
+            _ => None,
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode {
+        &self.0
+    }
+}
+
 /// Represents a reference to a name.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NameRef(SyntaxNode);
@@ -2077,6 +2381,7 @@ mod test {
 
     use super::*;
     use crate::Document;
+    use crate::SupportedVersion;
     use crate::VisitReason;
     use crate::Visitor;
 
@@ -2120,7 +2425,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
@@ -2276,7 +2588,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
@@ -2445,7 +2764,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
@@ -2479,6 +2805,12 @@ task test {
     String b = 'world'
     String c = "Hello, ${name}!"
     String d = 'String~{'ception'}!'
+    String e = <<< this is
+    a multiline \
+    string!
+    ${first}
+    ${second}
+    >>>
 }
 "#,
         );
@@ -2492,27 +2824,27 @@ task test {
 
         // Task declarations
         let decls: Vec<_> = tasks[0].declarations().collect();
-        assert_eq!(decls.len(), 4);
+        assert_eq!(decls.len(), 5);
 
         // First declaration
         assert_eq!(decls[0].ty().to_string(), "String");
         assert_eq!(decls[0].name().as_str(), "a");
         let s = decls[0].expr().unwrap_literal().unwrap_string();
-        assert_eq!(s.quote(), '"');
+        assert_eq!(s.kind(), LiteralStringKind::DoubleQuoted);
         assert_eq!(s.text().unwrap().as_str(), "hello");
 
         // Second declaration
         assert_eq!(decls[1].ty().to_string(), "String");
         assert_eq!(decls[1].name().as_str(), "b");
         let s = decls[1].expr().unwrap_literal().unwrap_string();
-        assert_eq!(s.quote(), '\'');
+        assert_eq!(s.kind(), LiteralStringKind::SingleQuoted);
         assert_eq!(s.text().unwrap().as_str(), "world");
 
         // Third declaration
         assert_eq!(decls[2].ty().to_string(), "String");
         assert_eq!(decls[2].name().as_str(), "c");
         let s = decls[2].expr().unwrap_literal().unwrap_string();
-        assert_eq!(s.quote(), '"');
+        assert_eq!(s.kind(), LiteralStringKind::DoubleQuoted);
         let parts: Vec<_> = s.parts().collect();
         assert_eq!(parts.len(), 3);
         assert_eq!(parts[0].clone().unwrap_text().as_str(), "Hello, ");
@@ -2525,7 +2857,7 @@ task test {
         assert_eq!(decls[3].ty().to_string(), "String");
         assert_eq!(decls[3].name().as_str(), "d");
         let s = decls[3].expr().unwrap_literal().unwrap_string();
-        assert_eq!(s.quote(), '\'');
+        assert_eq!(s.kind(), LiteralStringKind::SingleQuoted);
         let parts: Vec<_> = s.parts().collect();
         assert_eq!(parts.len(), 3);
         assert_eq!(parts[0].clone().unwrap_text().as_str(), "String");
@@ -2543,13 +2875,46 @@ task test {
         );
         assert_eq!(parts[2].clone().unwrap_text().as_str(), "!");
 
+        // Fifth declaration
+        assert_eq!(decls[4].ty().to_string(), "String");
+        assert_eq!(decls[4].name().as_str(), "e");
+        let s = decls[4].expr().unwrap_literal().unwrap_string();
+        assert_eq!(s.kind(), LiteralStringKind::Multiline);
+        let parts: Vec<_> = s.parts().collect();
+        assert_eq!(parts.len(), 5);
+        assert_eq!(
+            parts[0].clone().unwrap_text().as_str(),
+            " this is\n    a multiline \\\n    string!\n    "
+        );
+        let placeholder = parts[1].clone().unwrap_placeholder();
+        assert!(!placeholder.has_tilde());
+        assert_eq!(
+            placeholder.expr().unwrap_name_ref().name().as_str(),
+            "first"
+        );
+        assert_eq!(parts[2].clone().unwrap_text().as_str(), "\n    ");
+        let placeholder = parts[3].clone().unwrap_placeholder();
+        assert!(!placeholder.has_tilde());
+        assert_eq!(
+            placeholder.expr().unwrap_name_ref().name().as_str(),
+            "second"
+        );
+        assert_eq!(parts[4].clone().unwrap_text().as_str(), "\n    ");
+
         // Use a visitor to visit all the string literals without placeholders
         struct MyVisitor(Vec<String>);
 
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
@@ -2782,7 +3147,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
@@ -2980,7 +3352,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
@@ -3109,7 +3488,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
@@ -3240,7 +3626,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
@@ -3390,7 +3783,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
@@ -3491,7 +3891,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -3505,6 +3912,411 @@ task test {
         let mut visitor = MyVisitor(0);
         document.visit(&mut (), &mut visitor);
         assert_eq!(visitor.0, 2);
+    }
+
+    #[test]
+    fn literal_hints() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    hints {
+        foo: hints {
+            bar: "bar"
+            baz: "baz"
+        }
+        bar: "bar"
+        baz: hints {
+            a: 1
+            b: 10.0
+            c: {
+                "foo": "bar"
+            }
+        }
+    }
+}
+"#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+        assert_eq!(tasks[0].name().as_str(), "test");
+
+        // Task hints
+        let hints: Vec<_> = tasks[0].hints().collect();
+        assert_eq!(hints.len(), 1);
+        let items: Vec<_> = hints[0].items().collect();
+        assert_eq!(items.len(), 3);
+
+        // First hints item
+        assert_eq!(items[0].name().as_str(), "foo");
+        let inner: Vec<_> = items[0]
+            .expr()
+            .unwrap_literal()
+            .unwrap_hints()
+            .items()
+            .collect();
+        assert_eq!(inner.len(), 2);
+        assert_eq!(inner[0].name().as_str(), "bar");
+        assert_eq!(
+            inner[0]
+                .expr()
+                .unwrap_literal()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "bar"
+        );
+        assert_eq!(inner[1].name().as_str(), "baz");
+        assert_eq!(
+            inner[1]
+                .expr()
+                .unwrap_literal()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "baz"
+        );
+
+        // Second hints item
+        assert_eq!(items[1].name().as_str(), "bar");
+        assert_eq!(
+            items[1]
+                .expr()
+                .unwrap_literal()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "bar"
+        );
+
+        // Third hints item
+        assert_eq!(items[2].name().as_str(), "baz");
+        let inner: Vec<_> = items[2]
+            .expr()
+            .unwrap_literal()
+            .unwrap_hints()
+            .items()
+            .collect();
+        assert_eq!(inner.len(), 3);
+        assert_eq!(inner[0].name().as_str(), "a");
+        assert_eq!(
+            inner[0]
+                .expr()
+                .unwrap_literal()
+                .unwrap_integer()
+                .value()
+                .unwrap(),
+            1
+        );
+        assert_eq!(inner[1].name().as_str(), "b");
+        assert_relative_eq!(
+            inner[1]
+                .expr()
+                .unwrap_literal()
+                .unwrap_float()
+                .value()
+                .unwrap(),
+            10.0
+        );
+        assert_eq!(inner[2].name().as_str(), "c");
+        let map: Vec<_> = inner[2]
+            .expr()
+            .unwrap_literal()
+            .unwrap_map()
+            .items()
+            .collect();
+        assert_eq!(map.len(), 1);
+        let (k, v) = map[0].key_value();
+        assert_eq!(
+            k.unwrap_literal().unwrap_string().text().unwrap().as_str(),
+            "foo"
+        );
+        assert_eq!(
+            v.unwrap_literal().unwrap_string().text().unwrap().as_str(),
+            "bar"
+        );
+
+        // Use a visitor to count the number of literal `hints` in the tree
+        struct MyVisitor(usize);
+
+        impl Visitor for MyVisitor {
+            type State = ();
+
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
+
+            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+                if reason == VisitReason::Enter {
+                    if let Expr::Literal(LiteralExpr::Hints(_)) = expr {
+                        self.0 += 1;
+                    }
+                }
+            }
+        }
+
+        let mut visitor = MyVisitor(0);
+        document.visit(&mut (), &mut visitor);
+        assert_eq!(visitor.0, 2);
+    }
+
+    #[test]
+    fn literal_input() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    hints {
+        inputs: input {
+            a: hints {
+                foo: "bar"
+            }
+            b.c.d: hints {
+                bar: "baz"
+            }
+        }
+    }
+}
+"#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+        assert_eq!(tasks[0].name().as_str(), "test");
+
+        // Task hints
+        let hints: Vec<_> = tasks[0].hints().collect();
+        assert_eq!(hints.len(), 1);
+        let items: Vec<_> = hints[0].items().collect();
+        assert_eq!(items.len(), 1);
+
+        // First hints item
+        assert_eq!(items[0].name().as_str(), "inputs");
+        let input: Vec<_> = items[0]
+            .expr()
+            .unwrap_literal()
+            .unwrap_input()
+            .items()
+            .collect();
+        assert_eq!(input.len(), 2);
+        assert_eq!(
+            input[0]
+                .names()
+                .map(|i| i.as_str().to_string())
+                .collect::<Vec<_>>(),
+            ["a"]
+        );
+        let inner: Vec<_> = input[0]
+            .expr()
+            .unwrap_literal()
+            .unwrap_hints()
+            .items()
+            .collect();
+        assert_eq!(inner.len(), 1);
+        assert_eq!(inner[0].name().as_str(), "foo");
+        assert_eq!(
+            inner[0]
+                .expr()
+                .unwrap_literal()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "bar"
+        );
+        assert_eq!(
+            input[1]
+                .names()
+                .map(|i| i.as_str().to_string())
+                .collect::<Vec<_>>(),
+            ["b", "c", "d"]
+        );
+        let inner: Vec<_> = input[1]
+            .expr()
+            .unwrap_literal()
+            .unwrap_hints()
+            .items()
+            .collect();
+        assert_eq!(inner.len(), 1);
+        assert_eq!(inner[0].name().as_str(), "bar");
+        assert_eq!(
+            inner[0]
+                .expr()
+                .unwrap_literal()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "baz"
+        );
+
+        // Use a visitor to count the number of literal `hints` in the tree
+        struct MyVisitor(usize);
+
+        impl Visitor for MyVisitor {
+            type State = ();
+
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
+
+            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+                if reason == VisitReason::Enter {
+                    if let Expr::Literal(LiteralExpr::Input(_)) = expr {
+                        self.0 += 1;
+                    }
+                }
+            }
+        }
+
+        let mut visitor = MyVisitor(0);
+        document.visit(&mut (), &mut visitor);
+        assert_eq!(visitor.0, 1);
+    }
+
+    #[test]
+    fn literal_output() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    hints {
+        outputs: output {
+            a: hints {
+                foo: "bar"
+            }
+            b.c.d: hints {
+                bar: "baz"
+            }
+        }
+    }
+}
+"#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+        assert_eq!(tasks[0].name().as_str(), "test");
+
+        // Task hints
+        let hints: Vec<_> = tasks[0].hints().collect();
+        assert_eq!(hints.len(), 1);
+        let items: Vec<_> = hints[0].items().collect();
+        assert_eq!(items.len(), 1);
+
+        // First hints item
+        assert_eq!(items[0].name().as_str(), "outputs");
+        let output: Vec<_> = items[0]
+            .expr()
+            .unwrap_literal()
+            .unwrap_output()
+            .items()
+            .collect();
+        assert_eq!(output.len(), 2);
+        assert_eq!(
+            output[0]
+                .names()
+                .map(|i| i.as_str().to_string())
+                .collect::<Vec<_>>(),
+            ["a"]
+        );
+        let inner: Vec<_> = output[0]
+            .expr()
+            .unwrap_literal()
+            .unwrap_hints()
+            .items()
+            .collect();
+        assert_eq!(inner.len(), 1);
+        assert_eq!(inner[0].name().as_str(), "foo");
+        assert_eq!(
+            inner[0]
+                .expr()
+                .unwrap_literal()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "bar"
+        );
+        assert_eq!(
+            output[1]
+                .names()
+                .map(|i| i.as_str().to_string())
+                .collect::<Vec<_>>(),
+            ["b", "c", "d"]
+        );
+        let inner: Vec<_> = output[1]
+            .expr()
+            .unwrap_literal()
+            .unwrap_hints()
+            .items()
+            .collect();
+        assert_eq!(inner.len(), 1);
+        assert_eq!(inner[0].name().as_str(), "bar");
+        assert_eq!(
+            inner[0]
+                .expr()
+                .unwrap_literal()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "baz"
+        );
+
+        // Use a visitor to count the number of literal `hints` in the tree
+        struct MyVisitor(usize);
+
+        impl Visitor for MyVisitor {
+            type State = ();
+
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
+
+            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+                if reason == VisitReason::Enter {
+                    if let Expr::Literal(LiteralExpr::Output(_)) = expr {
+                        self.0 += 1;
+                    }
+                }
+            }
+        }
+
+        let mut visitor = MyVisitor(0);
+        document.visit(&mut (), &mut visitor);
+        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -3555,7 +4367,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
@@ -3636,7 +4455,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -3706,7 +4532,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -3783,7 +4616,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -3862,7 +4702,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -3926,7 +4773,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -3990,7 +4844,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -4054,7 +4915,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -4118,7 +4986,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -4198,7 +5073,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -4278,7 +5160,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -4358,7 +5247,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -4438,7 +5334,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -4518,7 +5421,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -4598,7 +5508,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -4678,7 +5595,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -4758,7 +5682,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -4838,7 +5769,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -4918,7 +5856,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -5021,7 +5966,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -5112,7 +6064,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
@@ -5187,7 +6146,14 @@ task test {
         impl Visitor for MyVisitor {
             type State = ();
 
-            fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document) {}
+            fn document(
+                &mut self,
+                _: &mut Self::State,
+                _: VisitReason,
+                _: &Document,
+                _: SupportedVersion,
+            ) {
+            }
 
             fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {

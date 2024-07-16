@@ -1,6 +1,5 @@
 //! Module for the concrete syntax tree (CST) representation.
 
-use std::cmp::Ordering;
 use std::fmt;
 
 use rowan::GreenNodeBuilder;
@@ -116,11 +115,11 @@ pub enum SyntaxKind {
     VersionKeyword,
     /// The `workflow` keyword token.
     WorkflowKeyword,
-    /// The reserved `Directory` type keyword token.
+    /// The 1.2 `Directory` type keyword token.
     DirectoryTypeKeyword,
-    /// The reserved `hints` keyword token.
+    /// The 1.2 `hints` keyword token.
     HintsKeyword,
-    /// The reserved `requirements` keyword token.
+    /// The 1.2 `requirements` keyword token.
     RequirementsKeyword,
     /// The `{` symbol token.
     OpenBrace,
@@ -214,6 +213,14 @@ pub enum SyntaxKind {
     OutputSectionNode,
     /// Represents a command section node.
     CommandSectionNode,
+    /// Represents a requirements section node.
+    RequirementsSectionNode,
+    /// Represents a requirements item node.
+    RequirementsItemNode,
+    /// Represents a hints section node.
+    HintsSectionNode,
+    /// Represents a hints item node.
+    HintsItemNode,
     /// Represents a runtime section node.
     RuntimeSectionNode,
     /// Represents a runtime item node.
@@ -268,6 +275,18 @@ pub enum SyntaxKind {
     LiteralStructNode,
     /// Represents a literal struct item node.
     LiteralStructItemNode,
+    /// Represents a literal hints node.
+    LiteralHintsNode,
+    /// Represents a literal hints item node.
+    LiteralHintsItemNode,
+    /// Represents a literal input node.
+    LiteralInputNode,
+    /// Represents a literal input item node.
+    LiteralInputItemNode,
+    /// Represents a literal output node.
+    LiteralOutputNode,
+    /// Represents a literal output item node.
+    LiteralOutputItemNode,
     /// Represents a parenthesized expression node.
     ParenthesizedExprNode,
     /// Represents a name reference node.
@@ -398,14 +417,7 @@ impl SyntaxTree {
     pub fn parse(source: &str) -> (Self, Vec<Diagnostic>) {
         let parser = Parser::new(Lexer::new(source));
         let (events, mut diagnostics) = grammar::document(source, parser);
-
-        // Sort the diagnostics by start of the primary label
-        diagnostics.sort_by(|a, b| match (a.labels().next(), b.labels().next()) {
-            (None, None) => Ordering::Equal,
-            (None, Some(_)) => Ordering::Less,
-            (Some(_), None) => Ordering::Greater,
-            (Some(a), Some(b)) => a.span().start().cmp(&b.span().start()),
-        });
+        diagnostics.sort();
 
         Self::build(source, events, diagnostics)
     }
