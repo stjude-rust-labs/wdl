@@ -88,10 +88,14 @@ fn non_object_meta_outputs(span: Span, item_name: &str, ty: &str) -> Diagnostic 
 pub struct NonmatchingOutputRule<'a> {
     /// The span of the `meta` section.
     current_meta_span: Option<Span>,
+    /// Are we currently within a `meta` section?
+    in_meta: bool,
     /// The span of the `meta.outputs` section.
     current_meta_outputs_span: Option<Span>,
     /// The span of the `output` section.
     current_output_span: Option<Span>,
+    /// Are we currently within an `output` section?
+    in_output: bool,
     /// The keys seen in `meta.outputs`.
     meta_outputs_keys: IndexMap<String, Span>,
     /// The keys seen in `output`.
@@ -253,8 +257,11 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
         match reason {
             VisitReason::Enter => {
                 self.current_meta_span = Some(section.syntax().text_range().to_span());
+                self.in_meta = true;
             }
-            VisitReason::Exit => {}
+            VisitReason::Exit => {
+                self.in_meta = false;
+            }
         }
     }
 
@@ -264,8 +271,14 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
         reason: VisitReason,
         section: &OutputSection,
     ) {
-        if reason == VisitReason::Enter {
-            self.current_output_span = Some(section.syntax().text_range().to_span());
+        match reason {
+            VisitReason::Enter => {
+                self.current_output_span = Some(section.syntax().text_range().to_span());
+                self.in_output = true;
+            }
+            VisitReason::Exit => {
+                self.in_output = false;
+            }
         }
     }
 
@@ -276,14 +289,11 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
         decl: &wdl_ast::v1::BoundDecl,
     ) {
         if reason == VisitReason::Enter {
-            if let Some(output) = &self.current_output_span {
-                let decl_span = decl.syntax().text_range().to_span();
-                if decl_span.start() > output.start() && decl_span.end() < output.end() {
-                    self.output_keys.insert(
-                        decl.name().as_str().to_string(),
-                        decl.syntax().text_range().to_span(),
-                    );
-                }
+            if self.in_output {
+                self.output_keys.insert(
+                    decl.name().as_str().to_string(),
+                    decl.syntax().text_range().to_span(),
+                );
             }
         }
     }
@@ -294,6 +304,10 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
         reason: VisitReason,
         item: &wdl_ast::v1::MetadataObjectItem,
     ) {
+        if !self.in_meta {
+            return;
+        }
+
         match reason {
             VisitReason::Exit => {
                 if let MetadataValue::Object(_) = item.value() {
