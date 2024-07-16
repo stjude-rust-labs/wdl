@@ -1,12 +1,18 @@
 //! A lint rule for blank spacing between elements.
 
+use wdl_ast::v1::InputSection;
 use wdl_ast::AstNode;
+use wdl_ast::AstToken;
+use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
+use wdl_ast::Direction;
 use wdl_ast::Document;
 use wdl_ast::Span;
+use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNode;
+use wdl_ast::SyntaxToken;
 use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -36,7 +42,22 @@ fn missing_blank_line(span: Span) -> Diagnostic {
 
 /// Detects unsorted input declarations.
 #[derive(Default, Debug, Clone, Copy)]
-pub struct BlanksBetweenElementsRule;
+pub struct BlanksBetweenElementsRule {
+    /// Are we in a `input` section?
+    input_section: bool,
+    /// Are we in a `output` section?
+    output_section: bool,
+    /// Are we in a `meta` section?
+    meta_section: bool,
+    /// Are we in a `parameter_meta` section?
+    parameter_meta_section: bool,
+    /// Are we in a `runtime` section?
+    runtime_section: bool,
+    /// Are we in a `struct` definition?
+    struct_definition: bool,
+    /// Are we in a `scatter` statement?
+    scatter_statement: bool,
+}
 
 impl Rule for BlanksBetweenElementsRule {
     fn id(&self) -> &'static str {
@@ -64,102 +85,6 @@ impl Rule for BlanksBetweenElementsRule {
     }
 }
 
-/// Check for blank lines between elements of `meta`, `parameter_meta`,
-/// `input`, `output`, and `runtime` sections.
-fn check_blank_lines(syntax: &SyntaxNode, state: &mut Diagnostics) {
-    let mut newline_seen = 0;
-    let mut blank_start = None;
-    syntax
-        .descendants_with_tokens()
-        .for_each(|c| match c.kind() {
-            SyntaxKind::Whitespace => {
-                let count = c.to_string().chars().filter(|c| *c == '\n').count();
-                blank_start = Some(c.text_range().to_span().start());
-                newline_seen += count;
-            }
-            _ => {
-                // Blank lines are not allowed between elements
-                if newline_seen > 1 {
-                    if let Some(start) = blank_start {
-                        state.add(excess_blank_line(Span::new(
-                            start,
-                            c.text_range().to_span().start() - start,
-                        )));
-                    }
-                }
-                newline_seen = 0;
-                blank_start = None;
-            }
-        });
-}
-
-/// Check blank lines in definitions (workflow and task).
-fn check_blank_lines_definition(syntax: &SyntaxNode, state: &mut Diagnostics) {
-    let mut newline_seen = 0;
-    let mut blank_start = None;
-    syntax.children_with_tokens().for_each(|c| match c.kind() {
-        SyntaxKind::Whitespace => {
-            let count = c.to_string().chars().filter(|c| *c == '\n').count();
-            blank_start = Some(c.text_range().to_span().start());
-            newline_seen += count;
-        }
-        SyntaxKind::OpenBrace => {
-            if let Some(next) = c.next_sibling_or_token() {
-                if next.kind() == SyntaxKind::Whitespace {
-                    let count = next.to_string().chars().filter(|c| *c == '\n').count();
-                    if count > 1 {
-                        let end = c.text_range().to_span().end();
-                        state.add(excess_blank_line(Span::new(
-                            end,
-                            next.text_range().to_span().end() - end,
-                        )));
-                    }
-                }
-            }
-        }
-        SyntaxKind::CloseBrace => {
-            if newline_seen > 1 {
-                if let Some(start) = blank_start {
-                    state.add(excess_blank_line(Span::new(
-                        start,
-                        c.text_range().to_span().start() - start,
-                    )));
-                }
-            }
-            newline_seen = 0;
-            blank_start = None;
-        }
-        SyntaxKind::BoundDeclNode => {
-            if newline_seen > 2 {
-                if let Some(start) = blank_start {
-                    state.add(excess_blank_line(Span::new(
-                        start,
-                        c.text_range().to_span().start() - start,
-                    )));
-                }
-            }
-            newline_seen = 0;
-            blank_start = None;
-        }
-        SyntaxKind::Comment => {
-            newline_seen = 0;
-            blank_start = None;
-        }
-        _ => {
-                // 2 newlines == 1 blank line between elements
-                // > 2 newlines / Consecutive blank lines will be handled by the Whitespace rule.
-                if newline_seen == 1 {
-                    let start = c.prev_sibling_or_token().unwrap().text_range().to_span().end();
-                    state.add(missing_blank_line(
-                        Span::new(start, c.text_range().to_span().start() - start),
-                    ));
-                }
-                newline_seen = 0;
-                blank_start = None;
-            }
-    });
-}
-
 impl Visitor for BlanksBetweenElementsRule {
     type State = Diagnostics;
 
@@ -172,46 +97,6 @@ impl Visitor for BlanksBetweenElementsRule {
             // Reset the visitor upon document entry
             *self = Default::default();
         }
-
-        let mut newline_seen = 0;
-        let mut blank_start = None;
-
-        let mut prior_comment = false;
-
-        doc.syntax()
-            .children_with_tokens()
-            .for_each(|c| match c.kind() {
-                // Don't require blank lines between `import` statements.
-                SyntaxKind::ImportStatementNode => {
-                    newline_seen = 0;
-                    blank_start = None;
-                    prior_comment = false;
-                }
-                SyntaxKind::Whitespace => {
-                    let count = c.to_string().chars().filter(|c| *c == '\n').count();
-                    blank_start = Some(c.text_range().to_span().start());
-                    newline_seen += count;
-                    // prior_comment = false;
-                }
-                SyntaxKind::Comment => {
-                    newline_seen = 0;
-                    blank_start = None;
-                    prior_comment = true;
-                }
-                _ => {
-                // 2 newlines == 1 blank line between elements
-                // > 2 newlines / Consecutive blank lines will be handled by the Whitespace rule.
-                if newline_seen == 1 && !prior_comment {
-                    let start = c.prev_sibling_or_token().unwrap().text_range().to_span().end();
-                    state.add(missing_blank_line(
-                        Span::new(start, c.text_range().to_span().start() - start),
-                    ));
-                }
-                newline_seen = 0;
-                blank_start = None;
-                prior_comment = false;
-            }
-            });
     }
 
     fn metadata_section(
@@ -221,10 +106,13 @@ impl Visitor for BlanksBetweenElementsRule {
         section: &wdl_ast::v1::MetadataSection,
     ) {
         if reason == VisitReason::Exit {
+            self.meta_section = false;
             return;
+        } else {
+            self.meta_section = true;
         }
 
-        check_blank_lines(section.syntax(), state);
+        check_prior_spacing(section.syntax(), state);
     }
 
     fn parameter_metadata_section(
@@ -234,23 +122,29 @@ impl Visitor for BlanksBetweenElementsRule {
         section: &wdl_ast::v1::ParameterMetadataSection,
     ) {
         if reason == VisitReason::Exit {
+            self.parameter_meta_section = false;
             return;
+        } else {
+            self.parameter_meta_section = true;
         }
-
-        check_blank_lines(section.syntax(), state);
+        check_prior_spacing(section.syntax(), state);
+        flag_all_blanks(section.syntax(), state);
     }
 
     fn input_section(
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        section: &wdl_ast::v1::InputSection,
+        section: &InputSection,
     ) {
         if reason == VisitReason::Exit {
+            self.input_section = false;
             return;
+        } else {
+            self.input_section = true;
         }
 
-        check_blank_lines(section.syntax(), state);
+        check_prior_spacing(section.syntax(), state);
     }
 
     fn output_section(
@@ -260,10 +154,12 @@ impl Visitor for BlanksBetweenElementsRule {
         section: &wdl_ast::v1::OutputSection,
     ) {
         if reason == VisitReason::Exit {
+            self.output_section = false;
             return;
+        } else {
+            self.output_section = true;
         }
-
-        check_blank_lines(section.syntax(), state);
+        check_prior_spacing(section.syntax(), state);
     }
 
     fn runtime_section(
@@ -273,12 +169,17 @@ impl Visitor for BlanksBetweenElementsRule {
         section: &wdl_ast::v1::RuntimeSection,
     ) {
         if reason == VisitReason::Exit {
+            self.runtime_section = false;
             return;
+        } else {
+            self.runtime_section = true;
         }
 
-        check_blank_lines(section.syntax(), state);
+        flag_all_blanks(section.syntax(), state);
+        check_prior_spacing(section.syntax(), state);
     }
 
+    // call statement internal spacing is handled by the CallInputSpacing rule
     fn call_statement(
         &mut self,
         state: &mut Self::State,
@@ -289,7 +190,29 @@ impl Visitor for BlanksBetweenElementsRule {
             return;
         }
 
-        check_blank_lines(stmt.syntax(), state);
+        let prev_token = stmt
+            .syntax()
+            .prev_sibling_or_token()
+            .and_then(SyntaxElement::into_token);
+
+        let between_calls = stmt
+            .syntax()
+            .prev_sibling()
+            .map(|s| s.kind() == SyntaxKind::CallStatementNode)
+            .unwrap_or(false);
+
+        if let Some(token) = prev_token {
+            if token.kind() == SyntaxKind::Whitespace {
+                let count = token.to_string().chars().filter(|c| *c == '\n').count();
+                // If this is the first element in the block, then no blank lines are allowed.
+                if is_first_element(stmt.syntax()) && count > 1 {
+                    state.add(excess_blank_line(token.text_range().to_span()));
+                } else if !between_calls && count < 2 {
+                    state.add(missing_blank_line(stmt.syntax().text_range().to_span()));
+                }
+                // If we're between calls, then blank lines are optional.
+            }
+        }
     }
 
     fn scatter_statement(
@@ -302,32 +225,252 @@ impl Visitor for BlanksBetweenElementsRule {
             return;
         }
 
-        check_blank_lines(stmt.syntax(), state);
+        let prev_token = stmt
+            .syntax()
+            .prev_sibling_or_token()
+            .and_then(SyntaxElement::into_token);
+
+        let first = is_first_element(stmt.syntax());
+
+        if let Some(token) = prev_token {
+            if token.kind() == SyntaxKind::Whitespace {
+                let count = token.to_string().chars().filter(|c| *c == '\n').count();
+                if first && count > 1 {
+                    state.add(excess_blank_line(token.text_range().to_span()));
+                } else if !first && count < 2 {
+                    state.add(missing_blank_line(stmt.syntax().text_range().to_span()));
+                }
+            }
+        } else if !first {
+            state.add(missing_blank_line(stmt.syntax().text_range().to_span()));
+        }
     }
 
-    fn task_definition(
+    // Import spacing is handled by the ImportWhitespace rule
+    // fn import_statement
+
+    fn struct_definition(
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        task: &wdl_ast::v1::TaskDefinition,
+        def: &wdl_ast::v1::StructDefinition,
     ) {
         if reason == VisitReason::Exit {
             return;
         }
 
-        check_blank_lines_definition(task.syntax(), state);
+        check_prior_spacing(def.syntax(), state);
+        flag_all_blanks(def.syntax(), state);
     }
 
-    fn workflow_definition(
+    fn requirements_section(
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        workflow: &wdl_ast::v1::WorkflowDefinition,
+        section: &wdl_ast::v1::RequirementsSection,
     ) {
         if reason == VisitReason::Exit {
             return;
         }
 
-        check_blank_lines_definition(workflow.syntax(), state);
+        check_prior_spacing(section.syntax(), state);
+        flag_all_blanks(section.syntax(), state);
+    }
+
+    fn unbound_decl(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        decl: &wdl_ast::v1::UnboundDecl,
+    ) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+
+        let prior_node = decl.syntax().prev_sibling();
+
+        let prior = decl.syntax().prev_sibling_or_token();
+        if let Some(p) = prior {
+            match p.kind() {
+                SyntaxKind::Whitespace => {
+                    let count = p.to_string().chars().filter(|c| *c == '\n').count();
+                    // If we're in an `input` or `output`, we should have no blank lines, so only
+                    // one `\n` is allowed.
+                    if self.input_section || self.output_section {
+                        if count > 1 {
+                            state.add(excess_blank_line(p.text_range().to_span()));
+                        }
+                    } else if let Some(n) = prior_node {
+                        match n.kind() {
+                            SyntaxKind::BoundDeclNode | SyntaxKind::UnboundDeclNode => {
+                                // If this is not the first (Un)BoundDeclNode,
+                                // then blank lines are optional.
+                                // More than one blank line will be caught by
+                                // the Whitespace rule.
+                            }
+                            _ => {
+                                if count < 2 {
+                                    state.add(missing_blank_line(
+                                        decl.syntax().text_range().to_span(),
+                                    ));
+                                }
+                            }
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+
+    fn bound_decl(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        decl: &wdl_ast::v1::BoundDecl,
+    ) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+
+        let prior_node = decl.syntax().prev_sibling();
+
+        let prior = decl.syntax().prev_sibling_or_token();
+        if let Some(p) = prior {
+            match p.kind() {
+                SyntaxKind::Whitespace => {
+                    let count = p.to_string().chars().filter(|c| *c == '\n').count();
+                    // If we're in an `input` or `output`, we should have no blank lines, so only
+                    // one `\n` is allowed.
+                    if self.input_section || self.output_section {
+                        if count > 1 {
+                            state.add(excess_blank_line(p.text_range().to_span()));
+                        }
+                    } else if let Some(n) = prior_node {
+                        match n.kind() {
+                            SyntaxKind::BoundDeclNode | SyntaxKind::UnboundDeclNode => {
+                                // If this is not the first (Un)BoundDeclNode,
+                                // then blank lines are optional.
+                                // More than one blank line will be caught by
+                                // the Whitespace rule.
+                            }
+                            _ => {
+                                if count < 2 {
+                                    state.add(missing_blank_line(
+                                        decl.syntax().text_range().to_span(),
+                                    ));
+                                }
+                            }
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+
+    fn conditional_statement(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        stmt: &wdl_ast::v1::ConditionalStatement,
+    ) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+
+        check_prior_spacing(stmt.syntax(), state);
+    }
+
+    fn metadata_object(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        object: &wdl_ast::v1::MetadataObject,
+    ) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+    }
+
+    // TODO: This isn't available in the wdl-ast crate yet
+    // fn metadata_object_item
+
+    // A comment needs blank space before it if the next node
+    fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
+        if comment_is_inline(comment) {
+            return;
+        }
+    }
+}
+
+fn comment_is_inline(comment: &Comment) -> bool {
+    let mut prior = comment.syntax().prev_sibling_or_token();
+    while let Some(ref cur) = prior {
+        match cur.kind() {
+            SyntaxKind::Whitespace => {
+                let count = cur.to_string().chars().filter(|c| *c == '\n').count();
+                // We've found the beginning of the line
+                if count > 0 {
+                    return false;
+                }
+            }
+            _ => {
+                // Something other than whitespace precedes the comment
+                break;
+            }
+        }
+        prior = cur.prev_sibling_or_token();
+    }
+    // If the comment is the first thing in the current block, prior will be None.
+    if prior.is_none() {
+        return false;
+    }
+    true
+}
+
+fn is_first_element(syntax: &SyntaxNode) -> bool {
+    if let Some(_) = syntax.prev_sibling() {
+        return false;
+    }
+    true
+}
+
+fn flag_all_blanks(syntax: &SyntaxNode, state: &mut Diagnostics) {
+    syntax.children_with_tokens().for_each(|c| match c.kind() {
+        SyntaxKind::Whitespace => {
+            let count = c.to_string().chars().filter(|c| *c == '\n').count();
+            if count > 0 {
+                state.add(excess_blank_line(c.text_range().to_span()));
+            }
+        }
+        _ => {}
+    });
+}
+
+fn check_prior_spacing(syntax: &SyntaxNode, state: &mut Diagnostics) {
+    let first = is_first_element(syntax);
+
+    let prior = syntax.prev_sibling_or_token();
+    if let Some(p) = prior {
+        match p.kind() {
+            SyntaxKind::Whitespace => {
+                let count = p.to_string().chars().filter(|c| *c == '\n').count();
+                // If this is the first element.
+                if first {
+                    // We should have no blank lines, so only one `\n` is allowed.
+                    if count > 1 {
+                        state.add(excess_blank_line(p.text_range().to_span()));
+                    }
+                } else {
+                    // If this is not the first element, we should have a blank line.
+                    if count < 2 {
+                        state.add(missing_blank_line(syntax.text_range().to_span()));
+                    }
+                }
+            }
+            SyntaxKind::Comment => {}
+            _ => {}
+        }
     }
 }

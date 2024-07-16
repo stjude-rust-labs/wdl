@@ -1,13 +1,15 @@
-#@ except: DescriptionMissing, InputSorting, LineWidth, MissingMetas, MissingOutput, MissingRuntime, Whitespace
+#@ except: DescriptionMissing, ImportWhitespace, InputSorting, LineWidth, MissingMetas, MissingOutput, MissingRuntime, Whitespace
 
 version 1.1
 
-import "baz"
+import "baz" # following whitespace will be caught by ImportWhitespace rule
+
 import "qux" # following whitespace duplication is caught be Whitespace rule
 
 
+# test comment
 workflow foo {
-
+    # This is OK.
     meta {}
     parameter_meta {}
     input {}
@@ -56,4 +58,26 @@ task bar {
         String u = "u"
     }
 
+}
+
+task bax {
+    meta {}
+
+    parameter_meta {}
+
+
+    input {}
+
+    command <<< >>>
+
+    output {}
+
+    runtime {
+
+        disks: "50 GB"
+        memory: "4 GB"
+
+        docker: "ubuntu:latest"
+        
+    }
 }
