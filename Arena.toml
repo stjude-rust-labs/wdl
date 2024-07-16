@@ -1427,18 +1427,13 @@ permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
-message = "ngsderive.wdl:8:9: warning[NonmatchingOutput]: `outputs` section of `meta` for the task `strandedness` is out of order"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/ngsderive.wdl/#L8"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/picard.wdl"
-message = "picard.wdl:1032:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/picard.wdl/#L1032"
+message = "ngsderive.wdl:366:28: note[Todo]: remaining `TODO` item found"
+permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/ngsderive.wdl/#L366"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
-message = "ngsderive.wdl:366:28: note[Todo]: remaining `TODO` item found"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/ngsderive.wdl/#L366"
+message = "ngsderive.wdl:8:9: warning[NonmatchingOutput]: `outputs` section of `meta` for the task `strandedness` is out of order"
+permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/ngsderive.wdl/#L8"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
@@ -1497,11 +1492,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
-message = "picard.wdl:820:12: note: unknown lint rule `NonmatchingOutput`"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/picard.wdl/#L820"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/picard.wdl"
 message = "picard.wdl:914:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
 permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/picard.wdl/#L914"
 
@@ -1514,11 +1504,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9
 document = "stjudecloud/workflows:/tools/qualimap.wdl"
 message = "qualimap.wdl:81:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/qualimap.wdl/#L81"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/qualimap.wdl"
-message = "qualimap.wdl:93:12: note: unknown lint rule `NonmatchingOutput`"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/qualimap.wdl/#L93"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/sambamba.wdl"
@@ -1544,11 +1529,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9
 document = "stjudecloud/workflows:/tools/sambamba.wdl"
 message = "sambamba.wdl:53:5: warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `disk`; therefore, its inclusion in the `runtime` section is deprecated"
 permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/sambamba.wdl/#L53"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/samtools.wdl"
-message = "samtools.wdl:1178:12: note: unknown lint rule `NonmatchingOutput`"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/samtools.wdl/#L1178"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/samtools.wdl"
@@ -1639,56 +1619,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9
 document = "stjudecloud/workflows:/tools/util.wdl"
 message = "util.wdl:693:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/util.wdl/#L693"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:709:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/util.wdl/#L709"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:720:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/util.wdl/#L720"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:721:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/util.wdl/#L721"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:722:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/util.wdl/#L722"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:723:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/util.wdl/#L723"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:724:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/util.wdl/#L724"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:725:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/util.wdl/#L725"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:726:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/util.wdl/#L726"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:728:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/util.wdl/#L728"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:729:1: note[LineWidth]: line exceeds maximum width of 90"
-permalink = "https://github.com/stjudecloud/workflows/blob/833b97fb582fe7d4f6df9d29a645d0289f1fc92e/tools/util.wdl/#L729"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
