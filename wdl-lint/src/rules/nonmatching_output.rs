@@ -177,10 +177,7 @@ fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule<'_>)
 }
 
 /// Handle missing `meta.outputs` and reset the visitor.
-fn handle_meta_outputs_and_reset(
-    state: &mut Diagnostics,
-    rule: &mut NonmatchingOutputRule<'_>,
-) {
+fn handle_meta_outputs_and_reset(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule<'_>) {
     if rule.current_meta_span.is_some()
         && rule.current_meta_outputs_span.is_none()
         && !rule.output_keys.is_empty()
@@ -288,13 +285,11 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
         reason: VisitReason,
         decl: &wdl_ast::v1::BoundDecl,
     ) {
-        if reason == VisitReason::Enter {
-            if self.in_output {
-                self.output_keys.insert(
-                    decl.name().as_str().to_string(),
-                    decl.syntax().text_range().to_span(),
-                );
-            }
+        if reason == VisitReason::Enter && self.in_output {
+            self.output_keys.insert(
+                decl.name().as_str().to_string(),
+                decl.syntax().text_range().to_span(),
+            );
         }
     }
 
