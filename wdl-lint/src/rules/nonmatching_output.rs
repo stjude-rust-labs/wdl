@@ -172,6 +172,32 @@ fn check_matching(state: &mut Diagnostics, rule: &mut NonmatchingOutputRule<'_>)
     }
 }
 
+/// Handle missing `meta.outputs` and reset the visitor.
+fn handle_meta_outputs_and_reset(
+    state: &mut Diagnostics,
+    rule: &mut NonmatchingOutputRule<'_>,
+) {
+    if rule.current_meta_span.is_some()
+        && rule.current_meta_outputs_span.is_none()
+        && !rule.output_keys.is_empty()
+    {
+        state.add(missing_outputs_in_meta(
+            rule.current_meta_span.expect("should have a `meta` span"),
+            rule.name.as_deref().expect("should have a name"),
+            rule.ty.expect("should have a type"),
+        ));
+    } else {
+        check_matching(state, rule);
+    }
+
+    rule.name = None;
+    rule.current_meta_outputs_span = None;
+    rule.current_meta_span = None;
+    rule.current_output_span = None;
+    rule.output_keys.clear();
+    rule.meta_outputs_keys.clear();
+}
+
 impl<'a> Visitor for NonmatchingOutputRule<'a> {
     type State = Diagnostics;
 
@@ -196,25 +222,7 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
                 self.ty = Some("workflow");
             }
             VisitReason::Exit => {
-                if self.current_meta_span.is_some()
-                    && self.current_meta_outputs_span.is_none()
-                    && !self.output_keys.is_empty()
-                {
-                    state.add(missing_outputs_in_meta(
-                        self.current_meta_span.expect("should have a `meta` span"),
-                        self.name.as_deref().expect("should have a name"),
-                        self.ty.expect("should have a type"),
-                    ));
-                } else {
-                    check_matching(state, self);
-                }
-
-                self.name = None;
-                self.current_meta_outputs_span = None;
-                self.current_meta_span = None;
-                self.current_output_span = None;
-                self.output_keys.clear();
-                self.meta_outputs_keys.clear();
+                handle_meta_outputs_and_reset(state, self);
             }
         }
     }
@@ -231,24 +239,7 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
                 self.ty = Some("task");
             }
             VisitReason::Exit => {
-                if self.current_meta_span.is_some()
-                    && self.current_meta_outputs_span.is_none()
-                    && !self.output_keys.is_empty()
-                {
-                    state.add(missing_outputs_in_meta(
-                        self.current_meta_span.expect("should have a `meta` span"),
-                        self.name.as_deref().expect("should have a name"),
-                        self.ty.expect("should have a type"),
-                    ));
-                } else {
-                    check_matching(state, self);
-                }
-
-                self.current_meta_outputs_span = None;
-                self.current_meta_span = None;
-                self.current_output_span = None;
-                self.output_keys.clear();
-                self.meta_outputs_keys.clear();
+                handle_meta_outputs_and_reset(state, self);
             }
         }
     }
