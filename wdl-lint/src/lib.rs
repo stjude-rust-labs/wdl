@@ -95,7 +95,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::DeprecatedPlaceholderOptionRule>::default(),
         Box::<rules::RuntimeSectionKeysRule>::default(),
         Box::<rules::TodoRule>::default(),
-        Box::new(rules::NonmatchingOutputRule::default()),
+        Box::<rules::NonmatchingOutputRule>::default(),
     ];
 
     // Ensure all the rule ids are unique and pascal case
