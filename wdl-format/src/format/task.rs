@@ -286,6 +286,9 @@ pub fn format_task(task_def: &TaskDefinition) -> String {
             TaskItem::Requirements(r) => {
                 // TODO
             }
+            TaskItem::Hints(h) => {
+                // TODO
+            }
         }
     }
 

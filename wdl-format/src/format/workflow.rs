@@ -760,6 +760,9 @@ pub fn format_workflow(workflow_def: &WorkflowDefinition) -> String {
             WorkflowItem::Declaration(d) => {
                 body_str.push_str(&format_declaration(&Decl::Bound(d), 1));
             }
+            WorkflowItem::Hints(h) => {
+                // TODO
+            }
         }
     }
 
