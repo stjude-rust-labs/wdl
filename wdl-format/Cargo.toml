@@ -1,0 +1,15 @@
+[package]
+name = "wdl-format"
+version = "0.1.0"
+license.workspace = true
+edition.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[dependencies]
+wdl-ast = { path = "../wdl-ast", version = "0.7.1" }
+nonempty.workspace = true
+
+[lints]
+workspace = true

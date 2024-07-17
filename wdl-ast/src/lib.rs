@@ -42,6 +42,7 @@ pub use rowan::Direction;
 pub use rowan::ast::AstChildren;
 pub use rowan::ast::AstNode;
 pub use rowan::ast::support;
+use v1::VersionKeyword;
 pub use wdl_grammar::Diagnostic;
 pub use wdl_grammar::Label;
 pub use wdl_grammar::Severity;
@@ -58,9 +59,13 @@ pub use wdl_grammar::version;
 
 pub mod v1;
 
+mod element;
+#[cfg(test)]
+mod registry;
 mod validation;
 mod visitor;
 
+pub use element::*;
 pub use validation::*;
 pub use visitor::*;
 
@@ -125,6 +130,36 @@ pub trait AstToken {
     }
 }
 
+/// Finds the first child that casts to a particular [`AstToken`].
+pub fn token_child<T: AstToken>(parent: &SyntaxNode) -> Option<T> {
+    parent
+        .children_with_tokens()
+        .filter_map(|c| c.into_token())
+        .find_map(T::cast)
+}
+
+/// Finds all children that cast to a particular [`AstToken`].
+pub fn token_children<T: AstToken>(parent: &SyntaxNode) -> impl Iterator<Item = T> {
+    parent
+        .children_with_tokens()
+        .filter_map(|c| c.into_token().and_then(T::cast))
+}
+
+/// An extension trait for [`AstNode`].
+pub trait AstNodeChildrenExt {
+    /// Gets the children of this [`AstNode`].
+    fn children(&self) -> impl Iterator<Item = Token>;
+}
+
+impl<T: AstNode<Language = WorkflowDescriptionLanguage>> AstNodeChildrenExt for T {
+    fn children(&self) -> impl Iterator<Item = Token> {
+        self.syntax()
+            .clone()
+            .children_with_tokens()
+            .map(|c| Token::cast(c).expect("element to cast to an AST element"))
+    }
+}
+
 /// Represents the AST of a [Document].
 ///
 /// See [Document::ast].
@@ -173,6 +208,27 @@ impl Ast {
 pub struct Document(SyntaxNode);
 
 impl Document {
+    /// Returns whether or not a [`SyntaxKind`] is able to be cast to any of the
+    /// underlying members within the [`Document`].
+    pub fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RootNode
+    }
+
+    /// Attempts to cast the [`SyntaxNode`] to any of the underlying members
+    /// within the [`Document`].
+    pub fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self(syntax))
+        } else {
+            None
+        }
+    }
+
+    /// Gets a reference to the underlying [`SyntaxNode`].
+    pub fn syntax(&self) -> &SyntaxNode {
+        &self.0
+    }
+
     /// Parses a document from the given source.
     ///
     /// A document and its AST elements are trivially cloned.
@@ -234,26 +290,6 @@ impl Document {
     }
 }
 
-impl AstNode for Document {
-    type Language = WorkflowDescriptionLanguage;
-
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::RootNode
-    }
-
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self(syntax))
-        } else {
-            None
-        }
-    }
-
-    fn syntax(&self) -> &SyntaxNode {
-        &self.0
-    }
-}
-
 impl fmt::Debug for Document {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
@@ -261,7 +297,7 @@ impl fmt::Debug for Document {
 }
 
 /// Represents a whitespace token in the AST.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Whitespace(SyntaxToken);
 
 impl AstToken for Whitespace {
@@ -323,6 +359,11 @@ impl VersionStatement {
     pub fn version(&self) -> Version {
         token(&self.0).expect("version statement must have a version token")
     }
+
+    /// Gets the version keyword of the version statement.
+    pub fn keyword(&self) -> VersionKeyword {
+        token(&self.0).expect("version statement must have a version keyword")
+    }
 }
 
 impl AstNode for VersionStatement {
@@ -351,7 +392,7 @@ impl AstNode for VersionStatement {
 }
 
 /// Represents a version in the AST.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Version(SyntaxToken);
 
 impl AstToken for Version {
