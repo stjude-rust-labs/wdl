@@ -276,6 +276,7 @@ enum App {
     Parse(ParseCommand),
     Check(CheckCommand),
     Lint(LintCommand),
+    Format(FormatCommand),
     Analyze(AnalyzeCommand),
     Format(FormatCommand),
 }
