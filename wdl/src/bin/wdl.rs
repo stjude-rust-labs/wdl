@@ -243,7 +243,7 @@ pub struct FormatCommand {
 }
 
 impl FormatCommand {
-    fn exec(self) -> Result<()> {
+    async fn exec(self) -> Result<()> {
         let source = read_source(&self.path)?;
         let formatted = format_document(&source);
         match formatted {

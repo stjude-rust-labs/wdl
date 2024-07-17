@@ -265,6 +265,8 @@ fn format_call_statement(call: CallStatement, num_indents: usize) -> String {
                 false,
             ));
 
+            // TODO check for comments belonging to a potential comma
+
             let close_brace = call
                 .syntax()
                 .children_with_tokens()
