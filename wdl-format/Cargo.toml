@@ -1,0 +1,27 @@
+[package]
+name = "wdl-format"
+version = "0.1.0"
+license.workspace = true
+edition.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+wdl-ast = { path = "../wdl-ast", version = "0.4.0" }
+
+[dev-dependencies]
+pretty_assertions = { workspace = true }
+approx = { workspace = true }
+rayon = { workspace = true }
+colored = { workspace = true }
+codespan-reporting = { workspace = true }
+
+[features]
+codespan = ["wdl-ast/codespan"]
+
+[[test]]
+name = "format"
+required-features = ["codespan"]
+harness = false
