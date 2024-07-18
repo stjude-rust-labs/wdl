@@ -21,8 +21,6 @@
 
 use std::fmt::Write;
 
-use anyhow::Error;
-use anyhow::Ok;
 use anyhow::Result;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
@@ -31,6 +29,7 @@ use wdl_ast::SyntaxKind;
 
 use super::FormatState;
 use super::Formattable;
+use super::NEWLINE;
 
 /// Inline comment space constant used for formatting.
 pub const INLINE_COMMENT_SPACE: &str = "  ";
@@ -40,7 +39,8 @@ pub fn format_preceding_comments(
     element: &SyntaxElement,
     buffer: &mut String,
     state: &mut FormatState,
-) -> Result<bool, Error> {
+    would_be_interrupting: bool,
+) -> Result<()> {
     // This walks _backwards_ through the syntax tree to find comments
     // so we must collect them in a vector and later reverse them to get them in the
     // correct order.
@@ -86,11 +86,17 @@ pub fn format_preceding_comments(
         prev = cur.prev_sibling_or_token()
     }
 
+    let comments_found = !preceding_comments.is_empty();
+    if comments_found && would_be_interrupting && !state.interrupted() {
+        write!(buffer, "{}", NEWLINE)?;
+        state.interrupt();
+    }
+
     for comment in preceding_comments.iter().rev() {
         state.indent(buffer)?;
         comment.format(buffer, state)?;
     }
-    return Ok(!preceding_comments.is_empty());
+    Ok(())
 }
 
 /// Format a comment on the same line as an element.
@@ -98,7 +104,8 @@ pub fn format_inline_comment(
     element: &SyntaxElement,
     buffer: &mut String,
     state: &mut FormatState,
-) -> Result<bool, Error> {
+    would_be_interrupting: bool,
+) -> Result<()> {
     let mut next = element.next_sibling_or_token();
     while let Some(cur) = next {
         match cur.kind() {
@@ -107,8 +114,11 @@ pub fn format_inline_comment(
                 let comment =
                     Comment::cast(cur.as_token().expect("Comment should be a token").clone())
                         .expect("Comment should cast to a comment");
+                if would_be_interrupting {
+                    state.interrupt();
+                }
                 comment.format(buffer, state)?;
-                return Ok(true);
+                return Ok(());
             }
             SyntaxKind::Whitespace => {
                 if cur.to_string().contains('\n') {
@@ -123,5 +133,9 @@ pub fn format_inline_comment(
         }
         next = cur.next_sibling_or_token();
     }
-    return Ok(false);
+
+    if !would_be_interrupting {
+        write!(buffer, "{}", NEWLINE)?;
+    }
+    Ok(())
 }

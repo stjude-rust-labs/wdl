@@ -2,8 +2,6 @@
 
 use std::fmt::Write;
 
-use anyhow::Error;
-use anyhow::Ok;
 use anyhow::Result;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
@@ -31,23 +29,22 @@ pub const INDENT: &str = "    ";
 
 struct FormatState {
     indent_level: usize,
+    interrupted_by_comments: bool,
 }
 
 impl Default for FormatState {
     fn default() -> Self {
-        FormatState { indent_level: 0 }
+        FormatState {
+            indent_level: 0,
+            interrupted_by_comments: false,
+        }
     }
 }
 
 impl FormatState {
-    fn indent(&self, buffer: &mut String) -> Result<(), Error> {
-        let indent = INDENT.repeat(self.indent_level);
-        write!(buffer, "{}", indent)?;
-        Ok(())
-    }
-
-    fn indent_extra(&self, buffer: &mut String) -> Result<(), Error> {
-        let indent = INDENT.repeat(self.indent_level + 1);
+    fn indent(&self, buffer: &mut String) -> Result<()> {
+        let indent =
+            INDENT.repeat(self.indent_level + (if self.interrupted_by_comments { 1 } else { 0 }));
         write!(buffer, "{}", indent)?;
         Ok(())
     }
@@ -59,15 +56,27 @@ impl FormatState {
     fn decrement_indent(&mut self) {
         self.indent_level = self.indent_level.saturating_sub(1);
     }
+
+    fn interrupted(&self) -> bool {
+        self.interrupted_by_comments
+    }
+
+    fn interrupt(&mut self) {
+        self.interrupted_by_comments = true;
+    }
+
+    fn reset_interrupted(&mut self) {
+        self.interrupted_by_comments = false;
+    }
 }
 
 trait Formattable {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<(), Error>;
+    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()>;
     fn syntax_element(&self) -> SyntaxElement;
 }
 
 impl Formattable for Comment {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<(), Error> {
+    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
         let comment = self.as_str().trim();
         write!(buffer, "{}{}", comment, NEWLINE)?;
         Ok(())
@@ -79,7 +88,7 @@ impl Formattable for Comment {
 }
 
 impl Formattable for Version {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<(), Error> {
+    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
         write!(buffer, "{}", self.as_str())?;
         Ok(())
     }
@@ -90,7 +99,7 @@ impl Formattable for Version {
 }
 
 impl Formattable for VersionStatement {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<(), Error> {
+    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         let mut preceding_comments = Vec::new();
         let comment_buffer = &mut String::new();
         for sibling in self.syntax().siblings_with_tokens(Direction::Prev) {
@@ -137,18 +146,17 @@ impl Formattable for VersionStatement {
         );
 
         let version = self.version();
-        if format_inline_comment(&version_keyword, buffer, state)?
-            || format_preceding_comments(&version.syntax_element(), buffer, state)?
-        {
-            state.indent_extra(buffer)?;
-        } else {
-            write!(buffer, "{}", SPACE)?;
-        }
 
-        version.format(buffer, state)?;
-        if !format_inline_comment(&self.syntax_element(), buffer, state)? {
-            buffer.push_str(NEWLINE);
+        format_inline_comment(&version_keyword, buffer, state, true)?;
+        format_preceding_comments(&version.syntax_element(), buffer, state, true)?;
+        if state.interrupted() {
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
         }
+        version.format(buffer, state)?;
+        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        state.reset_interrupted();
 
         Ok(())
     }
@@ -179,7 +187,7 @@ pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
         .version_statement()
         .expect("Document should have a version statement");
     match version_statement.format(&mut result, &mut state) {
-        std::result::Result::Ok(_) => {}
+        Ok(_) => {}
         Err(_) => {
             return Err(vec![Diagnostic::error(
                 "Failed to format version statement",
