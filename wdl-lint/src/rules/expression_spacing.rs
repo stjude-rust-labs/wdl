@@ -234,12 +234,28 @@ impl Visitor for ExpressionSpacingRule {
                 // parenthesis, or a negation (!). The parenthesized expression
                 // can be the first thing at its level if it is wrapped in a
                 // EqualityExpressionNode.
-                if let Some(prev) = expr.syntax().prev_sibling_or_token() {
+                let mut prev = expr.syntax().prev_sibling_or_token();
+                if prev.is_none() {
+                    // No prior elements, so we need to go up a level.
+                    if let Some(parent) = expr.syntax().parent() {
+                        if let Some(parent_prev) = parent.prev_sibling_or_token() {
+                            prev = Some(parent_prev);
+                        }
+                    } else {
+                        unreachable!(
+                            "parenthesized expression should have a prior sibling or a parent"
+                        );
+                    }
+                }
+
+                if let Some(prev) = prev {
                     match prev.kind() {
                         SyntaxKind::Whitespace
                         | SyntaxKind::OpenParen
                         | SyntaxKind::NegationExprNode
                         | SyntaxKind::Exclamation
+                        | SyntaxKind::NameRefNode // Function calls can precede without whitespace
+                        | SyntaxKind::PlaceholderOpen // Opening placeholders can precede a paren
                         | SyntaxKind::Plus // This and all below will report on those tokens.
                         | SyntaxKind::Minus
                         | SyntaxKind::Asterisk
@@ -256,22 +272,6 @@ impl Visitor for ExpressionSpacingRule {
                             // opening parens should be preceded by whitespace
                             state.add(missing_preceding_whitespace(open.text_range().to_span()));
                         }
-                    }
-                } else {
-                    // No prior elements, so we need to go up a level.
-                    if let Some(parent) = expr.syntax().parent() {
-                        if let Some(parent_prev) = parent.prev_sibling_or_token() {
-                            if parent_prev.kind() != SyntaxKind::Whitespace {
-                                // opening parens should be preceded by whitespace
-                                state.add(missing_preceding_whitespace(
-                                    parent.text_range().to_span(),
-                                ));
-                            }
-                        }
-                    } else {
-                        unreachable!(
-                            "parenthesized expression should have a prior sibling or a parent"
-                        );
                     }
                 }
 
@@ -347,14 +347,7 @@ impl Visitor for ExpressionSpacingRule {
                     .expect("expression node should have an operator");
 
                 // Infix operators must be surrounded by whitespace
-                if op.prev_sibling_or_token().map(|t| t.kind()) != Some(SyntaxKind::Whitespace) {
-                    // assignments must be preceded by whitespace
-                    state.add(missing_preceding_whitespace(op.text_range().to_span()));
-                }
-                if op.next_sibling_or_token().map(|t| t.kind()) != Some(SyntaxKind::Whitespace) {
-                    // assignments must be followed by whitespace
-                    state.add(missing_following_whitespace(op.text_range().to_span()));
-                }
+                check_required_surrounding_ws(state, &op);
             }
             Expr::Less(_) | Expr::LessEqual(_) | Expr::Greater(_) | Expr::GreaterEqual(_) => {
                 // find the operator

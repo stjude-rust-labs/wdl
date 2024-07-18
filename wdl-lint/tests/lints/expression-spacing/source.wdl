@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, InputSorting, LineWidth, MatchingParameterMeta, NonmatchingOutput, RuntimeSectionKeys
+#@ except: DescriptionMissing, InputSorting, LineWidth, MatchingParameterMeta, NonmatchingOutput, RuntimeSectionKeys, Whitespace
 
 version 1.1
 
@@ -53,7 +53,9 @@ task foo {
                 else
                     "WOWOWOW"
             )
-        Boolean v = if a < b then true else false
+        Boolean v = if 
+        a < b then true 
+        else false
     }
 
     command <<< >>>

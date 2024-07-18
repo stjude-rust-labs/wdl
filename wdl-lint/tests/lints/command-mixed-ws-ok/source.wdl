@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, NoCurlyCommands, RuntimeSectionKeys
+#@ except: DescriptionMissing, ExpressionSpacing, NoCurlyCommands, RuntimeSectionKeys
 ## This is a test of having mixed indentation inside of a placeholder.
 ## This should not cause a warning for the `CommandSectionMixedIndentation` rule.
 
