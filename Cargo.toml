@@ -3,6 +3,7 @@ members = [
     "wdl",
     "wdl-analysis",
     "wdl-ast",
+    "wdl-format",
     "wdl-gauntlet",
     "wdl-grammar",
     "wdl-lint",

@@ -1,14 +1,23 @@
 //! Format comments in a WDL file.
 //!
 //! All comments will be treated as either "preceding" or "inline" comments.
-//! A preceding comment is a comment that appears on a line before an element,
-//! if and only if that element is the first element of its line. preceding
-//! comments should always appear, without any blank lines, immediately before
-//! the element they are commenting on. preceding comments should be indented
-//! to the same level as the element they are commenting on. An inline
-//! comment is a comment that appears on the same line as an element, if and
-//! only if that element is the last element of its line. Inline comments should
-//! always appear immediately after the element they are commenting on.
+//! Every comment will "belong" or "be owned" by a specific element in the
+//! syntax tree. If that element is moved from one place to another, the
+//! comment will move with it. Only syntax elemnts that are either the first
+//! element of a line or the last element of a line can own comments. Elemnts
+//! may span multiple lines, only the beginning (in the case of preceding
+//! comments) or the end (in the case of inline comments) of the element
+//! are considered.
+//!
+//! A preceding comment is a comment that appears on a line before an element.
+//! There may be any number of preceding comments and they may be separated
+//! by any number of blank lines. All blank lines will be discarded.
+//! Preceding comments should be indented to the same level as the element which
+//! they belong to.
+//!
+//! An inline comment is a comment that appears on the same line as an element,
+//! if and only if that element is the last element of its line. Inline comments
+//! should always appear immediately after the element they are commenting on.
 
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
@@ -23,7 +32,7 @@ pub const INLINE_COMMENT_SPACE: &str = "  ";
 ///
 /// This function will return the empty string if no comments are found
 /// (regardless of the value of 'prepend_newline').
-/// This function will format all comments that appear before a node,
+/// This function will return all comments that appear before a node,
 /// so long as those comments are on their own line. If a comment is
 /// found that is not on its own line, this function will stop looking
 /// for comments. This function will return a string with all comments
