@@ -280,7 +280,7 @@ impl Visitor for ExpressionSpacingRule {
                 if let Some(open_next) = open.next_sibling_or_token() {
                     if open_next.kind() == SyntaxKind::Whitespace {
                         let token = open_next.as_token().expect("should be a token");
-                        if token.text().starts_with(" ") {
+                        if token.text().starts_with(' ') {
                             // opening parens should not be followed by non-newline whitespace
                             state.add(disallowed_space(token.text_range().to_span()));
                         }
@@ -295,7 +295,7 @@ impl Visitor for ExpressionSpacingRule {
                             .as_token()
                             .expect("should be a token")
                             .text()
-                            .contains("\n")
+                            .contains('\n')
                     {
                         // closing parenthesis should not be preceded by whitespace without a
                         // newline
