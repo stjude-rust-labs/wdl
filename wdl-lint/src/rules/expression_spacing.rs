@@ -1,5 +1,6 @@
 //! A lint rule for spacing of expressions.
 
+use rowan::Direction;
 use rowan::NodeOrToken;
 use wdl_ast::v1::Expr;
 use wdl_ast::AstNode;
@@ -84,6 +85,51 @@ fn assignment_missing_surrounding_whitespace(span: Span) -> Diagnostic {
         .with_rule(ID)
         .with_highlight(span)
         .with_fix("add a space before and after this assignment")
+}
+
+// /// Reports malformed multi-line if...then...else constructs
+// fn malformed_multiline_if_then_else(span: Span) -> Diagnostic {
+//     Diagnostic::note(
+//         "multi-line if...then...else must be enclosed in parentheses with
+// each `if`, `then`, and \          `else` starting a new line",
+//     )
+//     .with_rule(ID)
+//     .with_highlight(span)
+//     .with_fix("reformat the if...then...else construct")
+// }
+
+/// Reports missing open paren for multiline if...then...else constructs
+fn multiline_if_open_paren(span: Span) -> Diagnostic {
+    Diagnostic::note("multi-line if...then...else must have a preceding parenthesis and newline")
+        .with_rule(ID)
+        .with_highlight(span)
+        .with_fix("add a open parenthesis and newline prior to this if")
+}
+
+/// Reports missing newline prior to then in multiline if...then...else
+/// constructs
+fn multiline_then_space(span: Span) -> Diagnostic {
+    Diagnostic::note("multi-line if...then...else must have a preceding space")
+        .with_rule(ID)
+        .with_highlight(span)
+        .with_fix("add a newline before the then keyword")
+}
+
+/// Reports missing newline prior to else in multiline if...then...else
+/// constructs
+fn multiline_else_space(span: Span) -> Diagnostic {
+    Diagnostic::note("multi-line if...then...else must have a preceding space")
+        .with_rule(ID)
+        .with_highlight(span)
+        .with_fix("add a newline before the else keyword")
+}
+
+/// Reports missing close paren for multiline if...then...else constructs
+fn multiline_if_close_paren(span: Span) -> Diagnostic {
+    Diagnostic::note("multi-line if...then...else must have a following newline and parenthesis")
+        .with_rule(ID)
+        .with_highlight(span)
+        .with_fix("add a newline and close parenthesis after to this else clause")
 }
 
 /// Detects improperly spaced expressions.
@@ -176,14 +222,12 @@ impl Visitor for ExpressionSpacingRule {
                 let open = expr
                     .syntax()
                     .children_with_tokens()
-                    .filter(|t| t.kind() == SyntaxKind::OpenParen)
-                    .next()
+                    .find(|t| t.kind() == SyntaxKind::OpenParen)
                     .expect("parenthesized expression should have an opening parenthesis");
                 let close = expr
                     .syntax()
                     .children_with_tokens()
-                    .filter(|t| t.kind() == SyntaxKind::CloseParen)
-                    .next()
+                    .find(|t| t.kind() == SyntaxKind::CloseParen)
                     .expect("parenthesized expression should have an closing parenthesis");
 
                 // The opening parenthesis can be preceded by whitespace, another open
@@ -264,11 +308,7 @@ impl Visitor for ExpressionSpacingRule {
                 let op = expr
                     .syntax()
                     .children_with_tokens()
-                    .filter(|t| match t.kind() {
-                        SyntaxKind::LogicalAnd | SyntaxKind::LogicalOr => true,
-                        _ => false,
-                    })
-                    .next()
+                    .find(|t| matches!(t.kind(), SyntaxKind::LogicalAnd | SyntaxKind::LogicalOr))
                     .expect("expression node should have an operator");
 
                 check_required_surrounding_ws(state, &op);
@@ -278,11 +318,7 @@ impl Visitor for ExpressionSpacingRule {
                 let op = expr
                     .syntax()
                     .children_with_tokens()
-                    .filter(|t| match t.kind() {
-                        SyntaxKind::Equal | SyntaxKind::NotEqual => true,
-                        _ => false,
-                    })
-                    .next()
+                    .find(|t| matches!(t.kind(), SyntaxKind::Equal | SyntaxKind::NotEqual))
                     .expect("expression node should have an operator");
 
                 check_required_surrounding_ws(state, &op);
@@ -297,16 +333,17 @@ impl Visitor for ExpressionSpacingRule {
                 let op = expr
                     .syntax()
                     .children_with_tokens()
-                    .filter(|t| match t.kind() {
-                        SyntaxKind::Plus
-                        | SyntaxKind::Minus
-                        | SyntaxKind::Asterisk
-                        | SyntaxKind::Slash
-                        | SyntaxKind::Percent
-                        | SyntaxKind::Exponentiation => true,
-                        _ => false,
+                    .find(|t| {
+                        matches!(
+                            t.kind(),
+                            SyntaxKind::Plus
+                                | SyntaxKind::Minus
+                                | SyntaxKind::Asterisk
+                                | SyntaxKind::Slash
+                                | SyntaxKind::Percent
+                                | SyntaxKind::Exponentiation
+                        )
                     })
-                    .next()
                     .expect("expression node should have an operator");
 
                 // Infix operators must be surrounded by whitespace
@@ -324,14 +361,15 @@ impl Visitor for ExpressionSpacingRule {
                 let op = expr
                     .syntax()
                     .children_with_tokens()
-                    .filter(|t| match t.kind() {
-                        SyntaxKind::Less
-                        | SyntaxKind::LessEqual
-                        | SyntaxKind::Greater
-                        | SyntaxKind::GreaterEqual => true,
-                        _ => false,
+                    .find(|t| {
+                        matches!(
+                            t.kind(),
+                            SyntaxKind::Less
+                                | SyntaxKind::LessEqual
+                                | SyntaxKind::Greater
+                                | SyntaxKind::GreaterEqual
+                        )
                     })
-                    .next()
                     .expect("expression node should have an operator");
 
                 check_required_surrounding_ws(state, &op);
@@ -341,20 +379,99 @@ impl Visitor for ExpressionSpacingRule {
                 let if_keyword = expr
                     .syntax()
                     .children_with_tokens()
-                    .filter(|t| t.kind() == SyntaxKind::IfKeyword)
-                    .next()
+                    .find(|t| t.kind() == SyntaxKind::IfKeyword)
                     .expect("if expression node should have an if keyword");
                 let then_keyword = expr
                     .syntax()
                     .children_with_tokens()
-                    .filter(|t| t.kind() == SyntaxKind::ThenKeyword)
-                    .next()
+                    .find(|t| t.kind() == SyntaxKind::ThenKeyword)
                     .expect("if expression node should have a then keyword");
                 let else_keyword = expr
                     .syntax()
                     .children_with_tokens()
-                    .filter(|t| t.kind() == SyntaxKind::ElseKeyword)
-                    .next();
+                    .find(|t| t.kind() == SyntaxKind::ElseKeyword)
+                    .expect("if expression node should have an else keyword");
+
+                let newlines = expr
+                    .syntax()
+                    .descendants_with_tokens()
+                    .filter(|t| {
+                        if t.kind() == SyntaxKind::Whitespace && t.to_string().contains('\n') {
+                            return true;
+                        }
+                        false
+                    })
+                    .count();
+
+                // If..then..else expression contains newlines, so we need to check the
+                // formatting.
+                if newlines > 0 {
+                    // If expression should be preceded by a opening parenthesis and a newline (plus
+                    // indentation whitespace).
+                    let prior: Vec<NodeOrToken<SyntaxNode, SyntaxToken>> = expr
+                        .syntax()
+                        .siblings_with_tokens(Direction::Prev)
+                        .skip(1)
+                        .take(2)
+                        .collect();
+
+                    let ws = prior.first().expect("should have a last element");
+                    let paren = prior.last().expect("should have a first element");
+
+                    if paren.kind() != SyntaxKind::OpenParen
+                        || (ws.kind() != SyntaxKind::Whitespace
+                            && !ws.to_string().starts_with('\n'))
+                    {
+                        // if should be preceded by an opening parenthesis and a newline
+                        state.add(multiline_if_open_paren(if_keyword.text_range().to_span()));
+                    }
+
+                    // check the then keyword
+                    let then_ws = then_keyword
+                        .prev_sibling_or_token()
+                        .expect("should have a prior sibling");
+
+                    if then_ws.kind() != SyntaxKind::Whitespace
+                        || !then_ws.to_string().starts_with('\n')
+                    {
+                        // then should be preceded by a newline
+                        state.add(multiline_then_space(then_keyword.text_range().to_span()));
+                    }
+
+                    // else keyword should be preceded by a newline
+                    let else_prior = else_keyword
+                        .prev_sibling_or_token()
+                        .expect("should have a prior sibling");
+                    if else_prior.kind() != SyntaxKind::Whitespace
+                        || !else_prior.to_string().starts_with('\n')
+                    {
+                        // then should be preceded by a newline
+                        state.add(multiline_else_space(else_keyword.text_range().to_span()));
+                    }
+
+                    // check the closing parenthesis
+                    let next_tokens: Vec<NodeOrToken<SyntaxNode, SyntaxToken>> = expr
+                        .syntax()
+                        .siblings_with_tokens(Direction::Next)
+                        .skip(1)
+                        .take(2)
+                        .collect();
+                    let close_ws = next_tokens.first().unwrap_or(&else_keyword);
+                    let close_paren = next_tokens.last().unwrap_or(&else_keyword);
+
+                    if (close_ws.kind() != SyntaxKind::Whitespace
+                        && !close_ws.to_string().contains('\n'))
+                        || close_paren.kind() != SyntaxKind::CloseParen
+                    {
+                        // closing parenthesis should be preceded by a newline
+                        // closing parenthesis should be preceded by a newline
+                        state.add(multiline_if_close_paren(Span::new(
+                            else_keyword.text_range().start().into(),
+                            usize::from(expr.syntax().text_range().end())
+                                - usize::from(else_keyword.text_range().start()),
+                        )));
+                    }
+                }
             }
             Expr::Index(_) => {
                 let open_bracket = expr
@@ -368,28 +485,39 @@ impl Visitor for ExpressionSpacingRule {
                     .find(|t| t.kind() == SyntaxKind::CloseBracket)
                     .expect("index expression node should have a closing bracket");
 
-                let checks = vec![
-                    open_bracket.prev_sibling_or_token().filter(|t| t.kind() == SyntaxKind::Whitespace),
-                    open_bracket.next_sibling_or_token().filter(|t| t.kind() == SyntaxKind::Whitespace),
-                    close_bracket.prev_sibling_or_token().filter(|t| t.kind() == SyntaxKind::Whitespace),
-                    close_bracket.next_sibling_or_token().filter(|t| t.kind() == SyntaxKind::Whitespace),
+                let checks = [
+                    open_bracket
+                        .prev_sibling_or_token()
+                        .filter(|t| t.kind() == SyntaxKind::Whitespace),
+                    open_bracket
+                        .next_sibling_or_token()
+                        .filter(|t| t.kind() == SyntaxKind::Whitespace),
+                    close_bracket
+                        .prev_sibling_or_token()
+                        .filter(|t| t.kind() == SyntaxKind::Whitespace),
+                    close_bracket
+                        .next_sibling_or_token()
+                        .filter(|t| t.kind() == SyntaxKind::Whitespace),
                 ];
 
-                checks
-                    .iter()
-                    .for_each(|f|{
+                checks.iter().for_each(|f| {
                     if let Some(ws) = f {
                         state.add(disallowed_space(ws.text_range().to_span()));
                     }
                 });
             }
             Expr::Access(acc) => {
-                let op = acc.syntax().children_with_tokens().find(|t| t.kind() == SyntaxKind::Dot)
+                let op = acc
+                    .syntax()
+                    .children_with_tokens()
+                    .find(|t| t.kind() == SyntaxKind::Dot)
                     .expect("access expression node should have a dot operator");
-                let before_ws =
-                    op.prev_sibling_or_token().filter(|t| t.kind() == SyntaxKind::Whitespace);
-                let after_ws =
-                    op.next_sibling_or_token().filter(|t| t.kind() == SyntaxKind::Whitespace);
+                let before_ws = op
+                    .prev_sibling_or_token()
+                    .filter(|t| t.kind() == SyntaxKind::Whitespace);
+                let after_ws = op
+                    .next_sibling_or_token()
+                    .filter(|t| t.kind() == SyntaxKind::Whitespace);
 
                 if let Some(ws) = before_ws {
                     state.add(disallowed_space(ws.text_range().to_span()));
@@ -443,6 +571,7 @@ impl Visitor for ExpressionSpacingRule {
     }
 }
 
+/// Checks to ensure a token is surrounded by whitespace.
 fn check_required_surrounding_ws(
     state: &mut Diagnostics,
     op: &NodeOrToken<SyntaxNode, SyntaxToken>,
