@@ -2,6 +2,8 @@
 
 use std::fmt::Write;
 
+use anyhow::Error;
+use anyhow::Ok;
 use anyhow::Result;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
@@ -11,6 +13,7 @@ use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::v1::StructDefinition;
+use wdl_ast::version;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
@@ -23,21 +26,23 @@ use wdl_ast::Validator;
 use wdl_ast::Version;
 use wdl_ast::VersionStatement;
 
-/// Newline constant used for formatting.
-pub const NEWLINE: &str = "\n";
-/// Indentation constant used for formatting.
-pub const INDENT: &str = "    ";
-
-// mod comments;
+mod comments;
 // mod import;
 // mod task;
 // mod workflow;
 
-// use comments::format_inline_comment;
-// use comments::format_preceding_comments;
+use comments::format_inline_comment;
+use comments::format_preceding_comments;
 // use import::format_imports;
 // use task::format_task;
 // use workflow::format_workflow;
+
+/// Newline constant used for formatting.
+pub const NEWLINE: &str = "\n";
+/// Space constant used for formatting.
+pub const SPACE: &str = " ";
+/// Indentation constant used for formatting.
+pub const INDENT: &str = "    ";
 
 struct FormatState {
     indent_level: usize,
@@ -50,9 +55,16 @@ impl Default for FormatState {
 }
 
 impl FormatState {
-    fn indent(&self, buffer: &mut String) {
+    fn indent(&self, buffer: &mut String) -> Result<(), Error> {
         let indent = INDENT.repeat(self.indent_level);
-        write!(buffer, "{}", indent).unwrap();
+        write!(buffer, "{}", indent)?;
+        Ok(())
+    }
+
+    fn indent_extra(&self, buffer: &mut String) -> Result<(), Error> {
+        let indent = INDENT.repeat(self.indent_level + 1);
+        write!(buffer, "{}", indent)?;
+        Ok(())
     }
 
     fn increment_indent(&mut self) {
@@ -65,41 +77,50 @@ impl FormatState {
 }
 
 trait Formattable {
-    fn format(&self, buffer: &mut String, state: &mut FormatState);
-    fn syntax(&self) -> SyntaxElement;
+    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<(), Error>;
+    fn syntax_element(&self) -> SyntaxElement;
 }
 
 impl Formattable for Comment {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) {
+    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<(), Error> {
         let comment = self.as_str().trim();
-        write!(buffer, "{}{}", comment, NEWLINE).unwrap();
+        write!(buffer, "{}{}", comment, NEWLINE)?;
+        Ok(())
     }
 
-    fn syntax(&self) -> SyntaxElement {
-        SyntaxElement::Token(AstToken::syntax(self).clone())
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Token(self.syntax().clone())
     }
 }
 
 impl Formattable for Version {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) {
-        write!(buffer, "{}", self.as_str()).unwrap();
+    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<(), Error> {
+        write!(buffer, "{}", self.as_str())?;
+        Ok(())
     }
 
-    fn syntax(&self) -> SyntaxElement {
-        SyntaxElement::Token(AstToken::syntax(self).clone())
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Token(self.syntax().clone())
     }
 }
 
 impl Formattable for VersionStatement {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) {
+    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<(), Error> {
         let mut preceding_comments = Vec::new();
-        AstNode::syntax(self).siblings_with_tokens(Direction::Prev).for_each(|sibling| {
+        let comment_buffer = &mut String::new();
+        for sibling in self.syntax().siblings_with_tokens(Direction::Prev) {
             match sibling.kind() {
                 SyntaxKind::Comment => {
-                    let comment = Comment::cast(sibling.as_token().unwrap().clone()).unwrap();
-                    let comment_buffer = &mut String::new();
-                    comment.format(comment_buffer, state);
+                    let comment = Comment::cast(
+                        sibling
+                            .as_token()
+                            .expect("Comment should be a token")
+                            .clone(),
+                    )
+                    .expect("Comment should cast to a comment");
+                    comment.format(comment_buffer, state)?;
                     preceding_comments.push(comment_buffer.clone());
+                    comment_buffer.clear();
                 }
                 SyntaxKind::Whitespace => {
                     // Ignore
@@ -111,23 +132,44 @@ impl Formattable for VersionStatement {
                     unreachable!("Unexpected syntax kind: {:?}", sibling.kind());
                 }
             }
-        });
+        }
 
         for comment in preceding_comments.iter().rev() {
             buffer.push_str(comment);
         }
 
+        // If there are preamble comments, ensure a blank line is inserted
         if !preceding_comments.is_empty() {
-            // If there are preamble comments, ensure a blank line is inserted
             buffer.push_str(NEWLINE);
         }
 
         buffer.push_str("version");
+        let version_keyword = SyntaxElement::Token(
+            self.syntax()
+                .first_token()
+                .expect("Version Statement should have a token")
+                .clone(),
+        );
 
+        let version = self.version();
+        if format_inline_comment(&version_keyword, buffer, state)?
+            || format_preceding_comments(&version.syntax_element(), buffer, state)?
+        {
+            state.indent_extra(buffer)?;
+        } else {
+            write!(buffer, "{}", SPACE)?;
+        }
+
+        version.format(buffer, state)?;
+        if !format_inline_comment(&self.syntax_element(), buffer, state)? {
+            buffer.push_str(NEWLINE);
+        }
+
+        Ok(())
     }
 
-    fn syntax(&self) -> SyntaxElement {
-        SyntaxElement::Node(AstNode::syntax(self).clone())
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
@@ -146,8 +188,8 @@ impl Formattable for VersionStatement {
 //     {
 //         match sibling.kind() {
 //             SyntaxKind::Comment => {
-//                 preceding_comments.push(sibling.to_string().trim().to_owned());
-//             }
+//
+// preceding_comments.push(sibling.to_string().trim().to_owned());             }
 //             SyntaxKind::Whitespace => {
 //                 // Ignore
 //             }
@@ -178,9 +220,9 @@ impl Formattable for VersionStatement {
 //     ));
 
 //     // result.push_str(&format_preceding_comments(
-//     //     &SyntaxElement::Token(version_statement.version().syntax().clone()),
-//     //     1,
-//     //     !result.ends_with(NEWLINE),
+//     //
+// &SyntaxElement::Token(version_statement.version().syntax().clone()),     //
+// 1,     //     !result.ends_with(NEWLINE),
 //     // ));
 //     if result.ends_with("version") {
 //         result.push(' ');
@@ -307,8 +349,8 @@ impl Formattable for VersionStatement {
 // }
 
 // /// Format a parameter meta section.
-// fn format_parameter_meta_section(parameter_meta: ParameterMetadataSection) -> String {
-//     let mut result = String::new();
+// fn format_parameter_meta_section(parameter_meta: ParameterMetadataSection) ->
+// String {     let mut result = String::new();
 
 //     result.push_str(&format_preceding_comments(
 //         &SyntaxElement::Node(parameter_meta.syntax().clone()),
@@ -318,10 +360,10 @@ impl Formattable for VersionStatement {
 
 //     result.push_str(INDENT);
 //     result.push_str("parameter_meta");
-//     let parameter_meta_keyword = parameter_meta.syntax().first_token().unwrap();
-//     result.push_str(&format_inline_comment(
-//         &SyntaxElement::Token(parameter_meta_keyword.clone()),
-//         false,
+//     let parameter_meta_keyword =
+// parameter_meta.syntax().first_token().unwrap();     result.push_str(&
+// format_inline_comment(         &SyntaxElement::Token(parameter_meta_keyword.
+// clone()),         false,
 //     ));
 
 //     let open_brace = parameter_meta
@@ -554,8 +596,8 @@ impl Formattable for VersionStatement {
 //         } else {
 //             result.push(' ');
 //         }
-//         result.push_str(&expr.syntax().to_string()); // TODO: format expressions
-//     }
+//         result.push_str(&expr.syntax().to_string()); // TODO: format
+// expressions     }
 //     result.push_str(&format_inline_comment(
 //         &SyntaxElement::Node(declaration.syntax().clone()),
 //         true,
@@ -631,55 +673,64 @@ impl Formattable for VersionStatement {
 //     result
 // }
 
-// /// Format a WDL document.
-// pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
-//     let (document, diagnostics) = Document::parse(code);
-//     if !diagnostics.is_empty() {
-//         return Err(diagnostics);
-//     }
-//     let mut validator = Validator::default();
-//     match validator.validate(&document) {
-//         Ok(_) => {
-//             // The document is valid, so we can format it.
-//         }
-//         Err(diagnostics) => return Err(diagnostics),
-//     }
+/// Format a WDL document.
+pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
+    let (document, diagnostics) = Document::parse(code);
+    if !diagnostics.is_empty() {
+        return Err(diagnostics);
+    }
+    let mut validator = Validator::default();
+    match validator.validate(&document) {
+        std::result::Result::Ok(_) => {
+            // The document is valid, so we can format it.
+        }
+        Err(diagnostics) => return Err(diagnostics),
+    }
 
-//     let mut result = String::new();
-//     result.push_str(&format_version_statement(
-//         document.version_statement().unwrap(),
-//     ));
-//     result.push_str(NEWLINE);
+    let mut result = String::new();
+    let mut state = FormatState::default();
 
-//     let ast = document.ast();
-//     let ast = ast.as_v1().unwrap();
-//     result.push_str(&format_imports(ast.imports()));
+    let version_statement = document
+        .version_statement()
+        .expect("Document should have a version statement");
+    match version_statement.format(&mut result, &mut state) {
+        std::result::Result::Ok(_) => {}
+        Err(_) => {
+            return Err(vec![Diagnostic::error(
+                "Failed to format version statement",
+            )]);
+        }
+    }
 
-//     ast.items().for_each(|item| {
-//         match item {
-//             DocumentItem::Import(_) => {
-//                 // Imports have already been formatted
-//             }
-//             DocumentItem::Workflow(workflow_def) => {
-//                 if !result.ends_with(&NEWLINE.repeat(2)) {
-//                     result.push_str(NEWLINE);
-//                 }
-//                 result.push_str(&format_workflow(&workflow_def));
-//             }
-//             DocumentItem::Task(task_def) => {
-//                 if !result.ends_with(&NEWLINE.repeat(2)) {
-//                     result.push_str(NEWLINE);
-//                 }
-//                 result.push_str(&format_task(&task_def));
-//             }
-//             DocumentItem::Struct(struct_def) => {
-//                 if !result.ends_with(&NEWLINE.repeat(2)) {
-//                     result.push_str(NEWLINE);
-//                 }
-//                 result.push_str(&format_struct_definition(&struct_def));
-//             }
-//         };
-//     });
+    // let ast = document.ast();
+    // let ast = ast.as_v1().unwrap();
+    // result.push_str(&format_imports(ast.imports()));
 
-//     Ok(result)
-// }
+    // ast.items().for_each(|item| {
+    //     match item {
+    //         DocumentItem::Import(_) => {
+    //             // Imports have already been formatted
+    //         }
+    //         DocumentItem::Workflow(workflow_def) => {
+    //             if !result.ends_with(&NEWLINE.repeat(2)) {
+    //                 result.push_str(NEWLINE);
+    //             }
+    //             result.push_str(&format_workflow(&workflow_def));
+    //         }
+    //         DocumentItem::Task(task_def) => {
+    //             if !result.ends_with(&NEWLINE.repeat(2)) {
+    //                 result.push_str(NEWLINE);
+    //             }
+    //             result.push_str(&format_task(&task_def));
+    //         }
+    //         DocumentItem::Struct(struct_def) => {
+    //             if !result.ends_with(&NEWLINE.repeat(2)) {
+    //                 result.push_str(NEWLINE);
+    //             }
+    //             result.push_str(&format_struct_definition(&struct_def));
+    //         }
+    //     };
+    // });
+
+    std::result::Result::Ok(result)
+}
