@@ -39,21 +39,31 @@ fn missing_blank_line(span: Span) -> Diagnostic {
         .with_fix("add blank line before this element")
 }
 
+/// Track the position within a document
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
+enum State {
+    /// Outside tracked sections
+    #[default]
+    Outside,
+    /// In a `Input` section
+    InputSection,
+    /// In a `Output` section
+    OutputSection,
+    /// In a `Meta` section
+    MetaSection,
+    /// In a `Parameter Meta` section
+    ParameterMetaSection,
+    /// In a `Runtime` section
+    RuntimeSection,
+    /// In a `Scatter` block
+    InScatter,
+}
+
 /// Detects unsorted input declarations.
 #[derive(Default, Debug, Clone, Copy)]
 pub struct BlanksBetweenElementsRule {
-    /// Are we in a `input` section?
-    input_section: bool,
-    /// Are we in a `output` section?
-    output_section: bool,
-    /// Are we in a `meta` section?
-    meta_section: bool,
-    /// Are we in a `parameter_meta` section?
-    parameter_meta_section: bool,
-    /// Are we in a `runtime` section?
-    runtime_section: bool,
-    /// Are we in a `scatter` block?
-    in_scatter: bool,
+    /// Store whether we are in certain blocks
+    state: State,
 }
 
 impl Rule for BlanksBetweenElementsRule {
@@ -139,10 +149,10 @@ impl Visitor for BlanksBetweenElementsRule {
         section: &wdl_ast::v1::MetadataSection,
     ) {
         if reason == VisitReason::Exit {
-            self.meta_section = false;
+            self.state = State::Outside;
             return;
         } else {
-            self.meta_section = true;
+            self.state = State::MetaSection;
         }
 
         let first = is_first_element(section.syntax());
@@ -158,10 +168,10 @@ impl Visitor for BlanksBetweenElementsRule {
         section: &wdl_ast::v1::ParameterMetadataSection,
     ) {
         if reason == VisitReason::Exit {
-            self.parameter_meta_section = false;
+            self.state = State::Outside;
             return;
         } else {
-            self.parameter_meta_section = true;
+            self.state = State::ParameterMetaSection;
         }
 
         let first = is_first_element(section.syntax());
@@ -177,10 +187,10 @@ impl Visitor for BlanksBetweenElementsRule {
         section: &InputSection,
     ) {
         if reason == VisitReason::Exit {
-            self.input_section = false;
+            self.state = State::Outside;
             return;
         } else {
-            self.input_section = true;
+            self.state = State::InputSection;
         }
 
         let first = is_first_element(section.syntax());
@@ -210,10 +220,10 @@ impl Visitor for BlanksBetweenElementsRule {
         section: &wdl_ast::v1::OutputSection,
     ) {
         if reason == VisitReason::Exit {
-            self.output_section = false;
+            self.state = State::Outside;
             return;
         } else {
-            self.output_section = true;
+            self.state = State::OutputSection;
         }
         let first = is_first_element(section.syntax());
         let actual_start = skip_preceding_comments(section.syntax());
@@ -227,10 +237,10 @@ impl Visitor for BlanksBetweenElementsRule {
         section: &wdl_ast::v1::RuntimeSection,
     ) {
         if reason == VisitReason::Exit {
-            self.runtime_section = false;
+            self.state = State::Outside;
             return;
         } else {
-            self.runtime_section = true;
+            self.state = State::RuntimeSection;
         }
 
         flag_all_blanks(section.syntax(), state);
@@ -272,10 +282,10 @@ impl Visitor for BlanksBetweenElementsRule {
         stmt: &wdl_ast::v1::ScatterStatement,
     ) {
         if reason == VisitReason::Exit {
-            self.in_scatter = false;
+            self.state = State::Outside;
             return;
         } else {
-            self.in_scatter = true;
+            self.state = State::InScatter;
         }
 
         let prev_token = stmt
@@ -352,7 +362,7 @@ impl Visitor for BlanksBetweenElementsRule {
                 let count = p.to_string().chars().filter(|c| *c == '\n').count();
                 // If we're in an `input` or `output`, we should have no blank lines, so only
                 // one `\n` is allowed.
-                if self.input_section || self.output_section {
+                if self.state == State::InputSection || self.state == State::OutputSection {
                     if count > 1 {
                         state.add(excess_blank_line(p.text_range().to_span()));
                     }
@@ -396,7 +406,7 @@ impl Visitor for BlanksBetweenElementsRule {
                 let count = p.to_string().chars().filter(|c| *c == '\n').count();
                 // If we're in an `input` or `output`, we should have no blank lines, so only
                 // one `\n` is allowed.
-                if self.input_section || self.output_section {
+                if self.state == State::InputSection || self.state == State::OutputSection {
                     if count > 1 {
                         state.add(excess_blank_line(p.text_range().to_span()));
                     }

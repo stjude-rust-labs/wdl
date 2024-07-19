@@ -34,7 +34,7 @@ workflow foo {
     call bar as baz { input:
         s = s
     }
-    call bar as qux { input: # Calls must be separated by whitespace.
+    call bar as qux { input: # Calls may optionally be separated by whitespace.
         s = s
     }
 }
