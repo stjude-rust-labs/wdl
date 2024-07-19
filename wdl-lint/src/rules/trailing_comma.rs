@@ -81,22 +81,20 @@ impl Visitor for TrailingCommaRule {
         }
 
         // Check if object is multi-line
-        if item.syntax().to_string().contains('\n') {
-            if item.items().count() > 1 {
-                let last_child = item.items().last();
-                if let Some(last_child) = last_child {
-                    if let Some(last_child_comma) = last_child.syntax().next_sibling_or_token() {
-                        if last_child_comma.kind() != wdl_ast::SyntaxKind::Comma {
-                            state.add(missing_trailing_comma(
-                                last_child.syntax().text_range().to_span(),
-                            ));
-                        }
-                    } else {
-                        // no next means no comma
+        if item.syntax().to_string().contains('\n') && item.items().count() > 1 {
+            let last_child = item.items().last();
+            if let Some(last_child) = last_child {
+                if let Some(last_child_comma) = last_child.syntax().next_sibling_or_token() {
+                    if last_child_comma.kind() != wdl_ast::SyntaxKind::Comma {
                         state.add(missing_trailing_comma(
                             last_child.syntax().text_range().to_span(),
                         ));
                     }
+                } else {
+                    // no next means no comma
+                    state.add(missing_trailing_comma(
+                        last_child.syntax().text_range().to_span(),
+                    ));
                 }
             }
         }
@@ -113,22 +111,20 @@ impl Visitor for TrailingCommaRule {
         }
 
         // Check if array is multi-line
-        if item.syntax().to_string().contains('\n') {
-            if item.elements().count() > 1 {
-                let last_child = item.elements().last();
-                if let Some(last_child) = last_child {
-                    if let Some(last_child_comma) = last_child.syntax().next_sibling_or_token() {
-                        if last_child_comma.kind() != wdl_ast::SyntaxKind::Comma {
-                            state.add(missing_trailing_comma(
-                                last_child.syntax().text_range().to_span(),
-                            ));
-                        }
-                    } else {
-                        // no next means no comma
+        if item.syntax().to_string().contains('\n') && item.elements().count() > 1 {
+            let last_child = item.elements().last();
+            if let Some(last_child) = last_child {
+                if let Some(last_child_comma) = last_child.syntax().next_sibling_or_token() {
+                    if last_child_comma.kind() != wdl_ast::SyntaxKind::Comma {
                         state.add(missing_trailing_comma(
                             last_child.syntax().text_range().to_span(),
                         ));
                     }
+                } else {
+                    // no next means no comma
+                    state.add(missing_trailing_comma(
+                        last_child.syntax().text_range().to_span(),
+                    ));
                 }
             }
         }
