@@ -130,21 +130,17 @@ impl Visitor for CommentWhitespaceRule {
                 if this_indentation != expected_indentation {
                     // Report a diagnostic if the comment is not indented properly
                     match this_indentation.len().cmp(&expected_indentation.len()) {
-                        Ordering::Greater => {
-                            state.add(excess_indentation(
-                                comment.span(),
-                                expected_indentation.len() / INDENT.len(),
-                                this_indentation.len() / INDENT.len(),
-                            ))
-                        },
-                        Ordering::Less => {
-                            state.add(insufficient_indentation(
-                                comment.span(),
-                                expected_indentation.len() / INDENT.len(),
-                                this_indentation.len() / INDENT.len(),
-                            ))   
-                        }
-                        Ordering::Equal => {}   
+                        Ordering::Greater => state.add(excess_indentation(
+                            comment.span(),
+                            expected_indentation.len() / INDENT.len(),
+                            this_indentation.len() / INDENT.len(),
+                        )),
+                        Ordering::Less => state.add(insufficient_indentation(
+                            comment.span(),
+                            expected_indentation.len() / INDENT.len(),
+                            this_indentation.len() / INDENT.len(),
+                        )),
+                        Ordering::Equal => {}
                     }
                 }
             } else {
@@ -176,7 +172,7 @@ impl Visitor for CommentWhitespaceRule {
 /// whitespace.
 fn is_inline_comment(token: &Comment) -> bool {
     if let Some(prior) = token.syntax().prev_sibling_or_token() {
-        return prior.kind() != SyntaxKind::Whitespace || !prior.to_string().contains('\n')
+        return prior.kind() != SyntaxKind::Whitespace || !prior.to_string().contains('\n');
     }
     false
 }
