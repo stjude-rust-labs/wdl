@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, MissingRuntime
+#@ except: DescriptionMissing, MissingRuntime, TrailingComma
 
 version 1.1
 

@@ -26,6 +26,7 @@ mod runtime_section_keys;
 mod section_order;
 mod snake_case;
 mod todo;
+mod trailing_comma;
 mod whitespace;
 
 pub use call_input_spacing::*;
@@ -54,4 +55,5 @@ pub use runtime_section_keys::*;
 pub use section_order::*;
 pub use snake_case::*;
 pub use todo::*;
+pub use trailing_comma::*;
 pub use whitespace::*;
