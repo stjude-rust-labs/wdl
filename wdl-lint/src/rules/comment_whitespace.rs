@@ -111,7 +111,7 @@ impl Visitor for CommentWhitespaceRule {
         if is_inline_comment(comment) {
             // check preceding whitespace for two spaces
             if let Some(prior) = comment.syntax().prev_sibling_or_token() {
-                if prior.kind() == SyntaxKind::Whitespace && prior.to_string() != "  " {
+                if prior.kind() != SyntaxKind::Whitespace || prior.to_string() != "  " {
                     // Report a diagnostic if there are not two spaces before the comment delimiter
                     state.add(inline_preceding_whitespace(comment.span()))
                 }
@@ -176,7 +176,7 @@ impl Visitor for CommentWhitespaceRule {
 /// whitespace.
 fn is_inline_comment(token: &Comment) -> bool {
     if let Some(prior) = token.syntax().prev_sibling_or_token() {
-        return prior.kind() == SyntaxKind::Whitespace && !prior.to_string().contains('\n')
+        return prior.kind() != SyntaxKind::Whitespace || !prior.to_string().contains('\n')
     }
     false
 }
