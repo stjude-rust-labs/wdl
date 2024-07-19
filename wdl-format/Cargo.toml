@@ -9,7 +9,7 @@ repository.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-wdl-ast = { path = "../wdl-ast", version = "0.4.0" }
+wdl-ast = { path = "../wdl-ast", version = "0.5.0" }
 
 [dev-dependencies]
 pretty_assertions = { workspace = true }
