@@ -1,2 +1,9 @@
 version  #1
     1.0  #2
+
+workflow  #3
+    test_wf  #4
+    {  #5
+}
+
+

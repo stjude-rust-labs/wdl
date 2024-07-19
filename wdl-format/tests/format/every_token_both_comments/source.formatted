@@ -3,3 +3,13 @@
 version  #1
     #2
     1.0  #2
+
+#3
+workflow  #3
+    #4
+    test_wf  #4
+    #5
+    {  #5
+}
+
+
