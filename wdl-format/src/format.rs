@@ -33,8 +33,11 @@ use format_state::FormatState;
 /// Newline constant used for formatting.
 pub const NEWLINE: &str = "\n";
 
+/// A trait for elements that can be formatted.
 trait Formattable {
+    /// Format the element and write it to the buffer.
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()>;
+    /// Get the syntax element of the element.
     fn syntax_element(&self) -> SyntaxElement;
 }
 
@@ -134,7 +137,7 @@ impl Formattable for LiteralString {
                     write!(buffer, "{}", text.as_str())?;
                 }
                 StringPart::Placeholder(placeholder) => {
-                    write!(buffer, "{}", placeholder.syntax().to_string())?;
+                    write!(buffer, "{}", placeholder.syntax())?;
                 }
             }
         }
@@ -215,7 +218,7 @@ impl Formattable for ImportStatement {
                             SyntaxKind::Ident => {
                                 format_preceding_comments(&alias_part, buffer, state, true)?;
                                 state.space_or_indent(buffer)?;
-                                write!(buffer, "{}", alias_part.to_string())?;
+                                write!(buffer, "{}", alias_part)?;
                                 if !second_ident_of_clause {
                                     format_inline_comment(&alias_part, buffer, state, true)?;
                                     second_ident_of_clause = true;
