@@ -6,6 +6,7 @@ use anyhow::Result;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::ImportStatement;
 use wdl_ast::v1::LiteralString;
+use wdl_ast::v1::MetadataObjectItem;
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::StringPart;
 use wdl_ast::v1::WorkflowDefinition;
@@ -279,6 +280,46 @@ impl Formattable for ImportStatement {
 //     }
 // }
 
+impl Formattable for MetadataObjectItem {
+    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+
+        let name = self.name();
+        state.indent(buffer)?;
+        name.format(buffer, state)?;
+        format_inline_comment(&name.syntax_element(), buffer, state, true)?;
+
+        let colon = SyntaxElement::Token(
+            self.syntax()
+                .children_with_tokens()
+                .find(|element| element.kind() == SyntaxKind::Colon)
+                .expect("Metadata Object Item should have a colon")
+                .as_token()
+                .expect("Colon should be a token")
+                .clone(),
+        );
+        format_preceding_comments(&colon, buffer, state, true)?;
+        if state.interrupted() {
+            state.indent(buffer)?;
+            state.reset_interrupted();
+        }
+        buffer.push(':');
+        format_inline_comment(&colon, buffer, state, true)?;
+
+        let value = SyntaxElement::Node(self.value().syntax().clone());
+        format_preceding_comments(&value, buffer, state, true)?;
+        state.space_or_indent(buffer)?;
+        write!(buffer, "{}", value)?; // TODO impl Formattable for MetadataValue
+        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+
+        Ok(())
+    }
+
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Node(self.syntax().clone())
+    }
+}
+
 impl Formattable for MetadataSection {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
@@ -289,6 +330,7 @@ impl Formattable for MetadataSection {
                 .expect("Metadata Section should have a token")
                 .clone(),
         );
+        state.indent(buffer)?;
         buffer.push_str("meta");
         format_inline_comment(&meta_keyword, buffer, state, true)?;
 
@@ -302,20 +344,22 @@ impl Formattable for MetadataSection {
                 .clone(),
         );
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        if !state.interrupted() {
+            buffer.push(' ');
+        } else {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
 
-        let mut meta_items_str = String::new();
         for item in self.items() {
-            match item {
-                _ => {
-                    // todo!()
-                }
-            }
+            item.format(buffer, state)?;
         }
+
+        state.decrement_indent();
 
         let close_brace = SyntaxElement::Token(
             self.syntax()
@@ -326,12 +370,10 @@ impl Formattable for MetadataSection {
                 .expect("Close brace should be a token")
                 .clone(),
         );
-        format_preceding_comments(&close_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        format_preceding_comments(&close_brace, buffer, state, false)?;
+        state.indent(buffer)?;
         buffer.push('}');
-        format_inline_comment(&close_brace, buffer, state, false)?;
-
-        state.decrement_indent();
+        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())
     }
@@ -370,9 +412,14 @@ impl Formattable for WorkflowDefinition {
                 .clone(),
         );
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        if !state.interrupted() {
+            buffer.push(' ');
+        } else {
+            state.reset_interrupted();
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
+
         state.increment_indent();
 
         let mut meta_section_str = String::new();
@@ -413,6 +460,12 @@ impl Formattable for WorkflowDefinition {
             }
         }
 
+        if !meta_section_str.is_empty() {
+            buffer.push_str(&meta_section_str);
+        }
+
+        state.decrement_indent();
+
         let close_brace = SyntaxElement::Token(
             self.syntax()
                 .children_with_tokens()
@@ -422,11 +475,10 @@ impl Formattable for WorkflowDefinition {
                 .expect("Close brace should be a token")
                 .clone(),
         );
-        state.decrement_indent();
-        format_preceding_comments(&close_brace, buffer, state, true)?;
+        format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push('}');
-        format_inline_comment(&close_brace, buffer, state, false)?;
+        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())
     }

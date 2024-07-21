@@ -1,6 +1,6 @@
-//! Contains the `FormatState` struct, which is used to keep track of the current formatting state.
-//! This includes the current indentation level and whether the current line has been interrupted by
-//! comments.
+//! Contains the `FormatState` struct, which is used to keep track of the
+//! current formatting state. This includes the current indentation level and
+//! whether the current line has been interrupted by comments.
 use std::fmt::Write;
 
 use anyhow::Result;
@@ -10,9 +10,9 @@ pub const SPACE: &str = " ";
 /// Indentation constant used for formatting.
 pub const INDENT: &str = "    ";
 
-/// The `FormatState` struct is used to keep track of the current formatting state.
-/// This includes the current indentation level and whether the current line has been interrupted by
-/// comments.
+/// The `FormatState` struct is used to keep track of the current formatting
+/// state. This includes the current indentation level and whether the current
+/// line has been interrupted by comments.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct FormatState {
     /// The current indentation level.
@@ -47,11 +47,13 @@ impl FormatState {
     /// Add a level of indentation.
     pub fn increment_indent(&mut self) {
         self.indent_level += 1;
+        self.reset_interrupted();
     }
 
     /// Remove a level of indentation.
     pub fn decrement_indent(&mut self) {
         self.indent_level = self.indent_level.saturating_sub(1);
+        self.reset_interrupted();
     }
 
     /// Check if the current line has been interrupted by comments.

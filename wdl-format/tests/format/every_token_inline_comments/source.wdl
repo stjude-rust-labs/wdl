@@ -41,12 +41,12 @@ KAZAM #40
  = #41
   out_sj_filter_overhang_min #42
 } #43
-meta #44
-{ #45
-description #46
-: #47
- "Test workflow" #48
-} #49
+meta #6
+{ #7
+description #8
+: #9
+ "Test workflow" #10
+} #11
 
 call#50
  test_task #51

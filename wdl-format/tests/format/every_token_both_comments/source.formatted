@@ -1,15 +1,27 @@
-#1
+#1a
 
-version  #1
-    #2
-    1.0  #2
+version  #1b
+    #2a
+    1.0  #2b
 
-#3
-workflow  #3
-    #4
-    test_wf  #4
-    #5
-    {  #5
+#3a
+workflow  #3b
+    #4a
+    test_wf  #4b
+    #5a
+{
+    #6a
+    meta  #6b
+        #7a
+    {  #7b
+        #8a
+        description  #8b
+            #9a
+            :  #9b
+            #10a
+            "Test workflow"  #10b
+    #11a
+    }  #11b
 }
 
 

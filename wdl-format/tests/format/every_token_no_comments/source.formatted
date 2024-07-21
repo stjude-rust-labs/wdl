@@ -1,6 +1,9 @@
 version 1.0
 
 workflow test_wf {
+    meta {
+        description: "Test workflow"
+    }
 }
 
 

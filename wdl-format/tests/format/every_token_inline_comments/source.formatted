@@ -3,7 +3,13 @@ version  #1
 
 workflow  #3
     test_wf  #4
-    {  #5
-}
+{  #5
+    meta  #6
+    {  #7
+        description  #8
+            :  #9
+            "Test workflow"  #10
+    }  #11
+}  #102
 
 
