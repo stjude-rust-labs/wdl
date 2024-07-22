@@ -70,3 +70,11 @@ note[CommentWhitespace]: comment has too much indentation
    │
    = fix: this comment has 3 levels of indentation. It should have 2 levels of indentation.
 
+note[CommentWhitespace]: comment has too much indentation
+   ┌─ tests/lints/comment-whitespace/source.wdl:48:17
+   │
+48 │                 # even more comment
+   │                 ^^^^^^^^^^^^^^^^^^^
+   │
+   = fix: this comment has 4 levels of indentation. It should have 3 levels of indentation.
+

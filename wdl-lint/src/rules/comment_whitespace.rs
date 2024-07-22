@@ -174,28 +174,28 @@ impl Visitor for CommentWhitespaceRule {
         }
 
         // check the comment for one space following the comment delimiter
-        if let Some(delimiter) = comment_start.captures(comment.as_str()) {
-            let d = delimiter.get(0).unwrap();
-            let preamble = d.as_str().starts_with("##");
-            let rest = &comment.as_str()[d.len()..];
-            let without_spaces = rest.trim_start_matches(' ');
+        let mut comment_chars = comment.as_str().chars().peekable();
 
-            if !rest.is_empty() && rest.len() - without_spaces.len() != 1 && !preamble {
-                // Report a diagnostic if there is not one space after the comment delimiter
-                state.add(following_whitespace(Span::new(
-                    comment.span().start(),
-                    d.len(),
-                )));
-            } else if preamble && !rest.is_empty() && rest.len() - without_spaces.len() == 0 {
-                // If we're in a preamble comment, there should be a space after the delimiter
-                // But we have no opinion on how many spaces there should be.
-                state.add(following_whitespace(Span::new(
-                    comment.span().start(),
-                    d.len(),
-                )));
-            }
-        } else {
-            unreachable!("A comment must start with a #")
+        let mut n_delimiter = 0;
+        while let Some('#') = comment_chars.peek() {
+            n_delimiter += 1;
+            comment_chars.next();
+        }
+
+        let preamble = n_delimiter == 2;
+
+        if let Some('@') = comment_chars.peek() {
+            n_delimiter += 1;
+            comment_chars.next();
+        }
+
+        let n_whitespace = comment_chars.by_ref().take_while(|c| *c == ' ').count();
+
+        if comment_chars.skip(n_whitespace).count() > 0 && ((n_whitespace != 1 && !preamble) || (preamble && n_whitespace == 0)) {
+            state.add(following_whitespace(Span::new(
+                comment.span().start(),
+                n_delimiter,
+            )));
         }
     }
 }
