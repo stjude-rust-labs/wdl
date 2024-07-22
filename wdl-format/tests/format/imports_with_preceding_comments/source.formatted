@@ -1,9 +1,5 @@
 version 1.1
 
-# this comment belongs to fileC
-import "fileC.wdl"
-# this comment belongs to fileB
-import "fileB.wdl" as foo
 # fileA 1
 import
     # fileA 2.1
@@ -21,6 +17,10 @@ import
     as
     # fileA 8
     Qux
+# this comment belongs to fileB
+import "fileB.wdl" as foo
+# this comment belongs to fileC
+import "fileC.wdl"
 
 workflow test {
 }

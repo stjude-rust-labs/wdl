@@ -23,8 +23,8 @@ pub struct FormatState {
 
 impl FormatState {
     /// Add the current indentation to the buffer.
-    /// The indentation level can be temporarily increased by one if the current line has been
-    /// interrupted by comments.
+    /// The indentation level can be temporarily increased by one if the current
+    /// line has been interrupted by comments.
     pub fn indent(&self, buffer: &mut String) -> Result<()> {
         let indent =
             INDENT.repeat(self.indent_level + (if self.interrupted_by_comments { 1 } else { 0 }));
@@ -32,8 +32,9 @@ impl FormatState {
         Ok(())
     }
 
-    /// Add a space or an indentation to the buffer. If the current line has been interrupted by
-    /// comments, an indentation is added. Otherwise, a space is added.
+    /// Add a space or an indentation to the buffer. If the current line has
+    /// been interrupted by comments, an indentation is added. Otherwise, a
+    /// space is added.
     pub fn space_or_indent(&mut self, buffer: &mut String) -> Result<()> {
         if !self.interrupted_by_comments {
             write!(buffer, "{}", SPACE)?;

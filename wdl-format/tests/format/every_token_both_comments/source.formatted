@@ -22,6 +22,14 @@ workflow  #3b
             "Test workflow"  #10b
     #11a
     }  #11b
+    parameter_meta {
+        out_sj_filter_overhang_min: {
+            type: "SpliceJunctionMotifs"
+,
+            label: "Minimum overhang required to support a splicing junction"
+,
+        }
+    }
 }
 
 

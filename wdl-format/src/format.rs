@@ -4,10 +4,17 @@ use std::fmt::Write;
 
 use anyhow::Result;
 use wdl_ast::v1::DocumentItem;
-use wdl_ast::v1::ImportStatement;
+use wdl_ast::v1::LiteralBoolean;
+use wdl_ast::v1::LiteralFloat;
+use wdl_ast::v1::LiteralInteger;
+use wdl_ast::v1::LiteralNull;
 use wdl_ast::v1::LiteralString;
+use wdl_ast::v1::MetadataArray;
+use wdl_ast::v1::MetadataObject;
 use wdl_ast::v1::MetadataObjectItem;
 use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::MetadataValue;
+use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::v1::StringPart;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::v1::WorkflowItem;
@@ -26,6 +33,7 @@ use wdl_ast::VersionStatement;
 
 mod comments;
 mod format_state;
+mod import;
 
 use comments::format_inline_comment;
 use comments::format_preceding_comments;
@@ -35,7 +43,7 @@ use format_state::FormatState;
 pub const NEWLINE: &str = "\n";
 
 /// A trait for elements that can be formatted.
-trait Formattable {
+pub trait Formattable {
     /// Format the element and write it to the buffer.
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()>;
     /// Get the syntax element of the element.
@@ -162,109 +170,104 @@ impl Formattable for Ident {
     }
 }
 
-impl Formattable for ImportStatement {
+// impl Ord for ImportStatement {
+//     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+//         self.uri().as_str().cmp(other.uri().as_str())
+//     }
+// }
+
+impl Formattable for LiteralBoolean {
+    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+        match self.value() {
+            true => buffer.push_str("true"),
+            false => buffer.push_str("false"),
+        }
+        Ok(())
+    }
+
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Node(self.syntax().clone())
+    }
+}
+
+impl Formattable for LiteralFloat {
+    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+        write!(buffer, "{}", self.syntax().to_string())?;
+        Ok(())
+    }
+
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Node(self.syntax().clone())
+    }
+}
+
+impl Formattable for LiteralInteger {
+    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+        write!(buffer, "{}", self.syntax().to_string())?;
+        Ok(())
+    }
+
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Node(self.syntax().clone())
+    }
+}
+
+impl Formattable for LiteralNull {
+    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+        buffer.push_str("null");
+        Ok(())
+    }
+
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Node(self.syntax().clone())
+    }
+}
+
+impl Formattable for MetadataObject {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
-        let import_keyword = SyntaxElement::Token(
+        let open_brace = SyntaxElement::Token(
             self.syntax()
-                .first_token()
-                .expect("Import Statement should have a token")
+                .children_with_tokens()
+                .find(|element| element.kind() == SyntaxKind::OpenBrace)
+                .expect("Metadata Object should have an open brace")
+                .as_token()
+                .expect("Open brace should be a token")
                 .clone(),
         );
-        buffer.push_str("import");
-        format_inline_comment(&import_keyword, buffer, state, true)?;
-
-        let uri = self.uri();
-        format_preceding_comments(&uri.syntax_element(), buffer, state, true)?;
-        state.space_or_indent(buffer)?;
-        uri.format(buffer, state)?;
-        format_inline_comment(&uri.syntax_element(), buffer, state, true)?;
-
-        let mut next = uri.syntax().next_sibling_or_token();
-        while let Some(cur) = next {
-            match cur.kind() {
-                SyntaxKind::AsKeyword => {
-                    format_preceding_comments(&cur, buffer, state, true)?;
-                    state.space_or_indent(buffer)?;
-                    buffer.push_str("as");
-                    state.reset_interrupted();
-                    format_inline_comment(&cur, buffer, state, true)?;
-                }
-                SyntaxKind::Ident => {
-                    format_preceding_comments(&cur, buffer, state, true)?;
-                    state.space_or_indent(buffer)?;
-                    let ident =
-                        Ident::cast(cur.as_token().expect("Ident should be a token").clone())
-                            .expect("Ident should cast to an ident");
-                    ident.format(buffer, state)?;
-                    format_inline_comment(&cur, buffer, state, true)?;
-                }
-                SyntaxKind::ImportAliasNode => {
-                    format_preceding_comments(&cur, buffer, state, true)?;
-                    let mut second_ident_of_clause = false;
-                    for alias_part in cur
-                        .as_node()
-                        .expect("Import alias should be a node")
-                        .children_with_tokens()
-                    {
-                        match alias_part.kind() {
-                            SyntaxKind::AliasKeyword => {
-                                // Should always be first 'alias_part' processed
-                                // so preceding comments were handled above.
-                                state.space_or_indent(buffer)?;
-                                buffer.push_str("alias");
-                                format_inline_comment(&alias_part, buffer, state, true)?;
-                            }
-                            SyntaxKind::Ident => {
-                                format_preceding_comments(&alias_part, buffer, state, true)?;
-                                state.space_or_indent(buffer)?;
-                                write!(buffer, "{}", alias_part)?;
-                                if !second_ident_of_clause {
-                                    format_inline_comment(&alias_part, buffer, state, true)?;
-                                    second_ident_of_clause = true;
-                                } // else an inline comment will be handled by outer loop
-                            }
-                            SyntaxKind::AsKeyword => {
-                                format_preceding_comments(&alias_part, buffer, state, true)?;
-                                state.space_or_indent(buffer)?;
-                                buffer.push_str("as");
-                                format_inline_comment(&alias_part, buffer, state, true)?;
-                            }
-                            SyntaxKind::ImportAliasNode => {
-                                // Ignore the root node
-                            }
-                            SyntaxKind::Whitespace => {
-                                // Ignore
-                            }
-                            SyntaxKind::Comment => {
-                                // This comment will be included by a call to
-                                // 'format_inline_comment' or
-                                // 'format_preceding_comments'
-                                // in another match arm
-                            }
-                            _ => {
-                                unreachable!("Unexpected syntax kind: {:?}", alias_part.kind());
-                            }
-                        }
-                    }
-                    format_inline_comment(&cur, buffer, state, true)?;
-                }
-                SyntaxKind::Comment => {
-                    // This comment will be included by a call to
-                    // 'format_inline_comment' or 'format_preceding_comments'
-                    // in another match arm
-                }
-                SyntaxKind::Whitespace => {
-                    // Ignore
-                }
-                _ => {
-                    unreachable!("Unexpected syntax kind: {:?}", cur.kind());
-                }
-            }
-            next = cur.next_sibling_or_token();
+        format_preceding_comments(&open_brace, buffer, state, true)?;
+        if state.interrupted() {
+            state.indent(buffer)?;
+            state.reset_interrupted();
         }
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        buffer.push('{');
+        format_inline_comment(&open_brace, buffer, state, false)?;
+
+        state.increment_indent();
+
+        for item in self.items() {
+            // state.indent(buffer)?;
+            item.format(buffer, state)?;
+            buffer.push(',');
+            buffer.push_str(NEWLINE);
+        }
+
+        state.decrement_indent();
+
+        let close_brace = SyntaxElement::Token(
+            self.syntax()
+                .children_with_tokens()
+                .find(|element| element.kind() == SyntaxKind::CloseBrace)
+                .expect("Metadata Object should have a close brace")
+                .as_token()
+                .expect("Close brace should be a token")
+                .clone(),
+        );
+        format_preceding_comments(&close_brace, buffer, state, false)?;
+        state.indent(buffer)?;
+        buffer.push('}');
+        format_inline_comment(&self.syntax_element(), buffer, state, true)?;
 
         Ok(())
     }
@@ -274,11 +277,85 @@ impl Formattable for ImportStatement {
     }
 }
 
-// impl Ord for ImportStatement {
-//     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-//         self.uri().as_str().cmp(other.uri().as_str())
-//     }
-// }
+impl Formattable for MetadataArray {
+    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+
+        let open_bracket = SyntaxElement::Token(
+            self.syntax()
+                .children_with_tokens()
+                .find(|element| element.kind() == SyntaxKind::OpenBracket)
+                .expect("Metadata Array should have an open bracket")
+                .as_token()
+                .expect("Open bracket should be a token")
+                .clone(),
+        );
+        format_preceding_comments(&open_bracket, buffer, state, true)?;
+        if state.interrupted() {
+            state.indent(buffer)?;
+            state.reset_interrupted();
+        }
+        buffer.push('[');
+        format_inline_comment(&open_bracket, buffer, state, false)?;
+
+        state.increment_indent();
+
+        for item in self.elements() {
+            state.indent(buffer)?;
+            item.format(buffer, state)?;
+            buffer.push(',');
+            buffer.push_str(NEWLINE);
+        }
+
+        state.decrement_indent();
+
+        let close_bracket = SyntaxElement::Token(
+            self.syntax()
+                .children_with_tokens()
+                .find(|element| element.kind() == SyntaxKind::CloseBracket)
+                .expect("Metadata Array should have a close bracket")
+                .as_token()
+                .expect("Close bracket should be a token")
+                .clone(),
+        );
+        format_preceding_comments(&close_bracket, buffer, state, false)?;
+        state.indent(buffer)?;
+        buffer.push(']');
+        format_inline_comment(&self.syntax_element(), buffer, state, true)?;
+
+        Ok(())
+    }
+
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Node(self.syntax().clone())
+    }
+}
+
+impl Formattable for MetadataValue {
+    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+        match self {
+            MetadataValue::String(s) => s.format(buffer, state),
+            MetadataValue::Boolean(b) => b.format(buffer, state),
+            MetadataValue::Float(f) => f.format(buffer, state),
+            MetadataValue::Integer(i) => i.format(buffer, state),
+            MetadataValue::Null(n) => n.format(buffer, state),
+            MetadataValue::Object(o) => o.format(buffer, state),
+            MetadataValue::Array(a) => a.format(buffer, state),
+        }
+    }
+
+    fn syntax_element(&self) -> SyntaxElement {
+        match self {
+            MetadataValue::String(s) => s.syntax_element(),
+            MetadataValue::Object(o) => o.syntax_element(),
+            MetadataValue::Array(a) => a.syntax_element(),
+            MetadataValue::Boolean(b) => b.syntax_element(),
+            MetadataValue::Float(f) => f.syntax_element(),
+            MetadataValue::Integer(i) => i.syntax_element(),
+            MetadataValue::Null(n) => n.syntax_element(),
+        }
+    }
+}
 
 impl Formattable for MetadataObjectItem {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
@@ -306,10 +383,10 @@ impl Formattable for MetadataObjectItem {
         buffer.push(':');
         format_inline_comment(&colon, buffer, state, true)?;
 
-        let value = SyntaxElement::Node(self.value().syntax().clone());
-        format_preceding_comments(&value, buffer, state, true)?;
+        let value = self.value();
+        format_preceding_comments(&value.syntax_element(), buffer, state, true)?;
         state.space_or_indent(buffer)?;
-        write!(buffer, "{}", value)?; // TODO impl Formattable for MetadataValue
+        value.format(buffer, state)?;
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())
@@ -383,6 +460,69 @@ impl Formattable for MetadataSection {
     }
 }
 
+impl Formattable for ParameterMetadataSection {
+    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+
+        let parameter_meta_keyword = SyntaxElement::Token(
+            self.syntax()
+                .first_token()
+                .expect("Parameter Metadata Section should have a token")
+                .clone(),
+        );
+        state.indent(buffer)?;
+        buffer.push_str("parameter_meta");
+        format_inline_comment(&parameter_meta_keyword, buffer, state, true)?;
+
+        let open_brace = SyntaxElement::Token(
+            self.syntax()
+                .children_with_tokens()
+                .find(|element| element.kind() == SyntaxKind::OpenBrace)
+                .expect("Parameter Metadata Section should have an open brace")
+                .as_token()
+                .expect("Open brace should be a token")
+                .clone(),
+        );
+        format_preceding_comments(&open_brace, buffer, state, true)?;
+        if !state.interrupted() {
+            buffer.push(' ');
+        } else {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        }
+        buffer.push('{');
+        format_inline_comment(&open_brace, buffer, state, false)?;
+
+        state.increment_indent();
+
+        for item in self.items() {
+            item.format(buffer, state)?;
+        }
+
+        state.decrement_indent();
+
+        let close_brace = SyntaxElement::Token(
+            self.syntax()
+                .children_with_tokens()
+                .find(|element| element.kind() == SyntaxKind::CloseBrace)
+                .expect("Parameter Metadata Section should have a close brace")
+                .as_token()
+                .expect("Close brace should be a token")
+                .clone(),
+        );
+        format_preceding_comments(&close_brace, buffer, state, false)?;
+        state.indent(buffer)?;
+        buffer.push('}');
+        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+
+        Ok(())
+    }
+
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Node(self.syntax().clone())
+    }
+}
+
 impl Formattable for WorkflowDefinition {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
@@ -434,7 +574,7 @@ impl Formattable for WorkflowDefinition {
                     m.format(&mut meta_section_str, state)?;
                 }
                 WorkflowItem::ParameterMetadata(pm) => {
-                    // pm.format(&mut parameter_meta_section_str, state)?;
+                    pm.format(&mut parameter_meta_section_str, state)?;
                 }
                 WorkflowItem::Input(i) => {
                     // i.format(&mut input_section_str, state)?;
@@ -462,6 +602,9 @@ impl Formattable for WorkflowDefinition {
 
         if !meta_section_str.is_empty() {
             buffer.push_str(&meta_section_str);
+        }
+        if !parameter_meta_section_str.is_empty() {
+            buffer.push_str(&parameter_meta_section_str);
         }
 
         state.decrement_indent();
@@ -548,7 +691,7 @@ pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
     if !imports.is_empty() {
         result.push_str(NEWLINE);
     }
-    // imports.sort();
+    imports.sort_by(import::sort_imports);
     for import in imports {
         match import.format(&mut result, &mut state) {
             Ok(_) => {}

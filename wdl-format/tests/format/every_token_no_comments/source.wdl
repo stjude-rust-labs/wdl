@@ -21,9 +21,37 @@ output
 {
 SpliceJunctionMotifs KAZAM = out_sj_filter_overhang_min
 }
-meta
+meta {
+a: "hello"
+b: 'world'
+c: 5
+d: -0xf
+e: 1.0e10
+f: -2.
+g: true
+h: false
+i: null
+j: {
+a: [1, 2, 3],
+b: ["hello", "world", "!"],
+c: {
+x: 1,
+y: 2,
+z: 3
+}
+}
+k: [
 {
-description: "Test workflow"
+a: {},
+b: 0,
+c: "",
+d: '',
+e: [],
+},
+{
+x: [1.0, 2.0, 3.0]
+}
+]
 }
 
 call test_task as foo {
