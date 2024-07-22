@@ -2,7 +2,6 @@
 
 use std::cmp::Ordering;
 
-use regex::Regex;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
@@ -107,7 +106,6 @@ impl Visitor for CommentWhitespaceRule {
     }
 
     fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
-        let comment_start = Regex::new(r"^#+@?").unwrap();
         if is_inline_comment(comment) {
             // check preceding whitespace for two spaces
             if let Some(prior) = comment.syntax().prev_sibling_or_token() {
@@ -191,7 +189,9 @@ impl Visitor for CommentWhitespaceRule {
 
         let n_whitespace = comment_chars.by_ref().take_while(|c| *c == ' ').count();
 
-        if comment_chars.skip(n_whitespace).count() > 0 && ((n_whitespace != 1 && !preamble) || (preamble && n_whitespace == 0)) {
+        if comment_chars.skip(n_whitespace).count() > 0
+            && ((n_whitespace != 1 && !preamble) || (preamble && n_whitespace == 0))
+        {
             state.add(following_whitespace(Span::new(
                 comment.span().start(),
                 n_delimiter,
