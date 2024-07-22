@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.4.0 - 07-17-2024
 
 ### Added
 
@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Fixed a bug in `SectionOrder` that caused false positives to fire
+  ([#129](https://github.com/stjude-rust-labs/wdl/pull/129))
 * Fixed a bug in the `PreambleWhitespace` rule that would cause it to fire if
   there is only a single blank line after the version statement remaining in
   the document ([#110](https://github.com/stjude-rust-labs/wdl/pull/110)).
