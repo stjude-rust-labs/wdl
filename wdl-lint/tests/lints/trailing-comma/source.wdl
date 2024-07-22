@@ -5,15 +5,19 @@ version 1.2
 task foo {
     meta {
         description: {
-            help: "test"
+            help: "test"  # OK
         }
         help: {
             name: "something",
-            other: "another"
+            other: "another"  # missing comma
         }
         foo: {
             bar: "baz",
-            baz: "quux" ,
+            baz: "quux" ,  # misplaced comma
+        }
+        bar: {
+            baz: "quux",
+            quux: "quuz",  # OK
         }
     }
 
@@ -26,17 +30,17 @@ task foo {
             choices: [
                 "yes",
                 "reverse",
-                "no"
-            ]
+                "no"  # missing comma
+            ]  # missing comma
         }
         minaqual: {
             description: "Skip all reads with alignment quality lower than the given minimum value",
-            common: true
+            common: true  # missing comma
         }
         modify_memory_gb: "Add to or subtract from dynamic memory allocation. Default memory is determined by the size of the inputs. Specified in GB."
         modify_disk_size_gb: "Add to or subtract from dynamic disk space allocation. Default disk size is determined by the size of the inputs. Specified in GB."
         not_an_option: {
-            name: "test"
+            name: "test"  # OK
         }
    }
 

@@ -1,7 +1,7 @@
 note[TrailingComma]: item missing trailing comma
    ┌─ tests/lints/trailing-comma/source.wdl:12:13
    │
-12 │             other: "another"
+12 │             other: "another"  # missing comma
    │             ^^^^^^^^^^^^^^^^
    │
    = fix: add a comma after this element
@@ -9,35 +9,35 @@ note[TrailingComma]: item missing trailing comma
 error[TrailingComma]: extraneous content before trailing comma
    ┌─ tests/lints/trailing-comma/source.wdl:16:24
    │
-16 │             baz: "quux" ,
+16 │             baz: "quux" ,  # misplaced comma
    │                        ^
    │
    = fix: remove this extraneous content
 
 note[TrailingComma]: item missing trailing comma
-   ┌─ tests/lints/trailing-comma/source.wdl:26:13
+   ┌─ tests/lints/trailing-comma/source.wdl:30:13
    │  
-26 │ ╭             choices: [
-27 │ │                 "yes",
-28 │ │                 "reverse",
-29 │ │                 "no"
-30 │ │             ]
+30 │ ╭             choices: [
+31 │ │                 "yes",
+32 │ │                 "reverse",
+33 │ │                 "no"  # missing comma
+34 │ │             ]  # missing comma
    │ ╰─────────────^
    │  
    = fix: add a comma after this element
 
 note[TrailingComma]: item missing trailing comma
-   ┌─ tests/lints/trailing-comma/source.wdl:29:17
+   ┌─ tests/lints/trailing-comma/source.wdl:33:17
    │
-29 │                 "no"
+33 │                 "no"  # missing comma
    │                 ^^^^
    │
    = fix: add a comma after this element
 
 note[TrailingComma]: item missing trailing comma
-   ┌─ tests/lints/trailing-comma/source.wdl:34:13
+   ┌─ tests/lints/trailing-comma/source.wdl:38:13
    │
-34 │             common: true
+38 │             common: true  # missing comma
    │             ^^^^^^^^^^^^
    │
    = fix: add a comma after this element
