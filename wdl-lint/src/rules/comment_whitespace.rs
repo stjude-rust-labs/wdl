@@ -123,21 +123,26 @@ impl Visitor for CommentWhitespaceRule {
                 .parent_ancestors()
                 .filter(|a| {
                     if let Some(prior) = a.prev_sibling_or_token() {
-                        if prior.kind() == SyntaxKind::Whitespace && prior.to_string().contains('\n') {
-                            return true
+                        if prior.kind() == SyntaxKind::Whitespace
+                            && prior.to_string().contains('\n')
+                        {
+                            return true;
                         }
                     }
                     if let Some(next) = a.first_child_or_token() {
                         if next.kind() == SyntaxKind::OpenParen {
-                            if  let Some(next_next) = next.next_sibling_or_token() {
-                                if next_next.kind() == SyntaxKind::Whitespace && next_next.to_string().contains('\n') {
-                                    return true
+                            if let Some(next_next) = next.next_sibling_or_token() {
+                                if next_next.kind() == SyntaxKind::Whitespace
+                                    && next_next.to_string().contains('\n')
+                                {
+                                    return true;
                                 }
                             }
                         }
                     }
                     false
-                }).count();
+                })
+                .count();
             let expected_indentation = INDENT.repeat(ancestors);
 
             if let Some(leading_whitespace) = comment.syntax().prev_sibling_or_token() {
@@ -175,7 +180,7 @@ impl Visitor for CommentWhitespaceRule {
             let rest = &comment.as_str()[d.len()..];
             let without_spaces = rest.trim_start_matches(' ');
 
-            if !rest.is_empty() && rest.len() - without_spaces.len() != 1  && !preamble {
+            if !rest.is_empty() && rest.len() - without_spaces.len() != 1 && !preamble {
                 // Report a diagnostic if there is not one space after the comment delimiter
                 state.add(following_whitespace(Span::new(
                     comment.span().start(),
