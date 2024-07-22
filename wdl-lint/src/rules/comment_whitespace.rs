@@ -107,7 +107,7 @@ impl Visitor for CommentWhitespaceRule {
     }
 
     fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
-        let re = Regex::new(r"^#+@?").unwrap();
+        let comment_start = Regex::new(r"^#+@?").unwrap();
         if is_inline_comment(comment) {
             // check preceding whitespace for two spaces
             if let Some(prior) = comment.syntax().prev_sibling_or_token() {
@@ -150,7 +150,7 @@ impl Visitor for CommentWhitespaceRule {
         }
 
         // check the comment for one space following the comment delimiter
-        if let Some(delimiter) = re.captures(comment.as_str()) {
+        if let Some(delimiter) = comment_start.captures(comment.as_str()) {
             let d = delimiter.get(0).unwrap();
             let rest = &comment.as_str()[d.len()..];
             let without_spaces = rest.trim_start_matches(' ');

@@ -54,18 +54,26 @@ note[CommentWhitespace]: comment has too much indentation
    │
    = fix: this comment has 3 levels of indentation. It should have 2 levels of indentation.
 
-note[CommentWhitespace]: comment has too much indentation
-   ┌─ tests/lints/comment-whitespace/source.wdl:25:15
+note[CommentWhitespace]: in-line comments should be preceded by two spaces
+   ┌─ tests/lints/comment-whitespace/source.wdl:22:34
    │
-25 │               # what about this one?
+22 │         String foo = "bar"       # too much space for an inline comment
+   │                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = fix: this comment must be preceded with two spaces
+
+note[CommentWhitespace]: comment has too much indentation
+   ┌─ tests/lints/comment-whitespace/source.wdl:26:15
+   │
+26 │               # what about this one?
    │               ^^^^^^^^^^^^^^^^^^^^^^
    │
    = fix: this comment has 3 levels of indentation. It should have 2 levels of indentation.
 
 note[CommentWhitespace]: comment not sufficiently indented
-   ┌─ tests/lints/comment-whitespace/source.wdl:31:13
+   ┌─ tests/lints/comment-whitespace/source.wdl:32:13
    │
-31 │             # a comment
+32 │             # a comment
    │             ^^^^^^^^^^^
    │
    = fix: this comment has 3 levels of indentation. It should have 4 levels of indentation.
