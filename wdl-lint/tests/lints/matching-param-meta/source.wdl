@@ -1,4 +1,4 @@
-#@ except: BlanksBetweenElements, DescriptionMissing, RuntimeSectionKeys, SectionOrdering
+#@ except: BlankLinesBetweenElements, DescriptionMissing, RuntimeSectionKeys, SectionOrdering
 ## This is a test for checking for missing and extraneous entries
 ## in a `parameter_meta` section.
 

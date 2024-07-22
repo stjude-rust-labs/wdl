@@ -96,7 +96,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::RuntimeSectionKeysRule>::default(),
         Box::<rules::TodoRule>::default(),
         Box::<rules::NonmatchingOutputRule<'_>>::default(),
-        Box::<rules::BlanksBetweenElementsRule>::default(),
+        Box::<rules::BlankLinesBetweenElementsRule>::default(),
     ];
 
     // Ensure all the rule ids are unique and pascal case

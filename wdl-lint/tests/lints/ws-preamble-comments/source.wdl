@@ -1,4 +1,4 @@
-#@ except: BlanksBetweenElements, DescriptionMissing
+#@ except: BlankLinesBetweenElements, DescriptionMissing
 ## This is a test of whitespace between preamble comments
 
   

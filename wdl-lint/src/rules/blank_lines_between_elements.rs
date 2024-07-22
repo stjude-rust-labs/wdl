@@ -20,7 +20,7 @@ use crate::Tag;
 use crate::TagSet;
 
 /// The identifier for the blanks between elements rule.
-const ID: &str = "BlanksBetweenElements";
+const ID: &str = "BlankLinesBetweenElements";
 
 /// Creates an excessive blank line diagnostic.
 fn excess_blank_line(span: Span) -> Diagnostic {
@@ -58,12 +58,12 @@ enum State {
 
 /// Detects unsorted input declarations.
 #[derive(Default, Debug, Clone, Copy)]
-pub struct BlanksBetweenElementsRule {
+pub struct BlankLinesBetweenElementsRule {
     /// Store whether we are in certain blocks
     state: State,
 }
 
-impl Rule for BlanksBetweenElementsRule {
+impl Rule for BlankLinesBetweenElementsRule {
     fn id(&self) -> &'static str {
         ID
     }
@@ -89,7 +89,7 @@ impl Rule for BlanksBetweenElementsRule {
     }
 }
 
-impl Visitor for BlanksBetweenElementsRule {
+impl Visitor for BlankLinesBetweenElementsRule {
     type State = Diagnostics;
 
     fn document(

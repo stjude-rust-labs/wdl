@@ -1,4 +1,4 @@
-#@ except: BlanksBetweenElements, DescriptionMissing
+#@ except: BlankLinesBetweenElements, DescriptionMissing
 ## This is a normal preamble comment.
        ## Bad leading whitespace!
 

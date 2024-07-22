@@ -1,4 +1,4 @@
-#@ except: BlanksBetweenElements, DescriptionMissing, MissingRuntime
+#@ except: BlankLinesBetweenElements, DescriptionMissing, MissingRuntime
 
 version 1.1
 
