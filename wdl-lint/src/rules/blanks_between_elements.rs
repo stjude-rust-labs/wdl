@@ -351,7 +351,17 @@ impl Visitor for BlanksBetweenElementsRule {
                     let first = decl
                         .syntax()
                         .prev_sibling()
-                        .is_some_and(|f| f.kind() == SyntaxKind::InputSectionNode);
+                        .is_some_and(|f| match f.kind() {
+                            SyntaxKind::InputSectionNode
+                            | SyntaxKind::OutputSectionNode
+                            | SyntaxKind::RuntimeSectionNode
+                            | SyntaxKind::MetadataSectionNode
+                            | SyntaxKind::ParameterMetadataSectionNode
+                            | SyntaxKind::RequirementsSectionNode
+                            | SyntaxKind::HintsSectionNode
+                            | SyntaxKind::CommandSectionNode => true,
+                            _ => false,
+                        });
 
                     let prev = skip_preceding_comments(decl.syntax());
 
