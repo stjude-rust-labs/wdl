@@ -26,103 +26,111 @@ note[BlanksBetweenElements]: missing blank line
    = fix: add blank line before this element
 
 note[BlanksBetweenElements]: missing blank line
-   ┌─ tests/lints/blanks-between-elements/source.wdl:41:1
+   ┌─ tests/lints/blanks-between-elements/source.wdl:19:5
+   │
+19 │     String p = "pip"
+   │     ^^^^^^^^^^^^^^^^
+   │
+   = fix: add blank line before this element
+
+note[BlanksBetweenElements]: missing blank line
+   ┌─ tests/lints/blanks-between-elements/source.wdl:40:1
    │  
-41 │ ╭ task bar {
-42 │ │ 
-43 │ │     meta {
-44 │ │         
+40 │ ╭ task bar {
+41 │ │ 
+42 │ │     meta {
+43 │ │         
    · │
-64 │ │ 
-65 │ │ }
+63 │ │ 
+64 │ │ }
    │ ╰─^
    │  
    = fix: add blank line before this element
 
 note[BlanksBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blanks-between-elements/source.wdl:41:11
+   ┌─ tests/lints/blanks-between-elements/source.wdl:40:11
    │  
-41 │   task bar {
+40 │   task bar {
    │ ╭──────────^
-42 │ │ 
-43 │ │     meta {
+41 │ │ 
+42 │ │     meta {
    │ ╰────^
    │  
    = fix: remove blank line(s)
 
 note[BlanksBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blanks-between-elements/source.wdl:43:11
+   ┌─ tests/lints/blanks-between-elements/source.wdl:42:11
    │  
-43 │       meta {
+42 │       meta {
    │ ╭──────────^
-44 │ │         
-45 │ │         description: "bar"
+43 │ │         
+44 │ │         description: "bar"
    │ ╰────────^
    │  
    = fix: remove blank line(s)
 
 note[BlanksBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blanks-between-elements/source.wdl:45:27
+   ┌─ tests/lints/blanks-between-elements/source.wdl:44:27
    │  
-45 │           description: "bar"
+44 │           description: "bar"
    │ ╭──────────────────────────^
-46 │ │ 
-47 │ │         outputs: {
+45 │ │ 
+46 │ │         outputs: {
    │ ╰────────^
    │  
    = fix: remove blank line(s)
 
 note[BlanksBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blanks-between-elements/source.wdl:48:19
+   ┌─ tests/lints/blanks-between-elements/source.wdl:47:19
    │  
-48 │               u: "u"
+47 │               u: "u"
    │ ╭──────────────────^
-49 │ │ 
-50 │ │         }
+48 │ │ 
+49 │ │         }
    │ ╰────────^
    │  
    = fix: remove blank line(s)
 
 note[BlanksBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blanks-between-elements/source.wdl:54:27
+   ┌─ tests/lints/blanks-between-elements/source.wdl:53:27
    │  
-54 │           String s = "hello"
+53 │           String s = "hello"
    │ ╭──────────────────────────^
-55 │ │ 
-56 │ │         String? t
+54 │ │ 
+55 │ │         String? t
    │ ╰────────^
    │  
    = fix: remove blank line(s)
 
 note[BlanksBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blanks-between-elements/source.wdl:79:14
+   ┌─ tests/lints/blanks-between-elements/source.wdl:78:14
    │  
-79 │       runtime {
+78 │       runtime {
    │ ╭─────────────^
-80 │ │ 
-81 │ │         disks: "50 GB"
+79 │ │ 
+80 │ │         disks: "50 GB"
    │ ╰────────^
    │  
    = fix: remove blank line(s)
 
 note[BlanksBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blanks-between-elements/source.wdl:82:23
+   ┌─ tests/lints/blanks-between-elements/source.wdl:81:23
    │  
-82 │           memory: "4 GB"
+81 │           memory: "4 GB"
    │ ╭──────────────────────^
-83 │ │ 
-84 │ │         container: "ubuntu:latest"
+82 │ │ 
+83 │ │         container: "ubuntu:latest"
    │ ╰────────^
    │  
    = fix: remove blank line(s)
 
 note[BlanksBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blanks-between-elements/source.wdl:84:35
+   ┌─ tests/lints/blanks-between-elements/source.wdl:83:35
    │  
-84 │           container: "ubuntu:latest"
+83 │           container: "ubuntu:latest"
    │ ╭──────────────────────────────────^
-85 │ │         
-86 │ │     }
+84 │ │         
+85 │ │     }
    │ ╰────^
    │  
    = fix: remove blank line(s)

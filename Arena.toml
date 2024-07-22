@@ -1062,11 +1062,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:63:3: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L63"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:643:6: note[MissingMetas]: task `SamToFastq` is missing both meta and parameter_meta sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L643"
 
@@ -1237,23 +1232,8 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:102:9: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/chipseq/chipseq-standard.wdl/#L102"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:104:9: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/chipseq/chipseq-standard.wdl/#L104"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
 message = "chipseq-standard.wdl:10:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/chipseq/chipseq-standard.wdl/#L10"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:111:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/chipseq/chipseq-standard.wdl/#L111"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
@@ -1264,36 +1244,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
 message = "chipseq-standard.wdl:12:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/chipseq/chipseq-standard.wdl/#L12"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:59:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/chipseq/chipseq-standard.wdl/#L59"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:91:9: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/chipseq/chipseq-standard.wdl/#L91"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:98:9: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/chipseq/chipseq-standard.wdl/#L98"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:106:13: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-core.wdl/#L106"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:123:13: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-core.wdl/#L123"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:128:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-core.wdl/#L128"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
@@ -1316,16 +1266,6 @@ message = "dnaseq-standard-fastq.wdl:36:5: note[BlanksBetweenElements]: missing 
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L36"
 
 [[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:69:9: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L69"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:77:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L77"
-
-[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
 message = "dnaseq-standard.wdl:20:5: note[BlanksBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-standard.wdl/#L20"
@@ -1336,34 +1276,9 @@ message = "dnaseq-standard.wdl:34:5: note[BlanksBetweenElements]: missing blank 
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-standard.wdl/#L34"
 
 [[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:63:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-standard.wdl/#L63"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:61:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/general/alignment-post.wdl/#L61"
-
-[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
 message = "alignment-post.wdl:6:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/general/alignment-post.wdl/#L6"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:77:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/general/alignment-post.wdl/#L77"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:78:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/general/alignment-post.wdl/#L78"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:33:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/general/bam-to-fastqs.wdl/#L33"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
@@ -1376,109 +1291,14 @@ message = "samtools-merge.wdl:21:5: note[BlanksBetweenElements]: missing blank l
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/general/samtools-merge.wdl/#L21"
 
 [[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:40:17: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/general/samtools-merge.wdl/#L40"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:45:9: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/general/samtools-merge.wdl/#L45"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:54:9: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/general/samtools-merge.wdl/#L54"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:60:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/markdups-post.wdl/#L60"
-
-[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
 message = "quality-check-standard.wdl:111:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L111"
 
 [[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:150:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L150"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:170:9: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L170"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:179:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L179"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:268:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L268"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:317:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L317"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:347:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L347"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:354:9: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L354"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:357:9: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L357"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:371:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L371"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
-message = "make-qc-reference.wdl:126:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/make-qc-reference.wdl/#L126"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:118:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L118"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:133:9: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L133"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:141:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L141"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:89:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard.wdl/#L89"
-
-[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:18:5: note[BlanksBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L18"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:42:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L42"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
@@ -1494,8 +1314,3 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:32:5: note[BlanksBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/scrnaseq/scrnaseq-standard.wdl/#L32"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:65:5: note[BlanksBetweenElements]: missing blank line"
-permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/scrnaseq/scrnaseq-standard.wdl/#L65"

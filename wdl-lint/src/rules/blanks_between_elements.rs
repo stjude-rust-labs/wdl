@@ -8,7 +8,6 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
-use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNode;
 use wdl_ast::SyntaxToken;
@@ -55,8 +54,6 @@ enum State {
     ParameterMetaSection,
     /// In a `Runtime` section
     RuntimeSection,
-    /// In a `Scatter` block
-    InScatter,
 }
 
 /// Detects unsorted input declarations.
@@ -260,18 +257,17 @@ impl Visitor for BlanksBetweenElementsRule {
             return;
         }
 
-        let first = is_first_element(stmt.syntax());
+        // We only care about spacing for calls if they're the "first" thing in a
+        // workflow body.
+        let first = stmt
+            .syntax()
+            .prev_sibling()
+            .is_some_and(|f| f.kind() == SyntaxKind::InputSectionNode);
 
         let prev = skip_preceding_comments(stmt.syntax());
 
-        let between_calls = stmt
-            .syntax()
-            .prev_sibling()
-            .map(|s| s.kind() == SyntaxKind::CallStatementNode)
-            .unwrap_or(false);
-
-        if !between_calls {
-            check_prior_spacing(&prev, state, true, first);
+        if first {
+            check_prior_spacing(&prev, state, true, false);
         }
     }
 
@@ -282,30 +278,18 @@ impl Visitor for BlanksBetweenElementsRule {
         stmt: &wdl_ast::v1::ScatterStatement,
     ) {
         if reason == VisitReason::Exit {
-            self.state = State::Outside;
             return;
-        } else {
-            self.state = State::InScatter;
         }
 
-        let prev_token = stmt
+        let first = stmt
             .syntax()
-            .prev_sibling_or_token()
-            .and_then(SyntaxElement::into_token);
+            .prev_sibling()
+            .is_some_and(|f| f.kind() == SyntaxKind::InputSectionNode);
 
-        let first = is_first_element(stmt.syntax());
+        let prev = skip_preceding_comments(stmt.syntax());
 
-        if let Some(token) = prev_token {
-            if token.kind() == SyntaxKind::Whitespace {
-                let count = token.to_string().chars().filter(|c| *c == '\n').count();
-                if first && count > 1 {
-                    state.add(excess_blank_line(token.text_range().to_span()));
-                } else if !first && count < 2 {
-                    state.add(missing_blank_line(stmt.syntax().text_range().to_span()));
-                }
-            }
-        } else if !first {
-            state.add(missing_blank_line(stmt.syntax().text_range().to_span()));
+        if first {
+            check_prior_spacing(&prev, state, true, false);
         }
     }
 
@@ -353,9 +337,6 @@ impl Visitor for BlanksBetweenElementsRule {
             return;
         }
 
-        let first = is_first_element(decl.syntax());
-        let prior_node = decl.syntax().prev_sibling();
-
         let prior = decl.syntax().prev_sibling_or_token();
         if let Some(p) = prior {
             if p.kind() == SyntaxKind::Whitespace {
@@ -366,19 +347,16 @@ impl Visitor for BlanksBetweenElementsRule {
                     if count > 1 {
                         state.add(excess_blank_line(p.text_range().to_span()));
                     }
-                } else if let Some(n) = prior_node {
-                    match n.kind() {
-                        SyntaxKind::BoundDeclNode | SyntaxKind::UnboundDeclNode => {
-                            // If this is not the first (Un)BoundDeclNode,
-                            // then blank lines are optional.
-                            // More than one blank line will be caught by
-                            // the Whitespace rule.
-                        }
-                        _ => {
-                            if count < 2 && !first {
-                                state.add(missing_blank_line(decl.syntax().text_range().to_span()));
-                            }
-                        }
+                } else {
+                    let first = decl
+                        .syntax()
+                        .prev_sibling()
+                        .is_some_and(|f| f.kind() == SyntaxKind::InputSectionNode);
+
+                    let prev = skip_preceding_comments(decl.syntax());
+
+                    if first {
+                        check_prior_spacing(&prev, state, true, false);
                     }
                 }
             }
@@ -395,10 +373,7 @@ impl Visitor for BlanksBetweenElementsRule {
             return;
         }
 
-        let first = is_first_element(decl.syntax());
         let actual_start = skip_preceding_comments(decl.syntax());
-
-        let prior_node = decl.syntax().prev_sibling();
 
         let prior = actual_start.prev_sibling_or_token();
         if let Some(p) = prior {
@@ -410,19 +385,16 @@ impl Visitor for BlanksBetweenElementsRule {
                     if count > 1 {
                         state.add(excess_blank_line(p.text_range().to_span()));
                     }
-                } else if let Some(n) = prior_node {
-                    match n.kind() {
-                        SyntaxKind::BoundDeclNode | SyntaxKind::UnboundDeclNode => {
-                            // If this is not the first (Un)BoundDeclNode,
-                            // then blank lines are optional.
-                            // More than one blank line will be caught by
-                            // the Whitespace rule.
-                        }
-                        _ => {
-                            if count < 2 && !first {
-                                state.add(missing_blank_line(decl.syntax().text_range().to_span()));
-                            }
-                        }
+                } else {
+                    let first = decl
+                        .syntax()
+                        .prev_sibling()
+                        .is_some_and(|f| f.kind() == SyntaxKind::InputSectionNode);
+
+                    let prev = skip_preceding_comments(decl.syntax());
+
+                    if first {
+                        check_prior_spacing(&prev, state, true, false);
                     }
                 }
             }
@@ -439,9 +411,16 @@ impl Visitor for BlanksBetweenElementsRule {
             return;
         }
 
-        let first = is_first_element(stmt.syntax());
-        let actual_start = skip_preceding_comments(stmt.syntax());
-        check_prior_spacing(&actual_start, state, true, first);
+        let first = stmt
+            .syntax()
+            .prev_sibling()
+            .is_some_and(|f| f.kind() == SyntaxKind::InputSectionNode);
+
+        let prev = skip_preceding_comments(stmt.syntax());
+
+        if first {
+            check_prior_spacing(&prev, state, true, false);
+        }
     }
 }
 

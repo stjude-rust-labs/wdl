@@ -16,7 +16,12 @@ workflow foo {
     parameter_meta {}
     # what about this comment?
     input {}
-
+    scatter (i in ["hello", "world"]) {
+        call bar { input: s = i }
+    }
+    if (true) {
+        call bar { input: s = "world" }
+    }
     String p = "pip"
 
     
