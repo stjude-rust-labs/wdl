@@ -259,10 +259,7 @@ impl Visitor for BlanksBetweenElementsRule {
 
         // We only care about spacing for calls if they're the "first" thing in a
         // workflow body.
-        let first = stmt
-            .syntax()
-            .prev_sibling()
-            .is_some_and(|f| f.kind() == SyntaxKind::InputSectionNode);
+        let first = is_first_body(stmt.syntax());
 
         let prev = skip_preceding_comments(stmt.syntax());
 
@@ -281,10 +278,7 @@ impl Visitor for BlanksBetweenElementsRule {
             return;
         }
 
-        let first = stmt
-            .syntax()
-            .prev_sibling()
-            .is_some_and(|f| f.kind() == SyntaxKind::InputSectionNode);
+        let first = is_first_body(stmt.syntax());
 
         let prev = skip_preceding_comments(stmt.syntax());
 
@@ -348,20 +342,7 @@ impl Visitor for BlanksBetweenElementsRule {
                         state.add(excess_blank_line(p.text_range().to_span()));
                     }
                 } else {
-                    let first = decl
-                        .syntax()
-                        .prev_sibling()
-                        .is_some_and(|f| match f.kind() {
-                            SyntaxKind::InputSectionNode
-                            | SyntaxKind::OutputSectionNode
-                            | SyntaxKind::RuntimeSectionNode
-                            | SyntaxKind::MetadataSectionNode
-                            | SyntaxKind::ParameterMetadataSectionNode
-                            | SyntaxKind::RequirementsSectionNode
-                            | SyntaxKind::HintsSectionNode
-                            | SyntaxKind::CommandSectionNode => true,
-                            _ => false,
-                        });
+                    let first = is_first_body(decl.syntax());
 
                     let prev = skip_preceding_comments(decl.syntax());
 
@@ -396,10 +377,7 @@ impl Visitor for BlanksBetweenElementsRule {
                         state.add(excess_blank_line(p.text_range().to_span()));
                     }
                 } else {
-                    let first = decl
-                        .syntax()
-                        .prev_sibling()
-                        .is_some_and(|f| f.kind() == SyntaxKind::InputSectionNode);
+                    let first = is_first_body(decl.syntax());
 
                     let prev = skip_preceding_comments(decl.syntax());
 
@@ -421,10 +399,7 @@ impl Visitor for BlanksBetweenElementsRule {
             return;
         }
 
-        let first = stmt
-            .syntax()
-            .prev_sibling()
-            .is_some_and(|f| f.kind() == SyntaxKind::InputSectionNode);
+        let first = is_first_body(stmt.syntax());
 
         let prev = skip_preceding_comments(stmt.syntax());
 
@@ -553,4 +528,16 @@ fn skip_preceding_comments(syntax: &SyntaxNode) -> NodeOrToken<SyntaxNode, Synta
         .last()
         .unwrap_or(&NodeOrToken::Node(syntax.clone()))
         .clone();
+}
+
+/// Is first body element?
+fn is_first_body(syntax: &SyntaxNode) -> bool {
+    syntax.prev_sibling().is_some_and(|f| matches!(f.kind(), SyntaxKind::InputSectionNode
+        | SyntaxKind::OutputSectionNode
+        | SyntaxKind::RuntimeSectionNode
+        | SyntaxKind::MetadataSectionNode
+        | SyntaxKind::ParameterMetadataSectionNode
+        | SyntaxKind::RequirementsSectionNode
+        | SyntaxKind::HintsSectionNode
+        | SyntaxKind::CommandSectionNode))
 }
