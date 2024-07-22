@@ -11,6 +11,10 @@ task foo {
             name: "something",
             other: "another"
         }
+        foo: {
+            bar: "baz",
+            baz: "quux" ,
+        }
     }
 
     parameter_meta {

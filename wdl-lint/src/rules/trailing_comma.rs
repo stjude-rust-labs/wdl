@@ -26,6 +26,14 @@ fn missing_trailing_comma(span: Span) -> Diagnostic {
         .with_fix("add a comma after this element")
 }
 
+/// Diagnostic message for extraneous content before trailing comma.
+fn extraneous_content(span: Span) -> Diagnostic {
+    Diagnostic::error("extraneous content before trailing comma")
+        .with_rule(ID)
+        .with_highlight(span)
+        .with_fix("remove this extraneous content")
+}
+
 /// Detects missing trailing commas.
 #[derive(Default, Debug, Clone, Copy)]
 pub struct TrailingCommaRule;
@@ -84,14 +92,19 @@ impl Visitor for TrailingCommaRule {
         if item.syntax().to_string().contains('\n') && item.items().count() > 1 {
             let last_child = item.items().last();
             if let Some(last_child) = last_child {
-                if let Some(last_child_comma) = last_child.syntax().next_sibling_or_token() {
-                    if last_child_comma.kind() != wdl_ast::SyntaxKind::Comma {
-                        state.add(missing_trailing_comma(
-                            last_child.syntax().text_range().to_span(),
-                        ));
+                let (next_comma, comma_is_next) = find_next_comma(last_child.syntax());
+                if let Some(comma) = next_comma {
+                    if !comma_is_next {
+                        // Comma found, but not next, extraneous trivia
+                        state.add(extraneous_content(Span::new(
+                            usize::from(last_child.syntax().text_range().end()),
+                            usize::from(
+                                comma.text_range().start() - last_child.syntax().text_range().end(),
+                            ),
+                        )));
                     }
                 } else {
-                    // no next means no comma
+                    // No comma found, report missing
                     state.add(missing_trailing_comma(
                         last_child.syntax().text_range().to_span(),
                     ));
@@ -114,14 +127,19 @@ impl Visitor for TrailingCommaRule {
         if item.syntax().to_string().contains('\n') && item.elements().count() > 1 {
             let last_child = item.elements().last();
             if let Some(last_child) = last_child {
-                if let Some(last_child_comma) = last_child.syntax().next_sibling_or_token() {
-                    if last_child_comma.kind() != wdl_ast::SyntaxKind::Comma {
-                        state.add(missing_trailing_comma(
-                            last_child.syntax().text_range().to_span(),
-                        ));
+                let (next_comma, comma_is_next) = find_next_comma(last_child.syntax());
+                if let Some(comma) = next_comma {
+                    if !comma_is_next {
+                        // Comma found, but not next, extraneous trivia
+                        state.add(extraneous_content(Span::new(
+                            usize::from(last_child.syntax().text_range().end()),
+                            usize::from(
+                                comma.text_range().start() - last_child.syntax().text_range().end(),
+                            ),
+                        )));
                     }
                 } else {
-                    // no next means no comma
+                    // No comma found, report missing
                     state.add(missing_trailing_comma(
                         last_child.syntax().text_range().to_span(),
                     ));
@@ -129,4 +147,23 @@ impl Visitor for TrailingCommaRule {
             }
         }
     }
+}
+
+/// Find the next comma by consuming until we find a comma or a node.
+fn find_next_comma(node: &wdl_ast::SyntaxNode) -> (Option<wdl_ast::SyntaxToken>, bool) {
+    let mut next = node.next_sibling_or_token();
+    let mut comma_is_next = true;
+    while let Some(next_node) = next {
+        // If we find a node before a comma, then treat as no comma
+        // If we find other tokens, then mark that they precede any potential comma
+        if next_node.as_node().is_some() {
+            return (None, false);
+        } else if next_node.kind() == wdl_ast::SyntaxKind::Comma {
+            return (Some(next_node.into_token().unwrap()), comma_is_next);
+        } else {
+            comma_is_next = false;
+        }
+        next = next_node.next_sibling_or_token();
+    }
+    (None, false)
 }
