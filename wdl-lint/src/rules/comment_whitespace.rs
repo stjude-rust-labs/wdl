@@ -118,8 +118,27 @@ impl Visitor for CommentWhitespaceRule {
             }
         } else {
             // Not an in-line comment, so check indentation level
-            let ancestors = comment.syntax().parent_ancestors().collect::<Vec<_>>();
-            let expected_indentation = INDENT.repeat(ancestors.len() - 1);
+            let ancestors = comment
+                .syntax()
+                .parent_ancestors()
+                .filter(|a| {
+                    if let Some(prior) = a.prev_sibling_or_token() {
+                        if prior.kind() == SyntaxKind::Whitespace && prior.to_string().contains('\n') {
+                            return true
+                        }
+                    }
+                    if let Some(next) = a.first_child_or_token() {
+                        if next.kind() == SyntaxKind::OpenParen {
+                            if  let Some(next_next) = next.next_sibling_or_token() {
+                                if next_next.kind() == SyntaxKind::Whitespace && next_next.to_string().contains('\n') {
+                                    return true
+                                }
+                            }
+                        }
+                    }
+                    false
+                }).count();
+            let expected_indentation = INDENT.repeat(ancestors);
 
             if let Some(leading_whitespace) = comment.syntax().prev_sibling_or_token() {
                 let this_whitespace = leading_whitespace.to_string();
@@ -152,11 +171,19 @@ impl Visitor for CommentWhitespaceRule {
         // check the comment for one space following the comment delimiter
         if let Some(delimiter) = comment_start.captures(comment.as_str()) {
             let d = delimiter.get(0).unwrap();
+            let preamble = d.as_str().starts_with("##");
             let rest = &comment.as_str()[d.len()..];
             let without_spaces = rest.trim_start_matches(' ');
 
-            if !rest.is_empty() && rest.len() - without_spaces.len() != 1 {
+            if !rest.is_empty() && rest.len() - without_spaces.len() != 1  && !preamble {
                 // Report a diagnostic if there is not one space after the comment delimiter
+                state.add(following_whitespace(Span::new(
+                    comment.span().start(),
+                    d.len(),
+                )));
+            } else if preamble && !rest.is_empty() && rest.len() - without_spaces.len() == 0 {
+                // If we're in a preamble comment, there should be a space after the delimiter
+                // But we have no opinion on how many spaces there should be.
                 state.add(following_whitespace(Span::new(
                     comment.span().start(),
                     d.len(),

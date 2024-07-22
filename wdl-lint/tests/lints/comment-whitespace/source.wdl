@@ -31,5 +31,23 @@ workflow foo {# test in-line comment without preceding whitespace
         Int a = 5 / 
             # a comment
             10
+            / (
+                # a b comment
+                2
+            )
+            /
+            # another comment
+            2
+        Int b = 5 / (  # yet another comment
+            (  # more comment
+                # even more comment
+                2 * 5
+            )
+        )
+        Int c = 5 / ( (  # more comment
+                # even more comment
+                2 * 5
+            )
+        )
     }
 }
