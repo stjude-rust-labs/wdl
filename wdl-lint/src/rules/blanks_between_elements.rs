@@ -35,7 +35,7 @@ fn missing_blank_line(span: Span) -> Diagnostic {
     Diagnostic::note("missing blank line")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("add blank line before this element")
+        .with_fix("add a blank line before this element")
 }
 
 /// Track the position within a document
@@ -99,10 +99,6 @@ impl Visitor for BlanksBetweenElementsRule {
         _: &Document,
         _: SupportedVersion,
     ) {
-        if reason == VisitReason::Exit {
-            return;
-        }
-
         if reason == VisitReason::Enter {
             // Reset the visitor upon document entry
             *self = Default::default();
@@ -155,7 +151,7 @@ impl Visitor for BlanksBetweenElementsRule {
         let first = is_first_element(section.syntax());
         let actual_start = skip_preceding_comments(section.syntax());
         check_prior_spacing(&actual_start, state, true, first);
-        flag_all_blanks(section.syntax(), state);
+        flag_all_blank_lines_within(section.syntax(), state);
     }
 
     fn parameter_metadata_section(
@@ -174,7 +170,7 @@ impl Visitor for BlanksBetweenElementsRule {
         let first = is_first_element(section.syntax());
         let actual_start = skip_preceding_comments(section.syntax());
         check_prior_spacing(&actual_start, state, true, first);
-        flag_all_blanks(section.syntax(), state);
+        flag_all_blank_lines_within(section.syntax(), state);
     }
 
     fn input_section(
@@ -240,7 +236,7 @@ impl Visitor for BlanksBetweenElementsRule {
             self.state = State::RuntimeSection;
         }
 
-        flag_all_blanks(section.syntax(), state);
+        flag_all_blank_lines_within(section.syntax(), state);
         let first = is_first_element(section.syntax());
         let actual_start = skip_preceding_comments(section.syntax());
         check_prior_spacing(&actual_start, state, true, first);
@@ -318,7 +314,7 @@ impl Visitor for BlanksBetweenElementsRule {
         let first = is_first_element(section.syntax());
         let actual_start = skip_preceding_comments(section.syntax());
         check_prior_spacing(&actual_start, state, true, first);
-        flag_all_blanks(section.syntax(), state);
+        flag_all_blank_lines_within(section.syntax(), state);
     }
 
     fn unbound_decl(
@@ -425,11 +421,11 @@ fn is_first_element(syntax: &SyntaxNode) -> bool {
         }
         prev = cur.prev_sibling_or_token();
     }
-    true
+    unreachable!("No prior node or open brace found");
 }
 
 /// Some sections do not allow blank lines, so detect and flag them.
-fn flag_all_blanks(syntax: &SyntaxNode, state: &mut Diagnostics) {
+fn flag_all_blank_lines_within(syntax: &SyntaxNode, state: &mut Diagnostics) {
     syntax.descendants_with_tokens().for_each(|c| {
         if c.kind() == SyntaxKind::Whitespace {
             let count = c.to_string().chars().filter(|c| *c == '\n').count();
@@ -441,7 +437,8 @@ fn flag_all_blanks(syntax: &SyntaxNode, state: &mut Diagnostics) {
 }
 
 /// Check that an item has space prior to it.
-/// element_spacing indicates if spacing is required (true) or not (false).
+/// `element_spacing` indicates if spacing is required (`true`) or not
+/// (`false`).
 fn check_prior_spacing(
     syntax: &NodeOrToken<SyntaxNode, SyntaxToken>,
     state: &mut Diagnostics,
@@ -470,11 +467,6 @@ fn check_prior_spacing(
                 }
             }
         }
-    } else {
-        // If nothing precedes the Node/Token, we must be the first element
-        if !first {
-            unreachable!("Non-first element missing prior element")
-        }
     }
 }
 
@@ -490,7 +482,7 @@ fn skip_preceding_comments(syntax: &SyntaxNode) -> NodeOrToken<SyntaxNode, Synta
             SyntaxKind::Comment => {
                 // Ensure this comment "belongs" to the root element.
                 // A preceding comment on a blank line is considered to belong to the element.
-                // Othewise, the comment "belongs" to whatever
+                // Otherwise, the comment "belongs" to whatever
                 // else is on that line.
                 if let Some(before_cur) = cur.prev_sibling_or_token() {
                     match before_cur.kind() {
@@ -503,8 +495,8 @@ fn skip_preceding_comments(syntax: &SyntaxNode) -> NodeOrToken<SyntaxNode, Synta
                         }
                         _ => {
                             // The 'cur' comment is on the same line as this
-                            // token. It "belongs"
-                            // to whatever is currently being processed.
+                            // token. It "belongs" to whatever is currently
+                            // being processed.
                         }
                     }
                 }
@@ -532,12 +524,17 @@ fn skip_preceding_comments(syntax: &SyntaxNode) -> NodeOrToken<SyntaxNode, Synta
 
 /// Is first body element?
 fn is_first_body(syntax: &SyntaxNode) -> bool {
-    syntax.prev_sibling().is_some_and(|f| matches!(f.kind(), SyntaxKind::InputSectionNode
-        | SyntaxKind::OutputSectionNode
-        | SyntaxKind::RuntimeSectionNode
-        | SyntaxKind::MetadataSectionNode
-        | SyntaxKind::ParameterMetadataSectionNode
-        | SyntaxKind::RequirementsSectionNode
-        | SyntaxKind::HintsSectionNode
-        | SyntaxKind::CommandSectionNode))
+    syntax.prev_sibling().is_some_and(|f| {
+        matches!(
+            f.kind(),
+            SyntaxKind::InputSectionNode
+                | SyntaxKind::OutputSectionNode
+                | SyntaxKind::RuntimeSectionNode
+                | SyntaxKind::MetadataSectionNode
+                | SyntaxKind::ParameterMetadataSectionNode
+                | SyntaxKind::RequirementsSectionNode
+                | SyntaxKind::HintsSectionNode
+                | SyntaxKind::CommandSectionNode
+        )
+    })
 }

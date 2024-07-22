@@ -15,7 +15,7 @@ note[BlanksBetweenElements]: missing blank line
 16 │     parameter_meta {}
    │     ^^^^^^^^^^^^^^^^^
    │
-   = fix: add blank line before this element
+   = fix: add a blank line before this element
 
 note[BlanksBetweenElements]: missing blank line
    ┌─ tests/lints/blanks-between-elements/source.wdl:17:5
@@ -23,7 +23,7 @@ note[BlanksBetweenElements]: missing blank line
 17 │     # what about this comment?
    │     ^^^^^^^^^^^^^^^^^^^^^^^^^^
    │
-   = fix: add blank line before this element
+   = fix: add a blank line before this element
 
 note[BlanksBetweenElements]: missing blank line
    ┌─ tests/lints/blanks-between-elements/source.wdl:19:5
@@ -33,7 +33,7 @@ note[BlanksBetweenElements]: missing blank line
 21 │ │     }
    │ ╰─────^
    │  
-   = fix: add blank line before this element
+   = fix: add a blank line before this element
 
 note[BlanksBetweenElements]: missing blank line
    ┌─ tests/lints/blanks-between-elements/source.wdl:46:1
@@ -47,7 +47,7 @@ note[BlanksBetweenElements]: missing blank line
 70 │ │ }
    │ ╰─^
    │  
-   = fix: add blank line before this element
+   = fix: add a blank line before this element
 
 note[BlanksBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blanks-between-elements/source.wdl:46:11
