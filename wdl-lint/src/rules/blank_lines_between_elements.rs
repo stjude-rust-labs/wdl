@@ -437,6 +437,7 @@ fn flag_all_blank_lines_within(syntax: &SyntaxNode, state: &mut Diagnostics) {
 }
 
 /// Check that an item has space prior to it.
+///
 /// `element_spacing` indicates if spacing is required (`true`) or not
 /// (`false`).
 fn check_prior_spacing(
