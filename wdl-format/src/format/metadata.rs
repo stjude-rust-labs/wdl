@@ -18,7 +18,6 @@ use super::FormatState;
 use super::Formattable;
 use super::NEWLINE;
 
-
 impl Formattable for LiteralNull {
     fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
         buffer.push_str("null");

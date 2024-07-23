@@ -11,10 +11,9 @@ use wdl_ast::v1::LiteralBoolean;
 use wdl_ast::v1::LiteralFloat;
 use wdl_ast::v1::LiteralInteger;
 use wdl_ast::v1::LiteralString;
+use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::StringPart;
 use wdl_ast::v1::Type;
-use wdl_ast::v1::WorkflowDefinition;
-use wdl_ast::v1::WorkflowItem;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
@@ -32,6 +31,7 @@ mod comments;
 mod format_state;
 mod import;
 mod metadata;
+mod workflow;
 
 use comments::format_inline_comment;
 use comments::format_preceding_comments;
@@ -281,7 +281,7 @@ impl Formattable for InputSection {
                 .expect("Open brace should be a token")
                 .clone(),
         );
-        format_preceding_comments(&open_brace, buffer, state, true)?;    
+        format_preceding_comments(&open_brace, buffer, state, true)?;
         state.space_or_indent(buffer)?;
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
@@ -316,91 +316,40 @@ impl Formattable for InputSection {
     }
 }
 
-impl Formattable for WorkflowDefinition {
+impl Formattable for OutputSection {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
-        let workflow_keyword = SyntaxElement::Token(
+        let output_keyword = SyntaxElement::Token(
             self.syntax()
                 .first_token()
-                .expect("Workflow should have a token")
+                .expect("Output Section should have a token")
                 .clone(),
         );
-        buffer.push_str("workflow");
-        format_inline_comment(&workflow_keyword, buffer, state, true)?;
-
-        let name = self.name();
-        format_preceding_comments(&name.syntax_element(), buffer, state, true)?;
-        state.space_or_indent(buffer)?;
-        name.format(buffer, state)?;
-        format_inline_comment(&name.syntax_element(), buffer, state, true)?;
+        state.indent(buffer)?;
+        buffer.push_str("output");
+        format_inline_comment(&output_keyword, buffer, state, true)?;
 
         let open_brace = SyntaxElement::Token(
             self.syntax()
                 .children_with_tokens()
                 .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                .expect("Workflow should have an open brace")
+                .expect("Output Section should have an open brace")
                 .as_token()
                 .expect("Open brace should be a token")
                 .clone(),
         );
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        if !state.interrupted() {
-            buffer.push(' ');
-        } else {
-            state.reset_interrupted();
-        }
+        state.space_or_indent(buffer)?;
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
 
-        let mut meta_section_str = String::new();
-        let mut parameter_meta_section_str = String::new();
-        let mut input_section_str = String::new();
-        let mut body_str = String::new();
-        let mut output_section_str = String::new();
-
-        for item in self.items() {
-            match item {
-                WorkflowItem::Metadata(m) => {
-                    m.format(&mut meta_section_str, state)?;
-                }
-                WorkflowItem::ParameterMetadata(pm) => {
-                    pm.format(&mut parameter_meta_section_str, state)?;
-                }
-                WorkflowItem::Input(i) => {
-                    i.format(&mut input_section_str, state)?;
-                }
-                WorkflowItem::Call(c) => {
-                    // c.format(&mut body_str, state)?;
-                }
-                WorkflowItem::Conditional(c) => {
-                    // c.format(&mut body_str, state)?;
-                }
-                WorkflowItem::Scatter(s) => {
-                    // s.format(&mut body_str, state)?;
-                }
-                WorkflowItem::Declaration(d) => {
-                    // d.format(&mut body_str, state)?;
-                }
-                WorkflowItem::Output(o) => {
-                    // o.format(&mut output_section_str, state)?;
-                }
-                WorkflowItem::Hints(h) => {
-                    // h.format(&mut body_str, state)?;
-                }
-            }
-        }
-
-        if !meta_section_str.is_empty() {
-            buffer.push_str(&meta_section_str);
-        }
-        if !parameter_meta_section_str.is_empty() {
-            buffer.push_str(&parameter_meta_section_str);
-        }
-        if !input_section_str.is_empty() {
-            buffer.push_str(&input_section_str);
+        for decl in self.declarations() {
+            let decl = Decl::cast(decl.syntax().clone())
+                .expect("Output section decl should cast to a decl");
+            decl.format(buffer, state)?;
         }
 
         state.decrement_indent();
@@ -409,7 +358,7 @@ impl Formattable for WorkflowDefinition {
             self.syntax()
                 .children_with_tokens()
                 .find(|element| element.kind() == SyntaxKind::CloseBrace)
-                .expect("Workflow should have a close brace")
+                .expect("Output Section should have a close brace")
                 .as_token()
                 .expect("Close brace should be a token")
                 .clone(),
