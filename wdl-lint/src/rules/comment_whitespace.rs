@@ -10,6 +10,7 @@ use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
+use wdl_ast::SyntaxNode;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
@@ -119,27 +120,7 @@ impl Visitor for CommentWhitespaceRule {
             let ancestors = comment
                 .syntax()
                 .parent_ancestors()
-                .filter(|a| {
-                    if let Some(prior) = a.prev_sibling_or_token() {
-                        if prior.kind() == SyntaxKind::Whitespace
-                            && prior.to_string().contains('\n')
-                        {
-                            return true;
-                        }
-                    }
-                    if let Some(next) = a.first_child_or_token() {
-                        if next.kind() == SyntaxKind::OpenParen {
-                            if let Some(next_next) = next.next_sibling_or_token() {
-                                if next_next.kind() == SyntaxKind::Whitespace
-                                    && next_next.to_string().contains('\n')
-                                {
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                    false
-                })
+                .filter(filter_parent_ancestors)
                 .count();
             let expected_indentation = INDENT.repeat(ancestors);
 
@@ -209,6 +190,32 @@ fn is_inline_comment(token: &Comment) -> bool {
     false
 }
 
+/// Filter parent nodes, removing any that don't contribute indentation.
+fn filter_parent_ancestors(node: &SyntaxNode) -> bool {
+    // If the prior token is Whitespace with a newline, then this ancestor
+    // contributes to indentation.
+    if let Some(prior) = node.prev_sibling_or_token() {
+        if prior.kind() == SyntaxKind::Whitespace && prior.to_string().contains('\n') {
+            return true;
+        }
+    }
+    // If a parenthesized expression has a prior sibling that contains a newline
+    // before we get to a node, then this ancestor contributes to indentation.
+    if node.kind() == SyntaxKind::ParenthesizedExprNode {
+        let mut prior = node.prev_sibling_or_token();
+        while let Some(p) = prior {
+            if p.as_node().is_some() {
+                break;
+            }
+            if p.kind() == SyntaxKind::Whitespace && p.to_string().contains('\n') {
+                return true;
+            }
+            prior = p.prev_sibling_or_token();
+        }
+    }
+    false
+}
+
 #[cfg(test)]
 mod tests {
     use wdl_ast::AstToken;
@@ -247,5 +254,105 @@ task foo {  # an in-line comment
         let is_inline = is_inline_comment(&non_inline_comment);
 
         assert!(!is_inline);
+    }
+
+    #[test]
+    fn filter_parents() {
+        let (tree, _) = SyntaxTree::parse(
+            r#"version 1.2
+
+task foo {
+    meta {
+        # a comment
+        description: "test string"
+        choices: [
+            # another comment
+            "a",
+            "b",
+            "c",
+        ],
+        choice2:
+            [
+                # another comment
+                "a",
+                "b",
+                "c",
+            ]
+    }
+
+    input {
+        # another comment
+        Int a = 10 / (
+            # another comment
+            5
+        )
+    }
+
+    command {
+        # comment
+
+    }
+}"#,
+        );
+
+        let mut comments = tree
+            .root()
+            .descendants_with_tokens()
+            .filter(|t| t.kind() == SyntaxKind::Comment);
+
+        let comment = comments.next().expect("there should be a first comment");
+        let comment = Comment::cast(comment.as_token().unwrap().clone()).unwrap();
+
+        let ancestors = comment
+            .syntax()
+            .parent_ancestors()
+            .filter(|a| super::filter_parent_ancestors(a))
+            .count();
+
+        assert_eq!(ancestors, 2);
+
+        let comment = comments.next().expect("there should be a second comment");
+        let comment = Comment::cast(comment.as_token().unwrap().clone()).unwrap();
+
+        let ancestors = comment
+            .syntax()
+            .parent_ancestors()
+            .filter(|a| super::filter_parent_ancestors(a))
+            .count();
+
+        assert_eq!(ancestors, 3);
+
+        let comment = comments.next().expect("there should be a third comment");
+        let comment = Comment::cast(comment.as_token().unwrap().clone()).unwrap();
+
+        let ancestors = comment
+            .syntax()
+            .parent_ancestors()
+            .filter(|a| super::filter_parent_ancestors(a))
+            .count();
+
+        assert_eq!(ancestors, 4);
+
+        let comment = comments.next().expect("there should be a fourth comment");
+        let comment = Comment::cast(comment.as_token().unwrap().clone()).unwrap();
+
+        let ancestors = comment
+            .syntax()
+            .parent_ancestors()
+            .filter(|a| super::filter_parent_ancestors(a))
+            .count();
+
+        assert_eq!(ancestors, 2);
+
+        let comment = comments.next().expect("there should be a fifth comment");
+        let comment = Comment::cast(comment.as_token().unwrap().clone()).unwrap();
+
+        let ancestors = comment
+            .syntax()
+            .parent_ancestors()
+            .filter(|a| super::filter_parent_ancestors(a))
+            .count();
+
+        assert_eq!(ancestors, 3);
     }
 }

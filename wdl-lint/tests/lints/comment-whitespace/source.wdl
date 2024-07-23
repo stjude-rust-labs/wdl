@@ -49,5 +49,14 @@ workflow foo {# test in-line comment without preceding whitespace
                 2 * 5
             )
         )
+        Int d = 5 / (
+            # even more comment
+            2 * 5
+        )
+        Int e = 2
+            * (
+                # comment
+                2
+            )
     }
 }
