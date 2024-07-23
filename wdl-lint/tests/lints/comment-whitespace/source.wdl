@@ -68,5 +68,74 @@ workflow foo {# test in-line comment without preceding whitespace
                 # comment
                 2
             )
+        Boolean h = [1,2,3] == [1,2,3]
+        Boolean i = [1
+            # a comment
+            ,2,3] == [1,2,4]
+        Boolean j = [
+            1,
+            2,
+            3,
+            # a comment
+        ]
+        == [
+            # comment
+            1,
+            2,
+            3,
+        ]
+        Boolean q = [
+            1,
+            2,
+            3,
+            # a comment
+        ]
+        ==
+        [
+            # This comment will flag, because the  `] == [` expression is incorrect.
+            1,
+            2,
+            3,
+        ]
+        Boolean k = {"a": 1, "b": 2} == {"b": 2, "a": 1}
+        Boolean l = {
+            # comment
+            "a": 1,
+            "b": 2
+        } == {
+            "b": 2,
+            "a": 1,
+            # comment
+        }
+        Boolean m = {
+            # comment
+            "a": 1,
+            "b": 2
+        }
+        == {
+            "b": 2,
+            "a": 1,
+            # comment
+        }
+        Boolean n = {
+            # comment
+            "a": 1,
+            "b": 2
+        }
+        ==
+        {
+            "b": 2,
+            "a": 1,
+            # This comment will flag, because the  `} == {` expression is incorrect.
+        }
+        Boolean o = {
+            # comment
+            "a": 1,
+            "b": 2
+        } == {
+            "b": 2,
+            "a": 1,
+            # This comment is OK.
+        }
     }
 }

@@ -78,3 +78,19 @@ note[CommentWhitespace]: comment has too much indentation
    │
    = fix: this comment has 4 levels of indentation. It should have 3 levels of indentation.
 
+note[CommentWhitespace]: comment not sufficiently indented
+   ┌─ tests/lints/comment-whitespace/source.wdl:95:13
+   │
+95 │             # This comment will flag, because the  `] == [` expression is incorrect.
+   │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = fix: this comment has 3 levels of indentation. It should have 4 levels of indentation.
+
+note[CommentWhitespace]: comment not sufficiently indented
+    ┌─ tests/lints/comment-whitespace/source.wdl:129:13
+    │
+129 │             # This comment will flag, because the  `} == {` expression is incorrect.
+    │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    │
+    = fix: this comment has 3 levels of indentation. It should have 4 levels of indentation.
+
