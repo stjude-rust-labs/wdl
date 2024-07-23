@@ -3,7 +3,6 @@
 version  #1b
     #2a
     1.0  #2b
-
 #3a
 workflow  #3b
     #4a
@@ -20,16 +19,26 @@ workflow  #3b
             :  #9b
             #10a
             "Test workflow"  #10b
+
     #11a
     }  #11b
     parameter_meta {
         out_sj_filter_overhang_min: {
-            type: "SpliceJunctionMotifs"
-,
-            label: "Minimum overhang required to support a splicing junction"
-,
+            type: "SpliceJunctionMotifs",
+            label: "Minimum overhang required to support a splicing junction",
         }
     }
+    input {
+        SpliceJunctionMotifs out_sj_filter_overhang_min = SpliceJunctionMotifs
+    {
+noncanonical_motifs
+:
+ 30
+ , 
+GT_AG_and_CT_AC_motif 
+: 
+12 
+, 
 }
-
-
+    }
+}

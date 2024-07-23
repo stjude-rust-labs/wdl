@@ -21,9 +21,5 @@ import
 import "fileB.wdl" as foo
 # this comment belongs to fileC
 import "fileC.wdl"
-
 workflow test {
 }
-
-
-

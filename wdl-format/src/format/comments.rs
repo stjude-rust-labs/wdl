@@ -34,6 +34,18 @@ use super::NEWLINE;
 /// Inline comment space constant used for formatting.
 pub const INLINE_COMMENT_SPACE: &str = "  ";
 
+impl Formattable for Comment {
+    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+        let comment = self.as_str().trim();
+        write!(buffer, "{}{}", comment, NEWLINE)?;
+        Ok(())
+    }
+
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Token(self.syntax().clone())
+    }
+}
+
 /// Format comments that preceed a node.
 pub fn format_preceding_comments(
     element: &SyntaxElement,

@@ -1,6 +1,5 @@
 version  #1
     1.0  #2
-
 workflow  #3
     test_wf  #4
 {  #5
@@ -9,6 +8,7 @@ workflow  #3
         description  #8
             :  #9
             "Test workflow"  #10
+
     }  #11
     parameter_meta  #23
     {  #24
@@ -19,12 +19,28 @@ workflow  #3
                 :  #29
                 "SpliceJunctionMotifs"  #30
 ,
-            label  #32
+                label  #32
                 :  #33
                 "Minimum overhang required to support a splicing junction"  #34
 ,
         }  #35
+
     }  #36
+    input  #6
+        {  #7
+        SpliceJunctionMotifs  #8
+            out_sj_filter_overhang_min  #9
+            =  #10
+            SpliceJunctionMotifs #11
+    { #12
+noncanonical_motifs #13
+: #14
+ 30 #15
+ , #16
+GT_AG_and_CT_AC_motif #17
+: #18
+12 #19
+, #20
+}  #21
+    }  #22
 }  #102
-
-

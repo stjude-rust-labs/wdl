@@ -22,6 +22,11 @@ pub struct FormatState {
 }
 
 impl FormatState {
+    /// Return the current indent level.
+    pub fn level(&self) -> usize {
+        self.indent_level
+    }
+
     /// Add the current indentation to the buffer.
     /// The indentation level can be temporarily increased by one if the current
     /// line has been interrupted by comments.
