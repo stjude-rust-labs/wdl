@@ -58,5 +58,15 @@ workflow foo {# test in-line comment without preceding whitespace
                 # comment
                 2
             )
+        Int f = (
+            # comment
+            2
+        )
+        * 2
+        Int g = 2 *
+            (
+                # comment
+                2
+            )
     }
 }
