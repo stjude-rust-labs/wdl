@@ -35,7 +35,7 @@ mod diagnostic;
 pub mod grammar;
 pub mod lexer;
 pub mod parser;
-pub mod tree;
+mod tree;
 pub mod version;
 
 pub use diagnostic::*;

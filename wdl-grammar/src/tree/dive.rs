@@ -1,98 +1,76 @@
 //! Utilities for traversing a syntax tree while collecting elements of interest
 //! (i.e., "diving" for elements).
 
-use std::collections::VecDeque;
 use std::iter::FusedIterator;
-use std::marker::PhantomData;
 
+use rowan::api::PreorderWithTokens;
 use rowan::Language;
 
 use crate::SyntaxElement;
 use crate::SyntaxNode;
 use crate::WorkflowDescriptionLanguage;
 
-/// An iterator that explores every node within a
-/// [`SyntaxNode`](rowan::SyntaxNode) yielding all of the elements match the
-/// conditions laid out in `match_predicate`.
-///
-/// There are also facilities to ignore certain subtrees within the tree via the
-/// `ignore_predicate` callback. If the entire tree is desired, one can simply
-/// have the `ignore_predicate` always return `false`.
-#[derive(Debug)]
-pub struct DiveIterator<L, M, I>
+/// An iterator that performs a pre-order traversal of a
+/// [`SyntaxNode`](rowan::SyntaxNode)'s descendants and yields all elements
+/// while ignoring undesirable subtrees.
+#[allow(missing_debug_implementations)]
+pub struct DiveIterator<L, I>
 where
     L: Language,
-    M: Fn(&rowan::SyntaxElement<L>) -> bool,
     I: Fn(&rowan::SyntaxNode<L>) -> bool,
 {
-    /// The queue of nodes to be visited.
-    nodes: VecDeque<rowan::SyntaxElement<L>>,
-    /// The function that evaluates when checking if an element matches.
-    match_predicate: M,
-    /// The function that evaluates when checking if the children underneath a
-    /// node in the tree should be ignored.
+    /// The iterator that performs the pre-order traversal of elements.
+    it: PreorderWithTokens<L>,
+    /// The function that evaluates when checking if the subtree beneath a node
+    /// should be ignored.
     ignore_predicate: I,
-    /// A pointer to the [`Language`].
-    _phantom: PhantomData<L>,
 }
 
-impl<L, M, I> DiveIterator<L, M, I>
+impl<L, I> DiveIterator<L, I>
 where
     L: Language,
-    M: Fn(&rowan::SyntaxElement<L>) -> bool,
     I: Fn(&rowan::SyntaxNode<L>) -> bool,
 {
     /// Creates a new [`DiveIterator`].
-    ///
-    /// Note that this iterator traverses elements as a breadth-first traversal
-    /// (otherwise known as level-order).
-    pub fn new(root: rowan::SyntaxElement<L>, match_predicate: M, ignore_predicate: I) -> Self {
-        let mut nodes = VecDeque::new();
-        nodes.push_back(root);
-
+    pub fn new(root: rowan::SyntaxNode<L>, ignore_predicate: I) -> Self {
         Self {
-            nodes,
-            match_predicate,
+            it: root.preorder_with_tokens(),
             ignore_predicate,
-            _phantom: PhantomData,
         }
     }
 }
 
-impl<L, M, I> Iterator for DiveIterator<L, M, I>
+impl<L, I> Iterator for DiveIterator<L, I>
 where
     L: Language,
-    M: Fn(&rowan::SyntaxElement<L>) -> bool,
     I: Fn(&rowan::SyntaxNode<L>) -> bool,
 {
     type Item = rowan::SyntaxElement<L>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some(element) = self.nodes.pop_front() {
-            match &element {
-                rowan::SyntaxElement::Node(node) => {
-                    if !(self.ignore_predicate)(node) {
-                        self.nodes.extend(node.children_with_tokens());
-                    }
+        while let Some(event) = self.it.next() {
+            let element = match event {
+                rowan::WalkEvent::Enter(element) => element,
+                rowan::WalkEvent::Leave(_) => continue,
+            };
+
+            if let rowan::SyntaxElement::Node(node) = &element {
+                if (self.ignore_predicate)(node) {
+                    self.it.skip_subtree();
+                    continue;
                 }
-                // NOTE: tokens have no children to explore.
-                rowan::SyntaxElement::Token(_) => {}
             }
 
-            if (self.match_predicate)(&element) {
-                // NOTE: this is an inexpensive clone of a red node.
-                return Some(element.clone());
-            }
+            return Some(element);
         }
 
         None
     }
 }
 
-impl<L, M, I> FusedIterator for DiveIterator<L, M, I>
+impl<L, I> FusedIterator for DiveIterator<L, I>
 where
     L: Language,
-    M: Fn(&rowan::SyntaxElement<L>) -> bool,
     I: Fn(&rowan::SyntaxNode<L>) -> bool,
 {
 }
@@ -102,12 +80,9 @@ pub trait Divable<L>
 where
     L: Language,
 {
-    /// Visits every element in a syntax tree and accumulates all
-    /// [`SyntaxElement`](rowan::SyntaxElement)s for which the `match_predicate`
-    /// evaluates to `true`.
-    ///
-    /// No guarantees are made about the order in which elements will be
-    /// traversed or collected.
+    /// Iterates over every element in the tree at the current root and yields
+    /// the elements for which the given `match_predicate` evaluates to
+    /// `true`.
     fn dive<M>(&self, match_predicate: M) -> impl Iterator<Item = rowan::SyntaxElement<L>>
     where
         M: Fn(&rowan::SyntaxElement<L>) -> bool,
@@ -115,15 +90,12 @@ where
         self.dive_with_ignore(match_predicate, |_| false)
     }
 
-    /// Visits every element in a syntax tree and accumulates all
-    /// [`SyntaxElement`](rowan::SyntaxElement)s for which the `match_predicate`
-    /// evaluates to `true`. No children nodes will be searched for
-    /// [`SyntaxNode`](rowan::SyntaxNode)s that are visited and for which the
-    /// `ignore_predicate` evaluates to `true`. In this way, you can ignore
-    /// entire sections of the tree.
+    /// Iterates over every element in the tree at the current root and yields
+    /// the elements for which the given `match_predicate` evaluates to
+    /// `true`.
     ///
-    /// No guarantees are made about the order in which elements will be
-    /// traversed or collected.
+    /// If the `ignore_predicate` evaluates to `true`, the subtree at the given
+    /// node will not be traversed.
     fn dive_with_ignore<M, I>(
         &self,
         match_predicate: M,
@@ -164,10 +136,10 @@ impl Divable<WorkflowDescriptionLanguage> for SyntaxNode {
     {
         DiveIterator::new(
             // NOTE: this is an inexpensive clone of a red node.
-            SyntaxElement::Node(self.clone()),
-            match_predicate,
+            self.clone(),
             ignore_predicate,
         )
+        .filter(match_predicate)
     }
 }
 
@@ -200,7 +172,7 @@ workflow world {
                 );
 
                 assert!(diagnostics.is_empty());
-                tree.green()
+                tree.green().into()
             })
             .clone();
 
@@ -213,18 +185,14 @@ workflow world {
 
         let mut idents = tree.dive(|element| element.kind() == SyntaxKind::Ident);
 
-        // NOTE: unlike the visitor, which carries out a preorder traversal, the
-        // current implementation of dive in this create uses a level-order
-        // traversal. Thus, the names of the workflow and task will be seen
-        // before their inner members.
         assert_eq!(idents.next().unwrap().as_token().unwrap().text(), "hello");
-
-        assert_eq!(idents.next().unwrap().as_token().unwrap().text(), "world");
 
         assert_eq!(
             idents.next().unwrap().as_token().unwrap().text(),
             "a_private_declaration"
         );
+
+        assert_eq!(idents.next().unwrap().as_token().unwrap().text(), "world");
 
         assert_eq!(
             idents.next().unwrap().as_token().unwrap().text(),

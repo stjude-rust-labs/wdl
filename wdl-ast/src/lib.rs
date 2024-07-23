@@ -42,7 +42,6 @@ pub use rowan::ast::support;
 pub use rowan::ast::AstChildren;
 pub use rowan::ast::AstNode;
 pub use rowan::Direction;
-pub use wdl_grammar::tree;
 pub use wdl_grammar::version;
 pub use wdl_grammar::Diagnostic;
 pub use wdl_grammar::Label;

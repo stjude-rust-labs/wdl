@@ -2,10 +2,11 @@
 
 pub mod dive;
 
+use std::borrow::Cow;
 use std::fmt;
 
-use rowan::GreenNode;
 use rowan::GreenNodeBuilder;
+use rowan::GreenNodeData;
 
 use super::grammar;
 use super::lexer::Lexer;
@@ -483,10 +484,8 @@ impl SyntaxTree {
     }
 
     /// Gets a copy of the underlying root green node for the tree.
-    pub fn green(&self) -> GreenNode {
-        // NOTE: this does clone the underlying green node, but that is an RC
-        // underneath the hood, so it's a very cheap clone.
-        self.0.green().into_owned()
+    pub fn green(&self) -> Cow<'_, GreenNodeData> {
+        self.0.green()
     }
 
     /// Converts the tree into a syntax node.
