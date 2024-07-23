@@ -17,7 +17,7 @@ filters = ["/template/task-templates.wdl"]
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:127:60: note[BlanksBetweenElements]: extra blank line(s) found"
+message = "ww-fastq-to-cram.wdl:127:60: note[BlankLinesBetweenElements]: extra blank line(s) found"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L127"
 
 [[diagnostics]]
@@ -47,7 +47,7 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:163:60: note[BlanksBetweenElements]: extra blank line(s) found"
+message = "ww-fastq-to-cram.wdl:163:60: note[BlankLinesBetweenElements]: extra blank line(s) found"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L163"
 
 [[diagnostics]]
@@ -77,7 +77,7 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:200:67: note[BlanksBetweenElements]: extra blank line(s) found"
+message = "ww-fastq-to-cram.wdl:200:67: note[BlankLinesBetweenElements]: extra blank line(s) found"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L200"
 
 [[diagnostics]]
@@ -157,7 +157,7 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:72:94: note[BlanksBetweenElements]: extra blank line(s) found"
+message = "ww-fastq-to-cram.wdl:72:94: note[BlankLinesBetweenElements]: extra blank line(s) found"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L72"
 
 [[diagnostics]]
@@ -197,7 +197,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:117:92: note[BlanksBetweenElements]: extra blank line(s) found"
+message = "ww-star-deseq2.wdl:117:92: note[BlankLinesBetweenElements]: extra blank line(s) found"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697c3f707f073177ddde7013/ww-star-deseq2.wdl/#L117"
 
 [[diagnostics]]
@@ -242,7 +242,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:151:61: note[BlanksBetweenElements]: extra blank line(s) found"
+message = "ww-star-deseq2.wdl:151:61: note[BlankLinesBetweenElements]: extra blank line(s) found"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697c3f707f073177ddde7013/ww-star-deseq2.wdl/#L151"
 
 [[diagnostics]]
@@ -287,7 +287,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:210:58: note[BlanksBetweenElements]: extra blank line(s) found"
+message = "ww-star-deseq2.wdl:210:58: note[BlankLinesBetweenElements]: extra blank line(s) found"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697c3f707f073177ddde7013/ww-star-deseq2.wdl/#L210"
 
 [[diagnostics]]
@@ -352,7 +352,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:253:64: note[BlanksBetweenElements]: extra blank line(s) found"
+message = "ww-star-deseq2.wdl:253:64: note[BlankLinesBetweenElements]: extra blank line(s) found"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697c3f707f073177ddde7013/ww-star-deseq2.wdl/#L253"
 
 [[diagnostics]]
@@ -497,7 +497,7 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:71:100: note[BlanksBetweenElements]: extra blank line(s) found"
+message = "ww-star-deseq2.wdl:71:100: note[BlankLinesBetweenElements]: extra blank line(s) found"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697c3f707f073177ddde7013/ww-star-deseq2.wdl/#L71"
 
 [[diagnostics]]
@@ -757,7 +757,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:2:1: note[BlanksBetweenElements]: missing blank line"
+message = "ww-vc-trio.wdl:2:1: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L2"
 
 [[diagnostics]]
@@ -1187,7 +1187,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:164:10: note[BlanksBetweenElements]: extra blank line(s) found"
+message = "gatk4.wdl:164:10: note[BlankLinesBetweenElements]: extra blank line(s) found"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/gatk4.wdl/#L164"
 
 [[diagnostics]]
@@ -1207,7 +1207,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/librarian.wdl"
-message = "librarian.wdl:20:5: note[BlanksBetweenElements]: missing blank line"
+message = "librarian.wdl:20:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/librarian.wdl/#L20"
 
 [[diagnostics]]
@@ -1247,32 +1247,32 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:22:5: note[BlanksBetweenElements]: missing blank line"
+message = "dnaseq-core.wdl:22:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-core.wdl/#L22"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:36:5: note[BlanksBetweenElements]: missing blank line"
+message = "dnaseq-core.wdl:36:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-core.wdl/#L36"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:18:5: note[BlanksBetweenElements]: missing blank line"
+message = "dnaseq-standard-fastq.wdl:18:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L18"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:36:5: note[BlanksBetweenElements]: missing blank line"
+message = "dnaseq-standard-fastq.wdl:36:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L36"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:20:5: note[BlanksBetweenElements]: missing blank line"
+message = "dnaseq-standard.wdl:20:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-standard.wdl/#L20"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:34:5: note[BlanksBetweenElements]: missing blank line"
+message = "dnaseq-standard.wdl:34:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/dnaseq/dnaseq-standard.wdl/#L34"
 
 [[diagnostics]]
@@ -1282,12 +1282,12 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:15:5: note[BlanksBetweenElements]: missing blank line"
+message = "samtools-merge.wdl:15:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/general/samtools-merge.wdl/#L15"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:21:5: note[BlanksBetweenElements]: missing blank line"
+message = "samtools-merge.wdl:21:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/general/samtools-merge.wdl/#L21"
 
 [[diagnostics]]
@@ -1297,20 +1297,20 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:18:5: note[BlanksBetweenElements]: missing blank line"
+message = "10x-bam-to-fastqs.wdl:18:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L18"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:64:5: note[BlanksBetweenElements]: missing blank line"
+message = "10x-bam-to-fastqs.wdl:64:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L64"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:69:5: note[BlanksBetweenElements]: missing blank line"
+message = "10x-bam-to-fastqs.wdl:69:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L69"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:32:5: note[BlanksBetweenElements]: missing blank line"
+message = "scrnaseq-standard.wdl:32:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/scrnaseq/scrnaseq-standard.wdl/#L32"
