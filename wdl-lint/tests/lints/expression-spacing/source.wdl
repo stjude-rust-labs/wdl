@@ -56,6 +56,9 @@ task foo {
         Boolean v = if 
         a < b then true 
         else false
+        Int k = (  # a comment
+            2 * 5
+        )
     }
 
     command <<< >>>

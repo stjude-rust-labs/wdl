@@ -276,11 +276,12 @@ impl Visitor for ExpressionSpacingRule {
                 }
 
                 // Opening parenthesis cannot be followed by a space, but can be followed by a
-                // newline.
+                // newline. Except in the case of an in-line comment.
                 if let Some(open_next) = open.next_sibling_or_token() {
                     if open_next.kind() == SyntaxKind::Whitespace {
                         let token = open_next.as_token().expect("should be a token");
-                        if token.text().starts_with(' ') {
+                        if token.text().starts_with(' ')
+                            && token.next_sibling_or_token().is_some_and(|t| t.kind() != SyntaxKind::Comment) {
                             // opening parens should not be followed by non-newline whitespace
                             state.add(disallowed_space(token.text_range().to_span()));
                         }

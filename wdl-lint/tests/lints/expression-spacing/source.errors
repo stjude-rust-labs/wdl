@@ -119,9 +119,9 @@ note[ExpressionSpacing]: multi-line if...then...else must have a following newli
    = fix: add a newline and close parenthesis after to this else clause
 
 note[ExpressionSpacing]: prefix operators may not contain whitespace
-   ┌─ tests/lints/expression-spacing/source.wdl:64:21
+   ┌─ tests/lints/expression-spacing/source.wdl:67:21
    │
-64 │         Boolean b = ! a
+67 │         Boolean b = ! a
    │                     ^^^
    │
    = fix: remove the internal whitespace
