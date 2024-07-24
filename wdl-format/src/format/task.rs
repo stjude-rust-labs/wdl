@@ -60,7 +60,7 @@ impl Formattable for CommandSection {
                     buffer.push_str(t.as_str());
                 }
                 CommandPart::Placeholder(p) => {
-                    buffer.push_str(&p.syntax().to_string()); // TODO format placeholders
+                    buffer.push_str(&p.syntax()); // TODO format placeholders
                 }
             }
         }

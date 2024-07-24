@@ -174,7 +174,7 @@ impl Formattable for LiteralBoolean {
 
 impl Formattable for LiteralFloat {
     fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
-        write!(buffer, "{}", self.syntax().to_string())?;
+        write!(buffer, "{}", self.syntax())?;
         Ok(())
     }
 
@@ -185,7 +185,7 @@ impl Formattable for LiteralFloat {
 
 impl Formattable for LiteralInteger {
     fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
-        write!(buffer, "{}", self.syntax().to_string())?;
+        write!(buffer, "{}", self.syntax())?;
         Ok(())
     }
 
@@ -196,7 +196,7 @@ impl Formattable for LiteralInteger {
 
 impl Formattable for Type {
     fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
-        write!(buffer, "{}", self.syntax().to_string())?;
+        write!(buffer, "{}", self.syntax())?;
         Ok(())
     }
 
@@ -207,7 +207,7 @@ impl Formattable for Type {
 
 impl Formattable for Expr {
     fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
-        write!(buffer, "{}", self.syntax().to_string())?;
+        write!(buffer, "{}", self.syntax())?;
         Ok(())
     }
 

@@ -128,7 +128,7 @@ impl Formattable for CallStatement {
             true,
         )?;
         state.space_or_indent(buffer)?;
-        write!(buffer, "{}", target.syntax().to_string())?;
+        write!(buffer, "{}", target.syntax())?;
         format_inline_comment(
             &SyntaxElement::Node(target.syntax().clone()),
             buffer,
