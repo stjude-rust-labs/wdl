@@ -19,6 +19,12 @@ task foo {
             baz: "quux",
             quux: "quuz",  # OK
         }
+        baz: {
+            bar: "baz",
+            baz: "quux"  # wow this is ugly
+            # technically legal!
+            ,  # comments are horrible!
+        }
     }
 
     parameter_meta {
