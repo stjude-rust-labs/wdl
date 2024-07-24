@@ -603,8 +603,11 @@ impl Visitor for ExpressionSpacingRule {
                                 })
                                 .expect("literal expression node should have a closing bracket");
 
-                            let open_bracket_next =
-                                open_bracket.as_token().expect("should be a token").siblings_with_tokens(Direction::Next).skip(1);
+                            let open_bracket_next = open_bracket
+                                .as_token()
+                                .expect("should be a token")
+                                .siblings_with_tokens(Direction::Next)
+                                .skip(1);
 
                             let mut newline = false;
                             for t in open_bracket_next {
@@ -626,8 +629,11 @@ impl Visitor for ExpressionSpacingRule {
                                 ));
                             }
 
-                            let close_bracket_prior =
-                                close_bracket.as_token().expect("should be a token").siblings_with_tokens(Direction::Prev).skip(1);
+                            let close_bracket_prior = close_bracket
+                                .as_token()
+                                .expect("should be a token")
+                                .siblings_with_tokens(Direction::Prev)
+                                .skip(1);
 
                             let mut newline = false;
                             for t in close_bracket_prior {
