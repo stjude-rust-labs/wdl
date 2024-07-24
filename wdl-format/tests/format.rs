@@ -119,7 +119,7 @@ fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), String> {
             e = format_diagnostics(&e, path.as_path(), &source)
         )
     })?;
-    compare_result(path.with_extension("formatted").as_path(), &formatted)?;
+    compare_result(path.with_extension("formatted.wdl").as_path(), &formatted)?;
 
     ntests.fetch_add(1, Ordering::SeqCst);
     Ok(())
