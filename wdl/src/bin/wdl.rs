@@ -22,10 +22,10 @@ use wdl::ast::Diagnostic;
 use wdl::ast::Document;
 use wdl::ast::SyntaxNode;
 use wdl::ast::Validator;
+use wdl::format::format::format_document;
 use wdl::lint::LintVisitor;
 use wdl_analysis::AnalysisEngine;
 use wdl_analysis::AnalysisResult;
-use wdl::format::format::format_document;
 
 /// Emits the given diagnostics to the output stream.
 ///

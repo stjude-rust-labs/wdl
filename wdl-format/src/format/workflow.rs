@@ -27,12 +27,11 @@ impl Formattable for CallAlias {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, true)?;
 
-        let as_keyword = SyntaxElement::Token(
-            self.syntax()
-                .first_token()
-                .expect("Call Alias should have a token")
-                .clone(),
-        );
+        let as_keyword = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::AsKeyword)
+            .expect("Call Alias should have an as keyword");
         state.space_or_indent(buffer)?;
         buffer.push_str("as");
         format_inline_comment(&as_keyword, buffer, state, true)?;
@@ -54,12 +53,11 @@ impl Formattable for CallAfter {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, true)?;
 
-        let after_keyword = SyntaxElement::Token(
-            self.syntax()
-                .first_token()
-                .expect("Call After should have a token")
-                .clone(),
-        );
+        let after_keyword = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::AfterKeyword)
+            .expect("Call After should have an after keyword");
         state.space_or_indent(buffer)?;
         buffer.push_str("after");
         format_inline_comment(&after_keyword, buffer, state, true)?;
@@ -113,12 +111,11 @@ impl Formattable for CallStatement {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
-        let call_keyword = SyntaxElement::Token(
-            self.syntax()
-                .first_token()
-                .expect("Call Statement should have a token")
-                .clone(),
-        );
+        let call_keyword = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::CallKeyword)
+            .expect("Call Statement should have a call keyword");
         state.indent(buffer)?;
         buffer.push_str("call");
         format_inline_comment(&call_keyword, buffer, state, true)?;
@@ -149,15 +146,11 @@ impl Formattable for CallStatement {
 
         let inputs: Vec<_> = self.inputs().collect();
         if !inputs.is_empty() {
-            let open_brace = SyntaxElement::Token(
-                self.syntax()
-                    .children_with_tokens()
-                    .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                    .expect("Call Statement should have an open brace")
-                    .as_token()
-                    .expect("Open brace should be a token")
-                    .clone(),
-            );
+            let open_brace = self
+                .syntax()
+                .children_with_tokens()
+                .find(|element| element.kind() == SyntaxKind::OpenBrace)
+                .expect("Call Statement should have an open brace");
             format_preceding_comments(&open_brace, buffer, state, true)?;
             state.space_or_indent(buffer)?;
             buffer.push('{');
@@ -227,8 +220,6 @@ impl Formattable for CallStatement {
                 }
                 if !state.interrupted() {
                     buffer.push_str(NEWLINE);
-                } else {
-                    state.reset_interrupted();
                 }
 
                 state.decrement_indent();
@@ -302,15 +293,11 @@ impl Formattable for ConditionalStatement {
         }
         buffer.push(')');
 
-        let open_brace = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                .expect("Conditional Statement should have an open brace")
-                .as_token()
-                .expect("Open brace should be a token")
-                .clone(),
-        );
+        let open_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::OpenBrace)
+            .expect("Conditional Statement should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
         state.space_or_indent(buffer)?;
         buffer.push('{');
@@ -324,15 +311,11 @@ impl Formattable for ConditionalStatement {
 
         state.decrement_indent();
 
-        let close_brace = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::CloseBrace)
-                .expect("Conditional Statement should have a close brace")
-                .as_token()
-                .expect("Close brace should be a token")
-                .clone(),
-        );
+        let close_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::CloseBrace)
+            .expect("Conditional Statement should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push('}');
@@ -405,15 +388,11 @@ impl Formattable for ScatterStatement {
         buffer.push(')');
         format_inline_comment(&close_paren, buffer, state, true)?;
 
-        let open_brace = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                .expect("Scatter Statement should have an open brace")
-                .as_token()
-                .expect("Open brace should be a token")
-                .clone(),
-        );
+        let open_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::OpenBrace)
+            .expect("Scatter Statement should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
         state.space_or_indent(buffer)?;
         buffer.push('{');
@@ -482,21 +461,13 @@ impl Formattable for WorkflowDefinition {
         name.format(buffer, state)?;
         format_inline_comment(&name.syntax_element(), buffer, state, true)?;
 
-        let open_brace = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                .expect("Workflow should have an open brace")
-                .as_token()
-                .expect("Open brace should be a token")
-                .clone(),
-        );
+        let open_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::OpenBrace)
+            .expect("Workflow should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        if !state.interrupted() {
-            buffer.push(' ');
-        } else {
-            state.reset_interrupted();
-        }
+        state.space_or_indent(buffer)?; // current indent_level is `0` so no indent will be inserted
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 
@@ -507,6 +478,7 @@ impl Formattable for WorkflowDefinition {
         let mut input_section_str = String::new();
         let mut body_str = String::new();
         let mut output_section_str = String::new();
+        let mut hints_section_str = String::new();
 
         for item in self.items() {
             match item {
@@ -537,7 +509,7 @@ impl Formattable for WorkflowDefinition {
                     o.format(&mut output_section_str, state)?;
                 }
                 WorkflowItem::Hints(h) => {
-                    // h.format(&mut body_str, state)?;
+                    h.format(&mut hints_section_str, state)?;
                 }
             }
         }
@@ -579,18 +551,20 @@ impl Formattable for WorkflowDefinition {
             }
             buffer.push_str(&output_section_str);
         }
+        if !hints_section_str.is_empty() {
+            if !first_section {
+                buffer.push_str(NEWLINE);
+            }
+            buffer.push_str(&hints_section_str);
+        }
 
         state.decrement_indent();
 
-        let close_brace = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::CloseBrace)
-                .expect("Workflow should have a close brace")
-                .as_token()
-                .expect("Close brace should be a token")
-                .clone(),
-        );
+        let close_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::CloseBrace)
+            .expect("Workflow should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push('}');

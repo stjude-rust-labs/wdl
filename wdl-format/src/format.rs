@@ -6,6 +6,8 @@ use anyhow::Result;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::Expr;
+use wdl_ast::v1::HintsItem;
+use wdl_ast::v1::HintsSection;
 use wdl_ast::v1::InputSection;
 use wdl_ast::v1::LiteralBoolean;
 use wdl_ast::v1::LiteralFloat;
@@ -100,22 +102,20 @@ impl Formattable for VersionStatement {
             buffer.push_str(NEWLINE);
         }
 
+        let version_keyword = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::VersionKeyword)
+            .expect("Version statement should have a version keyword");
         buffer.push_str("version");
-        let version_keyword = SyntaxElement::Token(
-            self.syntax()
-                .first_token()
-                .expect("Version Statement should have a token")
-                .clone(),
-        );
+        format_inline_comment(&version_keyword, buffer, state, true)?;
 
         let version = self.version();
 
-        format_inline_comment(&version_keyword, buffer, state, true)?;
         format_preceding_comments(&version.syntax_element(), buffer, state, true)?;
         state.space_or_indent(buffer)?;
         version.format(buffer, state)?;
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
-        state.reset_interrupted();
 
         Ok(())
     }
@@ -232,15 +232,11 @@ impl Formattable for Decl {
         format_inline_comment(&name.syntax_element(), buffer, state, true)?;
 
         if let Some(expr) = self.expr() {
-            let eq = SyntaxElement::Token(
-                self.syntax()
-                    .children_with_tokens()
-                    .find(|element| element.kind() == SyntaxKind::Assignment)
-                    .expect("Bound declaration should have an equals sign")
-                    .as_token()
-                    .expect("Equals sign should be a token")
-                    .clone(),
-            );
+            let eq = self
+                .syntax()
+                .children_with_tokens()
+                .find(|element| element.kind() == SyntaxKind::Assignment)
+                .expect("Bound declaration should have an equals sign");
             format_preceding_comments(&eq, buffer, state, true)?;
             state.space_or_indent(buffer)?;
             buffer.push('=');
@@ -264,25 +260,20 @@ impl Formattable for InputSection {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
-        let input_keyword = SyntaxElement::Token(
-            self.syntax()
-                .first_token()
-                .expect("Input Section should have a token")
-                .clone(),
-        );
+        let input_keyword = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::InputKeyword)
+            .expect("Input Section should have an input keyword");
         state.indent(buffer)?;
         buffer.push_str("input");
         format_inline_comment(&input_keyword, buffer, state, true)?;
 
-        let open_brace = SyntaxElement::Token(
+        let open_brace = 
             self.syntax()
                 .children_with_tokens()
                 .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                .expect("Input Section should have an open brace")
-                .as_token()
-                .expect("Open brace should be a token")
-                .clone(),
-        );
+                .expect("Input Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
         state.space_or_indent(buffer)?;
         buffer.push('{');
@@ -296,15 +287,11 @@ impl Formattable for InputSection {
 
         state.decrement_indent();
 
-        let close_brace = SyntaxElement::Token(
+        let close_brace = 
             self.syntax()
                 .children_with_tokens()
                 .find(|element| element.kind() == SyntaxKind::CloseBrace)
-                .expect("Input Section should have a close brace")
-                .as_token()
-                .expect("Close brace should be a token")
-                .clone(),
-        );
+                .expect("Input Section should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push('}');
@@ -322,25 +309,20 @@ impl Formattable for OutputSection {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
-        let output_keyword = SyntaxElement::Token(
-            self.syntax()
-                .first_token()
-                .expect("Output Section should have a token")
-                .clone(),
-        );
+        let output_keyword = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::OutputKeyword)
+            .expect("Output Section should have an output keyword");
         state.indent(buffer)?;
         buffer.push_str("output");
         format_inline_comment(&output_keyword, buffer, state, true)?;
 
-        let open_brace = SyntaxElement::Token(
+        let open_brace = 
             self.syntax()
                 .children_with_tokens()
                 .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                .expect("Output Section should have an open brace")
-                .as_token()
-                .expect("Open brace should be a token")
-                .clone(),
-        );
+                .expect("Output Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
         state.space_or_indent(buffer)?;
         buffer.push('{');
@@ -349,22 +331,100 @@ impl Formattable for OutputSection {
         state.increment_indent();
 
         for decl in self.declarations() {
-            let decl = Decl::cast(decl.syntax().clone())
-                .expect("Output section decl should cast to a decl");
-            decl.format(buffer, state)?;
+            Decl::Bound(decl).format(buffer, state)?;
         }
 
         state.decrement_indent();
 
-        let close_brace = SyntaxElement::Token(
+        let close_brace = 
             self.syntax()
                 .children_with_tokens()
                 .find(|element| element.kind() == SyntaxKind::CloseBrace)
-                .expect("Output Section should have a close brace")
-                .as_token()
-                .expect("Close brace should be a token")
-                .clone(),
-        );
+                .expect("Output Section should have a close brace");
+        format_preceding_comments(&close_brace, buffer, state, false)?;
+        state.indent(buffer)?;
+        buffer.push('}');
+        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+
+        Ok(())
+    }
+
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Node(self.syntax().clone())
+    }
+}
+
+impl Formattable for HintsItem {
+    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+
+        let name = self.name();
+        state.indent(buffer)?;
+        name.format(buffer, state)?;
+        format_inline_comment(&name.syntax_element(), buffer, state, true)?;
+
+        let colon = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::Colon)
+            .expect("Hints Item should have a colon");
+        format_preceding_comments(&colon, buffer, state, true)?;
+        if state.interrupted() {
+            state.indent(buffer)?;
+        }
+        buffer.push(':');
+        format_inline_comment(&colon, buffer, state, true)?;
+
+        let expr = self.expr();
+        format_preceding_comments(&expr.syntax_element(), buffer, state, true)?;
+        state.space_or_indent(buffer)?;
+        expr.format(buffer, state)?;
+        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+
+        Ok(())
+    }
+
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Node(self.syntax().clone())
+    }
+}
+
+impl Formattable for HintsSection {
+    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+
+        let hints_keyword = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::HintsKeyword)
+            .expect("Hints Section should have a hints keyword");
+        state.indent(buffer)?;
+        buffer.push_str("hints");
+        format_inline_comment(&hints_keyword, buffer, state, true)?;
+
+        let open_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::OpenBrace)
+            .expect("Hints Section should have an open brace");
+        format_preceding_comments(&open_brace, buffer, state, true)?;
+        state.space_or_indent(buffer)?;
+        buffer.push('{');
+        format_inline_comment(&open_brace, buffer, state, false)?;
+
+        state.increment_indent();
+
+        for item in self.items() {
+            item.format(buffer, state)?;
+        }
+
+        state.decrement_indent();
+
+        let close_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::CloseBrace)
+            .expect("Hints Section should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push('}');
@@ -382,12 +442,11 @@ impl Formattable for StructDefinition {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
-        let struct_keyword = SyntaxElement::Token(
-            self.syntax()
-                .first_token()
-                .expect("Struct Definition should have a token")
-                .clone(),
-        );
+        let struct_keyword = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::StructKeyword)
+            .expect("Struct Definition should have a struct keyword");
         buffer.push_str("struct");
         format_inline_comment(&struct_keyword, buffer, state, true)?;
 

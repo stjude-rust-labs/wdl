@@ -33,15 +33,11 @@ impl Formattable for MetadataObject {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
-        let open_brace = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                .expect("Metadata Object should have an open brace")
-                .as_token()
-                .expect("Open brace should be a token")
-                .clone(),
-        );
+        let open_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::OpenBrace)
+            .expect("Metadata Object should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
         if state.interrupted() {
             state.indent(buffer)?;
@@ -52,6 +48,7 @@ impl Formattable for MetadataObject {
 
         state.increment_indent();
 
+        // TODO: Check commas
         for item in self.items() {
             item.format(buffer, state)?;
             buffer.push(',');
@@ -60,15 +57,11 @@ impl Formattable for MetadataObject {
 
         state.decrement_indent();
 
-        let close_brace = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::CloseBrace)
-                .expect("Metadata Object should have a close brace")
-                .as_token()
-                .expect("Close brace should be a token")
-                .clone(),
-        );
+        let close_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::CloseBrace)
+            .expect("Metadata Object should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push('}');
@@ -86,15 +79,11 @@ impl Formattable for MetadataArray {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
-        let open_bracket = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::OpenBracket)
-                .expect("Metadata Array should have an open bracket")
-                .as_token()
-                .expect("Open bracket should be a token")
-                .clone(),
-        );
+        let open_bracket = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::OpenBracket)
+            .expect("Metadata Array should have an open bracket");
         format_preceding_comments(&open_bracket, buffer, state, true)?;
         if state.interrupted() {
             state.indent(buffer)?;
@@ -105,6 +94,7 @@ impl Formattable for MetadataArray {
 
         state.increment_indent();
 
+        // TODO: Check commas
         for item in self.elements() {
             state.indent(buffer)?;
             item.format(buffer, state)?;
@@ -114,15 +104,11 @@ impl Formattable for MetadataArray {
 
         state.decrement_indent();
 
-        let close_bracket = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::CloseBracket)
-                .expect("Metadata Array should have a close bracket")
-                .as_token()
-                .expect("Close bracket should be a token")
-                .clone(),
-        );
+        let close_bracket = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::CloseBracket)
+            .expect("Metadata Array should have a close bracket");
         format_preceding_comments(&close_bracket, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push(']');
@@ -171,15 +157,11 @@ impl Formattable for MetadataObjectItem {
         name.format(buffer, state)?;
         format_inline_comment(&name.syntax_element(), buffer, state, true)?;
 
-        let colon = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::Colon)
-                .expect("Metadata Object Item should have a colon")
-                .as_token()
-                .expect("Colon should be a token")
-                .clone(),
-        );
+        let colon = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::Colon)
+            .expect("Metadata Object Item should have a colon");
         format_preceding_comments(&colon, buffer, state, true)?;
         if state.interrupted() {
             state.indent(buffer)?;
@@ -192,7 +174,6 @@ impl Formattable for MetadataObjectItem {
         format_preceding_comments(&value.syntax_element(), buffer, state, true)?;
         state.space_or_indent(buffer)?;
         value.format(buffer, state)?;
-
         format_inline_comment(&self.syntax_element(), buffer, state, true)?;
 
         Ok(())
@@ -207,32 +188,22 @@ impl Formattable for MetadataSection {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
-        let meta_keyword = SyntaxElement::Token(
-            self.syntax()
-                .first_token()
-                .expect("Metadata Section should have a token")
-                .clone(),
-        );
+        let meta_keyword = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::MetaKeyword)
+            .expect("Metadata Section should have a meta keyword");
         state.indent(buffer)?;
         buffer.push_str("meta");
         format_inline_comment(&meta_keyword, buffer, state, true)?;
 
-        let open_brace = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                .expect("Metadata Section should have an open brace")
-                .as_token()
-                .expect("Open brace should be a token")
-                .clone(),
-        );
+        let open_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::OpenBrace)
+            .expect("Metadata Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        if !state.interrupted() {
-            buffer.push(' ');
-        } else {
-            state.reset_interrupted();
-            state.indent(buffer)?;
-        }
+        state.space_or_indent(buffer)?;
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 
@@ -245,15 +216,11 @@ impl Formattable for MetadataSection {
 
         state.decrement_indent();
 
-        let close_brace = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::CloseBrace)
-                .expect("Metadata Section should have a close brace")
-                .as_token()
-                .expect("Close brace should be a token")
-                .clone(),
-        );
+        let close_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::CloseBrace)
+            .expect("Metadata Section should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push('}');
@@ -271,32 +238,22 @@ impl Formattable for ParameterMetadataSection {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
-        let parameter_meta_keyword = SyntaxElement::Token(
-            self.syntax()
-                .first_token()
-                .expect("Parameter Metadata Section should have a token")
-                .clone(),
-        );
+        let parameter_meta_keyword = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::ParameterMetaKeyword)
+            .expect("Parameter Metadata Section should have a parameter meta keyword");
         state.indent(buffer)?;
         buffer.push_str("parameter_meta");
         format_inline_comment(&parameter_meta_keyword, buffer, state, true)?;
 
-        let open_brace = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                .expect("Parameter Metadata Section should have an open brace")
-                .as_token()
-                .expect("Open brace should be a token")
-                .clone(),
-        );
+        let open_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::OpenBrace)
+            .expect("Parameter Metadata Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        if !state.interrupted() {
-            buffer.push(' ');
-        } else {
-            state.reset_interrupted();
-            state.indent(buffer)?;
-        }
+        state.space_or_indent(buffer)?;
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 
@@ -309,15 +266,11 @@ impl Formattable for ParameterMetadataSection {
 
         state.decrement_indent();
 
-        let close_brace = SyntaxElement::Token(
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::CloseBrace)
-                .expect("Parameter Metadata Section should have a close brace")
-                .as_token()
-                .expect("Close brace should be a token")
-                .clone(),
-        );
+        let close_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::CloseBrace)
+            .expect("Parameter Metadata Section should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push('}');

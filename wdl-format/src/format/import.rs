@@ -19,12 +19,11 @@ impl Formattable for ImportStatement {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
-        let import_keyword = SyntaxElement::Token(
-            self.syntax()
-                .first_token()
-                .expect("Import Statement should have a token")
-                .clone(),
-        );
+        let import_keyword = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::ImportKeyword)
+            .expect("Import statement should have an import keyword");
         buffer.push_str("import");
         format_inline_comment(&import_keyword, buffer, state, true)?;
 

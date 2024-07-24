@@ -1,6 +1,9 @@
 //! Contains the `FormatState` struct, which is used to keep track of the
 //! current formatting state. This includes the current indentation level and
 //! whether the current line has been interrupted by comments.
+//! The state becomes "interrupted" by comments when a comment forces a newline
+//! where it would otherwise not be expected. In this case, the next line(s)
+//! will be indented by one level.
 use std::fmt::Write;
 
 use anyhow::Result;
@@ -22,18 +25,15 @@ pub struct FormatState {
 }
 
 impl FormatState {
-    /// Return the current indent level.
-    pub fn level(&self) -> usize {
-        self.indent_level
-    }
-
     /// Add the current indentation to the buffer.
-    /// The indentation level can be temporarily increased by one if the current
-    /// line has been interrupted by comments.
+    /// The indentation level will be temporarily increased by one if the
+    /// current line has been interrupted by comments.
     pub fn indent(&self, buffer: &mut String) -> Result<()> {
-        let indent =
-            INDENT.repeat(self.indent_level + (if self.interrupted_by_comments { 1 } else { 0 }));
-        write!(buffer, "{}", indent)?;
+        write!(
+            buffer,
+            "{}",
+            INDENT.repeat(self.indent_level + (if self.interrupted_by_comments { 1 } else { 0 }))
+        )?;
         Ok(())
     }
 
