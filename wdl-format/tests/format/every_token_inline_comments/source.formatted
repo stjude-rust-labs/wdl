@@ -3,9 +3,9 @@ version  #1
 
 workflow  #3
     test_wf  #4
-{  #5
+    {  #5
     meta  #6
-    {  #7
+        {  #7
         description  #8
             :  #9
             "Test workflow"  #10
@@ -13,7 +13,7 @@ workflow  #3
     }  #11
 
     parameter_meta  #23
-    {  #24
+        {  #24
         out_sj_filter_overhang_min  #25
             :  #26
             {  #27
@@ -112,7 +112,7 @@ task  #103
     test_task  #104
     {  #105
     parameter_meta  #114
-    {  #115
+        {  #115
         bowchicka  #116
             :  #117
             {  #118
