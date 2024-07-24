@@ -1,5 +1,6 @@
 //! A lint rule for trailing commas in lists/objects.
 
+use wdl_ast::v1::CallStatement;
 use wdl_ast::v1::MetadataArray;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
@@ -28,7 +29,7 @@ fn missing_trailing_comma(span: Span) -> Diagnostic {
 
 /// Diagnostic message for extraneous content before trailing comma.
 fn extraneous_content(span: Span) -> Diagnostic {
-    Diagnostic::error("extraneous content before trailing comma")
+    Diagnostic::note("extraneous content before trailing comma")
         .with_rule(ID)
         .with_highlight(span)
         .with_fix("remove this extraneous content")
@@ -145,6 +146,40 @@ impl Visitor for TrailingCommaRule {
                 }
             }
         }
+    }
+
+    fn call_statement(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        call: &CallStatement,
+    ) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+
+        let inputs = call.inputs().count();
+
+        if inputs < 2 {
+            return;
+        }
+
+        call.inputs().for_each(|input| {
+            // check each input for trailing comma
+            let (next_comma, comma_is_next) = find_next_comma(input.syntax());
+            if let Some(nc) = next_comma {
+                if !comma_is_next {
+                    state.add(extraneous_content(Span::new(
+                        usize::from(input.syntax().text_range().end()),
+                        usize::from(nc.text_range().start() - input.syntax().text_range().end()),
+                    )));
+                }
+            } else {
+                state.add(missing_trailing_comma(
+                    input.syntax().text_range().to_span(),
+                ));
+            }
+        });
     }
 }
 

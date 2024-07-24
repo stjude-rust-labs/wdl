@@ -1,6 +1,29 @@
-#@ except: DescriptionMissing, MatchingParameterMeta
+#@ except: DescriptionMissing, InputSorting, LineWidth, MatchingParameterMeta, MissingMetas, MissingOutput
 
 version 1.2
+
+workflow bar {
+    call foo { input:
+        bam = "test.bam",
+        gtf = "test.gtf",
+        strandedness = "yes",
+        minaqual = 10,
+        modify_memory_gb = 2  # some other junk
+        ,
+        modify_disk_size_gb = 2,
+        not_an_option = "test",
+    }
+
+    call foo as foo2 { input:
+        bam = "test.bam",
+        gtf = "test.gtf",
+        strandedness = "yes",
+        minaqual = 10,
+        modify_memory_gb = 2,
+        modify_disk_size_gb = 2,
+        not_an_option = "test"
+    }
+}
 
 task foo {
     meta {
@@ -50,7 +73,15 @@ task foo {
         }
    }
 
-   input {}
+   input {
+         String bam
+         String gtf
+         String strandedness
+         Int minaqual
+         Int modify_memory_gb
+         Int modify_disk_size_gb
+         String not_an_option
+   }
 
    command <<< >>>
 
