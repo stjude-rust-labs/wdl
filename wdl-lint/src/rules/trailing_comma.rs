@@ -51,8 +51,7 @@ impl Rule for TrailingCommaRule {
         "All items in a comma-delimited object or list should be followed by a comma, including \
          the last item. An exception is made for lists for which all items are on the same line, \
          in which case there should not be a trailing comma following the last item. Note that \
-         single-line lists are not allowed in the `meta` or `parameter_meta` sections. See rule \
-         `key_value_pairs` for more information."
+         single-line lists are not allowed in the `meta` or `parameter_meta` sections."
     }
 
     fn tags(&self) -> TagSet {
