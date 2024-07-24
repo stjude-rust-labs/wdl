@@ -408,6 +408,7 @@ impl Visitor for ExpressionSpacingRule {
                     let prior = expr.syntax().siblings_with_tokens(Direction::Prev).skip(1);
 
                     let mut newline = false;
+                    let mut open_paren = false;
 
                     for t in prior {
                         // if keyword in a multi-line if..then..else should only be preceded by
@@ -417,21 +418,19 @@ impl Visitor for ExpressionSpacingRule {
                             SyntaxKind::Whitespace | SyntaxKind::OpenParen | SyntaxKind::Comment
                         ) {
                             // if should be preceded by an opening parenthesis and a newline
-                            state.add(multiline_if_open_paren(if_keyword.text_range().to_span()));
                             break;
                         } else if t.kind() == SyntaxKind::Whitespace && t.to_string().contains('\n')
                         {
                             newline = true;
                         } else if t.kind() == SyntaxKind::OpenParen {
-                            if newline {
-                                break;
-                            } else {
-                                state.add(multiline_if_open_paren(
-                                    if_keyword.text_range().to_span(),
-                                ));
-                            }
+                            open_paren = true;
+                            break;
                         }
                     }
+                    if !open_paren || !newline {
+                        state.add(multiline_if_open_paren(if_keyword.text_range().to_span()));
+                    }
+
 
                     // check the then keyword
                     let then_ws = then_keyword
@@ -460,6 +459,7 @@ impl Visitor for ExpressionSpacingRule {
                     let next_tokens = expr.syntax().siblings_with_tokens(Direction::Next).skip(1);
 
                     let mut newline = false;
+                    let mut close_paren = false;
                     for t in next_tokens {
                         // else keyword in a multi-line if..then..else should only be followed by
                         // whitespace or a comment, then a closing parenthesis.
@@ -468,20 +468,17 @@ impl Visitor for ExpressionSpacingRule {
                             SyntaxKind::Whitespace | SyntaxKind::CloseParen | SyntaxKind::Comment
                         ) {
                             // if should be preceded by an closing parenthesis and a newline
-                            state.add(multiline_if_close_paren(if_keyword.text_range().to_span()));
                             break;
                         } else if t.kind() == SyntaxKind::Whitespace && t.to_string().contains('\n')
                         {
                             newline = true;
                         } else if t.kind() == SyntaxKind::CloseParen {
-                            if newline {
-                                break;
-                            } else {
-                                state.add(multiline_if_close_paren(
-                                    if_keyword.text_range().to_span(),
-                                ));
-                            }
+                            close_paren = true;
+                            break;
                         }
+                    }
+                    if !close_paren || !newline {
+                        state.add(multiline_if_close_paren(else_keyword.text_range().to_span()));
                     }
                 }
             }
