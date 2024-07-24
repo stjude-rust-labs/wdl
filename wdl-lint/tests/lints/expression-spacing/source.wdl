@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, InputSorting, LineWidth, MatchingParameterMeta, NonmatchingOutput, RuntimeSectionKeys, Whitespace
+#@ except: CommentWhitespace, DescriptionMissing, InputSorting, LineWidth, MatchingParameterMeta, NonmatchingOutput, RuntimeSectionKeys, Whitespace
 
 version 1.1
 
@@ -54,7 +54,7 @@ task foo {
                     "WOWOWOW"
             )
         Boolean v = if 
-        a < b then true 
+        a < b then true
         else false
         Int k = (  # a comment
             2 * 5
@@ -74,6 +74,77 @@ task foo {
             then true  # OK comment
             else false  # OK comment
         )
+                Boolean h = [1,2,3] == [1,2,3]
+        Boolean i = [1
+            # a comment
+            ,2,3] == [1,2,4]
+        Boolean j = [
+            1,
+            2,
+            3,
+            # a comment
+        ]
+        == [
+            # comment
+            1,
+            2,
+            3,
+        ]
+        Boolean q = [
+            1,
+            2,
+            3,
+            # a comment
+        ]
+        ==
+        [
+            # This comment will flag, because the  `] == [` expression is incorrect.
+            1,
+            2,
+            3,
+        ]
+        Boolean k = {"a": 1, "b": 2} == {"b": 2, "a": 1}
+        Boolean l = {
+            # comment
+            "a": 1,
+            "b": 2
+        } == {
+            "b": 2,
+            "a": 1,
+            # comment
+        }
+        Boolean m = {
+            # comment
+            "a": 1,
+            "b": 2
+        }
+        == {
+            "b": 2,
+            "a": 1,
+            # comment
+        }
+        Boolean n = {
+            # comment
+            "a": 1,
+            "b": 2
+        }
+        ==
+        {
+            "b": 2,
+            "a": 1,
+            # This comment will flag, because the  `} == {` expression is incorrect.
+        }
+        Boolean o = {
+            # comment
+            "a": 1,
+            "b": 2
+        } == {
+            "b": 2,
+            "a": 1,
+            # This comment is OK.
+        }
+        Array[Int] p = [1,
+        2,3]
     }
 
     command <<< >>>

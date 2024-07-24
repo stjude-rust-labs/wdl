@@ -3,6 +3,7 @@
 use rowan::Direction;
 use rowan::NodeOrToken;
 use wdl_ast::v1::Expr;
+use wdl_ast::v1::LiteralExpr;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -130,6 +131,28 @@ fn multiline_if_close_paren(span: Span) -> Diagnostic {
         .with_rule(ID)
         .with_highlight(span)
         .with_fix("add a newline and close parenthesis after to this else clause")
+}
+
+/// Reports missing newline following open brace/bracket/paren for multiline
+/// array/map/object literals
+fn multiline_literal_open_newline(span: Span) -> Diagnostic {
+    Diagnostic::note(
+        "multi-line array/map/object literals must have a newline following the opening token",
+    )
+    .with_rule(ID)
+    .with_highlight(span)
+    .with_fix("add a newline after this token")
+}
+
+/// Reports missing newline before close brace/bracket/paren for multiline
+/// array/map/object literals
+fn multiline_literal_close_newline(span: Span) -> Diagnostic {
+    Diagnostic::note(
+        "multi-line array/map/object literals must have a newline preceding the closing token",
+    )
+    .with_rule(ID)
+    .with_highlight(span)
+    .with_fix("add a newline before this token")
 }
 
 /// Detects improperly spaced expressions.
@@ -534,6 +557,101 @@ impl Visitor for ExpressionSpacingRule {
                 }
                 if let Some(ws) = after_ws {
                     state.add(disallowed_space(ws.text_range().to_span()));
+                }
+            }
+            Expr::Literal(l) => {
+                match l {
+                    LiteralExpr::Array(_) | LiteralExpr::Map(_) | LiteralExpr::Object(_) => {
+                        let newlines = l
+                            .syntax()
+                            .descendants_with_tokens()
+                            .filter(|t| {
+                                if t.kind() == SyntaxKind::Whitespace
+                                    && t.to_string().contains('\n')
+                                {
+                                    return true;
+                                }
+                                false
+                            })
+                            .count();
+
+                        if newlines > 0 {
+                            // Find the opening and closing brackets
+                            let open_bracket = expr
+                                .syntax()
+                                .children_with_tokens()
+                                .find(|t| {
+                                    matches!(
+                                        t.kind(),
+                                        SyntaxKind::OpenBracket
+                                            | SyntaxKind::OpenBrace
+                                            | SyntaxKind::OpenParen
+                                    )
+                                })
+                                .expect("literal expression node should have an opening bracket");
+
+                            let close_bracket = expr
+                                .syntax()
+                                .children_with_tokens()
+                                .find(|t| {
+                                    matches!(
+                                        t.kind(),
+                                        SyntaxKind::CloseBracket
+                                            | SyntaxKind::CloseBrace
+                                            | SyntaxKind::CloseParen
+                                    )
+                                })
+                                .expect("literal expression node should have a closing bracket");
+
+                            let open_bracket_next =
+                                open_bracket.as_token().expect("should be a token").siblings_with_tokens(Direction::Next).skip(1);
+
+                            let mut newline = false;
+                            for t in open_bracket_next {
+                                // The opening bracket/brace/paren must be followed by a `\n`, with
+                                // optional additional whitespace or comment tokens.
+                                if !matches!(t.kind(), SyntaxKind::Whitespace | SyntaxKind::Comment)
+                                {
+                                    break;
+                                } else if t.kind() == SyntaxKind::Whitespace
+                                    && t.to_string().contains('\n')
+                                {
+                                    newline = true;
+                                    break;
+                                }
+                            }
+                            if !newline {
+                                state.add(multiline_literal_open_newline(
+                                    open_bracket.text_range().to_span(),
+                                ));
+                            }
+
+                            let close_bracket_prior =
+                                close_bracket.as_token().expect("should be a token").siblings_with_tokens(Direction::Prev).skip(1);
+
+                            let mut newline = false;
+                            for t in close_bracket_prior {
+                                // The closing bracket/brace/paren must be preceded by a `\n`, with
+                                // optional additional whitespace or comment tokens.
+                                if !matches!(t.kind(), SyntaxKind::Whitespace | SyntaxKind::Comment)
+                                {
+                                    // if should be preceded by an opening parenthesis and a newline
+                                    break;
+                                } else if t.kind() == SyntaxKind::Whitespace
+                                    && t.to_string().contains('\n')
+                                {
+                                    newline = true;
+                                    break;
+                                }
+                            }
+                            if !newline {
+                                state.add(multiline_literal_close_newline(
+                                    close_bracket.text_range().to_span(),
+                                ));
+                            }
+                        }
+                    }
+                    _ => {}
                 }
             }
             // Expr::Literal, Expr::Name, Expr::Call

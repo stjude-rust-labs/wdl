@@ -97,7 +97,7 @@ note[ExpressionSpacing]: multi-line if...then...else must have a preceding paren
 note[ExpressionSpacing]: multi-line if...then...else must have a preceding space
    ┌─ tests/lints/expression-spacing/source.wdl:57:15
    │
-57 │         a < b then true 
+57 │         a < b then true
    │               ^^^^
    │
    = fix: add a newline before the then keyword
@@ -126,11 +126,43 @@ note[ExpressionSpacing]: multi-line if...then...else must have a preceding space
    │
    = fix: add a newline before the then keyword
 
+note[ExpressionSpacing]: multi-line array/map/object literals must have a newline following the opening token
+   ┌─ tests/lints/expression-spacing/source.wdl:78:21
+   │
+78 │         Boolean i = [1
+   │                     ^
+   │
+   = fix: add a newline after this token
+
+note[ExpressionSpacing]: multi-line array/map/object literals must have a newline preceding the closing token
+   ┌─ tests/lints/expression-spacing/source.wdl:80:17
+   │
+80 │             ,2,3] == [1,2,4]
+   │                 ^
+   │
+   = fix: add a newline before this token
+
+note[ExpressionSpacing]: multi-line array/map/object literals must have a newline following the opening token
+    ┌─ tests/lints/expression-spacing/source.wdl:146:24
+    │
+146 │         Array[Int] p = [1,
+    │                        ^
+    │
+    = fix: add a newline after this token
+
+note[ExpressionSpacing]: multi-line array/map/object literals must have a newline preceding the closing token
+    ┌─ tests/lints/expression-spacing/source.wdl:147:12
+    │
+147 │         2,3]
+    │            ^
+    │
+    = fix: add a newline before this token
+
 note[ExpressionSpacing]: prefix operators may not contain whitespace
-   ┌─ tests/lints/expression-spacing/source.wdl:82:21
-   │
-82 │         Boolean b = ! a
-   │                     ^^^
-   │
-   = fix: remove the internal whitespace
+    ┌─ tests/lints/expression-spacing/source.wdl:153:21
+    │
+153 │         Boolean b = ! a
+    │                     ^^^
+    │
+    = fix: remove the internal whitespace
 
