@@ -14,6 +14,7 @@ use wdl_ast::SyntaxKind;
 
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
+use super::format_state::SPACE;
 use super::FormatState;
 use super::Formattable;
 use super::NEWLINE;
@@ -39,9 +40,10 @@ impl Formattable for MetadataObject {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Metadata Object should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
         if state.interrupted() {
-            state.indent(buffer)?;
             state.reset_interrupted();
+            state.indent(buffer)?;
         }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
@@ -85,9 +87,10 @@ impl Formattable for MetadataArray {
             .find(|element| element.kind() == SyntaxKind::OpenBracket)
             .expect("Metadata Array should have an open bracket");
         format_preceding_comments(&open_bracket, buffer, state, true)?;
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
         if state.interrupted() {
-            state.indent(buffer)?;
             state.reset_interrupted();
+            state.indent(buffer)?;
         }
         buffer.push('[');
         format_inline_comment(&open_bracket, buffer, state, false)?;
@@ -203,7 +206,13 @@ impl Formattable for MetadataSection {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Metadata Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 
@@ -253,7 +262,13 @@ impl Formattable for ParameterMetadataSection {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Parameter Metadata Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 

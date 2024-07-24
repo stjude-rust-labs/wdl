@@ -3,9 +3,9 @@ version  #1
 
 workflow  #3
     test_wf  #4
-    {  #5
+{  #5
     meta  #6
-        {  #7
+    {  #7
         description  #8
             :  #9
             "Test workflow"  #10
@@ -13,7 +13,7 @@ workflow  #3
     }  #11
 
     parameter_meta  #23
-        {  #24
+    {  #24
         out_sj_filter_overhang_min  #25
             :  #26
             {  #27
@@ -30,7 +30,7 @@ workflow  #3
     }  #36
 
     input  #6
-        {  #7
+    {  #7
         SpliceJunctionMotifs  #8
             out_sj_filter_overhang_min  #9
             =  #10
@@ -51,7 +51,7 @@ GT_AG_and_CT_AC_motif #17
         test_task  #51
         as  #52
         foo  #53
-        {  #54
+    {  #54
         input  #55
         :  #56
         bowchicka  #57
@@ -59,14 +59,14 @@ GT_AG_and_CT_AC_motif #17
         "wowwow"  #59
         }  #60
     if  #61
-        (  #62
+    (  #62
         true  #63
-        )        {  #65
+        )    {  #65
         call  #66
             test_task  #67
             after  #68
             foo  #69
-            {  #70
+        {  #70
             input  #71
             :  #72
             bowchicka  #73
@@ -74,7 +74,7 @@ GT_AG_and_CT_AC_motif #17
             "bowchicka"  #75
             }  #76
         scatter  #77
-            (  #78
+        (  #78
             i  #79
             in  #80
             range # 81
@@ -82,12 +82,12 @@ GT_AG_and_CT_AC_motif #17
    3 #83
    )  #84
             )  #85
-            {  #86
+        {  #86
             call  #87
                 test_task  #88
                 as  #89
                 bar  #90
-                {  #91
+            {  #91
                 input  #92
                 :  #93
                 bowchicka  #94
@@ -100,7 +100,7 @@ GT_AG_and_CT_AC_motif #17
     }  #101
 
     output  #37
-        {  #38
+    {  #38
         SpliceJunctionMotifs  #39
             KAZAM  #40
             =  #41
@@ -110,9 +110,9 @@ GT_AG_and_CT_AC_motif #17
 
 task  #103
     test_task  #104
-    {  #105
+{  #105
     parameter_meta  #114
-        {  #115
+    {  #115
         bowchicka  #116
             :  #117
             {  #118
@@ -129,19 +129,19 @@ task  #103
     }  #127
 
     input  #109
-        {  #110
+    {  #110
         String  #111
             bowchicka  #112
     }  #113
 
     command  #106
-        <<< #107
+    <<< #107
  >>>  #108
 }  #128
 
 struct  #129
     SpliceJunctionMotifs  #130
-    {  #131
+{  #131
     Int  #132
         noncanonical_motifs  #133
     Int GT_AG_and_CT_AC_motif  #134

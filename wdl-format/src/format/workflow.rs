@@ -19,6 +19,7 @@ use wdl_ast::SyntaxKind;
 
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
+use super::format_state::SPACE;
 use super::FormatState;
 use super::Formattable;
 use super::NEWLINE;
@@ -152,7 +153,13 @@ impl Formattable for CallStatement {
                 .find(|element| element.kind() == SyntaxKind::OpenBrace)
                 .expect("Call Statement should have an open brace");
             format_preceding_comments(&open_brace, buffer, state, true)?;
-            state.space_or_indent(buffer)?;
+            // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+            if state.interrupted() {
+                state.reset_interrupted();
+                state.indent(buffer)?;
+            } else {
+                buffer.push_str(SPACE);
+            }
             buffer.push('{');
             format_inline_comment(&open_brace, buffer, state, true)?;
 
@@ -264,7 +271,13 @@ impl Formattable for ConditionalStatement {
             .find(|element| element.kind() == SyntaxKind::OpenParen)
             .expect("Conditional Statement should have an open parenthesis");
         format_preceding_comments(&open_paren, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        // Open parens should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('(');
         format_inline_comment(&open_paren, buffer, state, true)?;
 
@@ -299,7 +312,13 @@ impl Formattable for ConditionalStatement {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Conditional Statement should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 
@@ -348,7 +367,13 @@ impl Formattable for ScatterStatement {
             .find(|element| element.kind() == SyntaxKind::OpenParen)
             .expect("Scatter Statement should have an open parenthesis");
         format_preceding_comments(&open_paren, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        // Open parens should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('(');
         format_inline_comment(&open_paren, buffer, state, true)?;
 
@@ -394,7 +419,13 @@ impl Formattable for ScatterStatement {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Scatter Statement should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 
@@ -467,7 +498,13 @@ impl Formattable for WorkflowDefinition {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Workflow should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?; // current indent_level is `0` so no indent will be inserted
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 

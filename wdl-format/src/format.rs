@@ -3,6 +3,7 @@
 use std::fmt::Write;
 
 use anyhow::Result;
+use format_state::SPACE;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::Expr;
@@ -275,7 +276,13 @@ impl Formattable for InputSection {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Input Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 
@@ -324,7 +331,13 @@ impl Formattable for OutputSection {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Output Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 
@@ -408,7 +421,13 @@ impl Formattable for HintsSection {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Hints Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 
@@ -461,7 +480,13 @@ impl Formattable for StructDefinition {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Struct Definition should have an open brace");
-        state.space_or_indent(buffer)?;
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 

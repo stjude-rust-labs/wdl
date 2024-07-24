@@ -17,6 +17,7 @@ use wdl_ast::SyntaxKind;
 
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
+use super::format_state::SPACE;
 use super::FormatState;
 use super::Formattable;
 use super::NEWLINE;
@@ -41,7 +42,13 @@ impl Formattable for CommandSection {
                 .find(|c| c.kind() == SyntaxKind::OpenHeredoc)
                 .expect("Command section should have an open heredoc");
             format_preceding_comments(&open_heredoc, buffer, state, true)?;
-            state.space_or_indent(buffer)?;
+            // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+            if state.interrupted() {
+                state.reset_interrupted();
+                state.indent(buffer)?;
+            } else {
+                buffer.push_str(SPACE);
+            }
             buffer.push_str("<<<");
         } else {
             let open_brace = self
@@ -50,7 +57,13 @@ impl Formattable for CommandSection {
                 .find(|c| c.kind() == SyntaxKind::OpenBrace)
                 .expect("Command section should have an open brace");
             format_preceding_comments(&open_brace, buffer, state, true)?;
-            state.space_or_indent(buffer)?;
+            // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+            if state.interrupted() {
+                state.reset_interrupted();
+                state.indent(buffer)?;
+            } else {
+                buffer.push_str(SPACE);
+            }
             buffer.push('{');
         }
 
@@ -96,6 +109,7 @@ impl Formattable for RuntimeItem {
             .expect("Runtime item should have a colon");
         format_preceding_comments(&colon, buffer, state, true)?;
         if state.interrupted() {
+            // TODO: does this need a reset_interrupted?
             state.indent(buffer)?;
         }
         buffer.push(':');
@@ -134,7 +148,13 @@ impl Formattable for RuntimeSection {
             .find(|c| c.kind() == SyntaxKind::OpenBrace)
             .expect("Runtime section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 
@@ -180,6 +200,7 @@ impl Formattable for RequirementsItem {
             .expect("Requirements item should have a colon");
         format_preceding_comments(&colon, buffer, state, true)?;
         if state.interrupted() {
+            // TODO does this need a reset_interrupted?
             state.indent(buffer)?;
         }
         buffer.push(':');
@@ -218,7 +239,13 @@ impl Formattable for RequirementsSection {
             .find(|c| c.kind() == SyntaxKind::OpenBrace)
             .expect("Requirements section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 
@@ -273,7 +300,13 @@ impl Formattable for TaskDefinition {
             .find(|c| c.kind() == SyntaxKind::OpenBrace)
             .expect("Task should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        state.space_or_indent(buffer)?;
+        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(buffer)?;
+        } else {
+            buffer.push_str(SPACE);
+        }
         buffer.push('{');
         format_inline_comment(&open_brace, buffer, state, false)?;
 

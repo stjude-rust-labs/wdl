@@ -9,11 +9,11 @@ workflow  #3b
     #4a
     test_wf  #4b
     #5a
-    {
+{
     #6a
     meta  #6b
         #7a
-        {  #7b
+    {  #7b
         #8a
         description  #8b
             #9a
