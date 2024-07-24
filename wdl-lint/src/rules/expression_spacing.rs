@@ -431,7 +431,6 @@ impl Visitor for ExpressionSpacingRule {
                         state.add(multiline_if_open_paren(if_keyword.text_range().to_span()));
                     }
 
-
                     // check the then keyword
                     let then_ws = then_keyword
                         .prev_sibling_or_token()
@@ -478,7 +477,9 @@ impl Visitor for ExpressionSpacingRule {
                         }
                     }
                     if !close_paren || !newline {
-                        state.add(multiline_if_close_paren(else_keyword.text_range().to_span()));
+                        state.add(multiline_if_close_paren(
+                            else_keyword.text_range().to_span(),
+                        ));
                     }
                 }
             }
