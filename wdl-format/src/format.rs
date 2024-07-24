@@ -13,6 +13,7 @@ use wdl_ast::v1::LiteralInteger;
 use wdl_ast::v1::LiteralString;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::StringPart;
+use wdl_ast::v1::StructDefinition;
 use wdl_ast::v1::Type;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
@@ -31,6 +32,7 @@ mod comments;
 mod format_state;
 mod import;
 mod metadata;
+mod task;
 mod workflow;
 
 use comments::format_inline_comment;
@@ -376,16 +378,79 @@ impl Formattable for OutputSection {
     }
 }
 
+impl Formattable for StructDefinition {
+    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+
+        let struct_keyword = SyntaxElement::Token(
+            self.syntax()
+                .first_token()
+                .expect("Struct Definition should have a token")
+                .clone(),
+        );
+        buffer.push_str("struct");
+        format_inline_comment(&struct_keyword, buffer, state, true)?;
+
+        let name = self.name();
+        format_preceding_comments(&name.syntax_element(), buffer, state, true)?;
+        state.space_or_indent(buffer)?;
+        name.format(buffer, state)?;
+        format_inline_comment(&name.syntax_element(), buffer, state, true)?;
+
+        let open_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::OpenBrace)
+            .expect("Struct Definition should have an open brace");
+        state.space_or_indent(buffer)?;
+        buffer.push('{');
+        format_inline_comment(&open_brace, buffer, state, false)?;
+
+        state.increment_indent();
+
+        if let Some(m) = self.metadata().next() {
+            m.format(buffer, state)?;
+            buffer.push_str(NEWLINE);
+        }
+
+        if let Some(pm) = self.parameter_metadata().next() {
+            pm.format(buffer, state)?;
+            buffer.push_str(NEWLINE);
+        }
+
+        for decl in self.members() {
+            Decl::Unbound(decl).format(buffer, state)?;
+        }
+
+        state.decrement_indent();
+
+        let close_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::CloseBrace)
+            .expect("Struct Definition should have a close brace");
+        format_preceding_comments(&close_brace, buffer, state, false)?;
+        state.indent(buffer)?;
+        buffer.push('}');
+        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+
+        Ok(())
+    }
+
+    fn syntax_element(&self) -> SyntaxElement {
+        SyntaxElement::Node(self.syntax().clone())
+    }
+}
+
 impl Formattable for DocumentItem {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
         match self {
             DocumentItem::Import(_) => {
-                // Import statements are handled separately
-                Ok(())
+                unreachable!("Import statements should not be formatted as a DocumentItem")
             }
             DocumentItem::Workflow(workflow) => workflow.format(buffer, state),
-            DocumentItem::Task(task) => Ok(()), // task.format(buffer, state),
-            DocumentItem::Struct(structure) => Ok(()), // structure.format(buffer, state),
+            DocumentItem::Task(task) => task.format(buffer, state),
+            DocumentItem::Struct(structure) => structure.format(buffer, state),
         }
     }
 
@@ -395,8 +460,8 @@ impl Formattable for DocumentItem {
                 unreachable!("Import statements should not be formatted as a DocumentItem")
             }
             DocumentItem::Workflow(workflow) => workflow.syntax_element(),
-            DocumentItem::Task(task) => todo!(), // task.syntax_element(),
-            DocumentItem::Struct(structure) => todo!(), // structure.syntax_element(),
+            DocumentItem::Task(task) => task.syntax_element(),
+            DocumentItem::Struct(structure) => structure.syntax_element(),
         }
     }
 }
@@ -447,6 +512,10 @@ pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
     }
 
     for item in ast.items() {
+        if item.syntax().kind() == SyntaxKind::ImportStatementNode {
+            continue;
+        }
+        result.push_str(NEWLINE);
         match item.format(&mut result, &mut state) {
             Ok(_) => {}
             Err(_) => {

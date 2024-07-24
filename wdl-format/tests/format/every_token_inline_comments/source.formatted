@@ -1,5 +1,6 @@
 version  #1
     1.0  #2
+
 workflow  #3
     test_wf  #4
 {  #5
@@ -106,3 +107,42 @@ GT_AG_and_CT_AC_motif #17
             out_sj_filter_overhang_min  #42
     }  #43
 }  #102
+
+task  #103
+    test_task  #104
+    {  #105
+    parameter_meta  #114
+    {  #115
+        bowchicka  #116
+            :  #117
+            {  #118
+            type  #119
+                :  #120
+                "String"  #121
+,
+                label  #123
+                :  #124
+                "Bowchicka"  #125
+,
+        }  #126
+
+    }  #127
+
+    input  #109
+        {  #110
+        String  #111
+            bowchicka  #112
+    }  #113
+
+    command  #106
+        <<< #107
+ >>>  #108
+}  #128
+
+struct  #129
+    SpliceJunctionMotifs  #130
+    {  #131
+    Int  #132
+        noncanonical_motifs  #133
+    Int GT_AG_and_CT_AC_motif  #134
+}  #135

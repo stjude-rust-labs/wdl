@@ -21,5 +21,6 @@ import  # fileA 1.2
 import "fileB.wdl" as foo  # also fileB
 # this comment belongs to fileC
 import "fileC.wdl"  # also fileC
+
 workflow test {
 }

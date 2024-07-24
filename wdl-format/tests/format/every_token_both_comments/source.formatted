@@ -3,6 +3,7 @@
 version  #1b
     #2a
     1.0  #2b
+
 #3a
 workflow  #3b
     #4a
@@ -55,4 +56,24 @@ GT_AG_and_CT_AC_motif
     output {
         SpliceJunctionMotifs KAZAM = out_sj_filter_overhang_min
     }
+}
+
+task test_task {
+    parameter_meta {
+        bowchicka: {
+            type: "String",
+            label: "Bowchicka",
+        }
+    }
+
+    input {
+        String bowchicka
+    }
+
+    command <<<>>>
+}
+
+struct SpliceJunctionMotifs {
+    Int noncanonical_motifs
+    Int GT_AG_and_CT_AC_motif
 }

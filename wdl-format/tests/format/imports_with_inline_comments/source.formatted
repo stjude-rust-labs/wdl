@@ -10,5 +10,6 @@ import  # fileA 1
     Qux  # fileA 8
 import "fileB.wdl" as foo  # fileB
 import "fileC.wdl"  # fileC
+
 workflow test {
 }

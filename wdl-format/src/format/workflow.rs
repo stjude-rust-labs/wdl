@@ -79,13 +79,7 @@ impl Formattable for CallAfter {
 
 impl Formattable for CallInputItem {
     fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, true)?;
-
         let name = self.name();
-        format_preceding_comments(&name.syntax_element(), buffer, state, true)?;
-        if state.interrupted() {
-            state.indent(buffer)?;
-        }
         name.format(buffer, state)?;
         format_inline_comment(&name.syntax_element(), buffer, state, true)?;
 
@@ -193,6 +187,7 @@ impl Formattable for CallStatement {
 
             if inputs.len() == 1 {
                 let input = inputs.first().expect("Inputs should have a first element");
+                format_preceding_comments(&input.syntax_element(), buffer, state, true)?;
                 state.space_or_indent(buffer)?;
                 input.format(buffer, state)?;
 
@@ -214,7 +209,12 @@ impl Formattable for CallStatement {
                 state.increment_indent();
 
                 for input in inputs {
-                    buffer.push_str(NEWLINE);
+                    if !state.interrupted() {
+                        buffer.push_str(NEWLINE);
+                    } else {
+                        state.reset_interrupted();
+                    }
+                    format_preceding_comments(&input.syntax_element(), buffer, state, false)?;
                     state.indent(buffer)?;
                     input.format(buffer, state)?;
                     if let Some(cur_comma) = commas.next() {
@@ -225,6 +225,11 @@ impl Formattable for CallStatement {
                         buffer.push(',');
                     }
                 }
+                if !state.interrupted() {
+                    buffer.push_str(NEWLINE);
+                } else {
+                    state.reset_interrupted();
+                }
 
                 state.decrement_indent();
 
@@ -234,7 +239,6 @@ impl Formattable for CallStatement {
                     .find(|element| element.kind() == SyntaxKind::CloseBrace)
                     .expect("Call Statement should have a close brace");
                 format_preceding_comments(&close_brace, buffer, state, false)?;
-                buffer.push_str(NEWLINE);
                 state.indent(buffer)?;
                 buffer.push('}');
             }
