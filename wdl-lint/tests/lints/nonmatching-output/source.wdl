@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, MissingRuntime, TrailingComma
+#@ except: CommentWhitespace, DescriptionMissing, MissingRuntime, TrailingComma
 
 version 1.1
 
