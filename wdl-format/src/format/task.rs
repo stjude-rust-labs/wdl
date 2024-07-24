@@ -42,7 +42,8 @@ impl Formattable for CommandSection {
                 .find(|c| c.kind() == SyntaxKind::OpenHeredoc)
                 .expect("Command section should have an open heredoc");
             format_preceding_comments(&open_heredoc, buffer, state, true)?;
-            // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+            // Open braces should ignore the "+1 rule" followed by other interrupted
+            // elements.
             if state.interrupted() {
                 state.reset_interrupted();
                 state.indent(buffer)?;
@@ -57,7 +58,8 @@ impl Formattable for CommandSection {
                 .find(|c| c.kind() == SyntaxKind::OpenBrace)
                 .expect("Command section should have an open brace");
             format_preceding_comments(&open_brace, buffer, state, true)?;
-            // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+            // Open braces should ignore the "+1 rule" followed by other interrupted
+            // elements.
             if state.interrupted() {
                 state.reset_interrupted();
                 state.indent(buffer)?;
@@ -148,7 +150,8 @@ impl Formattable for RuntimeSection {
             .find(|c| c.kind() == SyntaxKind::OpenBrace)
             .expect("Runtime section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        // Open braces should ignore the "+1 rule" followed by other interrupted
+        // elements.
         if state.interrupted() {
             state.reset_interrupted();
             state.indent(buffer)?;
@@ -239,7 +242,8 @@ impl Formattable for RequirementsSection {
             .find(|c| c.kind() == SyntaxKind::OpenBrace)
             .expect("Requirements section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        // Open braces should ignore the "+1 rule" followed by other interrupted
+        // elements.
         if state.interrupted() {
             state.reset_interrupted();
             state.indent(buffer)?;
@@ -300,7 +304,8 @@ impl Formattable for TaskDefinition {
             .find(|c| c.kind() == SyntaxKind::OpenBrace)
             .expect("Task should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        // Open braces should ignore the "+1 rule" followed by other interrupted
+        // elements.
         if state.interrupted() {
             state.reset_interrupted();
             state.indent(buffer)?;

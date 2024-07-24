@@ -276,7 +276,8 @@ impl Formattable for InputSection {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Input Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        // Open braces should ignore the "+1 rule" followed by other interrupted
+        // elements.
         if state.interrupted() {
             state.reset_interrupted();
             state.indent(buffer)?;
@@ -331,7 +332,8 @@ impl Formattable for OutputSection {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Output Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        // Open braces should ignore the "+1 rule" followed by other interrupted
+        // elements.
         if state.interrupted() {
             state.reset_interrupted();
             state.indent(buffer)?;
@@ -421,7 +423,8 @@ impl Formattable for HintsSection {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Hints Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        // Open braces should ignore the "+1 rule" followed by other interrupted
+        // elements.
         if state.interrupted() {
             state.reset_interrupted();
             state.indent(buffer)?;
@@ -480,7 +483,8 @@ impl Formattable for StructDefinition {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Struct Definition should have an open brace");
-        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        // Open braces should ignore the "+1 rule" followed by other interrupted
+        // elements.
         if state.interrupted() {
             state.reset_interrupted();
             state.indent(buffer)?;

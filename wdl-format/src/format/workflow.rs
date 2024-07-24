@@ -153,7 +153,8 @@ impl Formattable for CallStatement {
                 .find(|element| element.kind() == SyntaxKind::OpenBrace)
                 .expect("Call Statement should have an open brace");
             format_preceding_comments(&open_brace, buffer, state, true)?;
-            // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+            // Open braces should ignore the "+1 rule" followed by other interrupted
+            // elements.
             if state.interrupted() {
                 state.reset_interrupted();
                 state.indent(buffer)?;
@@ -271,7 +272,8 @@ impl Formattable for ConditionalStatement {
             .find(|element| element.kind() == SyntaxKind::OpenParen)
             .expect("Conditional Statement should have an open parenthesis");
         format_preceding_comments(&open_paren, buffer, state, true)?;
-        // Open parens should ignore the "+1 rule" followed by other interrupted elements.
+        // Open parens should ignore the "+1 rule" followed by other interrupted
+        // elements.
         if state.interrupted() {
             state.reset_interrupted();
             state.indent(buffer)?;
@@ -312,7 +314,8 @@ impl Formattable for ConditionalStatement {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Conditional Statement should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        // Open braces should ignore the "+1 rule" followed by other interrupted
+        // elements.
         if state.interrupted() {
             state.reset_interrupted();
             state.indent(buffer)?;
@@ -367,7 +370,8 @@ impl Formattable for ScatterStatement {
             .find(|element| element.kind() == SyntaxKind::OpenParen)
             .expect("Scatter Statement should have an open parenthesis");
         format_preceding_comments(&open_paren, buffer, state, true)?;
-        // Open parens should ignore the "+1 rule" followed by other interrupted elements.
+        // Open parens should ignore the "+1 rule" followed by other interrupted
+        // elements.
         if state.interrupted() {
             state.reset_interrupted();
             state.indent(buffer)?;
@@ -419,7 +423,8 @@ impl Formattable for ScatterStatement {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Scatter Statement should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        // Open braces should ignore the "+1 rule" followed by other interrupted
+        // elements.
         if state.interrupted() {
             state.reset_interrupted();
             state.indent(buffer)?;
@@ -498,7 +503,8 @@ impl Formattable for WorkflowDefinition {
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Workflow should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
-        // Open braces should ignore the "+1 rule" followed by other interrupted elements.
+        // Open braces should ignore the "+1 rule" followed by other interrupted
+        // elements.
         if state.interrupted() {
             state.reset_interrupted();
             state.indent(buffer)?;
