@@ -102,13 +102,13 @@ note[ExpressionSpacing]: multi-line if...then...else must have a preceding space
    │
    = fix: add a newline before the then keyword
 
-note[ExpressionSpacing]: multi-line if...then...else must have a preceding space
+note[ExpressionSpacing]: multi-line if...then...else must have a following newline and parenthesis
    ┌─ tests/lints/expression-spacing/source.wdl:58:9
    │
 58 │         else false
    │         ^^^^
    │
-   = fix: add a newline before the else keyword
+   = fix: add a newline and close parenthesis after to this else clause
 
 note[ExpressionSpacing]: multi-line if...then...else must have a preceding space
    ┌─ tests/lints/expression-spacing/source.wdl:63:22

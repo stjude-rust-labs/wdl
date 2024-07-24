@@ -437,7 +437,7 @@ impl Visitor for ExpressionSpacingRule {
                         .expect("should have a prior sibling");
 
                     if then_ws.kind() != SyntaxKind::Whitespace
-                        || !then_ws.to_string().starts_with('\n')
+                        || !then_ws.to_string().contains('\n')
                     {
                         // then should be preceded by a newline
                         state.add(multiline_then_space(then_keyword.text_range().to_span()));
@@ -448,7 +448,7 @@ impl Visitor for ExpressionSpacingRule {
                         .prev_sibling_or_token()
                         .expect("should have a prior sibling");
                     if else_prior.kind() != SyntaxKind::Whitespace
-                        || !else_prior.to_string().starts_with('\n')
+                        || !else_prior.to_string().contains('\n')
                     {
                         // then should be preceded by a newline
                         state.add(multiline_else_space(else_keyword.text_range().to_span()));
