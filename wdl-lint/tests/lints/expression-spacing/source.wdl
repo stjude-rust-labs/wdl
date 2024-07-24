@@ -59,6 +59,21 @@ task foo {
         Int k = (  # a comment
             2 * 5
         )
+        Boolean l = (  # a comment
+            if a < b then true
+            else false
+        )
+        Boolean m = (
+            # a comment
+            if a < b then true
+            else false
+        )
+        Boolean n = (
+            # OK comment
+            if a < b  # OK comment
+            then true  # OK comment
+            else false  # OK comment
+        )
     }
 
     command <<< >>>

@@ -110,18 +110,26 @@ note[ExpressionSpacing]: multi-line if...then...else must have a preceding space
    │
    = fix: add a newline before the else keyword
 
-note[ExpressionSpacing]: multi-line if...then...else must have a following newline and parenthesis
-   ┌─ tests/lints/expression-spacing/source.wdl:58:9
+note[ExpressionSpacing]: multi-line if...then...else must have a preceding space
+   ┌─ tests/lints/expression-spacing/source.wdl:63:22
    │
-58 │         else false
-   │         ^^^^^^^^^^
+63 │             if a < b then true
+   │                      ^^^^
    │
-   = fix: add a newline and close parenthesis after to this else clause
+   = fix: add a newline before the then keyword
+
+note[ExpressionSpacing]: multi-line if...then...else must have a preceding space
+   ┌─ tests/lints/expression-spacing/source.wdl:68:22
+   │
+68 │             if a < b then true
+   │                      ^^^^
+   │
+   = fix: add a newline before the then keyword
 
 note[ExpressionSpacing]: prefix operators may not contain whitespace
-   ┌─ tests/lints/expression-spacing/source.wdl:67:21
+   ┌─ tests/lints/expression-spacing/source.wdl:82:21
    │
-67 │         Boolean b = ! a
+82 │         Boolean b = ! a
    │                     ^^^
    │
    = fix: remove the internal whitespace

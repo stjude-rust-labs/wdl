@@ -402,22 +402,32 @@ impl Visitor for ExpressionSpacingRule {
                 if newlines > 0 {
                     // If expression should be preceded by a opening parenthesis and a newline (plus
                     // indentation whitespace).
-                    let prior: Vec<NodeOrToken<SyntaxNode, SyntaxToken>> = expr
+                    let mut prior = expr
                         .syntax()
                         .siblings_with_tokens(Direction::Prev)
-                        .skip(1)
-                        .take(2)
-                        .collect();
+                        .skip(1);
 
-                    let ws = prior.first().expect("should have a last element");
-                    let paren = prior.last().expect("should have a first element");
+                    let mut newline = false;
 
-                    if paren.kind() != SyntaxKind::OpenParen
-                        || (ws.kind() != SyntaxKind::Whitespace
-                            && !ws.to_string().starts_with('\n'))
-                    {
-                        // if should be preceded by an opening parenthesis and a newline
-                        state.add(multiline_if_open_paren(if_keyword.text_range().to_span()));
+                    while let Some(t) = prior.next() {
+                        // if keyword in a multi-line if..then..else should only be preceded by
+                        // whitespace, an opening parenthesis, or a comment.
+                        if !matches!(t.kind(), SyntaxKind::Whitespace | SyntaxKind::OpenParen | SyntaxKind::Comment) {
+                            // if should be preceded by an opening parenthesis and a newline
+                            state.add(multiline_if_open_paren(if_keyword.text_range().to_span()));
+                            break;
+                        }
+                        else if t.kind() == SyntaxKind::Whitespace && t.to_string().contains('\n') {
+                            newline = true;
+                        }
+                        else if t.kind() == SyntaxKind::OpenParen {
+                            if newline {
+                                break;
+                            }
+                            else {
+                                state.add(multiline_if_open_paren(if_keyword.text_range().to_span()));
+                            }
+                        }
                     }
 
                     // check the then keyword
@@ -444,26 +454,30 @@ impl Visitor for ExpressionSpacingRule {
                     }
 
                     // check the closing parenthesis
-                    let next_tokens: Vec<NodeOrToken<SyntaxNode, SyntaxToken>> = expr
+                    let mut next_tokens = expr
                         .syntax()
                         .siblings_with_tokens(Direction::Next)
-                        .skip(1)
-                        .take(2)
-                        .collect();
-                    let close_ws = next_tokens.first().unwrap_or(&else_keyword);
-                    let close_paren = next_tokens.last().unwrap_or(&else_keyword);
+                        .skip(1);
 
-                    if (close_ws.kind() != SyntaxKind::Whitespace
-                        && !close_ws.to_string().contains('\n'))
-                        || close_paren.kind() != SyntaxKind::CloseParen
-                    {
-                        // closing parenthesis should be preceded by a newline
-                        // closing parenthesis should be preceded by a newline
-                        state.add(multiline_if_close_paren(Span::new(
-                            else_keyword.text_range().start().into(),
-                            usize::from(expr.syntax().text_range().end())
-                                - usize::from(else_keyword.text_range().start()),
-                        )));
+                    while let Some(t) = next_tokens.next() {
+                        // else keyword in a multi-line if..then..else should only be followed by
+                        // whitespace or a comment, then a closing parenthesis.
+                        if !matches!(t.kind(), SyntaxKind::Whitespace | SyntaxKind::CloseParen | SyntaxKind::Comment) {
+                            // if should be preceded by an closing parenthesis and a newline
+                            state.add(multiline_if_close_paren(if_keyword.text_range().to_span()));
+                            break;
+                        }
+                        else if t.kind() == SyntaxKind::Whitespace && t.to_string().contains('\n') {
+                            newline = true;
+                        }
+                        else if t.kind() == SyntaxKind::CloseParen {
+                            if newline {
+                                break;
+                            }
+                            else {
+                                state.add(multiline_if_close_paren(if_keyword.text_range().to_span()));
+                            }
+                        }
                     }
                 }
             }
