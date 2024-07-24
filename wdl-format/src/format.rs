@@ -269,11 +269,11 @@ impl Formattable for InputSection {
         buffer.push_str("input");
         format_inline_comment(&input_keyword, buffer, state, true)?;
 
-        let open_brace = 
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                .expect("Input Section should have an open brace");
+        let open_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::OpenBrace)
+            .expect("Input Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
         state.space_or_indent(buffer)?;
         buffer.push('{');
@@ -287,11 +287,11 @@ impl Formattable for InputSection {
 
         state.decrement_indent();
 
-        let close_brace = 
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::CloseBrace)
-                .expect("Input Section should have a close brace");
+        let close_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::CloseBrace)
+            .expect("Input Section should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push('}');
@@ -318,11 +318,11 @@ impl Formattable for OutputSection {
         buffer.push_str("output");
         format_inline_comment(&output_keyword, buffer, state, true)?;
 
-        let open_brace = 
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                .expect("Output Section should have an open brace");
+        let open_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::OpenBrace)
+            .expect("Output Section should have an open brace");
         format_preceding_comments(&open_brace, buffer, state, true)?;
         state.space_or_indent(buffer)?;
         buffer.push('{');
@@ -336,11 +336,11 @@ impl Formattable for OutputSection {
 
         state.decrement_indent();
 
-        let close_brace = 
-            self.syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::CloseBrace)
-                .expect("Output Section should have a close brace");
+        let close_brace = self
+            .syntax()
+            .children_with_tokens()
+            .find(|element| element.kind() == SyntaxKind::CloseBrace)
+            .expect("Output Section should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push('}');
