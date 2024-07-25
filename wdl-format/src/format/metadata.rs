@@ -51,11 +51,21 @@ impl Formattable for MetadataObject {
 
         state.increment_indent();
 
-        // TODO: Check commas
+        let mut commas = self
+            .syntax()
+            .children_with_tokens()
+            .filter(|c| c.kind() == SyntaxKind::Comma);
         for item in self.items() {
             item.format(buffer, state)?;
-            buffer.push(',');
-            buffer.push_str(NEWLINE);
+            if let Some(cur_comma) = commas.next() {
+                format_preceding_comments(&cur_comma, buffer, state, true)?;
+                buffer.push(',');
+                format_inline_comment(&cur_comma, buffer, state, false)?;
+            } else {
+                // No trailing comma was in the input
+                buffer.push(',');
+                buffer.push_str(NEWLINE);
+            }
         }
 
         state.decrement_indent();
@@ -99,12 +109,22 @@ impl Formattable for MetadataArray {
 
         state.increment_indent();
 
-        // TODO: Check commas
+        let mut commas = self
+            .syntax()
+            .children_with_tokens()
+            .filter(|c| c.kind() == SyntaxKind::Comma);
         for item in self.elements() {
             state.indent(buffer)?;
             item.format(buffer, state)?;
-            buffer.push(',');
-            buffer.push_str(NEWLINE);
+            if let Some(cur_comma) = commas.next() {
+                format_preceding_comments(&cur_comma, buffer, state, true)?;
+                buffer.push(',');
+                format_inline_comment(&cur_comma, buffer, state, false)?;
+            } else {
+                // No trailing comma was in the input
+                buffer.push(',');
+                buffer.push_str(NEWLINE);
+            }
         }
 
         state.decrement_indent();

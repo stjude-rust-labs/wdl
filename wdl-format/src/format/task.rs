@@ -111,7 +111,7 @@ impl Formattable for RuntimeItem {
             .expect("Runtime item should have a colon");
         format_preceding_comments(&colon, buffer, state, true)?;
         if state.interrupted() {
-            // TODO: does this need a reset_interrupted?
+            state.reset_interrupted();
             state.indent(buffer)?;
         }
         buffer.push(':');
@@ -203,7 +203,7 @@ impl Formattable for RequirementsItem {
             .expect("Requirements item should have a colon");
         format_preceding_comments(&colon, buffer, state, true)?;
         if state.interrupted() {
-            // TODO does this need a reset_interrupted?
+            state.reset_interrupted();
             state.indent(buffer)?;
         }
         buffer.push(':');

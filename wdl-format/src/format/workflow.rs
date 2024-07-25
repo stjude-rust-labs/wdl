@@ -281,18 +281,23 @@ impl Formattable for ConditionalStatement {
             buffer.push_str(SPACE);
         }
         buffer.push('(');
-        format_inline_comment(&open_paren, buffer, state, true)?;
 
         let mut paren_on_same_line = true;
-
         let expr = self.expr();
-        format_preceding_comments(&expr.syntax_element(), buffer, state, true)?;
-        if state.interrupted() {
+        let multiline_expr = expr.syntax().to_string().contains(NEWLINE);
+
+        format_inline_comment(&open_paren, buffer, state, !multiline_expr)?;
+        if multiline_expr {
+            state.increment_indent();
+            paren_on_same_line = false;
+        }
+        format_preceding_comments(&expr.syntax_element(), buffer, state, !multiline_expr)?;
+        if state.interrupted() || multiline_expr {
             state.indent(buffer)?;
             paren_on_same_line = false;
         }
-        expr.format(buffer, state)?; // TODO handle multi-line expressions
-        format_inline_comment(&expr.syntax_element(), buffer, state, true)?;
+        expr.format(buffer, state)?;
+        format_inline_comment(&expr.syntax_element(), buffer, state, !multiline_expr)?;
         if state.interrupted() {
             paren_on_same_line = false;
         }
@@ -302,7 +307,7 @@ impl Formattable for ConditionalStatement {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::CloseParen)
             .expect("Conditional Statement should have a close parenthesis");
-        format_preceding_comments(&close_paren, buffer, state, true)?;
+        format_preceding_comments(&close_paren, buffer, state, !multiline_expr)?;
         if state.interrupted() || !paren_on_same_line {
             state.indent(buffer)?;
         }
