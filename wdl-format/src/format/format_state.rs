@@ -11,7 +11,7 @@ use anyhow::Result;
 /// Space constant used for formatting.
 pub const SPACE: &str = " ";
 /// Indentation constant used for formatting.
-pub const INDENT: &str = SPACE.repeat(4);
+pub const INDENT: &str = "    ";
 
 /// The `FormatState` struct is used to keep track of the current formatting
 /// state. This includes the current indentation level and whether the current
