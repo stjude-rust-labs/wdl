@@ -1,4 +1,4 @@
-note[TrailingComma]: extraneous content before trailing comma
+note[TrailingComma]: extraneous whitespace and/or comments before trailing comma
    ┌─ tests/lints/trailing-comma/source.wdl:11:29
    │  
 11 │           modify_memory_gb = 2  # some other junk
@@ -24,7 +24,7 @@ note[TrailingComma]: item missing trailing comma
    │
    = fix: add a comma after this element
 
-note[TrailingComma]: extraneous content before trailing comma
+note[TrailingComma]: extraneous whitespace and/or comments before trailing comma
    ┌─ tests/lints/trailing-comma/source.wdl:39:24
    │
 39 │             baz: "quux" ,  # misplaced comma
@@ -32,7 +32,7 @@ note[TrailingComma]: extraneous content before trailing comma
    │
    = fix: remove this extraneous content
 
-note[TrailingComma]: extraneous content before trailing comma
+note[TrailingComma]: extraneous whitespace and/or comments before trailing comma
    ┌─ tests/lints/trailing-comma/source.wdl:47:24
    │  
 47 │               baz: "quux"  # wow this is ugly
@@ -68,6 +68,38 @@ note[TrailingComma]: item missing trailing comma
    │
 67 │             common: true  # missing comma
    │             ^^^^^^^^^^^^
+   │
+   = fix: add a comma after this element
+
+note[TrailingComma]: item missing trailing comma
+   ┌─ tests/lints/trailing-comma/source.wdl:88:13
+   │
+88 │             3
+   │             ^
+   │
+   = fix: add a comma after this element
+
+note[TrailingComma]: item missing trailing comma
+   ┌─ tests/lints/trailing-comma/source.wdl:94:9
+   │
+94 │         "c": "d"
+   │         ^^^^^^^^
+   │
+   = fix: add a comma after this element
+
+note[DeprecatedObject]: use of a deprecated `Object` type
+   ┌─ tests/lints/trailing-comma/source.wdl:97:5
+   │
+97 │     Object q = {
+   │     ^^^^^^
+   │
+   = fix: replace the `Object` with a `Map` or a `Struct`
+
+note[TrailingComma]: item missing trailing comma
+   ┌─ tests/lints/trailing-comma/source.wdl:99:9
+   │
+99 │         "c": "d"
+   │         ^^^^^^^^
    │
    = fix: add a comma after this element
 

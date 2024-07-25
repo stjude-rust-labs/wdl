@@ -1,6 +1,8 @@
 //! A lint rule for trailing commas in lists/objects.
 
 use wdl_ast::v1::CallStatement;
+use wdl_ast::v1::Expr;
+use wdl_ast::v1::LiteralExpr;
 use wdl_ast::v1::MetadataArray;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
@@ -29,7 +31,7 @@ fn missing_trailing_comma(span: Span) -> Diagnostic {
 
 /// Diagnostic message for extraneous content before trailing comma.
 fn extraneous_content(span: Span) -> Diagnostic {
-    Diagnostic::note("extraneous content before trailing comma")
+    Diagnostic::note("extraneous whitespace and/or comments before trailing comma")
         .with_rule(ID)
         .with_highlight(span)
         .with_fix("remove this extraneous content")
@@ -45,14 +47,17 @@ impl Rule for TrailingCommaRule {
     }
 
     fn description(&self) -> &'static str {
-        "Ensures that lists and objects have a trailing comma."
+        "Ensures that lists and objects have a trailing comma and that there's not extraneous \
+         whitespace and/or comments before the trailing comma."
     }
 
     fn explanation(&self) -> &'static str {
         "All items in a comma-delimited object or list should be followed by a comma, including \
          the last item. An exception is made for lists for which all items are on the same line, \
          in which case there should not be a trailing comma following the last item. Note that \
-         single-line lists are not allowed in the `meta` or `parameter_meta` sections."
+         single-line lists are not allowed in the `meta` or `parameter_meta` sections. This method \
+         checks `arrays` and `objects` in `meta` and `parameter_meta` sections. It also checks \
+         `call` input blocks as well as `Array`, `Map`, `Object`, and `Struct` literals."
     }
 
     fn tags(&self) -> TagSet {
@@ -180,6 +185,47 @@ impl Visitor for TrailingCommaRule {
                 ));
             }
         });
+    }
+
+    fn expr(&mut self, state: &mut Self::State, reason: VisitReason, expr: &Expr) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+        if let Expr::Literal(l) = expr {
+            match l {
+                // items: map, object, struct
+                // elements: array
+                LiteralExpr::Array(_)
+                | LiteralExpr::Map(_)
+                | LiteralExpr::Object(_)
+                | LiteralExpr::Struct(_) => {
+                    // Check if array is multi-line
+                    if l.syntax().to_string().contains('\n') && l.syntax().children().count() > 1 {
+                        let last_child = l.syntax().children().last();
+                        if let Some(last_child) = last_child {
+                            let (next_comma, comma_is_next) = find_next_comma(&last_child);
+                            if let Some(comma) = next_comma {
+                                if !comma_is_next {
+                                    // Comma found, but not next, extraneous trivia
+                                    state.add(extraneous_content(Span::new(
+                                        usize::from(last_child.text_range().end()),
+                                        usize::from(
+                                            comma.text_range().start()
+                                                - last_child.text_range().end(),
+                                        ),
+                                    )));
+                                }
+                            } else {
+                                // No comma found, report missing
+                                state
+                                    .add(missing_trailing_comma(last_child.text_range().to_span()));
+                            }
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
     }
 }
 

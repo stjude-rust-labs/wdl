@@ -81,7 +81,23 @@ task foo {
          Int modify_memory_gb
          Int modify_disk_size_gb
          String not_an_option
+         Array[Int] another = [1,2,3]
+         Array[Int] another2 = [
+            1,
+            2,
+            3
+        ]
    }
+
+    Map[String, String] ano = {
+        "a": "b",
+        "c": "d"
+    }
+
+    Object q = {
+        "a": "b",
+        "c": "d"
+    }
 
    command <<< >>>
 
