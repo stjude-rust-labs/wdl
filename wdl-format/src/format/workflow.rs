@@ -471,9 +471,7 @@ impl Formattable for WorkflowStatement {
             WorkflowStatement::Call(c) => c.format(buffer, state),
             WorkflowStatement::Conditional(c) => c.format(buffer, state),
             WorkflowStatement::Scatter(s) => s.format(buffer, state),
-            WorkflowStatement::Declaration(d) => {
-                Decl::Bound(d.clone()).format(buffer, state)
-            }
+            WorkflowStatement::Declaration(d) => Decl::Bound(d.clone()).format(buffer, state),
         }
     }
 
