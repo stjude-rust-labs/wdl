@@ -87,14 +87,6 @@ note[TrailingComma]: item missing trailing comma
    │
    = fix: add a comma after this element
 
-note[DeprecatedObject]: use of a deprecated `Object` type
-   ┌─ tests/lints/trailing-comma/source.wdl:97:5
-   │
-97 │     Object q = {
-   │     ^^^^^^
-   │
-   = fix: replace the `Object` with a `Map` or a `Struct`
-
 note[TrailingComma]: item missing trailing comma
    ┌─ tests/lints/trailing-comma/source.wdl:99:9
    │
