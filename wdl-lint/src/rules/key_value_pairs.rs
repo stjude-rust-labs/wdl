@@ -72,11 +72,16 @@ impl Rule for KeyValuePairsRule {
     }
 
     fn description(&self) -> &'static str {
-        ""
+        "Ensures that arrays and objects in `meta` and `parameter_meta` sections have one element \
+         per line and are indented correctly."
     }
 
     fn explanation(&self) -> &'static str {
-        ""
+        "All lists and objects in the `meta` and `parameter_meta` sections should have one element \
+         per line (i.e. newline separate elements). A key/value pair are considered one element if \
+         the value is atomic (i.e. not a list or an object). Otherwise have the key and opening \
+         bracket on the same line; subsequently indent one level; put one value per line; and have \
+         the closing bracket on its own line at the same indentation level of the key."
     }
 
     fn tags(&self) -> TagSet {
