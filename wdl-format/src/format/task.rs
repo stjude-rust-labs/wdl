@@ -339,9 +339,7 @@ impl Formattable for TaskDefinition {
                     i.format(&mut input_section_str, state)?;
                 }
                 TaskItem::Declaration(d) => {
-                    let decl =
-                        Decl::cast(d.syntax().clone()).expect("Task declaration should be a Decl");
-                    decl.format(&mut declaration_section_str, state)?;
+                    Decl::Bound(d).format(&mut declaration_section_str, state)?;
                 }
                 TaskItem::Command(c) => {
                     c.format(&mut command_section_str, state)?;

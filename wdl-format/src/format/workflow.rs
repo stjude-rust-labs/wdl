@@ -472,9 +472,7 @@ impl Formattable for WorkflowStatement {
             WorkflowStatement::Conditional(c) => c.format(buffer, state),
             WorkflowStatement::Scatter(s) => s.format(buffer, state),
             WorkflowStatement::Declaration(d) => {
-                let decl = Decl::cast(d.syntax().clone())
-                    .expect("Workflow declaration should cast to a declaration");
-                decl.format(buffer, state)
+                Decl::Bound(d.clone()).format(buffer, state)
             }
         }
     }
@@ -549,9 +547,7 @@ impl Formattable for WorkflowDefinition {
                     s.format(&mut body_str, state)?;
                 }
                 WorkflowItem::Declaration(d) => {
-                    let decl = Decl::cast(d.syntax().clone())
-                        .expect("Workflow declaration should cast to a declaration");
-                    decl.format(&mut body_str, state)?;
+                    Decl::Bound(d).format(&mut body_str, state)?;
                 }
                 WorkflowItem::Output(o) => {
                     o.format(&mut output_section_str, state)?;
