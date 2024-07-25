@@ -3,8 +3,8 @@
 //! All comments will be treated as either "preceding" or "inline" comments.
 //! Every comment will "belong" or "be owned" by a specific element in the
 //! syntax tree. If that element is moved from one place to another, the
-//! comment will move with it. Only syntax elemnts that are either the first
-//! element of a line or the last element of a line can own comments. Elemnts
+//! comment will move with it. Only syntax elements that are either the first
+//! element of a line or the last element of a line can own comments. Elements
 //! may span multiple lines, only the beginning (in the case of preceding
 //! comments) or the end (in the case of inline comments) of the element
 //! are considered.
