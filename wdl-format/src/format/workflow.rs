@@ -151,7 +151,7 @@ impl Formattable for CallStatement {
                 .syntax()
                 .children_with_tokens()
                 .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                .expect("Call Statement should have an open brace");
+                .expect("Call Statement with input(s) should have an open brace");
             format_preceding_comments(&open_brace, buffer, state, true)?;
             // Open braces should ignore the "+1 rule" followed by other interrupted
             // elements.
@@ -168,7 +168,7 @@ impl Formattable for CallStatement {
                 .syntax()
                 .children_with_tokens()
                 .find(|element| element.kind() == SyntaxKind::InputKeyword)
-                .expect("Call Statement should have an input keyword");
+                .expect("Call Statement with input(s) should have an input keyword");
             format_preceding_comments(&input_keyword, buffer, state, true)?;
             state.space_or_indent(buffer)?;
             buffer.push_str(&input_keyword.to_string());
@@ -178,7 +178,7 @@ impl Formattable for CallStatement {
                 .syntax()
                 .children_with_tokens()
                 .find(|element| element.kind() == SyntaxKind::Colon)
-                .expect("Call Statement should have a colon");
+                .expect("Call Statement with input(s) should have a colon");
             format_preceding_comments(&colon, buffer, state, true)?;
             if state.interrupted() {
                 state.indent(buffer)?;
