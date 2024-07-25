@@ -44,6 +44,8 @@ use format_state::FormatState;
 
 /// Newline constant used for formatting.
 pub const NEWLINE: &str = "\n";
+/// String terminator constant used for formatting.
+const STRING_TERMINATOR: char = '"';
 
 /// A trait for elements that can be formatted.
 pub trait Formattable {
@@ -128,7 +130,7 @@ impl Formattable for VersionStatement {
 
 impl Formattable for LiteralString {
     fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
-        buffer.push('"');
+        buffer.push(STRING_TERMINATOR);
         for part in self.parts() {
             match part {
                 StringPart::Text(text) => {
@@ -139,7 +141,7 @@ impl Formattable for LiteralString {
                 }
             }
         }
-        buffer.push('"');
+        buffer.push(STRING_TERMINATOR);
         Ok(())
     }
 
