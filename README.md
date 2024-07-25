@@ -111,6 +111,8 @@ The `wdl` CLI tool currently supports three subcommands:
   document scopes and exits with a status code of `0` if the documents are
   valid; otherwise, prints the validation diagnostics and exits with a status
   code of `1`.
+* `format` - Parses, validates, and then formats a single WDL document, printing
+  the result to STDOUT.
 
 Each of the subcommands supports passing `-` as the file path to denote reading
 from STDIN instead of a file on disk.
