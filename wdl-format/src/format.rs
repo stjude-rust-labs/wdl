@@ -108,7 +108,7 @@ impl Formattable for VersionStatement {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::VersionKeyword)
             .expect("Version statement should have a version keyword");
-        buffer.push_str("version");
+        buffer.push_str(&version_keyword.to_string());
         format_inline_comment(&version_keyword, buffer, state, true)?;
 
         let version = self.version();
@@ -161,10 +161,7 @@ impl Formattable for Ident {
 
 impl Formattable for LiteralBoolean {
     fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
-        match self.value() {
-            true => buffer.push_str("true"),
-            false => buffer.push_str("false"),
-        }
+        buffer.push_str(&self.value().to_string());
         Ok(())
     }
 
@@ -240,7 +237,7 @@ impl Formattable for Decl {
                 .expect("Bound declaration should have an equals sign");
             format_preceding_comments(&eq, buffer, state, true)?;
             state.space_or_indent(buffer)?;
-            buffer.push('=');
+            buffer.push_str(&eq.to_string());
             format_inline_comment(&eq, buffer, state, true)?;
 
             format_preceding_comments(&expr.syntax_element(), buffer, state, true)?;
@@ -267,7 +264,7 @@ impl Formattable for InputSection {
             .find(|element| element.kind() == SyntaxKind::InputKeyword)
             .expect("Input Section should have an input keyword");
         state.indent(buffer)?;
-        buffer.push_str("input");
+        buffer.push_str(&input_keyword.to_string());
         format_inline_comment(&input_keyword, buffer, state, true)?;
 
         let open_brace = self
@@ -284,7 +281,7 @@ impl Formattable for InputSection {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('{');
+        buffer.push_str(&open_brace.to_string());
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
@@ -302,7 +299,7 @@ impl Formattable for InputSection {
             .expect("Input Section should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
-        buffer.push('}');
+        buffer.push_str(&close_brace.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())
@@ -340,7 +337,7 @@ impl Formattable for OutputSection {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('{');
+        buffer.push_str(&open_brace.to_string());
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
@@ -358,7 +355,7 @@ impl Formattable for OutputSection {
             .expect("Output Section should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
-        buffer.push('}');
+        buffer.push_str(&close_brace.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())
@@ -387,7 +384,7 @@ impl Formattable for HintsItem {
         if state.interrupted() {
             state.indent(buffer)?;
         }
-        buffer.push(':');
+        buffer.push_str(&colon.to_string());
         format_inline_comment(&colon, buffer, state, true)?;
 
         let expr = self.expr();
@@ -414,7 +411,7 @@ impl Formattable for HintsSection {
             .find(|element| element.kind() == SyntaxKind::HintsKeyword)
             .expect("Hints Section should have a hints keyword");
         state.indent(buffer)?;
-        buffer.push_str("hints");
+        buffer.push_str(&hints_keyword.to_string());
         format_inline_comment(&hints_keyword, buffer, state, true)?;
 
         let open_brace = self
@@ -431,7 +428,7 @@ impl Formattable for HintsSection {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('{');
+        buffer.push_str(&open_brace.to_string());
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
@@ -449,7 +446,7 @@ impl Formattable for HintsSection {
             .expect("Hints Section should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
-        buffer.push('}');
+        buffer.push_str(&close_brace.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())
@@ -469,7 +466,7 @@ impl Formattable for StructDefinition {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::StructKeyword)
             .expect("Struct Definition should have a struct keyword");
-        buffer.push_str("struct");
+        buffer.push_str(&struct_keyword.to_string());
         format_inline_comment(&struct_keyword, buffer, state, true)?;
 
         let name = self.name();
@@ -491,7 +488,7 @@ impl Formattable for StructDefinition {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('{');
+        buffer.push_str(&open_brace.to_string());
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
@@ -519,7 +516,7 @@ impl Formattable for StructDefinition {
             .expect("Struct Definition should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
-        buffer.push('}');
+        buffer.push_str(&close_brace.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())

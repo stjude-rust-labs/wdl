@@ -1,5 +1,7 @@
 //! A module for formatting metadata sections (meta and parameter_meta).
 
+use std::fmt::Write;
+
 use anyhow::Result;
 use wdl_ast::v1::LiteralNull;
 use wdl_ast::v1::MetadataArray;
@@ -21,7 +23,7 @@ use super::NEWLINE;
 
 impl Formattable for LiteralNull {
     fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
-        buffer.push_str("null");
+        write!(buffer, "{}", self.syntax())?;
         Ok(())
     }
 
@@ -46,7 +48,7 @@ impl Formattable for MetadataObject {
             state.reset_interrupted();
             state.indent(buffer)?;
         }
-        buffer.push('{');
+        buffer.push_str(&open_brace.to_string());
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
@@ -55,6 +57,7 @@ impl Formattable for MetadataObject {
             .syntax()
             .children_with_tokens()
             .filter(|c| c.kind() == SyntaxKind::Comma);
+
         for item in self.items() {
             item.format(buffer, state)?;
             if let Some(cur_comma) = commas.next() {
@@ -77,7 +80,7 @@ impl Formattable for MetadataObject {
             .expect("Metadata Object should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
-        buffer.push('}');
+        buffer.push_str(&close_brace.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, true)?;
 
         Ok(())
@@ -104,7 +107,7 @@ impl Formattable for MetadataArray {
             state.reset_interrupted();
             state.indent(buffer)?;
         }
-        buffer.push('[');
+        buffer.push_str(&open_bracket.to_string());
         format_inline_comment(&open_bracket, buffer, state, false)?;
 
         state.increment_indent();
@@ -113,6 +116,7 @@ impl Formattable for MetadataArray {
             .syntax()
             .children_with_tokens()
             .filter(|c| c.kind() == SyntaxKind::Comma);
+
         for item in self.elements() {
             state.indent(buffer)?;
             item.format(buffer, state)?;
@@ -136,7 +140,7 @@ impl Formattable for MetadataArray {
             .expect("Metadata Array should have a close bracket");
         format_preceding_comments(&close_bracket, buffer, state, false)?;
         state.indent(buffer)?;
-        buffer.push(']');
+        buffer.push_str(&close_bracket.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, true)?;
 
         Ok(())
@@ -192,7 +196,7 @@ impl Formattable for MetadataObjectItem {
             state.indent(buffer)?;
             state.reset_interrupted();
         }
-        buffer.push(':');
+        buffer.push_str(&colon.to_string());
         format_inline_comment(&colon, buffer, state, true)?;
 
         let value = self.value();
@@ -219,7 +223,7 @@ impl Formattable for MetadataSection {
             .find(|element| element.kind() == SyntaxKind::MetaKeyword)
             .expect("Metadata Section should have a meta keyword");
         state.indent(buffer)?;
-        buffer.push_str("meta");
+        buffer.push_str(&meta_keyword.to_string());
         format_inline_comment(&meta_keyword, buffer, state, true)?;
 
         let open_brace = self
@@ -236,7 +240,7 @@ impl Formattable for MetadataSection {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('{');
+        buffer.push_str(&open_brace.to_string());
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
@@ -255,7 +259,7 @@ impl Formattable for MetadataSection {
             .expect("Metadata Section should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
-        buffer.push('}');
+        buffer.push_str(&close_brace.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())
@@ -276,7 +280,7 @@ impl Formattable for ParameterMetadataSection {
             .find(|element| element.kind() == SyntaxKind::ParameterMetaKeyword)
             .expect("Parameter Metadata Section should have a parameter meta keyword");
         state.indent(buffer)?;
-        buffer.push_str("parameter_meta");
+        buffer.push_str(&parameter_meta_keyword.to_string());
         format_inline_comment(&parameter_meta_keyword, buffer, state, true)?;
 
         let open_brace = self
@@ -293,7 +297,7 @@ impl Formattable for ParameterMetadataSection {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('{');
+        buffer.push_str(&open_brace.to_string());
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
@@ -312,7 +316,7 @@ impl Formattable for ParameterMetadataSection {
             .expect("Parameter Metadata Section should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
-        buffer.push('}');
+        buffer.push_str(&close_brace.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())

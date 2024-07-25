@@ -34,7 +34,7 @@ impl Formattable for CallAlias {
             .find(|element| element.kind() == SyntaxKind::AsKeyword)
             .expect("Call Alias should have an as keyword");
         state.space_or_indent(buffer)?;
-        buffer.push_str("as");
+        buffer.push_str(&as_keyword.to_string());
         format_inline_comment(&as_keyword, buffer, state, true)?;
 
         let ident = self.name();
@@ -60,7 +60,7 @@ impl Formattable for CallAfter {
             .find(|element| element.kind() == SyntaxKind::AfterKeyword)
             .expect("Call After should have an after keyword");
         state.space_or_indent(buffer)?;
-        buffer.push_str("after");
+        buffer.push_str(&after_keyword.to_string());
         format_inline_comment(&after_keyword, buffer, state, true)?;
 
         let ident = self.name();
@@ -83,15 +83,15 @@ impl Formattable for CallInputItem {
         format_inline_comment(&name.syntax_element(), buffer, state, true)?;
 
         if let Some(expr) = self.expr() {
-            let equal_sign = self
+            let eq_sign = self
                 .syntax()
                 .children_with_tokens()
                 .find(|element| element.kind() == SyntaxKind::Assignment)
                 .expect("Call Input Item should have an equal sign");
-            format_preceding_comments(&equal_sign, buffer, state, true)?;
+            format_preceding_comments(&eq_sign, buffer, state, true)?;
             state.space_or_indent(buffer)?;
-            buffer.push('=');
-            format_inline_comment(&equal_sign, buffer, state, true)?;
+            buffer.push_str(&eq_sign.to_string());
+            format_inline_comment(&eq_sign, buffer, state, true)?;
 
             format_preceding_comments(&expr.syntax_element(), buffer, state, true)?;
             state.space_or_indent(buffer)?;
@@ -118,7 +118,7 @@ impl Formattable for CallStatement {
             .find(|element| element.kind() == SyntaxKind::CallKeyword)
             .expect("Call Statement should have a call keyword");
         state.indent(buffer)?;
-        buffer.push_str("call");
+        buffer.push_str(&call_keyword.to_string());
         format_inline_comment(&call_keyword, buffer, state, true)?;
 
         let target = self.target();
@@ -161,7 +161,7 @@ impl Formattable for CallStatement {
             } else {
                 buffer.push_str(SPACE);
             }
-            buffer.push('{');
+            buffer.push_str(&open_brace.to_string());
             format_inline_comment(&open_brace, buffer, state, true)?;
 
             let input_keyword = self
@@ -171,7 +171,7 @@ impl Formattable for CallStatement {
                 .expect("Call Statement should have an input keyword");
             format_preceding_comments(&input_keyword, buffer, state, true)?;
             state.space_or_indent(buffer)?;
-            buffer.push_str("input");
+            buffer.push_str(&input_keyword.to_string());
             format_inline_comment(&input_keyword, buffer, state, true)?;
 
             let colon = self
@@ -199,7 +199,7 @@ impl Formattable for CallStatement {
                     .expect("Call Statement should have a close brace");
                 format_preceding_comments(&close_brace, buffer, state, true)?;
                 state.space_or_indent(buffer)?;
-                buffer.push('}');
+                buffer.push_str(&close_brace.to_string());
             } else {
                 // multiple inputs
                 let mut commas = self
@@ -239,7 +239,7 @@ impl Formattable for CallStatement {
                     .expect("Call Statement should have a close brace");
                 format_preceding_comments(&close_brace, buffer, state, false)?;
                 state.indent(buffer)?;
-                buffer.push('}');
+                buffer.push_str(&close_brace.to_string());
             }
         }
 
@@ -263,7 +263,7 @@ impl Formattable for ConditionalStatement {
             .find(|element| element.kind() == SyntaxKind::IfKeyword)
             .expect("Conditional Statement should have an if keyword");
         state.indent(buffer)?;
-        buffer.push_str("if");
+        buffer.push_str(&if_keyword.to_string());
         format_inline_comment(&if_keyword, buffer, state, true)?;
 
         let open_paren = self
@@ -280,7 +280,7 @@ impl Formattable for ConditionalStatement {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('(');
+        buffer.push_str(&open_paren.to_string());
 
         let mut paren_on_same_line = true;
         let expr = self.expr();
@@ -311,7 +311,7 @@ impl Formattable for ConditionalStatement {
         if state.interrupted() || !paren_on_same_line {
             state.indent(buffer)?;
         }
-        buffer.push(')');
+        buffer.push_str(&close_paren.to_string());
 
         let open_brace = self
             .syntax()
@@ -327,7 +327,7 @@ impl Formattable for ConditionalStatement {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('{');
+        buffer.push_str(&open_brace.to_string());
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
@@ -345,7 +345,7 @@ impl Formattable for ConditionalStatement {
             .expect("Conditional Statement should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
-        buffer.push('}');
+        buffer.push_str(&close_brace.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())
@@ -366,7 +366,7 @@ impl Formattable for ScatterStatement {
             .find(|element| element.kind() == SyntaxKind::ScatterKeyword)
             .expect("Scatter Statement should have a scatter keyword");
         state.indent(buffer)?;
-        buffer.push_str("scatter");
+        buffer.push_str(&scatter_keyword.to_string());
         format_inline_comment(&scatter_keyword, buffer, state, true)?;
 
         let open_paren = self
@@ -383,7 +383,7 @@ impl Formattable for ScatterStatement {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('(');
+        buffer.push_str(&open_paren.to_string());
         format_inline_comment(&open_paren, buffer, state, true)?;
 
         let ident = self.variable();
@@ -401,7 +401,7 @@ impl Formattable for ScatterStatement {
             .expect("Scatter Statement should have an in keyword");
         format_preceding_comments(&in_keyword, buffer, state, true)?;
         state.space_or_indent(buffer)?;
-        buffer.push_str("in");
+        buffer.push_str(&in_keyword.to_string());
         format_inline_comment(&in_keyword, buffer, state, true)?;
 
         let expr = self.expr();
@@ -419,7 +419,7 @@ impl Formattable for ScatterStatement {
         if state.interrupted() {
             state.indent(buffer)?;
         }
-        buffer.push(')');
+        buffer.push_str(&close_paren.to_string());
         format_inline_comment(&close_paren, buffer, state, true)?;
 
         let open_brace = self
@@ -436,7 +436,7 @@ impl Formattable for ScatterStatement {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('{');
+        buffer.push_str(&open_brace.to_string());
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
@@ -454,7 +454,7 @@ impl Formattable for ScatterStatement {
             .expect("Scatter Statement should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
-        buffer.push('}');
+        buffer.push_str(&close_brace.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())
@@ -489,7 +489,7 @@ impl Formattable for WorkflowDefinition {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::WorkflowKeyword)
             .expect("Workflow should have a workflow keyword");
-        buffer.push_str("workflow");
+        buffer.push_str(&workflow_keyword.to_string());
         format_inline_comment(&workflow_keyword, buffer, state, true)?;
 
         let name = self.name();
@@ -512,7 +512,7 @@ impl Formattable for WorkflowDefinition {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('{');
+        buffer.push_str(&open_brace.to_string());
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
@@ -609,7 +609,7 @@ impl Formattable for WorkflowDefinition {
             .expect("Workflow should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
-        buffer.push('}');
+        buffer.push_str(&close_brace.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())

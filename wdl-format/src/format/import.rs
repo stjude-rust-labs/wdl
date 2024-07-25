@@ -24,7 +24,7 @@ impl Formattable for ImportStatement {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::ImportKeyword)
             .expect("Import statement should have an import keyword");
-        buffer.push_str("import");
+        buffer.push_str(&import_keyword.to_string());
         format_inline_comment(&import_keyword, buffer, state, true)?;
 
         let uri = self.uri();
@@ -39,7 +39,7 @@ impl Formattable for ImportStatement {
                 SyntaxKind::AsKeyword => {
                     format_preceding_comments(&cur, buffer, state, true)?;
                     state.space_or_indent(buffer)?;
-                    buffer.push_str("as");
+                    buffer.push_str(&cur.to_string());
                     state.reset_interrupted();
                     format_inline_comment(&cur, buffer, state, true)?;
                 }
@@ -65,7 +65,7 @@ impl Formattable for ImportStatement {
                                 // Should always be first 'alias_part' processed
                                 // so preceding comments were handled above.
                                 state.space_or_indent(buffer)?;
-                                buffer.push_str("alias");
+                                buffer.push_str(&alias_part.to_string());
                                 format_inline_comment(&alias_part, buffer, state, true)?;
                             }
                             SyntaxKind::Ident => {
@@ -80,7 +80,7 @@ impl Formattable for ImportStatement {
                             SyntaxKind::AsKeyword => {
                                 format_preceding_comments(&alias_part, buffer, state, true)?;
                                 state.space_or_indent(buffer)?;
-                                buffer.push_str("as");
+                                buffer.push_str(&alias_part.to_string());
                                 format_inline_comment(&alias_part, buffer, state, true)?;
                             }
                             SyntaxKind::ImportAliasNode => {

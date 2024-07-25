@@ -32,7 +32,7 @@ impl Formattable for CommandSection {
             .find(|c| c.kind() == SyntaxKind::CommandKeyword)
             .expect("Command section should have a command keyword");
         state.indent(buffer)?;
-        buffer.push_str("command");
+        buffer.push_str(&command_keyword.to_string());
         format_inline_comment(&command_keyword, buffer, state, true)?;
 
         if self.is_heredoc() {
@@ -50,7 +50,7 @@ impl Formattable for CommandSection {
             } else {
                 buffer.push_str(SPACE);
             }
-            buffer.push_str("<<<");
+            buffer.push_str(&open_heredoc.to_string());
         } else {
             let open_brace = self
                 .syntax()
@@ -66,7 +66,7 @@ impl Formattable for CommandSection {
             } else {
                 buffer.push_str(SPACE);
             }
-            buffer.push('{');
+            buffer.push_str(&open_brace.to_string());
         }
 
         for part in self.parts() {
@@ -114,7 +114,7 @@ impl Formattable for RuntimeItem {
             state.reset_interrupted();
             state.indent(buffer)?;
         }
-        buffer.push(':');
+        buffer.push_str(&colon.to_string());
         format_inline_comment(&colon, buffer, state, true)?;
 
         let expr = self.expr();
@@ -141,7 +141,7 @@ impl Formattable for RuntimeSection {
             .find(|c| c.kind() == SyntaxKind::RuntimeKeyword)
             .expect("Runtime section should have a runtime keyword");
         state.indent(buffer)?;
-        buffer.push_str("runtime");
+        buffer.push_str(&runtime_keyword.to_string());
         format_inline_comment(&runtime_keyword, buffer, state, true)?;
 
         let open_brace = self
@@ -158,7 +158,7 @@ impl Formattable for RuntimeSection {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('{');
+        buffer.push_str(&open_brace.to_string());
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
@@ -176,7 +176,7 @@ impl Formattable for RuntimeSection {
             .expect("Runtime section should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, true)?;
         state.indent(buffer)?;
-        buffer.push('}');
+        buffer.push_str(&close_brace.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())
@@ -206,7 +206,7 @@ impl Formattable for RequirementsItem {
             state.reset_interrupted();
             state.indent(buffer)?;
         }
-        buffer.push(':');
+        buffer.push_str(&colon.to_string());
         format_inline_comment(&colon, buffer, state, true)?;
 
         let expr = self.expr();
@@ -233,7 +233,7 @@ impl Formattable for RequirementsSection {
             .find(|c| c.kind() == SyntaxKind::RequirementsKeyword)
             .expect("Requirements section should have a requirements keyword");
         state.indent(buffer)?;
-        buffer.push_str("requirements");
+        buffer.push_str(&requirements_keyword.to_string());
         format_inline_comment(&requirements_keyword, buffer, state, true)?;
 
         let open_brace = self
@@ -250,7 +250,7 @@ impl Formattable for RequirementsSection {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('{');
+        buffer.push_str(&open_brace.to_string());
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
@@ -268,7 +268,7 @@ impl Formattable for RequirementsSection {
             .expect("Requirements section should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, true)?;
         state.indent(buffer)?;
-        buffer.push('}');
+        buffer.push_str(&close_brace.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())
@@ -289,7 +289,7 @@ impl Formattable for TaskDefinition {
             .find(|c| c.kind() == SyntaxKind::TaskKeyword)
             .expect("Task should have a task keyword");
         state.indent(buffer)?;
-        buffer.push_str("task");
+        buffer.push_str(&task_keyword.to_string());
         format_inline_comment(&task_keyword, buffer, state, true)?;
 
         let name = self.name();
@@ -312,7 +312,7 @@ impl Formattable for TaskDefinition {
         } else {
             buffer.push_str(SPACE);
         }
-        buffer.push('{');
+        buffer.push_str(&open_brace.to_string());
         format_inline_comment(&open_brace, buffer, state, false)?;
 
         state.increment_indent();
@@ -409,7 +409,7 @@ impl Formattable for TaskDefinition {
             .expect("Task should have a close brace");
         format_preceding_comments(&close_brace, buffer, state, true)?;
         state.indent(buffer)?;
-        buffer.push('}');
+        buffer.push_str(&close_brace.to_string());
         format_inline_comment(&self.syntax_element(), buffer, state, false)?;
 
         Ok(())
