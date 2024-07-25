@@ -95,7 +95,7 @@ cargo run --bin wdl --features cli -- $ARGS
 
 Where `$ARGS` are the command line arguments to the `wdl` CLI tool.
 
-The `wdl` CLI tool currently supports three subcommands:
+The `wdl` CLI tool currently supports the following subcommands:
 
 * `parse` - Parses a WDL document and prints both the parse diagnostics and the
   resulting Concrete Syntax Tree (CST).
