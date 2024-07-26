@@ -43,6 +43,7 @@ pub fn range_from_span(index: &LineIndex, span: Span) -> Result<Range> {
 pub fn diagnostic(
     uri: &Url,
     index: &LineIndex,
+    source: &str,
     diagnostic: &wdl_ast::Diagnostic,
 ) -> Result<Diagnostic> {
     let mut labels = diagnostic.labels();
@@ -77,7 +78,7 @@ pub fn diagnostic(
         range.unwrap_or_default(),
         Some(severity),
         code,
-        Some("sprocket".to_string()),
+        Some(source.to_owned()),
         message,
         Some(related),
         None,

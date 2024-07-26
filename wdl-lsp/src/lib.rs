@@ -130,6 +130,22 @@ impl Server {
         Ok(())
     }
 
+    /// Gets the name of the server.
+    fn name(&self) -> &str {
+        self.options
+            .name
+            .as_deref()
+            .unwrap_or(env!("CARGO_CRATE_NAME"))
+    }
+
+    /// Gets the version of the server.
+    fn version(&self) -> &str {
+        self.options
+            .version
+            .as_deref()
+            .unwrap_or(env!("CARGO_PKG_VERSION"))
+    }
+
     /// Registers a generic watcher for all files/directories in the workspace.
     async fn register_watcher(&self) {
         self.client
@@ -174,7 +190,7 @@ impl Server {
                 token: NumberOrString::String(token.clone()),
                 value: ProgressParamsValue::WorkDone(WorkDoneProgress::Begin(
                     WorkDoneProgressBegin {
-                        title: "Sprocket".to_string(),
+                        title: self.name().to_string(),
                         cancellable: None,
                         message: Some("analyzing...".to_string()),
                         percentage: Some(0),
@@ -280,17 +296,8 @@ impl LanguageServer for Server {
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
-                name: self
-                    .options
-                    .name
-                    .clone()
-                    .unwrap_or_else(|| env!("CARGO_CRATE_NAME").to_string()),
-                version: Some(
-                    self.options
-                        .version
-                        .clone()
-                        .unwrap_or_else(|| env!("CARGO_PKG_VERSION").to_string()),
-                ),
+                name: self.name().to_string(),
+                version: Some(self.version().to_string()),
             }),
         })
     }
@@ -364,7 +371,7 @@ impl LanguageServer for Server {
         };
 
         if let Some(cached) = cached {
-            return cached.document_diagnostic_report(params.previous_result_id);
+            return cached.document_diagnostic_report(self.name(), params.previous_result_id);
         }
 
         log::debug!(
@@ -386,7 +393,7 @@ impl LanguageServer for Server {
 
         self.workspace
             .write()
-            .on_document_diagnostics_results(params, results)
+            .on_document_diagnostics_results(self.name(), params, results)
     }
 
     async fn workspace_diagnostic(
@@ -408,7 +415,11 @@ impl LanguageServer for Server {
             let workspace = self.workspace.read();
             for (uri, document) in &workspace.documents {
                 if let Some(cached) = document.cached() {
-                    items.push(cached.workspace_diagnostic_report(uri, ids.remove(uri))?);
+                    items.push(cached.workspace_diagnostic_report(
+                        self.name(),
+                        uri,
+                        ids.remove(uri),
+                    )?);
                 } else {
                     log::debug!("document `{uri}` will be analyzed for diagnostics");
                     documents.push(uri.clone());
@@ -430,9 +441,11 @@ impl LanguageServer for Server {
                 self.complete_analysis_task(token).await;
             }
 
-            self.workspace
-                .write()
-                .on_workspace_diagnostics_results(results, &mut items);
+            self.workspace.write().on_workspace_diagnostics_results(
+                self.name(),
+                results,
+                &mut items,
+            );
         }
 
         Ok(WorkspaceDiagnosticReportResult::Report(

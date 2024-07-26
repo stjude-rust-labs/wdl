@@ -93,6 +93,7 @@ impl CachedResult {
     /// Creates a document diagnostic result from the cached result.
     pub fn document_diagnostic_report(
         &self,
+        source: &str,
         previous: Option<String>,
     ) -> RpcResult<DocumentDiagnosticReportResult> {
         if let Some(previous) = previous {
@@ -125,6 +126,7 @@ impl CachedResult {
                 proto::diagnostic(
                     self.result.uri(),
                     self.result.lines().expect("should have line index"),
+                    source,
                     d,
                 )
             })
@@ -145,6 +147,7 @@ impl CachedResult {
     /// Creates a workspace diagnostic report from the cached result.
     pub fn workspace_diagnostic_report(
         &self,
+        source: &str,
         uri: &Url,
         previous: Option<String>,
     ) -> RpcResult<WorkspaceDocumentDiagnosticReport> {
@@ -181,6 +184,7 @@ impl CachedResult {
                 proto::diagnostic(
                     self.result.uri(),
                     self.result.lines().expect("should have line index"),
+                    source,
                     d,
                 )
             })
@@ -392,6 +396,7 @@ impl Workspace {
     /// Handles the results of a document diagnostic request.
     pub fn on_document_diagnostics_results(
         &mut self,
+        source: &str,
         params: DocumentDiagnosticParams,
         results: Vec<AnalysisResult>,
     ) -> RpcResult<DocumentDiagnosticReportResult> {
@@ -413,6 +418,7 @@ impl Workspace {
                     proto::diagnostic(
                         result.uri(),
                         result.lines().expect("should have line index"),
+                        source,
                         d,
                     )
                 })
@@ -461,6 +467,7 @@ impl Workspace {
     /// Handles the results of a workspace diagnostic request.
     pub fn on_workspace_diagnostics_results(
         &mut self,
+        source: &str,
         results: Vec<AnalysisResult>,
         items: &mut Vec<WorkspaceDocumentDiagnosticReport>,
     ) {
@@ -483,6 +490,7 @@ impl Workspace {
                     proto::diagnostic(
                         result.uri(),
                         result.lines().expect("should have line index"),
+                        source,
                         d,
                     )
                     .ok()
