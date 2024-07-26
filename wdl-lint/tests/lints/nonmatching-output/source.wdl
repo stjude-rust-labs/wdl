@@ -1,4 +1,4 @@
-#@ except: BlankLinesBetweenElements, DescriptionMissing, MissingRuntime
+#@ except: BlankLinesBetweenElements, DescriptionMissing, MissingRuntime, TrailingComma
 
 version 1.1
 

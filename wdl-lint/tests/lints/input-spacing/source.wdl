@@ -1,4 +1,4 @@
-#@ except: BlankLinesBetweenElements, DescriptionMissing, LineWidth, SectionOrdering, RuntimeSectionKeys
+#@ except: BlankLinesBetweenElements, DescriptionMissing, LineWidth, SectionOrdering, RuntimeSectionKeys, TrailingComma
 
 version 1.1
 

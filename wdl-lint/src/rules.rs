@@ -3,6 +3,7 @@
 mod blank_lines_between_elements;
 mod call_input_spacing;
 mod command_mixed_indentation;
+mod comment_whitespace;
 mod deprecated_object;
 mod deprecated_placeholder_option;
 mod description_missing;
@@ -27,11 +28,13 @@ mod runtime_section_keys;
 mod section_order;
 mod snake_case;
 mod todo;
+mod trailing_comma;
 mod whitespace;
 
 pub use blank_lines_between_elements::*;
 pub use call_input_spacing::*;
 pub use command_mixed_indentation::*;
+pub use comment_whitespace::*;
 pub use deprecated_object::*;
 pub use deprecated_placeholder_option::*;
 pub use description_missing::*;
@@ -56,4 +59,5 @@ pub use runtime_section_keys::*;
 pub use section_order::*;
 pub use snake_case::*;
 pub use todo::*;
+pub use trailing_comma::*;
 pub use whitespace::*;

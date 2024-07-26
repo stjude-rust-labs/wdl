@@ -11,6 +11,7 @@ be out of sync with released packages.
 | `BlankLinesBetweenElements`      | Spacing                       | Ensures proper blank space between elements                                           |
 | `CallInputSpacing`               | Style, Clarity, Spacing       | Ensures proper spacing for call inputs                                                |
 | `CommandSectionMixedIndentation` | Clarity, Correctness, Spacing | Ensures that lines within a command do not mix spaces and tabs.                       |
+| `CommentWhitespace`              | Spacing                       | Ensures that comments are properly spaced.                                            |
 | `DeprecatedObject`               | Deprecated                    | Ensures that the deprecated `Object` construct is not used.                           |
 | `DeprecatedPlaceholderOption`    | Deprecated                    | Ensures that the deprecated placeholder options construct is not used.                |
 | `DescriptionMissing`             | Completeness                  | Ensures that each meta section has a description key.                                 |
@@ -35,5 +36,6 @@ be out of sync with released packages.
 | `SectionOrdering`                | Sorting, Style                | Ensures that sections within tasks and workflows are sorted.                          |
 | `SnakeCase`                      | Clarity, Naming, Style        | Ensures that tasks, workflows, and variables are defined with snake_case names.       |
 | `Todo`                           | Completeness                  | Ensures that `TODO` statements are flagged for followup.                              |
+| `TrailingComma`                  | Style                         | Ensures that lists and objects in meta have a trailing comma.                         |
 | `Whitespace`                     | Spacing, Style                | Ensures that a document does not contain undesired whitespace.                        |
 
