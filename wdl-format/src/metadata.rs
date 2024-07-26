@@ -16,13 +16,13 @@ use wdl_ast::SyntaxKind;
 
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
-use super::format_state::SPACE;
-use super::FormatState;
+use super::state::SPACE;
 use super::Formattable;
+use super::State;
 use super::NEWLINE;
 
 impl Formattable for LiteralNull {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
         write!(buffer, "{}", self.syntax())?;
         Ok(())
     }
@@ -33,7 +33,7 @@ impl Formattable for LiteralNull {
 }
 
 impl Formattable for MetadataObject {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let open_brace = self
@@ -92,7 +92,7 @@ impl Formattable for MetadataObject {
 }
 
 impl Formattable for MetadataArray {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let open_bracket = self
@@ -152,7 +152,7 @@ impl Formattable for MetadataArray {
 }
 
 impl Formattable for MetadataValue {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         match self {
             MetadataValue::String(s) => s.format(buffer, state),
             MetadataValue::Boolean(b) => b.format(buffer, state),
@@ -178,7 +178,7 @@ impl Formattable for MetadataValue {
 }
 
 impl Formattable for MetadataObjectItem {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let name = self.name();
@@ -214,7 +214,7 @@ impl Formattable for MetadataObjectItem {
 }
 
 impl Formattable for MetadataSection {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let meta_keyword = self
@@ -271,7 +271,7 @@ impl Formattable for MetadataSection {
 }
 
 impl Formattable for ParameterMetadataSection {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let parameter_meta_keyword = self

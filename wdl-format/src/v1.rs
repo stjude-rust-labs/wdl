@@ -24,14 +24,14 @@ use wdl_ast::SyntaxKind;
 
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
-use super::format_state::SPACE;
-use super::FormatState;
+use super::state::SPACE;
 use super::Formattable;
+use super::State;
 use super::NEWLINE;
 use super::STRING_TERMINATOR;
 
 impl Formattable for LiteralString {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
         buffer.push(STRING_TERMINATOR);
         for part in self.parts() {
             match part {
@@ -53,7 +53,7 @@ impl Formattable for LiteralString {
 }
 
 impl Formattable for LiteralBoolean {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
         buffer.push_str(&self.value().to_string());
         Ok(())
     }
@@ -64,7 +64,7 @@ impl Formattable for LiteralBoolean {
 }
 
 impl Formattable for LiteralFloat {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
         write!(buffer, "{}", self.syntax())?;
         Ok(())
     }
@@ -75,7 +75,7 @@ impl Formattable for LiteralFloat {
 }
 
 impl Formattable for LiteralInteger {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
         write!(buffer, "{}", self.syntax())?;
         Ok(())
     }
@@ -86,7 +86,7 @@ impl Formattable for LiteralInteger {
 }
 
 impl Formattable for Type {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
         write!(buffer, "{}", self.syntax())?;
         Ok(())
     }
@@ -97,7 +97,7 @@ impl Formattable for Type {
 }
 
 impl Formattable for Expr {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
         write!(buffer, "{}", self.syntax())?;
         Ok(())
     }
@@ -108,7 +108,7 @@ impl Formattable for Expr {
 }
 
 impl Formattable for Decl {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let ty = self.ty();
@@ -148,7 +148,7 @@ impl Formattable for Decl {
 }
 
 impl Formattable for InputSection {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let input_keyword = self
@@ -204,7 +204,7 @@ impl Formattable for InputSection {
 }
 
 impl Formattable for OutputSection {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let output_keyword = self
@@ -260,7 +260,7 @@ impl Formattable for OutputSection {
 }
 
 impl Formattable for HintsItem {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let name = self.name();
@@ -295,7 +295,7 @@ impl Formattable for HintsItem {
 }
 
 impl Formattable for HintsSection {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let hints_keyword = self
@@ -351,7 +351,7 @@ impl Formattable for HintsSection {
 }
 
 impl Formattable for StructDefinition {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let struct_keyword = self
@@ -421,7 +421,7 @@ impl Formattable for StructDefinition {
 }
 
 impl Formattable for DocumentItem {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         match self {
             DocumentItem::Import(_) => {
                 unreachable!("Import statements should not be formatted as a DocumentItem")

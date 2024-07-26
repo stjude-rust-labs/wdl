@@ -24,16 +24,16 @@ use wdl_ast::Version;
 use wdl_ast::VersionStatement;
 
 mod comments;
-mod format_state;
 mod import;
 mod metadata;
+mod state;
 mod task;
 mod v1;
 mod workflow;
 
 use comments::format_inline_comment;
 use comments::format_preceding_comments;
-use format_state::FormatState;
+use state::State;
 
 /// Newline constant used for formatting.
 pub const NEWLINE: &str = "\n";
@@ -43,13 +43,13 @@ const STRING_TERMINATOR: char = '"';
 /// A trait for elements that can be formatted.
 pub trait Formattable {
     /// Format the element and write it to the buffer.
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()>;
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()>;
     /// Get the syntax element of the element.
     fn syntax_element(&self) -> SyntaxElement;
 }
 
 impl Formattable for Version {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
         write!(buffer, "{}", self.as_str())?;
         Ok(())
     }
@@ -60,7 +60,7 @@ impl Formattable for Version {
 }
 
 impl Formattable for VersionStatement {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         let mut preceding_comments = Vec::new();
         let comment_buffer = &mut String::new();
         for sibling in self.syntax().siblings_with_tokens(Direction::Prev) {
@@ -122,7 +122,7 @@ impl Formattable for VersionStatement {
 }
 
 impl Formattable for Ident {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
         write!(buffer, "{}", self.as_str())?;
         Ok(())
     }
@@ -147,7 +147,7 @@ pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
     }
 
     let mut result = String::new();
-    let mut state = FormatState::default();
+    let mut state = State::default();
 
     let version_statement = document
         .version_statement()

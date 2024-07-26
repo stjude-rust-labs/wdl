@@ -17,13 +17,13 @@ use wdl_ast::SyntaxKind;
 
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
-use super::format_state::SPACE;
-use super::FormatState;
+use super::state::SPACE;
 use super::Formattable;
+use super::State;
 use super::NEWLINE;
 
 impl Formattable for CommandSection {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let command_keyword = self
@@ -96,7 +96,7 @@ impl Formattable for CommandSection {
 }
 
 impl Formattable for RuntimeItem {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let name = self.name();
@@ -132,7 +132,7 @@ impl Formattable for RuntimeItem {
 }
 
 impl Formattable for RuntimeSection {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let runtime_keyword = self
@@ -188,7 +188,7 @@ impl Formattable for RuntimeSection {
 }
 
 impl Formattable for RequirementsItem {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let name = self.name();
@@ -224,7 +224,7 @@ impl Formattable for RequirementsItem {
 }
 
 impl Formattable for RequirementsSection {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let requirements_keyword = self
@@ -280,7 +280,7 @@ impl Formattable for RequirementsSection {
 }
 
 impl Formattable for TaskDefinition {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let task_keyword = self

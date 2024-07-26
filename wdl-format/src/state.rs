@@ -1,4 +1,4 @@
-//! Contains the `FormatState` struct, which is used to keep track of the
+//! Contains the `State` struct, which is used to keep track of the
 //! current formatting state. This includes the current indentation level and
 //! whether the current line has been interrupted by comments.
 //! The state becomes "interrupted" by comments when a comment forces a newline
@@ -13,18 +13,18 @@ pub const SPACE: &str = " ";
 /// Indentation constant used for formatting.
 pub const INDENT: &str = "    ";
 
-/// The `FormatState` struct is used to keep track of the current formatting
+/// The `State` struct is used to keep track of the current formatting
 /// state. This includes the current indentation level and whether the current
 /// line has been interrupted by comments.
 #[derive(Debug, Clone, Copy, Default)]
-pub struct FormatState {
+pub struct State {
     /// The current indentation level.
     indent_level: usize,
     /// Whether the current line has been interrupted by comments.
     interrupted_by_comments: bool,
 }
 
-impl FormatState {
+impl State {
     /// Add the current indentation to the buffer.
     /// The indentation level will be temporarily increased by one if the
     /// current line has been interrupted by comments.

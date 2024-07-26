@@ -12,11 +12,11 @@ use wdl_ast::SyntaxKind;
 
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
-use super::FormatState;
 use super::Formattable;
+use super::State;
 
 impl Formattable for ImportStatement {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let import_keyword = self

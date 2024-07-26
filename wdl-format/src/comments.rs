@@ -28,15 +28,15 @@ use wdl_ast::Comment;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 
-use super::FormatState;
 use super::Formattable;
+use super::State;
 use super::NEWLINE;
 
 /// Inline comment space constant used for formatting.
 pub const INLINE_COMMENT_SPACE: &str = "  ";
 
 impl Formattable for Comment {
-    fn format(&self, buffer: &mut String, _state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
         let comment = self.as_str().trim();
         write!(buffer, "{}{}", comment, NEWLINE)?;
         Ok(())
@@ -51,7 +51,7 @@ impl Formattable for Comment {
 pub fn format_preceding_comments(
     element: &SyntaxElement,
     buffer: &mut String,
-    state: &mut FormatState,
+    state: &mut State,
     would_be_interrupting: bool,
 ) -> Result<()> {
     // This walks _backwards_ through the syntax tree to find comments
@@ -143,7 +143,7 @@ pub fn format_preceding_comments(
 pub fn format_inline_comment(
     element: &SyntaxElement,
     buffer: &mut String,
-    state: &mut FormatState,
+    state: &mut State,
     would_be_interrupting: bool,
 ) -> Result<()> {
     let mut next = element.next_sibling_or_token();

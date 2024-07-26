@@ -19,13 +19,13 @@ use wdl_ast::SyntaxKind;
 
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
-use super::format_state::SPACE;
-use super::FormatState;
+use super::state::SPACE;
 use super::Formattable;
+use super::State;
 use super::NEWLINE;
 
 impl Formattable for CallAlias {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, true)?;
 
         let as_keyword = self
@@ -51,7 +51,7 @@ impl Formattable for CallAlias {
 }
 
 impl Formattable for CallAfter {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, true)?;
 
         let after_keyword = self
@@ -77,7 +77,7 @@ impl Formattable for CallAfter {
 }
 
 impl Formattable for CallInputItem {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         let name = self.name();
         name.format(buffer, state)?;
         format_inline_comment(&name.syntax_element(), buffer, state, true)?;
@@ -109,7 +109,7 @@ impl Formattable for CallInputItem {
 }
 
 impl Formattable for CallStatement {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let call_keyword = self
@@ -254,7 +254,7 @@ impl Formattable for CallStatement {
 }
 
 impl Formattable for ConditionalStatement {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let if_keyword = self
@@ -357,7 +357,7 @@ impl Formattable for ConditionalStatement {
 }
 
 impl Formattable for ScatterStatement {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let scatter_keyword = self
@@ -466,7 +466,7 @@ impl Formattable for ScatterStatement {
 }
 
 impl Formattable for WorkflowStatement {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         match self {
             WorkflowStatement::Call(c) => c.format(buffer, state),
             WorkflowStatement::Conditional(c) => c.format(buffer, state),
@@ -481,7 +481,7 @@ impl Formattable for WorkflowStatement {
 }
 
 impl Formattable for WorkflowDefinition {
-    fn format(&self, buffer: &mut String, state: &mut FormatState) -> Result<()> {
+    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
 
         let workflow_keyword = self
