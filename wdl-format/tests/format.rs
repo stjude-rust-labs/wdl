@@ -28,7 +28,7 @@ use colored::Colorize;
 use pretty_assertions::StrComparison;
 use rayon::prelude::*;
 use wdl_ast::Diagnostic;
-use wdl_format::format::format_document;
+use wdl_format::format_document;
 
 fn find_tests() -> Vec<PathBuf> {
     // Check for filter arguments consisting of test names
