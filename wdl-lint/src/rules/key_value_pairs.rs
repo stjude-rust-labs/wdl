@@ -12,10 +12,10 @@ use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
+use crate::rules::trailing_comma::find_next_comma;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
-use crate::rules::trailing_comma::find_next_comma;
 
 /// Set indentation string
 const INDENT: &str = "    ";
