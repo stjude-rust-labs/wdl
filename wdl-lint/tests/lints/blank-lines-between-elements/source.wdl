@@ -88,6 +88,6 @@ task bax {
         memory: "4 GB"
 
         container: "ubuntu:latest"
-        
+
     }
 }

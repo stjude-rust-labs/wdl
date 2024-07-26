@@ -201,17 +201,9 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
    │  
 90 │           container: "ubuntu:latest"
    │ ╭──────────────────────────────────^
-91 │ │         
+91 │ │ 
 92 │ │     }
    │ ╰────^
    │  
    = fix: remove the blank line(s)
-
-warning[Whitespace]: line contains only whitespace
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:91:1
-   │
-91 │         
-   │ ^^^^^^^^
-   │
-   = fix: remove the whitespace from this line
 
