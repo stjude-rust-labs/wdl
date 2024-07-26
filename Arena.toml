@@ -1481,6 +1481,86 @@ message = "arriba.wdl:147:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/arriba.wdl/#L147"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:22:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/arriba.wdl/#L22"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:26:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/arriba.wdl/#L26"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:308:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/arriba.wdl/#L308"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:30:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/arriba.wdl/#L30"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:34:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/arriba.wdl/#L34"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:38:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/arriba.wdl/#L38"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:44:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/arriba.wdl/#L44"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:80:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/arriba.wdl/#L80"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:87:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/arriba.wdl/#L87"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:93:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/arriba.wdl/#L93"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/arriba.wdl"
+message = "arriba.wdl:97:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/arriba.wdl/#L97"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:105:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L105"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:109:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L109"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:115:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L115"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:119:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L119"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:123:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L123"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/tools/bwa.wdl"
 message = "bwa.wdl:171:46: note[ExpressionSpacing]: operators must be surrounded by whitespace"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L171"
@@ -1489,6 +1569,31 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 document = "stjudecloud/workflows:/tools/bwa.wdl"
 message = "bwa.wdl:171:57: note[ExpressionSpacing]: operators must be surrounded by whitespace"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L171"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:19:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L19"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:210:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L210"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:214:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L214"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:218:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L218"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:23:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L23"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/bwa.wdl"
@@ -1509,6 +1614,16 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 document = "stjudecloud/workflows:/tools/bwa.wdl"
 message = "bwa.wdl:268:57: note[ExpressionSpacing]: operators must be surrounded by whitespace"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L268"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:27:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L27"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/bwa.wdl"
+message = "bwa.wdl:303:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/bwa.wdl/#L303"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/cellranger.wdl"
@@ -1556,9 +1671,49 @@ message = "cellranger.wdl:157:25: note[ExpressionSpacing]: multi-line if...then.
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/cellranger.wdl/#L157"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/deeptools.wdl"
+message = "deeptools.wdl:19:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/deeptools.wdl/#L19"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/deeptools.wdl"
+message = "deeptools.wdl:23:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/deeptools.wdl/#L23"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/tools/estimate.wdl"
 message = "estimate.wdl:39:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/estimate.wdl/#L39"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fastqc.wdl"
+message = "fastqc.wdl:10:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fastqc.wdl/#L10"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fastqc.wdl"
+message = "fastqc.wdl:19:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fastqc.wdl/#L19"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fastqc.wdl"
+message = "fastqc.wdl:23:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fastqc.wdl/#L23"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:106:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fq.wdl/#L106"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:116:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fq.wdl/#L116"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:120:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fq.wdl/#L120"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/fq.wdl"
@@ -1579,6 +1734,51 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 document = "stjudecloud/workflows:/tools/fq.wdl"
 message = "fq.wdl:158:17: note[ExpressionSpacing]: multi-line if...then...else must have a following newline and parenthesis"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fq.wdl/#L158"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:16:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fq.wdl/#L16"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:20:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fq.wdl/#L20"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:24:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fq.wdl/#L24"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:32:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fq.wdl/#L32"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:37:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fq.wdl/#L37"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:40:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fq.wdl/#L40"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:45:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fq.wdl/#L45"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:48:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fq.wdl/#L48"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/fq.wdl"
+message = "fq.wdl:53:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/fq.wdl/#L53"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
@@ -1671,6 +1871,81 @@ message = "htseq.wdl:163:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/htseq.wdl/#L163"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:19:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/htseq.wdl/#L19"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:22:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/htseq.wdl/#L22"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:28:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/htseq.wdl/#L28"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:32:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/htseq.wdl/#L32"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:37:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/htseq.wdl/#L37"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:40:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/htseq.wdl/#L40"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:45:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/htseq.wdl/#L45"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:49:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/htseq.wdl/#L49"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:53:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/htseq.wdl/#L53"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:57:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/htseq.wdl/#L57"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:61:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/htseq.wdl/#L61"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/htseq.wdl"
+message = "htseq.wdl:65:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/htseq.wdl/#L65"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:192:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L192"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:197:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L197"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:205:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L205"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/tools/kraken2.wdl"
 message = "kraken2.wdl:259:15: note[ExpressionSpacing]: multi-line if...then...else must have a preceding parenthesis and newline"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L259"
@@ -1682,6 +1957,36 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:295:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L295"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:297:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L297"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:299:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L299"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:311:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L311"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:316:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L316"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:321:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L321"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
 message = "kraken2.wdl:351:24: note[ExpressionSpacing]: multi-line if...then...else must have a preceding parenthesis and newline"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L351"
 
@@ -1689,6 +1994,16 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 document = "stjudecloud/workflows:/tools/kraken2.wdl"
 message = "kraken2.wdl:353:9: note[ExpressionSpacing]: multi-line if...then...else must have a following newline and parenthesis"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L353"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:60:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L60"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/kraken2.wdl"
+message = "kraken2.wdl:72:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L72"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/kraken2.wdl"
@@ -1751,9 +2066,109 @@ message = "kraken2.wdl:92:13: note[ExpressionSpacing]: multi-line if...then...el
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L92"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/mosdepth.wdl"
+message = "mosdepth.wdl:11:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/mosdepth.wdl/#L11"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/mosdepth.wdl"
+message = "mosdepth.wdl:23:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/mosdepth.wdl/#L23"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:106:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L106"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:159:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L159"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:163:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L163"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:21:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L21"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:223:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L223"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
 message = "ngsderive.wdl:239:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L239"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:25:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L25"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:29:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L29"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:303:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L303"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:307:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L307"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:311:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L311"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:315:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L315"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:33:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L33"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:387:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L387"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:391:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L391"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:395:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L395"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:399:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L399"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:403:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L403"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/ngsderive.wdl"
+message = "ngsderive.wdl:407:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/ngsderive.wdl/#L407"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/ngsderive.wdl"
@@ -1777,6 +2192,36 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:145:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L145"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:14:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L14"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:153:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L153"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:159:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L159"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:163:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L163"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:167:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L167"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
 message = "picard.wdl:190:28: note[ExpressionSpacing]: multi-line if...then...else must have a preceding parenthesis and newline"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L190"
 
@@ -1797,6 +2242,156 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:259:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L259"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:26:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L26"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:270:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L270"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:272:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L272"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:280:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L280"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:29:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L29"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:342:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L342"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:355:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L355"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:357:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L357"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:364:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L364"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:38:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L38"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:429:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L429"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:441:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L441"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:46:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L46"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:497:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L497"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:511:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L511"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:52:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L52"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:560:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L560"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:562:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L562"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:574:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L574"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:622:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L622"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:626:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L626"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:628:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L628"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:641:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L641"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:693:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L693"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:695:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L695"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:707:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L707"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:754:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L754"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:766:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L766"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:819:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L819"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
 message = "picard.wdl:842:49: note[ExpressionSpacing]: operators must be surrounded by whitespace"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L842"
 
@@ -1809,6 +2404,296 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 document = "stjudecloud/workflows:/tools/picard.wdl"
 message = "picard.wdl:847:36: note[ExpressionSpacing]: operators must be surrounded by whitespace"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L847"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:869:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L869"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:915:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L915"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:923:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L923"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/picard.wdl"
+message = "picard.wdl:926:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/picard.wdl/#L926"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/qualimap.wdl"
+message = "qualimap.wdl:11:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/qualimap.wdl/#L11"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/qualimap.wdl"
+message = "qualimap.wdl:22:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/qualimap.wdl/#L22"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/qualimap.wdl"
+message = "qualimap.wdl:26:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/qualimap.wdl/#L26"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:135:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/sambamba.wdl/#L135"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:17:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/sambamba.wdl/#L17"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:183:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/sambamba.wdl/#L183"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:192:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/sambamba.wdl/#L192"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:21:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/sambamba.wdl/#L21"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:246:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/sambamba.wdl/#L246"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:250:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/sambamba.wdl/#L250"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:75:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/sambamba.wdl/#L75"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/sambamba.wdl"
+message = "sambamba.wdl:79:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/sambamba.wdl/#L79"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:1003:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L1003"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:1176:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L1176"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:1188:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L1188"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:1202:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L1202"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:1208:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L1208"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:171:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L171"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:175:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L175"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:228:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L228"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:232:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L232"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:281:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L281"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:291:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L291"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:295:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L295"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:436:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L436"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:440:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L440"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:523:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L523"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:527:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L527"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:531:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L531"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:535:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L535"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:539:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L539"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:543:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L543"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:55:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L55"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:60:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L60"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:623:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L623"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:628:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L628"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:632:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L632"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:636:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L636"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:640:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L640"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:64:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L64"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:68:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L68"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:708:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L708"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:712:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L712"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:716:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L716"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:72:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L72"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:788:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L788"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:792:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L792"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:796:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L796"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:800:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L800"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:804:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L804"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:808:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L808"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:814:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L814"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:818:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L818"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:822:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L822"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/samtools.wdl"
@@ -1881,6 +2766,391 @@ message = "samtools.wdl:921:17: note[ExpressionSpacing]: multi-line if...then...
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L921"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:973:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L973"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:980:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L980"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:982:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L982"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/samtools.wdl"
+message = "samtools.wdl:999:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/samtools.wdl/#L999"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:154:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L154"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:167:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L167"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:169:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L169"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:174:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L174"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:176:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L176"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:185:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L185"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:188:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L188"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:18:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L18"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:195:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L195"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:197:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L197"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:213:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L213"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:215:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L215"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:219:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L219"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:221:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L221"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:226:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L226"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:228:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L228"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:22:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L22"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:233:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L233"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:235:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L235"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:240:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L240"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:242:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L242"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:249:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L249"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:251:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L251"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:258:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L258"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:260:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L260"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:266:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L266"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:268:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L268"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:274:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L274"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:276:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L276"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:280:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L280"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:284:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L284"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:291:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L291"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:293:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L293"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:299:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L299"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:301:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L301"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:308:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L308"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:311:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L311"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:315:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L315"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:317:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L317"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:31:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L31"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:324:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L324"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:326:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L326"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:332:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L332"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:334:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L334"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:338:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L338"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:350:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L350"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:354:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L354"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:358:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L358"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:372:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L372"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:376:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L376"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:380:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L380"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:384:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L384"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:39:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L39"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:405:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L405"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:409:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L409"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:413:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L413"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:417:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L417"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:421:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L421"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:435:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L435"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:439:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L439"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:43:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L43"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:443:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L443"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:449:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L449"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:453:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L453"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:457:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L457"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:461:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L461"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:467:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L467"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:471:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L471"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:487:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L487"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:493:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L493"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:499:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L499"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:505:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L505"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:511:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L511"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
 message = "star.wdl:632:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L632"
@@ -1897,6 +3167,31 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:678:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L678"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:684:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L684"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:690:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L690"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:696:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L696"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
+message = "star.wdl:702:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L702"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/star.wdl"
 message = "star.wdl:726:17: note[ExpressionSpacing]: multi-line if...then...else must have a preceding parenthesis and newline"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L726"
 
@@ -1904,6 +3199,26 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 document = "stjudecloud/workflows:/tools/star.wdl"
 message = "star.wdl:728:17: note[ExpressionSpacing]: multi-line if...then...else must have a following newline and parenthesis"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/star.wdl/#L728"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:120:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/util.wdl/#L120"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:161:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/util.wdl/#L161"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:384:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/util.wdl/#L384"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/util.wdl"
+message = "util.wdl:392:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/util.wdl/#L392"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
@@ -2092,6 +3407,16 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:181:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L181"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:185:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L185"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
 message = "quality-check-standard.wdl:187:36: note[ExpressionSpacing]: multi-line if...then...else must have a preceding parenthesis and newline"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L187"
 
@@ -2099,6 +3424,141 @@ permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
 message = "quality-check-standard.wdl:189:9: note[ExpressionSpacing]: multi-line if...then...else must have a following newline and parenthesis"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L189"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:34:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L34"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:39:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L39"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:451:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L451"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:463:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L463"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:467:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L467"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:47:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L47"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:57:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L57"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:67:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L67"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
+message = "quality-check-standard.wdl:74:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/qc/quality-check-standard.wdl/#L74"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/bwa-db-build.wdl"
+message = "bwa-db-build.wdl:11:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/bwa-db-build.wdl/#L11"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "gatk-reference.wdl:17:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/gatk-reference.wdl/#L17"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "gatk-reference.wdl:57:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/gatk-reference.wdl/#L57"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "gatk-reference.wdl:70:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/gatk-reference.wdl/#L70"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "gatk-reference.wdl:76:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/gatk-reference.wdl/#L76"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "gatk-reference.wdl:83:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/gatk-reference.wdl/#L83"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
+message = "gatk-reference.wdl:90:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/gatk-reference.wdl/#L90"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
+message = "make-qc-reference.wdl:137:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/make-qc-reference.wdl/#L137"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
+message = "make-qc-reference.wdl:23:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/make-qc-reference.wdl/#L23"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
+message = "make-qc-reference.wdl:34:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/make-qc-reference.wdl/#L34"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
+message = "make-qc-reference.wdl:40:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/make-qc-reference.wdl/#L40"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/make-qc-reference.wdl"
+message = "make-qc-reference.wdl:48:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/make-qc-reference.wdl/#L48"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
+message = "star-db-build.wdl:12:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/reference/star-db-build.wdl/#L12"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/ESTIMATE.wdl"
+message = "ESTIMATE.wdl:12:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/ESTIMATE.wdl/#L12"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:105:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L105"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:111:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L111"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:127:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L127"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:151:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L151"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
@@ -2111,6 +3571,211 @@ message = "rnaseq-core.wdl:198:9: note[ExpressionSpacing]: multi-line if...then.
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L198"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:20:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L20"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:36:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L36"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:40:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L40"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:45:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L45"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:48:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L48"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:53:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L53"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:57:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L57"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:66:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L66"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:72:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L72"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:77:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L77"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:82:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L82"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:87:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L87"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:93:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L93"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:99:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-core.wdl/#L99"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
+message = "rnaseq-standard-fastq.wdl:112:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L112"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
+message = "rnaseq-standard-fastq.wdl:143:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L143"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
+message = "rnaseq-standard-fastq.wdl:148:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L148"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
+message = "rnaseq-standard-fastq.wdl:36:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L36"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
+message = "rnaseq-standard-fastq.wdl:49:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L49"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
+message = "rnaseq-standard-fastq.wdl:63:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L63"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
+message = "rnaseq-standard-fastq.wdl:70:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L70"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
+message = "rnaseq-standard-fastq.wdl:73:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L73"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
+message = "rnaseq-standard-fastq.wdl:78:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L78"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
+message = "rnaseq-standard-fastq.wdl:82:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L82"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
+message = "rnaseq-standard.wdl:141:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard.wdl/#L141"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
+message = "rnaseq-standard.wdl:145:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard.wdl/#L145"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
+message = "rnaseq-standard.wdl:20:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard.wdl/#L20"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
+message = "rnaseq-standard.wdl:33:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard.wdl/#L33"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
+message = "rnaseq-standard.wdl:36:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard.wdl/#L36"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
+message = "rnaseq-standard.wdl:41:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard.wdl/#L41"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
+message = "rnaseq-standard.wdl:45:17: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard.wdl/#L45"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
+message = "rnaseq-standard.wdl:73:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-standard.wdl/#L73"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "rnaseq-variant-calling.wdl:100:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-variant-calling.wdl/#L100"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "rnaseq-variant-calling.wdl:107:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-variant-calling.wdl/#L107"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "rnaseq-variant-calling.wdl:116:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-variant-calling.wdl/#L116"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "rnaseq-variant-calling.wdl:13:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-variant-calling.wdl/#L13"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
 message = "rnaseq-variant-calling.wdl:51:9: note[ExpressionSpacing]: prefix operators may not contain whitespace"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-variant-calling.wdl/#L51"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "rnaseq-variant-calling.wdl:54:13: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-variant-calling.wdl/#L54"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "rnaseq-variant-calling.wdl:64:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-variant-calling.wdl/#L64"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "rnaseq-variant-calling.wdl:76:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-variant-calling.wdl/#L76"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "rnaseq-variant-calling.wdl:83:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-variant-calling.wdl/#L83"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "rnaseq-variant-calling.wdl:88:9: note[TrailingComma]: item missing trailing comma"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/workflows/rnaseq/rnaseq-variant-calling.wdl/#L88"
