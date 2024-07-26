@@ -44,18 +44,12 @@ const STRING_TERMINATOR: char = '"';
 pub trait Formattable {
     /// Format the element and write it to the buffer.
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()>;
-    /// Get the syntax element of the element.
-    fn syntax_element(&self) -> SyntaxElement;
 }
 
 impl Formattable for Version {
     fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
         write!(buffer, "{}", self.as_str())?;
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Token(self.syntax().clone())
     }
 }
 
@@ -108,16 +102,22 @@ impl Formattable for VersionStatement {
 
         let version = self.version();
 
-        format_preceding_comments(&version.syntax_element(), buffer, state, true)?;
+        format_preceding_comments(
+            &SyntaxElement::from(version.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
         state.space_or_indent(buffer)?;
         version.format(buffer, state)?;
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
@@ -125,10 +125,6 @@ impl Formattable for Ident {
     fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
         write!(buffer, "{}", self.as_str())?;
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Token(self.syntax().clone())
     }
 }
 

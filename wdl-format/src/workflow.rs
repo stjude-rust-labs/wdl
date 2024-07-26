@@ -14,6 +14,7 @@ use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::v1::WorkflowItem;
 use wdl_ast::v1::WorkflowStatement;
 use wdl_ast::AstNode;
+use wdl_ast::AstToken;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 
@@ -26,7 +27,12 @@ use super::NEWLINE;
 
 impl Formattable for CallAlias {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, true)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         let as_keyword = self
             .syntax()
@@ -38,21 +44,32 @@ impl Formattable for CallAlias {
         format_inline_comment(&as_keyword, buffer, state, true)?;
 
         let ident = self.name();
-        format_preceding_comments(&ident.syntax_element(), buffer, state, true)?;
+        format_preceding_comments(
+            &SyntaxElement::from(ident.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
         state.space_or_indent(buffer)?;
         ident.format(buffer, state)?;
-        format_inline_comment(&self.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
 impl Formattable for CallAfter {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, true)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         let after_keyword = self
             .syntax()
@@ -64,15 +81,21 @@ impl Formattable for CallAfter {
         format_inline_comment(&after_keyword, buffer, state, true)?;
 
         let ident = self.name();
-        format_preceding_comments(&ident.syntax_element(), buffer, state, true)?;
+        format_preceding_comments(
+            &SyntaxElement::from(ident.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
         state.space_or_indent(buffer)?;
         ident.format(buffer, state)?;
-        format_inline_comment(&self.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
@@ -80,7 +103,12 @@ impl Formattable for CallInputItem {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
         let name = self.name();
         name.format(buffer, state)?;
-        format_inline_comment(&name.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(name.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         if let Some(expr) = self.expr() {
             let eq_sign = self
@@ -93,24 +121,35 @@ impl Formattable for CallInputItem {
             buffer.push_str(&eq_sign.to_string());
             format_inline_comment(&eq_sign, buffer, state, true)?;
 
-            format_preceding_comments(&expr.syntax_element(), buffer, state, true)?;
+            format_preceding_comments(
+                &SyntaxElement::from(expr.syntax().clone()),
+                buffer,
+                state,
+                true,
+            )?;
             state.space_or_indent(buffer)?;
             expr.format(buffer, state)?;
         }
 
-        format_inline_comment(&self.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
 impl Formattable for CallStatement {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let call_keyword = self
             .syntax()
@@ -188,7 +227,12 @@ impl Formattable for CallStatement {
 
             if inputs.len() == 1 {
                 let input = inputs.first().expect("Inputs should have a first element");
-                format_preceding_comments(&input.syntax_element(), buffer, state, true)?;
+                format_preceding_comments(
+                    &SyntaxElement::from(input.syntax().clone()),
+                    buffer,
+                    state,
+                    true,
+                )?;
                 state.space_or_indent(buffer)?;
                 input.format(buffer, state)?;
 
@@ -215,7 +259,12 @@ impl Formattable for CallStatement {
                     } else {
                         state.reset_interrupted();
                     }
-                    format_preceding_comments(&input.syntax_element(), buffer, state, false)?;
+                    format_preceding_comments(
+                        &SyntaxElement::from(input.syntax().clone()),
+                        buffer,
+                        state,
+                        false,
+                    )?;
                     state.indent(buffer)?;
                     input.format(buffer, state)?;
                     if let Some(cur_comma) = commas.next() {
@@ -243,19 +292,25 @@ impl Formattable for CallStatement {
             }
         }
 
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
 impl Formattable for ConditionalStatement {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let if_keyword = self
             .syntax()
@@ -291,13 +346,23 @@ impl Formattable for ConditionalStatement {
             state.increment_indent();
             paren_on_same_line = false;
         }
-        format_preceding_comments(&expr.syntax_element(), buffer, state, !multiline_expr)?;
+        format_preceding_comments(
+            &SyntaxElement::from(expr.syntax().clone()),
+            buffer,
+            state,
+            !multiline_expr,
+        )?;
         if state.interrupted() || multiline_expr {
             state.indent(buffer)?;
             paren_on_same_line = false;
         }
         expr.format(buffer, state)?;
-        format_inline_comment(&expr.syntax_element(), buffer, state, !multiline_expr)?;
+        format_inline_comment(
+            &SyntaxElement::from(expr.syntax().clone()),
+            buffer,
+            state,
+            !multiline_expr,
+        )?;
         if state.interrupted() {
             paren_on_same_line = false;
         }
@@ -346,19 +411,25 @@ impl Formattable for ConditionalStatement {
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push_str(&close_brace.to_string());
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
 impl Formattable for ScatterStatement {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let scatter_keyword = self
             .syntax()
@@ -387,12 +458,22 @@ impl Formattable for ScatterStatement {
         format_inline_comment(&open_paren, buffer, state, true)?;
 
         let ident = self.variable();
-        format_preceding_comments(&ident.syntax_element(), buffer, state, true)?;
+        format_preceding_comments(
+            &SyntaxElement::from(ident.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
         if state.interrupted() {
             state.indent(buffer)?;
         }
         ident.format(buffer, state)?;
-        format_inline_comment(&ident.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(ident.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         let in_keyword = self
             .syntax()
@@ -405,10 +486,20 @@ impl Formattable for ScatterStatement {
         format_inline_comment(&in_keyword, buffer, state, true)?;
 
         let expr = self.expr();
-        format_preceding_comments(&expr.syntax_element(), buffer, state, true)?;
+        format_preceding_comments(
+            &SyntaxElement::from(expr.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
         state.space_or_indent(buffer)?;
         expr.format(buffer, state)?;
-        format_inline_comment(&expr.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(expr.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         let close_paren = self
             .syntax()
@@ -455,13 +546,14 @@ impl Formattable for ScatterStatement {
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push_str(&close_brace.to_string());
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
@@ -474,15 +566,16 @@ impl Formattable for WorkflowStatement {
             WorkflowStatement::Declaration(d) => Decl::Bound(d.clone()).format(buffer, state),
         }
     }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
-    }
 }
 
 impl Formattable for WorkflowDefinition {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let workflow_keyword = self
             .syntax()
@@ -493,10 +586,20 @@ impl Formattable for WorkflowDefinition {
         format_inline_comment(&workflow_keyword, buffer, state, true)?;
 
         let name = self.name();
-        format_preceding_comments(&name.syntax_element(), buffer, state, true)?;
+        format_preceding_comments(
+            &SyntaxElement::from(name.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
         state.space_or_indent(buffer)?;
         name.format(buffer, state)?;
-        format_inline_comment(&name.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(name.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         let open_brace = self
             .syntax()
@@ -610,12 +713,13 @@ impl Formattable for WorkflowDefinition {
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push_str(&close_brace.to_string());
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }

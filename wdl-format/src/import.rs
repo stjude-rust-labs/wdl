@@ -17,7 +17,12 @@ use super::State;
 
 impl Formattable for ImportStatement {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let import_keyword = self
             .syntax()
@@ -28,10 +33,20 @@ impl Formattable for ImportStatement {
         format_inline_comment(&import_keyword, buffer, state, true)?;
 
         let uri = self.uri();
-        format_preceding_comments(&uri.syntax_element(), buffer, state, true)?;
+        format_preceding_comments(
+            &SyntaxElement::from(uri.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
         state.space_or_indent(buffer)?;
         uri.format(buffer, state)?;
-        format_inline_comment(&uri.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(uri.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         let mut next = uri.syntax().next_sibling_or_token();
         while let Some(cur) = next {
@@ -116,13 +131,14 @@ impl Formattable for ImportStatement {
             }
             next = cur.next_sibling_or_token();
         }
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 

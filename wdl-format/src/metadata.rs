@@ -11,6 +11,7 @@ use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::MetadataValue;
 use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::AstNode;
+use wdl_ast::AstToken;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 
@@ -26,15 +27,16 @@ impl Formattable for LiteralNull {
         write!(buffer, "{}", self.syntax())?;
         Ok(())
     }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
-    }
 }
 
 impl Formattable for MetadataObject {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let open_brace = self
             .syntax()
@@ -81,19 +83,25 @@ impl Formattable for MetadataObject {
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push_str(&close_brace.to_string());
-        format_inline_comment(&self.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
 impl Formattable for MetadataArray {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let open_bracket = self
             .syntax()
@@ -141,13 +149,14 @@ impl Formattable for MetadataArray {
         format_preceding_comments(&close_bracket, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push_str(&close_bracket.to_string());
-        format_inline_comment(&self.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
@@ -163,28 +172,26 @@ impl Formattable for MetadataValue {
             MetadataValue::Array(a) => a.format(buffer, state),
         }
     }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        match self {
-            MetadataValue::String(s) => s.syntax_element(),
-            MetadataValue::Object(o) => o.syntax_element(),
-            MetadataValue::Array(a) => a.syntax_element(),
-            MetadataValue::Boolean(b) => b.syntax_element(),
-            MetadataValue::Float(f) => f.syntax_element(),
-            MetadataValue::Integer(i) => i.syntax_element(),
-            MetadataValue::Null(n) => n.syntax_element(),
-        }
-    }
 }
 
 impl Formattable for MetadataObjectItem {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let name = self.name();
         state.indent(buffer)?;
         name.format(buffer, state)?;
-        format_inline_comment(&name.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(name.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         let colon = self
             .syntax()
@@ -200,22 +207,33 @@ impl Formattable for MetadataObjectItem {
         format_inline_comment(&colon, buffer, state, true)?;
 
         let value = self.value();
-        format_preceding_comments(&value.syntax_element(), buffer, state, true)?;
+        format_preceding_comments(
+            &SyntaxElement::from(value.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
         state.space_or_indent(buffer)?;
         value.format(buffer, state)?;
-        format_inline_comment(&self.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
 impl Formattable for MetadataSection {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let meta_keyword = self
             .syntax()
@@ -260,19 +278,25 @@ impl Formattable for MetadataSection {
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push_str(&close_brace.to_string());
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
 impl Formattable for ParameterMetadataSection {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let parameter_meta_keyword = self
             .syntax()
@@ -317,12 +341,13 @@ impl Formattable for ParameterMetadataSection {
         format_preceding_comments(&close_brace, buffer, state, false)?;
         state.indent(buffer)?;
         buffer.push_str(&close_brace.to_string());
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }

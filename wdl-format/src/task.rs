@@ -24,7 +24,12 @@ use super::NEWLINE;
 
 impl Formattable for CommandSection {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let command_keyword = self
             .syntax()
@@ -85,24 +90,35 @@ impl Formattable for CommandSection {
         } else {
             buffer.push('}');
         }
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
 impl Formattable for RuntimeItem {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let name = self.name();
         state.indent(buffer)?;
         name.format(buffer, state)?;
-        format_inline_comment(&name.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(name.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         let colon = self
             .syntax()
@@ -118,22 +134,33 @@ impl Formattable for RuntimeItem {
         format_inline_comment(&colon, buffer, state, true)?;
 
         let expr = self.expr();
-        format_preceding_comments(&expr.syntax_element(), buffer, state, true)?;
+        format_preceding_comments(
+            &SyntaxElement::from(expr.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
         state.space_or_indent(buffer)?;
         expr.format(buffer, state)?;
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
 impl Formattable for RuntimeSection {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let runtime_keyword = self
             .syntax()
@@ -177,24 +204,35 @@ impl Formattable for RuntimeSection {
         format_preceding_comments(&close_brace, buffer, state, true)?;
         state.indent(buffer)?;
         buffer.push_str(&close_brace.to_string());
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
 impl Formattable for RequirementsItem {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let name = self.name();
         state.indent(buffer)?;
         name.format(buffer, state)?;
-        format_inline_comment(&name.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(name.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         let colon = self
             .syntax()
@@ -210,22 +248,33 @@ impl Formattable for RequirementsItem {
         format_inline_comment(&colon, buffer, state, true)?;
 
         let expr = self.expr();
-        format_preceding_comments(&expr.syntax_element(), buffer, state, true)?;
+        format_preceding_comments(
+            &SyntaxElement::from(expr.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
         state.space_or_indent(buffer)?;
         expr.format(buffer, state)?;
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
 impl Formattable for RequirementsSection {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let requirements_keyword = self
             .syntax()
@@ -269,19 +318,25 @@ impl Formattable for RequirementsSection {
         format_preceding_comments(&close_brace, buffer, state, true)?;
         state.indent(buffer)?;
         buffer.push_str(&close_brace.to_string());
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }
 
 impl Formattable for TaskDefinition {
     fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
-        format_preceding_comments(&self.syntax_element(), buffer, state, false)?;
+        format_preceding_comments(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         let task_keyword = self
             .syntax()
@@ -293,10 +348,20 @@ impl Formattable for TaskDefinition {
         format_inline_comment(&task_keyword, buffer, state, true)?;
 
         let name = self.name();
-        format_preceding_comments(&name.syntax_element(), buffer, state, true)?;
+        format_preceding_comments(
+            &SyntaxElement::from(name.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
         state.space_or_indent(buffer)?;
         name.format(buffer, state)?;
-        format_inline_comment(&name.syntax_element(), buffer, state, true)?;
+        format_inline_comment(
+            &SyntaxElement::from(name.syntax().clone()),
+            buffer,
+            state,
+            true,
+        )?;
 
         let open_brace = self
             .syntax()
@@ -410,12 +475,13 @@ impl Formattable for TaskDefinition {
         format_preceding_comments(&close_brace, buffer, state, true)?;
         state.indent(buffer)?;
         buffer.push_str(&close_brace.to_string());
-        format_inline_comment(&self.syntax_element(), buffer, state, false)?;
+        format_inline_comment(
+            &SyntaxElement::from(self.syntax().clone()),
+            buffer,
+            state,
+            false,
+        )?;
 
         Ok(())
-    }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Node(self.syntax().clone())
     }
 }

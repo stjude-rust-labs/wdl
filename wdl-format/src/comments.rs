@@ -41,10 +41,6 @@ impl Formattable for Comment {
         write!(buffer, "{}{}", comment, NEWLINE)?;
         Ok(())
     }
-
-    fn syntax_element(&self) -> SyntaxElement {
-        SyntaxElement::Token(self.syntax().clone())
-    }
 }
 
 /// Format comments that preceed a node.
