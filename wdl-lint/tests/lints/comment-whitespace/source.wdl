@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, ExpressionSpacing, LineWidth, MissingMetas, NonmatchingOutput, Whitespace
+#@ except: DescriptionMissing, ExpressionSpacing, LineWidth, MissingMetas, NonmatchingOutput, TrailingComma, Whitespace
 ## some comment
 
 version 1.2
