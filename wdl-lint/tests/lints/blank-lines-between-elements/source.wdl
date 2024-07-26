@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, ImportWhitespace, InputSorting, LineWidth, MissingMetas, MissingOutput, MissingRuntime, Whitespace
+#@ except: CommentWhitespace, DescriptionMissing, ImportWhitespace, InputSorting, LineWidth, MissingMetas, MissingOutput, MissingRuntime, Whitespace
 
 version 1.1
 

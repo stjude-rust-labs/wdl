@@ -4,10 +4,10 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 11 │   workflow foo {
    │ ╭──────────────^
 12 │ │ 
-13 │ │     # This is OK.(but the prior line is not)
+13 │ │     # This is OK (but the prior line is not).
    │ ╰────^
    │  
-   = fix: remove blank line(s)
+   = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: missing blank line
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:16:5
@@ -58,7 +58,7 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 48 │ │     meta {
    │ ╰────^
    │  
-   = fix: remove blank line(s)
+   = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:48:11
@@ -69,7 +69,7 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 50 │ │         description: "bar"
    │ ╰────────^
    │  
-   = fix: remove blank line(s)
+   = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:50:27
@@ -80,7 +80,7 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 52 │ │         outputs: {
    │ ╰────────^
    │  
-   = fix: remove blank line(s)
+   = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:53:19
@@ -91,7 +91,7 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 55 │ │         }
    │ ╰────────^
    │  
-   = fix: remove blank line(s)
+   = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:59:27
@@ -102,7 +102,7 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 61 │ │         String? t
    │ ╰────────^
    │  
-   = fix: remove blank line(s)
+   = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:84:14
@@ -113,7 +113,7 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 86 │ │         disks: "50 GB"
    │ ╰────────^
    │  
-   = fix: remove blank line(s)
+   = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:87:23
@@ -124,7 +124,7 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 89 │ │         container: "ubuntu:latest"
    │ ╰────────^
    │  
-   = fix: remove blank line(s)
+   = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:89:35
@@ -135,5 +135,5 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 91 │ │     }
    │ ╰────^
    │  
-   = fix: remove blank line(s)
+   = fix: remove the blank line(s)
 
