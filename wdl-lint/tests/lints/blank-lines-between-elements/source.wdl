@@ -25,7 +25,7 @@ workflow foo {
     }
     String p = "pip"
 
-    
+
     String q = "bar"  # The following whitespace is allowable between private declarations
 
     String r = "world"

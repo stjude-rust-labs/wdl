@@ -53,18 +53,10 @@ note[BlankLinesBetweenElements]: missing blank line
    │  
    = fix: add a blank line before this element
 
-warning[Whitespace]: line contains only whitespace
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:28:1
-   │
-28 │     
-   │ ^^^^
-   │
-   = fix: remove the whitespace from this line
-
 warning[Whitespace]: more than one blank line in a row
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:28:1
    │  
-28 │ ╭     
+28 │ ╭ 
 29 │ │     String q = "bar"  # The following whitespace is allowable between private declarations
    │ ╰────^
    │  
