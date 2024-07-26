@@ -11,8 +11,8 @@
 //!
 //! A preceding comment is a comment that appears on a line before an element.
 //! There may be any number of preceding comments and they may be separated
-//! by any number of blank lines. Blank lines will be included in the formatted output,
-//! but multiple blank lines in a row will be consolidated to one.
+//! by any number of blank lines. Blank lines will be included in the formatted
+//! output, but multiple blank lines in a row will be consolidated to one.
 //! Preceding comments should be indented to the same level as the element which
 //! they belong to.
 //!
@@ -132,7 +132,7 @@ pub fn format_preceding_comments(
                 comment_processed = true;
             }
             if comment_processed {
-                buffer.push_str(&line);
+                buffer.push_str(line);
             }
         }
     }
