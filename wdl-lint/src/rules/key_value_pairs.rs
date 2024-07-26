@@ -158,8 +158,8 @@ impl Visitor for KeyValuePairsRule {
             if next_newline.is_none() {
                 // No newline found, report missing
                 let s = child.syntax().text_range().to_span();
-                let end = if let Some(next) = child.syntax().next_sibling() {
-                    next.text_range().start()
+                let end = if let Some(next) = find_next_comma(child.syntax()).0 {
+                    next.text_range().end()
                 } else {
                     close_delim.text_range().start()
                 };
@@ -268,7 +268,7 @@ impl Visitor for KeyValuePairsRule {
                 // No newline found, report missing
                 let s = child.syntax().text_range().to_span();
                 let end = if let Some(next) = find_next_comma(child.syntax()).0 {
-                    next.text_range().start()
+                    next.text_range().end()
                 } else {
                     close_delim.text_range().start()
                 };

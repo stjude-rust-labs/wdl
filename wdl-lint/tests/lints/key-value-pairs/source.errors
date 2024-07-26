@@ -20,7 +20,7 @@ note[KeyValuePairs]: item should be followed by a newline
   ┌─ tests/lints/key-value-pairs/source.wdl:9:9
   │
 9 │         "value2", "value3"]
-  │         ^^^^^^^^
+  │         ^^^^^^^^^
   │
   = fix: add a newline after this element
 
@@ -84,7 +84,7 @@ note[KeyValuePairs]: item should be followed by a newline
    ┌─ tests/lints/key-value-pairs/source.wdl:20:17
    │
 20 │                 "m", "n"],
-   │                 ^^^
+   │                 ^^^^
    │
    = fix: add a newline after this element
 
