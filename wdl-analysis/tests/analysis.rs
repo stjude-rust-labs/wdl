@@ -112,13 +112,14 @@ fn compare_results(test: &Path, results: Vec<AnalysisResult>) -> Result<()> {
             Err(_) => result.uri().as_str().into(),
         };
 
-        let diagnostics: Cow<'_, [Diagnostic]> = match result.error() {
+        let diagnostics: Cow<'_, [Diagnostic]> = match result.parse_result().error() {
             Some(e) => vec![Diagnostic::error(format!("failed to read `{path}`: {e:#}"))].into(),
             None => result.diagnostics().into(),
         };
 
         if !diagnostics.is_empty() {
             let source = result
+                .parse_result()
                 .root()
                 .map(|n| SyntaxNode::new_root(n.clone()).text().to_string())
                 .unwrap_or(String::new());

@@ -92,7 +92,7 @@ async fn analyze(path: PathBuf, lint: bool) -> Result<Vec<AnalysisResult>> {
             (Some(cwd), Some(path)) => path.strip_prefix(cwd).unwrap_or(path).to_string_lossy(),
         };
 
-        let diagnostics: Cow<'_, [Diagnostic]> = match result.error() {
+        let diagnostics: Cow<'_, [Diagnostic]> = match result.parse_result().error() {
             Some(e) => vec![Diagnostic::error(format!("failed to read `{path}`: {e:#}"))].into(),
             None => result.diagnostics().into(),
         };
@@ -101,6 +101,7 @@ async fn analyze(path: PathBuf, lint: bool) -> Result<Vec<AnalysisResult>> {
             emit_diagnostics(
                 &path,
                 &result
+                    .parse_result()
                     .root()
                     .map(|n| SyntaxNode::new_root(n.clone()).text().to_string())
                     .unwrap_or(String::new()),

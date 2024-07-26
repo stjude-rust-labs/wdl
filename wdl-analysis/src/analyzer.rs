@@ -57,6 +57,81 @@ pub fn path_to_uri(path: &Path) -> Option<Url> {
     Url::from_file_path(clean(absolute(path).ok()?)).ok()
 }
 
+/// Represents the result of a parse.
+#[derive(Debug, Clone)]
+pub enum ParseResult {
+    /// There was an error parsing the document.
+    Error(Arc<anyhow::Error>),
+    /// The document was parsed.
+    Parsed {
+        /// The root node of the document.
+        root: GreenNode,
+        /// The line index used to map line/column offsets to byte offsets and
+        /// vice versa.
+        lines: Arc<LineIndex>,
+    },
+}
+
+impl ParseResult {
+    /// Gets the root from the parse result.
+    ///
+    /// Returns `None` if there was an error parsing the document.
+    pub fn root(&self) -> Option<&GreenNode> {
+        match self {
+            Self::Error(_) => None,
+            Self::Parsed { root, .. } => Some(root),
+        }
+    }
+
+    /// Gets the line index from the parse result.
+    ///
+    /// Returns `None` if there was an error parsing the document.
+    pub fn lines(&self) -> Option<&Arc<LineIndex>> {
+        match self {
+            Self::Error(_) => None,
+            Self::Parsed { lines, .. } => Some(lines),
+        }
+    }
+
+    /// Gets the AST document of the parse result.
+    ///
+    /// Returns `None` if there was an error parsing the document.
+    pub fn document(&self) -> Option<wdl_ast::Document> {
+        match &self {
+            ParseResult::Error(_) => None,
+            ParseResult::Parsed { root, .. } => Some(
+                wdl_ast::Document::cast(SyntaxNode::new_root(root.clone()))
+                    .expect("node should cast"),
+            ),
+        }
+    }
+
+    /// Gets the error parsing the document.
+    ///
+    /// Returns` None` if the document was parsed.
+    pub fn error(&self) -> Option<&Arc<anyhow::Error>> {
+        match self {
+            Self::Error(e) => Some(e),
+            ParseResult::Parsed { .. } => None,
+        }
+    }
+}
+
+impl From<&ParseState> for ParseResult {
+    fn from(state: &ParseState) -> Self {
+        match state {
+            ParseState::NotParsed => {
+                panic!("cannot create a result for an file that hasn't been parsed")
+            }
+            ParseState::Error(e) => Self::Error(e.clone()),
+            ParseState::Parsed { root, lines, .. } => Self::Parsed {
+                root: root.clone(),
+                lines: lines.clone(),
+            },
+        }
+    }
+}
+
 /// Represents the result of an analysis.
 ///
 /// Analysis results are cheap to clone.
@@ -64,17 +139,8 @@ pub fn path_to_uri(path: &Path) -> Option<Url> {
 pub struct AnalysisResult {
     /// The URI of the analyzed document.
     uri: Arc<Url>,
-    /// The root node of the document.
-    ///
-    /// This is `None` if the document failed to be read.
-    root: Option<GreenNode>,
-    /// The line index used to map line/column offsets to byte offsets and vice
-    /// versa.
-    lines: Option<Arc<LineIndex>>,
-    /// The error encountered when trying to read the document.
-    ///
-    /// This is `None` if the document was read.
-    error: Option<Arc<anyhow::Error>>,
+    /// The result from parsing the file.
+    parse_result: ParseResult,
     /// The diagnostics for the document.
     diagnostics: Arc<[Diagnostic]>,
     /// The scope of the analyzed document.
@@ -84,23 +150,11 @@ pub struct AnalysisResult {
 impl AnalysisResult {
     /// Constructs a new analysis result for the given graph node.
     pub(crate) fn new(node: &DocumentGraphNode) -> Self {
-        let (root, lines, error) = match node.parse_state() {
-            ParseState::NotParsed => {
-                panic!("cannot create a result for an file that hasn't been parsed")
-            }
-            ParseState::Error(e) => (None, None, Some(e.clone())),
-            ParseState::Parsed { root, lines, .. } => {
-                (Some(root.clone()), Some(lines.clone()), None)
-            }
-        };
-
         let analysis = node.analysis().expect("analysis not completed");
 
         Self {
             uri: node.uri().clone(),
-            root,
-            lines,
-            error,
+            parse_result: node.parse_state().into(),
             diagnostics: analysis.diagnostics().clone(),
             scope: analysis.scope().clone(),
         }
@@ -111,37 +165,9 @@ impl AnalysisResult {
         &self.uri
     }
 
-    /// Gets the root node of the document that was analyzed.
-    ///
-    /// Returns `None` if the document was not parsed.
-    pub fn root(&self) -> Option<&GreenNode> {
-        self.root.as_ref()
-    }
-
-    /// Gets the AST document of the result.
-    ///
-    /// Returns `None` if the document was not parsed.
-    pub fn document(&self) -> Option<wdl_ast::Document> {
-        self.root.as_ref().map(|r| {
-            wdl_ast::Document::cast(SyntaxNode::new_root(r.clone())).expect("node should cast")
-        })
-    }
-
-    /// Gets the line index for the document.
-    ///
-    /// The line index may be used to convert line/column positions into byte
-    /// offsets and vice versa.
-    ///
-    /// Returns `None` if the document was not parsed.
-    pub fn lines(&self) -> Option<&LineIndex> {
-        self.lines.as_deref()
-    }
-
-    /// Gets the error if the document could not be read.
-    ///
-    /// Returns `None` if the document was parsed.
-    pub fn error(&self) -> Option<&anyhow::Error> {
-        self.error.as_deref()
+    /// Gets the result of the parse.
+    pub fn parse_result(&self) -> &ParseResult {
+        &self.parse_result
     }
 
     /// Gets the diagnostics associated with the document.

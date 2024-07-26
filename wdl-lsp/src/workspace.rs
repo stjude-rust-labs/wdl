@@ -125,7 +125,10 @@ impl CachedResult {
             .map(|d| {
                 proto::diagnostic(
                     self.result.uri(),
-                    self.result.lines().expect("should have line index"),
+                    self.result
+                        .parse_result()
+                        .lines()
+                        .expect("should have line index"),
                     source,
                     d,
                 )
@@ -183,7 +186,10 @@ impl CachedResult {
             .map(|d| {
                 proto::diagnostic(
                     self.result.uri(),
-                    self.result.lines().expect("should have line index"),
+                    self.result
+                        .parse_result()
+                        .lines()
+                        .expect("should have line index"),
                     source,
                     d,
                 )
@@ -417,7 +423,10 @@ impl Workspace {
                 .map(|d| {
                     proto::diagnostic(
                         result.uri(),
-                        result.lines().expect("should have line index"),
+                        result
+                            .parse_result()
+                            .lines()
+                            .expect("should have line index"),
                         source,
                         d,
                     )
@@ -489,7 +498,10 @@ impl Workspace {
                 .filter_map(|d| {
                     proto::diagnostic(
                         result.uri(),
-                        result.lines().expect("should have line index"),
+                        result
+                            .parse_result()
+                            .lines()
+                            .expect("should have line index"),
                         source,
                         d,
                     )
