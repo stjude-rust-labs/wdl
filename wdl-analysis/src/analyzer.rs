@@ -185,6 +185,7 @@ impl AnalysisResult {
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Copy, Clone, Default)]
 pub struct SourcePosition {
     /// Line position in a document (zero-based).
+    // NOTE: this field must come before `character` to maintain a correct sort order.
     pub line: u32,
     /// Character offset on a line in a document (zero-based). The meaning of
     /// this offset is determined by the position encoding.
