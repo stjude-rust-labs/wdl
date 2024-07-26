@@ -76,6 +76,7 @@ jobs:
     - name: Install cargo-binstall
       run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
     - name: Install cargo-msrv
-      run: cargo binstall -y cargo-msrv
+      run: cargo binstall -y --version 0.16.0-beta.23 cargo-msrv
     - name: Verify the MSRV
-      run: cargo msrv verify
+      working-directory: ./wdl
+      run: cargo msrv verify --output-format minimal --all-features
