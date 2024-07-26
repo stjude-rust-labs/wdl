@@ -8,6 +8,7 @@ description = "An abstract syntax tree for Workflow Description Language (WDL) d
 homepage = "https://github.com/stjude-rust-labs/wdl"
 repository = "https://github.com/stjude-rust-labs/wdl"
 documentation = "https://docs.rs/wdl-ast"
+rust-version = "1.79.0"
 
 [dependencies]
 wdl-grammar = { path = "../wdl-grammar", version = "0.6.0" }

@@ -8,6 +8,7 @@ homepage.workspace = true
 repository.workspace = true
 description = "Analysis of Workflow Description Language (WDL) documents."
 documentation = "https://docs.rs/wdl-analysis"
+rust-version = "1.79.0"
 
 [dependencies]
 wdl-ast = { path = "../wdl-ast", version = "0.5.0" }

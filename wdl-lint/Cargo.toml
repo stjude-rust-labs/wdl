@@ -9,6 +9,7 @@ homepage.workspace = true
 repository.workspace = true
 documentation = "https://docs.rs/wdl-lint"
 readme = "../README.md"
+rust-version = "1.79.0"
 
 [dependencies]
 wdl-ast = { path = "../wdl-ast", version = "0.5.0" }
