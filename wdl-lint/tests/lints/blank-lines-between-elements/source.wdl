@@ -10,7 +10,7 @@ import "qux" # following whitespace duplication is caught be Whitespace rule
 # test comment
 workflow foo {
 
-    # This is OK.(but the prior line is not)
+    # This is OK (but the prior line is not).
     # So is this.
     meta {}
     parameter_meta {}

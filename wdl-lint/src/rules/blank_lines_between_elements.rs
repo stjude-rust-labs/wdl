@@ -42,7 +42,7 @@ fn excess_blank_line(span: Span) -> Diagnostic {
     Diagnostic::note("extra blank line(s) found")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("remove blank line(s)")
+        .with_fix("remove the blank line(s)")
 }
 
 /// Creates a missing blank line diagnostic.
