@@ -90,7 +90,7 @@ There is a CI job that verifies the declared minimum supported version.
 
 If a contributor submits a PR that uses a feature from a newer version of Rust,
 the contributor is responsible for updating the minimum supported version in
-the `Cargo.toml` of the required crates.
+the `Cargo.toml`.
 
 Contributors may update the minimum supported version as-needed to the latest
 stable release of Rust.
@@ -102,7 +102,7 @@ install the `cargo-msrv` tool:
 cargo install cargo-msrv
 ```
 
-And run the following command from inside each crate's directory:
+And run the following command:
 
 ```bash
 cargo msrv --min 1.79.0

@@ -78,5 +78,4 @@ jobs:
     - name: Install cargo-msrv
       run: cargo binstall -y cargo-msrv
     - name: Verify the MSRV
-      working-directory: ./wdl
       run: cargo msrv verify

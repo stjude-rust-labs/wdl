@@ -2,13 +2,13 @@
 name = "wdl-grammar"
 version = "0.6.0"
 authors = ["Clay McLeod <clay.l.mcleod@gmail.com>"]
+rust-version.workspace = true
 edition.workspace = true
 license.workspace = true
 description = "A parse tree for Workflow Description Language (WDL) documents"
 homepage = "https://github.com/stjude-rust-labs/wdl"
 repository = "https://github.com/stjude-rust-labs/wdl"
 documentation = "https://docs.rs/wdl-grammar"
-rust-version = "1.79.0"
 
 [dependencies]
 logos = { workspace = true }
