@@ -55,7 +55,7 @@ async fn analyze(path: PathBuf, lint: bool) -> Result<Vec<AnalysisResult>> {
     );
 
     let analyzer = Analyzer::new_with_validator(
-        move |kind, completed, total, _| {
+        move |_: (), kind, completed, total| {
             let bar = bar.clone();
             async move {
                 if completed == 0 {
@@ -74,8 +74,8 @@ async fn analyze(path: PathBuf, lint: bool) -> Result<Vec<AnalysisResult>> {
         },
     );
 
-    let documents = Analyzer::find_documents(vec![path]).await;
-    let results = analyzer.analyze(documents, None).await;
+    analyzer.add_documents(vec![path]).await?;
+    let results = analyzer.analyze(()).await;
 
     let mut count = 0;
     let cwd = std::env::current_dir().ok();

@@ -27,11 +27,13 @@ glob = { workspace = true }
 path-clean = { workspace = true }
 indexmap = { workspace = true }
 line-index = { workspace = true }
+uuid = { workspace = true, features = ["v4"] }
 
 [dev-dependencies]
 pretty_assertions = { workspace = true }
 colored = { workspace = true }
 codespan-reporting = { workspace = true }
+tempfile = { workspace = true }
 
 [features]
 default = []
