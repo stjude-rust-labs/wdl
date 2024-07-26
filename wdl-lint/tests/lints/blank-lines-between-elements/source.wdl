@@ -1,10 +1,11 @@
-#@ except: CommentWhitespace, DescriptionMissing, ImportWhitespace, InputSorting, LineWidth, MissingMetas, MissingOutput, MissingRuntime, Whitespace
+#@ except: DescriptionMissing, InputSorting, LineWidth, MissingMetas, MissingOutput, MissingRuntime
+## CommentWhitespace, ImportWhitespace, and Whitespace are left enabled to understand all whitespace diagnostics.
 
 version 1.1
 
-import "baz" # following whitespace will be caught by ImportWhitespace rule
+import "baz"  # following whitespace will be caught by ImportWhitespace rule
 
-import "qux" # following whitespace duplication is caught be Whitespace rule
+import "qux"  # following whitespace duplication is caught be Whitespace rule
 
 
 # test comment
@@ -25,21 +26,21 @@ workflow foo {
     String p = "pip"
 
     
-    String q = "bar" # The following whitespace is allowable between private declarations
+    String q = "bar"  # The following whitespace is allowable between private declarations
 
     String r = "world"
-    String s = "hello" # following whitespace duplication is caught be Whitespace rule
+    String s = "hello"  # following whitespace duplication is caught be Whitespace rule
 
 
     call bar { input:
         s = s
-    } # following whitespace duplication is caught be Whitespace rule
+    }  # following whitespace duplication is caught be Whitespace rule
 
 
     call bar as baz { input:
         s = s
     }
-    call bar as qux { input: # Calls may optionally be separated by whitespace.
+    call bar as qux { input:  # Calls may optionally be separated by whitespace.
         s = s
     }
 }
