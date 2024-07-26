@@ -463,24 +463,24 @@ fn flag_all_blank_lines_within(syntax: &SyntaxNode, state: &mut Diagnostics) {
 
 /// Check that an item has space prior to it.
 ///
-/// `element_spacing` indicates if spacing is required (`true`) or not
+/// `element_spacing_required` indicates if spacing is required (`true`) or not
 /// (`false`).
 fn check_prior_spacing(
     syntax: &NodeOrToken<SyntaxNode, SyntaxToken>,
     state: &mut Diagnostics,
-    element_spacing: bool,
+    element_spacing_required: bool,
     first: bool,
 ) {
     if let Some(prior) = syntax.prev_sibling_or_token() {
         match prior.kind() {
             SyntaxKind::Whitespace => {
                 let count = prior.to_string().chars().filter(|c| *c == '\n').count();
-                if first || !element_spacing {
+                if first || !element_spacing_required {
                     // first element cannot have a blank line before it
                     if count > 1 {
                         state.add(excess_blank_line(prior.text_range().to_span()));
                     }
-                } else if count < 2 && element_spacing {
+                } else if count < 2 && element_spacing_required {
                     state.add(missing_blank_line(syntax.text_range().to_span()));
                 }
             }
@@ -488,7 +488,7 @@ fn check_prior_spacing(
             _ => {
                 // If we require between element spacing and are not the first element,
                 // we're missing a blank line.
-                if element_spacing && !first {
+                if element_spacing_required && !first {
                     state.add(missing_blank_line(syntax.text_range().to_span()));
                 }
             }
