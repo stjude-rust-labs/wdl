@@ -94,7 +94,7 @@ note[BlankLinesBetweenElements]: missing blank line
 47 │ ╭ task bar {
 48 │ │ 
 49 │ │     meta {
-50 │ │         
+50 │ │ 
    · │
 70 │ │ 
 71 │ │ }
@@ -118,19 +118,11 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
    │  
 49 │       meta {
    │ ╭──────────^
-50 │ │         
+50 │ │ 
 51 │ │         description: "bar"
    │ ╰────────^
    │  
    = fix: remove the blank line(s)
-
-warning[Whitespace]: line contains only whitespace
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:50:1
-   │
-50 │         
-   │ ^^^^^^^^
-   │
-   = fix: remove the whitespace from this line
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:51:27

@@ -47,7 +47,7 @@ workflow foo {
 task bar {
 
     meta {
-        
+
         description: "bar"
 
         outputs: {
