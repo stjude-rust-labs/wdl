@@ -1,6 +1,5 @@
 //! A module for formatting elements in tasks.
 
-use anyhow::Result;
 use wdl_ast::v1::CommandPart;
 use wdl_ast::v1::CommandSection;
 use wdl_ast::v1::Decl;
@@ -23,7 +22,7 @@ use super::State;
 use super::NEWLINE;
 
 impl Formattable for CommandSection {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -95,14 +94,12 @@ impl Formattable for CommandSection {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for RuntimeItem {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -147,14 +144,12 @@ impl Formattable for RuntimeItem {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for RuntimeSection {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -209,14 +204,12 @@ impl Formattable for RuntimeSection {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for RequirementsItem {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -261,14 +254,12 @@ impl Formattable for RequirementsItem {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for RequirementsSection {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -323,14 +314,12 @@ impl Formattable for RequirementsSection {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for TaskDefinition {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -488,8 +477,6 @@ impl Formattable for TaskDefinition {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }

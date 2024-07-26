@@ -1,6 +1,5 @@
 //! A module for formatting metadata sections (meta and parameter_meta).
 
-use anyhow::Result;
 use wdl_ast::v1::LiteralNull;
 use wdl_ast::v1::MetadataArray;
 use wdl_ast::v1::MetadataObject;
@@ -21,14 +20,13 @@ use super::State;
 use super::NEWLINE;
 
 impl Formattable for LiteralNull {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
-        write!(writer, "{}", self.syntax())?;
-        Ok(())
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+        write!(writer, "{}", self.syntax())
     }
 }
 
 impl Formattable for MetadataObject {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -86,14 +84,12 @@ impl Formattable for MetadataObject {
             writer,
             state,
             true,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for MetadataArray {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -152,14 +148,12 @@ impl Formattable for MetadataArray {
             writer,
             state,
             true,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for MetadataValue {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         match self {
             MetadataValue::String(s) => s.format(writer, state),
             MetadataValue::Boolean(b) => b.format(writer, state),
@@ -173,7 +167,7 @@ impl Formattable for MetadataValue {
 }
 
 impl Formattable for MetadataObjectItem {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -218,14 +212,12 @@ impl Formattable for MetadataObjectItem {
             writer,
             state,
             true,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for MetadataSection {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -281,14 +273,12 @@ impl Formattable for MetadataSection {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for ParameterMetadataSection {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -344,8 +334,6 @@ impl Formattable for ParameterMetadataSection {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }

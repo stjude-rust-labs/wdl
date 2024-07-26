@@ -20,7 +20,6 @@
 //! if and only if that element is the last element of its line. Inline comments
 //! should always appear immediately after the element they are commenting on.
 
-use anyhow::Result;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::SyntaxElement;
@@ -34,10 +33,9 @@ use super::NEWLINE;
 pub const INLINE_COMMENT_SPACE: &str = "  ";
 
 impl Formattable for Comment {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
         let comment = self.as_str().trim();
-        write!(writer, "{}{}", comment, NEWLINE)?;
-        Ok(())
+        write!(writer, "{}{}", comment, NEWLINE)
     }
 }
 
@@ -47,7 +45,7 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
     writer: &mut T,
     state: &mut State,
     would_be_interrupting: bool,
-) -> Result<()> {
+) -> std::fmt::Result {
     // This walks _backwards_ through the syntax tree to find comments
     // so we must collect them in a vector and later reverse them to get them in the
     // correct order.
@@ -139,7 +137,7 @@ pub fn format_inline_comment<T: std::fmt::Write>(
     writer: &mut T,
     state: &mut State,
     would_be_interrupting: bool,
-) -> Result<()> {
+) -> std::fmt::Result {
     let mut next = element.next_sibling_or_token();
     while let Some(cur) = next {
         match cur.kind() {

@@ -1,6 +1,5 @@
 //! A module for formatting elements in workflows.
 
-use anyhow::Result;
 use wdl_ast::v1::CallAfter;
 use wdl_ast::v1::CallAlias;
 use wdl_ast::v1::CallInputItem;
@@ -24,7 +23,7 @@ use super::State;
 use super::NEWLINE;
 
 impl Formattable for CallAlias {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -55,13 +54,12 @@ impl Formattable for CallAlias {
             writer,
             state,
             true,
-        )?;
-        Ok(())
+        )
     }
 }
 
 impl Formattable for CallAfter {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -92,13 +90,12 @@ impl Formattable for CallAfter {
             writer,
             state,
             true,
-        )?;
-        Ok(())
+        )
     }
 }
 
 impl Formattable for CallInputItem {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         let name = self.name();
         name.format(writer, state)?;
         format_inline_comment(
@@ -134,14 +131,12 @@ impl Formattable for CallInputItem {
             writer,
             state,
             true,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for CallStatement {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -295,14 +290,12 @@ impl Formattable for CallStatement {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for ConditionalStatement {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -414,14 +407,12 @@ impl Formattable for ConditionalStatement {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for ScatterStatement {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -549,14 +540,12 @@ impl Formattable for ScatterStatement {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for WorkflowStatement {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         match self {
             WorkflowStatement::Call(c) => c.format(writer, state),
             WorkflowStatement::Conditional(c) => c.format(writer, state),
@@ -567,7 +556,7 @@ impl Formattable for WorkflowStatement {
 }
 
 impl Formattable for WorkflowDefinition {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -716,8 +705,6 @@ impl Formattable for WorkflowDefinition {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }

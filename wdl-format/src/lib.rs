@@ -41,18 +41,17 @@ const STRING_TERMINATOR: char = '"';
 /// A trait for elements that can be formatted.
 pub trait Formattable {
     /// Format the element and write it to the writer.
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()>;
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result;
 }
 
 impl Formattable for Version {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
-        write!(writer, "{}", self.as_str())?;
-        Ok(())
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+        write!(writer, "{}", self.as_str())
     }
 }
 
 impl Formattable for VersionStatement {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         let mut preceding_comments = Vec::new();
         let comment_buffer = &mut String::new();
         for sibling in self.syntax().siblings_with_tokens(Direction::Prev) {
@@ -113,16 +112,13 @@ impl Formattable for VersionStatement {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for Ident {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
-        write!(writer, "{}", self.as_str())?;
-        Ok(())
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+        write!(writer, "{}", self.as_str())
     }
 }
 

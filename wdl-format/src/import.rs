@@ -1,6 +1,5 @@
 //! Format import statements.
 
-use anyhow::Result;
 use wdl_ast::v1::ImportStatement;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
@@ -14,7 +13,7 @@ use super::Formattable;
 use super::State;
 
 impl Formattable for ImportStatement {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -134,9 +133,7 @@ impl Formattable for ImportStatement {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 

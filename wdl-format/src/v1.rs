@@ -1,6 +1,5 @@
 //! A module for formatting WDL v1 elements.
 
-use anyhow::Result;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::Expr;
@@ -29,7 +28,7 @@ use super::NEWLINE;
 use super::STRING_TERMINATOR;
 
 impl Formattable for LiteralString {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
         write!(writer, "{}", STRING_TERMINATOR)?;
         for part in self.parts() {
             match part {
@@ -41,48 +40,42 @@ impl Formattable for LiteralString {
                 }
             }
         }
-        write!(writer, "{}", STRING_TERMINATOR)?;
-        Ok(())
+        write!(writer, "{}", STRING_TERMINATOR)
     }
 }
 
 impl Formattable for LiteralBoolean {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
-        write!(writer, "{}", self.value())?;
-        Ok(())
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+        write!(writer, "{}", self.value())
     }
 }
 
 impl Formattable for LiteralFloat {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
-        write!(writer, "{}", self.syntax())?;
-        Ok(())
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+        write!(writer, "{}", self.syntax())
     }
 }
 
 impl Formattable for LiteralInteger {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
-        write!(writer, "{}", self.syntax())?;
-        Ok(())
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+        write!(writer, "{}", self.syntax())
     }
 }
 
 impl Formattable for Type {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
-        write!(writer, "{}", self.syntax())?;
-        Ok(())
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+        write!(writer, "{}", self.syntax())
     }
 }
 
 impl Formattable for Expr {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
-        write!(writer, "{}", self.syntax())?;
-        Ok(())
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+        write!(writer, "{}", self.syntax())
     }
 }
 
 impl Formattable for Decl {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -141,14 +134,12 @@ impl Formattable for Decl {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for InputSection {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -203,14 +194,12 @@ impl Formattable for InputSection {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for OutputSection {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -265,14 +254,12 @@ impl Formattable for OutputSection {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for HintsItem {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -316,14 +303,12 @@ impl Formattable for HintsItem {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for HintsSection {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -378,14 +363,12 @@ impl Formattable for HintsSection {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for StructDefinition {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
@@ -464,14 +447,12 @@ impl Formattable for StructDefinition {
             writer,
             state,
             false,
-        )?;
-
-        Ok(())
+        )
     }
 }
 
 impl Formattable for DocumentItem {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         match self {
             DocumentItem::Import(_) => {
                 unreachable!("Import statements should not be formatted as a DocumentItem")
