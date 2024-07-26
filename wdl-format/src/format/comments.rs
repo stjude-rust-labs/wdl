@@ -11,7 +11,8 @@
 //!
 //! A preceding comment is a comment that appears on a line before an element.
 //! There may be any number of preceding comments and they may be separated
-//! by any number of blank lines. All blank lines will be discarded.
+//! by any number of blank lines. Blank lines will be included in the formatted output,
+//! but multiple blank lines in a row will be consolidated to one.
 //! Preceding comments should be indented to the same level as the element which
 //! they belong to.
 //!
@@ -56,7 +57,10 @@ pub fn format_preceding_comments(
     // This walks _backwards_ through the syntax tree to find comments
     // so we must collect them in a vector and later reverse them to get them in the
     // correct order.
-    let mut preceding_comments = Vec::new();
+    let mut reversed_text = Vec::new();
+    let mut inner_buffer = String::new();
+    let began_interrupted = state.interrupted();
+    let mut comments_found = false;
 
     let mut prev = element.prev_sibling_or_token();
     while let Some(cur) = prev {
@@ -72,11 +76,21 @@ pub fn format_preceding_comments(
                             if before_cur.to_string().contains('\n') {
                                 // The 'cur' comment is on is on its own line.
                                 // It "belongs" to the current element.
+                                comments_found = true;
+
+                                if would_be_interrupting {
+                                    state.interrupt();
+                                }
+
                                 let comment = Comment::cast(
                                     cur.as_token().expect("Comment should be a token").clone(),
                                 )
                                 .expect("Comment should cast to a comment");
-                                preceding_comments.push(comment);
+
+                                state.indent(&mut inner_buffer)?;
+                                comment.format(&mut inner_buffer, state)?;
+                                reversed_text.push(inner_buffer.clone());
+                                inner_buffer.clear();
                             }
                         }
                         _ => {
@@ -88,7 +102,13 @@ pub fn format_preceding_comments(
                 }
             }
             SyntaxKind::Whitespace => {
-                // Ignore
+                // Ignore whitespace less than one or more blank lines
+                // and ignore whitespace until a comment is found.
+                if cur.to_string().matches(NEWLINE).count() > 1 && comments_found {
+                    inner_buffer.push_str(NEWLINE);
+                    reversed_text.push(inner_buffer.clone());
+                    inner_buffer.clear();
+                }
             }
             _ => {
                 // We've backed up to non-trivia, so we can stop
@@ -98,15 +118,23 @@ pub fn format_preceding_comments(
         prev = cur.prev_sibling_or_token()
     }
 
-    let comments_found = !preceding_comments.is_empty();
-    if comments_found && would_be_interrupting && !state.interrupted() {
+    if comments_found && would_be_interrupting && !began_interrupted {
         write!(buffer, "{}", NEWLINE)?;
-        state.interrupt();
     }
 
-    for comment in preceding_comments.iter().rev() {
-        state.indent(buffer)?;
-        comment.format(buffer, state)?;
+    // Only iterate through 'reversed_text' if comments were found
+    // (i.e. don't iterate through if it's only whitespace)
+    // And skip any preceding whitespace.
+    let mut comment_processed = false;
+    if comments_found {
+        for line in reversed_text.iter().rev() {
+            if line.contains('#') {
+                comment_processed = true;
+            }
+            if comment_processed {
+                buffer.push_str(&line);
+            }
+        }
     }
     Ok(())
 }
