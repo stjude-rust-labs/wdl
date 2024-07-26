@@ -20,8 +20,6 @@
 //! if and only if that element is the last element of its line. Inline comments
 //! should always appear immediately after the element they are commenting on.
 
-use std::fmt::Write;
-
 use anyhow::Result;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
@@ -36,17 +34,17 @@ use super::NEWLINE;
 pub const INLINE_COMMENT_SPACE: &str = "  ";
 
 impl Formattable for Comment {
-    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
         let comment = self.as_str().trim();
-        write!(buffer, "{}{}", comment, NEWLINE)?;
+        write!(writer, "{}{}", comment, NEWLINE)?;
         Ok(())
     }
 }
 
 /// Format comments that preceed a node.
-pub fn format_preceding_comments(
+pub fn format_preceding_comments<T: std::fmt::Write>(
     element: &SyntaxElement,
-    buffer: &mut String,
+    writer: &mut T,
     state: &mut State,
     would_be_interrupting: bool,
 ) -> Result<()> {
@@ -115,7 +113,7 @@ pub fn format_preceding_comments(
     }
 
     if comments_found && would_be_interrupting && !began_interrupted {
-        write!(buffer, "{}", NEWLINE)?;
+        write!(writer, "{}", NEWLINE)?;
     }
 
     // Only iterate through 'reversed_text' if comments were found
@@ -128,7 +126,7 @@ pub fn format_preceding_comments(
                 comment_processed = true;
             }
             if comment_processed {
-                buffer.push_str(line);
+                write!(writer, "{}", line)?;
             }
         }
     }
@@ -136,9 +134,9 @@ pub fn format_preceding_comments(
 }
 
 /// Format a comment on the same line as an element.
-pub fn format_inline_comment(
+pub fn format_inline_comment<T: std::fmt::Write>(
     element: &SyntaxElement,
-    buffer: &mut String,
+    writer: &mut T,
     state: &mut State,
     would_be_interrupting: bool,
 ) -> Result<()> {
@@ -146,14 +144,14 @@ pub fn format_inline_comment(
     while let Some(cur) = next {
         match cur.kind() {
             SyntaxKind::Comment => {
-                write!(buffer, "{}", INLINE_COMMENT_SPACE)?;
+                write!(writer, "{}", INLINE_COMMENT_SPACE)?;
                 let comment =
                     Comment::cast(cur.as_token().expect("Comment should be a token").clone())
                         .expect("Comment should cast to a comment");
                 if would_be_interrupting {
                     state.interrupt();
                 }
-                comment.format(buffer, state)?;
+                comment.format(writer, state)?;
                 return Ok(());
             }
             SyntaxKind::Whitespace => {
@@ -171,7 +169,7 @@ pub fn format_inline_comment(
     }
 
     if !would_be_interrupting {
-        write!(buffer, "{}", NEWLINE)?;
+        write!(writer, "{}", NEWLINE)?;
     }
     Ok(())
 }

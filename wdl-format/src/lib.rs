@@ -7,8 +7,6 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
-use std::fmt::Write;
-
 use anyhow::Result;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
@@ -42,19 +40,19 @@ const STRING_TERMINATOR: char = '"';
 
 /// A trait for elements that can be formatted.
 pub trait Formattable {
-    /// Format the element and write it to the buffer.
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()>;
+    /// Format the element and write it to the writer.
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()>;
 }
 
 impl Formattable for Version {
-    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
-        write!(buffer, "{}", self.as_str())?;
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
+        write!(writer, "{}", self.as_str())?;
         Ok(())
     }
 }
 
 impl Formattable for VersionStatement {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         let mut preceding_comments = Vec::new();
         let comment_buffer = &mut String::new();
         for sibling in self.syntax().siblings_with_tokens(Direction::Prev) {
@@ -84,12 +82,12 @@ impl Formattable for VersionStatement {
         }
 
         for comment in preceding_comments.iter().rev() {
-            buffer.push_str(comment);
+            write!(writer, "{}", comment)?;
         }
 
         // If there are preamble comments, ensure a blank line is inserted
         if !preceding_comments.is_empty() {
-            buffer.push_str(NEWLINE);
+            write!(writer, "{}", NEWLINE)?;
         }
 
         let version_keyword = self
@@ -97,22 +95,22 @@ impl Formattable for VersionStatement {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::VersionKeyword)
             .expect("Version statement should have a version keyword");
-        buffer.push_str(&version_keyword.to_string());
-        format_inline_comment(&version_keyword, buffer, state, true)?;
+        write!(writer, "{}", version_keyword)?;
+        format_inline_comment(&version_keyword, writer, state, true)?;
 
         let version = self.version();
 
         format_preceding_comments(
             &SyntaxElement::from(version.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
-        state.space_or_indent(buffer)?;
-        version.format(buffer, state)?;
+        state.space_or_indent(writer)?;
+        version.format(writer, state)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -122,8 +120,8 @@ impl Formattable for VersionStatement {
 }
 
 impl Formattable for Ident {
-    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
-        write!(buffer, "{}", self.as_str())?;
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
+        write!(writer, "{}", self.as_str())?;
         Ok(())
     }
 }

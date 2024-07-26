@@ -4,8 +4,6 @@
 //! The state becomes "interrupted" by comments when a comment forces a newline
 //! where it would otherwise not be expected. In this case, the next line(s)
 //! will be indented by one level.
-use std::fmt::Write;
-
 use anyhow::Result;
 
 /// Space constant used for formatting.
@@ -25,26 +23,26 @@ pub struct State {
 }
 
 impl State {
-    /// Add the current indentation to the buffer.
+    /// Add the current indentation to the writer.
     /// The indentation level will be temporarily increased by one if the
     /// current line has been interrupted by comments.
-    pub fn indent(&self, buffer: &mut String) -> Result<()> {
+    pub fn indent<T: std::fmt::Write>(&self, writer: &mut T) -> Result<()> {
         write!(
-            buffer,
+            writer,
             "{}",
             INDENT.repeat(self.indent_level + (if self.interrupted_by_comments { 1 } else { 0 }))
         )?;
         Ok(())
     }
 
-    /// Add a space or an indentation to the buffer. If the current line has
+    /// Add a space or an indentation to the writer. If the current line has
     /// been interrupted by comments, an indentation is added. Otherwise, a
     /// space is added.
-    pub fn space_or_indent(&mut self, buffer: &mut String) -> Result<()> {
+    pub fn space_or_indent<T: std::fmt::Write>(&mut self, writer: &mut T) -> Result<()> {
         if !self.interrupted_by_comments {
-            write!(buffer, "{}", SPACE)?;
+            write!(writer, "{}", SPACE)?;
         } else {
-            self.indent(buffer)?;
+            self.indent(writer)?;
         }
         self.reset_interrupted();
         Ok(())

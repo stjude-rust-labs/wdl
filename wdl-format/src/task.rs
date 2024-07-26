@@ -23,10 +23,10 @@ use super::State;
 use super::NEWLINE;
 
 impl Formattable for CommandSection {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -36,9 +36,9 @@ impl Formattable for CommandSection {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::CommandKeyword)
             .expect("Command section should have a command keyword");
-        state.indent(buffer)?;
-        buffer.push_str(&command_keyword.to_string());
-        format_inline_comment(&command_keyword, buffer, state, true)?;
+        state.indent(writer)?;
+        write!(writer, "{}", command_keyword)?;
+        format_inline_comment(&command_keyword, writer, state, true)?;
 
         if self.is_heredoc() {
             let open_heredoc = self
@@ -46,53 +46,53 @@ impl Formattable for CommandSection {
                 .children_with_tokens()
                 .find(|c| c.kind() == SyntaxKind::OpenHeredoc)
                 .expect("Command section should have an open heredoc");
-            format_preceding_comments(&open_heredoc, buffer, state, true)?;
+            format_preceding_comments(&open_heredoc, writer, state, true)?;
             // Open braces should ignore the "+1 rule" followed by other interrupted
             // elements.
             if state.interrupted() {
                 state.reset_interrupted();
-                state.indent(buffer)?;
+                state.indent(writer)?;
             } else {
-                buffer.push_str(SPACE);
+                write!(writer, "{}", SPACE)?;
             }
-            buffer.push_str(&open_heredoc.to_string());
+            write!(writer, "{}", open_heredoc)?;
         } else {
             let open_brace = self
                 .syntax()
                 .children_with_tokens()
                 .find(|c| c.kind() == SyntaxKind::OpenBrace)
                 .expect("Command section should have an open brace");
-            format_preceding_comments(&open_brace, buffer, state, true)?;
+            format_preceding_comments(&open_brace, writer, state, true)?;
             // Open braces should ignore the "+1 rule" followed by other interrupted
             // elements.
             if state.interrupted() {
                 state.reset_interrupted();
-                state.indent(buffer)?;
+                state.indent(writer)?;
             } else {
-                buffer.push_str(SPACE);
+                write!(writer, "{}", SPACE)?;
             }
-            buffer.push_str(&open_brace.to_string());
+            write!(writer, "{}", open_brace)?;
         }
 
         for part in self.parts() {
             match part {
                 CommandPart::Text(t) => {
-                    buffer.push_str(t.as_str());
+                    write!(writer, "{}", t.as_str())?;
                 }
                 CommandPart::Placeholder(p) => {
-                    buffer.push_str(&p.syntax().to_string()); // TODO format placeholders
+                    write!(writer, "{}", p.syntax())?;
                 }
             }
         }
 
         if self.is_heredoc() {
-            buffer.push_str(">>>");
+            write!(writer, ">>>")?;
         } else {
-            buffer.push('}');
+            write!(writer, "}}")?;
         }
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -102,20 +102,20 @@ impl Formattable for CommandSection {
 }
 
 impl Formattable for RuntimeItem {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
 
         let name = self.name();
-        state.indent(buffer)?;
-        name.format(buffer, state)?;
+        state.indent(writer)?;
+        name.format(writer, state)?;
         format_inline_comment(
             &SyntaxElement::from(name.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
@@ -125,26 +125,26 @@ impl Formattable for RuntimeItem {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::Colon)
             .expect("Runtime item should have a colon");
-        format_preceding_comments(&colon, buffer, state, true)?;
+        format_preceding_comments(&colon, writer, state, true)?;
         if state.interrupted() {
             state.reset_interrupted();
-            state.indent(buffer)?;
+            state.indent(writer)?;
         }
-        buffer.push_str(&colon.to_string());
-        format_inline_comment(&colon, buffer, state, true)?;
+        write!(writer, "{}", colon)?;
+        format_inline_comment(&colon, writer, state, true)?;
 
         let expr = self.expr();
         format_preceding_comments(
             &SyntaxElement::from(expr.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
-        state.space_or_indent(buffer)?;
-        expr.format(buffer, state)?;
+        state.space_or_indent(writer)?;
+        expr.format(writer, state)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -154,10 +154,10 @@ impl Formattable for RuntimeItem {
 }
 
 impl Formattable for RuntimeSection {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -167,31 +167,31 @@ impl Formattable for RuntimeSection {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::RuntimeKeyword)
             .expect("Runtime section should have a runtime keyword");
-        state.indent(buffer)?;
-        buffer.push_str(&runtime_keyword.to_string());
-        format_inline_comment(&runtime_keyword, buffer, state, true)?;
+        state.indent(writer)?;
+        write!(writer, "{}", runtime_keyword)?;
+        format_inline_comment(&runtime_keyword, writer, state, true)?;
 
         let open_brace = self
             .syntax()
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::OpenBrace)
             .expect("Runtime section should have an open brace");
-        format_preceding_comments(&open_brace, buffer, state, true)?;
+        format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
         if state.interrupted() {
             state.reset_interrupted();
-            state.indent(buffer)?;
+            state.indent(writer)?;
         } else {
-            buffer.push_str(SPACE);
+            write!(writer, "{}", SPACE)?;
         }
-        buffer.push_str(&open_brace.to_string());
-        format_inline_comment(&open_brace, buffer, state, false)?;
+        write!(writer, "{}", open_brace)?;
+        format_inline_comment(&open_brace, writer, state, false)?;
 
         state.increment_indent();
 
         for item in self.items() {
-            item.format(buffer, state)?;
+            item.format(writer, state)?;
         }
 
         state.decrement_indent();
@@ -201,12 +201,12 @@ impl Formattable for RuntimeSection {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::CloseBrace)
             .expect("Runtime section should have a close brace");
-        format_preceding_comments(&close_brace, buffer, state, true)?;
-        state.indent(buffer)?;
-        buffer.push_str(&close_brace.to_string());
+        format_preceding_comments(&close_brace, writer, state, true)?;
+        state.indent(writer)?;
+        write!(writer, "{}", close_brace)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -216,20 +216,20 @@ impl Formattable for RuntimeSection {
 }
 
 impl Formattable for RequirementsItem {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
 
         let name = self.name();
-        state.indent(buffer)?;
-        name.format(buffer, state)?;
+        state.indent(writer)?;
+        name.format(writer, state)?;
         format_inline_comment(
             &SyntaxElement::from(name.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
@@ -239,26 +239,26 @@ impl Formattable for RequirementsItem {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::Colon)
             .expect("Requirements item should have a colon");
-        format_preceding_comments(&colon, buffer, state, true)?;
+        format_preceding_comments(&colon, writer, state, true)?;
         if state.interrupted() {
             state.reset_interrupted();
-            state.indent(buffer)?;
+            state.indent(writer)?;
         }
-        buffer.push_str(&colon.to_string());
-        format_inline_comment(&colon, buffer, state, true)?;
+        write!(writer, "{}", colon)?;
+        format_inline_comment(&colon, writer, state, true)?;
 
         let expr = self.expr();
         format_preceding_comments(
             &SyntaxElement::from(expr.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
-        state.space_or_indent(buffer)?;
-        expr.format(buffer, state)?;
+        state.space_or_indent(writer)?;
+        expr.format(writer, state)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -268,10 +268,10 @@ impl Formattable for RequirementsItem {
 }
 
 impl Formattable for RequirementsSection {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -281,31 +281,31 @@ impl Formattable for RequirementsSection {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::RequirementsKeyword)
             .expect("Requirements section should have a requirements keyword");
-        state.indent(buffer)?;
-        buffer.push_str(&requirements_keyword.to_string());
-        format_inline_comment(&requirements_keyword, buffer, state, true)?;
+        state.indent(writer)?;
+        write!(writer, "{}", requirements_keyword)?;
+        format_inline_comment(&requirements_keyword, writer, state, true)?;
 
         let open_brace = self
             .syntax()
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::OpenBrace)
             .expect("Requirements section should have an open brace");
-        format_preceding_comments(&open_brace, buffer, state, true)?;
+        format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
         if state.interrupted() {
             state.reset_interrupted();
-            state.indent(buffer)?;
+            state.indent(writer)?;
         } else {
-            buffer.push_str(SPACE);
+            write!(writer, "{}", SPACE)?;
         }
-        buffer.push_str(&open_brace.to_string());
-        format_inline_comment(&open_brace, buffer, state, false)?;
+        write!(writer, "{}", open_brace)?;
+        format_inline_comment(&open_brace, writer, state, false)?;
 
         state.increment_indent();
 
         for item in self.items() {
-            item.format(buffer, state)?;
+            item.format(writer, state)?;
         }
 
         state.decrement_indent();
@@ -315,12 +315,12 @@ impl Formattable for RequirementsSection {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::CloseBrace)
             .expect("Requirements section should have a close brace");
-        format_preceding_comments(&close_brace, buffer, state, true)?;
-        state.indent(buffer)?;
-        buffer.push_str(&close_brace.to_string());
+        format_preceding_comments(&close_brace, writer, state, true)?;
+        state.indent(writer)?;
+        write!(writer, "{}", close_brace)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -330,10 +330,10 @@ impl Formattable for RequirementsSection {
 }
 
 impl Formattable for TaskDefinition {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -343,22 +343,22 @@ impl Formattable for TaskDefinition {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::TaskKeyword)
             .expect("Task should have a task keyword");
-        state.indent(buffer)?;
-        buffer.push_str(&task_keyword.to_string());
-        format_inline_comment(&task_keyword, buffer, state, true)?;
+        state.indent(writer)?;
+        write!(writer, "{}", task_keyword)?;
+        format_inline_comment(&task_keyword, writer, state, true)?;
 
         let name = self.name();
         format_preceding_comments(
             &SyntaxElement::from(name.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
-        state.space_or_indent(buffer)?;
-        name.format(buffer, state)?;
+        state.space_or_indent(writer)?;
+        name.format(writer, state)?;
         format_inline_comment(
             &SyntaxElement::from(name.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
@@ -368,17 +368,17 @@ impl Formattable for TaskDefinition {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::OpenBrace)
             .expect("Task should have an open brace");
-        format_preceding_comments(&open_brace, buffer, state, true)?;
+        format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
         if state.interrupted() {
             state.reset_interrupted();
-            state.indent(buffer)?;
+            state.indent(writer)?;
         } else {
-            buffer.push_str(SPACE);
+            write!(writer, "{}", SPACE)?;
         }
-        buffer.push_str(&open_brace.to_string());
-        format_inline_comment(&open_brace, buffer, state, false)?;
+        write!(writer, "{}", open_brace)?;
+        format_inline_comment(&open_brace, writer, state, false)?;
 
         state.increment_indent();
 
@@ -428,41 +428,49 @@ impl Formattable for TaskDefinition {
 
         if !meta_section_str.is_empty() {
             first_section = false;
-            buffer.push_str(&meta_section_str);
+            write!(writer, "{}", meta_section_str)?;
         }
         if !parameter_meta_section_str.is_empty() {
             if !first_section {
-                buffer.push_str(NEWLINE);
+                write!(writer, "{}", NEWLINE)?;
             }
             first_section = false;
-            buffer.push_str(&parameter_meta_section_str);
+            write!(writer, "{}", parameter_meta_section_str)?;
         }
         if !input_section_str.is_empty() {
             if !first_section {
-                buffer.push_str(NEWLINE);
+                write!(writer, "{}", NEWLINE)?;
             }
             first_section = false;
-            buffer.push_str(&input_section_str);
+            write!(writer, "{}", input_section_str)?;
         }
         if !declaration_section_str.is_empty() {
             if !first_section {
-                buffer.push_str(NEWLINE);
+                write!(writer, "{}", NEWLINE)?;
             }
             first_section = false;
-            buffer.push_str(&declaration_section_str);
+            write!(writer, "{}", declaration_section_str)?;
         }
         // Command section is required
         if !first_section {
-            buffer.push_str(NEWLINE);
+            write!(writer, "{}", NEWLINE)?;
         }
-        buffer.push_str(&command_section_str);
+        write!(writer, "{}", command_section_str)?;
         if !output_section_str.is_empty() {
-            buffer.push_str(NEWLINE);
-            buffer.push_str(&output_section_str);
+            write!(writer, "{}", NEWLINE)?;
+            write!(writer, "{}", output_section_str)?;
         }
         if !runtime_section_str.is_empty() {
-            buffer.push_str(NEWLINE);
-            buffer.push_str(&runtime_section_str);
+            write!(writer, "{}", NEWLINE)?;
+            write!(writer, "{}", runtime_section_str)?;
+        }
+        if !hints_section_str.is_empty() {
+            write!(writer, "{}", NEWLINE)?;
+            write!(writer, "{}", hints_section_str)?;
+        }
+        if !requirements_section_str.is_empty() {
+            write!(writer, "{}", NEWLINE)?;
+            write!(writer, "{}", requirements_section_str)?;
         }
 
         state.decrement_indent();
@@ -472,12 +480,12 @@ impl Formattable for TaskDefinition {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::CloseBrace)
             .expect("Task should have a close brace");
-        format_preceding_comments(&close_brace, buffer, state, true)?;
-        state.indent(buffer)?;
-        buffer.push_str(&close_brace.to_string());
+        format_preceding_comments(&close_brace, writer, state, true)?;
+        state.indent(writer)?;
+        write!(writer, "{}", close_brace)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;

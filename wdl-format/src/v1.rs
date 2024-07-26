@@ -1,7 +1,5 @@
 //! A module for formatting WDL v1 elements.
 
-use std::fmt::Write;
-
 use anyhow::Result;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
@@ -31,73 +29,73 @@ use super::NEWLINE;
 use super::STRING_TERMINATOR;
 
 impl Formattable for LiteralString {
-    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
-        buffer.push(STRING_TERMINATOR);
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
+        write!(writer, "{}", STRING_TERMINATOR)?;
         for part in self.parts() {
             match part {
                 StringPart::Text(text) => {
-                    write!(buffer, "{}", text.as_str())?;
+                    write!(writer, "{}", text.as_str())?;
                 }
                 StringPart::Placeholder(placeholder) => {
-                    write!(buffer, "{}", placeholder.syntax())?;
+                    write!(writer, "{}", placeholder.syntax())?;
                 }
             }
         }
-        buffer.push(STRING_TERMINATOR);
+        write!(writer, "{}", STRING_TERMINATOR)?;
         Ok(())
     }
 }
 
 impl Formattable for LiteralBoolean {
-    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
-        buffer.push_str(&self.value().to_string());
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
+        write!(writer, "{}", self.value())?;
         Ok(())
     }
 }
 
 impl Formattable for LiteralFloat {
-    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
-        write!(buffer, "{}", self.syntax())?;
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
+        write!(writer, "{}", self.syntax())?;
         Ok(())
     }
 }
 
 impl Formattable for LiteralInteger {
-    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
-        write!(buffer, "{}", self.syntax())?;
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
+        write!(writer, "{}", self.syntax())?;
         Ok(())
     }
 }
 
 impl Formattable for Type {
-    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
-        write!(buffer, "{}", self.syntax())?;
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
+        write!(writer, "{}", self.syntax())?;
         Ok(())
     }
 }
 
 impl Formattable for Expr {
-    fn format(&self, buffer: &mut String, _state: &mut State) -> Result<()> {
-        write!(buffer, "{}", self.syntax())?;
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> Result<()> {
+        write!(writer, "{}", self.syntax())?;
         Ok(())
     }
 }
 
 impl Formattable for Decl {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
 
         let ty = self.ty();
-        state.indent(buffer)?;
-        ty.format(buffer, state)?;
+        state.indent(writer)?;
+        ty.format(writer, state)?;
         format_inline_comment(
             &SyntaxElement::from(ty.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
@@ -105,42 +103,42 @@ impl Formattable for Decl {
         let name = self.name();
         format_preceding_comments(
             &SyntaxElement::from(name.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
-        state.space_or_indent(buffer)?;
-        name.format(buffer, state)?;
+        state.space_or_indent(writer)?;
+        name.format(writer, state)?;
         format_inline_comment(
             &SyntaxElement::from(name.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
 
         if let Some(expr) = self.expr() {
-            let eq = self
+            let equal_sign = self
                 .syntax()
                 .children_with_tokens()
                 .find(|element| element.kind() == SyntaxKind::Assignment)
                 .expect("Bound declaration should have an equals sign");
-            format_preceding_comments(&eq, buffer, state, true)?;
-            state.space_or_indent(buffer)?;
-            buffer.push_str(&eq.to_string());
-            format_inline_comment(&eq, buffer, state, true)?;
+            format_preceding_comments(&equal_sign, writer, state, true)?;
+            state.space_or_indent(writer)?;
+            write!(writer, "{}", equal_sign)?;
+            format_inline_comment(&equal_sign, writer, state, true)?;
 
             format_preceding_comments(
                 &SyntaxElement::from(expr.syntax().clone()),
-                buffer,
+                writer,
                 state,
                 true,
             )?;
-            state.space_or_indent(buffer)?;
-            expr.format(buffer, state)?;
+            state.space_or_indent(writer)?;
+            expr.format(writer, state)?;
         }
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -150,10 +148,10 @@ impl Formattable for Decl {
 }
 
 impl Formattable for InputSection {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -163,31 +161,31 @@ impl Formattable for InputSection {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::InputKeyword)
             .expect("Input Section should have an input keyword");
-        state.indent(buffer)?;
-        buffer.push_str(&input_keyword.to_string());
-        format_inline_comment(&input_keyword, buffer, state, true)?;
+        state.indent(writer)?;
+        write!(writer, "{}", input_keyword)?;
+        format_inline_comment(&input_keyword, writer, state, true)?;
 
         let open_brace = self
             .syntax()
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Input Section should have an open brace");
-        format_preceding_comments(&open_brace, buffer, state, true)?;
+        format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
         if state.interrupted() {
             state.reset_interrupted();
-            state.indent(buffer)?;
+            state.indent(writer)?;
         } else {
-            buffer.push_str(SPACE);
+            write!(writer, "{}", SPACE)?;
         }
-        buffer.push_str(&open_brace.to_string());
-        format_inline_comment(&open_brace, buffer, state, false)?;
+        write!(writer, "{}", open_brace)?;
+        format_inline_comment(&open_brace, writer, state, false)?;
 
         state.increment_indent();
 
         for decl in self.declarations() {
-            decl.format(buffer, state)?;
+            decl.format(writer, state)?;
         }
 
         state.decrement_indent();
@@ -197,12 +195,12 @@ impl Formattable for InputSection {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::CloseBrace)
             .expect("Input Section should have a close brace");
-        format_preceding_comments(&close_brace, buffer, state, false)?;
-        state.indent(buffer)?;
-        buffer.push_str(&close_brace.to_string());
+        format_preceding_comments(&close_brace, writer, state, false)?;
+        state.indent(writer)?;
+        write!(writer, "{}", close_brace)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -212,10 +210,10 @@ impl Formattable for InputSection {
 }
 
 impl Formattable for OutputSection {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -225,31 +223,31 @@ impl Formattable for OutputSection {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::OutputKeyword)
             .expect("Output Section should have an output keyword");
-        state.indent(buffer)?;
-        buffer.push_str("output");
-        format_inline_comment(&output_keyword, buffer, state, true)?;
+        state.indent(writer)?;
+        write!(writer, "{}", output_keyword)?;
+        format_inline_comment(&output_keyword, writer, state, true)?;
 
         let open_brace = self
             .syntax()
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Output Section should have an open brace");
-        format_preceding_comments(&open_brace, buffer, state, true)?;
+        format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
         if state.interrupted() {
             state.reset_interrupted();
-            state.indent(buffer)?;
+            state.indent(writer)?;
         } else {
-            buffer.push_str(SPACE);
+            write!(writer, "{}", SPACE)?;
         }
-        buffer.push_str(&open_brace.to_string());
-        format_inline_comment(&open_brace, buffer, state, false)?;
+        write!(writer, "{}", open_brace)?;
+        format_inline_comment(&open_brace, writer, state, false)?;
 
         state.increment_indent();
 
         for decl in self.declarations() {
-            Decl::Bound(decl).format(buffer, state)?;
+            Decl::Bound(decl).format(writer, state)?;
         }
 
         state.decrement_indent();
@@ -259,12 +257,12 @@ impl Formattable for OutputSection {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::CloseBrace)
             .expect("Output Section should have a close brace");
-        format_preceding_comments(&close_brace, buffer, state, false)?;
-        state.indent(buffer)?;
-        buffer.push_str(&close_brace.to_string());
+        format_preceding_comments(&close_brace, writer, state, false)?;
+        state.indent(writer)?;
+        write!(writer, "{}", close_brace)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -274,20 +272,20 @@ impl Formattable for OutputSection {
 }
 
 impl Formattable for HintsItem {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
 
         let name = self.name();
-        state.indent(buffer)?;
-        name.format(buffer, state)?;
+        state.indent(writer)?;
+        name.format(writer, state)?;
         format_inline_comment(
             &SyntaxElement::from(name.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
@@ -297,25 +295,25 @@ impl Formattable for HintsItem {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::Colon)
             .expect("Hints Item should have a colon");
-        format_preceding_comments(&colon, buffer, state, true)?;
+        format_preceding_comments(&colon, writer, state, true)?;
         if state.interrupted() {
-            state.indent(buffer)?;
+            state.indent(writer)?;
         }
-        buffer.push_str(&colon.to_string());
-        format_inline_comment(&colon, buffer, state, true)?;
+        write!(writer, "{}", colon)?;
+        format_inline_comment(&colon, writer, state, true)?;
 
         let expr = self.expr();
         format_preceding_comments(
             &SyntaxElement::from(expr.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
-        state.space_or_indent(buffer)?;
-        expr.format(buffer, state)?;
+        state.space_or_indent(writer)?;
+        expr.format(writer, state)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -325,10 +323,10 @@ impl Formattable for HintsItem {
 }
 
 impl Formattable for HintsSection {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -338,31 +336,31 @@ impl Formattable for HintsSection {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::HintsKeyword)
             .expect("Hints Section should have a hints keyword");
-        state.indent(buffer)?;
-        buffer.push_str(&hints_keyword.to_string());
-        format_inline_comment(&hints_keyword, buffer, state, true)?;
+        state.indent(writer)?;
+        write!(writer, "{}", hints_keyword)?;
+        format_inline_comment(&hints_keyword, writer, state, true)?;
 
         let open_brace = self
             .syntax()
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::OpenBrace)
             .expect("Hints Section should have an open brace");
-        format_preceding_comments(&open_brace, buffer, state, true)?;
+        format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
         if state.interrupted() {
             state.reset_interrupted();
-            state.indent(buffer)?;
+            state.indent(writer)?;
         } else {
-            buffer.push_str(SPACE);
+            write!(writer, "{}", SPACE)?;
         }
-        buffer.push_str(&open_brace.to_string());
-        format_inline_comment(&open_brace, buffer, state, false)?;
+        write!(writer, "{}", open_brace)?;
+        format_inline_comment(&open_brace, writer, state, false)?;
 
         state.increment_indent();
 
         for item in self.items() {
-            item.format(buffer, state)?;
+            item.format(writer, state)?;
         }
 
         state.decrement_indent();
@@ -372,12 +370,12 @@ impl Formattable for HintsSection {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::CloseBrace)
             .expect("Hints Section should have a close brace");
-        format_preceding_comments(&close_brace, buffer, state, false)?;
-        state.indent(buffer)?;
-        buffer.push_str(&close_brace.to_string());
+        format_preceding_comments(&close_brace, writer, state, false)?;
+        state.indent(writer)?;
+        write!(writer, "{}", close_brace)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -387,10 +385,10 @@ impl Formattable for HintsSection {
 }
 
 impl Formattable for StructDefinition {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -400,21 +398,21 @@ impl Formattable for StructDefinition {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::StructKeyword)
             .expect("Struct Definition should have a struct keyword");
-        buffer.push_str(&struct_keyword.to_string());
-        format_inline_comment(&struct_keyword, buffer, state, true)?;
+        write!(writer, "{}", struct_keyword)?;
+        format_inline_comment(&struct_keyword, writer, state, true)?;
 
         let name = self.name();
         format_preceding_comments(
             &SyntaxElement::from(name.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
-        state.space_or_indent(buffer)?;
-        name.format(buffer, state)?;
+        state.space_or_indent(writer)?;
+        name.format(writer, state)?;
         format_inline_comment(
             &SyntaxElement::from(name.syntax().clone()),
-            buffer,
+            writer,
             state,
             true,
         )?;
@@ -428,27 +426,27 @@ impl Formattable for StructDefinition {
         // elements.
         if state.interrupted() {
             state.reset_interrupted();
-            state.indent(buffer)?;
+            state.indent(writer)?;
         } else {
-            buffer.push_str(SPACE);
+            write!(writer, "{}", SPACE)?;
         }
-        buffer.push_str(&open_brace.to_string());
-        format_inline_comment(&open_brace, buffer, state, false)?;
+        write!(writer, "{}", open_brace)?;
+        format_inline_comment(&open_brace, writer, state, false)?;
 
         state.increment_indent();
 
         if let Some(m) = self.metadata().next() {
-            m.format(buffer, state)?;
-            buffer.push_str(NEWLINE);
+            m.format(writer, state)?;
+            write!(writer, "{}", NEWLINE)?;
         }
 
         if let Some(pm) = self.parameter_metadata().next() {
-            pm.format(buffer, state)?;
-            buffer.push_str(NEWLINE);
+            pm.format(writer, state)?;
+            write!(writer, "{}", NEWLINE)?;
         }
 
         for decl in self.members() {
-            Decl::Unbound(decl).format(buffer, state)?;
+            Decl::Unbound(decl).format(writer, state)?;
         }
 
         state.decrement_indent();
@@ -458,12 +456,12 @@ impl Formattable for StructDefinition {
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::CloseBrace)
             .expect("Struct Definition should have a close brace");
-        format_preceding_comments(&close_brace, buffer, state, false)?;
-        state.indent(buffer)?;
-        buffer.push_str(&close_brace.to_string());
+        format_preceding_comments(&close_brace, writer, state, false)?;
+        state.indent(writer)?;
+        write!(writer, "{}", close_brace)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
-            buffer,
+            writer,
             state,
             false,
         )?;
@@ -473,14 +471,14 @@ impl Formattable for StructDefinition {
 }
 
 impl Formattable for DocumentItem {
-    fn format(&self, buffer: &mut String, state: &mut State) -> Result<()> {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> Result<()> {
         match self {
             DocumentItem::Import(_) => {
                 unreachable!("Import statements should not be formatted as a DocumentItem")
             }
-            DocumentItem::Workflow(workflow) => workflow.format(buffer, state),
-            DocumentItem::Task(task) => task.format(buffer, state),
-            DocumentItem::Struct(structure) => structure.format(buffer, state),
+            DocumentItem::Workflow(workflow) => workflow.format(writer, state),
+            DocumentItem::Task(task) => task.format(writer, state),
+            DocumentItem::Struct(structure) => structure.format(writer, state),
         }
     }
 }
