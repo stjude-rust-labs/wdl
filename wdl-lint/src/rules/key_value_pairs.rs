@@ -15,6 +15,7 @@ use wdl_ast::Visitor;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
+use crate::rules::trailing_comma::find_next_comma;
 
 /// Set indentation string
 const INDENT: &str = "    ";
@@ -266,7 +267,7 @@ impl Visitor for KeyValuePairsRule {
             if next_newline.is_none() {
                 // No newline found, report missing
                 let s = child.syntax().text_range().to_span();
-                let end = if let Some(next) = child.syntax().next_sibling() {
+                let end = if let Some(next) = find_next_comma(child.syntax()).0 {
                     next.text_range().start()
                 } else {
                     close_delim.text_range().start()
