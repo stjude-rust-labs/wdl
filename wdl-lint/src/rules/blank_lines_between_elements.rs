@@ -1,7 +1,22 @@
 //! A lint rule for blank spacing between elements.
 
 use rowan::NodeOrToken;
+use wdl_ast::v1::BoundDecl;
+use wdl_ast::v1::CallStatement;
+use wdl_ast::v1::CommandSection;
+use wdl_ast::v1::ConditionalStatement;
+use wdl_ast::v1::HintsSection;
 use wdl_ast::v1::InputSection;
+use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::OutputSection;
+use wdl_ast::v1::ParameterMetadataSection;
+use wdl_ast::v1::RequirementsSection;
+use wdl_ast::v1::RuntimeSection;
+use wdl_ast::v1::ScatterStatement;
+use wdl_ast::v1::StructDefinition;
+use wdl_ast::v1::TaskDefinition;
+use wdl_ast::v1::UnboundDecl;
+use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -77,11 +92,15 @@ impl Rule for BlankLinesBetweenElementsRule {
          as the import block and any task/workflow definitions) and between sections of a WDL task \
          or workflow. Never have a blank line when indentation levels are changing (such as \
          between the opening of a workflow definition and the meta section). There should also \
-         never be blanks within a meta, parameter meta, input, output, or runtime section. See \
-         example for a complete WDL document with proper spacing between elements. Note the blank \
-         lines between meta, parameter meta, input, the first call or first private declaration, \
-         output, and runtime for the example task. The blank line between the workflow definition \
-         and the task definition is also important."
+         never be blanks within a `meta`, `parameter_meta`, `input`, `output`, `runtime`, \
+         `requirements`, or `hints` section. For workflows, the `workflow body` includes any \
+         private declarations, call statements, conditional statements, and scatter statements. \
+         Within a workflow body, individual elements may optionally be separated by a blank line. \
+         See example (https://github.com/stjude-rust-labs/wdl/discussions/11) for a complete WDL \
+         document with proper spacing between elements. Note the blank lines between `meta`, \
+         `parameter_meta`, `input`, workflow body / `command` section, `output`, and `runtime` \
+         for the example task. The blank line between the workflow definition and the task \
+         definition is also important."
     }
 
     fn tags(&self) -> TagSet {
@@ -105,11 +124,14 @@ impl Visitor for BlankLinesBetweenElementsRule {
         }
     }
 
+    // Import spacing is handled by the ImportWhitespace rule
+    // fn import_statement
+
     fn task_definition(
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        task: &wdl_ast::v1::TaskDefinition,
+        task: &TaskDefinition,
     ) {
         if reason == VisitReason::Exit {
             return;
@@ -124,7 +146,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        workflow: &wdl_ast::v1::WorkflowDefinition,
+        workflow: &WorkflowDefinition,
     ) {
         if reason == VisitReason::Exit {
             return;
@@ -139,7 +161,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        section: &wdl_ast::v1::MetadataSection,
+        section: &MetadataSection,
     ) {
         if reason == VisitReason::Exit {
             self.state = State::Outside;
@@ -158,7 +180,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        section: &wdl_ast::v1::ParameterMetadataSection,
+        section: &ParameterMetadataSection,
     ) {
         if reason == VisitReason::Exit {
             self.state = State::Outside;
@@ -195,7 +217,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        section: &wdl_ast::v1::CommandSection,
+        section: &CommandSection,
     ) {
         if reason == VisitReason::Exit {
             return;
@@ -210,7 +232,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        section: &wdl_ast::v1::OutputSection,
+        section: &OutputSection,
     ) {
         if reason == VisitReason::Exit {
             self.state = State::Outside;
@@ -227,7 +249,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        section: &wdl_ast::v1::RuntimeSection,
+        section: &RuntimeSection,
     ) {
         if reason == VisitReason::Exit {
             self.state = State::Outside;
@@ -247,7 +269,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        stmt: &wdl_ast::v1::CallStatement,
+        stmt: &CallStatement,
     ) {
         if reason == VisitReason::Exit {
             return;
@@ -268,7 +290,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        stmt: &wdl_ast::v1::ScatterStatement,
+        stmt: &ScatterStatement,
     ) {
         if reason == VisitReason::Exit {
             return;
@@ -283,14 +305,11 @@ impl Visitor for BlankLinesBetweenElementsRule {
         }
     }
 
-    // Import spacing is handled by the ImportWhitespace rule
-    // fn import_statement
-
     fn struct_definition(
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        def: &wdl_ast::v1::StructDefinition,
+        def: &StructDefinition,
     ) {
         if reason == VisitReason::Exit {
             return;
@@ -305,7 +324,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        section: &wdl_ast::v1::RequirementsSection,
+        section: &RequirementsSection,
     ) {
         if reason == VisitReason::Exit {
             return;
@@ -317,12 +336,23 @@ impl Visitor for BlankLinesBetweenElementsRule {
         flag_all_blank_lines_within(section.syntax(), state);
     }
 
-    fn unbound_decl(
+    fn hints_section(
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        decl: &wdl_ast::v1::UnboundDecl,
+        section: &HintsSection,
     ) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+
+        let first = is_first_element(section.syntax());
+        let actual_start = skip_preceding_comments(section.syntax());
+        check_prior_spacing(&actual_start, state, true, first);
+        flag_all_blank_lines_within(section.syntax(), state);
+    }
+
+    fn unbound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &UnboundDecl) {
         if reason == VisitReason::Exit {
             return;
         }
@@ -350,12 +380,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         }
     }
 
-    fn bound_decl(
-        &mut self,
-        state: &mut Self::State,
-        reason: VisitReason,
-        decl: &wdl_ast::v1::BoundDecl,
-    ) {
+    fn bound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &BoundDecl) {
         if reason == VisitReason::Exit {
             return;
         }
@@ -389,7 +414,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        stmt: &wdl_ast::v1::ConditionalStatement,
+        stmt: &ConditionalStatement,
     ) {
         if reason == VisitReason::Exit {
             return;
