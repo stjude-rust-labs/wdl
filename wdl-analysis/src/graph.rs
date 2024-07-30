@@ -63,7 +63,11 @@ pub enum ParseState {
     Error(Arc<anyhow::Error>),
     /// The document was parsed.
     Parsed {
-        /// The version of the document that was parsed.
+        /// The monotonic version of the document that was parsed.
+        ///
+        /// This value comes from incremental changes to the file.
+        ///
+        /// If `None`, the parsed version had no incremental changes.
         version: Option<i32>,
         /// The root CST node of.
         root: GreenNode,
