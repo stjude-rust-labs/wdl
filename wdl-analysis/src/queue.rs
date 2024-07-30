@@ -51,7 +51,7 @@ pub enum Request<Context> {
 /// Represents a request to add documents to the graph.
 pub struct AddRequest {
     /// The documents to add to the graph.
-    pub documents: Vec<Url>,
+    pub documents: IndexSet<Url>,
     /// The sender for completing the request.
     pub completed: oneshot::Sender<()>,
 }
@@ -217,7 +217,7 @@ where
     }
 
     /// Adds a set of documents to the document graph.
-    fn add_documents(&self, documents: Vec<Url>) {
+    fn add_documents(&self, documents: IndexSet<Url>) {
         let mut graph = self.graph.write();
         for document in documents {
             graph.add_node(document, true);

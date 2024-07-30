@@ -1,5 +1,6 @@
 //! Implementation of the analyzer.
 
+use std::ffi::OsStr;
 use std::fmt;
 use std::future::Future;
 use std::mem::ManuallyDrop;
@@ -10,9 +11,9 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::thread::JoinHandle;
 
-use anyhow::bail;
 use anyhow::Context;
 use anyhow::Result;
+use indexmap::IndexSet;
 use line_index::LineCol;
 use line_index::LineIndex;
 use line_index::WideEncoding;
@@ -23,6 +24,7 @@ use tokio::runtime::Handle;
 use tokio::sync::mpsc;
 use tokio::sync::oneshot;
 use url::Url;
+use walkdir::WalkDir;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::SyntaxNode;
@@ -432,11 +434,18 @@ where
     /// specified paths.
     pub async fn add_documents(&self, paths: Vec<PathBuf>) -> Result<()> {
         // Start by searching for documents
-        let documents = RayonHandle::spawn(move || {
-            let mut documents = Vec::new();
+        let documents = RayonHandle::spawn(move || -> Result<IndexSet<Url>> {
+            let mut documents = IndexSet::new();
             for path in paths {
-                if path.is_file() {
-                    documents.push(path_to_uri(&path).with_context(|| {
+                let metadata = path.metadata().with_context(|| {
+                    format!(
+                        "failed to read metadata for `{path}`",
+                        path = path.display()
+                    )
+                })?;
+
+                if metadata.is_file() {
+                    documents.insert(path_to_uri(&path).with_context(|| {
                         format!(
                             "failed to convert path `{path}` to a URI",
                             path = path.display()
@@ -445,33 +454,20 @@ where
                     continue;
                 }
 
-                if !path.is_dir() {
-                    bail!("path `{path}` does not exist", path = path.display());
-                }
-
-                let pattern = format!("{path}/**/*.wdl", path = path.display());
-                let options = glob::MatchOptions {
-                    case_sensitive: true,
-                    require_literal_separator: false,
-                    require_literal_leading_dot: true,
-                };
-
-                let paths = glob::glob_with(&pattern, options).with_context(|| {
-                    format!("failed to glob directory `{path}`", path = path.display())
-                })?;
-                for file in paths {
-                    let file = file.with_context(|| {
+                for result in WalkDir::new(&path).follow_links(true) {
+                    let entry = result.with_context(|| {
                         format!("failed to read directory `{path}`", path = path.display())
                     })?;
-
-                    if !file.is_file() {
+                    if !entry.file_type().is_file()
+                        || entry.path().extension().and_then(OsStr::to_str) != Some("wdl")
+                    {
                         continue;
                     }
 
-                    documents.push(path_to_uri(&file).with_context(|| {
+                    documents.insert(path_to_uri(entry.path()).with_context(|| {
                         format!(
                             "failed to convert path `{path}` to a URI",
-                            path = file.display()
+                            path = entry.path().display()
                         )
                     })?);
                 }
