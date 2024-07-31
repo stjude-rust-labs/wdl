@@ -1,4 +1,4 @@
-#@ except: DeprecatedObject, DescriptionMissing, DisallowedInputName, LineWidth, SectionOrdering, RuntimeSectionKeys
+#@ except: BlankLinesBetweenElements, DeprecatedObject, DescriptionMissing, DisallowedInputName, LineWidth, SectionOrdering, RuntimeSectionKeys
 
 version 1.2
 

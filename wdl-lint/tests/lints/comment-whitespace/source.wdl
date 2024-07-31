@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, DisallowedOutputName, LineWidth, MissingMetas, NonmatchingOutput, TrailingComma, Whitespace
+#@ except: BlankLinesBetweenElements, DescriptionMissing, DisallowedOutputName, LineWidth, MissingMetas, NonmatchingOutput, TrailingComma, Whitespace
 ## some comment
 
 version 1.2
