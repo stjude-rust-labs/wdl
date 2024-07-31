@@ -2,6 +2,7 @@
 name = "wdl-lint"
 version = "0.4.0"
 description = "Lint rules for Workflow Description Language (WDL) documents"
+rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
 edition.workspace = true
@@ -14,6 +15,7 @@ readme = "../README.md"
 wdl-ast = { path = "../wdl-ast", version = "0.5.0" }
 convert_case = { workspace = true }
 indexmap = { workspace = true }
+rowan = { workspace = true }
 
 [dev-dependencies]
 codespan-reporting = { workspace = true }
