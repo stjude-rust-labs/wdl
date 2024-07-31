@@ -174,13 +174,14 @@ impl Rule for ExpressionSpacingRule {
          Sometimes a long expression will exceed the maximum line width. In these cases, one or \
          more linebreaks must be introduced. Line continuations should be indented one more level \
          than the beginning of the expression. There should never be more than one level of \
-         indentation change per-line. If bracketed content (things between `()`, `[]`, or `{}`) \
-         must be split onto multiple lines, a newline should follow the opening bracket, the \
-         contents should be indented an additional level, then the closing bracket should be \
-         de-indented to match the indentation of the opening bracket. If you are line splitting an \
-         expression on an infix operator, the operator and at least the beginning of the RHS \
-         operand should be on the continued line. (i.e. an operator should not be on a line by \
-         itself.)
+         indentation change per-line.
+         
+         If bracketed content (things between `()`, `[]`, or `{}`) must be split onto multiple \
+         lines, a newline should follow the opening bracket, the contents should be indented an \
+         additional level, then the closing bracket should be de-indented to match the indentation \
+         of the opening bracket. If you are line splitting an expression on an infix operator, the \
+         operator and at least the beginning of the RHS operand should be on the continued line. \
+         (i.e. an operator should not be on a line by itself.)
          
          If you are using the `if...then...else...` construct as part of your expression and it \
          needs to be line split, the entire construct should be wrapped in parentheses (`()`). The \
