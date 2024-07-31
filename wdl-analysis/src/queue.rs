@@ -7,6 +7,9 @@ use std::ops::Range;
 use std::sync::Arc;
 use std::time::Instant;
 
+use anyhow::bail;
+use anyhow::Context;
+use anyhow::Result;
 use futures::stream::FuturesUnordered;
 use futures::Future;
 use futures::StreamExt;
@@ -65,7 +68,7 @@ pub struct AnalyzeRequest<Context> {
     /// The context to provide to the progress callback.
     pub context: Context,
     /// The sender for completing the request.
-    pub completed: oneshot::Sender<Vec<AnalysisResult>>,
+    pub completed: oneshot::Sender<Result<Vec<AnalysisResult>>>,
 }
 
 /// Represents a request to remove documents from the document graph.
@@ -229,8 +232,8 @@ where
         &self,
         document: Option<Url>,
         context: Context,
-        completed: &oneshot::Sender<Vec<AnalysisResult>>,
-    ) -> Vec<AnalysisResult> {
+        completed: &oneshot::Sender<Result<Vec<AnalysisResult>>>,
+    ) -> Result<Vec<AnalysisResult>> {
         // Analysis works by building a subgraph of what needs to be analyzed.
         // We start with the requested node or all roots. We then perform a
         // breadth-first traversal maintaining the set of nodes that compromises the
@@ -244,7 +247,7 @@ where
                     // Check to see if the document is a rooted node
                     let index = match graph.get_index(&document) {
                         Some(index) if graph.is_rooted(index) => index,
-                        _ => return Vec::new(),
+                        _ => return Ok(Vec::new()),
                     };
 
                     let mut nodes = IndexSet::new();
@@ -261,7 +264,7 @@ where
         loop {
             if completed.is_closed() {
                 log::info!("analysis request has been canceled");
-                return Vec::new();
+                bail!("analysis request has been canceled");
             }
 
             let slice = subgraph
@@ -295,7 +298,7 @@ where
 
             // Update the graph, potentially adding more nodes to the subgraph
             let len = slice.len();
-            self.update_graphs(parsed, &mut subgraph, offset..offset + len);
+            self.update_graphs(parsed, &mut subgraph, offset..offset + len)?;
             offset += len;
         }
 
@@ -307,7 +310,7 @@ where
         while subgraph.node_count() > 0 {
             if completed.is_closed() {
                 log::info!("analysis request has been canceled");
-                return Vec::new();
+                bail!("analysis request has been canceled");
             }
 
             // Build a set of nodes with no incoming edges (i.e. no unanalyzed dependencies)
@@ -366,7 +369,7 @@ where
         }
 
         results.sort_by(|a, b| a.uri().cmp(b.uri()));
-        results
+        Ok(results)
     }
 
     /// Removes documents from the graph.
@@ -389,7 +392,7 @@ where
         &self,
         kind: ProgressKind,
         mut tasks: FuturesUnordered<Fut>,
-        completed: &oneshot::Sender<Vec<AnalysisResult>>,
+        completed: &oneshot::Sender<Result<Vec<AnalysisResult>>>,
         context: &Context,
     ) -> Vec<Output>
     where
@@ -447,7 +450,7 @@ where
     }
 
     /// Spawns a parse task on a rayon thread.
-    fn spawn_parse_task(&self, index: NodeIndex) -> RayonHandle<(NodeIndex, ParseState)> {
+    fn spawn_parse_task(&self, index: NodeIndex) -> RayonHandle<(NodeIndex, Result<ParseState>)> {
         let graph = self.graph.clone();
         let tokio = self.tokio.clone();
         let client = self.client.clone();
@@ -473,15 +476,17 @@ where
     /// nodes added to the subgraph.
     fn update_graphs(
         &self,
-        parsed: Vec<(NodeIndex, ParseState)>,
+        parsed: Vec<(NodeIndex, Result<ParseState>)>,
         subgraph: &mut IndexSet<NodeIndex>,
         range: Range<usize>,
-    ) {
+    ) -> Result<()> {
         let mut graph = self.graph.write();
 
         // Start by updating the parsed nodes
         for (index, state) in parsed {
             let node = graph.get_mut(index);
+            let state = state
+                .with_context(|| format!("failed to parse document `{uri}`", uri = node.uri()))?;
             node.parse_completed(state);
 
             // Remove all dependency edges from the node as the imports might have changed
@@ -543,6 +548,7 @@ where
         }
 
         subgraph.extend(dependencies);
+        Ok(())
     }
 
     /// Analyzes a node in the document graph.

@@ -160,7 +160,10 @@ async fn main() {
         .add_documents(tests.clone())
         .await
         .expect("should add documents");
-    let results = analyzer.analyze(()).await;
+    let results = analyzer
+        .analyze(())
+        .await
+        .expect("failed to analyze documents");
 
     let mut errors = Vec::new();
     for test in &tests {
@@ -204,7 +207,10 @@ async fn main() {
             .add_documents(vec![document])
             .await
             .expect("should add documents");
-        let results = analyzer.analyze_document((), uri).await;
+        let results = analyzer
+            .analyze_document((), uri)
+            .await
+            .expect("failed to analyze document");
         match compare_results(&test, results) {
             Ok(_) => {
                 println!("test {test_name} ... {ok}", ok = "ok".green());

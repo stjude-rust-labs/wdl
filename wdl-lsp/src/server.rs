@@ -392,14 +392,16 @@ impl LanguageServer for Server {
                 return;
             }
 
-            self.analyzer.notify_incremental_change(
+            if let Err(e) = self.analyzer.notify_incremental_change(
                 params.text_document.uri,
                 IncrementalChange {
                     version: params.text_document.version,
                     start: Some(params.text_document.text),
                     edits: Vec::new(),
                 },
-            );
+            ) {
+                log::error!("failed to notify incremental change: {e}");
+            }
         }
     }
 
@@ -426,7 +428,7 @@ impl LanguageServer for Server {
         };
 
         // Notify the analyzer that the document has changed
-        self.analyzer.notify_incremental_change(
+        if let Err(e) = self.analyzer.notify_incremental_change(
             params.text_document.uri,
             IncrementalChange {
                 version: params.text_document.version,
@@ -444,12 +446,16 @@ impl LanguageServer for Server {
                     })
                     .collect(),
             },
-        );
+        ) {
+            log::error!("failed to notify incremental change: {e}");
+        }
     }
 
     async fn did_close(&self, params: DidCloseTextDocumentParams) {
         log::debug!("received `textDocument/didClose` request: {params:#?}");
-        self.analyzer.notify_change(params.text_document.uri, true);
+        if let Err(e) = self.analyzer.notify_change(params.text_document.uri, true) {
+            log::error!("failed to notify change: {e}");
+        }
     }
 
     async fn diagnostic(
@@ -461,7 +467,12 @@ impl LanguageServer for Server {
         let results: Vec<wdl_analysis::AnalysisResult> = self
             .analyzer
             .analyze_document(ProgressToken::default(), params.text_document.uri.clone())
-            .await;
+            .await
+            .map_err(|e| RpcError {
+                code: ErrorCode::InternalError,
+                message: e.to_string().into(),
+                data: None,
+            })?;
 
         proto::document_diagnostic_report(params, results, self.name())
             .ok_or_else(RpcError::request_cancelled)
@@ -478,7 +489,15 @@ impl LanguageServer for Server {
         progress
             .start(&self.client, self.name(), "analyzing...")
             .await;
-        let results = self.analyzer.analyze(progress.clone()).await;
+        let results = self
+            .analyzer
+            .analyze(progress.clone())
+            .await
+            .map_err(|e| RpcError {
+                code: ErrorCode::InternalError,
+                message: e.to_string().into(),
+                data: None,
+            })?;
         progress.complete(&self.client, "analysis complete").await;
 
         Ok(proto::workspace_diagnostic_report(
@@ -493,9 +512,13 @@ impl LanguageServer for Server {
 
         // Process the removed folders
         if !params.event.removed.is_empty() {
-            self.analyzer
+            if let Err(e) = self
+                .analyzer
                 .remove_documents(params.event.removed.into_iter().map(|f| f.uri).collect())
-                .await;
+                .await
+            {
+                log::error!("failed to remove documents from analyzer: {e}");
+            }
         }
 
         // Progress the added folders
@@ -545,7 +568,9 @@ impl LanguageServer for Server {
                 FileChangeType::CHANGED => {
                     if to_wdl_file_path(&event.uri).is_some() {
                         log::debug!("document `{uri}` has been changed", uri = event.uri);
-                        self.analyzer.notify_change(event.uri, false);
+                        if let Err(e) = self.analyzer.notify_change(event.uri, false) {
+                            log::error!("failed to notify change: {e}");
+                        }
                     }
                 }
                 FileChangeType::DELETED => {
@@ -567,7 +592,9 @@ impl LanguageServer for Server {
 
         // Remove any documents from the analyzer
         if !deleted.is_empty() {
-            self.analyzer.remove_documents(deleted).await;
+            if let Err(e) = self.analyzer.remove_documents(deleted).await {
+                log::error!("failed to remove documents from analyzer: {e}");
+            }
         }
     }
 }

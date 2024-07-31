@@ -188,7 +188,14 @@ impl DocumentGraphNode {
         // Clear the analysis as there has been a change
         self.analysis = None;
 
-        if discard_pending {
+        if !matches!(
+            self.parse_state,
+            ParseState::Parsed {
+                version: Some(_),
+                ..
+            }
+        ) || discard_pending
+        {
             self.parse_state = ParseState::NotParsed;
             self.change = None;
         }
@@ -249,13 +256,23 @@ impl DocumentGraphNode {
     /// If a parse is not necessary, the current parse state is returned.
     ///
     /// Otherwise, the new parse state is returned.
-    pub fn parse(&self, tokio: &Handle, client: &Client, validator: &mut Validator) -> ParseState {
+    pub fn parse(
+        &self,
+        tokio: &Handle,
+        client: &Client,
+        validator: &mut Validator,
+    ) -> Result<ParseState> {
         if !self.needs_parse() {
-            return self.parse_state.clone();
+            return Ok(self.parse_state.clone());
         }
 
-        self.incremental_parse()
-            .unwrap_or_else(|| self.full_parse(tokio, client, validator))
+        // First attempt an incremental parse
+        if let Some(state) = self.incremental_parse() {
+            return Ok(state);
+        }
+
+        // Otherwise, fall back to a full parse.
+        self.full_parse(tokio, client, validator)
     }
 
     /// Performs an incremental parse of the document.
@@ -280,7 +297,12 @@ impl DocumentGraphNode {
     }
 
     /// Performs a full parse of the node.
-    fn full_parse(&self, tokio: &Handle, client: &Client, validator: &mut Validator) -> ParseState {
+    fn full_parse(
+        &self,
+        tokio: &Handle,
+        client: &Client,
+        validator: &mut Validator,
+    ) -> Result<ParseState> {
         let (version, source, lines) = match &self.change {
             None => {
                 // Fetch the source
@@ -297,7 +319,7 @@ impl DocumentGraphNode {
                         let lines = Arc::new(LineIndex::new(&source));
                         (None, source, lines)
                     }
-                    Err(e) => return ParseState::Error(e.into()),
+                    Err(e) => return Ok(ParseState::Error(e.into())),
                 }
             }
             Some(IncrementalChange {
@@ -334,7 +356,7 @@ impl DocumentGraphNode {
                     }
 
                     last_line = range.start.line;
-                    edit.apply(&mut source, &lines);
+                    edit.apply(&mut source, &lines)?;
                 }
 
                 if !edits.is_empty() {
@@ -367,12 +389,12 @@ impl DocumentGraphNode {
             Diagnostics::Parse(diagnostics.into())
         };
 
-        ParseState::Parsed {
+        Ok(ParseState::Parsed {
             version,
             root: document.syntax().green().into(),
             lines,
             diagnostics,
-        }
+        })
     }
 
     /// Downloads the source of a `http` or `https` scheme URI.

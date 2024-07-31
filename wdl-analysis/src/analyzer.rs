@@ -11,6 +11,8 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::thread::JoinHandle;
 
+use anyhow::anyhow;
+use anyhow::bail;
 use anyhow::Context;
 use anyhow::Result;
 use indexmap::IndexSet;
@@ -72,10 +74,11 @@ pub enum ParseResult {
     Error(Arc<anyhow::Error>),
     /// The document was parsed.
     Parsed {
-        /// The version of the parsed document.
+        /// The monotonic version of the document that was parsed.
         ///
-        /// This is `None` when the parsed document was not from incremental
-        /// changes.
+        /// This value comes from incremental changes to the file.
+        ///
+        /// If `None`, the parsed version had no incremental changes.
         version: Option<i32>,
         /// The root node of the document.
         root: GreenNode,
@@ -287,7 +290,7 @@ impl SourceEdit {
     }
 
     /// Applies the edit to the given string if it's in range.
-    pub(crate) fn apply(&self, source: &mut String, lines: &LineIndex) {
+    pub(crate) fn apply(&self, source: &mut String, lines: &LineIndex) -> Result<()> {
         let (start, end) = match self.encoding {
             SourcePositionEncoding::UTF8 => (
                 LineCol {
@@ -308,7 +311,7 @@ impl SourceEdit {
                             col: self.range.start.character,
                         },
                     )
-                    .expect("expected a valid start position"),
+                    .context("invalid edit start position")?,
                 lines
                     .to_utf8(
                         WideEncoding::Utf16,
@@ -317,22 +320,29 @@ impl SourceEdit {
                             col: self.range.end.character,
                         },
                     )
-                    .expect("expected a valid end position"),
+                    .context("invalid edit end position")?,
             ),
         };
 
         let range: Range<usize> = lines
             .offset(start)
-            .expect("expected a valid start position")
+            .context("invalid edit start position")?
             .into()
             ..lines
                 .offset(end)
-                .expect("expected a valid end position")
+                .context("invalid edit end position")?
                 .into();
 
-        if source.is_char_boundary(range.start) && source.is_char_boundary(range.end) {
-            source.replace_range(range, &self.text);
+        if !source.is_char_boundary(range.start) {
+            bail!("edit start position is not at a character boundary");
         }
+
+        if !source.is_char_boundary(range.end) {
+            bail!("edit end position is not at a character boundary");
+        }
+
+        source.replace_range(range, &self.text);
+        Ok(())
     }
 }
 
@@ -488,9 +498,14 @@ where
                 documents,
                 completed: tx,
             }))
-            .expect("failed to send add request");
+            .map_err(|_| {
+                anyhow!("failed to send request to analysis queue because the channel has closed")
+            })?;
 
-        rx.await.unwrap_or_default();
+        rx.await.map_err(|_| {
+            anyhow!("failed to receive response from analysis queue because the channel has closed")
+        })?;
+
         Ok(())
     }
 
@@ -500,7 +515,7 @@ where
     /// the analyzer, those documents will be removed.
     ///
     /// Documents are only removed when not referenced from importing documents.
-    pub async fn remove_documents<'a>(&self, documents: Vec<Url>) {
+    pub async fn remove_documents<'a>(&self, documents: Vec<Url>) -> Result<()> {
         // Send the remove request to the queue
         let (tx, rx) = oneshot::channel();
         self.sender
@@ -508,20 +523,32 @@ where
                 documents,
                 completed: tx,
             }))
-            .expect("failed to send remove request");
+            .map_err(|_| {
+                anyhow!("failed to send request to analysis queue because the channel has closed")
+            })?;
 
-        rx.await.unwrap_or_default()
+        rx.await.map_err(|_| {
+            anyhow!("failed to receive response from analysis queue because the channel has closed")
+        })?;
+
+        Ok(())
     }
 
     /// Notifies the analyzer that a document has an incremental change.
     ///
     /// Changes to documents that aren't known to the analyzer are ignored.
-    pub fn notify_incremental_change(&self, document: Url, change: IncrementalChange) {
+    pub fn notify_incremental_change(
+        &self,
+        document: Url,
+        change: IncrementalChange,
+    ) -> Result<()> {
         self.sender
             .send(Request::NotifyIncrementalChange(
                 NotifyIncrementalChangeRequest { document, change },
             ))
-            .expect("failed to send notification request");
+            .map_err(|_| {
+                anyhow!("failed to send request to analysis queue because the channel has closed")
+            })
     }
 
     /// Notifies the analyzer that a document has fully changed and should be
@@ -532,13 +559,15 @@ where
     /// If `discard_pending` is true, then any pending incremental changes are
     /// discarded; otherwise, the full change is ignored if there are pending
     /// incremental changes.
-    pub fn notify_change(&self, document: Url, discard_pending: bool) {
+    pub fn notify_change(&self, document: Url, discard_pending: bool) -> Result<()> {
         self.sender
             .send(Request::NotifyChange(NotifyChangeRequest {
                 document,
                 discard_pending,
             }))
-            .expect("failed to send notification request");
+            .map_err(|_| {
+                anyhow!("failed to send request to analysis queue because the channel has closed")
+            })
     }
 
     /// Analyzes a specific document.
@@ -549,7 +578,11 @@ where
     /// analysis result is returned.
     ///
     /// Returns an analysis result for each document that was analyzed.
-    pub async fn analyze_document(&self, context: Context, document: Url) -> Vec<AnalysisResult> {
+    pub async fn analyze_document(
+        &self,
+        context: Context,
+        document: Url,
+    ) -> Result<Vec<AnalysisResult>> {
         // Send the analyze request to the queue
         let (tx, rx) = oneshot::channel();
         self.sender
@@ -558,9 +591,13 @@ where
                 context,
                 completed: tx,
             }))
-            .expect("failed to send analyze request");
+            .map_err(|_| {
+                anyhow!("failed to send request to analysis queue because the channel has closed")
+            })?;
 
-        rx.await.unwrap_or_default()
+        rx.await.map_err(|_| {
+            anyhow!("failed to receive response from analysis queue because the channel has closed")
+        })?
     }
 
     /// Performs analysis of all documents.
@@ -571,7 +608,7 @@ where
     /// analysis result is returned.
     ///
     /// Returns an analysis result for each document that was analyzed.
-    pub async fn analyze(&self, context: Context) -> Vec<AnalysisResult> {
+    pub async fn analyze(&self, context: Context) -> Result<Vec<AnalysisResult>> {
         // Send the analyze request to the queue
         let (tx, rx) = oneshot::channel();
         self.sender
@@ -580,9 +617,13 @@ where
                 context,
                 completed: tx,
             }))
-            .expect("failed to send analyze request");
+            .map_err(|_| {
+                anyhow!("failed to send request to analysis queue because the channel has closed")
+            })?;
 
-        rx.await.unwrap_or_default()
+        rx.await.map_err(|_| {
+            anyhow!("failed to receive response from analysis queue because the channel has closed")
+        })?
     }
 }
 
@@ -615,7 +656,7 @@ mod test {
     #[tokio::test]
     async fn it_returns_empty_results() {
         let analyzer = Analyzer::new(|_: (), _, _, _| async {});
-        let results = analyzer.analyze(()).await;
+        let results = analyzer.analyze(()).await.unwrap();
         assert!(results.is_empty());
     }
 
@@ -644,7 +685,7 @@ workflow test {
             .await
             .expect("should add document");
 
-        let results = analyzer.analyze(()).await;
+        let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].diagnostics().len(), 1);
         assert_eq!(results[0].diagnostics()[0].rule(), None);
@@ -656,7 +697,7 @@ workflow test {
 
         // Analyze again and ensure the analysis result id is unchanged
         let id = results[0].id().clone();
-        let results = analyzer.analyze(()).await;
+        let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].id().as_ref(), id.as_ref());
         assert_eq!(results[0].diagnostics().len(), 1);
@@ -693,7 +734,7 @@ workflow test {
             .await
             .expect("should add document");
 
-        let results = analyzer.analyze(()).await;
+        let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].diagnostics().len(), 1);
         assert_eq!(results[0].diagnostics()[0].rule(), None);
@@ -702,35 +743,39 @@ workflow test {
             results[0].diagnostics()[0].message(),
             "conflicting workflow name `test`"
         );
+
+        // Rewrite the file to correct the issue
+        fs::write(
+            &path,
+            r#"version 1.1
+
+task test {
+    command <<<>>>
+}
+
+workflow something_else {
+}
+"#,
+        )
+        .expect("failed to create test file");
 
         let uri = path_to_uri(&path).expect("should convert to URI");
-        analyzer.notify_change(uri.clone(), false);
+        analyzer.notify_change(uri.clone(), false).unwrap();
 
-        // Analyze again and ensure the analysis result id is changed
+        // Analyze again and ensure the analysis result id is changed and the issue
+        // fixed
         let id = results[0].id().clone();
-        let results = analyzer.analyze(()).await;
+        let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 1);
         assert!(results[0].id().as_ref() != id.as_ref());
-        assert_eq!(results[0].diagnostics().len(), 1);
-        assert_eq!(results[0].diagnostics()[0].rule(), None);
-        assert_eq!(results[0].diagnostics()[0].severity(), Severity::Error);
-        assert_eq!(
-            results[0].diagnostics()[0].message(),
-            "conflicting workflow name `test`"
-        );
+        assert_eq!(results[0].diagnostics().len(), 0);
 
         // Analyze again and ensure the analysis result id is unchanged
         let id = results[0].id().clone();
-        let results = analyzer.analyze_document((), uri).await;
+        let results = analyzer.analyze_document((), uri).await.unwrap();
         assert_eq!(results.len(), 1);
-        assert_eq!(results[0].id().as_ref(), id.as_ref());
-        assert_eq!(results[0].diagnostics().len(), 1);
-        assert_eq!(results[0].diagnostics()[0].rule(), None);
-        assert_eq!(results[0].diagnostics()[0].severity(), Severity::Error);
-        assert_eq!(
-            results[0].diagnostics()[0].message(),
-            "conflicting workflow name `test`"
-        );
+        assert!(results[0].id().as_ref() == id.as_ref());
+        assert_eq!(results[0].diagnostics().len(), 0);
     }
 
     #[tokio::test]
@@ -758,7 +803,7 @@ workflow test {
             .await
             .expect("should add document");
 
-        let results = analyzer.analyze(()).await;
+        let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].diagnostics().len(), 1);
         assert_eq!(results[0].diagnostics()[0].rule(), None);
@@ -770,23 +815,25 @@ workflow test {
 
         // Edit the file to correct the issue
         let uri = path_to_uri(&path).expect("should convert to URI");
-        analyzer.notify_incremental_change(
-            uri.clone(),
-            IncrementalChange {
-                version: 2,
-                start: None,
-                edits: vec![SourceEdit {
-                    range: SourcePosition::new(6, 9)..SourcePosition::new(6, 13),
-                    encoding: SourcePositionEncoding::UTF8,
-                    text: "something_else".to_string(),
-                }],
-            },
-        );
+        analyzer
+            .notify_incremental_change(
+                uri.clone(),
+                IncrementalChange {
+                    version: 2,
+                    start: None,
+                    edits: vec![SourceEdit {
+                        range: SourcePosition::new(6, 9)..SourcePosition::new(6, 13),
+                        encoding: SourcePositionEncoding::UTF8,
+                        text: "something_else".to_string(),
+                    }],
+                },
+            )
+            .unwrap();
 
         // Analyze again and ensure the analysis result id is changed and the issue was
         // fixed
         let id = results[0].id().clone();
-        let results = analyzer.analyze_document((), uri).await;
+        let results = analyzer.analyze_document((), uri).await.unwrap();
         assert_eq!(results.len(), 1);
         assert!(results[0].id().as_ref() != id.as_ref());
         assert_eq!(results[0].diagnostics().len(), 0);
@@ -833,14 +880,14 @@ workflow test {
             .expect("should add documents");
 
         // Analyze the documents
-        let results = analyzer.analyze(()).await;
+        let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 3);
         assert!(results[0].diagnostics().is_empty());
         assert!(results[1].diagnostics().is_empty());
         assert!(results[2].diagnostics().is_empty());
 
         // Analyze the documents again
-        let results = analyzer.analyze(()).await;
+        let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 3);
 
         // Remove the documents by directory
@@ -848,8 +895,9 @@ workflow test {
             .remove_documents(vec![
                 path_to_uri(dir.path()).expect("should convert to URI"),
             ])
-            .await;
-        let results = analyzer.analyze(()).await;
+            .await
+            .unwrap();
+        let results = analyzer.analyze(()).await.unwrap();
         assert!(results.is_empty());
     }
 }
