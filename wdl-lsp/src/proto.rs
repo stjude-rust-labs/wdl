@@ -190,8 +190,7 @@ pub fn workspace_diagnostic_report(
                 items.push(WorkspaceDocumentDiagnosticReport::Unchanged(
                     WorkspaceUnchangedDocumentDiagnosticReport {
                         uri: result.uri().as_ref().clone(),
-                        // TODO: FIX ME
-                        version: None,
+                        version: result.parse_result().version().map(|v| v as i64),
                         unchanged_document_diagnostic_report: UnchangedDocumentDiagnosticReport {
                             result_id: result.id().as_ref().clone(),
                         },
