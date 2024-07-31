@@ -94,10 +94,9 @@ impl Rule for BlankLinesBetweenElementsRule {
          between the opening of a workflow definition and the meta section). There should also \
          never be blanks within a `meta`, `parameter_meta`, `input`, `output`, `runtime`, \
          `requirements`, or `hints` section. For workflows, the `workflow body` includes any \
-         private declarations, call statements, conditional statements, and scatter statements. \
-         A `task body` is any and all private declarations. \
-         Within a workflow or task body, individual elements may optionally be separated by a blank line. \
-         "
+         private declarations, call statements, conditional statements, and scatter statements. A \
+         `task body` is any and all private declarations. Within a workflow or task body, \
+         individual elements may optionally be separated by a blank line. "
     }
 
     fn tags(&self) -> TagSet {
