@@ -400,8 +400,6 @@ impl LanguageServer for Server {
                     edits: Vec::new(),
                 },
             );
-
-            // TODO: do something with version
         }
     }
 
