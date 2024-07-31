@@ -7,7 +7,6 @@ use std::ops::Range;
 use std::sync::Arc;
 use std::time::Instant;
 
-use anyhow::bail;
 use anyhow::Context;
 use anyhow::Result;
 use futures::stream::FuturesUnordered;
@@ -95,6 +94,14 @@ pub struct NotifyChangeRequest {
     pub discard_pending: bool,
 }
 
+/// A simple enumeration to signal a cancellation to the caller.
+enum Cancelable<T> {
+    /// The operation completed and yielded a value.
+    Completed(T),
+    /// The operation was canceled.
+    Canceled,
+}
+
 /// Represents the analysis queue.
 pub struct AnalysisQueue<Progress, Context, Return, Validator> {
     /// The document graph maintained by the analysis queue.
@@ -167,14 +174,22 @@ where
                         log::info!("received request to analyze all documents");
                     }
 
-                    let results = self.analyze(document, context, &completed);
+                    match self.analyze(document, context, &completed) {
+                        Cancelable::Completed(results) => {
+                            log::info!(
+                                "request to analyze documents completed in {elapsed:?}",
+                                elapsed = start.elapsed()
+                            );
 
-                    log::info!(
-                        "request to analyze documents completed in {elapsed:?}",
-                        elapsed = start.elapsed()
-                    );
-
-                    completed.send(results).ok();
+                            completed.send(results).ok();
+                        }
+                        Cancelable::Canceled => {
+                            log::info!(
+                                "request to analyze documents was canceled after {elapsed:?}",
+                                elapsed = start.elapsed()
+                            );
+                        }
+                    }
                 }
                 Request::Remove(RemoveRequest {
                     documents,
@@ -233,7 +248,7 @@ where
         document: Option<Url>,
         context: Context,
         completed: &oneshot::Sender<Result<Vec<AnalysisResult>>>,
-    ) -> Result<Vec<AnalysisResult>> {
+    ) -> Cancelable<Result<Vec<AnalysisResult>>> {
         // Analysis works by building a subgraph of what needs to be analyzed.
         // We start with the requested node or all roots. We then perform a
         // breadth-first traversal maintaining the set of nodes that compromises the
@@ -247,7 +262,7 @@ where
                     // Check to see if the document is a rooted node
                     let index = match graph.get_index(&document) {
                         Some(index) if graph.is_rooted(index) => index,
-                        _ => return Ok(Vec::new()),
+                        _ => return Cancelable::Completed(Ok(Vec::new())),
                     };
 
                     let mut nodes = IndexSet::new();
@@ -264,7 +279,7 @@ where
         loop {
             if completed.is_closed() {
                 log::info!("analysis request has been canceled");
-                bail!("analysis request has been canceled");
+                return Cancelable::Canceled;
             }
 
             let slice = subgraph
@@ -294,11 +309,17 @@ where
             };
 
             let parsed =
-                self.await_with_progress(ProgressKind::Parsing, tasks, completed, &context);
+                match self.await_with_progress(ProgressKind::Parsing, tasks, completed, &context) {
+                    Cancelable::Completed(parsed) => parsed,
+                    Cancelable::Canceled => return Cancelable::Canceled,
+                };
 
             // Update the graph, potentially adding more nodes to the subgraph
             let len = slice.len();
-            self.update_graphs(parsed, &mut subgraph, offset..offset + len)?;
+            if let Err(e) = self.update_graphs(parsed, &mut subgraph, offset..offset + len) {
+                return Cancelable::Completed(Err(e));
+            }
+
             offset += len;
         }
 
@@ -310,7 +331,7 @@ where
         while subgraph.node_count() > 0 {
             if completed.is_closed() {
                 log::info!("analysis request has been canceled");
-                bail!("analysis request has been canceled");
+                return Cancelable::Canceled;
             }
 
             // Build a set of nodes with no incoming edges (i.e. no unanalyzed dependencies)
@@ -353,7 +374,11 @@ where
             };
 
             let analyzed =
-                self.await_with_progress(ProgressKind::Analyzing, tasks, completed, &context);
+                match self.await_with_progress(ProgressKind::Analyzing, tasks, completed, &context)
+                {
+                    Cancelable::Completed(analyzed) => analyzed,
+                    Cancelable::Canceled => return Cancelable::Canceled,
+                };
 
             let mut graph = self.graph.write();
             results.extend(analyzed.into_iter().filter_map(|(index, analysis)| {
@@ -369,7 +394,7 @@ where
         }
 
         results.sort_by(|a, b| a.uri().cmp(b.uri()));
-        Ok(results)
+        Cancelable::Completed(Ok(results))
     }
 
     /// Removes documents from the graph.
@@ -394,12 +419,12 @@ where
         mut tasks: FuturesUnordered<Fut>,
         completed: &oneshot::Sender<Result<Vec<AnalysisResult>>>,
         context: &Context,
-    ) -> Vec<Output>
+    ) -> Cancelable<Vec<Output>>
     where
         Fut: Future<Output = Output>,
     {
         if tasks.is_empty() {
-            return Default::default();
+            return Cancelable::Completed(Vec::new());
         }
 
         let total = tasks.len();
@@ -446,7 +471,12 @@ where
         // Report all have completed even if there are cancellations
         self.tokio
             .block_on((self.progress)(context.clone(), kind, total, total));
-        results
+
+        if completed.is_closed() {
+            Cancelable::Canceled
+        } else {
+            Cancelable::Completed(results)
+        }
     }
 
     /// Spawns a parse task on a rayon thread.
