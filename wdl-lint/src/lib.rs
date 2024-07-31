@@ -98,6 +98,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::NonmatchingOutputRule<'_>>::default(),
         Box::<rules::CommentWhitespaceRule>::default(),
         Box::<rules::TrailingCommaRule>::default(),
+        Box::<rules::BlankLinesBetweenElementsRule>::default(),
         Box::<rules::ExpressionSpacingRule>::default(),
     ];
 

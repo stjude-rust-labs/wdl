@@ -1,6 +1,7 @@
 [package]
 name = "wdl-analysis"
 version = "0.1.0"
+rust-version.workspace = true
 license.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -25,6 +26,7 @@ futures = { workspace = true }
 glob = { workspace = true }
 path-clean = { workspace = true }
 indexmap = { workspace = true }
+line-index = { workspace = true }
 
 [dev-dependencies]
 pretty_assertions = { workspace = true }
