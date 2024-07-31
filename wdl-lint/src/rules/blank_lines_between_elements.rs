@@ -95,12 +95,9 @@ impl Rule for BlankLinesBetweenElementsRule {
          never be blanks within a `meta`, `parameter_meta`, `input`, `output`, `runtime`, \
          `requirements`, or `hints` section. For workflows, the `workflow body` includes any \
          private declarations, call statements, conditional statements, and scatter statements. \
-         Within a workflow body, individual elements may optionally be separated by a blank line. \
-         See example (https://github.com/stjude-rust-labs/wdl/discussions/11) for a complete WDL \
-         document with proper spacing between elements. Note the blank lines between `meta`, \
-         `parameter_meta`, `input`, workflow body / `command` section, `output`, and `runtime` \
-         for the example task. The blank line between the workflow definition and the task \
-         definition is also important."
+         A `task body` is any and all private declarations. \
+         Within a workflow or task body, individual elements may optionally be separated by a blank line. \
+         "
     }
 
     fn tags(&self) -> TagSet {
