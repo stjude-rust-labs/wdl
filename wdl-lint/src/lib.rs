@@ -100,6 +100,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::TrailingCommaRule>::default(),
         Box::<rules::BlankLinesBetweenElementsRule>::default(),
         Box::<rules::KeyValuePairsRule>::default(),
+        Box::<rules::ExpressionSpacingRule>::default(),
         Box::<rules::DisallowedInputNameRule>::default(),
         Box::<rules::DisallowedOutputNameRule>::default(),
     ];
