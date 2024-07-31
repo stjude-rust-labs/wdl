@@ -2121,6 +2121,11 @@ message = "kraken2.wdl:92:13: note[ExpressionSpacing]: multi-line if...then...el
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/kraken2.wdl/#L92"
 
 [[diagnostics]]
+document = "stjudecloud/workflows:/tools/librarian.wdl"
+message = "librarian.wdl:20:5: note[BlankLinesBetweenElements]: missing blank line"
+permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/librarian.wdl/#L20"
+
+[[diagnostics]]
 document = "stjudecloud/workflows:/tools/mosdepth.wdl"
 message = "mosdepth.wdl:11:13: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/stjudecloud/workflows/blob/129060215443bbd1b67c4d3d149d48acdab90ef2/tools/mosdepth.wdl/#L11"
