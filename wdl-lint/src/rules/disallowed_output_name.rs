@@ -57,7 +57,7 @@ impl Rule for DisallowedOutputNameRule {
     }
 
     fn description(&self) -> &'static str {
-        "Disallows the use of disallowed output names."
+        "Ensures output names are meaningful."
     }
 
     fn explanation(&self) -> &'static str {
