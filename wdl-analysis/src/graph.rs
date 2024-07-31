@@ -123,6 +123,8 @@ pub struct DocumentGraphNode {
     /// The URI of the document.
     uri: Arc<Url>,
     /// The current incremental change to the document.
+    ///
+    /// If `None`, there is no pending incremental change applied to the node.
     change: Option<IncrementalChange>,
     /// The parse state of the document.
     parse_state: ParseState,
