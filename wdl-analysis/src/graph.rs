@@ -127,6 +127,8 @@ pub struct DocumentGraphNode {
     /// The parse state of the document.
     parse_state: ParseState,
     /// The analysis of the document.
+    ///
+    /// If `None`, an analysis does not exist for the current state of the node.
     analysis: Option<Analysis>,
 }
 
