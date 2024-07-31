@@ -488,7 +488,7 @@ where
                 documents,
                 completed: tx,
             }))
-            .expect("failed to send remove request");
+            .expect("failed to send add request");
 
         rx.await.unwrap_or_default();
         Ok(())
