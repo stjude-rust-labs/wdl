@@ -29,15 +29,15 @@ fn decl_identifier_too_short(span: Span) -> Diagnostic {
 }
 
 /// Diagnostic for input names that start with [oO]ut[A-Z_]
-fn decl_identifier_starts_with_in(span: Span) -> Diagnostic {
+fn decl_identifier_starts_with_out(span: Span) -> Diagnostic {
     Diagnostic::note("declaration identifier starts with 'out'")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("rename the declaration to a name that does not start with 'in'")
+        .with_fix("rename the declaration to a name that does not start with 'out'")
 }
 
 /// Diagnostic for input names that start with "output"
-fn decl_identifier_starts_with_input(span: Span) -> Diagnostic {
+fn decl_identifier_starts_with_output(span: Span) -> Diagnostic {
     Diagnostic::note("declaration identifier starts with 'output'")
         .with_rule(ID)
         .with_highlight(span)
@@ -129,13 +129,13 @@ fn check_decl_name(state: &mut Diagnostics, decl: &Decl) {
                     name.next();
                     if let Some(c) = name.peek() {
                         if c.is_ascii_uppercase() || c == &'_' {
-                            // name starts with "in"
-                            state.add(decl_identifier_starts_with_in(decl.name().span()));
+                            // name starts with "out"
+                            state.add(decl_identifier_starts_with_out(decl.name().span()));
                         } else {
                             let s: String = name.take(3).collect();
                             if s == "put" {
-                                // name starts with "input"
-                                state.add(decl_identifier_starts_with_input(decl.name().span()));
+                                // name starts with "output"
+                                state.add(decl_identifier_starts_with_output(decl.name().span()));
                             }
                         }
                     }

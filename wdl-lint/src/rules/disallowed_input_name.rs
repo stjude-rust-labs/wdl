@@ -57,7 +57,7 @@ impl Rule for DisallowedInputNameRule {
     }
 
     fn description(&self) -> &'static str {
-        "Disallows the use of disallowed input names."
+        "Ensures input names are meaningful."
     }
 
     fn explanation(&self) -> &'static str {

@@ -12,7 +12,7 @@ note[DisallowedOutputName]: declaration identifier starts with 'out'
 28 │         String outString = "string"  # This is not OK
    │                ^^^^^^^^^
    │
-   = fix: rename the declaration to a name that does not start with 'in'
+   = fix: rename the declaration to a name that does not start with 'out'
 
 note[DisallowedOutputName]: declaration identifier starts with 'output'
    ┌─ tests/lints/disallowed-output-name/source.wdl:29:16
@@ -28,5 +28,5 @@ note[DisallowedOutputName]: declaration identifier starts with 'out'
 30 │         String out_string = "string"  # This is not OK
    │                ^^^^^^^^^^
    │
-   = fix: rename the declaration to a name that does not start with 'in'
+   = fix: rename the declaration to a name that does not start with 'out'
 
