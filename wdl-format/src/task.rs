@@ -16,6 +16,7 @@ use wdl_ast::SyntaxKind;
 
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
+use super::first_child_of_kind;
 use super::state::SPACE;
 use super::Formattable;
 use super::State;
@@ -30,21 +31,13 @@ impl Formattable for CommandSection {
             false,
         )?;
 
-        let command_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::CommandKeyword)
-            .expect("Command section should have a command keyword");
+        let command_keyword = first_child_of_kind(self.syntax(), SyntaxKind::CommandKeyword);
         state.indent(writer)?;
         write!(writer, "{}", command_keyword)?;
         format_inline_comment(&command_keyword, writer, state, true)?;
 
         if self.is_heredoc() {
-            let open_heredoc = self
-                .syntax()
-                .children_with_tokens()
-                .find(|c| c.kind() == SyntaxKind::OpenHeredoc)
-                .expect("Command section should have an open heredoc");
+            let open_heredoc = first_child_of_kind(self.syntax(), SyntaxKind::OpenHeredoc);
             format_preceding_comments(&open_heredoc, writer, state, true)?;
             // Open braces should ignore the "+1 rule" followed by other interrupted
             // elements.
@@ -56,11 +49,7 @@ impl Formattable for CommandSection {
             }
             write!(writer, "{}", open_heredoc)?;
         } else {
-            let open_brace = self
-                .syntax()
-                .children_with_tokens()
-                .find(|c| c.kind() == SyntaxKind::OpenBrace)
-                .expect("Command section should have an open brace");
+            let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
             format_preceding_comments(&open_brace, writer, state, true)?;
             // Open braces should ignore the "+1 rule" followed by other interrupted
             // elements.
@@ -117,11 +106,7 @@ impl Formattable for RuntimeItem {
             true,
         )?;
 
-        let colon = self
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::Colon)
-            .expect("Runtime item should have a colon");
+        let colon = first_child_of_kind(self.syntax(), SyntaxKind::Colon);
         format_preceding_comments(&colon, writer, state, true)?;
         if state.interrupted() {
             state.reset_interrupted();
@@ -157,20 +142,12 @@ impl Formattable for RuntimeSection {
             false,
         )?;
 
-        let runtime_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::RuntimeKeyword)
-            .expect("Runtime section should have a runtime keyword");
+        let runtime_keyword = first_child_of_kind(self.syntax(), SyntaxKind::RuntimeKeyword);
         state.indent(writer)?;
         write!(writer, "{}", runtime_keyword)?;
         format_inline_comment(&runtime_keyword, writer, state, true)?;
 
-        let open_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::OpenBrace)
-            .expect("Runtime section should have an open brace");
+        let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
         format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
@@ -191,11 +168,7 @@ impl Formattable for RuntimeSection {
 
         state.decrement_indent();
 
-        let close_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::CloseBrace)
-            .expect("Runtime section should have a close brace");
+        let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
         format_preceding_comments(&close_brace, writer, state, true)?;
         state.indent(writer)?;
         write!(writer, "{}", close_brace)?;
@@ -227,11 +200,7 @@ impl Formattable for RequirementsItem {
             true,
         )?;
 
-        let colon = self
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::Colon)
-            .expect("Requirements item should have a colon");
+        let colon = first_child_of_kind(self.syntax(), SyntaxKind::Colon);
         format_preceding_comments(&colon, writer, state, true)?;
         if state.interrupted() {
             state.reset_interrupted();
@@ -267,20 +236,13 @@ impl Formattable for RequirementsSection {
             false,
         )?;
 
-        let requirements_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::RequirementsKeyword)
-            .expect("Requirements section should have a requirements keyword");
+        let requirements_keyword =
+            first_child_of_kind(self.syntax(), SyntaxKind::RequirementsKeyword);
         state.indent(writer)?;
         write!(writer, "{}", requirements_keyword)?;
         format_inline_comment(&requirements_keyword, writer, state, true)?;
 
-        let open_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::OpenBrace)
-            .expect("Requirements section should have an open brace");
+        let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
         format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
@@ -301,11 +263,7 @@ impl Formattable for RequirementsSection {
 
         state.decrement_indent();
 
-        let close_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::CloseBrace)
-            .expect("Requirements section should have a close brace");
+        let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
         format_preceding_comments(&close_brace, writer, state, true)?;
         state.indent(writer)?;
         write!(writer, "{}", close_brace)?;
@@ -327,11 +285,7 @@ impl Formattable for TaskDefinition {
             false,
         )?;
 
-        let task_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::TaskKeyword)
-            .expect("Task should have a task keyword");
+        let task_keyword = first_child_of_kind(self.syntax(), SyntaxKind::TaskKeyword);
         state.indent(writer)?;
         write!(writer, "{}", task_keyword)?;
         format_inline_comment(&task_keyword, writer, state, true)?;
@@ -352,11 +306,7 @@ impl Formattable for TaskDefinition {
             true,
         )?;
 
-        let open_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::OpenBrace)
-            .expect("Task should have an open brace");
+        let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
         format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
@@ -464,11 +414,7 @@ impl Formattable for TaskDefinition {
 
         state.decrement_indent();
 
-        let close_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|c| c.kind() == SyntaxKind::CloseBrace)
-            .expect("Task should have a close brace");
+        let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
         format_preceding_comments(&close_brace, writer, state, true)?;
         state.indent(writer)?;
         write!(writer, "{}", close_brace)?;

@@ -17,6 +17,7 @@ use wdl_ast::Document;
 use wdl_ast::Ident;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
+use wdl_ast::SyntaxNode;
 use wdl_ast::Validator;
 use wdl_ast::Version;
 use wdl_ast::VersionStatement;
@@ -120,6 +121,16 @@ impl Formattable for Ident {
     fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
         write!(writer, "{}", self.as_str())
     }
+}
+
+/// Find an expected child element of the specified kind.
+///
+/// # Panics
+/// Panics if the child element is not found.
+pub fn first_child_of_kind(node: &SyntaxNode, kind: SyntaxKind) -> SyntaxElement {
+    node.children_with_tokens()
+        .find(|element| element.kind() == kind)
+        .expect("Expected to find a child")
 }
 
 /// Format a WDL document.

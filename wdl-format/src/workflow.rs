@@ -17,6 +17,7 @@ use wdl_ast::SyntaxKind;
 
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
+use super::first_child_of_kind;
 use super::state::SPACE;
 use super::Formattable;
 use super::State;
@@ -31,11 +32,7 @@ impl Formattable for CallAlias {
             true,
         )?;
 
-        let as_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::AsKeyword)
-            .expect("Call Alias should have an as keyword");
+        let as_keyword = first_child_of_kind(self.syntax(), SyntaxKind::AsKeyword);
         state.space_or_indent(writer)?;
         write!(writer, "{}", as_keyword)?;
         format_inline_comment(&as_keyword, writer, state, true)?;
@@ -67,11 +64,7 @@ impl Formattable for CallAfter {
             true,
         )?;
 
-        let after_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::AfterKeyword)
-            .expect("Call After should have an after keyword");
+        let after_keyword = first_child_of_kind(self.syntax(), SyntaxKind::AfterKeyword);
         state.space_or_indent(writer)?;
         write!(writer, "{}", after_keyword)?;
         format_inline_comment(&after_keyword, writer, state, true)?;
@@ -106,11 +99,7 @@ impl Formattable for CallInputItem {
         )?;
 
         if let Some(expr) = self.expr() {
-            let equal_sign = self
-                .syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::Assignment)
-                .expect("Call Input Item should have an equal sign");
+            let equal_sign = first_child_of_kind(self.syntax(), SyntaxKind::Assignment);
             format_preceding_comments(&equal_sign, writer, state, true)?;
             state.space_or_indent(writer)?;
             write!(writer, "{}", equal_sign)?;
@@ -144,11 +133,7 @@ impl Formattable for CallStatement {
             false,
         )?;
 
-        let call_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::CallKeyword)
-            .expect("Call Statement should have a call keyword");
+        let call_keyword = first_child_of_kind(self.syntax(), SyntaxKind::CallKeyword);
         state.indent(writer)?;
         write!(writer, "{}", call_keyword)?;
         format_inline_comment(&call_keyword, writer, state, true)?;
@@ -179,11 +164,7 @@ impl Formattable for CallStatement {
 
         let inputs: Vec<_> = self.inputs().collect();
         if !inputs.is_empty() {
-            let open_brace = self
-                .syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::OpenBrace)
-                .expect("Call Statement with input(s) should have an open brace");
+            let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
             format_preceding_comments(&open_brace, writer, state, true)?;
             // Open braces should ignore the "+1 rule" followed by other interrupted
             // elements.
@@ -196,21 +177,13 @@ impl Formattable for CallStatement {
             write!(writer, "{}", open_brace)?;
             format_inline_comment(&open_brace, writer, state, true)?;
 
-            let input_keyword = self
-                .syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::InputKeyword)
-                .expect("Call Statement with input(s) should have an input keyword");
+            let input_keyword = first_child_of_kind(self.syntax(), SyntaxKind::InputKeyword);
             format_preceding_comments(&input_keyword, writer, state, true)?;
             state.space_or_indent(writer)?;
             write!(writer, "{}", input_keyword)?;
             format_inline_comment(&input_keyword, writer, state, true)?;
 
-            let colon = self
-                .syntax()
-                .children_with_tokens()
-                .find(|element| element.kind() == SyntaxKind::Colon)
-                .expect("Call Statement with input(s) should have a colon");
+            let colon = first_child_of_kind(self.syntax(), SyntaxKind::Colon);
             format_preceding_comments(&colon, writer, state, true)?;
             if state.interrupted() {
                 state.indent(writer)?;
@@ -229,11 +202,7 @@ impl Formattable for CallStatement {
                 state.space_or_indent(writer)?;
                 input.format(writer, state)?;
 
-                let close_brace = self
-                    .syntax()
-                    .children_with_tokens()
-                    .find(|element| element.kind() == SyntaxKind::CloseBrace)
-                    .expect("Call Statement should have a close brace");
+                let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
                 format_preceding_comments(&close_brace, writer, state, true)?;
                 state.space_or_indent(writer)?;
                 write!(writer, "{}", close_brace)?;
@@ -274,11 +243,7 @@ impl Formattable for CallStatement {
 
                 state.decrement_indent();
 
-                let close_brace = self
-                    .syntax()
-                    .children_with_tokens()
-                    .find(|element| element.kind() == SyntaxKind::CloseBrace)
-                    .expect("Call Statement should have a close brace");
+                let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
                 format_preceding_comments(&close_brace, writer, state, false)?;
                 state.indent(writer)?;
                 write!(writer, "{}", close_brace)?;
@@ -303,20 +268,12 @@ impl Formattable for ConditionalStatement {
             false,
         )?;
 
-        let if_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::IfKeyword)
-            .expect("Conditional Statement should have an if keyword");
+        let if_keyword = first_child_of_kind(self.syntax(), SyntaxKind::IfKeyword);
         state.indent(writer)?;
         write!(writer, "{}", if_keyword)?;
         format_inline_comment(&if_keyword, writer, state, true)?;
 
-        let open_paren = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::OpenParen)
-            .expect("Conditional Statement should have an open parenthesis");
+        let open_paren = first_child_of_kind(self.syntax(), SyntaxKind::OpenParen);
         format_preceding_comments(&open_paren, writer, state, true)?;
         // Open parens should ignore the "+1 rule" followed by other interrupted
         // elements.
@@ -358,22 +315,14 @@ impl Formattable for ConditionalStatement {
             paren_on_same_line = false;
         }
 
-        let close_paren = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::CloseParen)
-            .expect("Conditional Statement should have a close parenthesis");
+        let close_paren = first_child_of_kind(self.syntax(), SyntaxKind::CloseParen);
         format_preceding_comments(&close_paren, writer, state, !multiline_expr)?;
         if state.interrupted() || !paren_on_same_line {
             state.indent(writer)?;
         }
         write!(writer, "{}", close_paren)?;
 
-        let open_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::OpenBrace)
-            .expect("Conditional Statement should have an open brace");
+        let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
         format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
@@ -394,11 +343,7 @@ impl Formattable for ConditionalStatement {
 
         state.decrement_indent();
 
-        let close_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::CloseBrace)
-            .expect("Conditional Statement should have a close brace");
+        let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
         format_preceding_comments(&close_brace, writer, state, false)?;
         state.indent(writer)?;
         write!(writer, "{}", close_brace)?;
@@ -420,20 +365,12 @@ impl Formattable for ScatterStatement {
             false,
         )?;
 
-        let scatter_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::ScatterKeyword)
-            .expect("Scatter Statement should have a scatter keyword");
+        let scatter_keyword = first_child_of_kind(self.syntax(), SyntaxKind::ScatterKeyword);
         state.indent(writer)?;
         write!(writer, "{}", scatter_keyword)?;
         format_inline_comment(&scatter_keyword, writer, state, true)?;
 
-        let open_paren = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::OpenParen)
-            .expect("Scatter Statement should have an open parenthesis");
+        let open_paren = first_child_of_kind(self.syntax(), SyntaxKind::OpenParen);
         format_preceding_comments(&open_paren, writer, state, true)?;
         // Open parens should ignore the "+1 rule" followed by other interrupted
         // elements.
@@ -464,11 +401,7 @@ impl Formattable for ScatterStatement {
             true,
         )?;
 
-        let in_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::InKeyword)
-            .expect("Scatter Statement should have an in keyword");
+        let in_keyword = first_child_of_kind(self.syntax(), SyntaxKind::InKeyword);
         format_preceding_comments(&in_keyword, writer, state, true)?;
         state.space_or_indent(writer)?;
         write!(writer, "{}", in_keyword)?;
@@ -490,11 +423,7 @@ impl Formattable for ScatterStatement {
             true,
         )?;
 
-        let close_paren = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::CloseParen)
-            .expect("Scatter Statement should have a close parenthesis");
+        let close_paren = first_child_of_kind(self.syntax(), SyntaxKind::CloseParen);
         format_preceding_comments(&close_paren, writer, state, true)?;
         if state.interrupted() {
             state.indent(writer)?;
@@ -502,11 +431,7 @@ impl Formattable for ScatterStatement {
         write!(writer, "{}", close_paren)?;
         format_inline_comment(&close_paren, writer, state, true)?;
 
-        let open_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::OpenBrace)
-            .expect("Scatter Statement should have an open brace");
+        let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
         format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
@@ -527,11 +452,7 @@ impl Formattable for ScatterStatement {
 
         state.decrement_indent();
 
-        let close_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::CloseBrace)
-            .expect("Scatter Statement should have a close brace");
+        let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
         format_preceding_comments(&close_brace, writer, state, false)?;
         state.indent(writer)?;
         write!(writer, "{}", close_brace)?;
@@ -564,11 +485,7 @@ impl Formattable for WorkflowDefinition {
             false,
         )?;
 
-        let workflow_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::WorkflowKeyword)
-            .expect("Workflow should have a workflow keyword");
+        let workflow_keyword = first_child_of_kind(self.syntax(), SyntaxKind::WorkflowKeyword);
         write!(writer, "{}", workflow_keyword)?;
         format_inline_comment(&workflow_keyword, writer, state, true)?;
 
@@ -588,11 +505,7 @@ impl Formattable for WorkflowDefinition {
             true,
         )?;
 
-        let open_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::OpenBrace)
-            .expect("Workflow should have an open brace");
+        let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
         format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
@@ -692,11 +605,7 @@ impl Formattable for WorkflowDefinition {
 
         state.decrement_indent();
 
-        let close_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::CloseBrace)
-            .expect("Workflow should have a close brace");
+        let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
         format_preceding_comments(&close_brace, writer, state, false)?;
         state.indent(writer)?;
         write!(writer, "{}", close_brace)?;

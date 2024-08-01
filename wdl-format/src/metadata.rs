@@ -14,6 +14,7 @@ use wdl_ast::SyntaxKind;
 
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
+use super::first_child_of_kind;
 use super::state::SPACE;
 use super::Formattable;
 use super::State;
@@ -34,11 +35,7 @@ impl Formattable for MetadataObject {
             false,
         )?;
 
-        let open_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::OpenBrace)
-            .expect("Metadata Object should have an open brace");
+        let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
         format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
@@ -71,11 +68,7 @@ impl Formattable for MetadataObject {
 
         state.decrement_indent();
 
-        let close_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::CloseBrace)
-            .expect("Metadata Object should have a close brace");
+        let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
         format_preceding_comments(&close_brace, writer, state, false)?;
         state.indent(writer)?;
         write!(writer, "{}", close_brace)?;
@@ -97,11 +90,7 @@ impl Formattable for MetadataArray {
             false,
         )?;
 
-        let open_bracket = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::OpenBracket)
-            .expect("Metadata Array should have an open bracket");
+        let open_bracket = first_child_of_kind(self.syntax(), SyntaxKind::OpenBracket);
         format_preceding_comments(&open_bracket, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
@@ -135,11 +124,7 @@ impl Formattable for MetadataArray {
 
         state.decrement_indent();
 
-        let close_bracket = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::CloseBracket)
-            .expect("Metadata Array should have a close bracket");
+        let close_bracket = first_child_of_kind(self.syntax(), SyntaxKind::CloseBracket);
         format_preceding_comments(&close_bracket, writer, state, false)?;
         state.indent(writer)?;
         write!(writer, "{}", close_bracket)?;
@@ -185,11 +170,7 @@ impl Formattable for MetadataObjectItem {
             true,
         )?;
 
-        let colon = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::Colon)
-            .expect("Metadata Object Item should have a colon");
+        let colon = first_child_of_kind(self.syntax(), SyntaxKind::Colon);
         format_preceding_comments(&colon, writer, state, true)?;
         if state.interrupted() {
             state.indent(writer)?;
@@ -225,20 +206,12 @@ impl Formattable for MetadataSection {
             false,
         )?;
 
-        let meta_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::MetaKeyword)
-            .expect("Metadata Section should have a meta keyword");
+        let meta_keyword = first_child_of_kind(self.syntax(), SyntaxKind::MetaKeyword);
         state.indent(writer)?;
         write!(writer, "{}", meta_keyword)?;
         format_inline_comment(&meta_keyword, writer, state, true)?;
 
-        let open_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::OpenBrace)
-            .expect("Metadata Section should have an open brace");
+        let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
         format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
@@ -260,11 +233,7 @@ impl Formattable for MetadataSection {
 
         state.decrement_indent();
 
-        let close_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::CloseBrace)
-            .expect("Metadata Section should have a close brace");
+        let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
         format_preceding_comments(&close_brace, writer, state, false)?;
         state.indent(writer)?;
         write!(writer, "{}", close_brace)?;
@@ -286,20 +255,13 @@ impl Formattable for ParameterMetadataSection {
             false,
         )?;
 
-        let parameter_meta_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::ParameterMetaKeyword)
-            .expect("Parameter Metadata Section should have a parameter meta keyword");
+        let parameter_meta_keyword =
+            first_child_of_kind(self.syntax(), SyntaxKind::ParameterMetaKeyword);
         state.indent(writer)?;
         write!(writer, "{}", parameter_meta_keyword)?;
         format_inline_comment(&parameter_meta_keyword, writer, state, true)?;
 
-        let open_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::OpenBrace)
-            .expect("Parameter Metadata Section should have an open brace");
+        let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
         format_preceding_comments(&open_brace, writer, state, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
@@ -321,11 +283,7 @@ impl Formattable for ParameterMetadataSection {
 
         state.decrement_indent();
 
-        let close_brace = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::CloseBrace)
-            .expect("Parameter Metadata Section should have a close brace");
+        let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
         format_preceding_comments(&close_brace, writer, state, false)?;
         state.indent(writer)?;
         write!(writer, "{}", close_brace)?;

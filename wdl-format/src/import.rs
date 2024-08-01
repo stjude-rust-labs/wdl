@@ -9,6 +9,7 @@ use wdl_ast::SyntaxKind;
 
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
+use super::first_child_of_kind;
 use super::Formattable;
 use super::State;
 
@@ -21,11 +22,7 @@ impl Formattable for ImportStatement {
             false,
         )?;
 
-        let import_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::ImportKeyword)
-            .expect("Import statement should have an import keyword");
+        let import_keyword = first_child_of_kind(self.syntax(), SyntaxKind::ImportKeyword);
         write!(writer, "{}", import_keyword)?;
         format_inline_comment(&import_keyword, writer, state, true)?;
 
