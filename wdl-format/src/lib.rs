@@ -130,7 +130,7 @@ impl Formattable for Ident {
 pub fn first_child_of_kind(node: &SyntaxNode, kind: SyntaxKind) -> SyntaxElement {
     node.children_with_tokens()
         .find(|element| element.kind() == kind)
-        .expect("Expected to find a child")
+        .unwrap_or_else(|| panic!("Expected to find a child of kind: {kind:?}"))
 }
 
 /// Format a WDL document.
