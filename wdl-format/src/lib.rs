@@ -90,11 +90,7 @@ impl Formattable for VersionStatement {
             write!(writer, "{}", NEWLINE)?;
         }
 
-        let version_keyword = self
-            .syntax()
-            .children_with_tokens()
-            .find(|element| element.kind() == SyntaxKind::VersionKeyword)
-            .expect("Version statement should have a version keyword");
+        let version_keyword = first_child_of_kind(self.syntax(), SyntaxKind::VersionKeyword);
         write!(writer, "{}", version_keyword)?;
         format_inline_comment(&version_keyword, writer, state, true)?;
 
