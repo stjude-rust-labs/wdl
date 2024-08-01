@@ -137,7 +137,7 @@ impl Formattable for ImportStatement {
 /// Sorts import statements by their core components.
 ///
 /// The core components of an import statement are the URI and the namespace.
-/// These two elements guarentee a unique import statement.
+/// These two elements guarantee a unique import statement.
 pub fn sort_imports(a: &ImportStatement, b: &ImportStatement) -> std::cmp::Ordering {
     let a_core = format!(
         "{}{}",

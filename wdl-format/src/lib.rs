@@ -153,7 +153,7 @@ pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
         Ok(_) => {}
         Err(_) => {
             return Err(vec![Diagnostic::error(
-                "Failed to format version statement",
+                "failed to format version statement",
             )]);
         }
     }
@@ -169,7 +169,7 @@ pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
         match import.format(&mut result, &mut state) {
             Ok(_) => {}
             Err(_) => {
-                return Err(vec![Diagnostic::error("Failed to format import statement")]);
+                return Err(vec![Diagnostic::error("failed to format import statement")]);
             }
         }
     }
@@ -182,7 +182,7 @@ pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
         match item.format(&mut result, &mut state) {
             Ok(_) => {}
             Err(_) => {
-                return Err(vec![Diagnostic::error("Failed to format import statement")]);
+                return Err(vec![Diagnostic::error("failed to format document item")]);
             }
         }
     }
