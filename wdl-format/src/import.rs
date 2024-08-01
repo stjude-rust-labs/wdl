@@ -139,21 +139,11 @@ impl Formattable for ImportStatement {
 /// The core components of an import statement are the URI and the namespace.
 /// These two elements guarentee a unique import statement.
 pub fn sort_imports(a: &ImportStatement, b: &ImportStatement) -> std::cmp::Ordering {
-    let a_core = format!(
-        "{}{}",
-        a.uri()
-            .text()
-            .expect("Import URI cannot have placeholders")
-            .as_str(),
-        a.namespace().expect("Import namespace should exist").0
-    );
-    let b_core = format!(
-        "{}{}",
-        b.uri()
-            .text()
-            .expect("Import URI cannot have placeholders")
-            .as_str(),
-        b.namespace().expect("Import namespace should exist").0
-    );
-    a_core.cmp(&b_core)
+    (
+        a.uri().text().expect("import URI cannot have placeholders").as_str(),
+        &a.namespace().expect("import namespace should exist").0
+    ).cmp(&(
+        b.uri().text().expect("import URI cannot have placeholders").as_str(),
+        &b.namespace().expect("import namespace should exist").0
+    ))
 }
