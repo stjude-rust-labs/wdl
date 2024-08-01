@@ -94,8 +94,9 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
                 }
             }
             SyntaxKind::Whitespace => {
-                // Ignore whitespace less than one or more blank lines
-                // and ignore whitespace until a comment is found.
+                // Ignore whitespace until a comment is found.
+                // Ignore whitespace that doesn't contain at least two newlines.
+                // (Two newlines indicates a blank line)
                 if cur.to_string().matches(NEWLINE).count() > 1 && comments_found {
                     inner_buffer.push_str(NEWLINE);
                     reversed_text.push(inner_buffer.clone());
@@ -114,18 +115,14 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
         write!(writer, "{}", NEWLINE)?;
     }
 
-    // Only iterate through 'reversed_text' if comments were found
-    // (i.e. don't iterate through if it's only whitespace)
-    // And skip any preceding whitespace.
+    // Skip any whitespace before comments start.
     let mut comment_processed = false;
-    if comments_found {
-        for line in reversed_text.iter().rev() {
-            if line.contains('#') {
-                comment_processed = true;
-            }
-            if comment_processed {
-                write!(writer, "{}", line)?;
-            }
+    for line in reversed_text.iter().rev() {
+        if line.contains('#') {
+            comment_processed = true;
+        }
+        if comment_processed {
+            write!(writer, "{}", line)?;
         }
     }
     Ok(())
