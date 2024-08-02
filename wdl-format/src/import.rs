@@ -140,10 +140,17 @@ impl Formattable for ImportStatement {
 /// These two elements guarantee a unique import statement.
 pub fn sort_imports(a: &ImportStatement, b: &ImportStatement) -> std::cmp::Ordering {
     (
-        a.uri().text().expect("import URI cannot have placeholders").as_str(),
-        &a.namespace().expect("import namespace should exist").0
-    ).cmp(&(
-        b.uri().text().expect("import URI cannot have placeholders").as_str(),
-        &b.namespace().expect("import namespace should exist").0
-    ))
+        a.uri()
+            .text()
+            .expect("import URI cannot have placeholders")
+            .as_str(),
+        &a.namespace().expect("import namespace should exist").0,
+    )
+        .cmp(&(
+            b.uri()
+                .text()
+                .expect("import URI cannot have placeholders")
+                .as_str(),
+            &b.namespace().expect("import namespace should exist").0,
+        ))
 }

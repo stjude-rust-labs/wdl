@@ -177,19 +177,24 @@ impl Formattable for CallStatement {
             write!(writer, "{}", open_brace)?;
             format_inline_comment(&open_brace, writer, state, true)?;
 
-            let input_keyword = first_child_of_kind(self.syntax(), SyntaxKind::InputKeyword);
-            format_preceding_comments(&input_keyword, writer, state, true)?;
-            state.space_or_indent(writer)?;
-            write!(writer, "{}", input_keyword)?;
-            format_inline_comment(&input_keyword, writer, state, true)?;
+            if let Some(input_keyword) = self
+                .syntax()
+                .children_with_tokens()
+                .find(|c| c.kind() == SyntaxKind::InputKeyword)
+            {
+                format_preceding_comments(&input_keyword, writer, state, true)?;
+                state.space_or_indent(writer)?;
+                write!(writer, "{}", input_keyword)?;
+                format_inline_comment(&input_keyword, writer, state, true)?;
 
-            let colon = first_child_of_kind(self.syntax(), SyntaxKind::Colon);
-            format_preceding_comments(&colon, writer, state, true)?;
-            if state.interrupted() {
-                state.indent(writer)?;
-            }
-            write!(writer, "{}", colon)?;
-            format_inline_comment(&colon, writer, state, true)?;
+                let colon = first_child_of_kind(self.syntax(), SyntaxKind::Colon);
+                format_preceding_comments(&colon, writer, state, true)?;
+                if state.interrupted() {
+                    state.indent(writer)?;
+                }
+                write!(writer, "{}", colon)?;
+                format_inline_comment(&colon, writer, state, true)?;
+            } // else v1.2 syntax
 
             if inputs.len() == 1 {
                 let input = inputs.first().expect("Inputs should have a first element");
