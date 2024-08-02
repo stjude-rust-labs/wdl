@@ -7,7 +7,7 @@
 
 /// Space constant used for formatting.
 pub const SPACE: &str = " ";
-/// Indentation constant used for formatting.
+/// Indentation constant used for formatting. Indentation is four spaces per-level.
 pub const INDENT: &str = "    ";
 
 /// The `State` struct is used to keep track of the current formatting
