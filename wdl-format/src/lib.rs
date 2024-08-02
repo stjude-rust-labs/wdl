@@ -23,6 +23,7 @@ use wdl_ast::Version;
 use wdl_ast::VersionStatement;
 
 mod comments;
+mod expr;
 mod import;
 mod metadata;
 mod state;

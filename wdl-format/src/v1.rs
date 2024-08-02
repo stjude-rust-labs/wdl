@@ -2,18 +2,11 @@
 
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
-use wdl_ast::v1::Expr;
 use wdl_ast::v1::HintsItem;
 use wdl_ast::v1::HintsSection;
 use wdl_ast::v1::InputSection;
-use wdl_ast::v1::LiteralBoolean;
-use wdl_ast::v1::LiteralFloat;
-use wdl_ast::v1::LiteralInteger;
-use wdl_ast::v1::LiteralString;
 use wdl_ast::v1::OutputSection;
-use wdl_ast::v1::StringPart;
 use wdl_ast::v1::StructDefinition;
-use wdl_ast::v1::Type;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::SyntaxElement;
@@ -26,54 +19,6 @@ use super::state::SPACE;
 use super::Formattable;
 use super::State;
 use super::NEWLINE;
-use super::STRING_TERMINATOR;
-
-impl Formattable for LiteralString {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
-        write!(writer, "{}", STRING_TERMINATOR)?;
-        for part in self.parts() {
-            match part {
-                StringPart::Text(text) => {
-                    write!(writer, "{}", text.as_str())?;
-                }
-                StringPart::Placeholder(placeholder) => {
-                    write!(writer, "{}", placeholder.syntax())?;
-                }
-            }
-        }
-        write!(writer, "{}", STRING_TERMINATOR)
-    }
-}
-
-impl Formattable for LiteralBoolean {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
-        write!(writer, "{}", self.value())
-    }
-}
-
-impl Formattable for LiteralFloat {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
-        write!(writer, "{}", self.syntax())
-    }
-}
-
-impl Formattable for LiteralInteger {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
-        write!(writer, "{}", self.syntax())
-    }
-}
-
-impl Formattable for Type {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
-        write!(writer, "{}", self.syntax())
-    }
-}
-
-impl Formattable for Expr {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
-        write!(writer, "{}", self.syntax())
-    }
-}
 
 impl Formattable for Decl {
     fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
@@ -111,11 +56,11 @@ impl Formattable for Decl {
         )?;
 
         if let Some(expr) = self.expr() {
-            let equal_sign = first_child_of_kind(self.syntax(), SyntaxKind::Assignment);
-            format_preceding_comments(&equal_sign, writer, state, true)?;
+            let assignment = first_child_of_kind(self.syntax(), SyntaxKind::Assignment);
+            format_preceding_comments(&assignment, writer, state, true)?;
             state.space_or_indent(writer)?;
-            write!(writer, "{}", equal_sign)?;
-            format_inline_comment(&equal_sign, writer, state, true)?;
+            write!(writer, "{}", assignment)?;
+            format_inline_comment(&assignment, writer, state, true)?;
 
             format_preceding_comments(
                 &SyntaxElement::from(expr.syntax().clone()),

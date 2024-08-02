@@ -152,7 +152,7 @@ workflow seaseq {
         Boolean run_motifs = true
     }
 
-    String pipeline_ver = 'v2.0.0'
+    String pipeline_ver = "v2.0.0"
     ### ---------------------------------------- ###
     ### ------------ S E C T I O N 1 ----------- ###
     ### ------ Pre-process Analysis Files ------ ###
@@ -268,7 +268,7 @@ workflow seaseq {
         call util.mergehtml { input:
             htmlfiles = indv_summarystats.xhtml,
             txtfiles = indv_summarystats.textfile,
-            default_location = 'SAMPLE',
+            default_location = "SAMPLE",
             outputfile = 'AllMapped_' + length(fastqfiles) + '_seaseq-summary-stats.html',
         }
         call samtools.mergebam { input:

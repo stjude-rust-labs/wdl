@@ -99,11 +99,11 @@ impl Formattable for CallInputItem {
         )?;
 
         if let Some(expr) = self.expr() {
-            let equal_sign = first_child_of_kind(self.syntax(), SyntaxKind::Assignment);
-            format_preceding_comments(&equal_sign, writer, state, true)?;
+            let assignment = first_child_of_kind(self.syntax(), SyntaxKind::Assignment);
+            format_preceding_comments(&assignment, writer, state, true)?;
             state.space_or_indent(writer)?;
-            write!(writer, "{}", equal_sign)?;
-            format_inline_comment(&equal_sign, writer, state, true)?;
+            write!(writer, "{}", assignment)?;
+            format_inline_comment(&assignment, writer, state, true)?;
 
             format_preceding_comments(
                 &SyntaxElement::from(expr.syntax().clone()),

@@ -853,14 +853,14 @@ workflow chip {
 
     input {
         # group: runtime_environment
-        String docker = 'encodedcc/chip-seq-pipeline:v2.2.2'
-        String singularity = 'https://encode-pipeline-singularity-image.s3.us-west-2.amazonaws.com/chip-seq-pipeline_v2.2.2.sif'
-        String conda = 'encd-chip'
-        String conda_macs2 = 'encd-chip-macs2'
-        String conda_spp = 'encd-chip-spp'
+        String docker = "encodedcc/chip-seq-pipeline:v2.2.2"
+        String singularity = "https://encode-pipeline-singularity-image.s3.us-west-2.amazonaws.com/chip-seq-pipeline_v2.2.2.sif"
+        String conda = "encd-chip"
+        String conda_macs2 = "encd-chip-macs2"
+        String conda_spp = "encd-chip-spp"
         # group: pipeline_metadata
-        String title = 'Untitled'
-        String description = 'No description'
+        String title = "Untitled"
+        String description = "No description"
         # group: reference_genome
         File? genome_tsv
         String? genome_name
@@ -940,17 +940,17 @@ workflow chip {
         Boolean enable_jsd = true
         Boolean enable_gc_bias = true
         # group: alignment
-        String aligner = 'bowtie2'
+        String aligner = "bowtie2"
         File? custom_align_py
         Boolean use_bwa_mem_for_pe = false
         Int bwa_mem_read_len_limit = 70
         Boolean use_bowtie2_local_mode = false
         Int crop_length = 0
         Int crop_length_tol = 2
-        String trimmomatic_phred_score_format = 'auto'
+        String trimmomatic_phred_score_format = "auto"
         Int xcor_trim_bp = 50
         Boolean use_filt_pe_ta_for_xcor = false
-        String dup_marker = 'picard'
+        String dup_marker = "picard"
         Boolean no_dup_removal = false
         Int mapq_thresh = 30
         Array[String] filter_chrs = []
@@ -1012,7 +1012,7 @@ workflow chip {
         String? gc_bias_picard_java_heap
     }
 
-    String pipeline_ver = 'v2.2.2'
+    String pipeline_ver = "v2.2.2"
     RuntimeEnvironment runtime_environment = {
         'docker': docker, 'singularity': singularity, 'conda': conda
     }
@@ -1168,37 +1168,37 @@ workflow chip {
     # sanity check for inputs
     if (num_rep == 0 && num_ctl == 0) {
         call raise_exception as error_input_data { input:
-            msg = 'No FASTQ/BAM/TAG-ALIGN/PEAK defined in your input JSON. Check if your FASTQs are defined as "chip.fastqs_repX_RY". DO NOT MISS suffix _R1 even for single ended FASTQ.',
+            msg = "No FASTQ/BAM/TAG-ALIGN/PEAK defined in your input JSON. Check if your FASTQs are defined as "chip.fastqs_repX_RY". DO NOT MISS suffix _R1 even for single ended FASTQ.",
             runtime_environment = runtime_environment,
         }
     }
     if (!align_only_ && peak_caller_ == 'spp' && num_ctl == 0) {
         call raise_exception as error_control_required { input:
-            msg = 'SPP requires control inputs. Define control input files ("chip.ctl_*") in an input JSON file.',
+            msg = "SPP requires control inputs. Define control input files ("chip.ctl_*") in an input JSON file.",
             runtime_environment = runtime_environment,
         }
     }
     if ((num_rep_fastq > 0 || num_ctl_fastq > 0) && aligner_ != 'bwa' && aligner_ != 'bowtie2' && aligner_ != 'custom') {
         call raise_exception as error_wrong_aligner { input:
-            msg = 'Choose chip.aligner to align your fastqs. Choices: bwa, bowtie2, custom.',
+            msg = "Choose chip.aligner to align your fastqs. Choices: bwa, bowtie2, custom.",
             runtime_environment = runtime_environment,
         }
     }
     if (aligner_ != 'bwa' && use_bwa_mem_for_pe) {
         call raise_exception as error_use_bwa_mem_for_non_bwa { input:
-            msg = 'To use chip.use_bwa_mem_for_pe, choose bwa for chip.aligner.',
+            msg = "To use chip.use_bwa_mem_for_pe, choose bwa for chip.aligner.",
             runtime_environment = runtime_environment,
         }
     }
     if (aligner_ != 'bowtie2' && use_bowtie2_local_mode) {
         call raise_exception as error_use_bowtie2_local_mode_for_non_bowtie2 { input:
-            msg = 'To use chip.use_bowtie2_local_mode, choose bowtie2 for chip.aligner.',
+            msg = "To use chip.use_bowtie2_local_mode, choose bowtie2 for chip.aligner.",
             runtime_environment = runtime_environment,
         }
     }
     if (aligner_ == 'custom' && ( !defined(custom_align_py) || !defined(custom_aligner_idx_tar) )) {
         call raise_exception as error_custom_aligner { input:
-            msg = 'To use a custom aligner, define chip.custom_align_py and chip.custom_aligner_idx_tar.',
+            msg = "To use a custom aligner, define chip.custom_align_py and chip.custom_aligner_idx_tar.",
             runtime_environment = runtime_environment,
         }
     }
@@ -1215,13 +1215,13 @@ workflow chip {
     }
     if (pipeline_type == 'control' && num_ctl > 0) {
         call raise_exception as error_ctl_input_defined_in_control_mode { input:
-            msg = 'In control mode (chip.pipeline_type: control), do not define ctl_* input variables. Define fastqs_repX_RY instead.',
+            msg = "In control mode (chip.pipeline_type: control), do not define ctl_* input variables. Define fastqs_repX_RY instead.",
             runtime_environment = runtime_environment,
         }
     }
     if (pipeline_type == 'control' && num_rep_fastq == 0) {
         call raise_exception as error_ctl_fastq_input_required_for_control_mode { input:
-            msg = 'Control mode (chip.pipeline_type: control) is for FASTQs only. Define FASTQs in fastqs_repX_RY. Pipeline will recognize them as control FASTQs.',
+            msg = "Control mode (chip.pipeline_type: control) is for FASTQs only. Define FASTQs in fastqs_repX_RY. Pipeline will recognize them as control FASTQs.",
             runtime_environment = runtime_environment,
         }
     }
@@ -1530,7 +1530,7 @@ workflow chip {
         # pool tagaligns from true replicates
         call pool_ta { input:
             tas = ta_,
-            prefix = 'rep',
+            prefix = "rep",
             runtime_environment = runtime_environment,
         }
     }
@@ -1540,7 +1540,7 @@ workflow chip {
         # pool tagaligns from pseudo replicate 1
         call pool_ta as pool_ta_pr1 { input:
             tas = spr.ta_pr1,
-            prefix = 'rep-pr1',
+            prefix = "rep-pr1",
             runtime_environment = runtime_environment,
         }
     }
@@ -1550,7 +1550,7 @@ workflow chip {
         # pool tagaligns from pseudo replicate 2
         call pool_ta as pool_ta_pr2 { input:
             tas = spr.ta_pr2,
-            prefix = 'rep-pr2',
+            prefix = "rep-pr2",
             runtime_environment = runtime_environment,
         }
     }
@@ -1560,7 +1560,7 @@ workflow chip {
         # pool tagaligns from true replicates
         call pool_ta as pool_ta_ctl { input:
             tas = ctl_ta_,
-            prefix = 'ctl',
+            prefix = "ctl",
             runtime_environment = runtime_environment,
         }
     }
@@ -1940,7 +1940,7 @@ workflow chip {
     if (!align_only_ && !true_rep_only && num_rep > 1) {
         # Naive overlap on pooled pseudo replicates
         call overlap as overlap_ppr { input:
-            prefix = 'pooled-pr1_vs_pooled-pr2',
+            prefix = "pooled-pr1_vs_pooled-pr2",
             peak1 = peak_ppr1_,
             peak2 = peak_ppr2_,
             peak_pooled = peak_pooled_,
@@ -1956,7 +1956,7 @@ workflow chip {
     if (!align_only_ && !true_rep_only && num_rep > 1 && enable_idr) {
         # IDR on pooled pseduo replicates
         call idr as idr_ppr { input:
-            prefix = 'pooled-pr1_vs_pooled-pr2',
+            prefix = "pooled-pr1_vs_pooled-pr2",
             peak1 = peak_ppr1_,
             peak2 = peak_ppr2_,
             peak_pooled = peak_pooled_,
@@ -1975,7 +1975,7 @@ workflow chip {
     if (!align_only_ && !true_rep_only && num_rep > 0) {
         # reproducibility QC for overlapping peaks
         call reproducibility as reproducibility_overlap { input:
-            prefix = 'overlap',
+            prefix = "overlap",
             peaks = select_all(overlap.bfilt_overlap_peak),
             peaks_pr = if defined(overlap_pr.bfilt_overlap_peak) then select_first([overlap_pr.bfilt_overlap_peak]) else [],
             peak_ppr = overlap_ppr.bfilt_overlap_peak,
@@ -1987,7 +1987,7 @@ workflow chip {
     if (!align_only_ && !true_rep_only && num_rep > 0 && enable_idr) {
         # reproducibility QC for IDR peaks
         call reproducibility as reproducibility_idr { input:
-            prefix = 'idr',
+            prefix = "idr",
             peaks = select_all(idr.bfilt_idr_peak),
             peaks_pr = if defined(idr_pr.bfilt_idr_peak) then select_first([idr_pr.bfilt_idr_peak]) else [],
             peak_ppr = idr_ppr.bfilt_idr_peak,
@@ -2191,9 +2191,9 @@ task align {
 
     runtime {
         cpu: cpu
-        memory: '${mem_gb} GB'
+        memory: "~{mem_gb} GB"
         time: time_hr
-        disks: 'local-disk ${disk_gb} SSD'
+        disks: "local-disk ~{disk_gb} SSD"
         preemptible: 0
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
@@ -2262,9 +2262,9 @@ task filter {
 
     runtime {
         cpu: cpu
-        memory: '${mem_gb} GB'
+        memory: "~{mem_gb} GB"
         time: time_hr
-        disks: 'local-disk ${disk_gb} SSD'
+        disks: "local-disk ~{disk_gb} SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2308,9 +2308,9 @@ task bam2ta {
 
     runtime {
         cpu: cpu
-        memory: '${mem_gb} GB'
+        memory: "~{mem_gb} GB"
         time: time_hr
-        disks: 'local-disk ${disk_gb} SSD'
+        disks: "local-disk ~{disk_gb} SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2346,9 +2346,9 @@ task spr {
 
     runtime {
         cpu: 1
-        memory: '${mem_gb} GB'
+        memory: "~{mem_gb} GB"
         time: 4
-        disks: 'local-disk ${disk_gb} SSD'
+        disks: "local-disk ~{disk_gb} SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2377,9 +2377,9 @@ task pool_ta {
 
     runtime {
         cpu: 1
-        memory: '8 GB'
+        memory: "8 GB"
         time: 4
-        disks: 'local-disk 100 SSD'
+        disks: "local-disk 100 SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2432,9 +2432,9 @@ task xcor {
 
     runtime {
         cpu: cpu
-        memory: '${mem_gb} GB'
+        memory: "~{mem_gb} GB"
         time: time_hr
-        disks: 'local-disk ${disk_gb} SSD'
+        disks: "local-disk ~{disk_gb} SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2475,9 +2475,9 @@ task jsd {
 
     runtime {
         cpu: cpu
-        memory: '${mem_gb} GB'
+        memory: "~{mem_gb} GB"
         time: time_hr
-        disks: 'local-disk ${disk_gb} SSD'
+        disks: "local-disk ~{disk_gb} SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2522,9 +2522,9 @@ task choose_ctl {
 
     runtime {
         cpu: 1
-        memory: '4 GB'
+        memory: "4 GB"
         time: 4
-        disks: 'local-disk 50 SSD'
+        disks: "local-disk 50 SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2555,9 +2555,9 @@ task count_signal_track {
 
     runtime {
         cpu: 1
-        memory: '${mem_gb} GB'
+        memory: "~{mem_gb} GB"
         time: 4
-        disks: 'local-disk 50 SSD'
+        disks: "local-disk 50 SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2591,9 +2591,9 @@ task subsample_ctl {
 
     runtime {
         cpu: 1
-        memory: '${mem_gb} GB'
+        memory: "~{mem_gb} GB"
         time: 4
-        disks: 'local-disk ${disk_gb} SSD'
+        disks: "local-disk ~{disk_gb} SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2674,9 +2674,9 @@ task call_peak {
 
     runtime {
         cpu: if peak_caller == 'macs2' then 2 else cpu
-        memory: '${mem_gb} GB'
+        memory: "~{mem_gb} GB"
         time: time_hr
-        disks: 'local-disk ${disk_gb} SSD'
+        disks: "local-disk ~{disk_gb} SSD"
         preemptible: 0
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
@@ -2720,9 +2720,9 @@ task macs2_signal_track {
 
     runtime {
         cpu: 1
-        memory: '${mem_gb} GB'
+        memory: "~{mem_gb} GB"
         time: time_hr
-        disks: 'local-disk ${disk_gb} SSD'
+        disks: "local-disk ~{disk_gb} SSD"
         preemptible: 0
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
@@ -2780,9 +2780,9 @@ task idr {
 
     runtime {
         cpu: 1
-        memory: '4 GB'
+        memory: "4 GB"
         time: 4
-        disks: 'local-disk 50 SSD'
+        disks: "local-disk 50 SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2833,9 +2833,9 @@ task overlap {
 
     runtime {
         cpu: 1
-        memory: '4 GB'
+        memory: "4 GB"
         time: 4
-        disks: 'local-disk 50 SSD'
+        disks: "local-disk 50 SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2887,9 +2887,9 @@ task reproducibility {
 
     runtime {
         cpu: 1
-        memory: '4 GB'
+        memory: "4 GB"
         time: 4
-        disks: 'local-disk 50 SSD'
+        disks: "local-disk 50 SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2924,9 +2924,9 @@ task gc_bias {
 
     runtime {
         cpu: 1
-        memory: '${mem_gb} GB'
+        memory: "~{mem_gb} GB"
         time: 6
-        disks: 'local-disk 250 SSD'
+        disks: "local-disk 250 SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3069,9 +3069,9 @@ task qc_report {
 
     runtime {
         cpu: 1
-        memory: '4 GB'
+        memory: "4 GB"
         time: 4
-        disks: 'local-disk 50 SSD'
+        disks: "local-disk 50 SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3122,9 +3122,9 @@ task read_genome_tsv {
     runtime {
         maxRetries: 0
         cpu: 1
-        memory: '2 GB'
+        memory: "2 GB"
         time: 4
-        disks: 'local-disk 10 SSD'
+        disks: "local-disk 10 SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3156,9 +3156,9 @@ task rounded_mean {
 
     runtime {
         cpu: 1
-        memory: '2 GB'
+        memory: "2 GB"
         time: 4
-        disks: 'local-disk 10 SSD'
+        disks: "local-disk 10 SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3177,15 +3177,15 @@ task raise_exception {
     }
 
     output {
-        String error_msg = '${msg}'
+        String error_msg = "~{msg}"
     }
 
     runtime {
         maxRetries: 0
         cpu: 1
-        memory: '2 GB'
+        memory: "2 GB"
         time: 4
-        disks: 'local-disk 10 SSD'
+        disks: "local-disk 10 SSD"
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
