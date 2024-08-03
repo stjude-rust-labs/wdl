@@ -1,5 +1,7 @@
 //! A module for formatting WDL v1 elements.
 
+use std::fmt::Write;
+
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::Expr;
@@ -14,6 +16,12 @@ use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::StringPart;
 use wdl_ast::v1::StructDefinition;
 use wdl_ast::v1::Type;
+use wdl_ast::v1::DefaultOption;
+use wdl_ast::v1::SepOption;
+use wdl_ast::v1::TrueFalseOption;
+use wdl_ast::v1::PlaceholderOption;
+use wdl_ast::v1::StringText;
+use wdl_ast::v1::Placeholder;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::SyntaxElement;
@@ -28,16 +36,223 @@ use super::State;
 use super::NEWLINE;
 use super::STRING_TERMINATOR;
 
-impl Formattable for LiteralString {
+impl Formattable for DefaultOption {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+        let default_word = first_child_of_kind(self.syntax(), SyntaxKind::Ident);
+        format_preceding_comments(&default_word, writer, state, true)?;
+        write!(writer, "{}", default_word)?;
+        format_inline_comment(&default_word, writer, state, true)?;
+
+        let assignment = first_child_of_kind(self.syntax(), SyntaxKind::Assignment);
+        format_preceding_comments(&assignment, writer, state, true)?;
+        state.space_or_indent(writer)?;
+        write!(writer, "{}", assignment)?;
+        format_inline_comment(&assignment, writer, state, true)?;
+
+        let value = self.value();
+        format_preceding_comments(
+            &SyntaxElement::from(value.syntax().clone()),
+            writer,
+            state,
+            true,
+        )?;
+        state.space_or_indent(writer)?;
+        value.format(writer, state)?;
+        format_inline_comment(
+            &SyntaxElement::from(value.syntax().clone()),
+            writer,
+            state,
+            true,
+        )
+    }
+}
+
+impl Formattable for SepOption {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+        let sep_word = first_child_of_kind(self.syntax(), SyntaxKind::Ident);
+        format_preceding_comments(&sep_word, writer, state, true)?;
+        write!(writer, "{}", sep_word)?;
+        format_inline_comment(&sep_word, writer, state, true)?;
+
+        let assignment = first_child_of_kind(self.syntax(), SyntaxKind::Assignment);
+        format_preceding_comments(&assignment, writer, state, true)?;
+        state.space_or_indent(writer)?;
+        write!(writer, "{}", assignment)?;
+        format_inline_comment(&assignment, writer, state, true)?;
+
+        let separator = self.separator();
+        format_preceding_comments(
+            &SyntaxElement::from(separator.syntax().clone()),
+            writer,
+            state,
+            true,
+        )?;
+        state.space_or_indent(writer)?;
+        separator.format(writer, state)?;
+        format_inline_comment(
+            &SyntaxElement::from(separator.syntax().clone()),
+            writer,
+            state,
+            true,
+        )
+    }
+}
+
+impl Formattable for TrueFalseOption {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+        let mut true_clause = String::new();
+        let mut false_clause = String::new();
+        let mut which_clause = None;
+        for child in self.syntax().children_with_tokens() {
+            match child.kind() {
+                SyntaxKind::TrueKeyword => {
+                    which_clause = Some(true);
+
+                    format_preceding_comments(&child, &mut true_clause, state, true)?;
+                    write!(true_clause, "{}", child)?;
+                    format_inline_comment(&child, &mut true_clause, state, true)?;
+                }
+                SyntaxKind::FalseKeyword => {
+                    which_clause = Some(false);
+
+                    format_preceding_comments(&child, &mut false_clause, state, true)?;
+                    write!(false_clause, "{}", child)?;
+                    format_inline_comment(&child, &mut false_clause, state, true)?;
+                }
+                SyntaxKind::Assignment => {
+                    let cur_clause = match which_clause {
+                        Some(true) => &mut true_clause,
+                        Some(false) => &mut false_clause,
+                        _ => unreachable!(
+                            "should have found a true or false keyword before an assignment"
+                        ),
+                    };
+
+                    format_preceding_comments(&child, cur_clause, state, true)?;
+                    state.space_or_indent(cur_clause)?;
+                    write!(cur_clause, "{}", child)?;
+                    format_inline_comment(&child, cur_clause, state, true)?;
+                }
+                SyntaxKind::LiteralStringNode => {
+                    let cur_clause = match which_clause {
+                        Some(true) => &mut true_clause,
+                        Some(false) => &mut false_clause,
+                        _ => unreachable!(
+                            "should have found a true or false keyword before a string"
+                        ),
+                    };
+
+                    format_preceding_comments(&child, cur_clause, state, true)?;
+                    state.space_or_indent(cur_clause)?;
+                    let literal_string = LiteralString::cast(
+                        child
+                            .as_node()
+                            .expect("LiteralStringNode should be a node")
+                            .clone(),
+                    )
+                    .expect("LiteralStringNode should cast to a LiteralString");
+                    literal_string.format(cur_clause, state)?;
+                    format_inline_comment(&child, writer, state, true)?;
+                }
+                SyntaxKind::Whitespace => {
+                    // Ignore
+                }
+                SyntaxKind::Comment => {
+                    // Handled by a call to `format_preceding_comments`
+                    // or `format_inline_comment` in another match arm.
+                }
+                _ => {
+                    unreachable!("Unexpected syntax kind: {:?}", child.kind());
+                }
+            }
+        }
+        write!(writer, "{} {}", true_clause, false_clause)?;
+
+        Ok(())
+    }
+}
+
+impl Formattable for PlaceholderOption {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+        match self {
+            PlaceholderOption::Default(default) => {
+                default.format(writer, state)
+            }
+            PlaceholderOption::Sep(sep) => {
+                sep.format(writer, state)
+            }
+            PlaceholderOption::TrueFalse(true_false) => {
+                true_false.format(writer, state)
+            }
+        }
+    }
+}
+
+impl Formattable for Placeholder {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+        write!(writer, "~{{")?;
+
+        let mut option_present = false;
+        if let Some(option) = self.options().next() {
+            option.format(writer, state)?;
+            option_present = true;
+        }
+
+        let expr = self.expr();
+        if option_present {
+            state.space_or_indent(writer)?;
+        }
+        expr.format(writer, state)?;
+
+        write!(writer, "}}")
+    }
+}
+
+impl Formattable for StringText {
     fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+        let mut iter = self.as_str().chars().peekable();
+        let mut prev_c = None;
+        while let Some(c) = iter.next() {
+            match c {
+                '\\' => {
+                    if let Some(next_c) = iter.peek() {
+                        if *next_c == '\'' {
+                            // Do not write this backslash
+                            prev_c = Some(c);
+                            continue;
+                        }
+                    }
+                    writer.write_char(c)?;
+                }
+                '"' => {
+                    if let Some(pc) = prev_c {
+                        if pc != '\\' {
+                            writer.write_char('\\')?;
+                        }
+                    }
+                    writer.write_char(c)?;
+                }
+                _ => {
+                    writer.write_char(c)?;
+                }
+            }
+            prev_c = Some(c);
+        }
+
+        Ok(())
+    }
+}
+
+impl Formattable for LiteralString {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         write!(writer, "{}", STRING_TERMINATOR)?;
         for part in self.parts() {
             match part {
                 StringPart::Text(text) => {
-                    write!(writer, "{}", text.as_str())?;
+                    text.format(writer, state)?;
                 }
                 StringPart::Placeholder(placeholder) => {
-                    write!(writer, "{}", placeholder.syntax())?;
+                    placeholder.format(writer, state)?;
                 }
             }
         }

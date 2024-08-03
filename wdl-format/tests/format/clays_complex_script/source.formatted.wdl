@@ -13,7 +13,7 @@ task a_task {
         # Here is a comment between `meta` and the parenthesis.
     {
         # Here is a comment within `meta`.
-        an_escaped_string: "bar \\ \n \t \' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
+        an_escaped_string: "bar \\ \n \t ' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
         a_true: true
         a_false: false
         an_integer: 42
@@ -36,7 +36,7 @@ task a_task {
         # Here is a comment between `parameter_meta` and the parenthesis.
     {
         # Here is a comment within `parameter_meta`.
-        an_escaped_string: "bar \\ \n \t \' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
+        an_escaped_string: "bar \\ \n \t ' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
         a_true: true
         a_false: false
         an_integer: 42
@@ -98,7 +98,7 @@ workflow hello {
         # Here is a comment between `meta` and the parenthesis.
     {
         # Here is a comment within `meta`.
-        an_escaped_string: "bar \\ \n \t \' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
+        an_escaped_string: "bar \\ \n \t ' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
         a_true: true
         a_false: false
         an_integer: 42
@@ -121,7 +121,7 @@ workflow hello {
         # Here is a comment between `parameter_meta` and the parenthesis.
     {
         # Here is a comment within `parameter_meta`.
-        an_escaped_string: "bar \\ \n \t \' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
+        an_escaped_string: "bar \\ \n \t ' \" \~ \$ \000 \xFF \uFFFF \UFFFFFFFF"
         a_true: true
         a_false: false
         an_integer: 42
