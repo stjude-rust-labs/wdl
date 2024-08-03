@@ -36,31 +36,26 @@ impl Formattable for CommandSection {
         write!(writer, "{}", command_keyword)?;
         format_inline_comment(&command_keyword, writer, state, true)?;
 
+        // coerce all command sections to use heredoc ('<<<>>>>') syntax
+        // (as opposed to bracket ('{}') syntax)
+        let mut open_section = None;
         if self.is_heredoc() {
-            let open_heredoc = first_child_of_kind(self.syntax(), SyntaxKind::OpenHeredoc);
-            format_preceding_comments(&open_heredoc, writer, state, true)?;
-            // Open braces should ignore the "+1 rule" followed by other interrupted
-            // elements.
-            if state.interrupted() {
-                state.reset_interrupted();
-                state.indent(writer)?;
-            } else {
-                write!(writer, "{}", SPACE)?;
-            }
-            write!(writer, "{}", open_heredoc)?;
+            open_section = Some(first_child_of_kind(self.syntax(), SyntaxKind::OpenHeredoc));
         } else {
-            let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
-            format_preceding_comments(&open_brace, writer, state, true)?;
-            // Open braces should ignore the "+1 rule" followed by other interrupted
-            // elements.
-            if state.interrupted() {
-                state.reset_interrupted();
-                state.indent(writer)?;
-            } else {
-                write!(writer, "{}", SPACE)?;
-            }
-            write!(writer, "{}", open_brace)?;
+            open_section = Some(first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace));
         }
+        let open_section = open_section.expect("command section should have heredoc or bracket open");
+        format_preceding_comments(&open_section, writer, state, true)?;
+
+        // Open braces should ignore the "+1 rule" followed by other interrupted
+        // elements.
+        if state.interrupted() {
+            state.reset_interrupted();
+            state.indent(writer)?;
+        } else {
+            write!(writer, "{}", SPACE)?;
+        }
+        write!(writer, "<<<")?;
 
         for part in self.parts() {
             match part {
@@ -68,16 +63,12 @@ impl Formattable for CommandSection {
                     write!(writer, "{}", t.as_str())?;
                 }
                 CommandPart::Placeholder(p) => {
-                    write!(writer, "{}", p.syntax())?;
+                    p.format(writer, state)?;
                 }
             }
         }
 
-        if self.is_heredoc() {
-            write!(writer, ">>>")?;
-        } else {
-            write!(writer, "}}")?;
-        }
+        write!(writer, ">>>")?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
             writer,

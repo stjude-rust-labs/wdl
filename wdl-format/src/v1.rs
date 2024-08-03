@@ -184,6 +184,8 @@ impl Formattable for PlaceholderOption {
 
 impl Formattable for Placeholder {
     fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+        // coerce all placeholders into '~{}' placeholders
+        // (as opposed to '${}' placeholders)
         write!(writer, "~{{")?;
 
         let mut option_present = false;
