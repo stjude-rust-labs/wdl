@@ -44,7 +44,8 @@ impl Formattable for CommandSection {
         } else {
             open_section = Some(first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace));
         }
-        let open_section = open_section.expect("command section should have heredoc or bracket open");
+        let open_section =
+            open_section.expect("command section should have heredoc or bracket open");
         format_preceding_comments(&open_section, writer, state, true)?;
 
         // Open braces should ignore the "+1 rule" followed by other interrupted
