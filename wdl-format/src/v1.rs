@@ -3,6 +3,7 @@
 use std::fmt::Write;
 
 use wdl_ast::v1::Decl;
+use wdl_ast::v1::DefaultOption;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::Expr;
 use wdl_ast::v1::HintsItem;
@@ -13,15 +14,14 @@ use wdl_ast::v1::LiteralFloat;
 use wdl_ast::v1::LiteralInteger;
 use wdl_ast::v1::LiteralString;
 use wdl_ast::v1::OutputSection;
-use wdl_ast::v1::StringPart;
-use wdl_ast::v1::StructDefinition;
-use wdl_ast::v1::Type;
-use wdl_ast::v1::DefaultOption;
-use wdl_ast::v1::SepOption;
-use wdl_ast::v1::TrueFalseOption;
-use wdl_ast::v1::PlaceholderOption;
-use wdl_ast::v1::StringText;
 use wdl_ast::v1::Placeholder;
+use wdl_ast::v1::PlaceholderOption;
+use wdl_ast::v1::SepOption;
+use wdl_ast::v1::StringPart;
+use wdl_ast::v1::StringText;
+use wdl_ast::v1::StructDefinition;
+use wdl_ast::v1::TrueFalseOption;
+use wdl_ast::v1::Type;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::SyntaxElement;
@@ -175,15 +175,9 @@ impl Formattable for TrueFalseOption {
 impl Formattable for PlaceholderOption {
     fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
         match self {
-            PlaceholderOption::Default(default) => {
-                default.format(writer, state)
-            }
-            PlaceholderOption::Sep(sep) => {
-                sep.format(writer, state)
-            }
-            PlaceholderOption::TrueFalse(true_false) => {
-                true_false.format(writer, state)
-            }
+            PlaceholderOption::Default(default) => default.format(writer, state),
+            PlaceholderOption::Sep(sep) => sep.format(writer, state),
+            PlaceholderOption::TrueFalse(true_false) => true_false.format(writer, state),
         }
     }
 }
