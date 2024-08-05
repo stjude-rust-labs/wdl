@@ -139,6 +139,33 @@ pub fn first_child_of_kind(node: &SyntaxNode, kind: SyntaxKind) -> SyntaxElement
         .unwrap_or_else(|| panic!("Expected to find a child of kind: {kind:?}"))
 }
 
+impl Formattable for Document {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+        let ast = self.ast();
+        let ast = ast.as_v1().expect("Document should be a v1 document");
+        let version_statement = self
+            .version_statement()
+            .expect("Document should have a version statement");
+        version_statement.format(writer, state)?;
+        let mut imports = ast.imports().collect::<Vec<_>>();
+        if !imports.is_empty() {
+            write!(writer, "{}", NEWLINE)?;
+        }
+        imports.sort_by(import::sort_imports);
+        for import in imports {
+            import.format(writer, state)?;
+        }
+        for item in ast.items() {
+            if item.syntax().kind() == SyntaxKind::ImportStatementNode {
+                continue;
+            }
+            write!(writer, "{}", NEWLINE)?;
+            item.format(writer, state)?;
+        }
+        Ok(())
+    }
+}
+
 /// Format a WDL document.
 pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
     let (document, diagnostics) = Document::parse(code);
@@ -156,44 +183,11 @@ pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
     let mut result = String::new();
     let mut state = State::default();
 
-    let version_statement = document
-        .version_statement()
-        .expect("Document should have a version statement");
-    match version_statement.format(&mut result, &mut state) {
+    match document.format(&mut result, &mut state) {
         Ok(_) => {}
-        Err(_) => {
-            return Err(vec![Diagnostic::error(
-                "failed to format version statement",
-            )]);
-        }
-    }
-
-    let ast = document.ast();
-    let ast = ast.as_v1().expect("Document should be a v1 document");
-    let mut imports = ast.imports().collect::<Vec<_>>();
-    if !imports.is_empty() {
-        result.push_str(NEWLINE);
-    }
-    imports.sort_by(import::sort_imports);
-    for import in imports {
-        match import.format(&mut result, &mut state) {
-            Ok(_) => {}
-            Err(_) => {
-                return Err(vec![Diagnostic::error("failed to format import statement")]);
-            }
-        }
-    }
-
-    for item in ast.items() {
-        if item.syntax().kind() == SyntaxKind::ImportStatementNode {
-            continue;
-        }
-        result.push_str(NEWLINE);
-        match item.format(&mut result, &mut state) {
-            Ok(_) => {}
-            Err(_) => {
-                return Err(vec![Diagnostic::error("failed to format document item")]);
-            }
+        Err(error) => {
+            let msg = format!("Failed to format document: {}", error);
+            return Err(vec![Diagnostic::error(msg)]);
         }
     }
 
