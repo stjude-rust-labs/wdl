@@ -71,10 +71,6 @@ impl Formattable for VersionStatement {
                     )
                     .expect("Comment should cast to a comment");
                     comment.format(comment_buffer, state)?;
-                    // If the comment does not start with "##", prepend a '#' to it
-                    if !comment_buffer.starts_with("##") && !comment_buffer.starts_with("#@") {
-                        comment_buffer.insert(0, '#');
-                    }
                     if comment_buffer.starts_with("#@") {
                         lint_directives.push(comment_buffer.clone());
                     } else {

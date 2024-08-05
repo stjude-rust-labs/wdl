@@ -1,8 +1,9 @@
-# preamble
+## # Header
+# regular comment will be left as is
 #@ except: CommentWhitespace, DeprecatedObject, DescriptionMissing
 #@ except: InputSorting, MatchingParameterMeta, NonmatchingOutput
 
-# preamble
+## part of preamble
 version 1.2
 
 #@ except: MissingMetas
