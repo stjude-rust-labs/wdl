@@ -58,9 +58,11 @@ workflow seaseq {
     input {
         # group: reference_genome
         File reference
+        File? spikein_reference
         File? blacklist
         File gtf
         Array[File]? bowtie_index
+        Array[File]? spikein_bowtie_index
         Array[File]? motif_databases
 
         # group: input_genomic_data
@@ -176,6 +178,32 @@ workflow seaseq {
     }
     Array[File] actual_bowtie_index = select_first([bowtie_idx_2.bowtie_indexes, bowtie_idx.bowtie_indexes, bowtie_index])
 
+    # Spike-in DNA
+    #3. Bowtie INDEX files if not provided
+    String string_spikein = "1"
+    Array[String] string_spikein_buffer = [1]
+    if ( !defined(spikein_bowtie_index) && defined(spikein_reference) ) {
+        # create bowtie index on spikein genome
+        call bowtie.index as spikein_bowtie_idx {
+            input :
+                reference=select_first([spikein_reference, string_spikein])
+        }
+    }
+
+    #4. Make sure indexes are six else build indexes for Spike-in DNA
+    if ( defined(spikein_bowtie_index) ) {
+        # check total number of bowtie indexes provided
+        Array[File] int_spikein_bowtie_index = select_first([spikein_bowtie_index, string_spikein_buffer])
+        if ( length(int_spikein_bowtie_index) != 6 ) {
+            # create bowtie index if 6 index files aren't provided
+            call bowtie.index as spikein_bowtie_idx_2 {
+                input :
+                    reference=select_first([spikein_reference, string_spikein])
+            }
+        }
+    }
+    Array[File] actual_spikein_bowtie_index = select_first([spikein_bowtie_idx_2.bowtie_indexes, spikein_bowtie_idx.bowtie_indexes, spikein_bowtie_index, string_spikein_buffer])
+
     # FASTA faidx and chromsizes and effective genome size
     call samtools.faidx as samtools_faidx {
         # create FASTA index and chrom sizes files
@@ -196,16 +224,46 @@ workflow seaseq {
 
         Array[File] sample_fastqfile = s_fastq
     }
-    Array[File] fastqfiles = flatten(select_all([sample_srafile, sample_fastqfile]))
+    Array[File] original_fastqfiles = flatten(select_all([sample_srafile, sample_fastqfile]))
+
+### ------------------------------------------------- ###
+### ---------------- S E C T I O N 1 ---------------- ###
+### ----------- B: remove Spike-IN reads ------------ ###
+### ------------------------------------------------- ###
+
+    # if multiple fastqfiles are provided
+    Boolean multi_fastq = if length(original_fastqfiles) > 1 then true else false
+    Boolean one_fastq = if length(original_fastqfiles) == 1 then true else false
+
+    if ( defined(spikein_bowtie_index) || defined(spikein_reference) ) {
+        scatter (eachfastq in original_fastqfiles) {
+            call fastqc.fastqc as spikein_indv_fastqc {
+                input :
+                    inputfile=eachfastq,
+                    default_location=if (one_fastq) then sub(basename(eachfastq),'.fastq.gz|.fq.gz','') + '/SpikeIn/FastQC' else 'SAMPLE/' + sub(basename(eachfastq),'.fastq.gz|.fq.gz','') + '/SpikeIn/FastQC'
+            }
+            call util.basicfastqstats as spikein_indv_bfs {
+                input :
+                    fastqfile=eachfastq,
+                    default_location=if (one_fastq) then sub(basename(eachfastq),'.fastq.gz|.fq.gz','') + '/SpikeIn/SummaryStats' else 'SAMPLE/' + sub(basename(eachfastq),'.fastq.gz|.fq.gz','') + '/SpikeIn/SummaryStats'
+            }
+            call bowtie.spikein_SE as spikein_indv_map {
+                input :
+                    fastqfile=eachfastq,
+                    index_files=actual_spikein_bowtie_index,
+                    metricsfile=spikein_indv_bfs.metrics_out,
+                    default_location=if (one_fastq) then sub(basename(eachfastq),'.fastq.gz|.fq.gz','') + '/SpikeIn/SummaryStats' else 'SAMPLE/' + sub(basename(eachfastq),'.fastq.gz|.fq.gz','') + '/SpikeIn/SummaryStats'
+            }
+        }
+
+        Array[File] spikein_fastqfiles = spikein_indv_map.unaligned
+    }
+    Array[File] fastqfiles = select_first([spikein_fastqfiles, original_fastqfiles])
 
 ### ------------------------------------------------- ###
 ### ---------------- S E C T I O N 2 ---------------- ###
 ### ---- A: analysis if multiple FASTQs provided ---- ###
 ### ------------------------------------------------- ###
-
-    # if multiple fastqfiles are provided
-    Boolean multi_fastq = if length(fastqfiles) > 1 then true else false
-    Boolean one_fastq = if length(fastqfiles) == 1 then true else false
 
     if ( multi_fastq ) {
         scatter (eachfastq in fastqfiles) {
@@ -661,6 +719,11 @@ workflow seaseq {
     } # end if multi_fastq
 
     output {
+        #SPIKE-IN
+        Array[File?]? spikein_indv_s_htmlfile = spikein_indv_fastqc.htmlfile
+        Array[File?]? spikein_indv_s_zipfile = spikein_indv_fastqc.zipfile
+        Array[File?]? spikein_s_metrics_out = spikein_indv_map.mapping_output
+
         #FASTQC
         Array[File?]? indv_s_htmlfile = indv_fastqc.htmlfile
         Array[File?]? indv_s_zipfile = indv_fastqc.zipfile
