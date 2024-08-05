@@ -27,7 +27,7 @@ use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 
 use super::Formattable;
-use super::State;
+use super::Formatter;
 use super::NEWLINE;
 
 /// Inline comment space constant used for formatting. Inline comments should
@@ -35,7 +35,11 @@ use super::NEWLINE;
 pub const INLINE_COMMENT_SPACE: &str = "  ";
 
 impl Formattable for Comment {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        _formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         let comment = self.as_str().trim();
         write!(writer, "{}{}", comment, NEWLINE)
     }
@@ -49,7 +53,7 @@ impl Formattable for Comment {
 pub fn format_preceding_comments<T: std::fmt::Write>(
     element: &SyntaxElement,
     writer: &mut T,
-    state: &mut State,
+    formatter: &mut Formatter,
     would_be_interrupting: bool,
 ) -> std::fmt::Result {
     // This walks _backwards_ through the syntax tree to find comments
@@ -57,7 +61,7 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
     // correct order.
     let mut reversed_text = Vec::new();
     let mut inner_buffer = String::new();
-    let began_interrupted = state.interrupted();
+    let began_interrupted = formatter.interrupted();
     let mut comments_found = false;
 
     let mut prev = element.prev_sibling_or_token();
@@ -77,7 +81,7 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
                                 comments_found = true;
 
                                 if would_be_interrupting {
-                                    state.interrupt();
+                                    formatter.interrupt();
                                 }
 
                                 let comment = Comment::cast(
@@ -85,7 +89,7 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
                                 )
                                 .expect("Comment should cast to a comment");
 
-                                comment.format(&mut inner_buffer, state)?;
+                                comment.format(&mut inner_buffer, formatter)?;
                                 if inner_buffer.starts_with("## ") {
                                     inner_buffer.remove(0);
                                 }
@@ -129,7 +133,7 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
     for line in reversed_text.iter().rev() {
         if line.contains('#') {
             comment_processed = true;
-            state.indent(writer)?;
+            formatter.indent(writer)?;
         }
         if comment_processed {
             write!(writer, "{}", line)?;
@@ -145,7 +149,7 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
 pub fn format_inline_comment<T: std::fmt::Write>(
     element: &SyntaxElement,
     writer: &mut T,
-    state: &mut State,
+    formatter: &mut Formatter,
     would_be_interrupting: bool,
 ) -> std::fmt::Result {
     let mut next = element.next_sibling_or_token();
@@ -157,10 +161,10 @@ pub fn format_inline_comment<T: std::fmt::Write>(
                     Comment::cast(cur.as_token().expect("Comment should be a token").clone())
                         .expect("Comment should cast to a comment");
                 if would_be_interrupting {
-                    state.interrupt();
+                    formatter.interrupt();
                 }
                 let mut tmp_buffer = String::new();
-                comment.format(&mut tmp_buffer, state)?;
+                comment.format(&mut tmp_buffer, formatter)?;
                 if tmp_buffer.starts_with("## ") {
                     tmp_buffer.remove(0);
                 }

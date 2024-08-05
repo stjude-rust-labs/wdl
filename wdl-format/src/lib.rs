@@ -23,16 +23,16 @@ use wdl_ast::Version;
 use wdl_ast::VersionStatement;
 
 mod comments;
+mod formatter;
 mod import;
 mod metadata;
-mod state;
 mod task;
 mod v1;
 mod workflow;
 
 use comments::format_inline_comment;
 use comments::format_preceding_comments;
-use state::State;
+use formatter::Formatter;
 
 /// Newline constant used for formatting on windows platforms.
 #[cfg(windows)]
@@ -46,17 +46,29 @@ const STRING_TERMINATOR: char = '"';
 /// A trait for elements that can be formatted.
 pub trait Formattable {
     /// Format the element and write it to the writer.
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result;
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result;
 }
 
 impl Formattable for Version {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        _formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         write!(writer, "{}", self.as_str())
     }
 }
 
 impl Formattable for VersionStatement {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         let mut preamble_comments = Vec::new();
         let mut lint_directives = Vec::new();
         let comment_buffer = &mut String::new();
@@ -70,7 +82,7 @@ impl Formattable for VersionStatement {
                             .clone(),
                     )
                     .expect("Comment should cast to a comment");
-                    comment.format(comment_buffer, state)?;
+                    comment.format(comment_buffer, formatter)?;
                     if comment_buffer.starts_with("#@") {
                         lint_directives.push(comment_buffer.clone());
                     } else {
@@ -102,29 +114,33 @@ impl Formattable for VersionStatement {
 
         let version_keyword = first_child_of_kind(self.syntax(), SyntaxKind::VersionKeyword);
         write!(writer, "{}", version_keyword)?;
-        format_inline_comment(&version_keyword, writer, state, true)?;
+        format_inline_comment(&version_keyword, writer, formatter, true)?;
 
         let version = self.version();
 
         format_preceding_comments(
             &SyntaxElement::from(version.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )?;
-        state.space_or_indent(writer)?;
-        version.format(writer, state)?;
+        formatter.space_or_indent(writer)?;
+        version.format(writer, formatter)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )
     }
 }
 
 impl Formattable for Ident {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        _formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         write!(writer, "{}", self.as_str())
     }
 }
@@ -140,44 +156,33 @@ pub fn first_child_of_kind(node: &SyntaxNode, kind: SyntaxKind) -> SyntaxElement
 }
 
 impl Formattable for Document {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         let ast = self.ast();
         let ast = ast.as_v1().expect("Document should be a v1 document");
         let version_statement = self
             .version_statement()
             .expect("Document should have a version statement");
-        version_statement.format(writer, state)?;
+        version_statement.format(writer, formatter)?;
         let mut imports = ast.imports().collect::<Vec<_>>();
         if !imports.is_empty() {
             write!(writer, "{}", NEWLINE)?;
         }
         imports.sort_by(import::sort_imports);
         for import in imports {
-            import.format(writer, state)?;
+            import.format(writer, formatter)?;
         }
         for item in ast.items() {
             if item.syntax().kind() == SyntaxKind::ImportStatementNode {
                 continue;
             }
             write!(writer, "{}", NEWLINE)?;
-            item.format(writer, state)?;
+            item.format(writer, formatter)?;
         }
         Ok(())
-    }
-}
-
-/// A formatter for WDL elements.
-#[derive(Debug, Default)]
-pub struct Formatter(State);
-
-impl Formatter {
-    /// Format an element.
-    pub fn format<F: std::fmt::Write, T: Formattable>(
-        &mut self,
-        element: T,
-        writer: &mut F,
-    ) -> std::fmt::Result {
-        element.format(writer, &mut self.0)
     }
 }
 
@@ -198,7 +203,7 @@ pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
     let mut result = String::new();
     let formatter = &mut Formatter::default();
 
-    match formatter.format(document, &mut result) {
+    match formatter.format(&document, &mut result) {
         Ok(_) => {}
         Err(error) => {
             let msg = format!("Failed to format document: {}", error);

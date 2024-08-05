@@ -30,76 +30,88 @@ use wdl_ast::SyntaxKind;
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
 use super::first_child_of_kind;
-use super::state::SPACE;
+use super::formatter::SPACE;
 use super::Formattable;
-use super::State;
+use super::Formatter;
 use super::NEWLINE;
 use super::STRING_TERMINATOR;
 
 impl Formattable for DefaultOption {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         let default_word = first_child_of_kind(self.syntax(), SyntaxKind::Ident);
-        format_preceding_comments(&default_word, writer, state, true)?;
+        format_preceding_comments(&default_word, writer, formatter, true)?;
         write!(writer, "{}", default_word)?;
-        format_inline_comment(&default_word, writer, state, true)?;
+        format_inline_comment(&default_word, writer, formatter, true)?;
 
         let assignment = first_child_of_kind(self.syntax(), SyntaxKind::Assignment);
-        format_preceding_comments(&assignment, writer, state, true)?;
-        state.space_or_indent(writer)?;
+        format_preceding_comments(&assignment, writer, formatter, true)?;
+        formatter.space_or_indent(writer)?;
         write!(writer, "{}", assignment)?;
-        format_inline_comment(&assignment, writer, state, true)?;
+        format_inline_comment(&assignment, writer, formatter, true)?;
 
         let value = self.value();
         format_preceding_comments(
             &SyntaxElement::from(value.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )?;
-        state.space_or_indent(writer)?;
-        value.format(writer, state)?;
+        formatter.space_or_indent(writer)?;
+        value.format(writer, formatter)?;
         format_inline_comment(
             &SyntaxElement::from(value.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )
     }
 }
 
 impl Formattable for SepOption {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         let sep_word = first_child_of_kind(self.syntax(), SyntaxKind::Ident);
-        format_preceding_comments(&sep_word, writer, state, true)?;
+        format_preceding_comments(&sep_word, writer, formatter, true)?;
         write!(writer, "{}", sep_word)?;
-        format_inline_comment(&sep_word, writer, state, true)?;
+        format_inline_comment(&sep_word, writer, formatter, true)?;
 
         let assignment = first_child_of_kind(self.syntax(), SyntaxKind::Assignment);
-        format_preceding_comments(&assignment, writer, state, true)?;
-        state.space_or_indent(writer)?;
+        format_preceding_comments(&assignment, writer, formatter, true)?;
+        formatter.space_or_indent(writer)?;
         write!(writer, "{}", assignment)?;
-        format_inline_comment(&assignment, writer, state, true)?;
+        format_inline_comment(&assignment, writer, formatter, true)?;
 
         let separator = self.separator();
         format_preceding_comments(
             &SyntaxElement::from(separator.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )?;
-        state.space_or_indent(writer)?;
-        separator.format(writer, state)?;
+        formatter.space_or_indent(writer)?;
+        separator.format(writer, formatter)?;
         format_inline_comment(
             &SyntaxElement::from(separator.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )
     }
 }
 
 impl Formattable for TrueFalseOption {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         let mut true_clause = String::new();
         let mut false_clause = String::new();
         let mut which_clause = None;
@@ -108,16 +120,16 @@ impl Formattable for TrueFalseOption {
                 SyntaxKind::TrueKeyword => {
                     which_clause = Some(true);
 
-                    format_preceding_comments(&child, &mut true_clause, state, true)?;
+                    format_preceding_comments(&child, &mut true_clause, formatter, true)?;
                     write!(true_clause, "{}", child)?;
-                    format_inline_comment(&child, &mut true_clause, state, true)?;
+                    format_inline_comment(&child, &mut true_clause, formatter, true)?;
                 }
                 SyntaxKind::FalseKeyword => {
                     which_clause = Some(false);
 
-                    format_preceding_comments(&child, &mut false_clause, state, true)?;
+                    format_preceding_comments(&child, &mut false_clause, formatter, true)?;
                     write!(false_clause, "{}", child)?;
-                    format_inline_comment(&child, &mut false_clause, state, true)?;
+                    format_inline_comment(&child, &mut false_clause, formatter, true)?;
                 }
                 SyntaxKind::Assignment => {
                     let cur_clause = match which_clause {
@@ -128,10 +140,10 @@ impl Formattable for TrueFalseOption {
                         ),
                     };
 
-                    format_preceding_comments(&child, cur_clause, state, true)?;
-                    state.space_or_indent(cur_clause)?;
+                    format_preceding_comments(&child, cur_clause, formatter, true)?;
+                    formatter.space_or_indent(cur_clause)?;
                     write!(cur_clause, "{}", child)?;
-                    format_inline_comment(&child, cur_clause, state, true)?;
+                    format_inline_comment(&child, cur_clause, formatter, true)?;
                 }
                 SyntaxKind::LiteralStringNode => {
                     let cur_clause = match which_clause {
@@ -142,8 +154,8 @@ impl Formattable for TrueFalseOption {
                         ),
                     };
 
-                    format_preceding_comments(&child, cur_clause, state, true)?;
-                    state.space_or_indent(cur_clause)?;
+                    format_preceding_comments(&child, cur_clause, formatter, true)?;
+                    formatter.space_or_indent(cur_clause)?;
                     let literal_string = LiteralString::cast(
                         child
                             .as_node()
@@ -151,8 +163,8 @@ impl Formattable for TrueFalseOption {
                             .clone(),
                     )
                     .expect("LiteralStringNode should cast to a LiteralString");
-                    literal_string.format(cur_clause, state)?;
-                    format_inline_comment(&child, writer, state, true)?;
+                    literal_string.format(cur_clause, formatter)?;
+                    format_inline_comment(&child, writer, formatter, true)?;
                 }
                 SyntaxKind::Whitespace => {
                     // Ignore
@@ -173,39 +185,47 @@ impl Formattable for TrueFalseOption {
 }
 
 impl Formattable for PlaceholderOption {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         match self {
-            PlaceholderOption::Default(default) => default.format(writer, state),
-            PlaceholderOption::Sep(sep) => sep.format(writer, state),
-            PlaceholderOption::TrueFalse(true_false) => true_false.format(writer, state),
+            PlaceholderOption::Default(default) => default.format(writer, formatter),
+            PlaceholderOption::Sep(sep) => sep.format(writer, formatter),
+            PlaceholderOption::TrueFalse(true_false) => true_false.format(writer, formatter),
         }
     }
 }
 
 impl Formattable for Placeholder {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         // coerce all placeholders into '~{}' placeholders
         // (as opposed to '${}' placeholders)
         write!(writer, "~{{")?;
 
         let mut option_present = false;
         if let Some(option) = self.options().next() {
-            option.format(writer, state)?;
+            option.format(writer, formatter)?;
             option_present = true;
         }
 
         let expr = self.expr();
         if option_present {
-            state.space_or_indent(writer)?;
+            formatter.space_or_indent(writer)?;
         }
-        expr.format(writer, state)?;
+        expr.format(writer, formatter)?;
 
         write!(writer, "}}")
     }
 }
 
 impl Formattable for StringText {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut Formatter) -> std::fmt::Result {
         let mut iter = self.as_str().chars().peekable();
         let mut prev_c = None;
         while let Some(c) = iter.next() {
@@ -240,15 +260,19 @@ impl Formattable for StringText {
 }
 
 impl Formattable for LiteralString {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         write!(writer, "{}", STRING_TERMINATOR)?;
         for part in self.parts() {
             match part {
                 StringPart::Text(text) => {
-                    text.format(writer, state)?;
+                    text.format(writer, formatter)?;
                 }
                 StringPart::Placeholder(placeholder) => {
-                    placeholder.format(writer, state)?;
+                    placeholder.format(writer, formatter)?;
                 }
             }
         }
@@ -257,51 +281,55 @@ impl Formattable for LiteralString {
 }
 
 impl Formattable for LiteralBoolean {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut Formatter) -> std::fmt::Result {
         write!(writer, "{}", self.value()) // TODO
     }
 }
 
 impl Formattable for LiteralFloat {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut Formatter) -> std::fmt::Result {
         write!(writer, "{}", self.syntax()) // TODO
     }
 }
 
 impl Formattable for LiteralInteger {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut Formatter) -> std::fmt::Result {
         write!(writer, "{}", self.syntax()) // TODO
     }
 }
 
 impl Formattable for Type {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut Formatter) -> std::fmt::Result {
         write!(writer, "{}", self.syntax()) // TODO
     }
 }
 
 impl Formattable for Expr {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut Formatter) -> std::fmt::Result {
         write!(writer, "{}", self.syntax()) // TODO
     }
 }
 
 impl Formattable for Decl {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )?;
 
         let ty = self.ty();
-        state.indent(writer)?;
-        ty.format(writer, state)?;
+        formatter.indent(writer)?;
+        ty.format(writer, formatter)?;
         format_inline_comment(
             &SyntaxElement::from(ty.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )?;
 
@@ -309,317 +337,341 @@ impl Formattable for Decl {
         format_preceding_comments(
             &SyntaxElement::from(name.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )?;
-        state.space_or_indent(writer)?;
-        name.format(writer, state)?;
+        formatter.space_or_indent(writer)?;
+        name.format(writer, formatter)?;
         format_inline_comment(
             &SyntaxElement::from(name.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )?;
 
         if let Some(expr) = self.expr() {
             let assignment = first_child_of_kind(self.syntax(), SyntaxKind::Assignment);
-            format_preceding_comments(&assignment, writer, state, true)?;
-            state.space_or_indent(writer)?;
+            format_preceding_comments(&assignment, writer, formatter, true)?;
+            formatter.space_or_indent(writer)?;
             write!(writer, "{}", assignment)?;
-            format_inline_comment(&assignment, writer, state, true)?;
+            format_inline_comment(&assignment, writer, formatter, true)?;
 
             format_preceding_comments(
                 &SyntaxElement::from(expr.syntax().clone()),
                 writer,
-                state,
+                formatter,
                 true,
             )?;
-            state.space_or_indent(writer)?;
-            expr.format(writer, state)?;
+            formatter.space_or_indent(writer)?;
+            expr.format(writer, formatter)?;
         }
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )
     }
 }
 
 impl Formattable for InputSection {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )?;
 
         let input_keyword = first_child_of_kind(self.syntax(), SyntaxKind::InputKeyword);
-        state.indent(writer)?;
+        formatter.indent(writer)?;
         write!(writer, "{}", input_keyword)?;
-        format_inline_comment(&input_keyword, writer, state, true)?;
+        format_inline_comment(&input_keyword, writer, formatter, true)?;
 
         let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
-        format_preceding_comments(&open_brace, writer, state, true)?;
+        format_preceding_comments(&open_brace, writer, formatter, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
-        if state.interrupted() {
-            state.reset_interrupted();
-            state.indent(writer)?;
+        if formatter.interrupted() {
+            formatter.reset_interrupted();
+            formatter.indent(writer)?;
         } else {
             write!(writer, "{}", SPACE)?;
         }
         write!(writer, "{}", open_brace)?;
-        format_inline_comment(&open_brace, writer, state, false)?;
+        format_inline_comment(&open_brace, writer, formatter, false)?;
 
-        state.increment_indent();
+        formatter.increment_indent();
 
         for decl in self.declarations() {
-            decl.format(writer, state)?;
+            decl.format(writer, formatter)?;
         }
 
-        state.decrement_indent();
+        formatter.decrement_indent();
 
         let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
-        format_preceding_comments(&close_brace, writer, state, false)?;
-        state.indent(writer)?;
+        format_preceding_comments(&close_brace, writer, formatter, false)?;
+        formatter.indent(writer)?;
         write!(writer, "{}", close_brace)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )
     }
 }
 
 impl Formattable for OutputSection {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )?;
 
         let output_keyword = first_child_of_kind(self.syntax(), SyntaxKind::OutputKeyword);
-        state.indent(writer)?;
+        formatter.indent(writer)?;
         write!(writer, "{}", output_keyword)?;
-        format_inline_comment(&output_keyword, writer, state, true)?;
+        format_inline_comment(&output_keyword, writer, formatter, true)?;
 
         let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
-        format_preceding_comments(&open_brace, writer, state, true)?;
+        format_preceding_comments(&open_brace, writer, formatter, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
-        if state.interrupted() {
-            state.reset_interrupted();
-            state.indent(writer)?;
+        if formatter.interrupted() {
+            formatter.reset_interrupted();
+            formatter.indent(writer)?;
         } else {
             write!(writer, "{}", SPACE)?;
         }
         write!(writer, "{}", open_brace)?;
-        format_inline_comment(&open_brace, writer, state, false)?;
+        format_inline_comment(&open_brace, writer, formatter, false)?;
 
-        state.increment_indent();
+        formatter.increment_indent();
 
         for decl in self.declarations() {
-            Decl::Bound(decl).format(writer, state)?;
+            Decl::Bound(decl).format(writer, formatter)?;
         }
 
-        state.decrement_indent();
+        formatter.decrement_indent();
 
         let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
-        format_preceding_comments(&close_brace, writer, state, false)?;
-        state.indent(writer)?;
+        format_preceding_comments(&close_brace, writer, formatter, false)?;
+        formatter.indent(writer)?;
         write!(writer, "{}", close_brace)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )
     }
 }
 
 impl Formattable for HintsItem {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )?;
 
         let name = self.name();
-        state.indent(writer)?;
-        name.format(writer, state)?;
+        formatter.indent(writer)?;
+        name.format(writer, formatter)?;
         format_inline_comment(
             &SyntaxElement::from(name.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )?;
 
         let colon = first_child_of_kind(self.syntax(), SyntaxKind::Colon);
-        format_preceding_comments(&colon, writer, state, true)?;
-        if state.interrupted() {
-            state.indent(writer)?;
+        format_preceding_comments(&colon, writer, formatter, true)?;
+        if formatter.interrupted() {
+            formatter.indent(writer)?;
         }
         write!(writer, "{}", colon)?;
-        format_inline_comment(&colon, writer, state, true)?;
+        format_inline_comment(&colon, writer, formatter, true)?;
 
         let expr = self.expr();
         format_preceding_comments(
             &SyntaxElement::from(expr.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )?;
-        state.space_or_indent(writer)?;
-        expr.format(writer, state)?;
+        formatter.space_or_indent(writer)?;
+        expr.format(writer, formatter)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )
     }
 }
 
 impl Formattable for HintsSection {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )?;
 
         let hints_keyword = first_child_of_kind(self.syntax(), SyntaxKind::HintsKeyword);
-        state.indent(writer)?;
+        formatter.indent(writer)?;
         write!(writer, "{}", hints_keyword)?;
-        format_inline_comment(&hints_keyword, writer, state, true)?;
+        format_inline_comment(&hints_keyword, writer, formatter, true)?;
 
         let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
-        format_preceding_comments(&open_brace, writer, state, true)?;
+        format_preceding_comments(&open_brace, writer, formatter, true)?;
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
-        if state.interrupted() {
-            state.reset_interrupted();
-            state.indent(writer)?;
+        if formatter.interrupted() {
+            formatter.reset_interrupted();
+            formatter.indent(writer)?;
         } else {
             write!(writer, "{}", SPACE)?;
         }
         write!(writer, "{}", open_brace)?;
-        format_inline_comment(&open_brace, writer, state, false)?;
+        format_inline_comment(&open_brace, writer, formatter, false)?;
 
-        state.increment_indent();
+        formatter.increment_indent();
 
         for item in self.items() {
-            item.format(writer, state)?;
+            item.format(writer, formatter)?;
         }
 
-        state.decrement_indent();
+        formatter.decrement_indent();
 
         let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
-        format_preceding_comments(&close_brace, writer, state, false)?;
-        state.indent(writer)?;
+        format_preceding_comments(&close_brace, writer, formatter, false)?;
+        formatter.indent(writer)?;
         write!(writer, "{}", close_brace)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )
     }
 }
 
 impl Formattable for StructDefinition {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )?;
 
         let struct_keyword = first_child_of_kind(self.syntax(), SyntaxKind::StructKeyword);
         write!(writer, "{}", struct_keyword)?;
-        format_inline_comment(&struct_keyword, writer, state, true)?;
+        format_inline_comment(&struct_keyword, writer, formatter, true)?;
 
         let name = self.name();
         format_preceding_comments(
             &SyntaxElement::from(name.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )?;
-        state.space_or_indent(writer)?;
-        name.format(writer, state)?;
+        formatter.space_or_indent(writer)?;
+        name.format(writer, formatter)?;
         format_inline_comment(
             &SyntaxElement::from(name.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )?;
 
         let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
         // Open braces should ignore the "+1 rule" followed by other interrupted
         // elements.
-        if state.interrupted() {
-            state.reset_interrupted();
-            state.indent(writer)?;
+        if formatter.interrupted() {
+            formatter.reset_interrupted();
+            formatter.indent(writer)?;
         } else {
             write!(writer, "{}", SPACE)?;
         }
         write!(writer, "{}", open_brace)?;
-        format_inline_comment(&open_brace, writer, state, false)?;
+        format_inline_comment(&open_brace, writer, formatter, false)?;
 
-        state.increment_indent();
+        formatter.increment_indent();
 
         if let Some(m) = self.metadata().next() {
-            m.format(writer, state)?;
+            m.format(writer, formatter)?;
             write!(writer, "{}", NEWLINE)?;
         }
 
         if let Some(pm) = self.parameter_metadata().next() {
-            pm.format(writer, state)?;
+            pm.format(writer, formatter)?;
             write!(writer, "{}", NEWLINE)?;
         }
 
         for decl in self.members() {
-            Decl::Unbound(decl).format(writer, state)?;
+            Decl::Unbound(decl).format(writer, formatter)?;
         }
 
-        state.decrement_indent();
+        formatter.decrement_indent();
 
         let close_brace = self
             .syntax()
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::CloseBrace)
             .expect("Struct Definition should have a close brace");
-        format_preceding_comments(&close_brace, writer, state, false)?;
-        state.indent(writer)?;
+        format_preceding_comments(&close_brace, writer, formatter, false)?;
+        formatter.indent(writer)?;
         write!(writer, "{}", close_brace)?;
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )
     }
 }
 
 impl Formattable for DocumentItem {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         match self {
             DocumentItem::Import(_) => {
                 unreachable!("Import statements should not be formatted as a DocumentItem")
             }
-            DocumentItem::Workflow(workflow) => workflow.format(writer, state),
-            DocumentItem::Task(task) => task.format(writer, state),
-            DocumentItem::Struct(structure) => structure.format(writer, state),
+            DocumentItem::Workflow(workflow) => workflow.format(writer, formatter),
+            DocumentItem::Task(task) => task.format(writer, formatter),
+            DocumentItem::Struct(structure) => structure.format(writer, formatter),
         }
     }
 }

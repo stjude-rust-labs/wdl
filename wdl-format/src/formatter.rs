@@ -1,9 +1,11 @@
-//! Contains the `State` struct, which is used to keep track of the
+//! Contains the `Formatter` struct, which is used to keep track of the
 //! current formatting state. This includes the current indentation level and
 //! whether the current line has been interrupted by comments.
 //! The state becomes "interrupted" by comments when a comment forces a newline
 //! where it would otherwise not be expected. In this case, the next line(s)
 //! will be indented by one level.
+
+use crate::Formattable;
 
 /// Space constant used for formatting.
 pub const SPACE: &str = " ";
@@ -11,18 +13,27 @@ pub const SPACE: &str = " ";
 /// per-level.
 pub const INDENT: &str = "    ";
 
-/// The `State` struct is used to keep track of the current formatting
+/// The `Formatter` struct is used to keep track of the current formatting
 /// state. This includes the current indentation level and whether the current
 /// line has been interrupted by comments.
 #[derive(Debug, Clone, Copy, Default)]
-pub struct State {
+pub struct Formatter {
     /// The current indentation level.
     indent_level: usize,
     /// Whether the current line has been interrupted by comments.
     interrupted_by_comments: bool,
 }
 
-impl State {
+impl Formatter {
+    /// Format an element.
+    pub fn format<F: std::fmt::Write, T: Formattable>(
+        mut self,
+        element: &T,
+        writer: &mut F,
+    ) -> std::fmt::Result {
+        element.format(writer, &mut self)
+    }
+
     /// Add the current indentation to the writer.
     /// The indentation level will be temporarily increased by one if the
     /// current line has been interrupted by comments.

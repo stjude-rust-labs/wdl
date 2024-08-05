@@ -11,34 +11,38 @@ use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
 use super::first_child_of_kind;
 use super::Formattable;
-use super::State;
+use super::Formatter;
 
 impl Formattable for ImportStatement {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        formatter: &mut Formatter,
+    ) -> std::fmt::Result {
         format_preceding_comments(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )?;
 
         let import_keyword = first_child_of_kind(self.syntax(), SyntaxKind::ImportKeyword);
         write!(writer, "{}", import_keyword)?;
-        format_inline_comment(&import_keyword, writer, state, true)?;
+        format_inline_comment(&import_keyword, writer, formatter, true)?;
 
         let uri = self.uri();
         format_preceding_comments(
             &SyntaxElement::from(uri.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )?;
-        state.space_or_indent(writer)?;
-        uri.format(writer, state)?;
+        formatter.space_or_indent(writer)?;
+        uri.format(writer, formatter)?;
         format_inline_comment(
             &SyntaxElement::from(uri.syntax().clone()),
             writer,
-            state,
+            formatter,
             true,
         )?;
 
@@ -46,23 +50,23 @@ impl Formattable for ImportStatement {
         while let Some(cur) = next {
             match cur.kind() {
                 SyntaxKind::AsKeyword => {
-                    format_preceding_comments(&cur, writer, state, true)?;
-                    state.space_or_indent(writer)?;
+                    format_preceding_comments(&cur, writer, formatter, true)?;
+                    formatter.space_or_indent(writer)?;
                     write!(writer, "{}", cur)?;
-                    state.reset_interrupted();
-                    format_inline_comment(&cur, writer, state, true)?;
+                    formatter.reset_interrupted();
+                    format_inline_comment(&cur, writer, formatter, true)?;
                 }
                 SyntaxKind::Ident => {
-                    format_preceding_comments(&cur, writer, state, true)?;
-                    state.space_or_indent(writer)?;
+                    format_preceding_comments(&cur, writer, formatter, true)?;
+                    formatter.space_or_indent(writer)?;
                     let ident =
                         Ident::cast(cur.as_token().expect("Ident should be a token").clone())
                             .expect("Ident should cast to an ident");
-                    ident.format(writer, state)?;
-                    format_inline_comment(&cur, writer, state, true)?;
+                    ident.format(writer, formatter)?;
+                    format_inline_comment(&cur, writer, formatter, true)?;
                 }
                 SyntaxKind::ImportAliasNode => {
-                    format_preceding_comments(&cur, writer, state, true)?;
+                    format_preceding_comments(&cur, writer, formatter, true)?;
                     let mut second_ident_of_clause = false;
                     for alias_part in cur
                         .as_node()
@@ -73,24 +77,24 @@ impl Formattable for ImportStatement {
                             SyntaxKind::AliasKeyword => {
                                 // Should always be first 'alias_part' processed
                                 // so preceding comments were handled above.
-                                state.space_or_indent(writer)?;
+                                formatter.space_or_indent(writer)?;
                                 write!(writer, "{}", alias_part)?;
-                                format_inline_comment(&alias_part, writer, state, true)?;
+                                format_inline_comment(&alias_part, writer, formatter, true)?;
                             }
                             SyntaxKind::Ident => {
-                                format_preceding_comments(&alias_part, writer, state, true)?;
-                                state.space_or_indent(writer)?;
+                                format_preceding_comments(&alias_part, writer, formatter, true)?;
+                                formatter.space_or_indent(writer)?;
                                 write!(writer, "{}", alias_part)?;
                                 if !second_ident_of_clause {
-                                    format_inline_comment(&alias_part, writer, state, true)?;
+                                    format_inline_comment(&alias_part, writer, formatter, true)?;
                                     second_ident_of_clause = true;
                                 } // else an inline comment will be handled by outer loop
                             }
                             SyntaxKind::AsKeyword => {
-                                format_preceding_comments(&alias_part, writer, state, true)?;
-                                state.space_or_indent(writer)?;
+                                format_preceding_comments(&alias_part, writer, formatter, true)?;
+                                formatter.space_or_indent(writer)?;
                                 write!(writer, "{}", alias_part)?;
-                                format_inline_comment(&alias_part, writer, state, true)?;
+                                format_inline_comment(&alias_part, writer, formatter, true)?;
                             }
                             SyntaxKind::Whitespace => {
                                 // Ignore
@@ -106,7 +110,7 @@ impl Formattable for ImportStatement {
                             }
                         }
                     }
-                    format_inline_comment(&cur, writer, state, true)?;
+                    format_inline_comment(&cur, writer, formatter, true)?;
                 }
                 SyntaxKind::Comment => {
                     // This comment will be included by a call to
@@ -125,7 +129,7 @@ impl Formattable for ImportStatement {
         format_inline_comment(
             &SyntaxElement::from(self.syntax().clone()),
             writer,
-            state,
+            formatter,
             false,
         )
     }
