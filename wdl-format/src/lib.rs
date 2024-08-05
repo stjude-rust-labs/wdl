@@ -166,6 +166,21 @@ impl Formattable for Document {
     }
 }
 
+/// A formatter for WDL elements.
+#[derive(Debug, Default)]
+pub struct Formatter(State);
+
+impl Formatter {
+    /// Format an element.
+    pub fn format<F: std::fmt::Write, T: Formattable>(
+        &mut self,
+        element: T,
+        writer: &mut F,
+    ) -> std::fmt::Result {
+        element.format(writer, &mut self.0)
+    }
+}
+
 /// Format a WDL document.
 pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
     let (document, diagnostics) = Document::parse(code);
@@ -181,9 +196,9 @@ pub fn format_document(code: &str) -> Result<String, Vec<Diagnostic>> {
     }
 
     let mut result = String::new();
-    let mut state = State::default();
+    let formatter = &mut Formatter::default();
 
-    match document.format(&mut result, &mut state) {
+    match formatter.format(document, &mut result) {
         Ok(_) => {}
         Err(error) => {
             let msg = format!("Failed to format document: {}", error);
