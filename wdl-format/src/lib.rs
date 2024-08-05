@@ -34,7 +34,11 @@ use comments::format_inline_comment;
 use comments::format_preceding_comments;
 use state::State;
 
-/// Newline constant used for formatting.
+/// Newline constant used for formatting on windows platforms.
+#[cfg(windows)]
+pub const NEWLINE: &str = "\r\n";
+/// Newline constant used for formatting on non-windows platforms.
+#[cfg(not(windows))]
 pub const NEWLINE: &str = "\n";
 /// String terminator constant used for formatting.
 const STRING_TERMINATOR: char = '"';
