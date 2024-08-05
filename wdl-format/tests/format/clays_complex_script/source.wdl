@@ -1,6 +1,8 @@
+# preamble
 #@ except: CommentWhitespace, DeprecatedObject, DescriptionMissing
 #@ except: InputSorting, MatchingParameterMeta, NonmatchingOutput
 
+# preamble
 version 1.2
 
 #@ except: MissingMetas
@@ -85,6 +87,8 @@ task a_task {
    }
 }
 
+## These double-pound-sign comments
+## should be converted to single-pound-sign comments.
 workflow hello {
    meta
    # Here is a comment between `meta` and the parenthesis.
@@ -114,7 +118,7 @@ workflow hello {
       a_false: false
       an_integer: 42
       a_float: -0.0e123
-      an_array: [true, -42, "hello, world"]
+      an_array: [true, -42, "hello, world"] ## This should be converted to a single-pound-sign comment.
       an_object: {
          subkey_one: "a",
          subkey_two: 73,

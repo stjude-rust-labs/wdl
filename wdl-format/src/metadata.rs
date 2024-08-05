@@ -228,7 +228,11 @@ impl Formattable for MetadataSection {
 
         for item in self.items() {
             item.format(writer, state)?;
-            write!(writer, "{}", NEWLINE)?;
+            if state.interrupted() {
+                state.reset_interrupted();
+            } else {
+                write!(writer, "{}", NEWLINE)?;
+            }
         }
 
         state.decrement_indent();
@@ -278,7 +282,11 @@ impl Formattable for ParameterMetadataSection {
 
         for item in self.items() {
             item.format(writer, state)?;
-            write!(writer, "{}", NEWLINE)?;
+            if state.interrupted() {
+                state.reset_interrupted();
+            } else {
+                write!(writer, "{}", NEWLINE)?;
+            }
         }
 
         state.decrement_indent();

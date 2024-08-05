@@ -92,9 +92,6 @@ impl Formattable for ImportStatement {
                                 write!(writer, "{}", alias_part)?;
                                 format_inline_comment(&alias_part, writer, state, true)?;
                             }
-                            SyntaxKind::ImportAliasNode => {
-                                // Ignore the root node
-                            }
                             SyntaxKind::Whitespace => {
                                 // Ignore
                             }

@@ -53,9 +53,10 @@ impl Formattable for Version {
 
 impl Formattable for VersionStatement {
     fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
-        let mut preceding_comments = Vec::new();
+        let mut preamble_comments = Vec::new();
+        let mut lint_directives = Vec::new();
         let comment_buffer = &mut String::new();
-        for sibling in self.syntax().siblings_with_tokens(Direction::Prev) {
+        for sibling in self.syntax().siblings_with_tokens(Direction::Prev).skip(1) {
             match sibling.kind() {
                 SyntaxKind::Comment => {
                     let comment = Comment::cast(
@@ -66,14 +67,19 @@ impl Formattable for VersionStatement {
                     )
                     .expect("Comment should cast to a comment");
                     comment.format(comment_buffer, state)?;
-                    preceding_comments.push(comment_buffer.clone());
+                    // If the comment does not start with "##", prepend a '#' to it
+                    if !comment_buffer.starts_with("##") && !comment_buffer.starts_with("#@") {
+                        comment_buffer.insert(0, '#');
+                    }
+                    if comment_buffer.starts_with("#@") {
+                        lint_directives.push(comment_buffer.clone());
+                    } else {
+                        preamble_comments.push(comment_buffer.clone());
+                    }
                     comment_buffer.clear();
                 }
                 SyntaxKind::Whitespace => {
                     // Ignore
-                }
-                SyntaxKind::VersionStatementNode => {
-                    // Ignore the root node
                 }
                 _ => {
                     unreachable!("Unexpected syntax kind: {:?}", sibling.kind());
@@ -81,13 +87,17 @@ impl Formattable for VersionStatement {
             }
         }
 
-        for comment in preceding_comments.iter().rev() {
+        for comment in preamble_comments.iter().rev() {
             write!(writer, "{}", comment)?;
         }
 
         // If there are preamble comments, ensure a blank line is inserted
-        if !preceding_comments.is_empty() {
+        if !preamble_comments.is_empty() {
             write!(writer, "{}", NEWLINE)?;
+        }
+
+        for comment in lint_directives.iter().rev() {
+            write!(writer, "{}", comment)?;
         }
 
         let version_keyword = first_child_of_kind(self.syntax(), SyntaxKind::VersionKeyword);

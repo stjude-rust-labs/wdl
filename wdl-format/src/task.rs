@@ -2,6 +2,7 @@
 
 use wdl_ast::v1::CommandPart;
 use wdl_ast::v1::CommandSection;
+use wdl_ast::v1::CommandText;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::RequirementsItem;
 use wdl_ast::v1::RequirementsSection;
@@ -21,6 +22,12 @@ use super::state::SPACE;
 use super::Formattable;
 use super::State;
 use super::NEWLINE;
+
+impl Formattable for CommandText {
+    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut State) -> std::fmt::Result {
+        write!(writer, "{}", self.as_str())
+    }
+}
 
 impl Formattable for CommandSection {
     fn format<T: std::fmt::Write>(&self, writer: &mut T, state: &mut State) -> std::fmt::Result {
@@ -61,7 +68,7 @@ impl Formattable for CommandSection {
         for part in self.parts() {
             match part {
                 CommandPart::Text(t) => {
-                    write!(writer, "{}", t.as_str())?;
+                    t.format(writer, state)?;
                 }
                 CommandPart::Placeholder(p) => {
                     p.format(writer, state)?;

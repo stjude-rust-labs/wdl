@@ -11,14 +11,15 @@
 //!
 //! A preceding comment is a comment that appears on a line before an element.
 //! There may be any number of preceding comments and they may be separated
-//! by any number of blank lines. Blank lines will be included in the formatted
-//! output, but multiple blank lines in a row will be consolidated to one.
-//! Preceding comments should be indented to the same level as the element which
-//! they belong to.
+//! by any number of blank lines. Internal blank lines (blanks _between_
+//! comments) will be included in the formatted output, but blank lines before
+//! or after all comments will not be includes. Multiple internal blank lines in
+//! a row will be consolidated to one. Preceding comments should be indented to
+//! the same level as the element which they belong to.
 //!
 //! An inline comment is a comment that appears on the same line as an element,
 //! if and only if that element is the last element of its line. Inline comments
-//! should always appear immediately after the element they are commenting on.
+//! should always appear two spaces after the element they are commenting on.
 
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
@@ -29,7 +30,8 @@ use super::Formattable;
 use super::State;
 use super::NEWLINE;
 
-/// Inline comment space constant used for formatting.
+/// Inline comment space constant used for formatting. Inline comments should
+/// start two spaces after the end of the element they are commenting on.
 pub const INLINE_COMMENT_SPACE: &str = "  ";
 
 impl Formattable for Comment {
@@ -39,7 +41,11 @@ impl Formattable for Comment {
     }
 }
 
-/// Format comments that preceed a node.
+/// Format comments that precede a node.
+///
+/// This function assumes we are _not_ in the preamble, and thus any
+/// double-pound-sign comments should be converted to single-pound-sign
+/// comments.
 pub fn format_preceding_comments<T: std::fmt::Write>(
     element: &SyntaxElement,
     writer: &mut T,
@@ -79,8 +85,10 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
                                 )
                                 .expect("Comment should cast to a comment");
 
-                                state.indent(&mut inner_buffer)?;
                                 comment.format(&mut inner_buffer, state)?;
+                                if inner_buffer.starts_with("## ") {
+                                    inner_buffer.remove(0);
+                                }
                                 reversed_text.push(inner_buffer.clone());
                                 inner_buffer.clear();
                             }
@@ -96,7 +104,8 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
             SyntaxKind::Whitespace => {
                 // Ignore whitespace until a comment is found.
                 // Ignore whitespace that doesn't contain at least two newlines.
-                // (Two newlines indicates a blank line)
+                // (Two newlines indicates a blank line). Since each comment is
+                // followed by a newline, we only insert one newline here.
                 if cur.to_string().matches(NEWLINE).count() > 1 && comments_found {
                     inner_buffer.push_str(NEWLINE);
                     reversed_text.push(inner_buffer.clone());
@@ -120,6 +129,7 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
     for line in reversed_text.iter().rev() {
         if line.contains('#') {
             comment_processed = true;
+            state.indent(writer)?;
         }
         if comment_processed {
             write!(writer, "{}", line)?;
@@ -129,6 +139,9 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
 }
 
 /// Format a comment on the same line as an element.
+///
+/// If 'would_be_interrupting' is false and there is no comment on the line, a
+/// newline will be inserted.
 pub fn format_inline_comment<T: std::fmt::Write>(
     element: &SyntaxElement,
     writer: &mut T,
@@ -146,7 +159,12 @@ pub fn format_inline_comment<T: std::fmt::Write>(
                 if would_be_interrupting {
                     state.interrupt();
                 }
-                comment.format(writer, state)?;
+                let mut tmp_buffer = String::new();
+                comment.format(&mut tmp_buffer, state)?;
+                if tmp_buffer.starts_with("## ") {
+                    tmp_buffer.remove(0);
+                }
+                write!(writer, "{}", tmp_buffer)?;
                 return Ok(());
             }
             SyntaxKind::Whitespace => {

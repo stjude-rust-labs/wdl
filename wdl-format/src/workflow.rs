@@ -99,11 +99,11 @@ impl Formattable for CallInputItem {
         )?;
 
         if let Some(expr) = self.expr() {
-            let equal_sign = first_child_of_kind(self.syntax(), SyntaxKind::Assignment);
-            format_preceding_comments(&equal_sign, writer, state, true)?;
+            let assignment = first_child_of_kind(self.syntax(), SyntaxKind::Assignment);
+            format_preceding_comments(&assignment, writer, state, true)?;
             state.space_or_indent(writer)?;
-            write!(writer, "{}", equal_sign)?;
-            format_inline_comment(&equal_sign, writer, state, true)?;
+            write!(writer, "{}", assignment)?;
+            format_inline_comment(&assignment, writer, state, true)?;
 
             format_preceding_comments(
                 &SyntaxElement::from(expr.syntax().clone()),
@@ -177,6 +177,7 @@ impl Formattable for CallStatement {
             write!(writer, "{}", open_brace)?;
             format_inline_comment(&open_brace, writer, state, true)?;
 
+            // TODO consider detecting if document is >= v1.2 and forcing the optional input syntax
             if let Some(input_keyword) = self
                 .syntax()
                 .children_with_tokens()
@@ -206,6 +207,7 @@ impl Formattable for CallStatement {
                 )?;
                 state.space_or_indent(writer)?;
                 input.format(writer, state)?;
+                // TODO there may be a trailing comma with comments attached to it
 
                 let close_brace = first_child_of_kind(self.syntax(), SyntaxKind::CloseBrace);
                 format_preceding_comments(&close_brace, writer, state, true)?;
@@ -292,6 +294,8 @@ impl Formattable for ConditionalStatement {
 
         let mut paren_on_same_line = true;
         let expr = self.expr();
+        // PERF: This calls `to_string()` which is also called later by `format()`
+        // There should be a way to avoid this.
         let multiline_expr = expr.syntax().to_string().contains(NEWLINE);
 
         format_inline_comment(&open_paren, writer, state, !multiline_expr)?;
