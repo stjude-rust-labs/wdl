@@ -21,7 +21,11 @@ use super::Formatter;
 use super::NEWLINE;
 
 impl Formattable for LiteralNull {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut Formatter) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        _state: &mut Formatter,
+    ) -> std::fmt::Result {
         write!(writer, "{}", self.syntax())
     }
 }

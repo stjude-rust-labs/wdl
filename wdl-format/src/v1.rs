@@ -225,7 +225,11 @@ impl Formattable for Placeholder {
 }
 
 impl Formattable for StringText {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut Formatter) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        _state: &mut Formatter,
+    ) -> std::fmt::Result {
         let mut iter = self.as_str().chars().peekable();
         let mut prev_c = None;
         while let Some(c) = iter.next() {
@@ -281,31 +285,51 @@ impl Formattable for LiteralString {
 }
 
 impl Formattable for LiteralBoolean {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut Formatter) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        _state: &mut Formatter,
+    ) -> std::fmt::Result {
         write!(writer, "{}", self.value()) // TODO
     }
 }
 
 impl Formattable for LiteralFloat {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut Formatter) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        _state: &mut Formatter,
+    ) -> std::fmt::Result {
         write!(writer, "{}", self.syntax()) // TODO
     }
 }
 
 impl Formattable for LiteralInteger {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut Formatter) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        _state: &mut Formatter,
+    ) -> std::fmt::Result {
         write!(writer, "{}", self.syntax()) // TODO
     }
 }
 
 impl Formattable for Type {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut Formatter) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        _state: &mut Formatter,
+    ) -> std::fmt::Result {
         write!(writer, "{}", self.syntax()) // TODO
     }
 }
 
 impl Formattable for Expr {
-    fn format<T: std::fmt::Write>(&self, writer: &mut T, _state: &mut Formatter) -> std::fmt::Result {
+    fn format<T: std::fmt::Write>(
+        &self,
+        writer: &mut T,
+        _state: &mut Formatter,
+    ) -> std::fmt::Result {
         write!(writer, "{}", self.syntax()) // TODO
     }
 }
