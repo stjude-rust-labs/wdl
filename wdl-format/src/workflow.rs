@@ -177,7 +177,8 @@ impl Formattable for CallStatement {
             write!(writer, "{}", open_brace)?;
             format_inline_comment(&open_brace, writer, state, true)?;
 
-            // TODO consider detecting if document is >= v1.2 and forcing the optional input syntax
+            // TODO consider detecting if document is >= v1.2 and forcing the optional input
+            // syntax
             if let Some(input_keyword) = self
                 .syntax()
                 .children_with_tokens()
