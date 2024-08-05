@@ -45,14 +45,11 @@ impl Formattable for CommandSection {
 
         // coerce all command sections to use heredoc ('<<<>>>>') syntax
         // (as opposed to bracket ('{}') syntax)
-        let open_section;
-        if self.is_heredoc() {
-            open_section = Some(first_child_of_kind(self.syntax(), SyntaxKind::OpenHeredoc));
+        let open_section = if self.is_heredoc() {
+            first_child_of_kind(self.syntax(), SyntaxKind::OpenHeredoc)
         } else {
-            open_section = Some(first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace));
-        }
-        let open_section =
-            open_section.expect("command section should have heredoc or bracket open");
+            first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace)
+        };
         format_preceding_comments(&open_section, writer, state, true)?;
 
         // Open braces should ignore the "+1 rule" followed by other interrupted
