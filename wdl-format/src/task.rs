@@ -45,7 +45,7 @@ impl Formattable for CommandSection {
 
         // coerce all command sections to use heredoc ('<<<>>>>') syntax
         // (as opposed to bracket ('{}') syntax)
-        let mut open_section = None;
+        let open_section;
         if self.is_heredoc() {
             open_section = Some(first_child_of_kind(self.syntax(), SyntaxKind::OpenHeredoc));
         } else {
