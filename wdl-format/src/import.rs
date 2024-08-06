@@ -70,7 +70,7 @@ impl Formattable for ImportStatement {
                     let mut second_ident_of_clause = false;
                     for alias_part in cur
                         .as_node()
-                        .expect("Import alias should be a node")
+                        .expect("import alias should be a node")
                         .children_with_tokens()
                     {
                         match alias_part.kind() {
