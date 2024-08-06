@@ -57,6 +57,50 @@ pub trait Formattable {
     ) -> std::fmt::Result;
 }
 
+/// An enum encapsulating the position of an element on a line.
+#[derive(PartialEq)]
+enum LinePosition {
+    StartOfLine,
+    MiddleOfLine,
+    EndOfLine,
+}
+
+fn format_element_with_comments<T: std::fmt::Write, F>(
+    element: &SyntaxElement,
+    writer: &mut T,
+    formatter: &mut Formatter,
+    position: LinePosition,
+    f: F,
+) -> std::fmt::Result
+where
+    F: Fn(&mut T, &mut Formatter) -> std::fmt::Result,
+{
+    format_preceding_comments(
+        element,
+        writer,
+        formatter,
+        position != LinePosition::StartOfLine,
+    )?;
+    f(writer, formatter)?;
+    write!(writer, "{}", element)?;
+    format_inline_comment(
+        element,
+        writer,
+        formatter,
+        position != LinePosition::EndOfLine,
+    )
+}
+
+/// Find an expected child element of the specified kind.
+///
+/// # Panics
+/// Panics if the child element is not found.
+pub fn first_child_of_kind(node: &SyntaxNode, kind: SyntaxKind) -> SyntaxElement {
+    node.children_with_tokens()
+        .find(|element| element.kind() == kind)
+        .unwrap_or_else(|| panic!("Expected to find a child of kind: {kind:?}"))
+}
+
 impl Formattable for Version {
     fn format<T: std::fmt::Write>(
         &self,
@@ -148,16 +192,6 @@ impl Formattable for Ident {
     ) -> std::fmt::Result {
         write!(writer, "{}", self.as_str())
     }
-}
-
-/// Find an expected child element of the specified kind.
-///
-/// # Panics
-/// Panics if the child element is not found.
-pub fn first_child_of_kind(node: &SyntaxNode, kind: SyntaxKind) -> SyntaxElement {
-    node.children_with_tokens()
-        .find(|element| element.kind() == kind)
-        .unwrap_or_else(|| panic!("Expected to find a child of kind: {kind:?}"))
 }
 
 impl Formattable for Document {

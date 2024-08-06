@@ -15,9 +15,11 @@ use wdl_ast::SyntaxKind;
 use super::comments::format_inline_comment;
 use super::comments::format_preceding_comments;
 use super::first_child_of_kind;
+use super::format_element_with_comments;
 use super::formatter::SPACE;
 use super::Formattable;
 use super::Formatter;
+use super::LinePosition;
 use super::NEWLINE;
 
 impl Formattable for LiteralNull {
@@ -44,15 +46,19 @@ impl Formattable for MetadataObject {
         )?;
 
         let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
-        format_preceding_comments(&open_brace, writer, formatter, true)?;
-        // Open braces should ignore the "+1 rule" followed by other interrupted
-        // elements.
-        if formatter.interrupted() {
-            formatter.reset_interrupted();
-            formatter.indent(writer)?;
-        }
-        write!(writer, "{}", open_brace)?;
-        format_inline_comment(&open_brace, writer, formatter, false)?;
+        format_element_with_comments(
+            &open_brace,
+            writer,
+            formatter,
+            LinePosition::EndOfLine,
+            |writer, formatter| {
+                if formatter.interrupted() {
+                    formatter.reset_interrupted();
+                    formatter.indent(writer)?;
+                }
+                Ok(())
+            },
+        )?;
 
         formatter.increment_indent();
 
@@ -64,9 +70,13 @@ impl Formattable for MetadataObject {
         for item in self.items() {
             item.format(writer, formatter)?;
             if let Some(cur_comma) = commas.next() {
-                format_preceding_comments(&cur_comma, writer, formatter, true)?;
-                write!(writer, ",")?;
-                format_inline_comment(&cur_comma, writer, formatter, false)?;
+                format_element_with_comments(
+                    &cur_comma,
+                    writer,
+                    formatter,
+                    LinePosition::EndOfLine,
+                    |_, _| Ok(()),
+                )?;
             } else {
                 // No trailing comma was in the input
                 write!(writer, ",")?;
@@ -103,15 +113,19 @@ impl Formattable for MetadataArray {
         )?;
 
         let open_bracket = first_child_of_kind(self.syntax(), SyntaxKind::OpenBracket);
-        format_preceding_comments(&open_bracket, writer, formatter, true)?;
-        // Open braces should ignore the "+1 rule" followed by other interrupted
-        // elements.
-        if formatter.interrupted() {
-            formatter.reset_interrupted();
-            formatter.indent(writer)?;
-        }
-        write!(writer, "{}", open_bracket)?;
-        format_inline_comment(&open_bracket, writer, formatter, false)?;
+        format_element_with_comments(
+            &open_bracket,
+            writer,
+            formatter,
+            LinePosition::EndOfLine,
+            |writer, formatter| {
+                if formatter.interrupted() {
+                    formatter.reset_interrupted();
+                    formatter.indent(writer)?;
+                }
+                Ok(())
+            },
+        )?;
 
         formatter.increment_indent();
 
@@ -124,9 +138,13 @@ impl Formattable for MetadataArray {
             formatter.indent(writer)?;
             item.format(writer, formatter)?;
             if let Some(cur_comma) = commas.next() {
-                format_preceding_comments(&cur_comma, writer, formatter, true)?;
-                write!(writer, ",")?;
-                format_inline_comment(&cur_comma, writer, formatter, false)?;
+                format_element_with_comments(
+                    &cur_comma,
+                    writer,
+                    formatter,
+                    LinePosition::EndOfLine,
+                    |_, _| Ok(()),
+                )?;
             } else {
                 // No trailing comma was in the input
                 write!(writer, ",")?;
@@ -191,13 +209,19 @@ impl Formattable for MetadataObjectItem {
         )?;
 
         let colon = first_child_of_kind(self.syntax(), SyntaxKind::Colon);
-        format_preceding_comments(&colon, writer, formatter, true)?;
-        if formatter.interrupted() {
-            formatter.indent(writer)?;
-            formatter.reset_interrupted();
-        }
-        write!(writer, "{}", colon)?;
-        format_inline_comment(&colon, writer, formatter, true)?;
+        format_element_with_comments(
+            &colon,
+            writer,
+            formatter,
+            LinePosition::MiddleOfLine,
+            |writer, formatter| {
+                if formatter.interrupted() {
+                    formatter.indent(writer)?;
+                    formatter.reset_interrupted();
+                }
+                Ok(())
+            },
+        )?;
 
         let value = self.value();
         format_preceding_comments(
@@ -236,17 +260,21 @@ impl Formattable for MetadataSection {
         format_inline_comment(&meta_keyword, writer, formatter, true)?;
 
         let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
-        format_preceding_comments(&open_brace, writer, formatter, true)?;
-        // Open braces should ignore the "+1 rule" followed by other interrupted
-        // elements.
-        if formatter.interrupted() {
-            formatter.reset_interrupted();
-            formatter.indent(writer)?;
-        } else {
-            write!(writer, "{}", SPACE)?;
-        }
-        write!(writer, "{}", open_brace)?;
-        format_inline_comment(&open_brace, writer, formatter, false)?;
+        format_element_with_comments(
+            &open_brace,
+            writer,
+            formatter,
+            LinePosition::EndOfLine,
+            |writer, formatter| {
+                if formatter.interrupted() {
+                    formatter.reset_interrupted();
+                    formatter.indent(writer)?;
+                } else {
+                    write!(writer, "{}", SPACE)?;
+                }
+                Ok(())
+            },
+        )?;
 
         formatter.increment_indent();
 
@@ -294,17 +322,21 @@ impl Formattable for ParameterMetadataSection {
         format_inline_comment(&parameter_meta_keyword, writer, formatter, true)?;
 
         let open_brace = first_child_of_kind(self.syntax(), SyntaxKind::OpenBrace);
-        format_preceding_comments(&open_brace, writer, formatter, true)?;
-        // Open braces should ignore the "+1 rule" followed by other interrupted
-        // elements.
-        if formatter.interrupted() {
-            formatter.reset_interrupted();
-            formatter.indent(writer)?;
-        } else {
-            write!(writer, "{}", SPACE)?;
-        }
-        write!(writer, "{}", open_brace)?;
-        format_inline_comment(&open_brace, writer, formatter, false)?;
+        format_element_with_comments(
+            &open_brace,
+            writer,
+            formatter,
+            LinePosition::EndOfLine,
+            |writer, formatter| {
+                if formatter.interrupted() {
+                    formatter.reset_interrupted();
+                    formatter.indent(writer)?;
+                } else {
+                    write!(writer, "{}", SPACE)?;
+                }
+                Ok(())
+            },
+        )?;
 
         formatter.increment_indent();
 
