@@ -159,6 +159,9 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
 
 /// Format a comment on the same line as an element.
 ///
+/// A comment is only added if there's no non-trivia between the element and
+/// the end of the line.
+/// 
 /// If 'would_be_interrupting' is false and there is no comment on the line, a
 /// newline will be inserted.
 pub fn format_inline_comment<T: std::fmt::Write>(
