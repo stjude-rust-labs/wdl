@@ -22,6 +22,7 @@ use wdl::ast::Diagnostic;
 use wdl::ast::Document;
 use wdl::ast::SyntaxNode;
 use wdl::ast::Validator;
+use wdl::format::format_document;
 use wdl::lint::LintVisitor;
 use wdl_analysis::AnalysisResult;
 use wdl_analysis::Analyzer;
@@ -236,6 +237,35 @@ impl AnalyzeCommand {
     }
 }
 
+/// Formats a WDL source file.
+#[derive(Args)]
+#[clap(disable_version_flag = true)]
+pub struct FormatCommand {
+    /// The path to the source WDL file.
+    #[clap(value_name = "PATH")]
+    pub path: PathBuf,
+}
+
+impl FormatCommand {
+    async fn exec(self) -> Result<()> {
+        let source = read_source(&self.path)?;
+        match format_document(&source) {
+            Ok(formatted) => print!("{}", formatted),
+            Err(diagnostics) => {
+                emit_diagnostics(&self.path.to_string_lossy(), &source, &diagnostics)?;
+
+                bail!(
+                    "aborting due to previous {count} diagnostic{s}",
+                    count = diagnostics.len(),
+                    s = if diagnostics.len() == 1 { "" } else { "s" }
+                );
+            }
+        }
+
+        Ok(())
+    }
+}
+
 /// A tool for parsing, validating, and linting WDL source code.
 ///
 /// This command line tool is intended as an entrypoint to work with and develop
@@ -257,6 +287,7 @@ enum App {
     Check(CheckCommand),
     Lint(LintCommand),
     Analyze(AnalyzeCommand),
+    Format(FormatCommand),
 }
 
 #[tokio::main]
@@ -271,6 +302,7 @@ async fn main() -> Result<()> {
         App::Check(cmd) => cmd.exec().await,
         App::Lint(cmd) => cmd.exec().await,
         App::Analyze(cmd) => cmd.exec().await,
+        App::Format(cmd) => cmd.exec().await,
     } {
         eprintln!(
             "{error}: {e:?}",
