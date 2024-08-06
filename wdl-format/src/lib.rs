@@ -7,6 +7,8 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
+use std::collections::VecDeque;
+
 use anyhow::Result;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
@@ -42,6 +44,8 @@ pub const NEWLINE: &str = "\r\n";
 pub const NEWLINE: &str = "\n";
 /// String terminator constant used for formatting.
 const STRING_TERMINATOR: char = '"';
+/// Lint directive prefix constant used for formatting.
+const LINT_DIRECTIVE_PREFIX: &str = "#@";
 
 /// A trait for elements that can be formatted.
 pub trait Formattable {
@@ -69,8 +73,8 @@ impl Formattable for VersionStatement {
         writer: &mut T,
         formatter: &mut Formatter,
     ) -> std::fmt::Result {
-        let mut preamble_comments = Vec::new();
-        let mut lint_directives = Vec::new();
+        let mut preamble_comments = VecDeque::new();
+        let mut lint_directives = VecDeque::new();
         let comment_buffer = &mut String::new();
         for sibling in self.syntax().siblings_with_tokens(Direction::Prev).skip(1) {
             match sibling.kind() {
@@ -83,10 +87,11 @@ impl Formattable for VersionStatement {
                     )
                     .expect("comment should cast to a comment");
                     comment.format(comment_buffer, formatter)?;
-                    if comment_buffer.starts_with("#@") {
-                        lint_directives.push(comment_buffer.clone());
+
+                    if comment_buffer.starts_with(LINT_DIRECTIVE_PREFIX) {
+                        lint_directives.push_front(comment_buffer.clone());
                     } else {
-                        preamble_comments.push(comment_buffer.clone());
+                        preamble_comments.push_front(comment_buffer.clone());
                     }
                     comment_buffer.clear();
                 }
@@ -99,7 +104,7 @@ impl Formattable for VersionStatement {
             }
         }
 
-        for comment in preamble_comments.iter().rev() {
+        for comment in preamble_comments.iter() {
             write!(writer, "{}", comment)?;
         }
 
@@ -108,7 +113,7 @@ impl Formattable for VersionStatement {
             write!(writer, "{}", NEWLINE)?;
         }
 
-        for comment in lint_directives.iter().rev() {
+        for comment in lint_directives.iter() {
             write!(writer, "{}", comment)?;
         }
 

@@ -21,6 +21,8 @@
 //! if and only if that element is the last element of its line. Inline comments
 //! should always appear two spaces after the element they are commenting on.
 
+use std::collections::VecDeque;
+
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::SyntaxElement;
@@ -30,9 +32,22 @@ use super::Formattable;
 use super::Formatter;
 use super::NEWLINE;
 
-/// Inline comment space constant used for formatting. Inline comments should
-/// start two spaces after the end of the element they are commenting on.
+/// Inline comment space constant used for formatting.
+///
+/// Inline comments should start two spaces after the end of the element they
+/// are commenting on.
 pub const INLINE_COMMENT_SPACE: &str = "  ";
+/// Misplaced preamble comment prefix constant used for formatting.
+///
+/// Preamble comments should start with two pound signs, but only if they are in
+/// the preamble. **No other comments should start with two pound signs.**
+/// This constant has a trailing space. This is to prevent trimming a pound sign
+/// from the beginning of a comment that is not a preamble comment (such as
+/// comments like `####### Section Header #######`).
+/// TODO: This could be made smarter. Perhaps a REGEX that looks for a trailing
+/// space OR `[a-zA-Z0-9]` could be used to determine if the comment is a
+/// preamble comment.
+const MISPLACED_PREAMBLE_COMMENT_PREFIX: &str = "## ";
 
 impl Formattable for Comment {
     fn format<T: std::fmt::Write>(
@@ -59,7 +74,7 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
     // This walks _backwards_ through the syntax tree to find comments
     // so we must collect them in a vector and later reverse them to get them in the
     // correct order.
-    let mut reversed_text = Vec::new();
+    let mut found_text = VecDeque::new();
     let mut inner_buffer = String::new();
     let began_interrupted = formatter.interrupted();
     let mut comments_found = false;
@@ -90,10 +105,10 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
                                 .expect("comment should cast to a comment");
 
                                 comment.format(&mut inner_buffer, formatter)?;
-                                if inner_buffer.starts_with("## ") {
+                                if inner_buffer.starts_with(MISPLACED_PREAMBLE_COMMENT_PREFIX) {
                                     inner_buffer.remove(0);
                                 }
-                                reversed_text.push(inner_buffer.clone());
+                                found_text.push_front(inner_buffer.clone());
                                 inner_buffer.clear();
                             }
                         }
@@ -112,7 +127,7 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
                 // followed by a newline, we only insert one newline here.
                 if cur.to_string().matches(NEWLINE).count() > 1 && comments_found {
                     inner_buffer.push_str(NEWLINE);
-                    reversed_text.push(inner_buffer.clone());
+                    found_text.push_front(inner_buffer.clone());
                     inner_buffer.clear();
                 }
             }
@@ -130,7 +145,7 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
 
     // Skip any whitespace before comments start.
     let mut comment_processed = false;
-    for line in reversed_text.iter().rev() {
+    for line in found_text.iter() {
         if line.contains('#') {
             comment_processed = true;
             formatter.indent(writer)?;
@@ -165,14 +180,14 @@ pub fn format_inline_comment<T: std::fmt::Write>(
                 }
                 let mut tmp_buffer = String::new();
                 comment.format(&mut tmp_buffer, formatter)?;
-                if tmp_buffer.starts_with("## ") {
+                if tmp_buffer.starts_with(MISPLACED_PREAMBLE_COMMENT_PREFIX) {
                     tmp_buffer.remove(0);
                 }
                 write!(writer, "{}", tmp_buffer)?;
                 return Ok(());
             }
             SyntaxKind::Whitespace => {
-                if cur.to_string().contains('\n') {
+                if cur.to_string().contains(NEWLINE) {
                     // We've looked ahead past the current line, so we can stop
                     break;
                 }
