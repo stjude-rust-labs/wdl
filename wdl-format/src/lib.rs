@@ -78,10 +78,10 @@ impl Formattable for VersionStatement {
                     let comment = Comment::cast(
                         sibling
                             .as_token()
-                            .expect("Comment should be a token")
+                            .expect("comment should be a token")
                             .clone(),
                     )
-                    .expect("Comment should cast to a comment");
+                    .expect("comment should cast to a comment");
                     comment.format(comment_buffer, formatter)?;
                     if comment_buffer.starts_with("#@") {
                         lint_directives.push(comment_buffer.clone());
@@ -162,10 +162,10 @@ impl Formattable for Document {
         formatter: &mut Formatter,
     ) -> std::fmt::Result {
         let ast = self.ast();
-        let ast = ast.as_v1().expect("Document should be a v1 document");
+        let ast = ast.as_v1().expect("document should be a v1 document");
         let version_statement = self
             .version_statement()
-            .expect("Document should have a version statement");
+            .expect("document should have a version statement");
         version_statement.format(writer, formatter)?;
         let mut imports = ast.imports().collect::<Vec<_>>();
         if !imports.is_empty() {

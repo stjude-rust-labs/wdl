@@ -85,9 +85,9 @@ pub fn format_preceding_comments<T: std::fmt::Write>(
                                 }
 
                                 let comment = Comment::cast(
-                                    cur.as_token().expect("Comment should be a token").clone(),
+                                    cur.as_token().expect("comment should be a token").clone(),
                                 )
-                                .expect("Comment should cast to a comment");
+                                .expect("comment should cast to a comment");
 
                                 comment.format(&mut inner_buffer, formatter)?;
                                 if inner_buffer.starts_with("## ") {
@@ -158,8 +158,8 @@ pub fn format_inline_comment<T: std::fmt::Write>(
             SyntaxKind::Comment => {
                 write!(writer, "{}", INLINE_COMMENT_SPACE)?;
                 let comment =
-                    Comment::cast(cur.as_token().expect("Comment should be a token").clone())
-                        .expect("Comment should cast to a comment");
+                    Comment::cast(cur.as_token().expect("comment should be a token").clone())
+                        .expect("comment should cast to a comment");
                 if would_be_interrupting {
                     formatter.interrupt();
                 }

@@ -215,7 +215,7 @@ impl Formattable for CallStatement {
             } // else v1.2 syntax
 
             if inputs.len() == 1 {
-                let input = inputs.first().expect("Inputs should have a first element");
+                let input = inputs.first().expect("inputs should have a first element");
                 format_preceding_comments(
                     &SyntaxElement::from(input.syntax().clone()),
                     writer,

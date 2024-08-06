@@ -60,8 +60,8 @@ impl Formattable for ImportStatement {
                     format_preceding_comments(&cur, writer, formatter, true)?;
                     formatter.space_or_indent(writer)?;
                     let ident =
-                        Ident::cast(cur.as_token().expect("Ident should be a token").clone())
-                            .expect("Ident should cast to an ident");
+                        Ident::cast(cur.as_token().expect("ident should be a token").clone())
+                            .expect("ident should cast to an ident");
                     ident.format(writer, formatter)?;
                     format_inline_comment(&cur, writer, formatter, true)?;
                 }

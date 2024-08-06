@@ -670,7 +670,7 @@ impl Formattable for StructDefinition {
             .syntax()
             .children_with_tokens()
             .find(|element| element.kind() == SyntaxKind::CloseBrace)
-            .expect("Struct Definition should have a close brace");
+            .expect("StructDefinition should have a close brace");
         format_preceding_comments(&close_brace, writer, formatter, false)?;
         formatter.indent(writer)?;
         write!(writer, "{}", close_brace)?;
