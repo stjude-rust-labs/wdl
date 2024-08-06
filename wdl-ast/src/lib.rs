@@ -58,6 +58,8 @@ pub use wdl_grammar::WorkflowDescriptionLanguage;
 
 pub mod v1;
 
+#[cfg(test)]
+mod registry;
 mod validation;
 mod visitor;
 
