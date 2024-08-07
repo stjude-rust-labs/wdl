@@ -3,10 +3,15 @@
 pub mod dive;
 
 use std::borrow::Cow;
+use std::collections::VecDeque;
 use std::fmt;
 
+use itertools::FoldWhile;
+use itertools::Itertools as _;
+use rowan::Direction;
 use rowan::GreenNodeBuilder;
 use rowan::GreenNodeData;
+use strum::VariantArray;
 
 use super::grammar;
 use super::lexer::Lexer;
@@ -22,7 +27,7 @@ use crate::parser::Parser;
 /// Tokens are terminal and represent any span of the source.
 ///
 /// This enumeration is a union of all supported WDL tokens and nodes.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, VariantArray)]
 #[repr(u16)]
 pub enum SyntaxKind {
     /// The token is unknown to WDL.
@@ -251,9 +256,9 @@ pub enum SyntaxKind {
     MetadataObjectNode,
     /// Represents a metadata array node.
     MetadataArrayNode,
-    /// Represents a literal integer node.  
+    /// Represents a literal integer node.
     LiteralIntegerNode,
-    /// Represents a literal float node.  
+    /// Represents a literal float node.
     LiteralFloatNode,
     /// Represents a literal boolean node.
     LiteralBooleanNode,
@@ -362,6 +367,9 @@ pub enum SyntaxKind {
     /// The exclusive maximum syntax kind value.
     MAX,
 }
+
+/// Every [`SyntaxKind`] variant.
+pub static ALL_SYNTAX_KIND: &[SyntaxKind] = SyntaxKind::VARIANTS;
 
 impl From<SyntaxKind> for rowan::SyntaxKind {
     fn from(kind: SyntaxKind) -> Self {
@@ -503,5 +511,295 @@ impl fmt::Display for SyntaxTree {
 impl fmt::Debug for SyntaxTree {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
+    }
+}
+
+/// Gathers comments from a stream of [`SyntaxElement`]s and groups comments
+/// logically from that stream (separated by whitespace).
+fn gather_comments<T: SyntaxExt>(
+    source: &T,
+    direction: Direction,
+    break_on_newline: bool,
+) -> Box<[String]> {
+    let iter = source.siblings_with_tokens(direction);
+
+    /// Adds the text to the currently collecting buffer in the right place
+    /// depending in the direction we are traversing.
+    fn extend_buffer(text: String, buffer: &mut VecDeque<String>, direction: &Direction) {
+        match direction {
+            Direction::Next => buffer.push_back(text),
+            Direction::Prev => buffer.push_front(text),
+        }
+    }
+
+    let (mut comments, buffer) = iter
+        .skip_while(|e| source.matches(e))
+        .take_while(|e| matches!(e.kind(), SyntaxKind::Comment | SyntaxKind::Whitespace))
+        .fold_while(
+            (VecDeque::new(), VecDeque::new()),
+            |(mut results, mut buffer), e| {
+                match e.kind() {
+                    SyntaxKind::Comment => {
+                        let text = e
+                            .into_token()
+                            .expect("comment should always be a token")
+                            .to_string()
+                            // NOTE: only `trim_end()` is needed here
+                            // because the beginning is trimmed in the
+                            // `skip_while` below (after the comment
+                            // character).
+                            .trim_end()
+                            .chars()
+                            .skip_while(|c| *c == '#' || c.is_whitespace())
+                            // TODO(clay): perhaps there is a way to avoid
+                            // an allocation here, but I cannot think of a
+                            // simple one.
+                            .collect::<String>();
+
+                        extend_buffer(text, &mut buffer, &direction);
+                    }
+                    SyntaxKind::Whitespace => {
+                        let newlines = e
+                            .into_token()
+                            .expect("whitespace should always be a token")
+                            .to_string()
+                            .chars()
+                            .filter(|c| *c == '\n')
+                            .count();
+
+                        if break_on_newline && newlines > 0 {
+                            return FoldWhile::Done((results, buffer));
+                        }
+
+                        // If there is more than one newline in the
+                        // whitespace token, then there is whitespace
+                        // separating two comments and the result should be
+                        // cut/pushed, and the buffer should be reset.
+                        if newlines > 1 {
+                            results.push_front(std::mem::take(&mut buffer).into_iter().join(" "));
+                        }
+                    }
+                    // SAFETY: we just filtered out any non-comment and
+                    // non-whitespace nodes above, so this should never occur.
+                    _ => unreachable!(),
+                }
+
+                FoldWhile::Continue((results, buffer))
+            },
+        )
+        .into_inner();
+
+    if !buffer.is_empty() {
+        comments.push_front(buffer.into_iter().join(" "));
+    }
+
+    // NOTE: most of the time, this conversion will be O(1). Occassionally
+    // it will be O(n). No allocations will ever be done. Thus, the
+    // ammortized cost of this is quite cheap.
+    Vec::from(comments).into_boxed_slice()
+}
+
+/// An extension trait for [`SyntaxNode`]s, [`SyntaxToken`]s, and
+/// [`SyntaxElement`]s.
+pub trait SyntaxExt {
+    /// Returns whether `self` matches the provided element.
+    fn matches(&self, other: &SyntaxElement) -> bool;
+
+    /// Gets the siblings with tokens.
+    ///
+    /// **NOTE:** this needed because Rowan does not encapsulate this
+    /// functionality in a trait. Once wrapped here, most of the functions
+    /// provided by this extension trait can just be provided, which simplifies
+    /// the code. Generally speaking, this should just defer to the underlying
+    /// `siblings_with_tokens` method for each type.
+    fn siblings_with_tokens(&self, direction: Direction) -> impl Iterator<Item = SyntaxElement>;
+
+    /// Returns all of the siblings _before_ the current element.
+    ///
+    /// The siblings are returned in the order they were parsed.
+    fn preceding_siblings(&self) -> Box<[SyntaxElement]> {
+        let mut results = VecDeque::new();
+
+        self.siblings_with_tokens(Direction::Prev)
+            // NOTE: this `skip_while` is necessary because
+            // `siblings_with_tokens` returns the current node.
+            .skip_while(|e| self.matches(e))
+            .for_each(|e| results.push_front(e));
+
+        // NOTE: most of the time, this conversion will be O(1). Occassionally
+        // it will be O(n). No allocations will ever be done. Thus, the
+        // ammortized cost of this is quite cheap.
+        Vec::from(results).into_boxed_slice()
+    }
+
+    /// Returns all of the siblings _after_ the current element.
+    ///
+    /// The siblings are returned in the order they were parsed.
+    fn succeeding_siblings(&self) -> Box<[SyntaxElement]> {
+        let mut results = Vec::new();
+
+        self.siblings_with_tokens(Direction::Next)
+            // NOTE: this `skip_while` is necessary because
+            // `siblings_with_tokens` returns the current node.
+            .skip_while(|e| self.matches(e))
+            .for_each(|e| results.push(e));
+
+        // NOTE: this should always be O(1) and never require any additional
+        // allocations.
+        results.into_boxed_slice()
+    }
+
+    /// Gets all elements that are adjacent to a particular element (not
+    /// including the element itself). This means in both the forward and
+    /// reverse direction.
+    ///
+    /// The siblings are returned in the order they were parsed.
+    fn adjacent(&self) -> Box<[SyntaxElement]> {
+        let mut results = Vec::from(self.preceding_siblings());
+        results.extend(self.succeeding_siblings().iter().cloned());
+
+        // NOTE: this should always be O(1) and never require any additional
+        // allocations.
+        results.into_boxed_slice()
+    }
+
+    /// Gets all of the preceding comments for an element.
+    fn preceding_comments(&self) -> Box<[String]>
+    where
+        Self: Sized,
+    {
+        gather_comments(self, Direction::Prev, false)
+    }
+
+    /// Gets all of the succeeding comments for an element.
+    fn succeeding_comments(&self) -> Box<[String]>
+    where
+        Self: Sized,
+    {
+        gather_comments(self, Direction::Next, false)
+    }
+
+    /// Gets all of the inline comments directly following an element on the
+    /// same line.
+    fn inline_comment(&self) -> Option<String>
+    where
+        Self: Sized,
+    {
+        gather_comments(self, Direction::Next, true)
+            // NOTE: at most, there can be one contiguous comment on a line.
+            .first()
+            .cloned()
+    }
+}
+
+impl SyntaxExt for SyntaxNode {
+    fn matches(&self, other: &SyntaxElement) -> bool {
+        other.as_node().map(|n| n == self).unwrap_or(false)
+    }
+
+    fn siblings_with_tokens(&self, direction: Direction) -> impl Iterator<Item = SyntaxElement> {
+        self.siblings_with_tokens(direction)
+    }
+}
+
+impl SyntaxExt for SyntaxToken {
+    fn matches(&self, other: &SyntaxElement) -> bool {
+        other.as_token().map(|n| n == self).unwrap_or(false)
+    }
+
+    fn siblings_with_tokens(&self, direction: Direction) -> impl Iterator<Item = SyntaxElement> {
+        self.siblings_with_tokens(direction)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::SyntaxTree;
+
+    #[test]
+    fn preceding_comments() {
+        let (tree, diagnostics) = SyntaxTree::parse(
+            "version 1.2
+
+# This comment should not be included
+task foo {}
+
+# Some
+# comments
+# are
+# long
+
+# Others are short
+
+#     and, yet    another
+workflow foo {} # This should not be collected.
+
+# This comment should not be included either.",
+        );
+
+        assert!(diagnostics.is_empty());
+
+        let workflow = tree.root().last_child().unwrap();
+        assert_eq!(workflow.kind(), SyntaxKind::WorkflowDefinitionNode);
+        assert_eq!(
+            workflow.preceding_comments().as_ref(),
+            vec![
+                "Some comments are long",
+                "Others are short",
+                "and, yet    another"
+            ]
+        );
+    }
+
+    #[test]
+    fn succeeding_comments() {
+        let (tree, diagnostics) = SyntaxTree::parse(
+            "version 1.2
+
+# This comment should not be included
+task foo {}
+
+# This should not be collected.
+workflow foo {} # Here is a comment that should be collected.
+
+# This comment should be included too.",
+        );
+
+        assert!(diagnostics.is_empty());
+
+        let workflow = tree.root().last_child().unwrap();
+        assert_eq!(workflow.kind(), SyntaxKind::WorkflowDefinitionNode);
+        assert_eq!(
+            workflow.succeeding_comments().as_ref(),
+            vec![
+                "This comment should be included too.",
+                "Here is a comment that should be collected."
+            ]
+        );
+    }
+
+    #[test]
+    fn inline_comment() {
+        let (tree, diagnostics) = SyntaxTree::parse(
+            "version 1.2
+
+# This comment should not be included
+task foo {}
+
+# This should not be collected.
+workflow foo {} # Here is a comment that should be collected.
+
+# This comment should not be included either.",
+        );
+
+        assert!(diagnostics.is_empty());
+
+        let workflow = tree.root().last_child().unwrap();
+        assert_eq!(workflow.kind(), SyntaxKind::WorkflowDefinitionNode);
+        assert_eq!(
+            workflow.inline_comment().as_deref(),
+            Some("Here is a comment that should be collected.")
+        );
     }
 }

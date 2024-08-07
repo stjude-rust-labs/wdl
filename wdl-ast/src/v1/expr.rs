@@ -3698,7 +3698,7 @@ task test {
             r#"
 version 1.1
 
-task test { 
+task test {
     Foo a = Foo { foo: "bar" }
     Bar b = Bar { bar: 1, baz: [1, 2, 3] }
 }
