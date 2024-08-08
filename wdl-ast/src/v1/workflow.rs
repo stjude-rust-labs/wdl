@@ -287,7 +287,7 @@ pub struct ConditionalStatement(pub(crate) SyntaxNode);
 impl ConditionalStatement {
     /// Gets the expression of the conditional statement
     pub fn expr(&self) -> Expr {
-        child(&self.0).expect("expected a conditional expression")
+        Expr::child(&self.0).expect("expected a conditional expression")
     }
 
     /// Gets the statements of the conditional body.
@@ -333,7 +333,7 @@ impl ScatterStatement {
 
     /// Gets the scatter expression.
     pub fn expr(&self) -> Expr {
-        child(&self.0).expect("expected a scatter expression")
+        Expr::child(&self.0).expect("expected a scatter expression")
     }
 
     /// Gets the statements of the scatter body.
@@ -544,7 +544,7 @@ impl CallInputItem {
 
     /// The optional expression for the input.
     pub fn expr(&self) -> Option<Expr> {
-        child(&self.0)
+        Expr::child(&self.0)
     }
 }
 

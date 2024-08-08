@@ -368,6 +368,19 @@ pub enum SyntaxKind {
     MAX,
 }
 
+impl SyntaxKind {
+    /// Returns whether the token is not a true [`SyntaxKind`].
+    ///
+    /// These are usually kinds with special meanings or that are largely
+    /// symbolic.
+    pub fn is_pseudokind(&self) -> bool {
+        matches!(
+            self,
+            SyntaxKind::Abandoned | SyntaxKind::Unknown | SyntaxKind::Unparsed | SyntaxKind::MAX
+        )
+    }
+}
+
 /// Every [`SyntaxKind`] variant.
 pub static ALL_SYNTAX_KIND: &[SyntaxKind] = SyntaxKind::VARIANTS;
 

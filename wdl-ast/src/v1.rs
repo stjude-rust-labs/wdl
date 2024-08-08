@@ -12,6 +12,7 @@ mod expr;
 mod import;
 mod r#struct;
 mod task;
+mod tokens;
 mod workflow;
 
 pub use decls::*;
@@ -19,6 +20,7 @@ pub use expr::*;
 pub use import::*;
 pub use r#struct::*;
 pub use task::*;
+pub use tokens::*;
 pub use workflow::*;
 
 /// Represents a WDL V1 Abstract Syntax Tree (AST).

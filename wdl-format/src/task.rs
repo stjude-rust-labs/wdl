@@ -125,7 +125,7 @@ impl Formattable for RuntimeItem {
 
         let expr = self.expr();
         format_preceding_comments(
-            &SyntaxElement::from(expr.syntax().clone()),
+            &SyntaxElement::from(expr.inner().clone()),
             writer,
             formatter,
             true,
@@ -227,7 +227,7 @@ impl Formattable for RequirementsItem {
 
         let expr = self.expr();
         format_preceding_comments(
-            &SyntaxElement::from(expr.syntax().clone()),
+            &SyntaxElement::from(expr.inner().clone()),
             writer,
             formatter,
             true,

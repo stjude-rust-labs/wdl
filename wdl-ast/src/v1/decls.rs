@@ -645,7 +645,7 @@ impl BoundDecl {
 
     /// Gets the expression the declaration is bound to.
     pub fn expr(&self) -> Expr {
-        child(&self.0).expect("bound declaration should have an expression")
+        Expr::child(&self.0).expect("bound declaration should have an expression")
     }
 }
 
