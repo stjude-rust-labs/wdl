@@ -514,7 +514,7 @@ impl fmt::Debug for SyntaxTree {
     }
 }
 
-/// Gathers comments from a stream of [`SyntaxElement`]s and groups comments
+/// Gathers comments from a [`SyntaxExt`] and groups comments
 /// logically from that stream (separated by whitespace).
 fn gather_comments<T: SyntaxExt>(
     source: &T,
@@ -541,7 +541,7 @@ fn gather_comments<T: SyntaxExt>(
                     // Check if e is a comment on its own line.
                     // If direction is 'Next' then we already know that the
                     // comment is on its own line.
-                    if break_on_newline && direction == Direction::Prev {
+                    if direction == Direction::Prev {
                         if let Some(prev) = e.prev_sibling_or_token() {
                             if prev.kind() == SyntaxKind::Whitespace {
                                 let newlines = prev
@@ -756,7 +756,7 @@ mod tests {
             "version 1.2
 
 # This comment should not be included
-task foo {}
+task foo {} # This comment should not be included
 
 # Some
 # comments
