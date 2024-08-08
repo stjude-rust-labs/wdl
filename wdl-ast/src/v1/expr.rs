@@ -4,6 +4,7 @@ use crate::support;
 use crate::support::child;
 use crate::support::children;
 use crate::token;
+use crate::token_child;
 use crate::AstChildren;
 use crate::AstNode;
 use crate::AstToken;
@@ -341,12 +342,27 @@ impl Expr {
             _ => panic!("not an access expression"),
         }
     }
-}
 
-impl AstNode for Expr {
-    type Language = WorkflowDescriptionLanguage;
+    /// Finds the first child that can be cast to an [`Expr`].
+    ///
+    /// This is meant to emulate the functionality of
+    /// [`rowan::ast::support::child`] without requiring [`Expr`] to implement
+    /// the `AstNode` trait.
+    pub fn child(syntax: &SyntaxNode) -> Option<Self> {
+        syntax.children().find_map(|c| Self::try_from(c).ok())
+    }
 
-    fn can_cast(kind: SyntaxKind) -> bool
+    /// Finds all children that can be cast to an [`Expr`].
+    ///
+    /// This is meant to emulate the functionality of
+    /// [`rowan::ast::support::children`] without requiring [`Expr`] to
+    /// implement the `AstNode` trait.
+    pub fn children(syntax: &SyntaxNode) -> impl Iterator<Item = Expr> {
+        syntax.children().filter_map(|c| Expr::try_from(c).ok())
+    }
+
+    /// Whether the [`SyntaxKind`] will be able to be turned into an [`Expr`].
+    pub fn supported(kind: SyntaxKind) -> bool
     where
         Self: Sized,
     {
@@ -381,72 +397,114 @@ impl AstNode for Expr {
         )
     }
 
-    fn cast(syntax: SyntaxNode) -> Option<Self>
-    where
-        Self: Sized,
-    {
+    /// Gets a reference to the inner [`SyntaxNode`].
+    pub fn inner(&self) -> &SyntaxNode {
+        match self {
+            Expr::Literal(node) => node.syntax(),
+            Expr::Name(node) => node.syntax(),
+            Expr::Parenthesized(node) => node.syntax(),
+            Expr::If(node) => node.syntax(),
+            Expr::LogicalNot(node) => node.syntax(),
+            Expr::Negation(node) => node.syntax(),
+            Expr::LogicalOr(node) => node.syntax(),
+            Expr::LogicalAnd(node) => node.syntax(),
+            Expr::Equality(node) => node.syntax(),
+            Expr::Inequality(node) => node.syntax(),
+            Expr::Less(node) => node.syntax(),
+            Expr::LessEqual(node) => node.syntax(),
+            Expr::Greater(node) => node.syntax(),
+            Expr::GreaterEqual(node) => node.syntax(),
+            Expr::Addition(node) => node.syntax(),
+            Expr::Subtraction(node) => node.syntax(),
+            Expr::Multiplication(node) => node.syntax(),
+            Expr::Division(node) => node.syntax(),
+            Expr::Modulo(node) => node.syntax(),
+            Expr::Exponentiation(node) => node.syntax(),
+            Expr::Call(node) => node.syntax(),
+            Expr::Index(node) => node.syntax(),
+            Expr::Access(node) => node.syntax(),
+        }
+    }
+}
+
+impl TryFrom<SyntaxNode> for Expr {
+    type Error = ();
+
+    fn try_from(syntax: SyntaxNode) -> Result<Self, Self::Error> {
         if LiteralExpr::can_cast(syntax.kind()) {
-            return LiteralExpr::cast(syntax).map(Self::Literal);
+            return Ok(Self::Literal(
+                LiteralExpr::cast(syntax).expect("literal expression should cast"),
+            ));
         }
 
         match syntax.kind() {
-            SyntaxKind::NameRefNode => Some(Self::Name(NameRef(syntax))),
-            SyntaxKind::ParenthesizedExprNode => {
-                Some(Self::Parenthesized(ParenthesizedExpr(syntax)))
+            SyntaxKind::NameRefNode => Ok(Self::Name(
+                NameRef::cast(syntax).expect("name ref should cast"),
+            )),
+            SyntaxKind::ParenthesizedExprNode => Ok(Self::Parenthesized(
+                ParenthesizedExpr::cast(syntax).expect("parenthesized expr should cast"),
+            )),
+            SyntaxKind::IfExprNode => {
+                Ok(Self::If(IfExpr::cast(syntax).expect("if expr should cast")))
             }
-            SyntaxKind::IfExprNode => Some(Self::If(IfExpr(syntax))),
-            SyntaxKind::LogicalNotExprNode => Some(Self::LogicalNot(LogicalNotExpr(syntax))),
-            SyntaxKind::NegationExprNode => Some(Self::Negation(NegationExpr(syntax))),
-            SyntaxKind::LogicalOrExprNode => Some(Self::LogicalOr(LogicalOrExpr(syntax))),
-            SyntaxKind::LogicalAndExprNode => Some(Self::LogicalAnd(LogicalAndExpr(syntax))),
-            SyntaxKind::EqualityExprNode => Some(Self::Equality(EqualityExpr(syntax))),
-            SyntaxKind::InequalityExprNode => Some(Self::Inequality(InequalityExpr(syntax))),
-            SyntaxKind::LessExprNode => Some(Self::Less(LessExpr(syntax))),
-            SyntaxKind::LessEqualExprNode => Some(Self::LessEqual(LessEqualExpr(syntax))),
-            SyntaxKind::GreaterExprNode => Some(Self::Greater(GreaterExpr(syntax))),
-            SyntaxKind::GreaterEqualExprNode => Some(Self::GreaterEqual(GreaterEqualExpr(syntax))),
-            SyntaxKind::AdditionExprNode => Some(Self::Addition(AdditionExpr(syntax))),
-            SyntaxKind::SubtractionExprNode => Some(Self::Subtraction(SubtractionExpr(syntax))),
-            SyntaxKind::MultiplicationExprNode => {
-                Some(Self::Multiplication(MultiplicationExpr(syntax)))
-            }
-            SyntaxKind::DivisionExprNode => Some(Self::Division(DivisionExpr(syntax))),
-            SyntaxKind::ModuloExprNode => Some(Self::Modulo(ModuloExpr(syntax))),
-            SyntaxKind::ExponentiationExprNode => {
-                Some(Self::Exponentiation(ExponentiationExpr(syntax)))
-            }
-            SyntaxKind::CallExprNode => Some(Self::Call(CallExpr(syntax))),
-            SyntaxKind::IndexExprNode => Some(Self::Index(IndexExpr(syntax))),
-            SyntaxKind::AccessExprNode => Some(Self::Access(AccessExpr(syntax))),
-            _ => None,
-        }
-    }
-
-    fn syntax(&self) -> &SyntaxNode {
-        match self {
-            Self::Literal(l) => l.syntax(),
-            Self::Name(n) => &n.0,
-            Self::Parenthesized(p) => &p.0,
-            Self::If(i) => &i.0,
-            Self::LogicalNot(n) => &n.0,
-            Self::Negation(n) => &n.0,
-            Self::LogicalOr(o) => &o.0,
-            Self::LogicalAnd(a) => &a.0,
-            Self::Equality(e) => &e.0,
-            Self::Inequality(i) => &i.0,
-            Self::Less(l) => &l.0,
-            Self::LessEqual(l) => &l.0,
-            Self::Greater(g) => &g.0,
-            Self::GreaterEqual(g) => &g.0,
-            Self::Addition(a) => &a.0,
-            Self::Subtraction(s) => &s.0,
-            Self::Multiplication(m) => &m.0,
-            Self::Division(d) => &d.0,
-            Self::Modulo(m) => &m.0,
-            Self::Exponentiation(e) => &e.0,
-            Self::Call(c) => &c.0,
-            Self::Index(i) => &i.0,
-            Self::Access(a) => &a.0,
+            SyntaxKind::LogicalNotExprNode => Ok(Self::LogicalNot(
+                LogicalNotExpr::cast(syntax).expect("logical not expr should cast"),
+            )),
+            SyntaxKind::NegationExprNode => Ok(Self::Negation(
+                NegationExpr::cast(syntax).expect("negation expr should cast"),
+            )),
+            SyntaxKind::LogicalOrExprNode => Ok(Self::LogicalOr(
+                LogicalOrExpr::cast(syntax).expect("logical or expr should cast"),
+            )),
+            SyntaxKind::LogicalAndExprNode => Ok(Self::LogicalAnd(
+                LogicalAndExpr::cast(syntax).expect("logical and expr should cast"),
+            )),
+            SyntaxKind::EqualityExprNode => Ok(Self::Equality(
+                EqualityExpr::cast(syntax).expect("equality expr should cast"),
+            )),
+            SyntaxKind::InequalityExprNode => Ok(Self::Inequality(
+                InequalityExpr::cast(syntax).expect("inequality expr should cast"),
+            )),
+            SyntaxKind::LessExprNode => Ok(Self::Less(
+                LessExpr::cast(syntax).expect("less expr should cast"),
+            )),
+            SyntaxKind::LessEqualExprNode => Ok(Self::LessEqual(
+                LessEqualExpr::cast(syntax).expect("less equal expr should cast"),
+            )),
+            SyntaxKind::GreaterExprNode => Ok(Self::Greater(
+                GreaterExpr::cast(syntax).expect("greater expr should cast"),
+            )),
+            SyntaxKind::GreaterEqualExprNode => Ok(Self::GreaterEqual(
+                GreaterEqualExpr::cast(syntax).expect("greater equal expr should cast"),
+            )),
+            SyntaxKind::AdditionExprNode => Ok(Self::Addition(
+                AdditionExpr::cast(syntax).expect("addition expr should cast"),
+            )),
+            SyntaxKind::SubtractionExprNode => Ok(Self::Subtraction(
+                SubtractionExpr::cast(syntax).expect("subtraction expr should cast"),
+            )),
+            SyntaxKind::MultiplicationExprNode => Ok(Self::Multiplication(
+                MultiplicationExpr::cast(syntax).expect("multiplication expr should cast"),
+            )),
+            SyntaxKind::DivisionExprNode => Ok(Self::Division(
+                DivisionExpr::cast(syntax).expect("division expr should cast"),
+            )),
+            SyntaxKind::ModuloExprNode => Ok(Self::Modulo(
+                ModuloExpr::cast(syntax).expect("modulo expr should cast"),
+            )),
+            SyntaxKind::ExponentiationExprNode => Ok(Self::Exponentiation(
+                ExponentiationExpr::cast(syntax).expect("exponentation expr should cast"),
+            )),
+            SyntaxKind::CallExprNode => Ok(Self::Call(
+                CallExpr::cast(syntax).expect("call expr should cast"),
+            )),
+            SyntaxKind::IndexExprNode => Ok(Self::Index(
+                IndexExpr::cast(syntax).expect("index expr should cast"),
+            )),
+            SyntaxKind::AccessExprNode => Ok(Self::Access(
+                AccessExpr::cast(syntax).expect("access expr should cast"),
+            )),
+            _ => Err(()),
         }
     }
 }
@@ -1162,7 +1220,7 @@ impl Placeholder {
 
     /// Gets the placeholder expression.
     pub fn expr(&self) -> Expr {
-        child(&self.0).expect("placeholder should have an expression")
+        Expr::child(&self.0).expect("placeholder should have an expression")
     }
 }
 
@@ -1431,8 +1489,8 @@ pub struct LiteralArray(SyntaxNode);
 
 impl LiteralArray {
     /// Gets the elements of the literal array.
-    pub fn elements(&self) -> AstChildren<Expr> {
-        children(&self.0)
+    pub fn elements(&self) -> impl Iterator<Item = Expr> {
+        Expr::children(&self.0)
     }
 }
 
@@ -1468,7 +1526,7 @@ pub struct LiteralPair(SyntaxNode);
 impl LiteralPair {
     /// Gets the first and second expressions in the literal pair.
     pub fn exprs(&self) -> (Expr, Expr) {
-        let mut children = self.0.children().filter_map(Expr::cast);
+        let mut children = Expr::children(&self.0);
         let first = children
             .next()
             .expect("pair should have a first expression");
@@ -1547,7 +1605,7 @@ pub struct LiteralMapItem(SyntaxNode);
 impl LiteralMapItem {
     /// Gets the key and the value of the item.
     pub fn key_value(&self) -> (Expr, Expr) {
-        let mut children = self.0.children().filter_map(Expr::cast);
+        let mut children = Expr::children(&self.0);
         let key = children.next().expect("expected a key expression");
         let value = children.next().expect("expected a value expression");
         (key, value)
@@ -1617,25 +1675,9 @@ impl AstNode for LiteralObject {
 
 /// Gets the name and value of a object or struct literal item.
 fn name_value(parent: &SyntaxNode) -> (Ident, Expr) {
-    let mut children = parent
-        .children_with_tokens()
-        .filter(|c| Ident::can_cast(c.kind()) || Expr::can_cast(c.kind()));
-    let key = Ident::cast(
-        children
-            .next()
-            .expect("expected a key token")
-            .into_token()
-            .expect("key should be a token"),
-    )
-    .expect("token should cast to ident");
-    let value = Expr::cast(
-        children
-            .next()
-            .expect("there should be a value expression")
-            .into_node()
-            .expect("value should be a node"),
-    )
-    .expect("node should cast to an expression");
+    let key = token_child::<Ident>(parent).expect("expected a key token");
+    let value = Expr::child(parent).expect("expected a value expression");
+
     (key, value)
 }
 
@@ -1829,7 +1871,7 @@ impl LiteralHintsItem {
 
     /// Gets the expression of the hints item.
     pub fn expr(&self) -> Expr {
-        child(&self.0).expect("expected an item expression")
+        Expr::child(&self.0).expect("expected an item expression")
     }
 }
 
@@ -1911,7 +1953,7 @@ impl LiteralInputItem {
 
     /// Gets the expression of the input item.
     pub fn expr(&self) -> Expr {
-        child(&self.0).expect("expected an item expression")
+        Expr::child(&self.0).expect("expected an item expression")
     }
 }
 
@@ -1993,7 +2035,7 @@ impl LiteralOutputItem {
 
     /// Gets the expression of the output item.
     pub fn expr(&self) -> Expr {
-        child(&self.0).expect("expected an item expression")
+        Expr::child(&self.0).expect("expected an item expression")
     }
 }
 
@@ -2065,7 +2107,7 @@ pub struct ParenthesizedExpr(SyntaxNode);
 impl ParenthesizedExpr {
     /// Gets the inner expression.
     pub fn inner(&self) -> Expr {
-        child(&self.0).expect("expected an inner expression")
+        Expr::child(&self.0).expect("expected an inner expression")
     }
 }
 
@@ -2105,7 +2147,7 @@ impl IfExpr {
     /// The second expression is the `true` expression.
     /// The third expression is the `false` expression.
     pub fn exprs(&self) -> (Expr, Expr, Expr) {
-        let mut children = self.0.children().filter_map(Expr::cast);
+        let mut children = Expr::children(&self.0);
         let conditional = children
             .next()
             .expect("should have a conditional expression");
@@ -2150,7 +2192,7 @@ macro_rules! prefix_expression {
         impl $name {
             /// Gets the operand expression.
             pub fn operand(&self) -> Expr {
-                child(&self.0).expect("expected an operand expression")
+                Expr::child(&self.0).expect("expected an operand expression")
             }
         }
 
@@ -2191,7 +2233,7 @@ macro_rules! infix_expression {
         impl $name {
             /// Gets the operands of the expression.
             pub fn operands(&self) -> (Expr, Expr) {
-                let mut children = self.0.children().filter_map(Expr::cast);
+                let mut children = Expr::children(&self.0);
                 let lhs = children.next().expect("expected a lhs expression");
                 let rhs = children.next().expect("expected a rhs expression");
                 (lhs, rhs)
@@ -2253,12 +2295,12 @@ pub struct CallExpr(SyntaxNode);
 impl CallExpr {
     /// Gets the call target expression.
     pub fn target(&self) -> Expr {
-        child(&self.0).expect("expected a target expression")
+        Expr::child(&self.0).expect("expected a target expression")
     }
 
     /// Gets the call arguments.
     pub fn arguments(&self) -> impl Iterator<Item = Expr> {
-        children(&self.0).skip(1)
+        Expr::children(&self.0).skip(1)
     }
 }
 
@@ -2297,7 +2339,7 @@ impl IndexExpr {
     /// The first is the operand expression.
     /// The second is the index expression.
     pub fn operands(&self) -> (Expr, Expr) {
-        let mut children = self.0.children().filter_map(Expr::cast);
+        let mut children = Expr::children(&self.0);
         let operand = children.next().expect("expected an operand expression");
         let index = children.next().expect("expected an index expression");
         (operand, index)
@@ -2339,7 +2381,7 @@ impl AccessExpr {
     /// The first is the operand expression.
     /// The second is the member name.
     pub fn operands(&self) -> (Expr, Ident) {
-        let operand = child(&self.0).expect("expected an operand expression");
+        let operand = Expr::child(&self.0).expect("expected an operand expression");
         let name = Ident::cast(self.0.last_token().expect("expected a last token"))
             .expect("expected an ident token");
         (operand, name)

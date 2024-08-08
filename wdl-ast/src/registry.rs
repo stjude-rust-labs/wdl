@@ -1,4 +1,4 @@
-use std::any::TypeId;
+use std::any::type_name;
 use std::collections::HashMap;
 use std::sync::LazyLock;
 
@@ -27,43 +27,77 @@ mod private {
 
 /// A registry of all known mappings between types that implement [`AstNode`]
 /// and the [`SyntaxKind`] they can map to.
-static REGISTRY: LazyLock<HashMap<TypeId, Box<[SyntaxKind]>>> = LazyLock::new(|| {
+static REGISTRY: LazyLock<HashMap<&'static str, Box<[SyntaxKind]>>> = LazyLock::new(|| {
     let types = vec![
         Comment::register(),
         Document::register(),
         Ident::register(),
         v1::AccessExpr::register(),
         v1::AdditionExpr::register(),
+        v1::AfterKeyword::register(),
+        v1::AliasKeyword::register(),
         v1::ArrayType::register(),
+        v1::ArrayTypeKeyword::register(),
+        v1::AsKeyword::register(),
+        v1::Assignment::register(),
         v1::Ast::register(),
+        v1::Asterisk::register(),
+        v1::BooleanTypeKeyword::register(),
         v1::BoundDecl::register(),
         v1::CallAfter::register(),
         v1::CallAlias::register(),
         v1::CallExpr::register(),
         v1::CallInputItem::register(),
+        v1::CallKeyword::register(),
         v1::CallTarget::register(),
+        v1::CloseBrace::register(),
+        v1::CloseBracket::register(),
+        v1::CloseHeredoc::register(),
+        v1::CloseParen::register(),
+        v1::Colon::register(),
+        v1::Comma::register(),
+        v1::CommandKeyword::register(),
         v1::CommandSection::register(),
         v1::CommandText::register(),
         v1::ConditionalStatement::register(),
         v1::Decl::register(),
         v1::DefaultOption::register(),
+        v1::DirectoryTypeKeyword::register(),
         v1::DivisionExpr::register(),
         v1::DocumentItem::register(),
+        v1::Dot::register(),
+        v1::DoubleQuote::register(),
+        v1::ElseKeyword::register(),
+        v1::Equal::register(),
         v1::EqualityExpr::register(),
+        v1::Exclamation::register(),
+        v1::Exponentiation::register(),
         v1::ExponentiationExpr::register(),
-        v1::Expr::register(),
+        v1::FalseKeyword::register(),
+        v1::FileTypeKeyword::register(),
         v1::Float::register(),
+        v1::FloatTypeKeyword::register(),
+        v1::Greater::register(),
+        v1::GreaterEqual::register(),
         v1::GreaterEqualExpr::register(),
         v1::GreaterExpr::register(),
         v1::HintsItem::register(),
+        v1::HintsKeyword::register(),
         v1::HintsSection::register(),
         v1::IfExpr::register(),
+        v1::IfKeyword::register(),
         v1::ImportAlias::register(),
+        v1::ImportKeyword::register(),
         v1::ImportStatement::register(),
         v1::IndexExpr::register(),
         v1::InequalityExpr::register(),
+        v1::InKeyword::register(),
+        v1::InputKeyword::register(),
         v1::InputSection::register(),
         v1::Integer::register(),
+        v1::IntTypeKeyword::register(),
+        v1::Less::register(),
+        v1::LessEqual::register(),
         v1::LessEqualExpr::register(),
         v1::LessExpr::register(),
         v1::LiteralArray::register(),
@@ -78,6 +112,7 @@ static REGISTRY: LazyLock<HashMap<TypeId, Box<[SyntaxKind]>>> = LazyLock::new(||
         v1::LiteralMap::register(),
         v1::LiteralMapItem::register(),
         v1::LiteralNone::register(),
+        v1::LiteralNull::register(),
         v1::LiteralObject::register(),
         v1::LiteralObjectItem::register(),
         v1::LiteralOutput::register(),
@@ -86,44 +121,79 @@ static REGISTRY: LazyLock<HashMap<TypeId, Box<[SyntaxKind]>>> = LazyLock::new(||
         v1::LiteralString::register(),
         v1::LiteralStruct::register(),
         v1::LiteralStructItem::register(),
+        v1::LogicalAnd::register(),
         v1::LogicalAndExpr::register(),
         v1::LogicalNotExpr::register(),
+        v1::LogicalOr::register(),
         v1::LogicalOrExpr::register(),
         v1::MapType::register(),
+        v1::MapTypeKeyword::register(),
         v1::MetadataArray::register(),
+        v1::MetadataObject::register(),
         v1::MetadataObjectItem::register(),
         v1::MetadataSection::register(),
+        v1::MetaKeyword::register(),
+        v1::Minus::register(),
         v1::ModuloExpr::register(),
         v1::MultiplicationExpr::register(),
         v1::NameRef::register(),
         v1::NegationExpr::register(),
+        v1::NoneKeyword::register(),
+        v1::NotEqual::register(),
+        v1::NullKeyword::register(),
+        v1::ObjectKeyword::register(),
         v1::ObjectType::register(),
+        v1::ObjectTypeKeyword::register(),
+        v1::OpenBrace::register(),
+        v1::OpenBracket::register(),
+        v1::OpenHeredoc::register(),
+        v1::OpenParen::register(),
+        v1::OutputKeyword::register(),
         v1::OutputSection::register(),
         v1::PairType::register(),
+        v1::PairTypeKeyword::register(),
         v1::ParameterMetadataSection::register(),
+        v1::ParameterMetaKeyword::register(),
         v1::ParenthesizedExpr::register(),
+        v1::Percent::register(),
         v1::Placeholder::register(),
+        v1::PlaceholderOpen::register(),
         v1::PlaceholderOption::register(),
+        v1::Plus::register(),
         v1::PrimitiveType::register(),
+        v1::QuestionMark::register(),
         v1::RequirementsItem::register(),
+        v1::RequirementsKeyword::register(),
         v1::RequirementsSection::register(),
         v1::RuntimeItem::register(),
+        v1::RuntimeKeyword::register(),
         v1::RuntimeSection::register(),
+        v1::ScatterKeyword::register(),
         v1::ScatterStatement::register(),
         v1::SectionParent::register(),
         v1::SepOption::register(),
+        v1::SingleQuote::register(),
+        v1::Slash::register(),
         v1::StringText::register(),
+        v1::StringTypeKeyword::register(),
         v1::StructDefinition::register(),
         v1::StructItem::register(),
+        v1::StructKeyword::register(),
         v1::SubtractionExpr::register(),
         v1::TaskDefinition::register(),
         v1::TaskItem::register(),
+        v1::TaskKeyword::register(),
+        v1::ThenKeyword::register(),
         v1::TrueFalseOption::register(),
+        v1::TrueKeyword::register(),
         v1::Type::register(),
         v1::TypeRef::register(),
         v1::UnboundDecl::register(),
+        v1::Unknown::register(),
+        v1::VersionKeyword::register(),
         v1::WorkflowDefinition::register(),
         v1::WorkflowItem::register(),
+        v1::WorkflowKeyword::register(),
         v1::WorkflowStatement::register(),
         Version::register(),
         VersionStatement::register(),
@@ -148,8 +218,8 @@ static REGISTRY: LazyLock<HashMap<TypeId, Box<[SyntaxKind]>>> = LazyLock::new(||
 /// Computes the inverse of the registry (maps [`SyntaxKind`]s to every type
 /// that can cast from them).
 
-fn inverse_registry() -> HashMap<SyntaxKind, Box<[TypeId]>> {
-    let mut result = HashMap::<SyntaxKind, Vec<TypeId>>::new();
+fn inverse_registry() -> HashMap<SyntaxKind, Box<[&'static str]>> {
+    let mut result = HashMap::<SyntaxKind, Vec<&'static str>>::new();
 
     for (key, values) in REGISTRY.iter() {
         for value in values.into_iter() {
@@ -164,16 +234,16 @@ fn inverse_registry() -> HashMap<SyntaxKind, Box<[TypeId]>> {
 }
 
 trait AstNodeRegistrant: private::SealedNode {
-    /// Registers the AST element.
-    fn register() -> (TypeId, Box<[SyntaxKind]>);
+    /// Returns all [`SyntaxKind`]s that can be cast into this AST node type.
+    fn register() -> (&'static str, Box<[SyntaxKind]>);
 }
 
 impl<T: AstNode<Language = WorkflowDescriptionLanguage> + 'static> private::SealedNode for T {}
 
 impl<T: AstNode<Language = WorkflowDescriptionLanguage> + 'static> AstNodeRegistrant for T {
-    fn register() -> (TypeId, Box<[SyntaxKind]>) {
+    fn register() -> (&'static str, Box<[SyntaxKind]>) {
         (
-            TypeId::of::<T>(),
+            type_name::<T>(),
             ALL_SYNTAX_KIND
                 .iter()
                 .filter(|kind| T::can_cast(**kind))
@@ -185,16 +255,16 @@ impl<T: AstNode<Language = WorkflowDescriptionLanguage> + 'static> AstNodeRegist
 }
 
 trait AstTokenRegistrant: private::SealedToken {
-    /// Registers a type implementing `AstToken` that can be  .
-    fn register() -> (TypeId, Box<[SyntaxKind]>);
+    /// Returns all [`SyntaxKind`]s that can be cast into this AST token type.
+    fn register() -> (&'static str, Box<[SyntaxKind]>);
 }
 
 impl<T: AstToken + 'static> private::SealedToken for T {}
 
 impl<T: AstToken + 'static> AstTokenRegistrant for T {
-    fn register() -> (TypeId, Box<[SyntaxKind]>) {
+    fn register() -> (&'static str, Box<[SyntaxKind]>) {
         (
-            TypeId::of::<T>(),
+            type_name::<T>(),
             ALL_SYNTAX_KIND
                 .iter()
                 .filter(|kind| T::can_cast(**kind))
@@ -209,18 +279,32 @@ mod tests {
     use super::*;
 
     #[test]
-    fn ensure_each_syntax_element_has_an_ast_node() {
+    fn ensure_each_syntax_element_has_exactly_one_ast_node_or_ast_token() {
         let mut missing = Vec::new();
+        let mut multiple = Vec::new();
+
         let inverse_registry = inverse_registry();
 
         for kind in ALL_SYNTAX_KIND {
             // NOTE: these are pseudo elements and should not be reported.
-            if *kind == SyntaxKind::Abandoned || *kind == SyntaxKind::MAX {
+            if kind.is_pseudokind() {
                 continue;
             }
 
-            if !inverse_registry.contains_key(kind) {
-                missing.push(kind);
+            match inverse_registry.get(kind) {
+                // SAFETY: because this is an inverse registry, only
+                // [`SyntaxKind`]s with at least one registered implementing
+                // type would be registered here. Thus, by design of the
+                // `inverse_registry()` method, this will never occur.
+                Some(values) if values.is_empty() => {
+                    unreachable!("the inverse registry should never contain
+an empty array")                 }
+                Some(values) if values.len() > 1 => multiple.push((kind,
+values)),                 None => missing.push(kind),
+                // NOTE: this is essentially only if the values exist and the
+                // length is 1—in that case, there is a one to one mapping,
+                // which is what we would like the case to be.
+                _ => {}
             }
         }
 
@@ -232,9 +316,36 @@ mod tests {
             missing.sort();
 
             panic!(
-                "detected `SyntaxKind`s without an associated `AstNode` (n={}): {}",
-                missing.len(),
+                "detected `SyntaxKind`s without an associated
+`AstNode`/`AstToken` (n={}): {}",                 missing.len(),
                 missing.join(", ")
+            )
+        }
+
+        if !multiple.is_empty() {
+            multiple.sort();
+            let mut multiple = multiple
+                .into_iter()
+                .map(|(kind, types)| {
+                    let mut types = types.clone();
+                    types.sort();
+
+                    let mut result = format!("== {:?} ==", kind);
+                    for r#type in types {
+                        result.push_str("\n* ");
+                        result.push_str(r#type);
+                    }
+
+                    result
+                })
+                .collect::<Vec<_>>();
+            multiple.sort();
+
+            panic!(
+                "detected `SyntaxKind`s associated with multiple
+`AstNode`s/`AstToken`s \                  (n={}):\n\n{}",
+                multiple.len(),
+                multiple.join("\n\n")
             )
         }
     }

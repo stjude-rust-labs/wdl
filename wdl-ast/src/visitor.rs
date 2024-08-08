@@ -47,7 +47,6 @@ use crate::v1::StructDefinition;
 use crate::v1::TaskDefinition;
 use crate::v1::UnboundDecl;
 use crate::v1::WorkflowDefinition;
-use crate::AstNode;
 use crate::AstToken as _;
 use crate::Comment;
 use crate::Document;
@@ -393,11 +392,16 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, state: &mut V::State, visitor
             SyntaxKind::MetadataArrayNode | SyntaxKind::LiteralNullNode => {
                 // Skip these nodes as they're part of a metadata section
             }
-            k if Expr::can_cast(k) => visitor.expr(
-                state,
-                reason,
-                &Expr::cast(element.into_node().unwrap()).expect("node should cast"),
-            ),
+            k if Expr::supported(k) => {
+                visitor.expr(
+                    state,
+                    reason,
+                    &Expr::try_from(element.into_node().expect(
+                        "any element that is able to be turned into an expr should be a node",
+                    ))
+                    .expect("expr should be built"),
+                )
+            }
             SyntaxKind::LiteralMapItemNode
             | SyntaxKind::LiteralObjectItemNode
             | SyntaxKind::LiteralStructItemNode

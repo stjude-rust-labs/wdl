@@ -557,7 +557,7 @@ impl RequirementsItem {
 
     /// Gets the expression of the requirements item.
     pub fn expr(&self) -> Expr {
-        child(&self.0).expect("expected an item expression")
+        Expr::child(&self.0).expect("expected an item expression")
     }
 }
 
@@ -640,7 +640,7 @@ impl HintsItem {
 
     /// Gets the expression of the hints item.
     pub fn expr(&self) -> Expr {
-        child(&self.0).expect("expected an item expression")
+        Expr::child(&self.0).expect("expected an item expression")
     }
 }
 
@@ -723,7 +723,7 @@ impl RuntimeItem {
 
     /// Gets the expression of the runtime item.
     pub fn expr(&self) -> Expr {
-        child(&self.0).expect("expected an item expression")
+        Expr::child(&self.0).expect("expected an item expression")
     }
 }
 

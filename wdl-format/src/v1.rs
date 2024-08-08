@@ -330,7 +330,7 @@ impl Formattable for Expr {
         writer: &mut T,
         _state: &mut Formatter,
     ) -> std::fmt::Result {
-        write!(writer, "{}", self.syntax()) // TODO
+        write!(writer, "{}", self.inner()) // TODO
     }
 }
 
@@ -381,7 +381,7 @@ impl Formattable for Decl {
             format_inline_comment(&assignment, writer, formatter, true)?;
 
             format_preceding_comments(
-                &SyntaxElement::from(expr.syntax().clone()),
+                &SyntaxElement::from(expr.inner().clone()),
                 writer,
                 formatter,
                 true,
@@ -535,7 +535,7 @@ impl Formattable for HintsItem {
 
         let expr = self.expr();
         format_preceding_comments(
-            &SyntaxElement::from(expr.syntax().clone()),
+            &SyntaxElement::from(expr.inner().clone()),
             writer,
             formatter,
             true,

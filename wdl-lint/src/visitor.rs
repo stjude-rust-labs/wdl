@@ -421,7 +421,7 @@ impl Visitor for LintVisitor {
     }
 
     fn expr(&mut self, state: &mut Self::State, reason: VisitReason, expr: &v1::Expr) {
-        self.each_enabled_rule(state, reason, expr.syntax(), |state, rule| {
+        self.each_enabled_rule(state, reason, expr.inner(), |state, rule| {
             rule.expr(state, reason, expr)
         });
     }

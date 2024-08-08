@@ -134,6 +134,21 @@ pub trait AstToken {
     }
 }
 
+/// Finds the first child that casts to a particular [`AstToken`].
+pub fn token_child<T: AstToken>(parent: &SyntaxNode) -> Option<T> {
+    parent
+        .children_with_tokens()
+        .filter_map(|c| c.into_token())
+        .find_map(T::cast)
+}
+
+/// Finds all children that cast to a particular [`AstToken`].
+pub fn token_children<T: AstToken>(parent: &SyntaxNode) -> impl Iterator<Item = T> {
+    parent
+        .children_with_tokens()
+        .filter_map(|c| c.into_token().and_then(T::cast))
+}
+
 /// Represents the AST of a [Document].
 ///
 /// See [Document::ast].
