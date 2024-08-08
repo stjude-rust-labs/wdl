@@ -5,7 +5,9 @@
 //! where it would otherwise not be expected. In this case, the next line(s)
 //! will be indented by one level.
 
+use crate::comments::INLINE_COMMENT_SPACE;
 use crate::Formattable;
+use crate::NEWLINE;
 
 /// Space constant used for formatting.
 pub const SPACE: &str = " ";
@@ -83,5 +85,39 @@ impl Formatter {
     /// Reset the interrupted state.
     pub fn reset_interrupted(&mut self) {
         self.interrupted_by_comments = false;
+    }
+
+    pub fn format_preceding_comments<F: std::fmt::Write>(
+        &mut self,
+        writer: &mut F,
+        comments: Box<[String]>,
+        would_be_interrupting: bool,
+    ) -> std::fmt::Result {
+        if would_be_interrupting && !comments.is_empty() && !self.interrupted_by_comments {
+            write!(writer, "{}", NEWLINE)?;
+            self.interrupt();
+        }
+        for comment in comments {
+            self.indent(writer)?;
+            write!(writer, "{}{}", comment, NEWLINE)?;
+        }
+        Ok(())
+    }
+
+    pub fn format_inline_comment<F: std::fmt::Write>(
+        &mut self,
+        writer: &mut F,
+        comment: Option<String>,
+        would_be_interrupting: bool,
+    ) -> std::fmt::Result {
+        if let Some(ref comment) = comment {
+            write!(writer, "{}{}{}", INLINE_COMMENT_SPACE, comment, NEWLINE)?;
+        }
+        if would_be_interrupting && comment.is_some() {
+            self.interrupt();
+        } else if !would_be_interrupting && comment.is_none() {
+            write!(writer, "{}", NEWLINE)?;
+        }
+        Ok(())
     }
 }

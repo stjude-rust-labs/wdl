@@ -525,73 +525,83 @@ fn gather_comments<T: SyntaxExt>(
 
     /// Adds the text to the currently collecting buffer in the right place
     /// depending in the direction we are traversing.
-    fn extend_buffer(text: String, buffer: &mut VecDeque<String>, direction: &Direction) {
+    fn push_results(text: String, results: &mut VecDeque<String>, direction: &Direction) {
         match direction {
-            Direction::Next => buffer.push_back(text),
-            Direction::Prev => buffer.push_front(text),
+            Direction::Next => results.push_back(text),
+            Direction::Prev => results.push_front(text),
         }
     }
 
-    let (mut comments, buffer) = iter
+    let comments = iter
         .skip_while(|e| source.matches(e))
         .take_while(|e| matches!(e.kind(), SyntaxKind::Comment | SyntaxKind::Whitespace))
-        .fold_while(
-            (VecDeque::new(), VecDeque::new()),
-            |(mut results, mut buffer), e| {
-                match e.kind() {
-                    SyntaxKind::Comment => {
-                        let text = e
-                            .into_token()
-                            .expect("comment should always be a token")
-                            .to_string()
-                            // NOTE: only `trim_end()` is needed here
-                            // because the beginning is trimmed in the
-                            // `skip_while` below (after the comment
-                            // character).
-                            .trim_end()
-                            .chars()
-                            .skip_while(|c| *c == '#' || c.is_whitespace())
-                            // TODO(clay): perhaps there is a way to avoid
-                            // an allocation here, but I cannot think of a
-                            // simple one.
-                            .collect::<String>();
+        .fold_while(VecDeque::new(), |mut results, e| {
+            match e.kind() {
+                SyntaxKind::Comment => {
+                    // Check if e is a comment on its own line.
+                    // If direction is 'Next' then we already know that the
+                    // comment is on its own line.
+                    if break_on_newline && direction == Direction::Prev {
+                        if let Some(prev) = e.prev_sibling_or_token() {
+                            if prev.kind() == SyntaxKind::Whitespace {
+                                let newlines = prev
+                                    .clone()
+                                    .into_token()
+                                    .expect("whitespace should always be a token")
+                                    .to_string()
+                                    .chars()
+                                    .filter(|c| *c == '\n')
+                                    .count();
 
-                        extend_buffer(text, &mut buffer, &direction);
-                    }
-                    SyntaxKind::Whitespace => {
-                        let newlines = e
-                            .into_token()
-                            .expect("whitespace should always be a token")
-                            .to_string()
-                            .chars()
-                            .filter(|c| *c == '\n')
-                            .count();
-
-                        if break_on_newline && newlines > 0 {
-                            return FoldWhile::Done((results, buffer));
-                        }
-
-                        // If there is more than one newline in the
-                        // whitespace token, then there is whitespace
-                        // separating two comments and the result should be
-                        // cut/pushed, and the buffer should be reset.
-                        if newlines > 1 {
-                            results.push_front(std::mem::take(&mut buffer).into_iter().join(" "));
+                                // If there are newlines in 'prev' then we know
+                                // that the comment is on its own line.
+                                // The comment may still be on its own line if
+                                // 'prev' does not have newlines and nothing comes
+                                // before 'prev'.
+                                if newlines == 0 && prev.prev_sibling_or_token().is_some() {
+                                    return FoldWhile::Done(results);
+                                }
+                            } else {
+                                // There is something else on this line before the comment.
+                                return FoldWhile::Done(results);
+                            }
                         }
                     }
-                    // SAFETY: we just filtered out any non-comment and
-                    // non-whitespace nodes above, so this should never occur.
-                    _ => unreachable!(),
+
+                    let text = e
+                        .into_token()
+                        .expect("comment should always be a token")
+                        .to_string()
+                        .trim_end()
+                        .to_string();
+
+                    push_results(text, &mut results, &direction);
                 }
+                SyntaxKind::Whitespace => {
+                    let newlines = e
+                        .into_token()
+                        .expect("whitespace should always be a token")
+                        .to_string()
+                        .chars()
+                        .filter(|c| *c == '\n')
+                        .count();
 
-                FoldWhile::Continue((results, buffer))
-            },
-        )
+                    if break_on_newline && newlines > 0 {
+                        return FoldWhile::Done(results);
+                    }
+
+                    if newlines > 1 {
+                        push_results("\n".to_string(), &mut results, &direction)
+                    }
+                }
+                // SAFETY: we just filtered out any non-comment and
+                // non-whitespace nodes above, so this should never occur.
+                _ => unreachable!(),
+            }
+
+            FoldWhile::Continue(results)
+        })
         .into_inner();
-
-    if !buffer.is_empty() {
-        comments.push_front(buffer.into_iter().join(" "));
-    }
 
     // NOTE: most of the time, this conversion will be O(1). Occassionally
     // it will be O(n). No allocations will ever be done. Thus, the
@@ -612,7 +622,8 @@ pub trait SyntaxExt {
     /// provided by this extension trait can just be provided, which simplifies
     /// the code. Generally speaking, this should just defer to the underlying
     /// `siblings_with_tokens` method for each type.
-    fn siblings_with_tokens(&self, direction: Direction) -> impl Iterator<Item = SyntaxElement>;
+    fn siblings_with_tokens(&self, direction: Direction)
+    -> Box<dyn Iterator<Item = SyntaxElement>>;
 
     /// Returns all of the siblings _before_ the current element.
     ///
@@ -679,7 +690,7 @@ pub trait SyntaxExt {
         gather_comments(self, Direction::Next, false)
     }
 
-    /// Gets all of the inline comments directly following an element on the
+    /// Get any inline comment directly following an element on the
     /// same line.
     fn inline_comment(&self) -> Option<String>
     where
@@ -697,8 +708,11 @@ impl SyntaxExt for SyntaxNode {
         other.as_node().map(|n| n == self).unwrap_or(false)
     }
 
-    fn siblings_with_tokens(&self, direction: Direction) -> impl Iterator<Item = SyntaxElement> {
-        self.siblings_with_tokens(direction)
+    fn siblings_with_tokens(
+        &self,
+        direction: Direction,
+    ) -> Box<dyn Iterator<Item = SyntaxElement>> {
+        Box::new(self.siblings_with_tokens(direction))
     }
 }
 
@@ -707,8 +721,27 @@ impl SyntaxExt for SyntaxToken {
         other.as_token().map(|n| n == self).unwrap_or(false)
     }
 
-    fn siblings_with_tokens(&self, direction: Direction) -> impl Iterator<Item = SyntaxElement> {
-        self.siblings_with_tokens(direction)
+    fn siblings_with_tokens(
+        &self,
+        direction: Direction,
+    ) -> Box<dyn Iterator<Item = SyntaxElement>> {
+        Box::new(self.siblings_with_tokens(direction))
+    }
+}
+
+impl SyntaxExt for SyntaxElement {
+    fn matches(&self, other: &SyntaxElement) -> bool {
+        self == other
+    }
+
+    fn siblings_with_tokens(
+        &self,
+        direction: Direction,
+    ) -> Box<dyn Iterator<Item = SyntaxElement>> {
+        match self {
+            SyntaxElement::Node(node) => Box::new(node.siblings_with_tokens(direction)),
+            SyntaxElement::Token(token) => Box::new(token.siblings_with_tokens(direction)),
+        }
     }
 }
 
@@ -745,9 +778,15 @@ workflow foo {} # This should not be collected.
         assert_eq!(
             workflow.preceding_comments().as_ref(),
             vec![
-                "Some comments are long",
-                "Others are short",
-                "and, yet    another"
+                "\n",
+                "# Some",
+                "# comments",
+                "# are",
+                "# long",
+                "\n",
+                "# Others are short",
+                "\n",
+                "#     and, yet    another"
             ]
         );
     }
@@ -773,8 +812,9 @@ workflow foo {} # Here is a comment that should be collected.
         assert_eq!(
             workflow.succeeding_comments().as_ref(),
             vec![
-                "This comment should be included too.",
-                "Here is a comment that should be collected."
+                "# Here is a comment that should be collected.",
+                "\n",
+                "# This comment should be included too."
             ]
         );
     }
@@ -799,7 +839,7 @@ workflow foo {} # Here is a comment that should be collected.
         assert_eq!(workflow.kind(), SyntaxKind::WorkflowDefinitionNode);
         assert_eq!(
             workflow.inline_comment().as_deref(),
-            Some("Here is a comment that should be collected.")
+            Some("# Here is a comment that should be collected.")
         );
     }
 }
