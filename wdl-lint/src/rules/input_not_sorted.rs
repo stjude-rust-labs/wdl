@@ -5,7 +5,6 @@ use std::cmp::Ordering;
 use wdl_ast::span_of;
 use wdl_ast::v1;
 use wdl_ast::v1::PrimitiveType;
-use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;

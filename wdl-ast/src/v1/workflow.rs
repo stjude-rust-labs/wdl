@@ -30,8 +30,8 @@ impl WorkflowDefinition {
     }
 
     /// Gets the items of the workflow.
-    pub fn items(&self) -> AstChildren<WorkflowItem> {
-        children(&self.0)
+    pub fn items(&self) -> impl Iterator<Item = WorkflowItem> {
+        WorkflowItem::children(&self.0)
     }
 
     /// Gets the input sections of the workflow.
@@ -45,8 +45,8 @@ impl WorkflowDefinition {
     }
 
     /// Gets the statements of the workflow.
-    pub fn statements(&self) -> AstChildren<WorkflowStatement> {
-        children(&self.0)
+    pub fn statements(&self) -> impl Iterator<Item = WorkflowStatement> {
+        WorkflowStatement::children(&self.0)
     }
 
     /// Gets the metadata sections of the workflow.
@@ -118,10 +118,10 @@ pub enum WorkflowItem {
     Declaration(BoundDecl),
 }
 
-impl AstNode for WorkflowItem {
-    type Language = WorkflowDescriptionLanguage;
-
-    fn can_cast(kind: SyntaxKind) -> bool
+impl WorkflowItem {
+    /// Returns whether or not a [`SyntaxKind`] is able to be cast to any of the
+    /// underlying members within the [`WorkflowItem`].
+    pub fn can_cast(kind: SyntaxKind) -> bool
     where
         Self: Sized,
     {
@@ -139,39 +139,304 @@ impl AstNode for WorkflowItem {
         )
     }
 
-    fn cast(syntax: SyntaxNode) -> Option<Self>
+    /// Attempts to cast the [`SyntaxNode`] to any of the underlying members
+    /// within the [`WorkflowItem`].
+    pub fn cast(syntax: SyntaxNode) -> Option<Self>
     where
         Self: Sized,
     {
-        match syntax.kind() {
-            SyntaxKind::InputSectionNode => Some(Self::Input(InputSection(syntax))),
-            SyntaxKind::OutputSectionNode => Some(Self::Output(OutputSection(syntax))),
-            SyntaxKind::ConditionalStatementNode => {
-                Some(Self::Conditional(ConditionalStatement(syntax)))
-            }
-            SyntaxKind::ScatterStatementNode => Some(Self::Scatter(ScatterStatement(syntax))),
-            SyntaxKind::CallStatementNode => Some(Self::Call(CallStatement(syntax))),
-            SyntaxKind::MetadataSectionNode => Some(Self::Metadata(MetadataSection(syntax))),
-            SyntaxKind::ParameterMetadataSectionNode => {
-                Some(Self::ParameterMetadata(ParameterMetadataSection(syntax)))
-            }
-            SyntaxKind::HintsSectionNode => Some(Self::Hints(HintsSection(syntax))),
-            SyntaxKind::BoundDeclNode => Some(Self::Declaration(BoundDecl(syntax))),
+        Self::try_from(syntax).ok()
+    }
+
+    /// Gets a reference to the underlying [`SyntaxNode`].
+    pub fn syntax(&self) -> &SyntaxNode {
+        match self {
+            Self::Input(element) => element.syntax(),
+            Self::Output(element) => element.syntax(),
+            Self::Conditional(element) => element.syntax(),
+            Self::Scatter(element) => element.syntax(),
+            Self::Call(element) => element.syntax(),
+            Self::Metadata(element) => element.syntax(),
+            Self::ParameterMetadata(element) => element.syntax(),
+            Self::Hints(element) => element.syntax(),
+            Self::Declaration(element) => element.syntax(),
+        }
+    }
+
+    /// Attempts to get a reference to the inner [`InputSection`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Input`], then a reference to the inner
+    ///   [`InputSection`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn as_input_section(&self) -> Option<&InputSection> {
+        match self {
+            Self::Input(input_section) => Some(input_section),
             _ => None,
         }
     }
 
-    fn syntax(&self) -> &SyntaxNode {
+    /// Consumes `self` and attempts to return the inner [`InputSection`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Input`], then the inner
+    ///   [`InputSection`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn into_input_section(self) -> Option<InputSection> {
         match self {
-            Self::Input(i) => &i.0,
-            Self::Output(o) => &o.0,
-            Self::Conditional(s) => &s.0,
-            Self::Scatter(s) => &s.0,
-            Self::Call(s) => &s.0,
-            Self::Metadata(m) => &m.0,
-            Self::ParameterMetadata(m) => &m.0,
-            Self::Hints(h) => &h.0,
-            Self::Declaration(d) => &d.0,
+            Self::Input(input_section) => Some(input_section),
+            _ => None,
+        }
+    }
+
+    /// Attempts to get a reference to the inner [`OutputSection`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Output`], then a reference to the inner
+    ///   [`OutputSection`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn as_output_section(&self) -> Option<&OutputSection> {
+        match self {
+            Self::Output(output_section) => Some(output_section),
+            _ => None,
+        }
+    }
+
+    /// Consumes `self` and attempts to return the inner [`OutputSection`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Output`], then the inner
+    ///   [`OutputSection`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn into_output_section(self) -> Option<OutputSection> {
+        match self {
+            Self::Output(output_section) => Some(output_section),
+            _ => None,
+        }
+    }
+
+    /// Attempts to get a reference to the inner [`ConditionalStatement`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Conditional`], then a reference to the
+    ///   inner [`ConditionalStatement`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn as_conditional(&self) -> Option<&ConditionalStatement> {
+        match self {
+            Self::Conditional(conditional) => Some(conditional),
+            _ => None,
+        }
+    }
+
+    /// Consumes `self` and attempts to return the inner
+    /// [`ConditionalStatement`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Conditional`], then the inner
+    ///   [`ConditionalStatement`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn into_conditional(self) -> Option<ConditionalStatement> {
+        match self {
+            Self::Conditional(conditional) => Some(conditional),
+            _ => None,
+        }
+    }
+
+    /// Attempts to get a reference to the inner [`ScatterStatement`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Scatter`], then a reference to the
+    ///   inner [`ScatterStatement`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn as_scatter(&self) -> Option<&ScatterStatement> {
+        match self {
+            Self::Scatter(scatter) => Some(scatter),
+            _ => None,
+        }
+    }
+
+    /// Consumes `self` and attempts to return the inner
+    /// [`ScatterStatement`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Scatter`], then the inner
+    ///   [`ScatterStatement`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn into_scatter(self) -> Option<ScatterStatement> {
+        match self {
+            Self::Scatter(scatter) => Some(scatter),
+            _ => None,
+        }
+    }
+
+    /// Attempts to get a reference to the inner [`CallStatement`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Call`], then a reference to the inner
+    ///   [`CallStatement`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn as_call(&self) -> Option<&CallStatement> {
+        match self {
+            Self::Call(call) => Some(call),
+            _ => None,
+        }
+    }
+
+    /// Consumes `self` and attempts to return the inner [`CallStatement`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Call`], then the inner
+    ///   [`CallStatement`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn into_call(self) -> Option<CallStatement> {
+        match self {
+            Self::Call(call) => Some(call),
+            _ => None,
+        }
+    }
+
+    /// Attempts to get a reference to the inner [`MetadataSection`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Metadata`], then a reference to the
+    ///   inner [`MetadataSection`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn as_metadata_section(&self) -> Option<&MetadataSection> {
+        match self {
+            Self::Metadata(metadata_section) => Some(metadata_section),
+            _ => None,
+        }
+    }
+
+    /// Consumes `self` and attempts to return the inner [`MetadataSection`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Metadata`], then the inner
+    ///   [`MetadataSection`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn into_metadata_section(self) -> Option<MetadataSection> {
+        match self {
+            Self::Metadata(metadata_section) => Some(metadata_section),
+            _ => None,
+        }
+    }
+
+    /// Attempts to get a reference to the inner [`ParameterMetadataSection`].
+    ///
+    /// * If `self` is a [`WorkflowItem::ParameterMetadata`], then a reference
+    ///   to the inner [`ParameterMetadataSection`] is returned wrapped in
+    ///   [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn as_parameter_metadata_section(&self) -> Option<&ParameterMetadataSection> {
+        match self {
+            Self::ParameterMetadata(parameter_metadata_section) => Some(parameter_metadata_section),
+            _ => None,
+        }
+    }
+
+    /// Consumes `self` and attempts to return the inner
+    /// [`ParameterMetadataSection`].
+    ///
+    /// * If `self` is a [`WorkflowItem::ParameterMetadata`], then the inner
+    ///   [`ParameterMetadataSection`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn into_parameter_metadata_section(self) -> Option<ParameterMetadataSection> {
+        match self {
+            Self::ParameterMetadata(parameter_metadata_section) => Some(parameter_metadata_section),
+            _ => None,
+        }
+    }
+
+    /// Attempts to get a reference to the inner [`HintsSection`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Hints`], then a reference to the inner
+    ///   [`HintsSection`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn as_hints_section(&self) -> Option<&HintsSection> {
+        match self {
+            Self::Hints(hints_section) => Some(hints_section),
+            _ => None,
+        }
+    }
+
+    /// Consumes `self` and attempts to return the inner [`HintsSection`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Hints`], then the inner
+    ///   [`HintsSection`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn into_hints_section(self) -> Option<HintsSection> {
+        match self {
+            Self::Hints(hints_section) => Some(hints_section),
+            _ => None,
+        }
+    }
+
+    /// Attempts to get a reference to the inner [`BoundDecl`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Declaration`], then a reference to the
+    ///   inner [`BoundDecl`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn as_declaration(&self) -> Option<&BoundDecl> {
+        match self {
+            Self::Declaration(declaration) => Some(declaration),
+            _ => None,
+        }
+    }
+
+    /// Consumes `self` and attempts to return the inner [`BoundDecl`].
+    ///
+    /// * If `self` is a [`WorkflowItem::Declaration`], then the inner
+    ///   [`BoundDecl`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn into_declaration(self) -> Option<BoundDecl> {
+        match self {
+            Self::Declaration(declaration) => Some(declaration),
+            _ => None,
+        }
+    }
+
+    /// Finds the first child that can be cast to an [`WorkflowItem`].
+    ///
+    /// This is meant to emulate the functionality of
+    /// [`rowan::ast::support::child`] without requiring [`WorkflowItem`] to
+    /// implement the `AstNode` trait.
+    pub fn child(syntax: &SyntaxNode) -> Option<Self> {
+        syntax.children().find_map(|c| Self::try_from(c).ok())
+    }
+
+    /// Finds all children that can be cast to an [`WorkflowItem`].
+    ///
+    /// This is meant to emulate the functionality of
+    /// [`rowan::ast::support::children`] without requiring [`WorkflowItem`] to
+    /// implement the `AstNode` trait.
+    pub fn children(syntax: &SyntaxNode) -> impl Iterator<Item = WorkflowItem> {
+        syntax
+            .children()
+            .filter_map(|c| WorkflowItem::try_from(c).ok())
+    }
+}
+
+impl TryFrom<SyntaxNode> for WorkflowItem {
+    type Error = ();
+
+    fn try_from(syntax: SyntaxNode) -> Result<Self, Self::Error> {
+        match syntax.kind() {
+            SyntaxKind::InputSectionNode => Ok(Self::Input(
+                InputSection::cast(syntax).expect("input section to cast"),
+            )),
+            SyntaxKind::OutputSectionNode => Ok(Self::Output(
+                OutputSection::cast(syntax).expect("output section to cast"),
+            )),
+            SyntaxKind::ConditionalStatementNode => Ok(Self::Conditional(
+                ConditionalStatement::cast(syntax).expect("conditional statement to cast"),
+            )),
+            SyntaxKind::ScatterStatementNode => Ok(Self::Scatter(
+                ScatterStatement::cast(syntax).expect("scatter statement to cast"),
+            )),
+            SyntaxKind::CallStatementNode => Ok(Self::Call(
+                CallStatement::cast(syntax).expect("call statement to cast"),
+            )),
+            SyntaxKind::MetadataSectionNode => Ok(Self::Metadata(
+                MetadataSection::cast(syntax).expect("metadata section to cast"),
+            )),
+            SyntaxKind::ParameterMetadataSectionNode => Ok(Self::ParameterMetadata(
+                ParameterMetadataSection::cast(syntax).expect("parameter metadata section to cast"),
+            )),
+            SyntaxKind::HintsSectionNode => Ok(Self::Hints(
+                HintsSection::cast(syntax).expect("hints section to cast"),
+            )),
+            SyntaxKind::BoundDeclNode => Ok(Self::Declaration(
+                BoundDecl::cast(syntax).expect("bound decl to cast"),
+            )),
+            _ => Err(()),
         }
     }
 }
@@ -190,6 +455,65 @@ pub enum WorkflowStatement {
 }
 
 impl WorkflowStatement {
+    /// Returns whether or not a [`SyntaxKind`] is able to be cast to any of the
+    /// underlying members within the [`WorkflowStatement`].
+    pub fn can_cast(kind: SyntaxKind) -> bool
+    where
+        Self: Sized,
+    {
+        matches!(
+            kind,
+            SyntaxKind::ConditionalStatementNode
+                | SyntaxKind::ScatterStatementNode
+                | SyntaxKind::CallStatementNode
+                | SyntaxKind::BoundDeclNode
+        )
+    }
+
+    /// Attempts to cast the [`SyntaxNode`] to any of the underlying members
+    /// within the [`WorkflowStatement`].
+    pub fn cast(syntax: SyntaxNode) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        Self::try_from(syntax).ok()
+    }
+
+    /// Gets a reference to the underlying [`SyntaxNode`].
+    pub fn syntax(&self) -> &SyntaxNode {
+        match self {
+            Self::Conditional(element) => element.syntax(),
+            Self::Scatter(element) => element.syntax(),
+            Self::Call(element) => element.syntax(),
+            Self::Declaration(element) => element.syntax(),
+        }
+    }
+
+    /// Attempts to get a reference to the inner [`ConditionalStatement`].
+    ///
+    /// * If `self` is a [`WorkflowStatement::Conditional`], then a reference to
+    ///   the inner [`ConditionalStatement`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn as_conditional(&self) -> Option<&ConditionalStatement> {
+        match self {
+            Self::Conditional(conditional) => Some(conditional),
+            _ => None,
+        }
+    }
+
+    /// Consumes `self` and attempts to return the inner
+    /// [`ConditionalStatement`].
+    ///
+    /// * If `self` is a [`WorkflowStatement::Conditional`], then the inner
+    ///   [`ConditionalStatement`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn into_conditional(self) -> Option<ConditionalStatement> {
+        match self {
+            Self::Conditional(conditional) => Some(conditional),
+            _ => None,
+        }
+    }
+
     /// Unwraps the statement into a conditional statement.
     ///
     /// # Panics
@@ -199,6 +523,31 @@ impl WorkflowStatement {
         match self {
             Self::Conditional(stmt) => stmt,
             _ => panic!("not a conditional statement"),
+        }
+    }
+
+    /// Attempts to get a reference to the inner [`ScatterStatement`].
+    ///
+    /// * If `self` is a [`WorkflowStatement::Scatter`], then a reference to the
+    ///   inner [`ScatterStatement`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn as_scatter(&self) -> Option<&ScatterStatement> {
+        match self {
+            Self::Scatter(scatter) => Some(scatter),
+            _ => None,
+        }
+    }
+
+    /// Consumes `self` and attempts to return the inner
+    /// [`ScatterStatement`].
+    ///
+    /// * If `self` is a [`WorkflowStatement::Scatter`], then the inner
+    ///   [`ScatterStatement`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn into_scatter(self) -> Option<ScatterStatement> {
+        match self {
+            Self::Scatter(scatter) => Some(scatter),
+            _ => None,
         }
     }
 
@@ -214,6 +563,31 @@ impl WorkflowStatement {
         }
     }
 
+    /// Attempts to get a reference to the inner [`CallStatement`].
+    ///
+    /// * If `self` is a [`WorkflowStatement::Call`], then a reference to the
+    ///   inner [`CallStatement`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn as_call(&self) -> Option<&CallStatement> {
+        match self {
+            Self::Call(call) => Some(call),
+            _ => None,
+        }
+    }
+
+    /// Consumes `self` and attempts to return the inner
+    /// [`CallStatement`].
+    ///
+    /// * If `self` is a [`WorkflowStatement::Call`], then the inner
+    ///   [`CallStatement`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn into_call(self) -> Option<CallStatement> {
+        match self {
+            Self::Call(call) => Some(call),
+            _ => None,
+        }
+    }
+
     /// Unwraps the statement into a call statement.
     ///
     /// # Panics
@@ -226,56 +600,82 @@ impl WorkflowStatement {
         }
     }
 
+    /// Attempts to get a reference to the inner [`BoundDecl`].
+    ///
+    /// * If `self` is a [`WorkflowStatement::Declaration`], then a reference to
+    ///   the inner [`BoundDecl`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn as_declaration(&self) -> Option<&BoundDecl> {
+        match self {
+            Self::Declaration(declaration) => Some(declaration),
+            _ => None,
+        }
+    }
+
+    /// Consumes `self` and attempts to return the inner
+    /// [`BoundDecl`].
+    ///
+    /// * If `self` is a [`WorkflowStatement::Declaration`], then the inner
+    ///   [`BoundDecl`] is returned wrapped in [`Some`].
+    /// * Else, [`None`] is returned.
+    pub fn into_declaration(self) -> Option<BoundDecl> {
+        match self {
+            Self::Declaration(declaration) => Some(declaration),
+            _ => None,
+        }
+    }
+
     /// Unwraps the statement into a bound declaration.
     ///
     /// # Panics
     ///
     /// Panics if the statement is not a bound declaration.
-    pub fn unwrap_bound_decl(self) -> BoundDecl {
+    pub fn unwrap_declaration(self) -> BoundDecl {
         match self {
-            Self::Declaration(stmt) => stmt,
+            Self::Declaration(declaration) => declaration,
             _ => panic!("not a bound declaration"),
         }
     }
+
+    /// Finds the first child that can be cast to an [`WorkflowStatement`].
+    ///
+    /// This is meant to emulate the functionality of
+    /// [`rowan::ast::support::child`] without requiring [`WorkflowStatement`]
+    /// to implement the `AstNode` trait.
+    pub fn child(syntax: &SyntaxNode) -> Option<Self> {
+        syntax.children().find_map(|c| Self::try_from(c).ok())
+    }
+
+    /// Finds all children that can be cast to an [`WorkflowStatement`].
+    ///
+    /// This is meant to emulate the functionality of
+    /// [`rowan::ast::support::children`] without requiring
+    /// [`WorkflowStatement`] to implement the `AstNode` trait.
+    pub fn children(syntax: &SyntaxNode) -> impl Iterator<Item = WorkflowStatement> {
+        syntax
+            .children()
+            .filter_map(|c| WorkflowStatement::try_from(c).ok())
+    }
 }
 
-impl AstNode for WorkflowStatement {
-    type Language = WorkflowDescriptionLanguage;
+impl TryFrom<SyntaxNode> for WorkflowStatement {
+    type Error = ();
 
-    fn can_cast(kind: SyntaxKind) -> bool
-    where
-        Self: Sized,
-    {
-        matches!(
-            kind,
-            SyntaxKind::ConditionalStatementNode
-                | SyntaxKind::ScatterStatementNode
-                | SyntaxKind::CallStatementNode
-                | SyntaxKind::BoundDeclNode
-        )
-    }
-
-    fn cast(syntax: SyntaxNode) -> Option<Self>
-    where
-        Self: Sized,
-    {
+    fn try_from(syntax: SyntaxNode) -> Result<Self, Self::Error> {
         match syntax.kind() {
-            SyntaxKind::ConditionalStatementNode => {
-                Some(Self::Conditional(ConditionalStatement(syntax)))
-            }
-            SyntaxKind::ScatterStatementNode => Some(Self::Scatter(ScatterStatement(syntax))),
-            SyntaxKind::CallStatementNode => Some(Self::Call(CallStatement(syntax))),
-            SyntaxKind::BoundDeclNode => Some(Self::Declaration(BoundDecl(syntax))),
-            _ => None,
-        }
-    }
-
-    fn syntax(&self) -> &SyntaxNode {
-        match self {
-            Self::Conditional(s) => &s.0,
-            Self::Scatter(s) => &s.0,
-            Self::Call(s) => &s.0,
-            Self::Declaration(d) => &d.0,
+            SyntaxKind::ConditionalStatementNode => Ok(Self::Conditional(
+                ConditionalStatement::cast(syntax).expect("conditional statement to cast"),
+            )),
+            SyntaxKind::ScatterStatementNode => Ok(Self::Scatter(
+                ScatterStatement::cast(syntax).expect("scatter statement to cast"),
+            )),
+            SyntaxKind::CallStatementNode => Ok(Self::Call(
+                CallStatement::cast(syntax).expect("call statement to cast"),
+            )),
+            SyntaxKind::BoundDeclNode => Ok(Self::Declaration(
+                BoundDecl::cast(syntax).expect("bound decl to cast"),
+            )),
+            _ => Err(()),
         }
     }
 }
@@ -291,8 +691,8 @@ impl ConditionalStatement {
     }
 
     /// Gets the statements of the conditional body.
-    pub fn statements(&self) -> AstChildren<WorkflowStatement> {
-        children(&self.0)
+    pub fn statements(&self) -> impl Iterator<Item = WorkflowStatement> {
+        WorkflowStatement::children(&self.0)
     }
 }
 
@@ -337,8 +737,8 @@ impl ScatterStatement {
     }
 
     /// Gets the statements of the scatter body.
-    pub fn statements(&self) -> AstChildren<WorkflowStatement> {
-        children(&self.0)
+    pub fn statements(&self) -> impl Iterator<Item = WorkflowStatement> {
+        WorkflowStatement::children(&self.0)
     }
 }
 

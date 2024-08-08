@@ -4,7 +4,6 @@ use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::TaskItem;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::v1::WorkflowItem;
-use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;

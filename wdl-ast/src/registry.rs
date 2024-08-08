@@ -9,7 +9,6 @@ use crate::v1;
 use crate::AstNode;
 use crate::AstToken;
 use crate::Comment;
-use crate::Document;
 use crate::Ident;
 use crate::SyntaxKind;
 use crate::Version;
@@ -30,7 +29,6 @@ mod private {
 static REGISTRY: LazyLock<HashMap<&'static str, Box<[SyntaxKind]>>> = LazyLock::new(|| {
     let types = vec![
         Comment::register(),
-        Document::register(),
         Ident::register(),
         v1::AccessExpr::register(),
         v1::AdditionExpr::register(),
@@ -49,6 +47,7 @@ static REGISTRY: LazyLock<HashMap<&'static str, Box<[SyntaxKind]>>> = LazyLock::
         v1::CallExpr::register(),
         v1::CallInputItem::register(),
         v1::CallKeyword::register(),
+        v1::CallStatement::register(),
         v1::CallTarget::register(),
         v1::CloseBrace::register(),
         v1::CloseBracket::register(),
@@ -60,11 +59,9 @@ static REGISTRY: LazyLock<HashMap<&'static str, Box<[SyntaxKind]>>> = LazyLock::
         v1::CommandSection::register(),
         v1::CommandText::register(),
         v1::ConditionalStatement::register(),
-        v1::Decl::register(),
         v1::DefaultOption::register(),
         v1::DirectoryTypeKeyword::register(),
         v1::DivisionExpr::register(),
-        v1::DocumentItem::register(),
         v1::Dot::register(),
         v1::DoubleQuote::register(),
         v1::ElseKeyword::register(),
@@ -102,7 +99,6 @@ static REGISTRY: LazyLock<HashMap<&'static str, Box<[SyntaxKind]>>> = LazyLock::
         v1::LessExpr::register(),
         v1::LiteralArray::register(),
         v1::LiteralBoolean::register(),
-        v1::LiteralExpr::register(),
         v1::LiteralFloat::register(),
         v1::LiteralHints::register(),
         v1::LiteralHintsItem::register(),
@@ -158,7 +154,6 @@ static REGISTRY: LazyLock<HashMap<&'static str, Box<[SyntaxKind]>>> = LazyLock::
         v1::Percent::register(),
         v1::Placeholder::register(),
         v1::PlaceholderOpen::register(),
-        v1::PlaceholderOption::register(),
         v1::Plus::register(),
         v1::PrimitiveType::register(),
         v1::QuestionMark::register(),
@@ -170,31 +165,25 @@ static REGISTRY: LazyLock<HashMap<&'static str, Box<[SyntaxKind]>>> = LazyLock::
         v1::RuntimeSection::register(),
         v1::ScatterKeyword::register(),
         v1::ScatterStatement::register(),
-        v1::SectionParent::register(),
         v1::SepOption::register(),
         v1::SingleQuote::register(),
         v1::Slash::register(),
         v1::StringText::register(),
         v1::StringTypeKeyword::register(),
         v1::StructDefinition::register(),
-        v1::StructItem::register(),
         v1::StructKeyword::register(),
         v1::SubtractionExpr::register(),
         v1::TaskDefinition::register(),
-        v1::TaskItem::register(),
         v1::TaskKeyword::register(),
         v1::ThenKeyword::register(),
         v1::TrueFalseOption::register(),
         v1::TrueKeyword::register(),
-        v1::Type::register(),
         v1::TypeRef::register(),
         v1::UnboundDecl::register(),
         v1::Unknown::register(),
         v1::VersionKeyword::register(),
         v1::WorkflowDefinition::register(),
-        v1::WorkflowItem::register(),
         v1::WorkflowKeyword::register(),
-        v1::WorkflowStatement::register(),
         Version::register(),
         VersionStatement::register(),
         Whitespace::register(),
@@ -297,10 +286,10 @@ mod tests {
                 // type would be registered here. Thus, by design of the
                 // `inverse_registry()` method, this will never occur.
                 Some(values) if values.is_empty() => {
-                    unreachable!("the inverse registry should never contain
-an empty array")                 }
-                Some(values) if values.len() > 1 => multiple.push((kind,
-values)),                 None => missing.push(kind),
+                    unreachable!("the inverse registry should never contain an empty array")
+                }
+                Some(values) if values.len() > 1 => multiple.push((kind, values)),
+                None => missing.push(kind),
                 // NOTE: this is essentially only if the values exist and the
                 // length is 1—in that case, there is a one to one mapping,
                 // which is what we would like the case to be.
@@ -316,8 +305,8 @@ values)),                 None => missing.push(kind),
             missing.sort();
 
             panic!(
-                "detected `SyntaxKind`s without an associated
-`AstNode`/`AstToken` (n={}): {}",                 missing.len(),
+                "detected `SyntaxKind`s without an associated `AstNode`/`AstToken` (n={}): {}",
+                missing.len(),
                 missing.join(", ")
             )
         }
@@ -342,8 +331,8 @@ values)),                 None => missing.push(kind),
             multiple.sort();
 
             panic!(
-                "detected `SyntaxKind`s associated with multiple
-`AstNode`s/`AstToken`s \                  (n={}):\n\n{}",
+                "detected `SyntaxKind`s associated with multiple `AstNode`s/`AstToken`s \
+                 (n={}):\n\n{}",
                 multiple.len(),
                 multiple.join("\n\n")
             )

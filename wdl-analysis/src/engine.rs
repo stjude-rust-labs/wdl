@@ -33,7 +33,6 @@ use tokio::sync::oneshot;
 use tokio::task::JoinHandle;
 use url::Url;
 use wdl_ast::Ast;
-use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::SyntaxNode;

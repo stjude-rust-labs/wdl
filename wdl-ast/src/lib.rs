@@ -180,6 +180,23 @@ impl Ast {
 pub struct Document(SyntaxNode);
 
 impl Document {
+    /// Returns whether or not a [`SyntaxKind`] is able to be cast to any of the
+    /// underlying members within the [`Document`].
+    pub fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RootNode
+    }
+
+    /// Attempts to cast the [`SyntaxNode`] to any of the underlying members
+    /// within the [`Document`].
+    pub fn cast(syntax: SyntaxNode) -> Option<Self> {
+        Self::try_from(syntax).ok()
+    }
+
+    /// Gets a reference to the underlying [`SyntaxNode`].
+    pub fn syntax(&self) -> &SyntaxNode {
+        &self.0
+    }
+
     /// Parses a document from the given source.
     ///
     /// A document and its AST elements are trivially cloned.
@@ -241,23 +258,15 @@ impl Document {
     }
 }
 
-impl AstNode for Document {
-    type Language = WorkflowDescriptionLanguage;
+impl TryFrom<SyntaxNode> for Document {
+    type Error = ();
 
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::RootNode
-    }
-
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
+    fn try_from(syntax: SyntaxNode) -> Result<Self, Self::Error> {
         if Self::can_cast(syntax.kind()) {
-            Some(Self(syntax))
+            Ok(Self(syntax))
         } else {
-            None
+            Err(())
         }
-    }
-
-    fn syntax(&self) -> &SyntaxNode {
-        &self.0
     }
 }
 

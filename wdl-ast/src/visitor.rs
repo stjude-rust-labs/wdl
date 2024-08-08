@@ -392,7 +392,7 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, state: &mut V::State, visitor
             SyntaxKind::MetadataArrayNode | SyntaxKind::LiteralNullNode => {
                 // Skip these nodes as they're part of a metadata section
             }
-            k if Expr::supported(k) => {
+            k if Expr::can_cast(k) => {
                 visitor.expr(
                     state,
                     reason,

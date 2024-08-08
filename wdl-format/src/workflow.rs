@@ -118,7 +118,7 @@ impl Formattable for CallInputItem {
             format_inline_comment(&assignment, writer, formatter, true)?;
 
             format_preceding_comments(
-                &SyntaxElement::from(expr.inner().clone()),
+                &SyntaxElement::from(expr.syntax().clone()),
                 writer,
                 formatter,
                 true,
@@ -317,7 +317,7 @@ impl Formattable for ConditionalStatement {
         let expr = self.expr();
         // PERF: This calls `to_string()` which is also called later by `format()`
         // There should be a way to avoid this.
-        let multiline_expr = expr.inner().to_string().contains(NEWLINE);
+        let multiline_expr = expr.syntax().to_string().contains(NEWLINE);
 
         format_inline_comment(&open_paren, writer, formatter, !multiline_expr)?;
         if multiline_expr {
@@ -325,7 +325,7 @@ impl Formattable for ConditionalStatement {
             paren_on_same_line = false;
         }
         format_preceding_comments(
-            &SyntaxElement::from(expr.inner().clone()),
+            &SyntaxElement::from(expr.syntax().clone()),
             writer,
             formatter,
             !multiline_expr,
@@ -336,7 +336,7 @@ impl Formattable for ConditionalStatement {
         }
         expr.format(writer, formatter)?;
         format_inline_comment(
-            &SyntaxElement::from(expr.inner().clone()),
+            &SyntaxElement::from(expr.syntax().clone()),
             writer,
             formatter,
             !multiline_expr,
@@ -443,7 +443,7 @@ impl Formattable for ScatterStatement {
 
         let expr = self.expr();
         format_preceding_comments(
-            &SyntaxElement::from(expr.inner().clone()),
+            &SyntaxElement::from(expr.syntax().clone()),
             writer,
             formatter,
             true,
@@ -451,7 +451,7 @@ impl Formattable for ScatterStatement {
         formatter.space_or_indent(writer)?;
         expr.format(writer, formatter)?;
         format_inline_comment(
-            &SyntaxElement::from(expr.inner().clone()),
+            &SyntaxElement::from(expr.syntax().clone()),
             writer,
             formatter,
             true,
