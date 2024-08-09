@@ -6,6 +6,7 @@ use std::fmt::Write;
 use std::sync::LazyLock;
 
 use indexmap::IndexMap;
+use indexmap::IndexSet;
 use wdl_ast::version::V1;
 use wdl_ast::SupportedVersion;
 
@@ -17,13 +18,28 @@ use crate::Optional;
 use crate::PairType;
 use crate::PrimitiveType;
 use crate::PrimitiveTypeKind;
-use crate::Requireable;
 use crate::Type;
+use crate::TypeEq;
 use crate::Types;
 
 mod constraints;
 
 pub use constraints::*;
+
+/// The maximum number of allowable type parameters in a function signature.
+///
+/// This is intentionally set low to limit the amount of space needed to store
+/// associated data.
+///
+/// Accessing `STDLIB` will panic if a signature is defined that exceeds this
+/// number.
+const MAX_TYPE_PARAMETERS: usize = 4;
+
+#[allow(clippy::missing_docs_in_private_items)]
+const _: () = assert!(
+    MAX_TYPE_PARAMETERS < usize::BITS as usize,
+    "the maximum number of type parameters cannot exceed the number of bits in usize"
+);
 
 /// A helper function for writing uninferred type parameter constraints to a
 /// given writer.
@@ -49,7 +65,7 @@ fn write_uninferred_constraints(
             s.write_str(", ")?;
         }
 
-        write!(s, "{name}: {desc}", desc = constraint.description())?;
+        write!(s, "`{name}`: {desc}", desc = constraint.description())?;
     }
 
     Ok(())
@@ -73,6 +89,13 @@ pub enum FunctionBindError {
         index: usize,
         /// The expected type for the argument.
         expected: String,
+    },
+    /// The function call arguments were ambiguous.
+    Ambiguous {
+        /// The first conflicting function signature.
+        first: String,
+        /// The second conflicting function signature.
+        second: String,
     },
 }
 
@@ -303,14 +326,11 @@ impl GenericArrayType {
     /// Realizes the generic type to an `Array`.
     fn realize(&self, types: &mut Types, params: &TypeParameters<'_>) -> Option<Type> {
         let ty = self.element_type.realize(types, params)?;
-        Some(types.add_array(
-            if self.non_empty {
-                ArrayType::non_empty(ty)
-            } else {
-                ArrayType::new(ty)
-            },
-            false,
-        ))
+        Some(types.add_array(if self.non_empty {
+            ArrayType::non_empty(ty)
+        } else {
+            ArrayType::new(ty)
+        }))
     }
 
     /// Asserts that the type parameters referenced by the type are valid.
@@ -405,7 +425,7 @@ impl GenericPairType {
     fn realize(&self, types: &mut Types, params: &TypeParameters<'_>) -> Option<Type> {
         let first_type = self.first_type.realize(types, params)?;
         let second_type = self.second_type.realize(types, params)?;
-        Some(types.add_pair(PairType::new(first_type, second_type), false))
+        Some(types.add_pair(PairType::new(first_type, second_type)))
     }
 
     /// Asserts that the type parameters referenced by the type are valid.
@@ -497,7 +517,7 @@ impl GenericMapType {
         match key_type {
             Type::Primitive(key_type) => {
                 let value_type = self.value_type.realize(types, params)?;
-                Some(types.add_map(MapType::new(key_type, value_type), false))
+                Some(types.add_map(MapType::new(key_type, value_type)))
             }
             _ => None,
         }
@@ -513,21 +533,6 @@ impl GenericMapType {
         self.value_type.assert_type_parameters(parameters);
     }
 }
-
-/// The maximum number of allowable type parameters in a function signature.
-///
-/// This is intentionally set low to limit the amount of space needed to store
-/// associated data.
-///
-/// Accessing `STDLIB` will panic if a signature is defined that exceeds this
-/// number.
-pub const MAX_TYPE_PARAMETERS: usize = 4;
-
-#[allow(clippy::missing_docs_in_private_items)]
-const _: () = assert!(
-    MAX_TYPE_PARAMETERS < usize::BITS as usize,
-    "the maximum number of type parameters cannot exceed the number of bits in usize"
-);
 
 /// Represents a collection of type parameters.
 #[derive(Debug, Clone)]
@@ -626,6 +631,11 @@ pub enum FunctionalType {
 }
 
 impl FunctionalType {
+    /// Determines if the type is generic.
+    pub fn is_generic(&self) -> bool {
+        matches!(self, Self::Generic(_))
+    }
+
     /// Returns an object that implements `Display` for formatting the type.
     pub fn display<'a>(
         &'a self,
@@ -761,8 +771,32 @@ impl TypeParameter {
     }
 }
 
+/// Represents a successful binding of arguments to a function.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+enum Binding {
+    /// The binding was an equivalence binding, meaning all of the provided
+    /// arguments had type equivalence with corresponding concrete parameters.
+    ///
+    /// The value is the bound return type of the function.
+    Equivalence(Type),
+    /// The binding was a coercion binding, meaning at least one of the provided
+    /// arguments needed to be coerced.
+    ///
+    /// The value it the bound return type of the function.
+    Coercion(Type),
+}
+
+impl Binding {
+    /// Gets the binding's return type.
+    pub fn ret(&self) -> Type {
+        match self {
+            Self::Equivalence(ty) | Self::Coercion(ty) => *ty,
+        }
+    }
+}
+
 /// Represents a WDL function signature.
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct FunctionSignature {
     /// The generic type parameters of the function.
     type_parameters: Vec<TypeParameter>,
@@ -771,7 +805,7 @@ pub struct FunctionSignature {
     /// The parameter types of the function.
     parameters: Vec<FunctionalType>,
     /// The return type of the function.
-    ret: Option<FunctionalType>,
+    ret: FunctionalType,
 }
 
 impl FunctionSignature {
@@ -780,7 +814,7 @@ impl FunctionSignature {
         FunctionSignatureBuilder::new()
     }
 
-    /// Gets the arity of the function's generic parameters.
+    /// Gets the function's type parameters.
     pub fn type_parameters(&self) -> &[TypeParameter] {
         &self.type_parameters
     }
@@ -800,20 +834,28 @@ impl FunctionSignature {
 
     /// Gets the function's return type.
     pub fn ret(&self) -> &FunctionalType {
-        self.ret.as_ref().expect("should have return type")
+        &self.ret
+    }
+
+    /// Determines if the function signature is generic.
+    pub fn is_generic(&self) -> bool {
+        self.generic_parameter_count() > 0 || self.ret.is_generic()
+    }
+
+    /// Gets the count of generic parameters for the function.
+    pub fn generic_parameter_count(&self) -> usize {
+        self.parameters.iter().filter(|p| p.is_generic()).count()
     }
 
     /// Returns an object that implements `Display` for formatting the signature
     /// with the given function name.
     pub fn display<'a>(
         &'a self,
-        name: &'a str,
         types: &'a Types,
         params: &'a TypeParameters<'a>,
     ) -> impl fmt::Display + 'a {
         #[allow(clippy::missing_docs_in_private_items)]
         struct Display<'a> {
-            name: &'a str,
             types: &'a Types,
             params: &'a TypeParameters<'a>,
             sig: &'a FunctionSignature,
@@ -821,7 +863,7 @@ impl FunctionSignature {
 
         impl fmt::Display for Display<'_> {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                write!(f, "{name}(", name = self.name)?;
+                f.write_char('(')?;
 
                 self.params.reset();
                 let required = self.sig.required();
@@ -845,13 +887,11 @@ impl FunctionSignature {
                     }
                 }
 
-                f.write_char(')')?;
-
-                if let Some(ret) = &self.sig.ret {
-                    write!(f, " -> ")?;
-                    write!(f, "{ret}", ret = ret.display(self.types, self.params))?;
-                }
-
+                write!(
+                    f,
+                    ") -> {ret}",
+                    ret = self.sig.ret.display(self.types, self.params)
+                )?;
                 write_uninferred_constraints(f, self.params)?;
 
                 Ok(())
@@ -859,7 +899,6 @@ impl FunctionSignature {
         }
 
         Display {
-            name,
             types,
             params,
             sig: self,
@@ -882,10 +921,13 @@ impl FunctionSignature {
     /// Binds the function signature to the given arguments.
     ///
     /// This function will infer the type parameters for the arguments and
-    /// ensure that the argument types are coercible to the parameter types.
+    /// ensure that the argument types are equivalent to the parameter types.
+    ///
+    /// If an argument is not type equivalent, an attempt is made to coerce the
+    /// type.
     ///
     /// Returns the realized type of the function's return type.
-    fn bind(&self, types: &mut Types, arguments: &[Type]) -> Result<Type, FunctionBindError> {
+    fn bind(&self, types: &mut Types, arguments: &[Type]) -> Result<Binding, FunctionBindError> {
         let required = self.required();
         if arguments.len() < required {
             return Err(FunctionBindError::TooFewArguments(required));
@@ -896,14 +938,21 @@ impl FunctionSignature {
         }
 
         // Ensure the argument types are correct for the function
+        let mut coerced = false;
         let type_parameters = self.infer_type_parameters(types, arguments);
         for (i, (parameter, argument)) in self.parameters.iter().zip(arguments.iter()).enumerate() {
             match parameter.realize(types, &type_parameters) {
                 Some(ty) => {
-                    if !argument.is_coercible_to(types, &ty) {
+                    // If a coercion hasn't occurred yet, check for type equivalence
+                    // Otherwise, fall back to coercion
+                    if !coerced && !argument.type_eq(types, &ty) {
+                        coerced = true;
+                    }
+
+                    if coerced && !argument.is_coercible_to(types, &ty) {
                         return Err(FunctionBindError::ArgumentTypeMismatch {
                             index: i,
-                            expected: ty.display(types).to_string(),
+                            expected: format!("`{ty}`", ty = ty.display(types)),
                         });
                     }
                 }
@@ -919,13 +968,12 @@ impl FunctionSignature {
 
                     write!(
                         &mut expected,
-                        "{param}",
+                        "`{param}`",
                         param = parameter.display(types, &type_parameters)
                     )
                     .unwrap();
 
                     write_uninferred_constraints(&mut expected, &type_parameters).unwrap();
-
                     return Err(FunctionBindError::ArgumentTypeMismatch { index: i, expected });
                 }
             }
@@ -934,10 +982,27 @@ impl FunctionSignature {
         // Finally, realize the return type; if it fails to realize, it means there was
         // at least one uninferred type parameter; we return `Union` instead to indicate
         // that the return value is indeterminate.
-        Ok(self
+        let ret = self
             .ret()
             .realize(types, &type_parameters)
-            .unwrap_or(Type::Union))
+            .unwrap_or(Type::Union);
+
+        if coerced {
+            Ok(Binding::Coercion(ret))
+        } else {
+            Ok(Binding::Equivalence(ret))
+        }
+    }
+}
+
+impl Default for FunctionSignature {
+    fn default() -> Self {
+        Self {
+            type_parameters: Default::default(),
+            required: Default::default(),
+            parameters: Default::default(),
+            ret: FunctionalType::Concrete(Type::Union),
+        }
     }
 }
 
@@ -976,8 +1041,11 @@ impl FunctionSignatureBuilder {
     }
 
     /// Sets the return value in the function signature.
+    ///
+    /// If this is not called, the function signature will return a `Union`
+    /// type.
     pub fn ret(mut self, ret: impl Into<FunctionalType>) -> Self {
-        self.0.ret = Some(ret.into());
+        self.0.ret = ret.into();
         self
     }
 
@@ -1004,11 +1072,9 @@ impl FunctionSignatureBuilder {
         }
 
         assert!(
-            sig.type_parameters.len() < MAX_TYPE_PARAMETERS,
+            sig.type_parameters.len() <= MAX_TYPE_PARAMETERS,
             "too many type parameters"
         );
-
-        assert!(sig.ret.is_some(), "a WDL function must return a value");
 
         // Ensure any generic type parameters indexes are in range for the parameters
         for param in sig.parameters.iter() {
@@ -1081,7 +1147,7 @@ impl MonomorphicFunction {
 
     /// Binds the function to the given arguments.
     pub fn bind(&self, types: &mut Types, arguments: &[Type]) -> Result<Type, FunctionBindError> {
-        self.signature.bind(types, arguments)
+        Ok(self.signature.bind(types, arguments)?.ret())
     }
 }
 
@@ -1109,7 +1175,7 @@ impl PolymorphicFunction {
     ///
     /// # Panics
     ///
-    /// Panics if the number of signatures is less than 2.
+    /// Panics if the number of signatures is less than two.
     pub fn new(minimum_version: SupportedVersion, signatures: Vec<FunctionSignature>) -> Self {
         assert!(
             signatures.len() > 1,
@@ -1133,8 +1199,146 @@ impl PolymorphicFunction {
     }
 
     /// Binds the function to the given arguments.
-    pub fn bind(&self, _: &mut Types, _: &[Type]) -> Result<Type, FunctionBindError> {
-        todo!()
+    ///
+    /// This performs overload resolution for the polymorphic function.
+    pub fn bind(&self, types: &mut Types, arguments: &[Type]) -> Result<Type, FunctionBindError> {
+        // First check the min/max parameter counts
+        let mut min = usize::MAX;
+        let mut max = 0;
+        for sig in &self.signatures {
+            min = std::cmp::min(min, sig.required());
+            max = std::cmp::max(max, sig.parameters().len());
+        }
+
+        if arguments.len() < min {
+            return Err(FunctionBindError::TooFewArguments(min));
+        }
+
+        if arguments.len() > max {
+            return Err(FunctionBindError::TooManyArguments(max));
+        }
+
+        // Overload resolution precedence is from most specific to least specific:
+        // * Non-generic exact match
+        // * Non-generic with coercion
+        // * Generic exact match
+        // * Generic with coercion
+
+        let mut max_mismatch_index = 0;
+        let mut expected_types = IndexSet::new();
+
+        for generic in [false, true] {
+            let mut exact: Option<(usize, Type)> = None;
+            let mut coercion1: Option<(usize, Type)> = None;
+            let mut coercion2 = None;
+            for (index, signature) in self
+                .signatures
+                .iter()
+                .enumerate()
+                .filter(|(_, s)| s.is_generic() == generic)
+            {
+                match signature.bind(types, arguments) {
+                    Ok(Binding::Equivalence(ty)) => {
+                        // We cannot have more than one exact match ever
+                        if let Some((previous, _)) = exact {
+                            return Err(FunctionBindError::Ambiguous {
+                                first: self.signatures[previous]
+                                    .display(
+                                        types,
+                                        &TypeParameters::new(
+                                            &self.signatures[previous].type_parameters,
+                                        ),
+                                    )
+                                    .to_string(),
+                                second: self.signatures[index]
+                                    .display(
+                                        types,
+                                        &TypeParameters::new(
+                                            &self.signatures[index].type_parameters,
+                                        ),
+                                    )
+                                    .to_string(),
+                            });
+                        }
+
+                        exact = Some((index, ty));
+                    }
+                    Ok(Binding::Coercion(ty)) => {
+                        // If this is the first coercion, store it; otherwise, store the second
+                        // coercion index; if there's more than one coercion, we'll report an error
+                        // below after ensuring there's no exact match
+                        if coercion1.is_none() {
+                            coercion1 = Some((index, ty));
+                        } else {
+                            coercion2.get_or_insert(index);
+                        }
+                    }
+                    Err(FunctionBindError::ArgumentTypeMismatch { index, expected }) => {
+                        // We'll report an argument mismatch for the greatest argument index
+                        if index > max_mismatch_index {
+                            max_mismatch_index = index;
+                            expected_types.clear();
+                        }
+
+                        if index == max_mismatch_index {
+                            expected_types.insert(expected);
+                        }
+                    }
+                    Err(
+                        FunctionBindError::Ambiguous { .. }
+                        | FunctionBindError::TooFewArguments(_)
+                        | FunctionBindError::TooManyArguments(_),
+                    ) => continue,
+                }
+            }
+
+            if let Some((_, ty)) = exact {
+                return Ok(ty);
+            }
+
+            // Ensure there wasn't more than one coercion
+            if let Some(previous) = coercion2 {
+                let index = coercion1.unwrap().0;
+                return Err(FunctionBindError::Ambiguous {
+                    first: self.signatures[previous]
+                        .display(
+                            types,
+                            &TypeParameters::new(&self.signatures[previous].type_parameters),
+                        )
+                        .to_string(),
+                    second: self.signatures[index]
+                        .display(
+                            types,
+                            &TypeParameters::new(&self.signatures[index].type_parameters),
+                        )
+                        .to_string(),
+                });
+            }
+
+            if let Some((_, ty)) = coercion1 {
+                return Ok(ty);
+            }
+        }
+
+        let mut expected = String::new();
+        for (i, ty) in expected_types.iter().enumerate() {
+            if i > 0 {
+                if expected_types.len() == 2 {
+                    expected.push_str(" or ");
+                } else if i == expected_types.len() - 1 {
+                    expected.push_str(", or ");
+                } else {
+                    expected.push_str(", ");
+                }
+            }
+
+            expected.push_str(ty);
+        }
+
+        Err(FunctionBindError::ArgumentTypeMismatch {
+            index: max_mismatch_index,
+            expected,
+        })
     }
 }
 
@@ -1174,17 +1378,16 @@ impl StandardLibrary {
 pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
     let mut types = Types::new();
 
-    let array_int = types.add_array(ArrayType::new(PrimitiveTypeKind::Integer), false);
-    let array_string = types.add_array(ArrayType::new(PrimitiveTypeKind::String), false);
-    let array_file = types.add_array(ArrayType::new(PrimitiveTypeKind::File), false);
-    let array_object = types.add_array(ArrayType::new(Type::Object), false);
-    let array_string_non_empty =
-        types.add_array(ArrayType::non_empty(PrimitiveTypeKind::String), false);
-    let array_array_string = types.add_array(ArrayType::new(array_string), false);
-    let map_string_string = types.add_map(
-        MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-        false,
-    );
+    let array_int = types.add_array(ArrayType::new(PrimitiveTypeKind::Integer));
+    let array_string = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
+    let array_file = types.add_array(ArrayType::new(PrimitiveTypeKind::File));
+    let array_object = types.add_array(ArrayType::new(Type::Object));
+    let array_string_non_empty = types.add_array(ArrayType::non_empty(PrimitiveTypeKind::String));
+    let array_array_string = types.add_array(ArrayType::new(array_string));
+    let map_string_string = types.add_map(MapType::new(
+        PrimitiveTypeKind::String,
+        PrimitiveTypeKind::String,
+    ));
 
     let mut functions = IndexMap::new();
 
@@ -2096,7 +2299,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                     vec![
                         FunctionSignature::builder()
                             .type_parameter("X", OptionalTypeConstraint)
-                            .parameter(GenericArrayType::non_empty(GenericType::Parameter("X"),))
+                            .parameter(GenericArrayType::non_empty(GenericType::Parameter("X")))
                             .ret(GenericType::UnqualifiedParameter("X"))
                             .build(),
                         FunctionSignature::builder()
@@ -2385,16 +2588,16 @@ mod test {
                 Function::Monomorphic(f) => {
                     let params = TypeParameters::new(&f.signature.type_parameters);
                     signatures.push(format!(
-                        "{sig}",
-                        sig = f.signature.display(name, STDLIB.types(), &params)
+                        "{name}{sig}",
+                        sig = f.signature.display(STDLIB.types(), &params)
                     ));
                 }
                 Function::Polymorphic(f) => {
                     for signature in &f.signatures {
                         let params = TypeParameters::new(&signature.type_parameters);
                         signatures.push(format!(
-                            "{sig}",
-                            sig = signature.display(name, STDLIB.types(), &params)
+                            "{name}{sig}",
+                            sig = signature.display(STDLIB.types(), &params)
                         ));
                     }
                 }
@@ -2426,8 +2629,8 @@ mod test {
                 "glob(String) -> Array[File]",
                 "size(File?, <String>) -> Float",
                 "size(Directory?, <String>) -> Float",
-                "size(X, <String>) -> Float where X: any compound type that recursively contains \
-                 a `File` or `Directory`",
+                "size(X, <String>) -> Float where `X`: any compound type that recursively \
+                 contains a `File` or `Directory`",
                 "stdout() -> File",
                 "stderr() -> File",
                 "read_string(File) -> String",
@@ -2440,49 +2643,49 @@ mod test {
                 "read_tsv(File, Boolean) -> Array[Object]",
                 "read_tsv(File, Boolean, Array[String]) -> Array[Object]",
                 "write_tsv(Array[Array[String]]) -> File",
-                "write_tsv(Array[S]) -> File where S: any structure",
+                "write_tsv(Array[S]) -> File where `S`: any structure",
                 "write_tsv(Array[Array[String]], Boolean, Array[String]) -> File",
-                "write_tsv(Array[S], Boolean, Array[String]) -> File where S: any structure",
+                "write_tsv(Array[S], Boolean, Array[String]) -> File where `S`: any structure",
                 "read_map(File) -> Map[String, String]",
                 "write_map(Map[String, String]) -> File",
                 "read_json(File) -> Union",
-                "write_json(X) -> Union where X: any JSON-serializable type",
+                "write_json(X) -> Union where `X`: any JSON-serializable type",
                 "read_object(File) -> Object",
                 "read_objects(File) -> Array[Object]",
                 "write_object(Object) -> File",
-                "write_object(S) -> File where S: any structure",
+                "write_object(S) -> File where `S`: any structure",
                 "write_objects(Array[Object]) -> File",
-                "write_objects(Array[S]) -> File where S: any structure",
-                "prefix(String, Array[P]) -> Array[String] where P: any required primitive type",
-                "suffix(String, Array[P]) -> Array[String] where P: any required primitive type",
-                "quote(Array[P]) -> Array[String] where P: any required primitive type",
-                "squote(Array[P]) -> Array[String] where P: any required primitive type",
-                "sep(String, Array[P]) -> String where P: any required primitive type",
+                "write_objects(Array[S]) -> File where `S`: any structure",
+                "prefix(String, Array[P]) -> Array[String] where `P`: any required primitive type",
+                "suffix(String, Array[P]) -> Array[String] where `P`: any required primitive type",
+                "quote(Array[P]) -> Array[String] where `P`: any required primitive type",
+                "squote(Array[P]) -> Array[String] where `P`: any required primitive type",
+                "sep(String, Array[P]) -> String where `P`: any required primitive type",
                 "range(Int) -> Array[Int]",
                 "transpose(Array[Array[X]]) -> Array[Array[X]]",
                 "cross(Array[X], Array[Y]) -> Array[Pair[X, Y]]",
                 "zip(Array[X], Array[Y]) -> Array[Pair[X, Y]]",
                 "unzip(Array[Pair[X, Y]]) -> Pair[Array[X], Array[Y]]",
-                "contains(Array[P], P) -> Boolean where P: any primitive type",
+                "contains(Array[P], P) -> Boolean where `P`: any primitive type",
                 "chunk(Array[X], Int) -> Array[Array[X]]",
                 "flatten(Array[Array[X]]) -> Array[X]",
-                "select_first(Array[X]+) -> X where X: any optional type",
-                "select_first(Array[X], <X>) -> X where X: any optional type",
-                "select_all(Array[X]) -> Array[X] where X: any optional type",
-                "as_pairs(Map[K, V]) -> Array[Pair[K, V]] where K: any required primitive type",
-                "as_map(Array[Pair[K, V]]) -> Map[K, V] where K: any required primitive type",
-                "keys(Map[K, V]) -> Array[K] where K: any required primitive type",
-                "keys(S) -> Array[String] where S: any structure",
+                "select_first(Array[X]+) -> X where `X`: any optional type",
+                "select_first(Array[X], <X>) -> X where `X`: any optional type",
+                "select_all(Array[X]) -> Array[X] where `X`: any optional type",
+                "as_pairs(Map[K, V]) -> Array[Pair[K, V]] where `K`: any required primitive type",
+                "as_map(Array[Pair[K, V]]) -> Map[K, V] where `K`: any required primitive type",
+                "keys(Map[K, V]) -> Array[K] where `K`: any required primitive type",
+                "keys(S) -> Array[String] where `S`: any structure",
                 "keys(Object) -> Array[String]",
-                "contains_key(Map[K, V], K) -> Boolean where K: any required primitive type",
+                "contains_key(Map[K, V], K) -> Boolean where `K`: any required primitive type",
                 "contains_key(Object, String) -> Boolean",
                 "contains_key(Map[String, V], Array[String]) -> Boolean",
-                "contains_key(S, Array[String]) -> Boolean where S: any structure",
+                "contains_key(S, Array[String]) -> Boolean where `S`: any structure",
                 "contains_key(Object, Array[String]) -> Boolean",
-                "values(Map[K, V]) -> Array[V] where K: any required primitive type",
-                "collect_by_key(Array[Pair[K, V]]) -> Map[K, Array[V]] where K: any required \
+                "values(Map[K, V]) -> Array[V] where `K`: any required primitive type",
+                "collect_by_key(Array[Pair[K, V]]) -> Map[K, Array[V]] where `K`: any required \
                  primitive type",
-                "defined(X) -> Boolean where X: any optional type",
+                "defined(X) -> Boolean where `X`: any optional type",
                 "length(Array[X]) -> Int",
                 "length(Map[K, V]) -> Int",
                 "length(Object) -> Int",
@@ -2519,7 +2722,7 @@ mod test {
             e,
             FunctionBindError::ArgumentTypeMismatch {
                 index: 0,
-                expected: "Float".into()
+                expected: "`Float`".into()
             }
         );
 
@@ -2570,7 +2773,7 @@ mod test {
             e,
             FunctionBindError::ArgumentTypeMismatch {
                 index: 0,
-                expected: "Map[K, V] where K: any required primitive type".into()
+                expected: "`Map[K, V]` where `K`: any required primitive type".into()
             }
         );
 
@@ -2581,32 +2784,29 @@ mod test {
         assert_eq!(ty.display(&types).to_string(), "Union");
 
         // Check for a Map[String, String]
-        let ty = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
+        let ty = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
         let ty = f.bind(&mut types, &[ty]).expect("bind should succeed");
         assert_eq!(ty.display(&types).to_string(), "Array[String]");
 
         // Check for a Map[String, Object]
-        let ty = types.add_map(MapType::new(PrimitiveTypeKind::String, Type::Object), false);
+        let ty = types.add_map(MapType::new(PrimitiveTypeKind::String, Type::Object));
         let ty = f.bind(&mut types, &[ty]).expect("bind should succeed");
         assert_eq!(ty.display(&types).to_string(), "Array[Object]");
 
         // Check for a map with an optional primitive type
-        let ty = types.add_map(
-            MapType::new(
-                PrimitiveType::optional(PrimitiveTypeKind::String),
-                PrimitiveTypeKind::Boolean,
-            ),
-            false,
-        );
+        let ty = types.add_map(MapType::new(
+            PrimitiveType::optional(PrimitiveTypeKind::String),
+            PrimitiveTypeKind::Boolean,
+        ));
         let e = f.bind(&mut types, &[ty]).expect_err("bind should fail");
         assert_eq!(
             e,
             FunctionBindError::ArgumentTypeMismatch {
                 index: 0,
-                expected: "Map[K, Boolean] where K: any required primitive type".into()
+                expected: "`Map[K, Boolean]` where `K`: any required primitive type".into()
             }
         );
     }
@@ -2619,7 +2819,7 @@ mod test {
         let mut types = Types::new();
 
         // Check for a Array[String] (type mismatch due to constraint)
-        let array_string = types.add_array(ArrayType::new(PrimitiveTypeKind::String), false);
+        let array_string = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
         let e = f
             .bind(&mut types, &[array_string])
             .expect_err("bind should fail");
@@ -2627,15 +2827,14 @@ mod test {
             e,
             FunctionBindError::ArgumentTypeMismatch {
                 index: 0,
-                expected: "Array[X] where X: any optional type".into()
+                expected: "`Array[X]` where `X`: any optional type".into()
             }
         );
 
         // Check for a Array[String?] -> Array[String]
-        let array_optional_string = types.add_array(
-            ArrayType::new(PrimitiveType::optional(PrimitiveTypeKind::String)),
-            false,
-        );
+        let array_optional_string = types.add_array(ArrayType::new(PrimitiveType::optional(
+            PrimitiveTypeKind::String,
+        )));
         let ty = f
             .bind(&mut types, &[array_optional_string])
             .expect("bind should succeed");
@@ -2648,11 +2847,248 @@ mod test {
         assert_eq!(ty.display(&types).to_string(), "Union");
 
         // Check for a Array[Array[String]?] -> Array[Array[String]]
-        let array_string = types.add_array(ArrayType::new(PrimitiveTypeKind::String), true);
-        let array_array_string = types.add_array(ArrayType::new(array_string), false);
+        let array_string = types
+            .add_array(ArrayType::new(PrimitiveTypeKind::String))
+            .optional();
+        let array_array_string = types.add_array(ArrayType::new(array_string));
         let ty = f
             .bind(&mut types, &[array_array_string])
             .expect("bind should succeed");
         assert_eq!(ty.display(&types).to_string(), "Array[Array[String]]");
+    }
+
+    #[test]
+    fn it_binds_concrete_overloads() {
+        let f = STDLIB.function("max").expect("should have function");
+        assert_eq!(f.minimum_version(), SupportedVersion::V1(V1::One));
+
+        let mut types = Types::new();
+
+        let e = f.bind(&mut types, &[]).expect_err("bind should fail");
+        assert_eq!(e, FunctionBindError::TooFewArguments(2));
+
+        let e = f
+            .bind(
+                &mut types,
+                &[
+                    PrimitiveTypeKind::String.into(),
+                    PrimitiveTypeKind::Boolean.into(),
+                    PrimitiveTypeKind::File.into(),
+                ],
+            )
+            .expect_err("bind should fail");
+        assert_eq!(e, FunctionBindError::TooManyArguments(2));
+
+        // Check for `(Int, Int)`
+        let ty = f
+            .bind(
+                &mut types,
+                &[
+                    PrimitiveTypeKind::Integer.into(),
+                    PrimitiveTypeKind::Integer.into(),
+                ],
+            )
+            .expect("binding should succeed");
+        assert_eq!(ty.display(&types).to_string(), "Int");
+
+        // Check for `(Int, Float)`
+        let ty = f
+            .bind(
+                &mut types,
+                &[
+                    PrimitiveTypeKind::Integer.into(),
+                    PrimitiveTypeKind::Float.into(),
+                ],
+            )
+            .expect("binding should succeed");
+        assert_eq!(ty.display(&types).to_string(), "Float");
+
+        // Check for `(Float, Int)`
+        let ty = f
+            .bind(
+                &mut types,
+                &[
+                    PrimitiveTypeKind::Float.into(),
+                    PrimitiveTypeKind::Integer.into(),
+                ],
+            )
+            .expect("binding should succeed");
+        assert_eq!(ty.display(&types).to_string(), "Float");
+
+        // Check for `(Float, Float)`
+        let ty = f
+            .bind(
+                &mut types,
+                &[
+                    PrimitiveTypeKind::Float.into(),
+                    PrimitiveTypeKind::Float.into(),
+                ],
+            )
+            .expect("binding should succeed");
+        assert_eq!(ty.display(&types).to_string(), "Float");
+
+        // Check for `(String, Int)`
+        let e = f
+            .bind(
+                &mut types,
+                &[
+                    PrimitiveTypeKind::String.into(),
+                    PrimitiveTypeKind::Integer.into(),
+                ],
+            )
+            .expect_err("binding should fail");
+        assert_eq!(
+            e,
+            FunctionBindError::ArgumentTypeMismatch {
+                index: 0,
+                expected: "`Int` or `Float`".into()
+            }
+        );
+
+        // Check for `(Int, String)`
+        let e = f
+            .bind(
+                &mut types,
+                &[
+                    PrimitiveTypeKind::Integer.into(),
+                    PrimitiveTypeKind::String.into(),
+                ],
+            )
+            .expect_err("binding should fail");
+        assert_eq!(
+            e,
+            FunctionBindError::ArgumentTypeMismatch {
+                index: 1,
+                expected: "`Int` or `Float`".into()
+            }
+        );
+
+        // Check for `(String, Float)`
+        let e = f
+            .bind(
+                &mut types,
+                &[
+                    PrimitiveTypeKind::String.into(),
+                    PrimitiveTypeKind::Float.into(),
+                ],
+            )
+            .expect_err("binding should fail");
+        assert_eq!(
+            e,
+            FunctionBindError::ArgumentTypeMismatch {
+                index: 0,
+                expected: "`Int` or `Float`".into()
+            }
+        );
+
+        // Check for `(Float, String)`
+        let e = f
+            .bind(
+                &mut types,
+                &[
+                    PrimitiveTypeKind::Float.into(),
+                    PrimitiveTypeKind::String.into(),
+                ],
+            )
+            .expect_err("binding should fail");
+        assert_eq!(
+            e,
+            FunctionBindError::ArgumentTypeMismatch {
+                index: 1,
+                expected: "`Int` or `Float`".into()
+            }
+        );
+    }
+
+    #[test]
+    fn it_binds_generic_overloads() {
+        let f = STDLIB
+            .function("select_first")
+            .expect("should have function");
+        assert_eq!(f.minimum_version(), SupportedVersion::V1(V1::Zero));
+
+        let mut types = Types::default();
+        let e = f.bind(&mut types, &[]).expect_err("bind should fail");
+        assert_eq!(e, FunctionBindError::TooFewArguments(1));
+
+        let e = f
+            .bind(
+                &mut types,
+                &[
+                    PrimitiveTypeKind::String.into(),
+                    PrimitiveTypeKind::Boolean.into(),
+                    PrimitiveTypeKind::File.into(),
+                ],
+            )
+            .expect_err("bind should fail");
+        assert_eq!(e, FunctionBindError::TooManyArguments(2));
+
+        // Check `Int`
+        let e = f
+            .bind(&mut types, &[PrimitiveTypeKind::Integer.into()])
+            .expect_err("binding should fail");
+        assert_eq!(
+            e,
+            FunctionBindError::ArgumentTypeMismatch {
+                index: 0,
+                expected: "`Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any \
+                           optional type"
+                    .into()
+            }
+        );
+
+        // Check `Array[String?]+`
+        let array = types.add_array(ArrayType::non_empty(PrimitiveType::optional(
+            PrimitiveTypeKind::String,
+        )));
+        let ty = f
+            .bind(&mut types, &[array])
+            .expect("binding should succeed");
+        assert_eq!(ty.display(&types).to_string(), "String");
+
+        // Check (`Array[String?]+`, `String`)
+        let ty = f
+            .bind(&mut types, &[array, PrimitiveTypeKind::String.into()])
+            .expect("binding should succeed");
+        assert_eq!(ty.display(&types).to_string(), "String");
+
+        // Check (`Array[String?]+`, `Int`)
+        let e = f
+            .bind(&mut types, &[array, PrimitiveTypeKind::Integer.into()])
+            .expect_err("binding should fail");
+        assert_eq!(
+            e,
+            FunctionBindError::ArgumentTypeMismatch {
+                index: 1,
+                expected: "`String`".into()
+            }
+        );
+
+        // Check `Array[String?]`
+        let array = types.add_array(ArrayType::new(PrimitiveType::optional(
+            PrimitiveTypeKind::String,
+        )));
+        let ty = f
+            .bind(&mut types, &[array])
+            .expect("binding should succeed");
+        assert_eq!(ty.display(&types).to_string(), "String");
+
+        // Check (`Array[String?]`, `String`)
+        let ty = f
+            .bind(&mut types, &[array, PrimitiveTypeKind::String.into()])
+            .expect("binding should succeed");
+        assert_eq!(ty.display(&types).to_string(), "String");
+
+        // Check (`Array[String?]`, `Int`)
+        let e = f
+            .bind(&mut types, &[array, PrimitiveTypeKind::Integer.into()])
+            .expect_err("binding should fail");
+        assert_eq!(
+            e,
+            FunctionBindError::ArgumentTypeMismatch {
+                index: 1,
+                expected: "`String`".into()
+            }
+        );
     }
 }

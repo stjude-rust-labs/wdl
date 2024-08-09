@@ -244,62 +244,29 @@ mod test {
         assert!(constraint.satisfied(&types, Type::OptionalObject));
         assert!(!constraint.satisfied(&types, Type::Union));
 
-        let ty = types.add_array(
-            ArrayType::new(PrimitiveType::optional(PrimitiveTypeKind::Boolean)),
-            false,
-        );
+        let ty = types.add_array(ArrayType::new(PrimitiveType::optional(
+            PrimitiveTypeKind::Boolean,
+        )));
         assert!(!constraint.satisfied(&types, ty));
+        assert!(constraint.satisfied(&types, ty.optional()));
 
-        let ty: Type = types.add_array(ArrayType::new(ty), true);
-        assert!(constraint.satisfied(&types, ty));
-
-        let ty = types.add_pair(
-            PairType::new(
-                PrimitiveTypeKind::Boolean,
-                PrimitiveType::optional(PrimitiveTypeKind::Boolean),
-            ),
-            false,
-        );
+        let ty = types.add_pair(PairType::new(
+            PrimitiveTypeKind::Boolean,
+            PrimitiveType::optional(PrimitiveTypeKind::Boolean),
+        ));
         assert!(!constraint.satisfied(&types, ty));
+        assert!(constraint.satisfied(&types, ty.optional()));
 
-        let ty = types.add_pair(
-            PairType::new(
-                PrimitiveTypeKind::Boolean,
-                PrimitiveType::optional(PrimitiveTypeKind::Boolean),
-            ),
-            true,
-        );
-        assert!(constraint.satisfied(&types, ty));
-
-        let ty = types.add_map(
-            MapType::new(
-                PrimitiveTypeKind::String,
-                PrimitiveType::optional(PrimitiveTypeKind::Boolean),
-            ),
-            false,
-        );
+        let ty = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveType::optional(PrimitiveTypeKind::Boolean),
+        ));
         assert!(!constraint.satisfied(&types, ty));
+        assert!(constraint.satisfied(&types, ty.optional()));
 
-        let ty = types.add_map(
-            MapType::new(
-                PrimitiveTypeKind::String,
-                PrimitiveType::optional(PrimitiveTypeKind::Boolean),
-            ),
-            true,
-        );
-        assert!(constraint.satisfied(&types, ty));
-
-        let ty = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-            false,
-        );
+        let ty = types.add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]));
         assert!(!constraint.satisfied(&types, ty));
-
-        let ty = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-            true,
-        );
-        assert!(constraint.satisfied(&types, ty));
+        assert!(constraint.satisfied(&types, ty.optional()));
     }
 
     #[test]
@@ -341,60 +308,66 @@ mod test {
         assert!(constraint.satisfied(&types, Type::OptionalObject));
         assert!(constraint.satisfied(&types, Type::Union));
 
-        let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String), false);
+        let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::File), true);
+        let ty = types
+            .add_array(ArrayType::new(PrimitiveTypeKind::File))
+            .optional();
         assert!(constraint.satisfied(&types, ty));
 
-        let ty = types.add_pair(
-            PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
+        let ty = types.add_pair(PairType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_pair(
-            PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::File),
-            false,
-        );
+        let ty = types.add_pair(PairType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::File,
+        ));
         assert!(constraint.satisfied(&types, ty));
 
-        let ty = types.add_pair(
-            PairType::new(PrimitiveTypeKind::Directory, PrimitiveTypeKind::String),
-            true,
-        );
+        let ty = types
+            .add_pair(PairType::new(
+                PrimitiveTypeKind::Directory,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
         assert!(constraint.satisfied(&types, ty));
 
-        let array = types.add_array(ArrayType::new(PrimitiveTypeKind::String), false);
-        let ty = types.add_map(MapType::new(PrimitiveTypeKind::String, array), true);
+        let array = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
+        let ty = types
+            .add_map(MapType::new(PrimitiveTypeKind::String, array))
+            .optional();
         assert!(!constraint.satisfied(&types, ty));
 
-        let array = types.add_array(ArrayType::new(PrimitiveTypeKind::File), true);
-        let ty = types.add_map(MapType::new(PrimitiveTypeKind::String, array), false);
+        let array = types
+            .add_array(ArrayType::new(PrimitiveTypeKind::File))
+            .optional();
+        let ty = types.add_map(MapType::new(PrimitiveTypeKind::String, array));
         assert!(constraint.satisfied(&types, ty));
 
-        let ty = types.add_map(
-            MapType::new(PrimitiveTypeKind::Directory, PrimitiveTypeKind::String),
-            true,
-        );
+        let ty = types
+            .add_map(MapType::new(
+                PrimitiveTypeKind::Directory,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
         assert!(constraint.satisfied(&types, ty));
 
-        let ty = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-            false,
-        );
+        let ty = types.add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]));
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::File)]),
-            true,
-        );
+        let ty = types
+            .add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::File)]))
+            .optional();
         assert!(constraint.satisfied(&types, ty));
 
-        let ty = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::Directory)]),
-            false,
-        );
+        let ty = types.add_struct(StructType::new(
+            "Foo",
+            [("foo", PrimitiveTypeKind::Directory)],
+        ));
         assert!(constraint.satisfied(&types, ty));
     }
 
@@ -437,25 +410,26 @@ mod test {
         assert!(!constraint.satisfied(&types, Type::OptionalObject));
         assert!(!constraint.satisfied(&types, Type::Union));
 
-        let ty = types.add_array(ArrayType::non_empty(PrimitiveTypeKind::String), false);
+        let ty = types.add_array(ArrayType::non_empty(PrimitiveTypeKind::String));
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_pair(
-            PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            true,
-        );
+        let ty = types
+            .add_pair(PairType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
+        let ty = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-            true,
-        );
+        let ty = types
+            .add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]))
+            .optional();
         assert!(constraint.satisfied(&types, ty));
     }
 
@@ -498,31 +472,34 @@ mod test {
         assert!(constraint.satisfied(&types, Type::OptionalObject));
         assert!(constraint.satisfied(&types, Type::Union));
 
-        let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String), true);
+        let ty = types
+            .add_array(ArrayType::new(PrimitiveTypeKind::String))
+            .optional();
         assert!(constraint.satisfied(&types, ty));
 
-        let ty = types.add_pair(
-            PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
+        let ty = types.add_pair(PairType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            true,
-        );
+        let ty = types
+            .add_map(MapType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
         assert!(constraint.satisfied(&types, ty));
 
-        let ty = types.add_map(
-            MapType::new(PrimitiveTypeKind::Integer, PrimitiveTypeKind::String),
-            false,
-        );
+        let ty = types.add_map(MapType::new(
+            PrimitiveTypeKind::Integer,
+            PrimitiveTypeKind::String,
+        ));
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-            true,
-        );
+        let ty = types
+            .add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]))
+            .optional();
         assert!(constraint.satisfied(&types, ty));
     }
 
@@ -566,25 +543,26 @@ mod test {
         assert!(constraint.satisfied(&types, Type::Union));
         assert!(!constraint.satisfied(&types, Type::None));
 
-        let ty = types.add_array(ArrayType::non_empty(PrimitiveTypeKind::String), false);
+        let ty = types.add_array(ArrayType::non_empty(PrimitiveTypeKind::String));
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_pair(
-            PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            true,
-        );
+        let ty = types
+            .add_pair(PairType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
+        let ty = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-            true,
-        );
+        let ty = types
+            .add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]))
+            .optional();
         assert!(!constraint.satisfied(&types, ty));
     }
 
@@ -628,25 +606,26 @@ mod test {
         assert!(constraint.satisfied(&types, Type::Union));
         assert!(constraint.satisfied(&types, Type::None));
 
-        let ty = types.add_array(ArrayType::non_empty(PrimitiveTypeKind::String), false);
+        let ty = types.add_array(ArrayType::non_empty(PrimitiveTypeKind::String));
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_pair(
-            PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            true,
-        );
+        let ty = types
+            .add_pair(PairType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
+        let ty = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
         assert!(!constraint.satisfied(&types, ty));
 
-        let ty = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-            true,
-        );
+        let ty = types
+            .add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]))
+            .optional();
         assert!(!constraint.satisfied(&types, ty));
     }
 }

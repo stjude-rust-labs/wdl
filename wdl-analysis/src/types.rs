@@ -11,20 +11,14 @@ use indexmap::IndexMap;
 use crate::STDLIB;
 
 /// A trait implemented on types that may be optional.
-pub trait Optional {
+pub trait Optional: Copy {
     /// Determines if the type is optional.
     fn is_optional(&self) -> bool;
-}
 
-/// A trait implemented on types to make the type required.
-///
-/// Requiring a type removes any optional qualifier.
-pub trait Requireable: Copy {
-    /// Makes the type required if it is optional.
-    ///
-    /// If the type is optional, the optional qualifier is removed.
-    ///
-    /// If the type is already required, this is a no-op.
+    /// Makes the type optional if it isn't already optional.
+    fn optional(&self) -> Self;
+
+    /// Makes the type required if it isn't already required.
     fn require(&self) -> Self;
 }
 
@@ -32,6 +26,14 @@ pub trait Requireable: Copy {
 pub trait Coercible {
     /// Determines if the type is coercible to the target type.
     fn is_coercible_to(&self, types: &Types, target: &Self) -> bool;
+}
+
+/// A trait implement on types for type equality.
+///
+/// This is similar to `Eq` except it supports recursive types.
+pub trait TypeEq {
+    /// Determines if the two types are equal.
+    fn type_eq(&self, types: &Types, other: &Self) -> bool;
 }
 
 /// Represents a kind of primitive WDL type.
@@ -108,9 +110,14 @@ impl Optional for PrimitiveType {
     fn is_optional(&self) -> bool {
         self.optional
     }
-}
 
-impl Requireable for PrimitiveType {
+    fn optional(&self) -> Self {
+        Self {
+            kind: self.kind,
+            optional: true,
+        }
+    }
+
     fn require(&self) -> Self {
         Self {
             kind: self.kind,
@@ -127,6 +134,12 @@ impl Coercible for PrimitiveType {
         }
 
         self.kind.is_coercible_to(types, &target.kind)
+    }
+}
+
+impl TypeEq for PrimitiveType {
+    fn type_eq(&self, _: &Types, other: &Self) -> bool {
+        self == other
     }
 }
 
@@ -234,9 +247,16 @@ impl Optional for Type {
             Self::Object | Self::Union => false,
         }
     }
-}
 
-impl Requireable for Type {
+    fn optional(&self) -> Self {
+        match self {
+            Self::Primitive(ty) => Self::Primitive(ty.optional()),
+            Self::Compound(ty) => Self::Compound(ty.optional()),
+            Self::Object | Self::OptionalObject => Self::OptionalObject,
+            Self::Union | Self::None => Self::None,
+        }
+    }
+
     fn require(&self) -> Self {
         match self {
             Self::Primitive(ty) => Self::Primitive(ty.require()),
@@ -321,6 +341,20 @@ impl Coercible for Type {
     }
 }
 
+impl TypeEq for Type {
+    fn type_eq(&self, types: &Types, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Primitive(a), Self::Primitive(b)) => a.type_eq(types, b),
+            (Self::Compound(a), Self::Compound(b)) => a.type_eq(types, b),
+            (Self::Object, Self::Object) => true,
+            (Self::OptionalObject, Self::OptionalObject) => true,
+            (Self::Union, Self::Union) => true,
+            (Self::None, Self::None) => true,
+            _ => false,
+        }
+    }
+}
+
 impl From<PrimitiveTypeKind> for Type {
     fn from(value: PrimitiveTypeKind) -> Self {
         Self::Primitive(PrimitiveType::new(value))
@@ -391,9 +425,14 @@ impl Optional for CompoundType {
     fn is_optional(&self) -> bool {
         self.optional
     }
-}
 
-impl Requireable for CompoundType {
+    fn optional(&self) -> Self {
+        Self {
+            definition: self.definition,
+            optional: true,
+        }
+    }
+
     fn require(&self) -> Self {
         Self {
             definition: self.definition,
@@ -411,6 +450,32 @@ impl Coercible for CompoundType {
         types
             .type_definition(self.definition)
             .is_coercible_to(types, types.type_definition(target.definition))
+    }
+}
+
+impl TypeEq for CompoundType {
+    fn type_eq(&self, types: &Types, other: &Self) -> bool {
+        if self.optional != other.optional {
+            return false;
+        }
+
+        if self.definition == other.definition {
+            return true;
+        }
+
+        match (
+            types.type_definition(self.definition),
+            types.type_definition(other.definition),
+        ) {
+            (CompoundTypeDef::Array(a), CompoundTypeDef::Array(b)) => a.type_eq(types, b),
+            (CompoundTypeDef::Pair(a), CompoundTypeDef::Pair(b)) => a.type_eq(types, b),
+            (CompoundTypeDef::Map(a), CompoundTypeDef::Map(b)) => a.type_eq(types, b),
+            (CompoundTypeDef::Struct(_), CompoundTypeDef::Struct(_)) => {
+                // Struct types are only equivalent if they're the same definition
+                false
+            }
+            _ => false,
+        }
     }
 }
 
@@ -612,6 +677,12 @@ impl Coercible for ArrayType {
     }
 }
 
+impl TypeEq for ArrayType {
+    fn type_eq(&self, types: &Types, other: &Self) -> bool {
+        self.non_empty == other.non_empty && self.element_type.type_eq(types, &other.element_type)
+    }
+}
+
 /// Represents the type of a `Pair`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct PairType {
@@ -675,6 +746,13 @@ impl Coercible for PairType {
     }
 }
 
+impl TypeEq for PairType {
+    fn type_eq(&self, types: &Types, other: &Self) -> bool {
+        self.first_type.type_eq(types, &other.first_type)
+            && self.second_type.type_eq(types, &other.second_type)
+    }
+}
+
 /// Represents the type of a `Map`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct MapType {
@@ -734,6 +812,13 @@ impl Coercible for MapType {
     fn is_coercible_to(&self, types: &Types, target: &Self) -> bool {
         self.key_type.is_coercible_to(types, &target.key_type)
             && self.value_type.is_coercible_to(types, &target.value_type)
+    }
+}
+
+impl TypeEq for MapType {
+    fn type_eq(&self, types: &Types, other: &Self) -> bool {
+        self.key_type.type_eq(types, &other.key_type)
+            && self.value_type.type_eq(types, &other.value_type)
     }
 }
 
@@ -818,11 +903,11 @@ impl Types {
     ///
     /// Panics if the provided type contains a type definition identifier from a
     /// different types collection.
-    pub fn add_array(&mut self, ty: ArrayType, optional: bool) -> Type {
+    pub fn add_array(&mut self, ty: ArrayType) -> Type {
         ty.assert_valid(self);
         Type::Compound(CompoundType {
             definition: self.0.alloc(CompoundTypeDef::Array(ty)),
-            optional,
+            optional: false,
         })
     }
 
@@ -832,11 +917,11 @@ impl Types {
     ///
     /// Panics if the provided type contains a type definition identifier from a
     /// different types collection.
-    pub fn add_pair(&mut self, ty: PairType, optional: bool) -> Type {
+    pub fn add_pair(&mut self, ty: PairType) -> Type {
         ty.assert_valid(self);
         Type::Compound(CompoundType {
             definition: self.0.alloc(CompoundTypeDef::Pair(ty)),
-            optional,
+            optional: false,
         })
     }
 
@@ -846,11 +931,11 @@ impl Types {
     ///
     /// Panics if the provided type contains a type definition identifier from a
     /// different types collection.
-    pub fn add_map(&mut self, ty: MapType, optional: bool) -> Type {
+    pub fn add_map(&mut self, ty: MapType) -> Type {
         ty.assert_valid(self);
         Type::Compound(CompoundType {
             definition: self.0.alloc(CompoundTypeDef::Map(ty)),
-            optional,
+            optional: false,
         })
     }
 
@@ -860,11 +945,11 @@ impl Types {
     ///
     /// Panics if the provided type contains a type definition identifier from a
     /// different types collection.
-    pub fn add_struct(&mut self, ty: StructType, optional: bool) -> Type {
+    pub fn add_struct(&mut self, ty: StructType) -> Type {
         ty.assert_valid(self);
         Type::Compound(CompoundType {
             definition: self.0.alloc(CompoundTypeDef::Struct(ty)),
-            optional,
+            optional: false,
         })
     }
 
@@ -956,22 +1041,24 @@ mod test {
             "Array[String]+"
         );
 
-        let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String), false);
+        let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
         assert_eq!(
             types
-                .add_array(ArrayType::new(ty), false)
+                .add_array(ArrayType::new(ty))
                 .display(&types)
                 .to_string(),
             "Array[Array[String]]"
         );
 
-        let ty = types.add_array(
-            ArrayType::non_empty(PrimitiveType::optional(PrimitiveTypeKind::String)),
-            true,
-        );
+        let ty = types
+            .add_array(ArrayType::non_empty(PrimitiveType::optional(
+                PrimitiveTypeKind::String,
+            )))
+            .optional();
         assert_eq!(
             types
-                .add_array(ArrayType::non_empty(ty), true)
+                .add_array(ArrayType::non_empty(ty))
+                .optional()
                 .display(&types)
                 .to_string(),
             "Array[Array[String?]+?]+?"
@@ -988,22 +1075,24 @@ mod test {
             "Pair[String, Boolean]"
         );
 
-        let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String), false);
+        let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
         assert_eq!(
             types
-                .add_pair(PairType::new(ty, ty), false)
+                .add_pair(PairType::new(ty, ty))
                 .display(&types)
                 .to_string(),
             "Pair[Array[String], Array[String]]"
         );
 
-        let ty = types.add_array(
-            ArrayType::non_empty(PrimitiveType::optional(PrimitiveTypeKind::File)),
-            true,
-        );
+        let ty = types
+            .add_array(ArrayType::non_empty(PrimitiveType::optional(
+                PrimitiveTypeKind::File,
+            )))
+            .optional();
         assert_eq!(
             types
-                .add_pair(PairType::new(ty, ty), true)
+                .add_pair(PairType::new(ty, ty))
+                .optional()
                 .display(&types)
                 .to_string(),
             "Pair[Array[File?]+?, Array[File?]+?]?"
@@ -1020,22 +1109,24 @@ mod test {
             "Map[String, Boolean]"
         );
 
-        let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String), false);
+        let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
         assert_eq!(
             types
-                .add_map(MapType::new(PrimitiveTypeKind::Boolean, ty), false)
+                .add_map(MapType::new(PrimitiveTypeKind::Boolean, ty))
                 .display(&types)
                 .to_string(),
             "Map[Boolean, Array[String]]"
         );
 
-        let ty = types.add_array(
-            ArrayType::non_empty(PrimitiveType::optional(PrimitiveTypeKind::File)),
-            true,
-        );
+        let ty = types
+            .add_array(ArrayType::non_empty(PrimitiveType::optional(
+                PrimitiveTypeKind::File,
+            )))
+            .optional();
         assert_eq!(
             types
-                .add_map(MapType::new(PrimitiveTypeKind::String, ty), true)
+                .add_map(MapType::new(PrimitiveTypeKind::String, ty))
+                .optional()
                 .display(&types)
                 .to_string(),
             "Map[String, Array[File?]+?]?"
@@ -1132,66 +1223,62 @@ mod test {
         assert!(!Type::OptionalObject.is_coercible_to(&types, &Type::Object));
 
         // Object -> Map[String, X]
-        let ty = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
+        let ty = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
         assert!(!Type::OptionalObject.is_coercible_to(&types, &ty));
 
         // Object -> Map[Int, X] (not a string key)
-        let ty = types.add_map(
-            MapType::new(PrimitiveTypeKind::Integer, PrimitiveTypeKind::String),
-            false,
-        );
+        let ty = types.add_map(MapType::new(
+            PrimitiveTypeKind::Integer,
+            PrimitiveTypeKind::String,
+        ));
         assert!(!Type::Object.is_coercible_to(&types, &ty));
 
         // Object -> Map[String, X]?
-        let ty = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            true,
-        );
+        let ty = types
+            .add_map(MapType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
         assert!(Type::Object.is_coercible_to(&types, &ty));
 
         // Object? -> Map[String, X]?
-        let ty = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            true,
-        );
+        let ty = types
+            .add_map(MapType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
         assert!(Type::OptionalObject.is_coercible_to(&types, &ty));
 
         // Object? -> Map[String, X]
-        let ty = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
+        let ty = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
         assert!(!Type::OptionalObject.is_coercible_to(&types, &ty));
 
         // Object -> Struct
-        let ty = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-            false,
-        );
+        let ty = types.add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]));
         assert!(Type::Object.is_coercible_to(&types, &ty));
 
         // Object -> Struct?
-        let ty = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-            true,
-        );
+        let ty = types
+            .add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]))
+            .optional();
         assert!(Type::Object.is_coercible_to(&types, &ty));
 
         // Object? -> Struct?
-        let ty = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-            true,
-        );
+        let ty = types
+            .add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]))
+            .optional();
         assert!(Type::OptionalObject.is_coercible_to(&types, &ty));
 
         // Object? -> Struct
-        let ty = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-            false,
-        );
+        let ty = types.add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]));
         assert!(!Type::OptionalObject.is_coercible_to(&types, &ty));
     }
 
@@ -1214,44 +1301,48 @@ mod test {
         );
 
         // Array[X] -> Array[Y?]
-        let type1 = types.add_array(ArrayType::new(PrimitiveTypeKind::String), false);
-        let type2 = types.add_array(
-            ArrayType::new(PrimitiveType::optional(PrimitiveTypeKind::File)),
-            false,
-        );
+        let type1 = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
+        let type2 = types.add_array(ArrayType::new(PrimitiveType::optional(
+            PrimitiveTypeKind::File,
+        )));
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(!type2.is_coercible_to(&types, &type1));
 
         // Array[Array[X]] -> Array[Array[Y]]
-        let type1 = types.add_array(ArrayType::new(type1), false);
-        let type2 = types.add_array(ArrayType::new(type2), false);
+        let type1 = types.add_array(ArrayType::new(type1));
+        let type2 = types.add_array(ArrayType::new(type2));
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(!type2.is_coercible_to(&types, &type1));
 
         // Array[X]+ -> Array[Y]
-        let type1 = types.add_array(ArrayType::non_empty(PrimitiveTypeKind::String), false);
-        let type2 = types.add_array(
-            ArrayType::new(PrimitiveType::optional(PrimitiveTypeKind::File)),
-            false,
-        );
+        let type1 = types.add_array(ArrayType::non_empty(PrimitiveTypeKind::String));
+        let type2 = types.add_array(ArrayType::new(PrimitiveType::optional(
+            PrimitiveTypeKind::File,
+        )));
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(!type2.is_coercible_to(&types, &type1));
 
         // Array[X] -> Array[X]
-        let type1 = types.add_array(ArrayType::new(PrimitiveTypeKind::String), false);
-        let type2 = types.add_array(ArrayType::new(PrimitiveTypeKind::String), false);
+        let type1 = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
+        let type2 = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(type2.is_coercible_to(&types, &type1));
 
         // Array[X]? -> Array[X]?
-        let type1 = types.add_array(ArrayType::new(PrimitiveTypeKind::String), true);
-        let type2 = types.add_array(ArrayType::new(PrimitiveTypeKind::String), true);
+        let type1 = types
+            .add_array(ArrayType::new(PrimitiveTypeKind::String))
+            .optional();
+        let type2 = types
+            .add_array(ArrayType::new(PrimitiveTypeKind::String))
+            .optional();
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(type2.is_coercible_to(&types, &type1));
 
         // Array[X] -> Array[X]?
-        let type1 = types.add_array(ArrayType::new(PrimitiveTypeKind::String), false);
-        let type2 = types.add_array(ArrayType::new(PrimitiveTypeKind::String), true);
+        let type1 = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
+        let type2 = types
+            .add_array(ArrayType::new(PrimitiveTypeKind::String))
+            .optional();
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(!type2.is_coercible_to(&types, &type1));
     }
@@ -1281,59 +1372,62 @@ mod test {
         );
 
         // Pair[W, X] -> Pair[Y?, Z?]
-        let type1 = types.add_pair(
-            PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
-        let type2 = types.add_pair(
-            PairType::new(
-                PrimitiveType::optional(PrimitiveTypeKind::File),
-                PrimitiveType::optional(PrimitiveTypeKind::Directory),
-            ),
-            false,
-        );
+        let type1 = types.add_pair(PairType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
+        let type2 = types.add_pair(PairType::new(
+            PrimitiveType::optional(PrimitiveTypeKind::File),
+            PrimitiveType::optional(PrimitiveTypeKind::Directory),
+        ));
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(!type2.is_coercible_to(&types, &type1));
 
         // Pair[Pair[W, X], Pair[W, X]] -> Pair[Pair[Y, Z], Pair[Y, Z]]
-        let type1 = types.add_pair(PairType::new(type1, type1), false);
-        let type2 = types.add_pair(PairType::new(type2, type2), false);
+        let type1 = types.add_pair(PairType::new(type1, type1));
+        let type2 = types.add_pair(PairType::new(type2, type2));
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(!type2.is_coercible_to(&types, &type1));
 
         // Pair[W, X] -> Pair[W, X]
-        let type1 = types.add_pair(
-            PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
-        let type2 = types.add_pair(
-            PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
+        let type1 = types.add_pair(PairType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
+        let type2 = types.add_pair(PairType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(type2.is_coercible_to(&types, &type1));
 
         // Pair[W, X]? -> Pair[W, X]?
-        let type1 = types.add_pair(
-            PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            true,
-        );
-        let type2 = types.add_pair(
-            PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            true,
-        );
+        let type1 = types
+            .add_pair(PairType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
+        let type2 = types
+            .add_pair(PairType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(type2.is_coercible_to(&types, &type1));
 
         // Pair[W, X] -> Pair[W, X]?
-        let type1 = types.add_pair(
-            PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
-        let type2 = types.add_pair(
-            PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            true,
-        );
+        let type1 = types.add_pair(PairType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
+        let type2 = types
+            .add_pair(PairType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(!type2.is_coercible_to(&types, &type1));
     }
@@ -1363,149 +1457,147 @@ mod test {
         );
 
         // Map[W, X] -> Map[Y?, Z?]
-        let type1 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
-        let type2 = types.add_map(
-            MapType::new(
-                PrimitiveType::optional(PrimitiveTypeKind::File),
-                PrimitiveType::optional(PrimitiveTypeKind::Directory),
-            ),
-            false,
-        );
+        let type1 = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
+        let type2 = types.add_map(MapType::new(
+            PrimitiveType::optional(PrimitiveTypeKind::File),
+            PrimitiveType::optional(PrimitiveTypeKind::Directory),
+        ));
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(!type2.is_coercible_to(&types, &type1));
 
         // Map[P, Map[W, X]] -> Map[Q, Map[Y, Z]]
-        let type1 = types.add_map(MapType::new(PrimitiveTypeKind::String, type1), false);
-        let type2 = types.add_map(MapType::new(PrimitiveTypeKind::Directory, type2), false);
+        let type1 = types.add_map(MapType::new(PrimitiveTypeKind::String, type1));
+        let type2 = types.add_map(MapType::new(PrimitiveTypeKind::Directory, type2));
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(!type2.is_coercible_to(&types, &type1));
 
         // Map[W, X] -> Map[W, X]
-        let type1 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
-        let type2 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
+        let type1 = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
+        let type2 = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(type2.is_coercible_to(&types, &type1));
 
         // Map[W, X]? -> Map[W, X]?
-        let type1 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            true,
-        );
-        let type2: Type = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            true,
-        );
+        let type1 = types
+            .add_map(MapType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
+        let type2: Type = types
+            .add_map(MapType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(type2.is_coercible_to(&types, &type1));
 
         // Map[W, X] -> Map[W, X]?
-        let type1 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
-        let type2 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            true,
-        );
+        let type1 = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
+        let type2 = types
+            .add_map(MapType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::String,
+            ))
+            .optional();
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(!type2.is_coercible_to(&types, &type1));
 
         // Map[String, X] -> Struct
-        let type1 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::Integer),
-            false,
-        );
-        let type2 = types.add_struct(
-            StructType::new(
-                "Foo",
-                [
-                    ("foo", PrimitiveTypeKind::Integer),
-                    ("bar", PrimitiveTypeKind::Integer),
-                    ("baz", PrimitiveTypeKind::Integer),
-                ],
-            ),
-            false,
-        );
+        let type1 = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::Integer,
+        ));
+        let type2 = types.add_struct(StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveTypeKind::Integer),
+                ("bar", PrimitiveTypeKind::Integer),
+                ("baz", PrimitiveTypeKind::Integer),
+            ],
+        ));
         assert!(type1.is_coercible_to(&types, &type2));
 
         // Map[String, X] -> Struct (mismatched fields)
-        let type1 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::Integer),
-            false,
-        );
-        let type2 = types.add_struct(
-            StructType::new(
-                "Foo",
-                [
-                    ("foo", PrimitiveTypeKind::Integer),
-                    ("bar", PrimitiveTypeKind::String),
-                    ("baz", PrimitiveTypeKind::Integer),
-                ],
-            ),
-            false,
-        );
+        let type1 = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::Integer,
+        ));
+        let type2 = types.add_struct(StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveTypeKind::Integer),
+                ("bar", PrimitiveTypeKind::String),
+                ("baz", PrimitiveTypeKind::Integer),
+            ],
+        ));
         assert!(!type1.is_coercible_to(&types, &type2));
 
         // Map[Int, X] -> Struct
-        let type1 = types.add_map(
-            MapType::new(PrimitiveTypeKind::Integer, PrimitiveTypeKind::Integer),
-            false,
-        );
-        let type2 = types.add_struct(
-            StructType::new(
-                "Foo",
-                [
-                    ("foo", PrimitiveTypeKind::Integer),
-                    ("bar", PrimitiveTypeKind::Integer),
-                    ("baz", PrimitiveTypeKind::Integer),
-                ],
-            ),
-            false,
-        );
+        let type1 = types.add_map(MapType::new(
+            PrimitiveTypeKind::Integer,
+            PrimitiveTypeKind::Integer,
+        ));
+        let type2 = types.add_struct(StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveTypeKind::Integer),
+                ("bar", PrimitiveTypeKind::Integer),
+                ("baz", PrimitiveTypeKind::Integer),
+            ],
+        ));
         assert!(!type1.is_coercible_to(&types, &type2));
 
         // Map[String, X] -> Object
-        let type1 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::Integer),
-            false,
-        );
+        let type1 = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::Integer,
+        ));
         assert!(type1.is_coercible_to(&types, &Type::Object));
 
         // Map[String, X] -> Object?
-        let type1 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::Integer),
-            false,
-        );
+        let type1 = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::Integer,
+        ));
         assert!(type1.is_coercible_to(&types, &Type::OptionalObject));
 
         // Map[String, X]? -> Object?
-        let type1 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::Integer),
-            true,
-        );
+        let type1 = types
+            .add_map(MapType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::Integer,
+            ))
+            .optional();
         assert!(type1.is_coercible_to(&types, &Type::OptionalObject));
 
         // Map[String, X]? -> Object
-        let type1 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::Integer),
-            true,
-        );
+        let type1 = types
+            .add_map(MapType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::Integer,
+            ))
+            .optional();
         assert!(!type1.is_coercible_to(&types, &Type::Object));
 
         // Map[Integer, X] -> Object
-        let type1 = types.add_map(
-            MapType::new(PrimitiveTypeKind::Integer, PrimitiveTypeKind::Integer),
-            false,
-        );
+        let type1 = types.add_map(MapType::new(
+            PrimitiveTypeKind::Integer,
+            PrimitiveTypeKind::Integer,
+        ));
         assert!(!type1.is_coercible_to(&types, &Type::Object));
     }
 
@@ -1514,180 +1606,147 @@ mod test {
         let mut types = Types::new();
 
         // S -> S (identical)
-        let type1 = types.add_struct(
-            StructType::new(
-                "Foo",
-                [
-                    ("foo", PrimitiveTypeKind::String),
-                    ("bar", PrimitiveTypeKind::String),
-                    ("baz", PrimitiveTypeKind::Integer),
-                ],
-            ),
-            false,
-        );
-        let type2 = types.add_struct(
-            StructType::new(
-                "Foo",
-                [
-                    ("foo", PrimitiveTypeKind::String),
-                    ("bar", PrimitiveTypeKind::String),
-                    ("baz", PrimitiveTypeKind::Integer),
-                ],
-            ),
-            false,
-        );
+        let type1 = types.add_struct(StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveTypeKind::String),
+                ("bar", PrimitiveTypeKind::String),
+                ("baz", PrimitiveTypeKind::Integer),
+            ],
+        ));
+        let type2 = types.add_struct(StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveTypeKind::String),
+                ("bar", PrimitiveTypeKind::String),
+                ("baz", PrimitiveTypeKind::Integer),
+            ],
+        ));
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(type2.is_coercible_to(&types, &type1));
 
         // S -> S?
-        let type1 = types.add_struct(
-            StructType::new(
+        let type1 = types.add_struct(StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveTypeKind::String),
+                ("bar", PrimitiveTypeKind::String),
+                ("baz", PrimitiveTypeKind::Integer),
+            ],
+        ));
+        let type2 = types
+            .add_struct(StructType::new(
                 "Foo",
                 [
                     ("foo", PrimitiveTypeKind::String),
                     ("bar", PrimitiveTypeKind::String),
                     ("baz", PrimitiveTypeKind::Integer),
                 ],
-            ),
-            false,
-        );
-        let type2 = types.add_struct(
-            StructType::new(
-                "Foo",
-                [
-                    ("foo", PrimitiveTypeKind::String),
-                    ("bar", PrimitiveTypeKind::String),
-                    ("baz", PrimitiveTypeKind::Integer),
-                ],
-            ),
-            true,
-        );
+            ))
+            .optional();
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(!type2.is_coercible_to(&types, &type1));
 
         // S? -> S?
-        let type1 = types.add_struct(
-            StructType::new(
+        let type1 = types
+            .add_struct(StructType::new(
                 "Foo",
                 [
                     ("foo", PrimitiveTypeKind::String),
                     ("bar", PrimitiveTypeKind::String),
                     ("baz", PrimitiveTypeKind::Integer),
                 ],
-            ),
-            true,
-        );
-        let type2 = types.add_struct(
-            StructType::new(
+            ))
+            .optional();
+        let type2 = types
+            .add_struct(StructType::new(
                 "Foo",
                 [
                     ("foo", PrimitiveTypeKind::String),
                     ("bar", PrimitiveTypeKind::String),
                     ("baz", PrimitiveTypeKind::Integer),
                 ],
-            ),
-            true,
-        );
+            ))
+            .optional();
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(type2.is_coercible_to(&types, &type1));
 
         // S -> S (coercible fields)
-        let type1 = types.add_struct(
-            StructType::new(
-                "Foo",
-                [
-                    ("foo", PrimitiveTypeKind::String),
-                    ("bar", PrimitiveTypeKind::String),
-                    ("baz", PrimitiveTypeKind::Integer),
-                ],
-            ),
-            false,
-        );
-        let type2 = types.add_struct(
-            StructType::new(
-                "Bar",
-                [
-                    ("foo", PrimitiveTypeKind::File),
-                    ("bar", PrimitiveTypeKind::Directory),
-                    ("baz", PrimitiveTypeKind::Float),
-                ],
-            ),
-            false,
-        );
+        let type1 = types.add_struct(StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveTypeKind::String),
+                ("bar", PrimitiveTypeKind::String),
+                ("baz", PrimitiveTypeKind::Integer),
+            ],
+        ));
+        let type2 = types.add_struct(StructType::new(
+            "Bar",
+            [
+                ("foo", PrimitiveTypeKind::File),
+                ("bar", PrimitiveTypeKind::Directory),
+                ("baz", PrimitiveTypeKind::Float),
+            ],
+        ));
         assert!(type1.is_coercible_to(&types, &type2));
         assert!(!type2.is_coercible_to(&types, &type1));
 
         // S -> S (mismatched fields)
-        let type1 = types.add_struct(
-            StructType::new(
-                "Foo",
-                [
-                    ("foo", PrimitiveTypeKind::String),
-                    ("bar", PrimitiveTypeKind::String),
-                    ("baz", PrimitiveTypeKind::Integer),
-                ],
-            ),
-            false,
-        );
-        let type2 = types.add_struct(
-            StructType::new("Bar", [("baz", PrimitiveTypeKind::Float)]),
-            false,
-        );
+        let type1 = types.add_struct(StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveTypeKind::String),
+                ("bar", PrimitiveTypeKind::String),
+                ("baz", PrimitiveTypeKind::Integer),
+            ],
+        ));
+        let type2 = types.add_struct(StructType::new("Bar", [("baz", PrimitiveTypeKind::Float)]));
         assert!(!type1.is_coercible_to(&types, &type2));
         assert!(!type2.is_coercible_to(&types, &type1));
 
         // Struct -> Map[String, X]
-        let type1 = types.add_struct(
-            StructType::new(
-                "Foo",
-                [
-                    ("foo", PrimitiveTypeKind::String),
-                    ("bar", PrimitiveTypeKind::String),
-                    ("baz", PrimitiveTypeKind::String),
-                ],
-            ),
-            false,
-        );
-        let type2 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
+        let type1 = types.add_struct(StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveTypeKind::String),
+                ("bar", PrimitiveTypeKind::String),
+                ("baz", PrimitiveTypeKind::String),
+            ],
+        ));
+        let type2 = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
         assert!(type1.is_coercible_to(&types, &type2));
 
         // Struct -> Map[String, X] (mismatched types)
-        let type1 = types.add_struct(
-            StructType::new(
-                "Foo",
-                [
-                    ("foo", PrimitiveTypeKind::String),
-                    ("bar", PrimitiveTypeKind::Integer),
-                    ("baz", PrimitiveTypeKind::String),
-                ],
-            ),
-            false,
-        );
-        let type2 = types.add_map(
-            MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::String),
-            false,
-        );
+        let type1 = types.add_struct(StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveTypeKind::String),
+                ("bar", PrimitiveTypeKind::Integer),
+                ("baz", PrimitiveTypeKind::String),
+            ],
+        ));
+        let type2 = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::String,
+        ));
         assert!(!type1.is_coercible_to(&types, &type2));
 
         // Struct -> Map[Int, X] (not a string key)
-        let type1 = types.add_struct(
-            StructType::new(
-                "Foo",
-                [
-                    ("foo", PrimitiveTypeKind::String),
-                    ("bar", PrimitiveTypeKind::String),
-                    ("baz", PrimitiveTypeKind::String),
-                ],
-            ),
-            false,
-        );
-        let type2 = types.add_map(
-            MapType::new(PrimitiveTypeKind::Integer, PrimitiveTypeKind::String),
-            false,
-        );
+        let type1 = types.add_struct(StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveTypeKind::String),
+                ("bar", PrimitiveTypeKind::String),
+                ("baz", PrimitiveTypeKind::String),
+            ],
+        ));
+        let type2 = types.add_map(MapType::new(
+            PrimitiveTypeKind::Integer,
+            PrimitiveTypeKind::String,
+        ));
         assert!(!type1.is_coercible_to(&types, &type2));
 
         // Struct -> Object
@@ -1697,10 +1756,9 @@ mod test {
         assert!(type1.is_coercible_to(&types, &Type::OptionalObject));
 
         // Struct? -> Object?
-        let type1 = types.add_struct(
-            StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-            true,
-        );
+        let type1 = types
+            .add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]))
+            .optional();
         assert!(type1.is_coercible_to(&types, &Type::OptionalObject));
 
         // Struct? -> Object
@@ -1726,31 +1784,33 @@ mod test {
 
         for optional in [true, false] {
             // Union -> Array[X], Union -> Array[X]?
-            let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String), optional);
+            let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
+            let ty = if optional { ty.optional() } else { ty };
+
             let coercible = Type::Union.is_coercible_to(&types, &ty);
             assert!(coercible);
 
             // Union -> Pair[X, Y], Union -> Pair[X, Y]?
-            let ty = types.add_pair(
-                PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::Boolean),
-                optional,
-            );
+            let ty = types.add_pair(PairType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::Boolean,
+            ));
+            let ty = if optional { ty.optional() } else { ty };
             let coercible = Type::Union.is_coercible_to(&types, &ty);
             assert!(coercible);
 
             // Union -> Map[X, Y], Union -> Map[X, Y]?
-            let ty = types.add_map(
-                MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::Boolean),
-                optional,
-            );
+            let ty = types.add_map(MapType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::Boolean,
+            ));
+            let ty = if optional { ty.optional() } else { ty };
             let coercible = Type::Union.is_coercible_to(&types, &ty);
             assert!(coercible);
 
             // Union -> Struct, Union -> Struct?
-            let ty = types.add_struct(
-                StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-                optional,
-            );
+            let ty = types.add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]));
+            let ty = if optional { ty.optional() } else { ty };
             let coercible = Type::Union.is_coercible_to(&types, &ty);
             assert!(coercible);
         }
@@ -1775,7 +1835,8 @@ mod test {
 
         for optional in [true, false] {
             // None -> Array[X], None -> Array[X]?
-            let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String), optional);
+            let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
+            let ty = if optional { ty.optional() } else { ty };
             let coercible = Type::None.is_coercible_to(&types, &ty);
             if optional {
                 assert!(coercible);
@@ -1784,10 +1845,11 @@ mod test {
             }
 
             // None -> Pair[X, Y], None -> Pair[X, Y]?
-            let ty = types.add_pair(
-                PairType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::Boolean),
-                optional,
-            );
+            let ty = types.add_pair(PairType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::Boolean,
+            ));
+            let ty = if optional { ty.optional() } else { ty };
             let coercible = Type::None.is_coercible_to(&types, &ty);
             if optional {
                 assert!(coercible);
@@ -1796,10 +1858,11 @@ mod test {
             }
 
             // None -> Map[X, Y], None -> Map[X, Y]?
-            let ty = types.add_map(
-                MapType::new(PrimitiveTypeKind::String, PrimitiveTypeKind::Boolean),
-                optional,
-            );
+            let ty = types.add_map(MapType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::Boolean,
+            ));
+            let ty = if optional { ty.optional() } else { ty };
             let coercible = Type::None.is_coercible_to(&types, &ty);
             if optional {
                 assert!(coercible);
@@ -1808,10 +1871,8 @@ mod test {
             }
 
             // None -> Struct, None -> Struct?
-            let ty = types.add_struct(
-                StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]),
-                optional,
-            );
+            let ty = types.add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]));
+            let ty = if optional { ty.optional() } else { ty };
             let coercible = Type::None.is_coercible_to(&types, &ty);
             if optional {
                 assert!(coercible);
@@ -1819,5 +1880,181 @@ mod test {
                 assert!(!coercible);
             }
         }
+    }
+
+    #[test]
+    fn primitive_type_equality() {
+        let types = Types::new();
+
+        for kind in [
+            PrimitiveTypeKind::Boolean,
+            PrimitiveTypeKind::Directory,
+            PrimitiveTypeKind::File,
+            PrimitiveTypeKind::Float,
+            PrimitiveTypeKind::Integer,
+            PrimitiveTypeKind::String,
+        ] {
+            assert!(PrimitiveType::new(kind).type_eq(&types, &PrimitiveType::new(kind)));
+            assert!(!PrimitiveType::optional(kind).type_eq(&types, &PrimitiveType::new(kind)));
+            assert!(!PrimitiveType::new(kind).type_eq(&types, &PrimitiveType::optional(kind)));
+            assert!(PrimitiveType::optional(kind).type_eq(&types, &PrimitiveType::optional(kind)));
+            assert!(!Type::from(PrimitiveType::new(kind)).type_eq(&types, &Type::Object));
+            assert!(!Type::from(PrimitiveType::new(kind)).type_eq(&types, &Type::OptionalObject));
+            assert!(!Type::from(PrimitiveType::new(kind)).type_eq(&types, &Type::Union));
+            assert!(!Type::from(PrimitiveType::new(kind)).type_eq(&types, &Type::None));
+        }
+    }
+
+    #[test]
+    fn array_type_equality() {
+        let mut types = Types::new();
+
+        // Array[String] == Array[String]
+        let a = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
+        let b = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
+        assert!(a.type_eq(&types, &b));
+        assert!(!a.optional().type_eq(&types, &b));
+        assert!(!a.type_eq(&types, &b.optional()));
+        assert!(a.optional().type_eq(&types, &b.optional()));
+
+        // Array[Array[String]] == Array[Array[String]
+        let a = types.add_array(ArrayType::new(a));
+        let b = types.add_array(ArrayType::new(b));
+        assert!(a.type_eq(&types, &b));
+
+        // Array[Array[Array[String]]]+ == Array[Array[Array[String]]+
+        let a = types.add_array(ArrayType::non_empty(a));
+        let b = types.add_array(ArrayType::non_empty(b));
+        assert!(a.type_eq(&types, &b));
+
+        // Array[String] != Array[String]+
+        let a = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
+        let b = types.add_array(ArrayType::non_empty(PrimitiveTypeKind::String));
+        assert!(!a.type_eq(&types, &b));
+
+        // Array[String] != Array[Int]
+        let a = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
+        let b = types.add_array(ArrayType::new(PrimitiveTypeKind::Integer));
+        assert!(!a.type_eq(&types, &b));
+
+        assert!(!a.type_eq(&types, &Type::Object));
+        assert!(!a.type_eq(&types, &Type::OptionalObject));
+        assert!(!a.type_eq(&types, &Type::Union));
+        assert!(!a.type_eq(&types, &Type::None));
+    }
+
+    #[test]
+    fn pair_type_equality() {
+        let mut types = Types::new();
+
+        // Pair[String, Int] == Pair[String, Int]
+        let a = types.add_pair(PairType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::Integer,
+        ));
+        let b = types.add_pair(PairType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::Integer,
+        ));
+        assert!(a.type_eq(&types, &b));
+        assert!(!a.optional().type_eq(&types, &b));
+        assert!(!a.type_eq(&types, &b.optional()));
+        assert!(a.optional().type_eq(&types, &b.optional()));
+
+        // Pair[Pair[String, Int], Pair[String, Int]] == Pair[Pair[String, Int],
+        // Pair[String, Int]]
+        let a = types.add_pair(PairType::new(a, a));
+        let b = types.add_pair(PairType::new(b, b));
+        assert!(a.type_eq(&types, &b));
+
+        // Pair[String, Int] != Pair[String, Int]?
+        let a = types.add_pair(PairType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::Integer,
+        ));
+        let b = types
+            .add_pair(PairType::new(
+                PrimitiveTypeKind::String,
+                PrimitiveTypeKind::Integer,
+            ))
+            .optional();
+        assert!(!a.type_eq(&types, &b));
+
+        assert!(!a.type_eq(&types, &Type::Object));
+        assert!(!a.type_eq(&types, &Type::OptionalObject));
+        assert!(!a.type_eq(&types, &Type::Union));
+        assert!(!a.type_eq(&types, &Type::None));
+    }
+
+    #[test]
+    fn map_type_equality() {
+        let mut types = Types::new();
+
+        // Map[String, Int] == Map[String, Int]
+        let a = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::Integer,
+        ));
+        let b = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::Integer,
+        ));
+        assert!(a.type_eq(&types, &b));
+        assert!(!a.optional().type_eq(&types, &b));
+        assert!(!a.type_eq(&types, &b.optional()));
+        assert!(a.optional().type_eq(&types, &b.optional()));
+
+        // Map[File, Map[String, Int]] == Map[File, Map[String, Int]]
+        let a = types.add_map(MapType::new(PrimitiveTypeKind::File, a));
+        let b = types.add_map(MapType::new(PrimitiveTypeKind::File, b));
+        assert!(a.type_eq(&types, &b));
+
+        // Map[String, Int] != Map[Int, String]
+        let a = types.add_map(MapType::new(
+            PrimitiveTypeKind::String,
+            PrimitiveTypeKind::Integer,
+        ));
+        let b = types.add_map(MapType::new(
+            PrimitiveTypeKind::Integer,
+            PrimitiveTypeKind::String,
+        ));
+        assert!(!a.type_eq(&types, &b));
+
+        assert!(!a.type_eq(&types, &Type::Object));
+        assert!(!a.type_eq(&types, &Type::OptionalObject));
+        assert!(!a.type_eq(&types, &Type::Union));
+        assert!(!a.type_eq(&types, &Type::None));
+    }
+
+    #[test]
+    fn struct_type_equality() {
+        let mut types = Types::new();
+
+        let a = types.add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]));
+        assert!(a.type_eq(&types, &a));
+        assert!(!a.optional().type_eq(&types, &a));
+        assert!(!a.type_eq(&types, &a.optional()));
+        assert!(a.optional().type_eq(&types, &a.optional()));
+
+        let b = types.add_struct(StructType::new("Foo", [("foo", PrimitiveTypeKind::String)]));
+        assert!(!a.type_eq(&types, &b));
+    }
+
+    #[test]
+    fn object_type_equality() {
+        let types = Types::new();
+        assert!(Type::Object.type_eq(&types, &Type::Object));
+        assert!(!Type::OptionalObject.type_eq(&types, &Type::Object));
+        assert!(!Type::Object.type_eq(&types, &Type::OptionalObject));
+        assert!(Type::OptionalObject.type_eq(&types, &Type::OptionalObject));
+    }
+
+    #[test]
+    fn union_type_equality() {
+        let types = Types::new();
+        assert!(Type::Union.type_eq(&types, &Type::Union));
+        assert!(!Type::None.type_eq(&types, &Type::Union));
+        assert!(!Type::Union.type_eq(&types, &Type::None));
+        assert!(Type::None.type_eq(&types, &Type::None));
     }
 }
