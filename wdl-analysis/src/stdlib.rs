@@ -74,12 +74,6 @@ pub enum FunctionBindError {
         /// The expected type for the argument.
         expected: String,
     },
-    /// Cannot infer the given type parameter.
-    CannotInferTypeParameter {
-        /// The name of the function's type parameter that could not be
-        /// inferred.
-        name: &'static str,
-    },
 }
 
 /// Represents a generic type to a standard library function.
@@ -586,19 +580,6 @@ impl<'a> TypeParameters<'a> {
         self.referenced.set(0);
     }
 
-    /// Gets the first uninferred type parameter.
-    ///
-    /// Returns `None` if all type parameters could be inferred.
-    pub fn first_uninferred(&self) -> Option<&TypeParameter> {
-        for i in 0..self.parameters.len() {
-            if self.inferred_types[i].is_none() {
-                return Some(&self.parameters[i]);
-            }
-        }
-
-        None
-    }
-
     /// Gets an iterator of the type parameters that have been referenced since
     /// the last reset.
     pub fn referenced(&self) -> impl Iterator<Item = (&TypeParameter, Option<Type>)> {
@@ -926,7 +907,12 @@ impl FunctionSignature {
                         });
                     }
                 }
+                None if *argument == Type::Union => {
+                    // If the type is `Union`, accept it as indeterminate
+                    continue;
+                }
                 None => {
+                    // Otherwise, this is a type mismatch
                     type_parameters.reset();
 
                     let mut expected = String::new();
@@ -945,17 +931,13 @@ impl FunctionSignature {
             }
         }
 
-        // By this point, all type parameters should be inferred
-        if let Some(p) = type_parameters.first_uninferred() {
-            return Err(FunctionBindError::CannotInferTypeParameter { name: p.name });
-        }
-
-        // Finally, realize the return type; it should always realize as all type
-        // parameters were inferred
+        // Finally, realize the return type; if it fails to realize, it means there was
+        // at least one uninferred type parameter; we return `Union` instead to indicate
+        // that the return value is indeterminate.
         Ok(self
             .ret()
             .realize(types, &type_parameters)
-            .expect("should realize type"))
+            .unwrap_or(Type::Union))
     }
 }
 
@@ -2541,6 +2523,12 @@ mod test {
             }
         );
 
+        // Check for Union (i.e. indeterminate)
+        let ty = f
+            .bind(&mut types, &[Type::Union])
+            .expect("bind should succeed");
+        assert_eq!(ty.display(&types).to_string(), "Int");
+
         // Check for a float argument
         let ty = f
             .bind(&mut types, &[PrimitiveTypeKind::Float.into()])
@@ -2585,6 +2573,12 @@ mod test {
                 expected: "Map[K, V] where K: any required primitive type".into()
             }
         );
+
+        // Check for Union (i.e. indeterminate)
+        let ty = f
+            .bind(&mut types, &[Type::Union])
+            .expect("bind should succeed");
+        assert_eq!(ty.display(&types).to_string(), "Union");
 
         // Check for a Map[String, String]
         let ty = types.add_map(
@@ -2646,6 +2640,12 @@ mod test {
             .bind(&mut types, &[array_optional_string])
             .expect("bind should succeed");
         assert_eq!(ty.display(&types).to_string(), "Array[String]");
+
+        // Check for Union (i.e. indeterminate)
+        let ty = f
+            .bind(&mut types, &[Type::Union])
+            .expect("bind should succeed");
+        assert_eq!(ty.display(&types).to_string(), "Union");
 
         // Check for a Array[Array[String]?] -> Array[Array[String]]
         let array_string = types.add_array(ArrayType::new(PrimitiveTypeKind::String), true);

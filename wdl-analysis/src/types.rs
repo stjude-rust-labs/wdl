@@ -3,6 +3,8 @@
 use std::fmt;
 
 use id_arena::Arena;
+use id_arena::ArenaBehavior;
+use id_arena::DefaultArenaBehavior;
 use id_arena::Id;
 use indexmap::IndexMap;
 
@@ -172,6 +174,9 @@ pub enum Type {
     OptionalObject,
     /// A special hidden type for a value that may have any one of several
     /// concrete types.
+    ///
+    /// This variant is also used to convey an "indeterminate" type; an
+    /// indeterminate type may result from a previous type error.
     Union,
     /// A special type that behaves like an optional `Union`.
     None,
@@ -205,7 +210,15 @@ impl Type {
     /// Asserts that the type is valid.
     fn assert_valid(&self, types: &Types) {
         match self {
-            Self::Compound(ty) => ty.assert_valid(types),
+            Self::Compound(ty) => {
+                let arena_id = DefaultArenaBehavior::arena_id(ty.definition());
+                assert!(
+                    arena_id == DefaultArenaBehavior::arena_id(types.0.next_id())
+                        || arena_id == DefaultArenaBehavior::arena_id(STDLIB.types().0.next_id()),
+                    "type comes from a different arena"
+                );
+                ty.assert_valid(types);
+            }
             Self::Primitive(_) | Self::Object | Self::OptionalObject | Self::Union | Self::None => {
             }
         }
@@ -800,6 +813,11 @@ impl Types {
     }
 
     /// Adds an array type to the type collection.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the provided type contains a type definition identifier from a
+    /// different types collection.
     pub fn add_array(&mut self, ty: ArrayType, optional: bool) -> Type {
         ty.assert_valid(self);
         Type::Compound(CompoundType {
@@ -809,6 +827,11 @@ impl Types {
     }
 
     /// Adds a pair type to the type collection.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the provided type contains a type definition identifier from a
+    /// different types collection.
     pub fn add_pair(&mut self, ty: PairType, optional: bool) -> Type {
         ty.assert_valid(self);
         Type::Compound(CompoundType {
@@ -818,6 +841,11 @@ impl Types {
     }
 
     /// Adds a map type to the type collection.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the provided type contains a type definition identifier from a
+    /// different types collection.
     pub fn add_map(&mut self, ty: MapType, optional: bool) -> Type {
         ty.assert_valid(self);
         Type::Compound(CompoundType {
@@ -827,6 +855,11 @@ impl Types {
     }
 
     /// Adds a struct type to the type collection.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the provided type contains a type definition identifier from a
+    /// different types collection.
     pub fn add_struct(&mut self, ty: StructType, optional: bool) -> Type {
         ty.assert_valid(self);
         Type::Compound(CompoundType {
