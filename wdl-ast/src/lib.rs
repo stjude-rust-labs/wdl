@@ -58,11 +58,13 @@ pub use wdl_grammar::WorkflowDescriptionLanguage;
 
 pub mod v1;
 
+mod element;
 #[cfg(test)]
 mod registry;
 mod validation;
 mod visitor;
 
+pub use element::*;
 pub use validation::*;
 pub use visitor::*;
 
@@ -147,6 +149,21 @@ pub fn token_children<T: AstToken>(parent: &SyntaxNode) -> impl Iterator<Item = 
     parent
         .children_with_tokens()
         .filter_map(|c| c.into_token().and_then(T::cast))
+}
+
+/// An extension trait for [`AstNode`].
+pub trait AstNodeExt {
+    /// Gets the children of this [`AstNode`].
+    fn children(&self) -> impl Iterator<Item = AstElement>;
+}
+
+impl<T: AstNode<Language = WorkflowDescriptionLanguage>> AstNodeExt for T {
+    fn children(&self) -> impl Iterator<Item = AstElement> {
+        self.syntax()
+            .clone()
+            .children_with_tokens()
+            .map(|c| AstElement::cast(c).expect("element to be castable to an AST element"))
+    }
 }
 
 /// Represents the AST of a [Document].

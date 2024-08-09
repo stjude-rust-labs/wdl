@@ -1996,7 +1996,7 @@ impl std::fmt::Display for TrueKeyword {
     }
 }
 
-/// A token representing the `unknown` keyword.
+/// A token representing unknown contents within a WDL document.
 #[derive(Debug)]
 pub struct Unknown(SyntaxToken);
 
