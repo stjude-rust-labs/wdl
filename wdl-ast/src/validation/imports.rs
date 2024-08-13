@@ -20,7 +20,8 @@ fn empty_import(span: Span) -> Diagnostic {
 /// Creates a "placeholder in import" diagnostic
 fn placeholder_in_import(span: Span) -> Diagnostic {
     Diagnostic::error("import URI cannot contain placeholders")
-        .with_label("remove this placeholder", span)
+        .with_highlight(span)
+        .with_fix("remove the placeholder")
 }
 
 /// Creates an "invalid import namespace" diagnostic
