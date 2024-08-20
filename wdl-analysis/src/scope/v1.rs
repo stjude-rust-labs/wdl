@@ -263,7 +263,8 @@ impl DocumentScope {
                 }
             }
             None => {
-                // Invalid import, ignore it
+                // Invalid import namespaces are caught during validation, so there is already a
+                // diagnostic for this issue; ignore the import here
                 return;
             }
         };
@@ -747,6 +748,8 @@ impl DocumentScope {
         let text = match uri.text() {
             Some(text) => text,
             None => {
+                // The import URI isn't valid; this is caught at validation time, so we do not
+                // emit any additional diagnostics for it here.
                 return Err(None);
             }
         };
