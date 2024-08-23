@@ -10,14 +10,13 @@
 #![warn(rustdoc::broken_intra_doc_links)]
 
 mod analyzer;
+// pub mod evaluation;
 mod graph;
 mod queue;
 mod rayon;
-mod scope;
-mod stdlib;
-mod types;
+pub mod scope;
+pub mod stdlib;
+mod task;
+pub mod types;
 
 pub use analyzer::*;
-pub use scope::*;
-pub use stdlib::*;
-pub use types::*;

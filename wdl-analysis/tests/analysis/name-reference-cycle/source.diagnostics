@@ -1,0 +1,9 @@
+error: name reference cycle detected
+  ┌─ tests/analysis/name-reference-cycle/source.wdl:6:9
+  │
+6 │     Int a = b
+  │         ^ this name participates in the cycle
+7 │     Int b = c
+8 │     Int c = a
+  │         - this name participates in the cycle
+
