@@ -67,7 +67,7 @@ pub trait Rule: Visitor<State = Diagnostics> {
     }
 
     /// Gets the nodes that are exceptable for this rule.
-    /// 
+    ///
     /// If `None` is returned, all nodes are exceptable.
     fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>>;
 }
