@@ -71,6 +71,10 @@ impl Rule for PreambleCommentsRule {
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Spacing, Tag::Style, Tag::Clarity])
     }
+
+    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+        Some(vec![SyntaxKind::VersionStatementNode])
+    }
 }
 
 impl Visitor for PreambleCommentsRule {

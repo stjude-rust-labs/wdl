@@ -53,6 +53,13 @@ impl Rule for NoCurlyCommandsRule {
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Clarity])
     }
+
+    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+        Some(vec![
+            SyntaxKind::VersionStatementNode,
+            SyntaxKind::CommandSectionNode,
+        ])
+    }
 }
 
 impl Visitor for NoCurlyCommandsRule {

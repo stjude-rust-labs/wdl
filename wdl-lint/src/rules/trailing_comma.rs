@@ -10,6 +10,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxKind;
 use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -62,6 +63,21 @@ impl Rule for TrailingCommaRule {
 
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Style])
+    }
+
+    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+        Some(vec![
+            SyntaxKind::VersionStatementNode,
+            SyntaxKind::MetadataSectionNode,
+            SyntaxKind::ParameterMetadataSectionNode,
+            SyntaxKind::MetadataArrayNode,
+            SyntaxKind::MetadataObjectNode,
+            SyntaxKind::CallStatementNode,
+            SyntaxKind::LiteralStructNode,
+            SyntaxKind::LiteralArrayNode,
+            SyntaxKind::LiteralMapNode,
+            SyntaxKind::LiteralObjectNode,
+        ])
     }
 }
 

@@ -77,6 +77,14 @@ impl Rule for CallInputSpacingRule {
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Style, Tag::Clarity, Tag::Spacing])
     }
+
+    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+        Some(vec![
+            SyntaxKind::VersionStatementNode,
+            SyntaxKind::CallStatementNode,
+            SyntaxKind::WorkflowDefinitionNode,
+        ])
+    }
 }
 
 impl Visitor for CallInputSpacingRule {

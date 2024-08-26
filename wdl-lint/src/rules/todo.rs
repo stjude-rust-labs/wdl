@@ -55,6 +55,10 @@ impl Rule for TodoRule {
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Completeness])
     }
+
+    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
+        None
+    }
 }
 
 impl Visitor for TodoRule {

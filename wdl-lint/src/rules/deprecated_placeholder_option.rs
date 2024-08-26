@@ -9,6 +9,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
@@ -83,6 +84,14 @@ impl Rule for DeprecatedPlaceholderOptionRule {
 
          This rule only evaluates for WDL V1 documents with a version of v1.1 or later, as this \
          was the version where the deprecation was introduced."
+    }
+
+    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
+        Some(vec![
+            SyntaxKind::VersionStatementNode,
+            SyntaxKind::TaskDefinitionNode,
+            SyntaxKind::PlaceholderNode,
+        ])
     }
 
     fn tags(&self) -> TagSet {

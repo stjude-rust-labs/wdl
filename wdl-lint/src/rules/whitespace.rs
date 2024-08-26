@@ -71,6 +71,10 @@ impl Rule for WhitespaceRule {
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Style, Tag::Spacing])
     }
+
+    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+        None
+    }
 }
 
 impl Visitor for WhitespaceRule {

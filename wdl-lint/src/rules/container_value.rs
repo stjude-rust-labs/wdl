@@ -15,6 +15,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
@@ -126,6 +127,14 @@ impl Rule for ContainerValue {
         //   pull the latest image for a mutably tagged container whereas another may
         //   use a older, cached version until the user prompts it to upgrade).
         TagSet::new(&[Tag::Clarity, Tag::Portability])
+    }
+
+    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
+        Some(vec![
+            SyntaxKind::VersionStatementNode,
+            SyntaxKind::RuntimeSectionNode,
+            SyntaxKind::RequirementsSectionNode,
+        ])
     }
 }
 

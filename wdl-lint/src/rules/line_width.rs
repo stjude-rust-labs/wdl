@@ -95,6 +95,10 @@ impl Rule for LineWidthRule {
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Style, Tag::Clarity, Tag::Spacing])
     }
+
+    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
+        None
+    }
 }
 
 impl Visitor for LineWidthRule {

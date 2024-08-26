@@ -201,6 +201,10 @@ impl Rule for ExpressionSpacingRule {
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Spacing])
     }
+
+    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+        None
+    }
 }
 
 impl Visitor for ExpressionSpacingRule {

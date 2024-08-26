@@ -11,6 +11,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Ident;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
@@ -112,6 +113,15 @@ impl Rule for MissingMetasRule {
 
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Completeness, Tag::Clarity])
+    }
+
+    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+        Some(vec![
+            SyntaxKind::VersionStatementNode,
+            SyntaxKind::TaskDefinitionNode,
+            SyntaxKind::WorkflowDefinitionNode,
+            SyntaxKind::StructDefinitionNode,
+        ])
     }
 }
 

@@ -14,6 +14,7 @@ use wdl_ast::Document;
 use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
@@ -91,6 +92,13 @@ impl Rule for MatchingParameterMetaRule {
 
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Completeness])
+    }
+
+    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+        Some(vec![
+            SyntaxKind::VersionStatementNode,
+            SyntaxKind::ParameterMetadataSectionNode,
+        ])
     }
 }
 

@@ -10,6 +10,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
@@ -71,6 +72,14 @@ impl Rule for DisallowedOutputNameRule {
 
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Naming])
+    }
+
+    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
+        Some(vec![
+            SyntaxKind::VersionStatementNode,
+            SyntaxKind::OutputSectionNode,
+            SyntaxKind::BoundDeclNode,
+        ])
     }
 }
 

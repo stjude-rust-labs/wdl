@@ -8,6 +8,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxKind;
 use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -88,6 +89,17 @@ impl Rule for KeyValuePairsRule {
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Style])
     }
+
+    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+        Some(vec![
+            SyntaxKind::VersionStatementNode,
+            SyntaxKind::TaskDefinitionNode,
+            SyntaxKind::WorkflowDefinitionNode,
+            SyntaxKind::StructDefinitionNode,
+            SyntaxKind::MetadataSectionNode,
+            SyntaxKind::ParameterMetadataSectionNode,
+        ])
+    }
 }
 
 impl Visitor for KeyValuePairsRule {
@@ -141,9 +153,7 @@ impl Visitor for KeyValuePairsRule {
             .first_token()
             .expect("should have an opening delimiter");
         if let Some(open_ws) = open_delim.next_sibling_or_token() {
-            if open_ws.kind() != wdl_ast::SyntaxKind::Whitespace
-                || !open_ws.to_string().contains('\n')
-            {
+            if open_ws.kind() != SyntaxKind::Whitespace || !open_ws.to_string().contains('\n') {
                 state.add(missing_trailing_newline(open_delim.text_range().to_span()))
             }
         }
@@ -171,8 +181,7 @@ impl Visitor for KeyValuePairsRule {
             // Check indentation. If there is no prior whitespace, that will have been
             // reported already.
             if let Some(prior_ws) = child.syntax().prev_sibling_or_token() {
-                if prior_ws.kind() == wdl_ast::SyntaxKind::Whitespace
-                    && prior_ws.to_string().contains('\n')
+                if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
                 {
                     // If there was no newline, that is already reported
                     let ws = prior_ws.to_string();
@@ -193,9 +202,7 @@ impl Visitor for KeyValuePairsRule {
         // No need to check the closing delimiter as the last element must have
         // a newline. But we should check the indentation of the closing delimiter.
         if let Some(prior_ws) = close_delim.prev_sibling_or_token() {
-            if prior_ws.kind() == wdl_ast::SyntaxKind::Whitespace
-                && prior_ws.to_string().contains('\n')
-            {
+            if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n') {
                 let ws = prior_ws.to_string();
                 let ws = ws
                     .split('\n')
@@ -250,9 +257,7 @@ impl Visitor for KeyValuePairsRule {
             .first_token()
             .expect("should have an opening delimiter");
         if let Some(open_ws) = open_delim.next_sibling_or_token() {
-            if open_ws.kind() != wdl_ast::SyntaxKind::Whitespace
-                || !open_ws.to_string().contains('\n')
-            {
+            if open_ws.kind() != SyntaxKind::Whitespace || !open_ws.to_string().contains('\n') {
                 state.add(missing_trailing_newline(open_delim.text_range().to_span()))
             }
         }
@@ -280,8 +285,7 @@ impl Visitor for KeyValuePairsRule {
             // Check indentation. If there is no prior whitespace, that will have been
             // reported already.
             if let Some(prior_ws) = child.syntax().prev_sibling_or_token() {
-                if prior_ws.kind() == wdl_ast::SyntaxKind::Whitespace
-                    && prior_ws.to_string().contains('\n')
+                if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
                 {
                     // If there was no newline, that is already reported
                     let ws = prior_ws.to_string();
@@ -305,9 +309,7 @@ impl Visitor for KeyValuePairsRule {
         // No need to check the closing delimiter as the last element must have
         // a newline. But we should check the indentation of the closing delimiter.
         if let Some(prior_ws) = close_delim.prev_sibling_or_token() {
-            if prior_ws.kind() == wdl_ast::SyntaxKind::Whitespace
-                && prior_ws.to_string().contains('\n')
-            {
+            if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n') {
                 let ws = prior_ws.to_string();
                 let ws = ws
                     .split('\n')
@@ -340,8 +342,7 @@ fn find_next_newline(node: &wdl_ast::SyntaxNode) -> (Option<wdl_ast::SyntaxToken
         // If we find other tokens, then mark that they precede any potential newline.
         if next_node.as_node().is_some() {
             return (None, false);
-        } else if next_node.kind() == wdl_ast::SyntaxKind::Whitespace
-            && next_node.to_string().contains('\n')
+        } else if next_node.kind() == SyntaxKind::Whitespace && next_node.to_string().contains('\n')
         {
             return (Some(next_node.into_token().unwrap()), is_next);
         } else {

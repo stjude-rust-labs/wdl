@@ -52,6 +52,10 @@ impl Rule for InconsistentNewlinesRule {
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Style, Tag::Clarity])
     }
+
+    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
+        None
+    }
 }
 
 impl Visitor for InconsistentNewlinesRule {

@@ -102,6 +102,23 @@ impl Rule for BlankLinesBetweenElementsRule {
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Spacing])
     }
+
+    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+        Some(vec![
+            SyntaxKind::VersionStatementNode,
+            SyntaxKind::TaskDefinitionNode,
+            SyntaxKind::WorkflowDefinitionNode,
+            SyntaxKind::StructDefinitionNode,
+            SyntaxKind::InputSectionNode,
+            SyntaxKind::OutputSectionNode,
+            SyntaxKind::RuntimeSectionNode,
+            SyntaxKind::MetadataSectionNode,
+            SyntaxKind::ParameterMetadataSectionNode,
+            SyntaxKind::RequirementsSectionNode,
+            SyntaxKind::HintsSectionNode,
+            SyntaxKind::CommandSectionNode,
+        ])
+    }
 }
 
 impl Visitor for BlankLinesBetweenElementsRule {

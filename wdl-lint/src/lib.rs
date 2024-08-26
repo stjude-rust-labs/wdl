@@ -30,6 +30,7 @@
 #![warn(rustdoc::broken_intra_doc_links)]
 
 use wdl_ast::Diagnostics;
+use wdl_ast::SyntaxKind;
 use wdl_ast::Visitor;
 
 pub mod rules;
@@ -64,6 +65,11 @@ pub trait Rule: Visitor<State = Diagnostics> {
     fn url(&self) -> Option<&'static str> {
         None
     }
+
+    /// Gets the nodes that are exceptable for this rule.
+    /// 
+    /// If `None` is returned, all nodes are exceptable.
+    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>>;
 }
 
 /// Gets the default rule set.

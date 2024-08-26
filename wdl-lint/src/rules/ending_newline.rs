@@ -62,6 +62,10 @@ impl Rule for EndingNewlineRule {
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Spacing, Tag::Style])
     }
+
+    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+        Some(vec![SyntaxKind::VersionStatementNode])
+    }
 }
 
 impl Visitor for EndingNewlineRule {

@@ -10,6 +10,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxKind;
 use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -55,6 +56,13 @@ impl Rule for ImportPlacementRule {
 
     fn tags(&self) -> TagSet {
         TagSet::new(&[Tag::Clarity])
+    }
+
+    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
+        Some(vec![
+            SyntaxKind::VersionStatementNode,
+            SyntaxKind::ImportStatementNode,
+        ])
     }
 }
 
