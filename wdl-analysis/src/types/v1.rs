@@ -74,7 +74,7 @@ pub(crate) fn type_mismatch(
 /// Creates a "not a task member" diagnostic.
 fn not_a_task_member(member: &Ident) -> Diagnostic {
     Diagnostic::error(format!(
-        "task variable does not have a member named `{member}`",
+        "the `task` variable does not have a member named `{member}`",
         member = member.as_str()
     ))
     .with_highlight(member.span())

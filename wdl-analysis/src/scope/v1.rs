@@ -222,8 +222,8 @@ fn unknown_type(name: &str, span: Span) -> Diagnostic {
 fn unknown_name(name: &str, span: Span) -> Diagnostic {
     // Handle special case names here
     let message = match name {
-        "task" => "the name `task` may only be used within a task command section or task output \
-                   section using WDL 1.2 or later"
+        "task" => "the `task` variable may only be used within a task command section or task \
+                   output section using WDL 1.2 or later"
             .to_string(),
         _ => format!("unknown name `{name}`"),
     };
