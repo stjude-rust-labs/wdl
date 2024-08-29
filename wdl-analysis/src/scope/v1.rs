@@ -220,7 +220,15 @@ fn unknown_type(name: &str, span: Span) -> Diagnostic {
 
 /// Creates an "unknown name" diagnostic.
 fn unknown_name(name: &str, span: Span) -> Diagnostic {
-    Diagnostic::error(format!("unknown name `{name}`")).with_highlight(span)
+    // Handle special case names here
+    let message = match name {
+        "task" => "the name `task` may only be used within a task command section or task output \
+                   section using WDL 1.2 or later"
+            .to_string(),
+        _ => format!("unknown name `{name}`"),
+    };
+
+    Diagnostic::error(message).with_highlight(span)
 }
 
 /// Creates a "self-referential" diagnostic.
