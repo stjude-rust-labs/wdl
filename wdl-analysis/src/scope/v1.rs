@@ -225,10 +225,13 @@ fn self_referential(name: &str, span: Span, reference: Span) -> Diagnostic {
 }
 
 /// Creates a "reference cycle" diagnostic.
-fn reference_cycle(first: Span, second: Span) -> Diagnostic {
-    Diagnostic::error("name reference cycle detected")
-        .with_label("this name participates in the cycle", first)
-        .with_label("this name participates in the cycle", second)
+fn reference_cycle(from: &str, from_span: Span, to: &str, to_span: Span) -> Diagnostic {
+    Diagnostic::error("a name reference cycle was detected")
+        .with_label(
+            format!("ensure this expression does not directly or indirectly refer to `{from}`"),
+            to_span,
+        )
+        .with_label(format!("a reference back to `{to}` is here"), from_span)
 }
 
 /// Creates a new document scope for a V1 AST.
@@ -974,7 +977,7 @@ fn type_check_task(
     fn add_decl_node(
         document: &mut DocumentScope,
         graph: &mut DiGraph<GraphNode, ()>,
-        names: &mut HashMap<TokenStrHash<Ident>, NodeIndex>,
+        names: &mut IndexMap<TokenStrHash<Ident>, NodeIndex>,
         scope: ScopeIndex,
         decl: Decl,
         diagnostics: &mut Vec<Diagnostic>,
@@ -1016,7 +1019,7 @@ fn type_check_task(
     fn add_reference_edges(
         document: &DocumentScope,
         graph: &mut DiGraph<GraphNode, ()>,
-        names: &HashMap<TokenStrHash<Ident>, NodeIndex>,
+        names: &IndexMap<TokenStrHash<Ident>, NodeIndex>,
         diagnostics: &mut Vec<Diagnostic>,
     ) {
         let mut space = Default::default();
@@ -1055,11 +1058,16 @@ fn type_check_task(
                                 // Check to see if the edge would form a cycle
                                 if has_path_connecting(&*graph, from, to, Some(&mut space)) {
                                     diagnostics.push(reference_cycle(
+                                        names.get_index(from.index()).unwrap().0.as_ref().as_str(),
+                                        r.span(),
+                                        name.as_str(),
                                         match &graph[to] {
-                                            GraphNode::Decl { span, .. } => *span,
+                                            GraphNode::Decl { expr, .. } => expr
+                                                .as_ref()
+                                                .map(|e| e.span())
+                                                .expect("should have expr to form a cycle"),
                                             _ => panic!("expected decl node"),
                                         },
-                                        span,
                                     ));
                                     continue;
                                 }
@@ -1102,7 +1110,7 @@ fn type_check_task(
     let mut saw_outputs = false;
     let mut command = None;
     let mut graph = DiGraph::new();
-    let mut names = HashMap::new();
+    let mut names = IndexMap::new();
     for item in task.items() {
         match item {
             TaskItem::Input(section) if !saw_inputs => {
