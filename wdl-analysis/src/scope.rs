@@ -165,7 +165,8 @@ pub struct Struct {
     span: Span,
     /// The offset of the CST node from the start of the document.
     ///
-    /// This is used to adjust
+    /// This is used to adjust diagnostics resulting from traversing the struct
+    /// node as if it were the root of the CST.
     offset: usize,
     /// Stores the CST node of the struct.
     ///
