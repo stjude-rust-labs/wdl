@@ -1,0 +1,12 @@
+error: unknown name `task`
+  ┌─ tests/analysis/task-variable-unsupported/source.wdl:7:28
+  │
+7 │         echo "Hello from ~{task.name}!"
+  │                            ^^^^
+
+error: unknown name `task`
+   ┌─ tests/analysis/task-variable-unsupported/source.wdl:11:23
+   │
+11 │         String name = task.name
+   │                       ^^^^
+
