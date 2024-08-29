@@ -1,5 +1,6 @@
 //! Conversion of a V1 AST to a document scope.
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::str::FromStr;
 use std::sync::Arc;
 
@@ -962,12 +963,18 @@ fn add_struct_types(document: &mut DocumentScope, diagnostics: &mut Vec<Diagnost
 
 /// Performs type checking on a document.
 fn type_check(document: &mut DocumentScope, ast: &Ast, diagnostics: &mut Vec<Diagnostic>) {
+    let mut seen = HashSet::new();
     for item in ast.items() {
         match item {
             DocumentItem::Import(_) | DocumentItem::Struct(_) => continue,
             DocumentItem::Task(definition) => {
                 if let Some(task) = document.tasks.get_index_of(definition.name().as_str()) {
-                    type_check_task(document, &definition, task, diagnostics);
+                    // Only process the first task we encounter in the AST with this name
+                    // Duplicates that come later will be excluded from type checking, but a
+                    // diagnostic will have already been added for the duplicate
+                    if seen.insert(task) {
+                        type_check_task(document, &definition, task, diagnostics);
+                    }
                 }
             }
             DocumentItem::Workflow(_) => {
