@@ -1,0 +1,16 @@
+note: unknown lint rule `ThisIsNotARealRule`
+  ┌─ tests/lints/unknown_rule/source.wdl:3:12
+  │
+3 │ #@ except: ThisIsNotARealRule, DescriptionMissing
+  │            ^^^^^^^^^^^^^^^^^^ cannot make an exception for this rule
+  │
+  = fix: remove the rule from the exception list
+
+note[UnknownRule]: unknown lint rule `ThisIsNotARealRule`
+  ┌─ tests/lints/unknown_rule/source.wdl:3:12
+  │
+3 │ #@ except: ThisIsNotARealRule, DescriptionMissing
+  │            ^^^^^^^^^^^^^^^^^^ cannot make an exception for this rule
+  │
+  = fix: remove the rule from the exception list
+

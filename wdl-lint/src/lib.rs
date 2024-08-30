@@ -111,6 +111,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::DisallowedOutputNameRule>::default(),
         Box::<rules::ContainerValue>::default(),
         Box::<rules::MissingRequirementsRule>::default(),
+        Box::<rules::UnknownRule>::default(),
     ];
 
     // Ensure all the rule ids are unique and pascal case

@@ -35,6 +35,7 @@ mod section_order;
 mod snake_case;
 mod todo;
 mod trailing_comma;
+mod unknown_rule;
 mod whitespace;
 
 pub use blank_lines_between_elements::*;
@@ -72,4 +73,5 @@ pub use section_order::*;
 pub use snake_case::*;
 pub use todo::*;
 pub use trailing_comma::*;
+pub use unknown_rule::*;
 pub use whitespace::*;
