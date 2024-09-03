@@ -585,8 +585,13 @@ fn add_task(
                 add_decl(document.scope_mut(scope), decl, diagnostics);
             }
             TaskItem::Command(section) if command.is_none() => {
-                let child =
-                    document.add_scope(Scope::new(Some(scope), heredoc_scope_span(&section)));
+                let span = if section.is_heredoc() {
+                    heredoc_scope_span(&section)
+                } else {
+                    braced_scope_span(&section)
+                };
+
+                let child = document.add_scope(Scope::new(Some(scope), span));
                 document.scope_mut(scope).add_child(child);
 
                 if document.version >= Some(SupportedVersion::V1(V1::Two)) {
