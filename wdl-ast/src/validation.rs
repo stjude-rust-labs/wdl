@@ -51,7 +51,7 @@ impl Diagnostics {
         &mut self,
         diagnostic: Diagnostic,
         element: SyntaxElement,
-        exceptable_nodes: Option<Vec<SyntaxKind>>,
+        exceptable_nodes: &Option<Vec<SyntaxKind>>,
     ) {
         if diagnostic.rule().is_none() {
             self.add(diagnostic);

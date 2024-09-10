@@ -10,11 +10,13 @@ use wdl_ast::v1::common::container::value::Value;
 use wdl_ast::v1::common::container::Kind;
 use wdl_ast::v1::RequirementsSection;
 use wdl_ast::v1::RuntimeSection;
+use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -157,7 +159,12 @@ impl Visitor for ContainerValue {
 
         if let Some(container) = section.container() {
             if let Ok(value) = container.value() {
-                check_container_value(state, value);
+                check_container_value(
+                    state,
+                    value,
+                    SyntaxElement::from(section.syntax().clone()),
+                    &self.exceptable_nodes(),
+                );
             }
         }
     }
@@ -174,7 +181,12 @@ impl Visitor for ContainerValue {
 
         if let Some(container) = section.container() {
             if let Ok(value) = container.value() {
-                check_container_value(state, value);
+                check_container_value(
+                    state,
+                    value,
+                    SyntaxElement::from(section.syntax().clone()),
+                    &self.exceptable_nodes(),
+                );
             }
         }
     }
@@ -182,22 +194,37 @@ impl Visitor for ContainerValue {
 
 /// Examines the value of the `container` item in both the `runtime` and
 /// `requirements` sections.
-fn check_container_value(state: &mut Diagnostics, value: Value) {
+fn check_container_value(
+    state: &mut Diagnostics,
+    value: Value,
+    syntax: SyntaxElement,
+    exceptable_nodes: &Option<Vec<SyntaxKind>>,
+) {
     if let Kind::Array(array) = value.kind() {
         if array.is_empty() {
-            state.add(empty_array(span_of(value.expr())))
+            state.exceptable_add(
+                empty_array(span_of(value.expr())),
+                syntax.clone(),
+                exceptable_nodes,
+            );
         } else if array.len() == 1 {
             // SAFETY: we just checked to ensure that exactly one element exists in the
             // vec, so this will always unwrap.
             let uri = array.iter().next().unwrap();
-            state.add(array_to_string_literal(span_of(uri.literal_string())));
+            state.exceptable_add(
+                array_to_string_literal(span_of(uri.literal_string())),
+                syntax.clone(),
+                exceptable_nodes,
+            );
         } else {
             let mut anys = array.iter().filter(|uri| uri.kind().is_any()).peekable();
 
             if anys.peek().is_some() {
-                state.add(array_containing_anys(
-                    anys.map(|any| span_of(any.literal_string())),
-                ));
+                state.exceptable_add(
+                    array_containing_anys(anys.map(|any| span_of(any.literal_string()))),
+                    syntax.clone(),
+                    exceptable_nodes,
+                );
             }
         }
     }
@@ -205,9 +232,17 @@ fn check_container_value(state: &mut Diagnostics, value: Value) {
     for uri in value.uris() {
         if let Some(entry) = uri.kind().as_entry() {
             if entry.tag().is_none() {
-                state.add(missing_tag(span_of(uri.literal_string())));
+                state.exceptable_add(
+                    missing_tag(span_of(uri.literal_string())),
+                    syntax.clone(),
+                    exceptable_nodes,
+                );
             } else if !entry.immutable() {
-                state.add(mutable_tag(span_of(uri.literal_string())));
+                state.exceptable_add(
+                    mutable_tag(span_of(uri.literal_string())),
+                    syntax.clone(),
+                    exceptable_nodes,
+                );
             }
         }
     }
