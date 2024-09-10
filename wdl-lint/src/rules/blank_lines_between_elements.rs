@@ -23,6 +23,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNode;
 use wdl_ast::SyntaxToken;
@@ -378,7 +379,11 @@ impl Visitor for BlankLinesBetweenElementsRule {
                 // one `\n` is allowed.
                 if self.state == State::InputSection || self.state == State::OutputSection {
                     if count > 1 {
-                        state.add(excess_blank_line(p.text_range().to_span()));
+                        state.exceptable_add(
+                            excess_blank_line(p.text_range().to_span()),
+                            SyntaxElement::from(decl.syntax().clone()),
+                            self.exceptable_nodes(),
+                        );
                     }
                 } else {
                     let first = is_first_body(decl.syntax());
@@ -408,7 +413,11 @@ impl Visitor for BlankLinesBetweenElementsRule {
                 // one `\n` is allowed.
                 if self.state == State::InputSection || self.state == State::OutputSection {
                     if count > 1 {
-                        state.add(excess_blank_line(p.text_range().to_span()));
+                        state.exceptable_add(
+                            excess_blank_line(p.text_range().to_span()),
+                            SyntaxElement::from(decl.syntax().clone()),
+                            self.exceptable_nodes(),
+                        );
                     }
                 } else {
                     let first = is_first_body(decl.syntax());
@@ -469,6 +478,11 @@ fn flag_all_blank_lines_within(syntax: &SyntaxNode, state: &mut Diagnostics) {
             let count = c.to_string().chars().filter(|c| *c == '\n').count();
             if count > 1 {
                 state.add(excess_blank_line(c.text_range().to_span()));
+                // state.exceptable_add(
+                //     excess_blank_line(c.text_range().to_span()),
+                //     SyntaxElement::from(syntax.clone()),
+                //     BlankLinesBetweenElementsRule::exceptable_nodes(),
+                // );
             }
         }
     });

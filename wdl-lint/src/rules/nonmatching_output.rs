@@ -135,6 +135,7 @@ impl<'a> Rule for NonmatchingOutputRule<'a> {
         Some(vec![
             SyntaxKind::VersionStatementNode,
             SyntaxKind::TaskDefinitionNode,
+            SyntaxKind::WorkflowDefinitionNode,
         ])
     }
 }

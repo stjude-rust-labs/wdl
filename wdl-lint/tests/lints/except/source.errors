@@ -1,11 +1,3 @@
-note: unknown lint rule `Unknown`
-  ┌─ tests/lints/except/source.wdl:1:58
-  │
-1 │ #@ except: CommentWhitespace, Whitespace, EndingNewline, Unknown
-  │                                                          ^^^^^^^ cannot make an exception for this rule
-  │
-  = fix: remove the rule from the exception list
-
 note[UnknownRule]: unknown lint rule `Unknown`
   ┌─ tests/lints/except/source.wdl:1:58
   │
@@ -14,13 +6,29 @@ note[UnknownRule]: unknown lint rule `Unknown`
   │
   = fix: remove the rule from the exception list
 
-note: unknown lint rule `AlsoUnknown`
-   ┌─ tests/lints/except/source.wdl:21:26
+warning[PascalCase]: struct name `OK` is not PascalCase
+  ┌─ tests/lints/except/source.wdl:9:8
+  │
+9 │ struct OK {         # OK
+  │        ^^ this name must be PascalCase
+  │
+  = fix: replace `OK` with `Ok`
+
+warning[SnakeCase]: struct member name `AlsoOk` is not snake_case
+   ┌─ tests/lints/except/source.wdl:10:9
    │
-21 │     #@ except: SnakeCase,AlsoUnknown
-   │                          ^^^^^^^^^^^ cannot make an exception for this rule
+10 │     Int AlsoOk      # OK
+   │         ^^^^^^ this name must be snake_case
    │
-   = fix: remove the rule from the exception list
+   = fix: replace `AlsoOk` with `also_ok`
+
+warning[SnakeCase]: struct member name `OKTOO` is not snake_case
+   ┌─ tests/lints/except/source.wdl:11:9
+   │
+11 │     Int OKTOO       # OK
+   │         ^^^^^ this name must be snake_case
+   │
+   = fix: replace `OKTOO` with `oktoo`
 
 note[UnknownRule]: unknown lint rule `AlsoUnknown`
    ┌─ tests/lints/except/source.wdl:21:26
@@ -30,6 +38,14 @@ note[UnknownRule]: unknown lint rule `AlsoUnknown`
    │
    = fix: remove the rule from the exception list
 
+warning[SnakeCase]: struct member name `AlsoOk` is not snake_case
+   ┌─ tests/lints/except/source.wdl:22:9
+   │
+22 │     Int AlsoOk      # OK
+   │         ^^^^^^ this name must be snake_case
+   │
+   = fix: replace `AlsoOk` with `also_ok`
+
 warning[SnakeCase]: struct member name `NotOk` is not snake_case
    ┌─ tests/lints/except/source.wdl:23:9
    │
@@ -38,11 +54,35 @@ warning[SnakeCase]: struct member name `NotOk` is not snake_case
    │
    = fix: replace `NotOk` with `not_ok`
 
+note[MissingMetas]: workflow `test` is missing a `meta` section
+   ┌─ tests/lints/except/source.wdl:27:10
+   │
+27 │ workflow test {
+   │          ^^^^ this workflow is missing a `meta` section
+   │
+   = fix: add a `meta` section to the workflow
+
+warning[MissingOutput]: workflow `test` is missing an output section
+   ┌─ tests/lints/except/source.wdl:27:10
+   │
+27 │ workflow test {
+   │          ^^^^ this workflow is missing an output section
+   │
+   = fix: add an output section to the workflow
+
 warning[DoubleQuotes]: string defined with single quotes
    ┌─ tests/lints/except/source.wdl:28:18
    │
 28 │     String bad = 'bad string'   # NOT OK
    │                  ^^^^^^^^^^^^
+   │
+   = fix: change the single quotes to double quotes
+
+warning[DoubleQuotes]: string defined with single quotes
+   ┌─ tests/lints/except/source.wdl:30:9
+   │
+30 │         'good string'           # OK
+   │         ^^^^^^^^^^^^^
    │
    = fix: change the single quotes to double quotes
 

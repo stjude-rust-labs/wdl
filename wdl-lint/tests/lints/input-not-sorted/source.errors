@@ -1,3 +1,11 @@
+note[MissingMetas]: struct `Mystruct` is missing both meta and parameter_meta sections
+  ┌─ tests/lints/input-not-sorted/source.wdl:7:8
+  │
+7 │ struct Mystruct {
+  │        ^^^^^^^^ this struct is missing both meta and parameter_meta sections
+  │
+  = fix: add meta and parameter_meta sections to the struct
+
 warning[InputSorting]: input not sorted
    ┌─ tests/lints/input-not-sorted/source.wdl:40:5
    │  

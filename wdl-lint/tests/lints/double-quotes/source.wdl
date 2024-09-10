@@ -16,8 +16,8 @@ workflow test {
                 }"
             }'
         }!"
+    #@ except: DoubleQuotes
     String excepted =
-        #@ except: DoubleQuotes
         'this string is excepted'
     output {}
 }

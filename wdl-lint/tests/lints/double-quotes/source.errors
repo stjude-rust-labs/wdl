@@ -26,3 +26,11 @@ warning[DoubleQuotes]: string defined with single quotes
    │
    = fix: change the single quotes to double quotes
 
+warning[DoubleQuotes]: string defined with single quotes
+   ┌─ tests/lints/double-quotes/source.wdl:21:9
+   │
+21 │         'this string is excepted'
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = fix: change the single quotes to double quotes
+

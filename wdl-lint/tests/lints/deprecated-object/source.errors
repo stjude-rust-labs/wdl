@@ -22,3 +22,11 @@ note[DeprecatedObject]: use of a deprecated `Object` type
    │
    = fix: replace the `Object` with a `Map` or a `Struct`
 
+note[DeprecatedObject]: use of a deprecated `Object` type
+   ┌─ tests/lints/deprecated-object/source.wdl:24:9
+   │
+24 │         Object but_this_is_okay = object {
+   │         ^^^^^^
+   │
+   = fix: replace the `Object` with a `Map` or a `Struct`
+

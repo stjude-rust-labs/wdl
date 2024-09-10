@@ -10,8 +10,8 @@ use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
+use wdl_ast::EXCEPT_COMMENT_PREFIX;
 
-use crate::visitor::EXCEPT_COMMENT_PREFIX;
 use crate::rules;
 use crate::Rule;
 use crate::Tag;
@@ -76,8 +76,15 @@ impl Visitor for UnknownRule {
                 offset += id.len() - trimmed.len();
 
                 // Check if the rule is known
-                if !rules().iter().map(|rule| rule.id()).any(|rule_id| rule_id == trimmed) {
-                    state.add(unknown_rule(trimmed, Span::new(start + offset, trimmed.len())));
+                if !rules()
+                    .iter()
+                    .map(|rule| rule.id())
+                    .any(|rule_id| rule_id == trimmed)
+                {
+                    state.add(unknown_rule(
+                        trimmed,
+                        Span::new(start + offset, trimmed.len()),
+                    ));
                 }
 
                 // Update the offset to account for the rule id and comma

@@ -15,17 +15,19 @@ note[LineWidth]: line exceeds maximum width of 90
    = fix: split the line into multiple lines
 
 note[LineWidth]: line exceeds maximum width of 90
-   ┌─ tests/lints/line-width/source.wdl:31:1
-   │  
-31 │ ╭     command <<<
-32 │ │         bin /
-33 │ │             this is going to be a really long line that is not going to trip up our maximum line lint because it is excepted /
-34 │ │             some other /
-   · │
-37 │ │             options
-38 │ │     >>>
-   │ ╰───────^
-   │  
+   ┌─ tests/lints/line-width/source.wdl:33:1
+   │
+33 │             this is going to be a really long line that is not going to trip up our maximum line lint because it is excepted /
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = fix: split the line into multiple lines
+
+note[LineWidth]: line exceeds maximum width of 90
+   ┌─ tests/lints/line-width/source.wdl:35:1
+   │
+35 │             this line is also going to be very very very long but it will also not trip up our maximum line line because it is excepted /
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
    = fix: split the line into multiple lines
 
 note[LineWidth]: line exceeds maximum width of 90

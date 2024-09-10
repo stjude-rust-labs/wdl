@@ -11,11 +11,11 @@ use wdl_ast::SyntaxKind;
 use wdl_ast::VersionStatement;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
+use wdl_ast::EXCEPT_COMMENT_PREFIX;
 
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
-use crate::EXCEPT_COMMENT_PREFIX;
 
 /// The identifier for the preamble comments rule.
 const ID: &str = "PreambleComments";

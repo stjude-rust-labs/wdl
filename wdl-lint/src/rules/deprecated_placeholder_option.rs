@@ -90,6 +90,7 @@ impl Rule for DeprecatedPlaceholderOptionRule {
         Some(vec![
             SyntaxKind::VersionStatementNode,
             SyntaxKind::TaskDefinitionNode,
+            SyntaxKind::WorkflowDefinitionNode,
             SyntaxKind::PlaceholderNode,
         ])
     }
