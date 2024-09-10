@@ -4,13 +4,13 @@
 //! This check only occurs if the `container` key exists in the
 //! `runtime`/`requirements` sections.
 
-use wdl_ast::span_of;
 use wdl_ast::v1::common::container::value::uri::ANY_CONTAINER_VALUE;
 use wdl_ast::v1::common::container::value::Value;
 use wdl_ast::v1::common::container::Kind;
 use wdl_ast::v1::RequirementsSection;
 use wdl_ast::v1::RuntimeSection;
 use wdl_ast::AstNode;
+use wdl_ast::AstNodeExt;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Document;
@@ -203,7 +203,7 @@ fn check_container_value(
     if let Kind::Array(array) = value.kind() {
         if array.is_empty() {
             state.exceptable_add(
-                empty_array(span_of(value.expr())),
+                empty_array(value.expr().span()),
                 syntax.clone(),
                 exceptable_nodes,
             );
@@ -212,7 +212,7 @@ fn check_container_value(
             // vec, so this will always unwrap.
             let uri = array.iter().next().unwrap();
             state.exceptable_add(
-                array_to_string_literal(span_of(uri.literal_string())),
+                array_to_string_literal(uri.literal_string().span()),
                 syntax.clone(),
                 exceptable_nodes,
             );
@@ -221,7 +221,7 @@ fn check_container_value(
 
             if anys.peek().is_some() {
                 state.exceptable_add(
-                    array_containing_anys(anys.map(|any| span_of(any.literal_string()))),
+                    array_containing_anys(anys.map(|any| any.literal_string().span())),
                     syntax.clone(),
                     exceptable_nodes,
                 );
@@ -233,13 +233,13 @@ fn check_container_value(
         if let Some(entry) = uri.kind().as_entry() {
             if entry.tag().is_none() {
                 state.exceptable_add(
-                    missing_tag(span_of(uri.literal_string())),
+                    missing_tag(uri.literal_string().span()),
                     syntax.clone(),
                     exceptable_nodes,
                 );
             } else if !entry.immutable() {
                 state.exceptable_add(
-                    mutable_tag(span_of(uri.literal_string())),
+                    mutable_tag(uri.literal_string().span()),
                     syntax.clone(),
                     exceptable_nodes,
                 );

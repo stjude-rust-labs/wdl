@@ -2,13 +2,13 @@
 
 use std::fmt;
 
-use crate::CompoundType;
-use crate::CompoundTypeDef;
-use crate::Optional;
-use crate::PrimitiveType;
-use crate::PrimitiveTypeKind;
-use crate::Type;
-use crate::Types;
+use crate::types::CompoundType;
+use crate::types::CompoundTypeDef;
+use crate::types::Optional;
+use crate::types::PrimitiveType;
+use crate::types::PrimitiveTypeKind;
+use crate::types::Type;
+use crate::types::Types;
 
 /// A trait implemented by type constraints.
 pub trait Constraint: fmt::Debug + Send + Sync {
@@ -66,8 +66,7 @@ impl Constraint for SizeableConstraint {
                         | type_is_sizable(types, ty.second_type())
                 }
                 CompoundTypeDef::Map(ty) => {
-                    primitive_type_is_sizable(ty.key_type())
-                        | type_is_sizable(types, ty.value_type())
+                    type_is_sizable(types, ty.key_type()) | type_is_sizable(types, ty.value_type())
                 }
                 CompoundTypeDef::Struct(s) => {
                     s.members().values().any(|ty| type_is_sizable(types, *ty))
@@ -86,6 +85,7 @@ impl Constraint for SizeableConstraint {
                 }
                 // Treat unions as sizable as they can only be checked at runtime
                 Type::Union | Type::None => true,
+                Type::Task => false,
             }
         }
 
@@ -130,7 +130,7 @@ impl Constraint for JsonSerializableConstraint {
                 CompoundTypeDef::Pair(_) => false,
                 CompoundTypeDef::Map(ty) => {
                     !ty.key_type().is_optional()
-                        && ty.key_type().kind() == PrimitiveTypeKind::String
+                        && matches!(ty.key_type(), Type::Primitive(ty) if ty.kind() == PrimitiveTypeKind::String)
                         && type_is_serializable(types, ty.value_type())
                 }
                 CompoundTypeDef::Struct(s) => s
@@ -148,7 +148,8 @@ impl Constraint for JsonSerializableConstraint {
                 | Type::Object
                 | Type::OptionalObject
                 | Type::Union
-                | Type::None => true,
+                | Type::None
+                | Type::Task => true,
                 Type::Compound(ty) => compound_type_is_serializable(types, ty),
             }
         }
@@ -171,7 +172,9 @@ impl Constraint for RequiredPrimitiveTypeConstraint {
             Type::Primitive(ty) => !ty.is_optional(),
             // Treat unions as primitive as they can only be checked at runtime
             Type::Union => true,
-            Type::Compound(_) | Type::Object | Type::OptionalObject | Type::None => false,
+            Type::Compound(_) | Type::Object | Type::OptionalObject | Type::None | Type::Task => {
+                false
+            }
         }
     }
 }
@@ -190,7 +193,7 @@ impl Constraint for AnyPrimitiveTypeConstraint {
             Type::Primitive(_) => true,
             // Treat unions as primitive as they can only be checked at runtime
             Type::Union | Type::None => true,
-            Type::Compound(_) | Type::Object | Type::OptionalObject => false,
+            Type::Compound(_) | Type::Object | Type::OptionalObject | Type::Task => false,
         }
     }
 }
@@ -198,12 +201,12 @@ impl Constraint for AnyPrimitiveTypeConstraint {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::ArrayType;
-    use crate::MapType;
-    use crate::PairType;
-    use crate::PrimitiveType;
-    use crate::StructType;
-    use crate::Types;
+    use crate::types::ArrayType;
+    use crate::types::MapType;
+    use crate::types::PairType;
+    use crate::types::PrimitiveType;
+    use crate::types::StructType;
+    use crate::types::Types;
 
     #[test]
     fn test_optional_constraint() {
