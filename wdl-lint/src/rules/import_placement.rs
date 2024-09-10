@@ -10,6 +10,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
@@ -95,7 +96,11 @@ impl Visitor for ImportPlacementRule {
         }
 
         if self.invalid {
-            state.add(misplaced_import(stmt.syntax().text_range().to_span()));
+            state.exceptable_add(
+                misplaced_import(stmt.syntax().text_range().to_span()),
+                SyntaxElement::from(stmt.syntax().clone()),
+                &self.exceptable_nodes(),
+            );
         }
     }
 

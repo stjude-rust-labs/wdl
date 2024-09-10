@@ -12,6 +12,7 @@ use wdl_ast::v1::RuntimeItem;
 use wdl_ast::v1::RuntimeSection;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::version::V1;
+use wdl_ast::AstNode;
 use wdl_ast::AstNodeExt;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -19,6 +20,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::TokenStrHash;
 use wdl_ast::VisitReason;
@@ -360,7 +362,7 @@ impl Visitor for RuntimeSectionKeysRule {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        _: &TaskDefinition,
+        def: &TaskDefinition,
     ) {
         match reason {
             VisitReason::Enter => {
@@ -383,11 +385,15 @@ impl Visitor for RuntimeSectionKeysRule {
                     let specification = format!("the {minor_version} specification");
 
                     if !self.non_reserved_keys.is_empty() {
-                        state.add(report_non_reserved_runtime_keys(
-                            &self.non_reserved_keys,
-                            runtime_span,
-                            &specification,
-                        ));
+                        state.exceptable_add(
+                            report_non_reserved_runtime_keys(
+                                &self.non_reserved_keys,
+                                runtime_span,
+                                &specification,
+                            ),
+                            SyntaxElement::from(def.syntax().clone()),
+                            &self.exceptable_nodes(),
+                        );
                     }
 
                     let recommended_keys = match minor_version {
@@ -404,11 +410,15 @@ impl Visitor for RuntimeSectionKeysRule {
                         .collect::<Vec<_>>();
 
                     if !missing_keys.is_empty() {
-                        state.add(report_missing_recommended_keys(
-                            missing_keys,
-                            runtime_span,
-                            &specification,
-                        ));
+                        state.exceptable_add(
+                            report_missing_recommended_keys(
+                                missing_keys,
+                                runtime_span,
+                                &specification,
+                            ),
+                            SyntaxElement::from(def.syntax().clone()),
+                            &self.exceptable_nodes(),
+                        );
                     }
                 }
             }
@@ -475,7 +485,11 @@ impl Visitor for RuntimeSectionKeysRule {
                         // problem that can be encountered is if the key is
                         // deprecated.
                         if let KeyKind::Deprecated(replacement) = kind {
-                            state.add(deprecated_runtime_key(&key_name, replacement));
+                            state.exceptable_add(
+                                deprecated_runtime_key(&key_name, replacement),
+                                SyntaxElement::from(item.syntax().clone()),
+                                &self.exceptable_nodes(),
+                            );
                         }
                     }
                     None => {

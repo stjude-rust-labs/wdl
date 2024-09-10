@@ -79,30 +79,6 @@ warning[NonmatchingOutput]: `v` appears in `outputs` section of the task `garply
     │
     = fix: ensure the output exists or remove the `v` key from `meta.outputs`
 
-warning[NonmatchingOutput]: `v` appears in `outputs` section of the task `garply2` but is not a declared `output`
-    ┌─ tests/lints/nonmatching-output/source.wdl:120:13
-    │
-120 │             v: "v"
-    │             ^^^^^^
-    │
-    = fix: ensure the output exists or remove the `v` key from `meta.outputs`
-
-warning[NonmatchingOutput]: output `v` is missing from `meta.outputs` section in task `waldo`
-    ┌─ tests/lints/nonmatching-output/source.wdl:143:9
-    │
-143 │         String v = "!"
-    │         ^^^^^^^^^^^^^^
-    │
-    = fix: add a description of output `v` to documentation in `meta.outputs`
-
-warning[NonmatchingOutput]: output `v` is missing from `meta.outputs` section in task `waldo2`
-    ┌─ tests/lints/nonmatching-output/source.wdl:160:9
-    │
-160 │         String v = "!"
-    │         ^^^^^^^^^^^^^^
-    │
-    = fix: add a description of output `v` to documentation in `meta.outputs`
-
 warning[NonmatchingOutput]: `s` appears in `outputs` section of the task `quuux` but is not a declared `output`
     ┌─ tests/lints/nonmatching-output/source.wdl:168:13
     │

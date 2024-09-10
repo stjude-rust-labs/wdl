@@ -46,11 +46,3 @@ warning[SnakeCase]: struct member name `bAdFiElD` is not snake_case
    │
    = fix: replace `bAdFiElD` with `b_ad_fi_el_d`
 
-warning[SnakeCase]: struct member name `OK` is not snake_case
-   ┌─ tests/lints/snake-case/source.wdl:62:12
-   │
-62 │     String OK
-   │            ^^ this name must be snake_case
-   │
-   = fix: replace `OK` with `ok`
-

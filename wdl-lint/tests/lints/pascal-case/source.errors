@@ -22,11 +22,3 @@ warning[PascalCase]: struct name `This_Is_Bad_Too` is not PascalCase
    │
    = fix: replace `This_Is_Bad_Too` with `ThisIsBadToo`
 
-warning[PascalCase]: struct name `excepted_name` is not PascalCase
-   ┌─ tests/lints/pascal-case/source.wdl:22:8
-   │
-22 │ struct excepted_name {
-   │        ^^^^^^^^^^^^^ this name must be PascalCase
-   │
-   = fix: replace `excepted_name` with `ExceptedName`
-

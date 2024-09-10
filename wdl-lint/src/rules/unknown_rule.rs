@@ -81,6 +81,9 @@ impl Visitor for UnknownRule {
                     .map(|rule| rule.id())
                     .any(|rule_id| rule_id == trimmed)
                 {
+                    // Since this rule can only be excepted in a document-wide fashion,
+                    // if the rule is running we can directly add the diagnostic
+                    // without checking for the exceptable nodes
                     state.add(unknown_rule(
                         trimmed,
                         Span::new(start + offset, trimmed.len()),

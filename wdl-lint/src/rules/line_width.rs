@@ -7,6 +7,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::Whitespace;
@@ -47,7 +48,14 @@ impl LineWidthRule {
     }
 
     /// Detects lines that exceed a certain width.
-    fn detect_line_too_long(&mut self, state: &mut Diagnostics, text: &str, start: usize) {
+    fn detect_line_too_long(
+        &mut self,
+        state: &mut Diagnostics,
+        text: &str,
+        start: usize,
+        element: SyntaxElement,
+        exceptable_nodes: &Option<Vec<wdl_ast::SyntaxKind>>,
+    ) {
         for offset in text
             .char_indices()
             .filter(|(_, c)| *c == '\n')
@@ -58,7 +66,11 @@ impl LineWidthRule {
 
             if !self.ignored_section && current_offset - previous_offset > self.max_width {
                 let span = Span::new(previous_offset, current_offset - previous_offset);
-                state.add(line_too_long(span, self.max_width));
+                state.exceptable_add(
+                    line_too_long(span, self.max_width),
+                    element.clone(),
+                    exceptable_nodes,
+                );
             }
 
             self.previous_newline_offset = Some(current_offset + 1);
@@ -123,11 +135,23 @@ impl Visitor for LineWidthRule {
     }
 
     fn whitespace(&mut self, state: &mut Self::State, whitespace: &Whitespace) {
-        self.detect_line_too_long(state, whitespace.as_str(), whitespace.span().start());
+        self.detect_line_too_long(
+            state,
+            whitespace.as_str(),
+            whitespace.span().start(),
+            SyntaxElement::from(whitespace.syntax().clone()),
+            &self.exceptable_nodes(),
+        );
     }
 
     fn command_text(&mut self, state: &mut Self::State, text: &v1::CommandText) {
-        self.detect_line_too_long(state, text.as_str(), text.span().start())
+        self.detect_line_too_long(
+            state,
+            text.as_str(),
+            text.span().start(),
+            SyntaxElement::from(text.syntax().clone()),
+            &self.exceptable_nodes(),
+        );
     }
 
     fn metadata_section(

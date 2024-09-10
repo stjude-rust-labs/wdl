@@ -2,6 +2,7 @@
 
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::version::V1;
+use wdl_ast::AstNode;
 use wdl_ast::AstNodeExt;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -9,6 +10,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -104,12 +106,20 @@ impl Visitor for MissingRequirementsRule {
             if minor_version >= V1::Two {
                 if task.requirements().is_none() {
                     let name = task.name();
-                    state.add(missing_requirements_section(name.as_str(), name.span()));
+                    state.exceptable_add(
+                        missing_requirements_section(name.as_str(), name.span()),
+                        SyntaxElement::from(task.syntax().clone()),
+                        &self.exceptable_nodes(),
+                    );
                 }
 
                 if let Some(runtime) = task.runtime() {
                     let name = task.name();
-                    state.add(deprecated_runtime_section(name.as_str(), runtime.span()));
+                    state.exceptable_add(
+                        deprecated_runtime_section(name.as_str(), runtime.span()),
+                        SyntaxElement::from(runtime.syntax().clone()),
+                        &self.exceptable_nodes(),
+                    );
                 }
             }
         }

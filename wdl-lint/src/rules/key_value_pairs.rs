@@ -8,6 +8,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
@@ -143,7 +144,11 @@ impl Visitor for KeyValuePairsRule {
         let parent_ws = tmp.split('\n').last().expect("should have indentation");
 
         if !item.syntax().to_string().contains('\n') {
-            state.add(all_on_one_line(item.syntax().text_range().to_span()));
+            state.exceptable_add(
+                all_on_one_line(item.syntax().text_range().to_span()),
+                SyntaxElement::from(item.syntax().clone()),
+                &self.exceptable_nodes(),
+            );
             return;
         }
 
@@ -154,7 +159,11 @@ impl Visitor for KeyValuePairsRule {
             .expect("should have an opening delimiter");
         if let Some(open_ws) = open_delim.next_sibling_or_token() {
             if open_ws.kind() != SyntaxKind::Whitespace || !open_ws.to_string().contains('\n') {
-                state.add(missing_trailing_newline(open_delim.text_range().to_span()))
+                state.exceptable_add(
+                    missing_trailing_newline(open_delim.text_range().to_span()),
+                    SyntaxElement::from(item.syntax().clone()),
+                    &self.exceptable_nodes(),
+                );
             }
         }
 
@@ -173,10 +182,11 @@ impl Visitor for KeyValuePairsRule {
                 } else {
                     close_delim.text_range().start()
                 };
-                state.add(missing_trailing_newline(Span::new(
-                    s.start(),
-                    usize::from(end) - s.start(),
-                )));
+                state.exceptable_add(
+                    missing_trailing_newline(Span::new(s.start(), usize::from(end) - s.start())),
+                    SyntaxElement::from(child.syntax().clone()),
+                    &self.exceptable_nodes(),
+                );
             }
             // Check indentation. If there is no prior whitespace, that will have been
             // reported already.
@@ -189,11 +199,15 @@ impl Visitor for KeyValuePairsRule {
                     let expected_ws = parent_ws.to_owned() + INDENT;
 
                     if ws != expected_ws {
-                        state.add(incorrect_indentation(
-                            prior_ws.text_range().to_span(),
-                            &expected_ws,
-                            ws,
-                        ));
+                        state.exceptable_add(
+                            incorrect_indentation(
+                                prior_ws.text_range().to_span(),
+                                &expected_ws,
+                                ws,
+                            ),
+                            SyntaxElement::from(child.syntax().clone()),
+                            &self.exceptable_nodes(),
+                        );
                     }
                 }
             }
@@ -211,14 +225,18 @@ impl Visitor for KeyValuePairsRule {
                 let expected_ws = parent_ws.to_owned();
 
                 if ws != expected_ws {
-                    state.add(incorrect_indentation(
-                        Span::new(
-                            usize::from(close_delim.text_range().start()) - ws.len(),
-                            ws.len(),
+                    state.exceptable_add(
+                        incorrect_indentation(
+                            Span::new(
+                                usize::from(close_delim.text_range().start()) - ws.len(),
+                                ws.len(),
+                            ),
+                            &expected_ws,
+                            ws,
                         ),
-                        &expected_ws,
-                        ws,
-                    ));
+                        SyntaxElement::from(item.syntax().clone()),
+                        &self.exceptable_nodes(),
+                    );
                 }
             }
         }
@@ -247,7 +265,11 @@ impl Visitor for KeyValuePairsRule {
 
         // If the array is all on one line, report that
         if !item.syntax().to_string().contains('\n') {
-            state.add(all_on_one_line(item.syntax().text_range().to_span()));
+            state.exceptable_add(
+                all_on_one_line(item.syntax().text_range().to_span()),
+                SyntaxElement::from(item.syntax().clone()),
+                &self.exceptable_nodes(),
+            );
             return;
         }
 
@@ -258,7 +280,11 @@ impl Visitor for KeyValuePairsRule {
             .expect("should have an opening delimiter");
         if let Some(open_ws) = open_delim.next_sibling_or_token() {
             if open_ws.kind() != SyntaxKind::Whitespace || !open_ws.to_string().contains('\n') {
-                state.add(missing_trailing_newline(open_delim.text_range().to_span()))
+                state.exceptable_add(
+                    missing_trailing_newline(open_delim.text_range().to_span()),
+                    SyntaxElement::from(item.syntax().clone()),
+                    &self.exceptable_nodes(),
+                );
             }
         }
 
@@ -277,10 +303,11 @@ impl Visitor for KeyValuePairsRule {
                 } else {
                     close_delim.text_range().start()
                 };
-                state.add(missing_trailing_newline(Span::new(
-                    s.start(),
-                    usize::from(end) - s.start(),
-                )));
+                state.exceptable_add(
+                    missing_trailing_newline(Span::new(s.start(), usize::from(end) - s.start())),
+                    SyntaxElement::from(child.syntax().clone()),
+                    &self.exceptable_nodes(),
+                );
             }
             // Check indentation. If there is no prior whitespace, that will have been
             // reported already.
@@ -296,11 +323,15 @@ impl Visitor for KeyValuePairsRule {
                     let expected_ws = parent_ws.to_owned() + INDENT;
 
                     if ws != expected_ws {
-                        state.add(incorrect_indentation(
-                            prior_ws.text_range().to_span(),
-                            &expected_ws,
-                            ws,
-                        ));
+                        state.exceptable_add(
+                            incorrect_indentation(
+                                prior_ws.text_range().to_span(),
+                                &expected_ws,
+                                ws,
+                            ),
+                            SyntaxElement::from(child.syntax().clone()),
+                            &self.exceptable_nodes(),
+                        );
                     }
                 }
             }
@@ -318,14 +349,18 @@ impl Visitor for KeyValuePairsRule {
                 let expected_ws = parent_ws.to_owned();
 
                 if ws != expected_ws {
-                    state.add(incorrect_indentation(
-                        Span::new(
-                            usize::from(close_delim.text_range().start()) - ws.len(),
-                            ws.len(),
+                    state.exceptable_add(
+                        incorrect_indentation(
+                            Span::new(
+                                usize::from(close_delim.text_range().start()) - ws.len(),
+                                ws.len(),
+                            ),
+                            &expected_ws,
+                            ws,
                         ),
-                        &expected_ws,
-                        ws,
-                    ));
+                        SyntaxElement::from(item.syntax().clone()),
+                        &self.exceptable_nodes(),
+                    );
                 }
             }
         }

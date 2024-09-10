@@ -22,19 +22,3 @@ note[Todo]: remaining `TODO` item found
    │
    = fix: implement this todo item and remove the `TODO` statement
 
-note[Todo]: remaining `TODO` item found
-   ┌─ tests/lints/todo/source.wdl:14:11
-   │
-14 │         # TODO: this should NOT be flagged either
-   │           ^^^^
-   │
-   = fix: implement this todo item and remove the `TODO` statement
-
-note[Todo]: remaining `TODO` item found
-   ┌─ tests/lints/todo/source.wdl:21:7
-   │
-21 │     # TODO: This should NOT be flagged as well.
-   │       ^^^^
-   │
-   = fix: implement this todo item and remove the `TODO` statement
-

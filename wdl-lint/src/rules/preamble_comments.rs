@@ -158,6 +158,9 @@ impl Visitor for PreambleCommentsRule {
             current = sibling.next_sibling_or_token();
         }
 
+        // Since this rule can only be excepted in a document-wide fashion,
+        // if the rule is running we can directly add the diagnostic
+        // without checking for the exceptable nodes
         if self.finished {
             state.add(preamble_comment_after_version(span));
         } else {

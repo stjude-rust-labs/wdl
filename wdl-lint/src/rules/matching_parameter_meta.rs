@@ -7,6 +7,7 @@ use wdl_ast::v1::SectionParent;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::version::V1;
+use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -14,6 +15,7 @@ use wdl_ast::Document;
 use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -108,6 +110,7 @@ fn check_parameter_meta(
     expected: impl Iterator<Item = (Ident, Span)>,
     param_meta: ParameterMetadataSection,
     diagnostics: &mut Diagnostics,
+    exceptable_nodes: &Option<Vec<SyntaxKind>>,
 ) {
     let expected: HashMap<_, _> = expected.map(|(i, s)| (i.as_str().to_string(), s)).collect();
 
@@ -121,13 +124,21 @@ fn check_parameter_meta(
 
     for (name, span) in &expected {
         if !actual.contains_key(name) {
-            diagnostics.add(missing_param_meta(parent, name, *span));
+            diagnostics.exceptable_add(
+                missing_param_meta(parent, name, *span),
+                SyntaxElement::from(param_meta.syntax().clone()),
+                exceptable_nodes,
+            );
         }
     }
 
     for (name, span) in &actual {
         if !expected.contains_key(name) {
-            diagnostics.add(extra_param_meta(parent, name, *span));
+            diagnostics.exceptable_add(
+                extra_param_meta(parent, name, *span),
+                SyntaxElement::from(param_meta.syntax().clone()),
+                exceptable_nodes,
+            );
         }
     }
 }
@@ -176,6 +187,7 @@ impl Visitor for MatchingParameterMetaRule {
                     }),
                     param_meta,
                     state,
+                    &self.exceptable_nodes(),
                 );
             }
             None => {
@@ -210,6 +222,7 @@ impl Visitor for MatchingParameterMetaRule {
                     }),
                     param_meta,
                     state,
+                    &self.exceptable_nodes(),
                 );
             }
             None => {
@@ -247,6 +260,7 @@ impl Visitor for MatchingParameterMetaRule {
                     }),
                     param_meta,
                     state,
+                    &self.exceptable_nodes(),
                 );
             }
             None => {
