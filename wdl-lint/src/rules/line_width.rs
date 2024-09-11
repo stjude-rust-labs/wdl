@@ -139,7 +139,10 @@ impl Visitor for LineWidthRule {
             state,
             whitespace.as_str(),
             whitespace.span().start(),
-            SyntaxElement::from(whitespace.syntax().clone()),
+            whitespace
+                .syntax()
+                .prev_sibling_or_token()
+                .unwrap_or(SyntaxElement::from(whitespace.syntax().clone())),
             &self.exceptable_nodes(),
         );
     }

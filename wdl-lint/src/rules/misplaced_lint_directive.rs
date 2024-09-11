@@ -7,7 +7,9 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
+use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::EXCEPT_COMMENT_PREFIX;
@@ -21,20 +23,31 @@ use crate::TagSet;
 const ID: &str = "MisplacedLintDirective";
 
 /// Creates an "unknown rule" diagnostic.
-fn misplaced_lint_directive(id: &str, span: Span, exceptable_nodes: &[SyntaxKind]) -> Diagnostic {
+fn misplaced_lint_directive(
+    id: &str,
+    span: Span,
+    wrong_element: &SyntaxElement,
+    exceptable_nodes: &[SyntaxKind],
+) -> Diagnostic {
     let locations = exceptable_nodes
         .iter()
         .map(|node| node.describe())
         .collect::<Vec<_>>()
         .join(", ");
 
-    Diagnostic::note(format!("lint directive `{id}` above incorrect location"))
-        .with_rule(ID)
-        .with_label("cannot make an exception for this rule", span)
-        .with_fix(format!(
-            "move the lint directive to a valid location. Valid locations for this rule are \
-             above: {locations}"
-        ))
+    Diagnostic::note(format!(
+        "lint directive `{id}` has no effect above: {elem}",
+        elem = wrong_element.kind().describe()
+    ))
+    .with_rule(ID)
+    .with_label("cannot make an exception for this rule", span)
+    .with_label(
+        "invalid element for this lint directive",
+        wrong_element.text_range().to_span(),
+    )
+    .with_fix(format!(
+        "valid locations for this directive are above: {locations}"
+    ))
 }
 
 /// Detects unknown rules within lint directives.
@@ -102,6 +115,7 @@ impl Visitor for MisplacedLintDirective {
                                 state.add(misplaced_lint_directive(
                                     trimmed,
                                     Span::new(start + offset, trimmed.len()),
+                                    elem,
                                     &exceptable_nodes,
                                 ));
                             }

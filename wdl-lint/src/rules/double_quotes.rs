@@ -61,6 +61,7 @@ impl Rule for DoubleQuotesRule {
             SyntaxKind::StructDefinitionNode,
             SyntaxKind::MetadataSectionNode,
             SyntaxKind::ParameterMetadataSectionNode,
+            SyntaxKind::BoundDeclNode,
             SyntaxKind::LiteralStringNode,
         ])
     }
