@@ -64,7 +64,9 @@ impl Rule for MisplacedLintDirective {
     }
 
     fn explanation(&self) -> &'static str {
-        "TODO"
+        "When writing WDL, lint directives are used to suppress certain rules. If a lint directive is \
+         misplaced, it will have no effect. This rule flags misplaced lint directives to ensure they \
+         are in the correct location."
     }
 
     fn tags(&self) -> TagSet {

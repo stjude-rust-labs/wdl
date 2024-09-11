@@ -42,7 +42,8 @@ impl Rule for UnknownRule {
     }
 
     fn explanation(&self) -> &'static str {
-        "TODO"
+        "When writing WDL, lint directives are used to suppress certain rules. If a rule is unknown, \
+         nothing will be suppressed. This rule flags unknown rules as they are often mistakes."
     }
 
     fn tags(&self) -> TagSet {
