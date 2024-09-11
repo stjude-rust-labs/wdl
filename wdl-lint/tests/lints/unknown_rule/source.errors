@@ -6,6 +6,14 @@ note[UnknownRule]: unknown lint rule `ThisIsNotARealRule`
   │
   = fix: remove the rule from the exception list
 
+note[MisplacedLintDirective]: lint directive `DescriptionMissing` above incorrect location
+  ┌─ tests/lints/unknown_rule/source.wdl:3:32
+  │
+3 │ #@ except: ThisIsNotARealRule, DescriptionMissing
+  │                                ^^^^^^^^^^^^^^^^^^ cannot make an exception for this rule
+  │
+  = fix: move the lint directive to a valid location. Valid locations for this rule are above: version statement, metadata section
+
 note[DescriptionMissing]: workflow `test` is missing a description key
   ┌─ tests/lints/unknown_rule/source.wdl:5:3
   │

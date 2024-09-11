@@ -112,6 +112,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::ContainerValue>::default(),
         Box::<rules::MissingRequirementsRule>::default(),
         Box::<rules::UnknownRule>::default(),
+        Box::<rules::MisplacedLintDirective>::default(),
     ];
 
     // Ensure all the rule ids are unique and pascal case

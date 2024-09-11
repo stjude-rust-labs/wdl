@@ -71,6 +71,14 @@ warning[NonmatchingOutput]: output `v` is missing from `meta.outputs` section in
    │
    = fix: add a description of output `v` to documentation in `meta.outputs`
 
+note[MisplacedLintDirective]: lint directive `NonmatchingOutput` above incorrect location
+    ┌─ tests/lints/nonmatching-output/source.wdl:102:24
+    │
+102 │             #@ except: NonmatchingOutput
+    │                        ^^^^^^^^^^^^^^^^^ cannot make an exception for this rule
+    │
+    = fix: move the lint directive to a valid location. Valid locations for this rule are above: version statement, task definition, workflow definition
+
 warning[NonmatchingOutput]: `v` appears in `outputs` section of the task `garply` but is not a declared `output`
     ┌─ tests/lints/nonmatching-output/source.wdl:103:13
     │
