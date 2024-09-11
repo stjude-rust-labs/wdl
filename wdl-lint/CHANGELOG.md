@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+* Lint directives finally work :tada: ([#162](https://github.com/stjude-rust-labs/wdl/pull/162))
+
 ## 0.5.0 - 08-22-2024
 
 ### Added
