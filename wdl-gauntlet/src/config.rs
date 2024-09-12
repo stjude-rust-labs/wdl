@@ -141,7 +141,7 @@ impl Config {
         trace!(
             "  -> {} ignored diagnostics.",
             result.inner().diagnostics().len()
-            );
+        );
 
         Ok(result)
     }

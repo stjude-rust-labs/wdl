@@ -33,14 +33,10 @@ async fn inner() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         LevelFilter::WARN
     };
-    
+
     let filter = match args.log_all_modules {
-        true => {
-            EnvFilter::default().add_directive(level.into())
-        },
-        false => {
-            EnvFilter::default().add_directive(format!("wdl_gauntlet={}", level).parse()?)
-        }
+        true => EnvFilter::default().add_directive(level.into()),
+        false => EnvFilter::default().add_directive(format!("wdl_gauntlet={}", level).parse()?),
     };
 
     tracing_subscriber::fmt().with_env_filter(filter).init();
