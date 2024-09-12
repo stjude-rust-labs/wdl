@@ -8,7 +8,7 @@ use faster_hex;
 use git2::build::RepoBuilder;
 use git2::FetchOptions;
 use indexmap::IndexMap;
-use log::info;
+use tracing::info;
 use serde::Deserialize;
 use serde::Serialize;
 

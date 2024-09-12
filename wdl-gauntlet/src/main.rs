@@ -14,7 +14,8 @@
 #![warn(rustdoc::broken_intra_doc_links)]
 
 use clap::Parser as _;
-use log::LevelFilter;
+use tracing::level_filters::LevelFilter;
+use tracing_subscriber::EnvFilter;
 use wdl_gauntlet as gauntlet;
 
 /// The inner function for `wdl-gauntlet`.
@@ -22,23 +23,28 @@ async fn inner() -> Result<(), Box<dyn std::error::Error>> {
     let args = gauntlet::Args::parse();
 
     let level = if args.trace {
-        LevelFilter::max()
+        LevelFilter::TRACE
     } else if args.debug {
-        LevelFilter::Debug
+        LevelFilter::DEBUG
     } else if args.verbose {
-        LevelFilter::Info
+        LevelFilter::INFO
     } else if args.quiet {
-        LevelFilter::Error
+        LevelFilter::ERROR
     } else {
-        LevelFilter::Warn
+        LevelFilter::WARN
+    };
+    
+    let filter = match args.log_all_modules {
+        true => {
+            EnvFilter::default().add_directive(level.into())
+        },
+        false => {
+            EnvFilter::default().add_directive(format!("wdl_gauntlet={}", level).parse()?)
+        }
     };
 
-    let module = match args.log_all_modules {
-        true => None,
-        false => Some("wdl_gauntlet"),
-    };
+    tracing_subscriber::fmt().with_env_filter(filter).init();
 
-    env_logger::builder().filter(module, level).init();
     gauntlet::gauntlet(args).await?;
 
     Ok(())

@@ -21,7 +21,6 @@ clap = { workspace = true, optional = true }
 anyhow = { workspace = true, optional = true }
 colored = { workspace = true, optional = true }
 codespan-reporting = { workspace = true, optional = true }
-env_logger = { workspace = true, optional = true }
 indicatif = { workspace = true, optional = true }
 tokio = { workspace = true, optional = true }
 
@@ -45,7 +44,6 @@ cli = [
     "dep:clap",
     "dep:anyhow",
     "dep:colored",
-    "dep:env_logger",
     "dep:indicatif",
     "dep:tokio",
 ]
