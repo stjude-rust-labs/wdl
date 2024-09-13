@@ -75,6 +75,32 @@ pub(crate) fn type_mismatch(
     )
 }
 
+/// Creates a "element type mismatch" diagnostic.
+pub(crate) fn element_type_mismatch(
+    types: &Types,
+    expected: Type,
+    expected_span: Span,
+    actual: Type,
+    actual_span: Span,
+) -> Diagnostic {
+    Diagnostic::error(format!(
+        "type mismatch: expected all elements to be type `{expected}`, but found type `{actual}`",
+        expected = expected.display(types),
+        actual = actual.display(types)
+    ))
+    .with_label(
+        format!("this is type `{actual}`", actual = actual.display(types)),
+        actual_span,
+    )
+    .with_label(
+        format!(
+            "the first element is type `{expected}`",
+            expected = expected.display(types)
+        ),
+        expected_span,
+    )
+}
+
 /// Creates a custom "type mismatch" diagnostic.
 fn type_mismatch_custom(
     types: &Types,
@@ -846,7 +872,7 @@ where
                 for expr in elements {
                     if let Some(actual) = self.evaluate_expr(scope, &expr) {
                         if !actual.is_coercible_to(self.types, &expected) {
-                            self.diagnostics.push(type_mismatch(
+                            self.diagnostics.push(element_type_mismatch(
                                 self.types,
                                 expected,
                                 expected_span,
@@ -919,7 +945,7 @@ where
                             }
 
                             if !actual_value.is_coercible_to(self.types, &expected_value) {
-                                self.diagnostics.push(type_mismatch(
+                                self.diagnostics.push(element_type_mismatch(
                                     self.types,
                                     expected_value,
                                     expected_value_span,

@@ -38,29 +38,29 @@ error: type mismatch: expected type `Map[Int, String]`, but found type `Map[Stri
    │                      │    
    │                      this expects type `Map[Int, String]`
 
-error: type mismatch: expected type `Int`, but found type `String`
+error: type mismatch: expected all elements to be type `Int`, but found type `String`
    ┌─ tests/analysis/type-mismatch/source.wdl:15:24
    │
 15 │     Array[Int] f = [1, "2", "3"]
    │                     -  ^^^ this is type `String`
    │                     │   
-   │                     this expects type `Int`
+   │                     the first element is type `Int`
 
-error: type mismatch: expected type `Int`, but found type `String`
+error: type mismatch: expected all elements to be type `Int`, but found type `String`
    ┌─ tests/analysis/type-mismatch/source.wdl:15:29
    │
 15 │     Array[Int] f = [1, "2", "3"]
    │                     -       ^^^ this is type `String`
    │                     │        
-   │                     this expects type `Int`
+   │                     the first element is type `Int`
 
-error: type mismatch: expected type `String`, but found type `Int`
+error: type mismatch: expected all elements to be type `String`, but found type `Int`
    ┌─ tests/analysis/type-mismatch/source.wdl:16:46
    │
 16 │     Map[String, String] g = { "a": "1", "b": 2, "c": "3" }
    │                                    ---       ^ this is type `Int`
    │                                    │          
-   │                                    this expects type `String`
+   │                                    the first element is type `String`
 
 error: type mismatch: expected type `Int`, but found type `Array[Int]`
    ┌─ tests/analysis/type-mismatch/source.wdl:17:22
