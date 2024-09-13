@@ -1,5 +1,5 @@
 #@ except: BlankLinesBetweenElements, DescriptionMissing, RuntimeSectionKeys
-##
+
 ## This is a test of the `DeprecatedPlaceholderOption` lint.
 
 version 1.1

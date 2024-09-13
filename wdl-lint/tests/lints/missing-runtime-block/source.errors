@@ -1,7 +1,7 @@
 warning[MissingRuntime]: task `bad` is missing a `runtime` section
-  ┌─ tests/lints/missing-runtime-block/source.wdl:7:6
+  ┌─ tests/lints/missing-runtime-block/source.wdl:8:6
   │
-7 │ task bad {
+8 │ task bad {
   │      ^^^ this task is missing a `runtime` section
   │
   = fix: add a `runtime` section to the task

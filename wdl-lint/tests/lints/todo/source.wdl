@@ -1,4 +1,5 @@
 #@ except: BlankLinesBetweenElements, DescriptionMissing
+
 ## This is a test of the todo rule.
 
 version 1.1

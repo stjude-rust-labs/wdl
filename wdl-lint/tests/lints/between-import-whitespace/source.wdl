@@ -1,4 +1,5 @@
 #@ except: BlankLinesBetweenElements, CommentWhitespace, DescriptionMissing
+
 ## This is a test of whitespace between import statements.
 
 version 1.1

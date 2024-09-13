@@ -1,4 +1,5 @@
 #@ except: BlankLinesBetweenElements, DescriptionMissing, LineWidth, NoCurlyCommands, RuntimeSectionKeys
+
 ## This is a test of having mixed _trailing_ indentation in command sections.
 ## There should be no warnings from the `CommandSectionMixedIndentation` rule.
 
