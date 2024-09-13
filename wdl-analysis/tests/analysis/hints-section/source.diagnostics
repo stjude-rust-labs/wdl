@@ -44,7 +44,7 @@ error: type mismatch: expected type `Boolean`, but found type `String`
 119 │         short_task: "false"
     │         ----------  ^^^^^^^ this is type `String`
     │         │            
-    │         this is type `Boolean`
+    │         this expects type `Boolean`
 
 error: type mismatch: expected type `Boolean`, but found type `String`
     ┌─ tests/analysis/hints-section/source.wdl:120:32
@@ -52,7 +52,7 @@ error: type mismatch: expected type `Boolean`, but found type `String`
 120 │         localization_optional: "true"
     │         ---------------------  ^^^^^^ this is type `String`
     │         │                       
-    │         this is type `Boolean`
+    │         this expects type `Boolean`
 
 error: an input with name `wrong` does not exist
     ┌─ tests/analysis/hints-section/source.wdl:122:13
@@ -78,7 +78,7 @@ error: type mismatch: expected type `hints`, but found type `String`
 131 │             foo: "wrong"
     │             ---  ^^^^^^^ this is type `String`
     │             │     
-    │             this is type `hints`
+    │             this expects type `hints`
 
 error: an output with name `wrong` does not exist
     ┌─ tests/analysis/hints-section/source.wdl:134:13
@@ -104,5 +104,5 @@ error: type mismatch: expected type `hints`, but found type `String`
 143 │             qux: "wrong"
     │             ---  ^^^^^^^ this is type `String`
     │             │     
-    │             this is type `hints`
+    │             this expects type `hints`
 

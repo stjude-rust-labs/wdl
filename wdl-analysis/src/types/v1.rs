@@ -68,7 +68,7 @@ pub(crate) fn type_mismatch(
     )
     .with_label(
         format!(
-            "this is type `{expected}`",
+            "this expects type `{expected}`",
             expected = expected.display(types)
         ),
         expected_span,

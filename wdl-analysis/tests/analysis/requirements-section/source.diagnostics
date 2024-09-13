@@ -52,7 +52,7 @@ error: type mismatch: expected type `Boolean`, but found type `String`
 65 │         gpu: "false"
    │         ---  ^^^^^^^ this is type `String`
    │         │     
-   │         this is type `Boolean`
+   │         this expects type `Boolean`
 
 error: type mismatch: expected type `Boolean`, but found type `String`
    ┌─ tests/analysis/requirements-section/source.wdl:66:15
@@ -60,7 +60,7 @@ error: type mismatch: expected type `Boolean`, but found type `String`
 66 │         fpga: "false"
    │         ----  ^^^^^^^ this is type `String`
    │         │      
-   │         this is type `Boolean`
+   │         this expects type `Boolean`
 
 error: type mismatch: expected type `Int`, type `String`, or type `Array[String]`, but found type `Boolean`
    ┌─ tests/analysis/requirements-section/source.wdl:67:16
@@ -76,7 +76,7 @@ error: type mismatch: expected type `Int`, but found type `Boolean`
 68 │         max_retries: false
    │         -----------  ^^^^^ this is type `Boolean`
    │         │             
-   │         this is type `Int`
+   │         this expects type `Int`
 
 error: type mismatch: expected type `Int`, type `String`, or type `Array[Int]`, but found type `Boolean`
    ┌─ tests/analysis/requirements-section/source.wdl:69:23

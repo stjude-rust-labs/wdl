@@ -28,7 +28,7 @@ error: type mismatch: expected type `Boolean`, but found type `String`
 65 │         gpu: "false"
    │         ---  ^^^^^^^ this is type `String`
    │         │     
-   │         this is type `Boolean`
+   │         this expects type `Boolean`
 
 error: type mismatch: expected type `Int`, type `String`, or type `Array[String]`, but found type `Boolean`
    ┌─ tests/analysis/runtime-section/source.wdl:67:16
