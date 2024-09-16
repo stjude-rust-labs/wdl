@@ -378,6 +378,11 @@ impl Visitor for RuntimeSectionKeysRule {
                     Some(span) => span,
                     None => return,
                 };
+                let runtime_node = def
+                    .runtime()
+                    .expect("runtime section should exist")
+                    .syntax()
+                    .clone();
 
                 // SAFETY: the version must always be set before we get to this
                 // point, as document is the root node of the tree.
@@ -391,7 +396,7 @@ impl Visitor for RuntimeSectionKeysRule {
                                 runtime_span,
                                 &specification,
                             ),
-                            SyntaxElement::from(def.syntax().clone()),
+                            SyntaxElement::from(runtime_node.clone()),
                             &self.exceptable_nodes(),
                         );
                     }
@@ -416,7 +421,7 @@ impl Visitor for RuntimeSectionKeysRule {
                                 runtime_span,
                                 &specification,
                             ),
-                            SyntaxElement::from(def.syntax().clone()),
+                            SyntaxElement::from(runtime_node),
                             &self.exceptable_nodes(),
                         );
                     }

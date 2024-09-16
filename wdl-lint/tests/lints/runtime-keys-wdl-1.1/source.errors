@@ -6,14 +6,6 @@ note[RuntimeSectionKeys]: the following runtime key is recommended by the WDL v1
    │
    = fix: include an entry for the `container` key in the `runtime` section
 
-note[RuntimeSectionKeys]: the following runtime key is recommended by the WDL v1.1 specification: `container`
-   ┌─ tests/lints/runtime-keys-wdl-1.1/source.wdl:19:5
-   │
-19 │     runtime {} # No errors should show.
-   │     ^^^^^^^^^^
-   │
-   = fix: include an entry for the `container` key in the `runtime` section
-
 warning[RuntimeSectionKeys]: the following runtime key is not reserved in the WDL v1.1 specification: `foo`; therefore, its inclusion in the `runtime` section is deprecated
    ┌─ tests/lints/runtime-keys-wdl-1.1/source.wdl:42:5
    │  
