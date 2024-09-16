@@ -54,15 +54,14 @@ fn misplaced_lint_directive(
 }
 
 /// Creates a static LazyLock of the rules' excepatable nodes.
-pub fn exceptable_nodes() -> LazyLock<HashMap<&'static str, Option<&'static [SyntaxKind]>>> {
+pub static RULE_MAP: LazyLock<HashMap<&'static str, Option<&'static [SyntaxKind]>>> =
     LazyLock::new(|| {
         let mut map = HashMap::new();
         for rule in rules() {
             map.insert(rule.id(), rule.exceptable_nodes());
         }
         map
-    })
-}
+    });
 
 /// Detects unknown rules within lint directives.
 #[derive(Default, Debug, Clone, Copy)]
@@ -125,7 +124,7 @@ impl Visitor for MisplacedLintDirective {
                 offset += id.len() - trimmed.len();
 
                 if let Some(elem) = &excepted_element {
-                    if let Some(Some(exceptable_nodes)) = exceptable_nodes().get(trimmed) {
+                    if let Some(Some(exceptable_nodes)) = RULE_MAP.get(trimmed) {
                         if !exceptable_nodes.contains(&elem.kind()) {
                             state.add(misplaced_lint_directive(
                                 trimmed,
