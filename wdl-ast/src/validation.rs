@@ -53,21 +53,16 @@ impl Diagnostics {
         element: SyntaxElement,
         exceptable_nodes: &Option<Vec<SyntaxKind>>,
     ) {
-        if diagnostic.rule().is_none() {
-            self.add(diagnostic);
-            return;
-        }
-
-        for node in element.ancestors().filter(|node| {
-            exceptable_nodes
-                .as_ref()
-                .map_or(true, |nodes| nodes.contains(&node.kind()))
-        }) {
-            if self
-                .exceptions_for(&node)
-                .contains(diagnostic.rule().expect("rule id"))
-            {
-                return;
+        if let Some(rule) = diagnostic.rule() {
+            for node in element.ancestors().filter(|node| {
+                exceptable_nodes
+                    .as_ref()
+                    .map_or(true, |nodes| nodes.contains(&node.kind()))
+            }) {
+                if self.exceptions_for(&node).contains(rule) {
+                    // Rule is currently excepted, don't add the diagnostic
+                    return;
+                }
             }
         }
 

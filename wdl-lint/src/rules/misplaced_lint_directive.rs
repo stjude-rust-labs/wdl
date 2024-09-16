@@ -36,7 +36,7 @@ fn misplaced_lint_directive(
         .join(", ");
 
     Diagnostic::note(format!(
-        "lint directive `{id}` has no effect above: {elem}",
+        "lint directive `{id}` has no effect above {elem}",
         elem = wrong_element.kind().describe()
     ))
     .with_rule(ID)
