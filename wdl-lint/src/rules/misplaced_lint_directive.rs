@@ -1,5 +1,8 @@
 //! A lint rule for flagging misplaced lint directives.
 
+use std::collections::HashMap;
+use std::sync::LazyLock;
+
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
@@ -48,6 +51,17 @@ fn misplaced_lint_directive(
     .with_fix(format!(
         "valid locations for this directive are above: {locations}"
     ))
+}
+
+/// Creates a static LazyLock of the rules' excepatable nodes.
+pub fn exceptable_nodes() -> LazyLock<HashMap<&'static str, Option<&'static [SyntaxKind]>>> {
+    LazyLock::new(|| {
+        let mut map = HashMap::new();
+        for rule in rules() {
+            map.insert(rule.id(), rule.exceptable_nodes());
+        }
+        map
+    })
 }
 
 /// Detects unknown rules within lint directives.
@@ -110,17 +124,15 @@ impl Visitor for MisplacedLintDirective {
                 // Update the offset to account for the whitespace that was removed
                 offset += id.len() - trimmed.len();
 
-                if let Some(rule) = rules().iter().find(|r| r.id() == trimmed) {
-                    if let Some(elem) = &excepted_element {
-                        if let Some(exceptable_nodes) = rule.exceptable_nodes() {
-                            if !exceptable_nodes.contains(&elem.kind()) {
-                                state.add(misplaced_lint_directive(
-                                    trimmed,
-                                    Span::new(start + offset, trimmed.len()),
-                                    elem,
-                                    exceptable_nodes,
-                                ));
-                            }
+                if let Some(elem) = &excepted_element {
+                    if let Some(Some(exceptable_nodes)) = exceptable_nodes().get(trimmed) {
+                        if !exceptable_nodes.contains(&elem.kind()) {
+                            state.add(misplaced_lint_directive(
+                                trimmed,
+                                Span::new(start + offset, trimmed.len()),
+                                elem,
+                                exceptable_nodes,
+                            ));
                         }
                     }
                 }
