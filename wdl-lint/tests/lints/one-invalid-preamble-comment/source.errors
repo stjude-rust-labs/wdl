@@ -1,11 +1,3 @@
-note[UnknownRule]: unknown lint rule `PreambleWhitespace`
-  ┌─ tests/lints/one-invalid-preamble-comment/source.wdl:1:59
-  │
-1 │ #@ except: BlankLinesBetweenElements, DescriptionMissing, PreambleWhitespace
-  │                                                           ^^^^^^^^^^^^^^^^^^ cannot make an exception for this rule
-  │
-  = fix: remove the rule from the exception list
-
 note[PreambleFormatting]: preamble comments must start with `##` followed by a space
    ┌─ tests/lints/one-invalid-preamble-comment/source.wdl:3:1
    │  

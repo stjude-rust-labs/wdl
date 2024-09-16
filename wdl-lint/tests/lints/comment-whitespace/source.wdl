@@ -1,7 +1,5 @@
 #@ except: BlankLinesBetweenElements, DescriptionMissing, DisallowedOutputName, ExpressionSpacing, LineWidth, MissingMetas, NonmatchingOutput, TrailingComma, Whitespace
 
-## some comment
-
 version 1.2
 
 
@@ -11,6 +9,7 @@ version 1.2
     # another bad comment
 
 # a good comment
+# a comment with trailing whitespace          
 
 workflow foo {# test in-line comment without preceding whitespace
     meta {# this is a problematic yet valid comment
