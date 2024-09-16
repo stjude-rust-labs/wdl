@@ -12,7 +12,7 @@ use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::EXCEPT_COMMENT_PREFIX;
 
-use crate::rules;
+use crate::rules::RULE_MAP;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -52,8 +52,8 @@ impl Rule for UnknownRule {
         TagSet::new(&[Tag::Clarity])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
-        Some(vec![SyntaxKind::VersionStatementNode])
+    fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
+        Some(&[SyntaxKind::VersionStatementNode])
     }
 }
 
@@ -78,11 +78,7 @@ impl Visitor for UnknownRule {
                 offset += id.len() - trimmed.len();
 
                 // Check if the rule is known
-                if !rules()
-                    .iter()
-                    .map(|rule| rule.id())
-                    .any(|rule_id| rule_id == trimmed)
-                {
+                if !RULE_MAP.contains_key(&trimmed) {
                     // Since this rule can only be excepted in a document-wide fashion,
                     // if the rule is running we can directly add the diagnostic
                     // without checking for the exceptable nodes

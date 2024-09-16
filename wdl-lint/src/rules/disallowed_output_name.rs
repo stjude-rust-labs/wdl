@@ -76,8 +76,8 @@ impl Rule for DisallowedOutputNameRule {
         TagSet::new(&[Tag::Naming])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
-        Some(vec![
+    fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
+        Some(&[
             SyntaxKind::VersionStatementNode,
             SyntaxKind::OutputSectionNode,
             SyntaxKind::BoundDeclNode,
@@ -128,7 +128,7 @@ impl Visitor for DisallowedOutputNameRule {
 fn check_decl_name(
     state: &mut Diagnostics,
     decl: &Decl,
-    exceptable_nodes: &Option<Vec<SyntaxKind>>,
+    exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
     let name = decl.name();
     let name = name.as_str();

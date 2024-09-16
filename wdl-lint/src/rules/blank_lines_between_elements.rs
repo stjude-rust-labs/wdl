@@ -104,8 +104,8 @@ impl Rule for BlankLinesBetweenElementsRule {
         TagSet::new(&[Tag::Spacing])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
-        Some(vec![
+    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
+        Some(&[
             SyntaxKind::VersionStatementNode,
             SyntaxKind::TaskDefinitionNode,
             SyntaxKind::WorkflowDefinitionNode,
@@ -475,7 +475,7 @@ fn is_first_element(syntax: &SyntaxNode) -> bool {
 fn flag_all_blank_lines_within(
     syntax: &SyntaxNode,
     state: &mut Diagnostics,
-    exceptable_nodes: &Option<Vec<SyntaxKind>>,
+    exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
     syntax.descendants_with_tokens().for_each(|c| {
         if c.kind() == SyntaxKind::Whitespace {
@@ -500,7 +500,7 @@ fn check_prior_spacing(
     state: &mut Diagnostics,
     element_spacing_required: bool,
     first: bool,
-    exceptable_nodes: &Option<Vec<SyntaxKind>>,
+    exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
     if let Some(prior) = syntax.prev_sibling_or_token() {
         match prior.kind() {

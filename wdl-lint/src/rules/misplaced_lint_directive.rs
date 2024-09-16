@@ -1,5 +1,8 @@
 //! A lint rule for flagging misplaced lint directives.
 
+use std::collections::HashMap;
+use std::sync::LazyLock;
+
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
@@ -36,7 +39,7 @@ fn misplaced_lint_directive(
         .join(", ");
 
     Diagnostic::note(format!(
-        "lint directive `{id}` has no effect above: {elem}",
+        "lint directive `{id}` has no effect above {elem}",
         elem = wrong_element.kind().describe()
     ))
     .with_rule(ID)
@@ -49,6 +52,16 @@ fn misplaced_lint_directive(
         "valid locations for this directive are above: {locations}"
     ))
 }
+
+/// Creates a static LazyLock of the rules' excepatable nodes.
+pub static RULE_MAP: LazyLock<HashMap<&'static str, Option<&'static [SyntaxKind]>>> =
+    LazyLock::new(|| {
+        let mut map = HashMap::new();
+        for rule in rules() {
+            map.insert(rule.id(), rule.exceptable_nodes());
+        }
+        map
+    });
 
 /// Detects unknown rules within lint directives.
 #[derive(Default, Debug, Clone, Copy)]
@@ -73,8 +86,8 @@ impl Rule for MisplacedLintDirective {
         TagSet::new(&[Tag::Clarity, Tag::Correctness])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
-        Some(vec![SyntaxKind::VersionStatementNode])
+    fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
+        Some(&[SyntaxKind::VersionStatementNode])
     }
 }
 
@@ -110,17 +123,15 @@ impl Visitor for MisplacedLintDirective {
                 // Update the offset to account for the whitespace that was removed
                 offset += id.len() - trimmed.len();
 
-                if let Some(rule) = rules().iter().find(|r| r.id() == trimmed) {
-                    if let Some(elem) = &excepted_element {
-                        if let Some(exceptable_nodes) = rule.exceptable_nodes() {
-                            if !exceptable_nodes.contains(&elem.kind()) {
-                                state.add(misplaced_lint_directive(
-                                    trimmed,
-                                    Span::new(start + offset, trimmed.len()),
-                                    elem,
-                                    &exceptable_nodes,
-                                ));
-                            }
+                if let Some(elem) = &excepted_element {
+                    if let Some(Some(exceptable_nodes)) = RULE_MAP.get(trimmed) {
+                        if !exceptable_nodes.contains(&elem.kind()) {
+                            state.add(misplaced_lint_directive(
+                                trimmed,
+                                Span::new(start + offset, trimmed.len()),
+                                elem,
+                                exceptable_nodes,
+                            ));
                         }
                     }
                 }

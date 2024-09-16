@@ -53,8 +53,8 @@ impl Rule for DoubleQuotesRule {
         TagSet::new(&[Tag::Clarity, Tag::Style])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
-        Some(vec![
+    fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
+        Some(&[
             SyntaxKind::VersionStatementNode,
             SyntaxKind::TaskDefinitionNode,
             SyntaxKind::WorkflowDefinitionNode,

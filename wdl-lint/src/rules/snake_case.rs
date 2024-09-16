@@ -78,7 +78,7 @@ fn check_name(
     span: Span,
     diagnostics: &mut Diagnostics,
     element: SyntaxElement,
-    exceptable_nodes: &Option<Vec<SyntaxKind>>,
+    exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
     let converter = Converter::new()
         .remove_boundaries(&[Boundary::DigitLower, Boundary::LowerDigit])
@@ -134,8 +134,8 @@ impl Rule for SnakeCaseRule {
         TagSet::new(&[Tag::Naming, Tag::Style, Tag::Clarity])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
-        Some(vec![
+    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
+        Some(&[
             SyntaxKind::VersionStatementNode,
             SyntaxKind::StructDefinitionNode,
             SyntaxKind::TaskDefinitionNode,

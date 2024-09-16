@@ -88,7 +88,7 @@ impl Rule for CommentWhitespaceRule {
         TagSet::new(&[Tag::Spacing])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
         None
     }
 }

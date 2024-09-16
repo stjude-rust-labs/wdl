@@ -76,8 +76,8 @@ impl Rule for ImportWhitespaceRule {
         TagSet::new(&[Tag::Style, Tag::Clarity, Tag::Spacing])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
-        Some(vec![
+    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
+        Some(&[
             SyntaxKind::VersionStatementNode,
             SyntaxKind::ImportStatementNode,
         ])

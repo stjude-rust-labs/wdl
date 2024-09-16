@@ -69,7 +69,7 @@ pub trait Rule: Visitor<State = Diagnostics> {
     /// Gets the nodes that are exceptable for this rule.
     ///
     /// If `None` is returned, all nodes are exceptable.
-    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>>;
+    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]>;
 }
 
 /// Gets the default rule set.
@@ -80,7 +80,8 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::SnakeCaseRule>::default(),
         Box::<rules::MissingRuntimeRule>::default(),
         Box::<rules::EndingNewlineRule>::default(),
-        Box::<rules::PreambleFormattingRule>::default(),
+        Box::<rules::PreambleWhitespaceRule>::default(),
+        Box::<rules::PreambleCommentsRule>::default(),
         Box::<rules::MatchingParameterMetaRule>::default(),
         Box::<rules::WhitespaceRule>::default(),
         Box::<rules::CommandSectionMixedIndentationRule>::default(),

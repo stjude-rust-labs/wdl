@@ -200,7 +200,7 @@ impl Rule for ExpressionSpacingRule {
         TagSet::new(&[Tag::Spacing])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
         None
     }
 }
@@ -762,7 +762,7 @@ impl Visitor for ExpressionSpacingRule {
 fn check_required_surrounding_ws(
     state: &mut Diagnostics,
     op: &SyntaxElement,
-    exceptable_nodes: &Option<Vec<SyntaxKind>>,
+    exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
     let before_ws = op.prev_sibling_or_token().map(|t| t.kind()) == Some(SyntaxKind::Whitespace);
     let after_ws = op.next_sibling_or_token().map(|t| t.kind()) == Some(SyntaxKind::Whitespace);
