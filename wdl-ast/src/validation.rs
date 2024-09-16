@@ -51,7 +51,7 @@ impl Diagnostics {
         &mut self,
         diagnostic: Diagnostic,
         element: SyntaxElement,
-        exceptable_nodes: &Option<Vec<SyntaxKind>>,
+        exceptable_nodes: &Option<&'static [SyntaxKind]>,
     ) {
         if let Some(rule) = diagnostic.rule() {
             for node in element.ancestors().filter(|node| {

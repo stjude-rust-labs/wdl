@@ -73,8 +73,8 @@ impl Rule for MisplacedLintDirective {
         TagSet::new(&[Tag::Clarity, Tag::Correctness])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
-        Some(vec![SyntaxKind::VersionStatementNode])
+    fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
+        Some(&[SyntaxKind::VersionStatementNode])
     }
 }
 
@@ -118,7 +118,7 @@ impl Visitor for MisplacedLintDirective {
                                     trimmed,
                                     Span::new(start + offset, trimmed.len()),
                                     elem,
-                                    &exceptable_nodes,
+                                    exceptable_nodes,
                                 ));
                             }
                         }

@@ -98,8 +98,8 @@ impl Rule for CommandSectionMixedIndentationRule {
         TagSet::new(&[Tag::Correctness, Tag::Spacing, Tag::Clarity])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
-        Some(vec![
+    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
+        Some(&[
             SyntaxKind::VersionStatementNode,
             SyntaxKind::TaskDefinitionNode,
             SyntaxKind::CommandSectionNode,

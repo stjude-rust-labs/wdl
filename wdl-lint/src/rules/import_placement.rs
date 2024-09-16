@@ -59,8 +59,8 @@ impl Rule for ImportPlacementRule {
         TagSet::new(&[Tag::Clarity])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
-        Some(vec![
+    fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
+        Some(&[
             SyntaxKind::VersionStatementNode,
             SyntaxKind::ImportStatementNode,
         ])

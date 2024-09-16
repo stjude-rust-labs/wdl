@@ -50,8 +50,8 @@ impl Rule for MissingRuntimeRule {
         TagSet::new(&[Tag::Completeness, Tag::Portability])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
-        Some(vec![
+    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
+        Some(&[
             SyntaxKind::VersionStatementNode,
             SyntaxKind::TaskDefinitionNode,
         ])

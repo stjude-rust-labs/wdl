@@ -6,7 +6,7 @@ note[UnknownRule]: unknown lint rule `ThisIsNotARealRule`
   │
   = fix: remove the rule from the exception list
 
-note[MisplacedLintDirective]: lint directive `DescriptionMissing` has no effect above: workflow definition
+note[MisplacedLintDirective]: lint directive `DescriptionMissing` has no effect above workflow definition
   ┌─ tests/lints/unknown_rule/source.wdl:3:32
   │  
 3 │   #@ except: ThisIsNotARealRule, DescriptionMissing

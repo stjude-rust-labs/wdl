@@ -131,8 +131,8 @@ impl Rule for ContainerValue {
         TagSet::new(&[Tag::Clarity, Tag::Portability])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
-        Some(vec![
+    fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
+        Some(&[
             SyntaxKind::VersionStatementNode,
             SyntaxKind::RuntimeSectionNode,
             SyntaxKind::RequirementsSectionNode,
@@ -198,7 +198,7 @@ fn check_container_value(
     state: &mut Diagnostics,
     value: Value,
     syntax: SyntaxElement,
-    exceptable_nodes: &Option<Vec<SyntaxKind>>,
+    exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
     if let Kind::Array(array) = value.kind() {
         if array.is_empty() {

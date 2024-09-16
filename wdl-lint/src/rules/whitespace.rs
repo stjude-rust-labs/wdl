@@ -73,7 +73,7 @@ impl Rule for WhitespaceRule {
         TagSet::new(&[Tag::Style, Tag::Spacing])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
+    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
         None
     }
 }

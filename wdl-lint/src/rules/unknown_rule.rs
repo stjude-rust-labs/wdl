@@ -52,8 +52,8 @@ impl Rule for UnknownRule {
         TagSet::new(&[Tag::Clarity])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
-        Some(vec![SyntaxKind::VersionStatementNode])
+    fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
+        Some(&[SyntaxKind::VersionStatementNode])
     }
 }
 

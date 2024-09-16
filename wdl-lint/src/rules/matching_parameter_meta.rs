@@ -96,8 +96,8 @@ impl Rule for MatchingParameterMetaRule {
         TagSet::new(&[Tag::Completeness])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
-        Some(vec![
+    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
+        Some(&[
             SyntaxKind::VersionStatementNode,
             SyntaxKind::ParameterMetadataSectionNode,
         ])
@@ -110,7 +110,7 @@ fn check_parameter_meta(
     expected: impl Iterator<Item = (Ident, Span)>,
     param_meta: ParameterMetadataSection,
     diagnostics: &mut Diagnostics,
-    exceptable_nodes: &Option<Vec<SyntaxKind>>,
+    exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
     let expected: HashMap<_, _> = expected.map(|(i, s)| (i.as_str().to_string(), s)).collect();
 

@@ -318,8 +318,8 @@ impl Rule for RuntimeSectionKeysRule {
         TagSet::new(&[Tag::Completeness, Tag::Deprecated])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
-        Some(vec![
+    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
+        Some(&[
             SyntaxKind::VersionStatementNode,
             SyntaxKind::RuntimeSectionNode,
         ])

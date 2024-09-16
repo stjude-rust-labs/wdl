@@ -54,7 +54,7 @@ impl LineWidthRule {
         text: &str,
         start: usize,
         element: SyntaxElement,
-        exceptable_nodes: &Option<Vec<wdl_ast::SyntaxKind>>,
+        exceptable_nodes: &Option<&'static [wdl_ast::SyntaxKind]>,
     ) {
         for offset in text
             .char_indices()
@@ -108,7 +108,7 @@ impl Rule for LineWidthRule {
         TagSet::new(&[Tag::Style, Tag::Clarity, Tag::Spacing])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
+    fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
         None
     }
 }

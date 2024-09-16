@@ -60,8 +60,8 @@ impl Rule for ImportSortRule {
         TagSet::new(&[Tag::Style, Tag::Clarity])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<SyntaxKind>> {
-        Some(vec![SyntaxKind::VersionStatementNode])
+    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
+        Some(&[SyntaxKind::VersionStatementNode])
     }
 }
 

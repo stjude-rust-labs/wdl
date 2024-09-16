@@ -215,8 +215,8 @@ impl Rule for InputNotSortedRule {
         TagSet::new(&[Tag::Style, Tag::Clarity, Tag::Sorting])
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
-        Some(vec![
+    fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
+        Some(&[
             SyntaxKind::VersionStatementNode,
             SyntaxKind::InputSectionNode,
         ])

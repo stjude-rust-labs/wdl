@@ -88,8 +88,8 @@ impl Rule for DeprecatedPlaceholderOptionRule {
          was the version where the deprecation was introduced."
     }
 
-    fn exceptable_nodes(&self) -> Option<Vec<wdl_ast::SyntaxKind>> {
-        Some(vec![
+    fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
+        Some(&[
             SyntaxKind::VersionStatementNode,
             SyntaxKind::TaskDefinitionNode,
             SyntaxKind::WorkflowDefinitionNode,
