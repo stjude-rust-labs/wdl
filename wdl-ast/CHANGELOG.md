@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+* Split hint section representation into `TaskHintsSection` and
+  `WorkflowHintsSection` as the latter no longer supports expressions ([#176](https://github.com/stjude-rust-labs/wdl/pull/176))
+
+
 ## 0.7.1 - 09-16-2024
 
 ### Fixed
