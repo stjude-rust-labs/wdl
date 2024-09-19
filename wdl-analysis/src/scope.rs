@@ -23,6 +23,10 @@ use crate::types::Types;
 
 mod v1;
 
+/// The `task` variable name available in task command sections and outputs in
+/// WDL 1.2.
+pub(crate) const TASK_VAR_NAME: &str = "task";
+
 /// Calculates the span of a scope given a braced node.
 fn braced_scope_span(parent: &impl AstNode<Language = WorkflowDescriptionLanguage>) -> Span {
     scope_span(parent, SyntaxKind::OpenBrace, SyntaxKind::CloseBrace)

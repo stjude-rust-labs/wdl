@@ -10,6 +10,7 @@
 #![warn(rustdoc::broken_intra_doc_links)]
 
 mod analyzer;
+pub mod eval;
 mod graph;
 mod queue;
 mod rayon;
