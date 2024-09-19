@@ -81,6 +81,18 @@ impl Rule for WhitespaceRule {
 impl Visitor for WhitespaceRule {
     type State = Diagnostics;
 
+    fn comment(&mut self, state: &mut Self::State, comment: &wdl_ast::Comment) {
+        let comment_str = comment.as_str();
+        if comment_str.ends_with(|char: char| char.is_whitespace()) {
+            // Trailing whitespace
+            state.exceptable_add(
+                trailing_whitespace(comment.span()),
+                SyntaxElement::from(comment.syntax().clone()),
+                &self.exceptable_nodes(),
+            )
+        }
+    }
+
     fn document(
         &mut self,
         _: &mut Self::State,
