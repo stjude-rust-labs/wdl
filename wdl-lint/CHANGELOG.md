@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
-* Added Trailing Comments lint rule as an extension of the `Whitespace` rule ([]())
+* Added Trailing Comments lint rule as an extension of the `Whitespace` rule ([177](https://github.com/stjude-rust-labs/wdl/pull/177))
 
 ## 0.6.0 - 09-16-2024
 
