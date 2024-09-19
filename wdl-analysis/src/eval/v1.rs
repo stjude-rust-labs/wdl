@@ -1,10 +1,14 @@
 //! Evaluation graphs for WDL 1.x.
 
+use std::fmt;
+
 use indexmap::IndexMap;
+use petgraph::algo::DfsSpace;
 use petgraph::algo::has_path_connecting;
 use petgraph::algo::toposort;
 use petgraph::graph::DiGraph;
 use petgraph::graph::NodeIndex;
+use petgraph::visit::Visitable;
 use wdl_ast::AstNode;
 use wdl_ast::AstNodeExt;
 use wdl_ast::AstToken;
@@ -26,6 +30,65 @@ use wdl_ast::v1::TaskItem;
 use wdl_ast::version::V1;
 
 use crate::scope::TASK_VAR_NAME;
+
+/// Represents context of a declaration in a task.
+enum TaskDeclContext {
+    /// The name was introduced by an task input.
+    Input(Span),
+    /// The name was introduced by an task output.
+    Output(Span),
+    /// The name was introduced by a private declaration.
+    Decl(Span),
+}
+
+impl TaskDeclContext {
+    /// Gets the span of the name.
+    pub fn span(&self) -> Span {
+        match self {
+            Self::Input(s) => *s,
+            Self::Output(s) => *s,
+            Self::Decl(s) => *s,
+        }
+    }
+}
+
+impl fmt::Display for TaskDeclContext {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Input(_) => write!(f, "input"),
+            Self::Output(_) => write!(f, "output"),
+            Self::Decl(_) => write!(f, "declaration"),
+        }
+    }
+}
+
+impl From<TaskGraphNode> for TaskDeclContext {
+    fn from(value: TaskGraphNode) -> Self {
+        match value {
+            TaskGraphNode::Input(decl) => Self::Input(decl.name().span()),
+            TaskGraphNode::Decl(decl) => Self::Decl(decl.name().span()),
+            TaskGraphNode::Output(decl) => Self::Output(decl.name().span()),
+            _ => unreachable!("expected a declaration node"),
+        }
+    }
+}
+
+/// Creates a "task decl conflict" diagnostic
+fn task_decl_conflict(
+    name: &str,
+    conflicting: TaskDeclContext,
+    first: TaskDeclContext,
+) -> Diagnostic {
+    Diagnostic::error(format!("conflicting {conflicting} name `{name}`"))
+        .with_label(
+            format!("this {conflicting} conflicts with a previously used name"),
+            conflicting.span(),
+        )
+        .with_label(
+            format!("the {first} with the conflicting name is here"),
+            first.span(),
+        )
+}
 
 /// Creates an "unknown name" diagnostic.
 fn unknown_name(name: &str, span: Span) -> Diagnostic {
@@ -106,6 +169,7 @@ impl TaskGraph {
         diagnostics: &mut Vec<Diagnostic>,
     ) -> Self {
         // Populate the declaration types and build a name reference graph
+        let mut space = Default::default();
         let mut saw_inputs = false;
         let mut outputs = None;
         let mut graph = Self::default();
@@ -114,14 +178,18 @@ impl TaskGraph {
                 TaskItem::Input(section) if !saw_inputs => {
                     saw_inputs = true;
                     for decl in section.declarations() {
-                        graph.add_decl_node(decl, TaskGraphNode::Input);
+                        graph.add_decl_node(decl.name(), TaskGraphNode::Input(decl), diagnostics);
                     }
                 }
                 TaskItem::Output(section) if outputs.is_none() => {
                     outputs = Some(section);
                 }
                 TaskItem::Declaration(decl) => {
-                    graph.add_decl_node(Decl::Bound(decl), TaskGraphNode::Decl);
+                    graph.add_decl_node(
+                        decl.name(),
+                        TaskGraphNode::Decl(Decl::Bound(decl)),
+                        diagnostics,
+                    );
                 }
                 TaskItem::Command(section) if graph.command.is_none() => {
                     graph.command = Some(graph.inner.add_node(TaskGraphNode::Command(section)));
@@ -149,12 +217,16 @@ impl TaskGraph {
         }
 
         // Add name reference edges before adding the outputs
-        graph.add_reference_edges(version, None, diagnostics);
+        graph.add_reference_edges(version, None, &mut space, diagnostics);
 
         let count = graph.inner.node_count();
         if let Some(section) = outputs {
             for decl in section.declarations() {
-                if let Some(index) = graph.add_decl_node(Decl::Bound(decl), TaskGraphNode::Output) {
+                if let Some(index) = graph.add_decl_node(
+                    decl.name(),
+                    TaskGraphNode::Output(Decl::Bound(decl)),
+                    diagnostics,
+                ) {
                     // Add an edge to the command node as all outputs depend on the command
                     if let Some(command) = graph.command {
                         graph.inner.update_edge(command, index, ());
@@ -164,7 +236,7 @@ impl TaskGraph {
         }
 
         // Add reference edges again, but only for the output declaration nodes
-        graph.add_reference_edges(version, Some(count), diagnostics);
+        graph.add_reference_edges(version, Some(count), &mut space, diagnostics);
 
         // Finally, add edges from the command to runtime/requirements/hints
         if let Some(command) = graph.command {
@@ -194,18 +266,23 @@ impl TaskGraph {
     }
 
     /// Adds a declaration node to the graph.
-    fn add_decl_node<F>(&mut self, decl: Decl, map: F) -> Option<NodeIndex>
-    where
-        F: FnOnce(Decl) -> TaskGraphNode,
-    {
-        let name = decl.name();
-
-        // Ignore duplicate nodes
-        if self.names.contains_key(name.as_str()) {
+    fn add_decl_node(
+        &mut self,
+        name: Ident,
+        node: TaskGraphNode,
+        diagnostics: &mut Vec<Diagnostic>,
+    ) -> Option<NodeIndex> {
+        // Check for conflicting nodes
+        if let Some(existing) = self.names.get(name.as_str()) {
+            diagnostics.push(task_decl_conflict(
+                name.as_str(),
+                node.into(),
+                self.inner[*existing].clone().into(),
+            ));
             return None;
         }
 
-        let index = self.inner.add_node(map(decl));
+        let index = self.inner.add_node(node);
         self.names.insert(TokenStrHash::new(name), index);
         Some(index)
     }
@@ -237,19 +314,21 @@ impl TaskGraph {
         &mut self,
         version: SupportedVersion,
         skip: Option<usize>,
+        space: &mut DfsSpace<NodeIndex, <DiGraph<TaskGraphNode, ()> as Visitable>::Map>,
         diagnostics: &mut Vec<Diagnostic>,
     ) {
         // Populate edges for any nodes that reference other nodes by name
         for from in self.inner.node_indices().skip(skip.unwrap_or(0)) {
             match self.inner[from].clone() {
                 TaskGraphNode::Input(decl) | TaskGraphNode::Decl(decl) => {
-                    self.add_decl_edges(from, decl, false, diagnostics);
+                    self.add_decl_edges(from, decl, false, space, diagnostics);
                 }
                 TaskGraphNode::Output(decl) => {
                     self.add_decl_edges(
                         from,
                         decl,
                         version >= SupportedVersion::V1(V1::Two),
+                        space,
                         diagnostics,
                     );
                 }
@@ -313,10 +392,9 @@ impl TaskGraph {
         from: NodeIndex,
         decl: Decl,
         allow_task_var: bool,
+        space: &mut DfsSpace<NodeIndex, <DiGraph<TaskGraphNode, ()> as Visitable>::Map>,
         diagnostics: &mut Vec<Diagnostic>,
     ) {
-        let mut space = Default::default();
-
         let span = decl.name().span();
         let expr = decl.expr();
         if let Some(expr) = expr {
@@ -332,7 +410,7 @@ impl TaskGraph {
                     }
 
                     // Check for a dependency cycle
-                    if has_path_connecting(&self.inner, from, *to, Some(&mut space)) {
+                    if has_path_connecting(&self.inner, from, *to, Some(space)) {
                         diagnostics.push(reference_cycle(
                             self.names
                                 .get_index(from.index())

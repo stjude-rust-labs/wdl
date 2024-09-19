@@ -1,8 +1,8 @@
 use std::borrow::Cow;
 use std::fs;
-use std::io::stderr;
 use std::io::IsTerminal;
 use std::io::Read;
+use std::io::stderr;
 use std::path::Path;
 use std::path::PathBuf;
 

@@ -1,5 +1,6 @@
 //! Representation of scopes for for WDL documents.
 
+use std::collections::HashMap;
 use std::fmt;
 use std::sync::Arc;
 
@@ -9,10 +10,12 @@ use url::Url;
 use wdl_ast::Ast;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
+use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
 use wdl_ast::ToSpan;
+use wdl_ast::TokenStrHash;
 use wdl_ast::WorkflowDescriptionLanguage;
 use wdl_ast::support::token;
 
@@ -230,15 +233,13 @@ pub struct Name {
     /// The context of the name.
     context: NameContext,
     /// The type of the name.
-    ///
-    /// This is initially `None` until a type check occurs.
-    ty: Option<Type>,
+    ty: Type,
 }
 
 impl Name {
     /// Constructs a new name with the given context.
-    fn new(context: NameContext) -> Self {
-        Self { context, ty: None }
+    fn new(context: NameContext, ty: Type) -> Self {
+        Self { context, ty }
     }
 
     /// Gets the context of the name.
@@ -248,9 +249,8 @@ impl Name {
 
     /// Gets the type of the name.
     ///
-    /// Returns `None` if the type could not be determined; for example, if the
-    /// name's declared type is to an unknown struct.
-    pub fn ty(&self) -> Option<Type> {
+    /// A value of `Type::Union` indicates a reference to an unknown type name.
+    pub fn ty(&self) -> Type {
         self.ty
     }
 }
@@ -289,19 +289,6 @@ impl Scope {
     }
 }
 
-/// Represents information about a scope for task outputs.
-///
-/// This is used in evaluation of a task `hints` section.
-#[derive(Debug, Clone, Copy)]
-enum TaskOutputScope {
-    /// A task `output` section was not present.
-    NotPresent,
-    /// A task `output` section was present.
-    ///
-    /// Stores the scope index for the outputs.
-    Present(ScopeIndex),
-}
-
 /// Represents a reference to a scope.
 #[derive(Debug, Clone, Copy)]
 pub struct ScopeRef<'a> {
@@ -309,17 +296,14 @@ pub struct ScopeRef<'a> {
     scopes: &'a [Scope],
     /// The index of the scope.
     scope: ScopeIndex,
-    /// The index to the scope that might contain input declarations.
-    ///
-    /// Unlike outputs, inputs don't have a dedicated scope; instead, they are
-    /// accessible from the root scope of a task.
+    /// The input type map.
     ///
     /// This is `None` when `input` hidden types are not supported.
-    inputs: Option<ScopeIndex>,
-    /// The task output scope that's accessible from this scope.
+    inputs: Option<&'a HashMap<TokenStrHash<Ident>, Type>>,
+    /// The output type map.
     ///
     /// This is `None` when `output` hidden types are not supported.
-    outputs: Option<TaskOutputScope>,
+    outputs: Option<&'a HashMap<TokenStrHash<Ident>, Type>>,
     /// Whether or not `hints` hidden types are supported in this scope.
     ///
     /// This is `true` only when evaluating the `hints` section in a task.
@@ -394,7 +378,7 @@ impl<'a> ScopeRef<'a> {
         None
     }
 
-    /// Gets an input for the given name.
+    /// Gets the type of an input for the given name.
     ///
     /// Returns `Err(())` if input hidden types are not supported by this scope.
     ///
@@ -403,18 +387,14 @@ impl<'a> ScopeRef<'a> {
     ///
     /// Returns `Ok(Some)` if input hidden types are supported and the name is
     /// known.
-    pub(crate) fn input(&self, name: &str) -> Result<Option<Name>, ()> {
+    pub(crate) fn input_type(&self, name: &str) -> Result<Option<Type>, ()> {
         match self.inputs {
-            Some(scope) => Ok(self.scopes[scope.0]
-                .names
-                .get(name)
-                .copied()
-                .filter(|n| matches!(n.context, NameContext::Input(_)))),
+            Some(map) => Ok(map.get(name).copied()),
             None => Err(()),
         }
     }
 
-    /// Gets an output for the given name.
+    /// Gets the type of an output for the given name.
     ///
     /// Returns `Err(())` if output hidden types are not supported by this
     /// scope.
@@ -424,14 +404,9 @@ impl<'a> ScopeRef<'a> {
     ///
     /// Returns `Ok(Some)` if output hidden types are supported and the name is
     /// known.
-    pub(crate) fn output(&self, name: &str) -> Result<Option<Name>, ()> {
+    pub(crate) fn output_type(&self, name: &str) -> Result<Option<Type>, ()> {
         match self.outputs {
-            Some(TaskOutputScope::NotPresent) => Ok(None),
-            Some(TaskOutputScope::Present(scope)) => Ok(self.scopes[scope.0]
-                .names
-                .get(name)
-                .copied()
-                .filter(|n| matches!(n.context, NameContext::Output(_)))),
+            Some(map) => Ok(map.get(name).copied()),
             None => Err(()),
         }
     }
@@ -462,23 +437,6 @@ struct ScopeRefMut<'a> {
 }
 
 impl<'a> ScopeRefMut<'a> {
-    /// Lookups a name in the scope.
-    ///
-    /// Returns `None` if the name is not available in the scope.
-    pub fn lookup(&self, name: &str) -> Option<Name> {
-        let mut scope = Some(self.scope);
-
-        while let Some(index) = scope {
-            if let Some(name) = self.scopes[index.0].names.get(name).copied() {
-                return Some(name);
-            }
-
-            scope = self.scopes[index.0].parent;
-        }
-
-        None
-    }
-
     /// Inserts a name into the scope.
     pub fn insert(&mut self, key: String, name: Name) {
         self.scopes[self.scope.0].names.insert(key, name);
@@ -497,10 +455,6 @@ struct Task {
     name_span: Span,
     /// The root scope index for the task.
     scope: ScopeIndex,
-    /// The scope index for the outputs.
-    outputs: Option<ScopeIndex>,
-    /// The scope index for the command.
-    command: Option<ScopeIndex>,
 }
 
 /// Represents a workflow in a document.

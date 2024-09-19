@@ -690,7 +690,7 @@ where
     pub fn evaluate_expr(&mut self, scope: &ScopeRef<'_>, expr: &Expr) -> Option<Type> {
         match expr {
             Expr::Literal(expr) => self.evaluate_literal_expr(scope, expr),
-            Expr::Name(r) => scope.lookup(r.name().as_str()).and_then(|n| n.ty()),
+            Expr::Name(r) => scope.lookup(r.name().as_str()).map(|n| n.ty()),
             Expr::Parenthesized(expr) => self.evaluate_expr(scope, &expr.inner()),
             Expr::If(expr) => self.evaluate_if_expr(scope, expr),
             Expr::LogicalNot(expr) => self.evaluate_logical_not_expr(scope, expr),
@@ -1461,14 +1461,11 @@ where
                 span = Some(name.span());
 
                 match if input {
-                    scope.input(name.as_str()).unwrap()
+                    scope.input_type(name.as_str()).unwrap()
                 } else {
-                    scope.output(name.as_str()).unwrap()
+                    scope.output_type(name.as_str()).unwrap()
                 } {
-                    Some(n) => match n.ty() {
-                        Some(ty) => ty,
-                        None => break,
-                    },
+                    Some(ty) => ty,
                     None => {
                         self.diagnostics.push(not_io_name(&name, input));
                         break;
