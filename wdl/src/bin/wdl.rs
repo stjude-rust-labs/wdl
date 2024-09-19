@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 use std::fs;
+use std::io::stderr;
 use std::io::IsTerminal;
 use std::io::Read;
 use std::path::Path;
@@ -10,6 +11,8 @@ use anyhow::Result;
 use anyhow::bail;
 use clap::Args;
 use clap::Parser;
+use clap::Subcommand;
+use clap_verbosity_flag::Verbosity;
 use codespan_reporting::files::SimpleFile;
 use codespan_reporting::term::Config;
 use codespan_reporting::term::emit;
@@ -18,6 +21,7 @@ use codespan_reporting::term::termcolor::StandardStream;
 use colored::Colorize;
 use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
+use tracing_log::AsTrace;
 use wdl::ast::Diagnostic;
 use wdl::ast::Document;
 use wdl::ast::SyntaxNode;
@@ -247,7 +251,16 @@ impl AnalyzeCommand {
     propagate_version = true,
     arg_required_else_help = true
 )]
-enum App {
+struct App {
+    #[command(subcommand)]
+    command: Command,
+
+    #[command(flatten)]
+    verbose: Verbosity,
+}
+
+#[derive(Subcommand)]
+enum Command {
     Parse(ParseCommand),
     Check(CheckCommand),
     Lint(LintCommand),
@@ -256,13 +269,20 @@ enum App {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    tracing_subscriber::fmt().with_target(false).init();
+    let app = App::parse();
 
-    if let Err(e) = match App::parse() {
-        App::Parse(cmd) => cmd.exec().await,
-        App::Check(cmd) => cmd.exec().await,
-        App::Lint(cmd) => cmd.exec().await,
-        App::Analyze(cmd) => cmd.exec().await,
+    let subscriber = tracing_subscriber::fmt::Subscriber::builder()
+        .with_max_level(app.verbose.log_level_filter().as_trace())
+        .with_writer(std::io::stderr)
+        .with_ansi(stderr().is_terminal())
+        .finish();
+    tracing::subscriber::set_global_default(subscriber)?;
+
+    if let Err(e) = match app.command {
+        Command::Parse(cmd) => cmd.exec().await,
+        Command::Check(cmd) => cmd.exec().await,
+        Command::Lint(cmd) => cmd.exec().await,
+        Command::Analyze(cmd) => cmd.exec().await,
     } {
         eprintln!(
             "{error}: {e:?}",
