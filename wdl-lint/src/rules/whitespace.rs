@@ -34,7 +34,7 @@ fn trailing_whitespace(span: Span) -> Diagnostic {
     Diagnostic::warning("line contains trailing whitespace")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("remove the trailing whitespace from this line")
+        .with_fix("remove this trailing whitespace")
 }
 
 /// Creates a "more than one blank line" diagnostic.

@@ -31,7 +31,7 @@ warning[Whitespace]: line contains trailing whitespace
 13 │ workflow test {    
    │                ^^^^
    │
-   = fix: remove the trailing whitespace from this line
+   = fix: remove this trailing whitespace
 
 warning[Whitespace]: line contains only whitespace
    ┌─ tests/lints/only-whitespace/source.wdl:14:1
@@ -47,7 +47,7 @@ warning[Whitespace]: line contains trailing whitespace
 18 │     String x = ""           
    │                  ^^^^^^^^^^^
    │
-   = fix: remove the trailing whitespace from this line
+   = fix: remove this trailing whitespace
 
 warning[Whitespace]: line contains only whitespace
    ┌─ tests/lints/only-whitespace/source.wdl:20:1
