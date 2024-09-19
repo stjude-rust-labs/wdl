@@ -32,6 +32,11 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "ww-fastq-to-cram.wdl:133:1: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L133"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "ww-fastq-to-cram.wdl:134:6: note[MissingMetas]: task `ValidateCram` is missing a `meta` section"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L134"
 
@@ -167,6 +172,11 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "ww-fastq-to-cram.wdl:34:46: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L34"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "ww-fastq-to-cram.wdl:35:112: note[CallInputSpacing]: call input not properly spaced"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L35"
 
@@ -288,6 +298,11 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "ww-fastq-to-cram.wdl:8:24: note[CommentWhitespace]: in-line comments should be preceded by two spaces"
+permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L8"
+
+[[diagnostics]]
+document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
+message = "ww-fastq-to-cram.wdl:8:24: warning[Whitespace]: line contains trailing whitespace"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L8"
 
 [[diagnostics]]
@@ -622,6 +637,11 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
+message = "ww-star-deseq2.wdl:53:5: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697c3f707f073177ddde7013/ww-star-deseq2.wdl/#L53"
+
+[[diagnostics]]
+document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
 message = "ww-star-deseq2.wdl:55:3: note[CommentWhitespace]: comment not sufficiently indented"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697c3f707f073177ddde7013/ww-star-deseq2.wdl/#L55"
 
@@ -852,6 +872,11 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+message = "ww-vc-trio.wdl:16:1: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L16"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:170:28: note[CallInputSpacing]: call input not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L170"
 
@@ -958,6 +983,11 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:236:5: note[CommentWhitespace]: in-line comments should be preceded by two spaces"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L236"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+message = "ww-vc-trio.wdl:236:5: warning[Whitespace]: line contains trailing whitespace"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L236"
 
 [[diagnostics]]
@@ -1634,6 +1664,11 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:733:10: note[DisallowedOutputName]: declaration identifier starts with 'output'"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L733"
+
+[[diagnostics]]
+document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
+message = "ww-vc-trio.wdl:744:1: warning[Whitespace]: line contains trailing whitespace"
+permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L744"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
