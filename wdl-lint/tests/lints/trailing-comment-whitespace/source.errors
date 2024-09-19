@@ -1,24 +1,32 @@
 warning[Whitespace]: line contains trailing whitespace
-  ┌─ tests/lints/trailing-comment-whitespace/source.wdl:1:1
+  ┌─ tests/lints/trailing-comment-whitespace/source.wdl:1:57
   │
 1 │ #@ except: BlankLinesBetweenElements, DescriptionMissing 
-  │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │                                                         ^
   │
   = fix: remove the trailing whitespace from this line
 
 warning[Whitespace]: line contains trailing whitespace
-  ┌─ tests/lints/trailing-comment-whitespace/source.wdl:2:1
+  ┌─ tests/lints/trailing-comment-whitespace/source.wdl:2:55
   │
 2 │ ## This is a preamble comment with whitespace trailing 
-  │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │                                                       ^
   │
   = fix: remove the trailing whitespace from this line
 
 warning[Whitespace]: line contains trailing whitespace
-  ┌─ tests/lints/trailing-comment-whitespace/source.wdl:6:1
+  ┌─ tests/lints/trailing-comment-whitespace/source.wdl:6:54
   │
 6 │ # This is a workflow comment with trailing whitespace 
-  │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │                                                      ^
+  │
+  = fix: remove the trailing whitespace from this line
+
+warning[Whitespace]: line contains trailing whitespace
+  ┌─ tests/lints/trailing-comment-whitespace/source.wdl:7:65
+  │
+7 │ # This is a workflow comment with a bunch of trailing whitespace                 
+  │                                                                 ^^^^^^^^^^^^^^^^^
   │
   = fix: remove the trailing whitespace from this line
 
