@@ -27,6 +27,7 @@ const SORTED_CRATES_TO_PUBLISH: &[&str] = &[
     "wdl",
 ];
 
+#[derive(Debug, Clone)]
 struct Crate {
     manifest: DocumentMut,
     path: PathBuf,
@@ -81,19 +82,29 @@ fn main() {
             patch,
             crates_to_bump,
         }) => {
-            let crates_to_bump = if crates_to_bump.is_empty() {
-                all_crates.iter().map(|krate| krate.name.clone()).collect()
+            let crates_to_bump: Vec<&Crate> = if !crates_to_bump.is_empty() {
+                all_crates
+                    .iter()
+                    .skip_while(|krate| !crates_to_bump.contains(&krate.name))
+                    .collect()
             } else {
-                crates_to_bump
+                all_crates.iter().collect()
             };
-            let crates_to_bump = crates_to_bump
-                .iter()
-                .filter_map(|name| all_crates.iter().find(|krate| krate.name == *name))
-                .collect::<Vec<_>>();
+            if crates_to_bump.is_empty() {
+                println!("no crates found to bump");
+                return;
+            }
             for krate in crates_to_bump {
                 bump_version(krate, &all_crates, patch);
             }
             // update the lock file
+            assert!(
+                Command::new("cargo")
+                    .arg("update")
+                    .status()
+                    .unwrap()
+                    .success()
+            );
             assert!(
                 Command::new("cargo")
                     .arg("fetch")
