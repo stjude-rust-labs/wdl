@@ -14,7 +14,6 @@ use std::thread;
 use std::time::Duration;
 
 use clap::Parser;
-use toml;
 
 // note that this list must be topologically sorted by dependencies
 const SORTED_CRATES_TO_PUBLISH: &[&str] = &[
@@ -25,12 +24,6 @@ const SORTED_CRATES_TO_PUBLISH: &[&str] = &[
     "wdl-lsp",
     "wdl",
 ];
-
-// Anything **not** mentioned in this array is required to have an `=a.b.c`
-// dependency requirement on it to enable breaking api changes even in "patch"
-// releases since everything not mentioned here is just an organizational detail
-// that no one else should rely on.
-const PUBLIC_CRATES: &[&str] = &["cargo-component-core", "wit", "cargo-component"];
 
 struct Crate {
     manifest: cargo_toml::Manifest,
@@ -129,8 +122,9 @@ fn main() {
 
 fn find_crates(dir: &Path, dst: &mut Vec<Crate>) {
     if dir.join("Cargo.toml").exists() {
-        let krate = read_crate(&dir.join("Cargo.toml"));
-        dst.push(krate);
+        if let Some(krate) = read_crate(&dir.join("Cargo.toml")) {
+            dst.push(krate);
+        }
     }
 
     for entry in dir.read_dir().unwrap() {
@@ -141,35 +135,26 @@ fn find_crates(dir: &Path, dst: &mut Vec<Crate>) {
     }
 }
 
-fn read_crate(manifest_path: &Path) -> Crate {
+fn read_crate(manifest_path: &Path) -> Option<Crate> {
     let manifest =
         cargo_toml::Manifest::from_path(manifest_path).expect("failed to parse manifest");
-    let name = manifest
-        .package
-        .as_ref()
-        .map(|p| p.name.clone())
-        .expect("missing package name");
-    let version = manifest
-        .package
-        .as_ref()
-        .map(|p| p.version())
-        .expect("missing package version")
-        .to_string();
-    let publish = manifest
-        .package
-        .as_ref()
-        .map(|p| match p.publish() {
-            cargo_toml::Publish::Flag(b) => b.to_owned(),
-            _ => true,
-        })
-        .unwrap_or(true);
-    Crate {
+    let package = match manifest.package {
+        Some(ref p) => p,
+        None => return None, // workspace manifests don't have a package section
+    };
+    let name = package.name().to_string();
+    let version = package.version().to_string();
+    let publish = match package.publish() {
+        cargo_toml::Publish::Flag(b) => b.to_owned(),
+        _ => true,
+    };
+    Some(Crate {
         manifest,
         path: manifest_path.to_path_buf(),
         name,
         version,
         publish,
-    }
+    })
 }
 
 fn bump_version(krate: &Crate, crates: &[Crate], patch: bool) {
@@ -182,77 +167,19 @@ fn bump_version(krate: &Crate, crates: &[Crate], patch: bool) {
     };
 
     let mut new_manifest = krate.manifest.clone();
-    new_manifest.package.as_mut().expect("shuold be a package").version = cargo_toml::Inheritable::Set(next_version(krate));
-    // for line in contents.lines() {
-    //     let mut rewritten = false;
-    //     if !is_deps
-    //         && line.starts_with("version =")
-    //         && SORTED_CRATES_TO_PUBLISH.contains(&&krate.name[..])
-    //     {
-    //         println!(
-    //             "bump `{}` {} => {}",
-    //             krate.name,
-    //             krate.version,
-    //             next_version(krate),
-    //         );
-    //         new_manifest.push_str(&line.replace(&krate.version, &next_version(krate)));
-    //         rewritten = true;
-    //     }
+    new_manifest
+        .package
+        .as_mut()
+        .expect("should be a package")
+        .version = cargo_toml::Inheritable::Set(next_version(krate));
 
-    //     is_deps = if line.starts_with("[") {
-    //         line.contains("dependencies")
-    //     } else {
-    //         is_deps
-    //     };
+    // TODO: update dependencies
 
-    //     for other in crates {
-    //         // If `other` isn't a published crate then it's not going to get a
-    //         // bumped version so we don't need to update anything in the
-    //         // manifest.
-    //         if !other.publish {
-    //             continue;
-    //         }
-    //         if !is_deps || !line.starts_with(&format!("{} ", other.name)) {
-    //             continue;
-    //         }
-    //         if !line.contains(&other.version) {
-    //             if !line.contains("version =") || !krate.publish {
-    //                 continue;
-    //             }
-    //             panic!(
-    //                 "{:?} has a dep on {} but doesn't list version {}",
-    //                 krate.manifest, other.name, other.version
-    //             );
-    //         }
-    //         if krate.publish {
-    //             if PUBLIC_CRATES.contains(&other.name.as_str()) {
-    //                 assert!(
-    //                     !line.contains("\"="),
-    //                     "{} should not have an exact version requirement on {}",
-    //                     krate.name,
-    //                     other.name
-    //                 );
-    //             } else {
-    //                 assert!(
-    //                     line.contains("\"="),
-    //                     "{} should have an exact version requirement on {}",
-    //                     krate.name,
-    //                     other.name
-    //                 );
-    //             }
-    //         }
-    //         rewritten = true;
-    //         new_manifest.push_str(&line.replace(&other.version, &next_version(other)));
-    //         break;
-    //     }
-    //     if !rewritten {
-    //         new_manifest.push_str(line);
-    //     }
-    //     new_manifest.push('\n');
-    // }
-    // fs::write(&krate.path, new_manifest).unwrap();
-    fs::write(&krate.path, toml::to_string(&new_manifest).expect("failed to serialize new manifest"))
-        .expect("failed to write new manifest");
+    fs::write(
+        &krate.path,
+        toml::to_string(&new_manifest).expect("failed to serialize new manifest"),
+    )
+    .expect("failed to write new manifest");
 }
 
 /// Performs a major version bump increment on the semver version `version`.
