@@ -5,7 +5,6 @@
 //! * `./publish publish` - actually publish crates to crates.io
 
 use std::collections::HashMap;
-use std::env;
 use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
@@ -14,9 +13,18 @@ use std::process::Stdio;
 use std::thread;
 use std::time::Duration;
 
+use clap::Parser;
+use toml;
 
 // note that this list must be topologically sorted by dependencies
-const CRATES_TO_PUBLISH: &[&str] = &["cargo-component-core", "wit", "cargo-component"];
+const SORTED_CRATES_TO_PUBLISH: &[&str] = &[
+    "wdl-grammar",
+    "wdl-ast",
+    "wdl-lint",
+    "wdl-analysis",
+    "wdl-lsp",
+    "wdl",
+];
 
 // Anything **not** mentioned in this array is required to have an `=a.b.c`
 // dependency requirement on it to enable breaking api changes even in "patch"
@@ -24,37 +32,55 @@ const CRATES_TO_PUBLISH: &[&str] = &["cargo-component-core", "wit", "cargo-compo
 // that no one else should rely on.
 const PUBLIC_CRATES: &[&str] = &["cargo-component-core", "wit", "cargo-component"];
 
-struct Workspace {
-    version: String,
-}
-
 struct Crate {
-    manifest: PathBuf,
+    manifest: cargo_toml::Manifest,
+    path: PathBuf,
     name: String,
     version: String,
     publish: bool,
 }
 
+#[derive(Parser)]
+struct Opts {
+    #[clap(subcommand)]
+    subcmd: SubCommand,
+}
+
+#[derive(Parser)]
+enum SubCommand {
+    Bump(Bump),
+    Publish(Publish),
+    Verify(Verify),
+}
+
+#[derive(Parser)]
+struct Bump {
+    #[clap(short, long)]
+    patch: bool,
+}
+
+#[derive(Parser)]
+struct Publish {}
+
+#[derive(Parser)]
+struct Verify {}
+
 fn main() {
     let mut crates = Vec::new();
-    let root = read_crate(None, "./Cargo.toml".as_ref());
-    let ws = Workspace {
-        version: root.version.clone(),
-    };
-    crates.push(root);
-    find_crates("crates".as_ref(), &ws, &mut crates);
+    find_crates(".".as_ref(), &mut crates);
 
-    let pos = CRATES_TO_PUBLISH
+    let publish_order = SORTED_CRATES_TO_PUBLISH
         .iter()
         .enumerate()
         .map(|(i, c)| (*c, i))
         .collect::<HashMap<_, _>>();
-    crates.sort_by_key(|krate| pos.get(&krate.name[..]));
+    crates.sort_by_key(|krate| publish_order.get(&krate.name[..]));
 
-    match &env::args().nth(1).expect("must have one argument")[..] {
-        name @ "bump" | name @ "bump-patch" => {
+    let opts = Opts::parse();
+    match opts.subcmd {
+        SubCommand::Bump(Bump { patch }) => {
             for krate in crates.iter() {
-                bump_version(krate, &crates, name == "bump-patch");
+                bump_version(krate, &crates, patch);
             }
             // update the lock file
             assert!(
@@ -65,8 +91,7 @@ fn main() {
                     .success()
             );
         }
-
-        "publish" => {
+        SubCommand::Publish(_) => {
             // We have so many crates to publish we're frequently either
             // rate-limited or we run into issues where crates can't publish
             // successfully because they're waiting on the index entries of
@@ -94,74 +119,53 @@ fn main() {
             println!("===================================================================");
             println!();
             println!("Don't forget to push a git tag for this release!");
-            println!();
-            println!("    $ git tag vX.Y.Z");
             println!("    $ git push git@github.com:bytecodealliance/cargo-component.git vX.Y.Z");
         }
-
-        "verify" => {
+        SubCommand::Verify(_) => {
             verify(&crates);
         }
-
-        s => panic!("unknown command: {}", s),
     }
 }
 
-fn find_crates(dir: &Path, ws: &Workspace, dst: &mut Vec<Crate>) {
+fn find_crates(dir: &Path, dst: &mut Vec<Crate>) {
     if dir.join("Cargo.toml").exists() {
-        let krate = read_crate(Some(ws), &dir.join("Cargo.toml"));
-        if !krate.publish || CRATES_TO_PUBLISH.iter().any(|c| krate.name == *c) {
-            dst.push(krate);
-        } else {
-            panic!("failed to find {:?} in whitelist or blacklist", krate.name);
-        }
+        let krate = read_crate(&dir.join("Cargo.toml"));
+        dst.push(krate);
     }
 
     for entry in dir.read_dir().unwrap() {
         let entry = entry.unwrap();
         if entry.file_type().unwrap().is_dir() {
-            find_crates(&entry.path(), ws, dst);
+            find_crates(&entry.path(), dst);
         }
     }
 }
 
-fn read_crate(ws: Option<&Workspace>, manifest: &Path) -> Crate {
-    let mut name = None;
-    let mut version = None;
-    let mut publish = true;
-    for line in fs::read_to_string(manifest).unwrap().lines() {
-        if name.is_none() && line.starts_with("name = \"") {
-            name = Some(
-                line.replace("name = \"", "")
-                    .replace("\"", "")
-                    .trim()
-                    .to_string(),
-            );
-        }
-        if version.is_none() && line.starts_with("version = \"") {
-            version = Some(
-                line.replace("version = \"", "")
-                    .replace("\"", "")
-                    .trim()
-                    .to_string(),
-            );
-        }
-        if let Some(ws) = ws {
-            if version.is_none()
-                && (line.starts_with("version.workspace = true")
-                    || line.starts_with("version = { workspace = true }"))
-            {
-                version = Some(ws.version.clone());
-            }
-        }
-        if line.starts_with("publish = false") {
-            publish = false;
-        }
-    }
-    let name = name.unwrap();
-    let version = version.unwrap();
+fn read_crate(manifest_path: &Path) -> Crate {
+    let manifest =
+        cargo_toml::Manifest::from_path(manifest_path).expect("failed to parse manifest");
+    let name = manifest
+        .package
+        .as_ref()
+        .map(|p| p.name.clone())
+        .expect("missing package name");
+    let version = manifest
+        .package
+        .as_ref()
+        .map(|p| p.version())
+        .expect("missing package version")
+        .to_string();
+    let publish = manifest
+        .package
+        .as_ref()
+        .map(|p| match p.publish() {
+            cargo_toml::Publish::Flag(b) => b.to_owned(),
+            _ => true,
+        })
+        .unwrap_or(true);
     Crate {
-        manifest: manifest.to_path_buf(),
+        manifest,
+        path: manifest_path.to_path_buf(),
         name,
         version,
         publish,
@@ -169,82 +173,86 @@ fn read_crate(ws: Option<&Workspace>, manifest: &Path) -> Crate {
 }
 
 fn bump_version(krate: &Crate, crates: &[Crate], patch: bool) {
-    let contents = fs::read_to_string(&krate.manifest).unwrap();
     let next_version = |krate: &Crate| -> String {
-        if CRATES_TO_PUBLISH.contains(&&krate.name[..]) {
+        if SORTED_CRATES_TO_PUBLISH.contains(&&krate.name[..]) {
             bump(&krate.version, patch)
         } else {
             krate.version.clone()
         }
     };
 
-    let mut new_manifest = String::new();
-    let mut is_deps = false;
-    for line in contents.lines() {
-        let mut rewritten = false;
-        if !is_deps && line.starts_with("version =") && CRATES_TO_PUBLISH.contains(&&krate.name[..]) {
-            println!(
-                "bump `{}` {} => {}",
-                krate.name,
-                krate.version,
-                next_version(krate),
-            );
-            new_manifest.push_str(&line.replace(&krate.version, &next_version(krate)));
-            rewritten = true;
-        }
+    let mut new_manifest = krate.manifest.clone();
+    new_manifest.package.as_mut().expect("shuold be a package").version = cargo_toml::Inheritable::Set(next_version(krate));
+    // for line in contents.lines() {
+    //     let mut rewritten = false;
+    //     if !is_deps
+    //         && line.starts_with("version =")
+    //         && SORTED_CRATES_TO_PUBLISH.contains(&&krate.name[..])
+    //     {
+    //         println!(
+    //             "bump `{}` {} => {}",
+    //             krate.name,
+    //             krate.version,
+    //             next_version(krate),
+    //         );
+    //         new_manifest.push_str(&line.replace(&krate.version, &next_version(krate)));
+    //         rewritten = true;
+    //     }
 
-        is_deps = if line.starts_with("[") {
-            line.contains("dependencies")
-        } else {
-            is_deps
-        };
+    //     is_deps = if line.starts_with("[") {
+    //         line.contains("dependencies")
+    //     } else {
+    //         is_deps
+    //     };
 
-        for other in crates {
-            // If `other` isn't a published crate then it's not going to get a
-            // bumped version so we don't need to update anything in the
-            // manifest.
-            if !other.publish {
-                continue;
-            }
-            if !is_deps || !line.starts_with(&format!("{} ", other.name)) {
-                continue;
-            }
-            if !line.contains(&other.version) {
-                if !line.contains("version =") || !krate.publish {
-                    continue;
-                }
-                panic!(
-                    "{:?} has a dep on {} but doesn't list version {}",
-                    krate.manifest, other.name, other.version
-                );
-            }
-            if krate.publish {
-                if PUBLIC_CRATES.contains(&other.name.as_str()) {
-                    assert!(
-                        !line.contains("\"="),
-                        "{} should not have an exact version requirement on {}",
-                        krate.name,
-                        other.name
-                    );
-                } else {
-                    assert!(
-                        line.contains("\"="),
-                        "{} should have an exact version requirement on {}",
-                        krate.name,
-                        other.name
-                    );
-                }
-            }
-            rewritten = true;
-            new_manifest.push_str(&line.replace(&other.version, &next_version(other)));
-            break;
-        }
-        if !rewritten {
-            new_manifest.push_str(line);
-        }
-        new_manifest.push('\n');
-    }
-    fs::write(&krate.manifest, new_manifest).unwrap();
+    //     for other in crates {
+    //         // If `other` isn't a published crate then it's not going to get a
+    //         // bumped version so we don't need to update anything in the
+    //         // manifest.
+    //         if !other.publish {
+    //             continue;
+    //         }
+    //         if !is_deps || !line.starts_with(&format!("{} ", other.name)) {
+    //             continue;
+    //         }
+    //         if !line.contains(&other.version) {
+    //             if !line.contains("version =") || !krate.publish {
+    //                 continue;
+    //             }
+    //             panic!(
+    //                 "{:?} has a dep on {} but doesn't list version {}",
+    //                 krate.manifest, other.name, other.version
+    //             );
+    //         }
+    //         if krate.publish {
+    //             if PUBLIC_CRATES.contains(&other.name.as_str()) {
+    //                 assert!(
+    //                     !line.contains("\"="),
+    //                     "{} should not have an exact version requirement on {}",
+    //                     krate.name,
+    //                     other.name
+    //                 );
+    //             } else {
+    //                 assert!(
+    //                     line.contains("\"="),
+    //                     "{} should have an exact version requirement on {}",
+    //                     krate.name,
+    //                     other.name
+    //                 );
+    //             }
+    //         }
+    //         rewritten = true;
+    //         new_manifest.push_str(&line.replace(&other.version, &next_version(other)));
+    //         break;
+    //     }
+    //     if !rewritten {
+    //         new_manifest.push_str(line);
+    //     }
+    //     new_manifest.push('\n');
+    // }
+    // fs::write(&krate.path, new_manifest).unwrap();
+    fs::write(&krate.path, toml::to_string(&new_manifest).expect("failed to serialize new manifest"))
+        .expect("failed to write new manifest");
 }
 
 /// Performs a major version bump increment on the semver version `version`.
@@ -273,7 +281,7 @@ fn bump(version: &str, patch_bump: bool) -> String {
 }
 
 fn publish(krate: &Crate) -> bool {
-    if !CRATES_TO_PUBLISH.iter().any(|s| *s == krate.name) {
+    if !SORTED_CRATES_TO_PUBLISH.iter().any(|s| *s == krate.name) {
         return true;
     }
 
@@ -296,7 +304,7 @@ fn publish(krate: &Crate) -> bool {
 
     let status = Command::new("cargo")
         .arg("publish")
-        .current_dir(krate.manifest.parent().unwrap())
+        .current_dir(krate.path.parent().unwrap())
         .arg("--no-verify")
         .status()
         .expect("failed to run cargo");
@@ -374,7 +382,7 @@ fn verify(crates: &[Crate]) {
         let mut cmd = Command::new("cargo");
         cmd.arg("package")
             .arg("--manifest-path")
-            .arg(&krate.manifest)
+            .arg(&krate.path)
             .env("CARGO_TARGET_DIR", "./target");
         let status = cmd.status().unwrap();
         assert!(status.success(), "failed to verify {:?}", &krate.manifest);
