@@ -95,7 +95,7 @@ fn main() {
                 return;
             }
             for krate in crates_to_bump {
-                bump_version(krate, &all_crates, patch);
+                bump_version(krate, &crates_to_bump, patch);
             }
             // update the lock file
             assert!(
