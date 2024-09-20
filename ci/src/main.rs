@@ -166,7 +166,7 @@ fn bump_version(krate: &Crate, crates: &[Crate], patch: bool) {
     let next_version = bump(&krate.version, patch);
 
     let mut new_manifest = krate.manifest.clone();
-    new_manifest["package"]["version"] = toml_edit::value(next_version.clone());
+    new_manifest["package"]["version"] = toml_edit::value(next_version);
 
     // Update the dependencies of this crate to point to the new version of
     // crates that we're bumping.
@@ -174,9 +174,10 @@ fn bump_version(krate: &Crate, crates: &[Crate], patch: bool) {
         Some(d) => d,
         None => return,
     };
-    for dep in dependencies.iter_mut() {
-        if crates.iter().any(|k| *k.name == *dep.0) {
-            dep.1["version"] = toml_edit::value(next_version.clone());
+    for (dep_name, dep) in dependencies.iter_mut() {
+        if crates.iter().any(|k| *k.name == *dep_name) {
+            let dep_version = bump(dep["version"].as_str().expect("dep version"), patch);
+            dep["version"] = toml_edit::value(dep_version.clone());
         }
     }
 
