@@ -1,51 +1,26 @@
 [package]
 name = "wdl-lsp"
-version = "0.4.0"
-edition = "2021"
-rust-version = "1.80.0"
-authors = ["The Rust WDL project developers"]
+version = "0.3.0"
+license.workspace = true
+rust-version.workspace = true
+edition.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
 description = "Language Server Protocol implementation for WDL"
-homepage = "https://github.com/stjude-rust-labs/wdl"
 documentation = "https://docs.rs/wdl-lsp"
-license = "MIT OR Apache-2.0"
-repository = "https://github.com/stjude-rust-labs/wdl"
 
 [dependencies]
-anyhow = "1.0.86"
-line-index = "0.1.1"
-parking_lot = "0.12.3"
-serde_json = "1.0.120"
-tower-lsp = "0.20.0"
-tracing = "0.1.40"
-url = "2.5.2"
-
-[dependencies.indexmap]
-version = "2.2.6"
-features = ["serde"]
-
-[dependencies.tokio]
-version = "1.38.0"
-features = ["full"]
-
-[dependencies.uuid]
-version = "1.10.0"
-features = ["v4"]
-
-[dependencies.wdl-analysis]
-version = "0.4.0"
-path = "../wdl-analysis"
-
-[dependencies.wdl-ast]
-version = "0.8.0"
-path = "../wdl-ast"
-
-[dependencies.wdl-lint]
-version = "0.7.0"
-path = "../wdl-lint"
-
-[lib]
-path = "src/lib.rs"
-name = "wdl_lsp"
-edition = "2021"
-crate-type = ["lib"]
-required-features = []
+wdl-ast = { path = "../wdl-ast", version = "0.7.1" }
+wdl-lint = { path = "../wdl-lint", version = "0.6.0" }
+wdl-analysis = { path = "../wdl-analysis", version = "0.3.0" }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+tower-lsp = { workspace = true }
+tracing = { workspace = true }
+url = { workspace = true }
+parking_lot = { workspace = true }
+line-index = { workspace = true }
+serde_json = { workspace = true }
+indexmap = { workspace = true }
+uuid = { workspace = true, features = ["v4"] }

@@ -1,58 +1,28 @@
 [package]
 name = "gauntlet"
-version = "0.6.0"
-edition = "2021"
-rust-version = "1.80.0"
-description = "Testing of parse trees and ASTs within the `wdl` family of crates"
-license = "MIT OR Apache-2.0"
+version = "0.5.0"
 publish = false
+description = "Testing of parse trees and ASTs within the `wdl` family of crates"
+rust-version.workspace = true
+license.workspace = true
+edition.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.86"
-codespan-reporting = "0.11.1"
-colored = "2.1.0"
-dirs = "5.0.1"
-faster-hex = "0.9.0"
-git2 = "0.18.3"
-serde_with = "3.8.1"
-tempfile = "3.10.1"
-toml = "0.8.14"
-tracing = "0.1.40"
-
-[dependencies.clap]
-version = "4.5.7"
-features = ["derive"]
-
-[dependencies.indexmap]
-version = "2.2.6"
-features = ["serde"]
-
-[dependencies.serde]
-version = "1"
-features = ["derive"]
-
-[dependencies.tokio]
-version = "1.38.0"
-features = ["full"]
-
-[dependencies.tracing-subscriber]
-version = "0.3.18"
-features = ["env-filter"]
-
-[dependencies.wdl-lint]
-version = "0.7.0"
-path = "../wdl-lint"
-features = ["codespan"]
-
-[lib]
-path = "src/lib.rs"
-name = "gauntlet"
-edition = "2021"
-crate-type = ["lib"]
-required-features = []
-
-[[bin]]
-path = "src/main.rs"
-name = "gauntlet"
-edition = "2021"
-required-features = []
+wdl-lint = { path = "../wdl-lint", version = "0.6.0", features = ["codespan"] }
+clap.workspace = true
+colored.workspace = true
+dirs.workspace = true
+faster-hex.workspace = true
+git2.workspace = true
+indexmap.workspace = true
+serde.workspace = true
+serde_with.workspace = true
+tempfile.workspace = true
+tokio.workspace = true
+toml.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true
+codespan-reporting.workspace = true

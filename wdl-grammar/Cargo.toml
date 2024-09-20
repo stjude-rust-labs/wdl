@@ -1,41 +1,30 @@
 [package]
 name = "wdl-grammar"
-version = "0.9.0"
-edition = "2021"
-rust-version = "1.80.0"
+version = "0.8.0"
 authors = ["Clay McLeod <clay.l.mcleod@gmail.com>"]
+rust-version.workspace = true
+edition.workspace = true
+license.workspace = true
 description = "A parse tree for Workflow Description Language (WDL) documents"
 homepage = "https://github.com/stjude-rust-labs/wdl"
-documentation = "https://docs.rs/wdl-grammar"
-license = "MIT OR Apache-2.0"
 repository = "https://github.com/stjude-rust-labs/wdl"
+documentation = "https://docs.rs/wdl-grammar"
 
 [dependencies]
-logos = "0.14.0"
-rowan = "0.15.15"
-
-[dependencies.codespan-reporting]
-version = "0.11.1"
-optional = true
+logos = { workspace = true }
+rowan = { workspace = true }
+codespan-reporting = { workspace = true, optional = true }
 
 [dev-dependencies]
-codespan-reporting = "0.11.1"
-colored = "2.1.0"
-pretty_assertions = "1.4.0"
-rayon = "1.10.0"
+pretty_assertions = { workspace = true }
+rayon = { workspace = true }
+colored = { workspace = true }
+codespan-reporting = { workspace = true }
 
 [features]
 codespan = ["dep:codespan-reporting"]
 
-[lib]
-path = "src/lib.rs"
-name = "wdl_grammar"
-edition = "2021"
-crate-type = ["lib"]
-required-features = []
-
 [[test]]
-path = "tests/parsing.rs"
 name = "parsing"
-harness = false
 required-features = ["codespan"]
+harness = false
