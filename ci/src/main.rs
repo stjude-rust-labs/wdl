@@ -10,10 +10,12 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command;
 use std::process::Stdio;
+use std::str::FromStr;
 use std::thread;
 use std::time::Duration;
 
 use clap::Parser;
+use toml_edit::DocumentMut;
 
 // note that this list must be topologically sorted by dependencies
 const SORTED_CRATES_TO_PUBLISH: &[&str] = &[
@@ -26,7 +28,7 @@ const SORTED_CRATES_TO_PUBLISH: &[&str] = &[
 ];
 
 struct Crate {
-    manifest: cargo_toml::Manifest,
+    manifest: DocumentMut,
     path: PathBuf,
     string: String,
     name: String,
@@ -138,16 +140,17 @@ fn find_crates(dir: &Path, dst: &mut Vec<Crate>) {
 
 fn read_crate(manifest_path: &Path) -> Option<Crate> {
     let contents = fs::read_to_string(manifest_path).expect("failed to read manifest");
-    let manifest = cargo_toml::Manifest::from_str(&contents).expect("failed to parse manifest");
-    let package = match manifest.package {
-        Some(ref p) => p,
+    let mut manifest =
+        toml_edit::DocumentMut::from_str(&contents).expect("failed to parse manifest");
+    let package = match manifest.get_mut("package") {
+        Some(p) => p,
         None => return None, // workspace manifests don't have a package section
     };
-    let name = package.name().to_string();
-    let version = package.version().to_string();
-    let publish = match package.publish() {
-        cargo_toml::Publish::Flag(b) => b.to_owned(),
-        _ => true,
+    let name = package["name"].as_str().expect("name").to_string();
+    let version = package["version"].as_str().expect("version").to_string();
+    let publish = match &package.get("publish") {
+        Some(p) => p.as_bool().expect("publish"),
+        None => true,
     };
     Some(Crate {
         manifest,
@@ -163,37 +166,21 @@ fn bump_version(krate: &Crate, crates: &[Crate], patch: bool) {
     let next_version = bump(&krate.version, patch);
 
     let mut new_manifest = krate.manifest.clone();
-    new_manifest
-        .package
-        .as_mut()
-        .expect("should be a package")
-        .version = cargo_toml::Inheritable::Set(next_version.clone());
+    new_manifest["package"]["version"] = toml_edit::value(next_version.clone());
 
-    for (other_name, dep) in new_manifest.dependencies.iter_mut() {
-        if crates.iter().any(|k| k.name == *other_name) {
-            dep.detail_mut().version = match dep.detail() {
-                Some(detail) => {
-                    match &detail.version {
-                        Some(v) => Some(bump(v, patch)),
-                        None => {
-                            // No version to bump
-                            continue;
-                        }
-                    }
-                }
-                None => {
-                    // No version to bump
-                    continue;
-                }
-            }
+    // Update the dependencies of this crate to point to the new version of
+    // crates that we're bumping.
+    let dependencies = match new_manifest["dependencies"].as_table_mut() {
+        Some(d) => d,
+        None => return,
+    };
+    for dep in dependencies.iter_mut() {
+        if crates.iter().any(|k| *k.name == *dep.0) {
+            dep.1["version"] = toml_edit::value(next_version.clone());
         }
     }
 
-    fs::write(
-        &krate.path,
-        toml::to_string(&new_manifest).expect("failed to serialize new manifest"),
-    )
-    .expect("failed to write new manifest");
+    fs::write(&krate.path, new_manifest.to_string()).expect("failed to write new manifest");
 }
 
 /// Performs a major version bump increment on the semver version `version`.
