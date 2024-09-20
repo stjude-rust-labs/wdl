@@ -53,6 +53,9 @@ enum SubCommand {
 struct Bump {
     #[clap(short, long)]
     patch: bool,
+
+    #[clap(short, long)]
+    crates_to_bump: Vec<String>,
 }
 
 #[derive(Parser)]
@@ -62,21 +65,33 @@ struct Publish {}
 struct Verify {}
 
 fn main() {
-    let mut crates = Vec::new();
-    find_crates(".".as_ref(), &mut crates);
+    let mut all_crates = Vec::new();
+    find_crates(".".as_ref(), &mut all_crates);
 
     let publish_order = SORTED_CRATES_TO_PUBLISH
         .iter()
         .enumerate()
         .map(|(i, c)| (*c, i))
         .collect::<HashMap<_, _>>();
-    crates.sort_by_key(|krate| publish_order.get(&krate.name[..]));
+    all_crates.sort_by_key(|krate| publish_order.get(&krate.name[..]));
 
     let opts = Opts::parse();
     match opts.subcmd {
-        SubCommand::Bump(Bump { patch }) => {
-            for krate in crates.iter() {
-                bump_version(krate, &crates, patch);
+        SubCommand::Bump(Bump {
+            patch,
+            crates_to_bump,
+        }) => {
+            let crates_to_bump = if crates_to_bump.is_empty() {
+                all_crates.iter().map(|krate| krate.name.clone()).collect()
+            } else {
+                crates_to_bump
+            };
+            let crates_to_bump = crates_to_bump
+                .iter()
+                .filter_map(|name| all_crates.iter().find(|krate| krate.name == *name))
+                .collect::<Vec<_>>();
+            for krate in crates_to_bump {
+                bump_version(krate, &all_crates, patch);
             }
             // update the lock file
             assert!(
@@ -96,20 +111,20 @@ fn main() {
             // published. Failed-to-publish crates get enqueued for another try
             // later on.
             for _ in 0..10 {
-                crates.retain(|krate| !publish(krate));
+                all_crates.retain(|krate| !publish(krate));
 
-                if crates.is_empty() {
+                if all_crates.is_empty() {
                     break;
                 }
 
                 println!(
                     "{} crates failed to publish, waiting for a bit to retry",
-                    crates.len(),
+                    all_crates.len(),
                 );
                 thread::sleep(Duration::from_secs(40));
             }
 
-            assert!(crates.is_empty(), "failed to publish all crates");
+            assert!(all_crates.is_empty(), "failed to publish all crates");
 
             println!();
             println!("===================================================================");
@@ -118,7 +133,7 @@ fn main() {
             println!("    $ git push git@github.com:bytecodealliance/cargo-component.git vX.Y.Z");
         }
         SubCommand::Verify(_) => {
-            verify(&crates);
+            verify(&all_crates);
         }
     }
 }
