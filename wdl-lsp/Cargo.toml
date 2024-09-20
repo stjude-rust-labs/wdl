@@ -1,66 +1,26 @@
 [package]
 name = "wdl-lsp"
-version = "0.4.0"
+version = "0.3.0"
+license.workspace = true
+rust-version.workspace = true
+edition.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
 description = "Language Server Protocol implementation for WDL"
 documentation = "https://docs.rs/wdl-lsp"
 
-[package.edition]
-workspace = true
-
-[package.rust-version]
-workspace = true
-
-[package.authors]
-workspace = true
-
-[package.homepage]
-workspace = true
-
-[package.license]
-workspace = true
-
-[package.repository]
-workspace = true
-
-[dependencies.anyhow]
-workspace = true
-
-[dependencies.indexmap]
-workspace = true
-
-[dependencies.line-index]
-workspace = true
-
-[dependencies.parking_lot]
-workspace = true
-
-[dependencies.serde_json]
-workspace = true
-
-[dependencies.tokio]
-workspace = true
-
-[dependencies.tower-lsp]
-workspace = true
-
-[dependencies.tracing]
-workspace = true
-
-[dependencies.url]
-workspace = true
-
-[dependencies.uuid]
-features = ["v4"]
-workspace = true
-
-[dependencies.wdl-analysis]
-version = "0.4.0"
-path = "../wdl-analysis"
-
-[dependencies.wdl-ast]
-version = "0.8.0"
-path = "../wdl-ast"
-
-[dependencies.wdl-lint]
-version = "0.7.0"
-path = "../wdl-lint"
+[dependencies]
+wdl-ast = { path = "../wdl-ast", version = "0.7.1" }
+wdl-lint = { path = "../wdl-lint", version = "0.6.0" }
+wdl-analysis = { path = "../wdl-analysis", version = "0.3.0" }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+tower-lsp = { workspace = true }
+tracing = { workspace = true }
+url = { workspace = true }
+parking_lot = { workspace = true }
+line-index = { workspace = true }
+serde_json = { workspace = true }
+indexmap = { workspace = true }
+uuid = { workspace = true, features = ["v4"] }

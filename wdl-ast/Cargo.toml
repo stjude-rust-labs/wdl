@@ -1,53 +1,32 @@
 [package]
 name = "wdl-ast"
-version = "0.8.0"
+version = "0.7.1"
 authors = ["Clay McLeod <clay.l.mcleod@gmail.com>"]
+rust-version.workspace = true
+edition.workspace = true
+license.workspace = true
 description = "An abstract syntax tree for Workflow Description Language (WDL) documents"
 homepage = "https://github.com/stjude-rust-labs/wdl"
-documentation = "https://docs.rs/wdl-ast"
 repository = "https://github.com/stjude-rust-labs/wdl"
+documentation = "https://docs.rs/wdl-ast"
 
-[package.edition]
-workspace = true
+[dependencies]
+wdl-grammar = { path = "../wdl-grammar", version = "0.8.0" }
+rowan = { workspace = true }
+url = { workspace = true }
+urlencoding = { workspace = true }
 
-[package.rust-version]
-workspace = true
-
-[package.license]
-workspace = true
-
-[dependencies.rowan]
-workspace = true
-
-[dependencies.url]
-workspace = true
-
-[dependencies.urlencoding]
-workspace = true
-
-[dependencies.wdl-grammar]
-version = "0.9.0"
-path = "../wdl-grammar"
-
-[dev-dependencies.approx]
-workspace = true
-
-[dev-dependencies.codespan-reporting]
-workspace = true
-
-[dev-dependencies.colored]
-workspace = true
-
-[dev-dependencies.pretty_assertions]
-workspace = true
-
-[dev-dependencies.rayon]
-workspace = true
+[dev-dependencies]
+pretty_assertions = { workspace = true }
+approx = { workspace = true }
+rayon = { workspace = true }
+colored = { workspace = true }
+codespan-reporting = { workspace = true }
 
 [features]
 codespan = ["wdl-grammar/codespan"]
 
 [[test]]
 name = "validation"
-harness = false
 required-features = ["codespan"]
+harness = false

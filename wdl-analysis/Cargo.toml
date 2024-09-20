@@ -1,102 +1,46 @@
 [package]
 name = "wdl-analysis"
-version = "0.4.0"
+version = "0.3.0"
+rust-version.workspace = true
+license.workspace = true
+edition.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
 description = "Analysis of Workflow Description Language (WDL) documents."
 documentation = "https://docs.rs/wdl-analysis"
 
-[package.edition]
-workspace = true
+[dependencies]
+wdl-ast = { path = "../wdl-ast", version = "0.7.1" }
+wdl-lint = { path = "../wdl-lint", version = "0.6.0", optional = true }
+anyhow = { workspace = true }
+rowan = { workspace = true }
+url = { workspace = true }
+tokio = { workspace = true }
+parking_lot = { workspace = true }
+rayon = { workspace = true }
+reqwest = { workspace = true }
+petgraph = { workspace = true }
+futures = { workspace = true }
+path-clean = { workspace = true }
+indexmap = { workspace = true }
+line-index = { workspace = true }
+uuid = { workspace = true, features = ["v4"] }
+walkdir = { workspace = true }
+id-arena = { workspace = true }
+tracing = { workspace = true }
 
-[package.rust-version]
-workspace = true
-
-[package.authors]
-workspace = true
-
-[package.homepage]
-workspace = true
-
-[package.license]
-workspace = true
-
-[package.repository]
-workspace = true
-
-[dependencies.anyhow]
-workspace = true
-
-[dependencies.futures]
-workspace = true
-
-[dependencies.id-arena]
-workspace = true
-
-[dependencies.indexmap]
-workspace = true
-
-[dependencies.line-index]
-workspace = true
-
-[dependencies.parking_lot]
-workspace = true
-
-[dependencies.path-clean]
-workspace = true
-
-[dependencies.petgraph]
-workspace = true
-
-[dependencies.rayon]
-workspace = true
-
-[dependencies.reqwest]
-workspace = true
-
-[dependencies.rowan]
-workspace = true
-
-[dependencies.tokio]
-workspace = true
-
-[dependencies.tracing]
-workspace = true
-
-[dependencies.url]
-workspace = true
-
-[dependencies.uuid]
-features = ["v4"]
-workspace = true
-
-[dependencies.walkdir]
-workspace = true
-
-[dependencies.wdl-ast]
-version = "0.8.0"
-path = "../wdl-ast"
-
-[dependencies.wdl-lint]
-version = "0.7.0"
-path = "../wdl-lint"
-optional = true
-
-[dev-dependencies.codespan-reporting]
-workspace = true
-
-[dev-dependencies.colored]
-workspace = true
-
-[dev-dependencies.pretty_assertions]
-workspace = true
-
-[dev-dependencies.tempfile]
-workspace = true
+[dev-dependencies]
+pretty_assertions = { workspace = true }
+colored = { workspace = true }
+codespan-reporting = { workspace = true }
+tempfile = { workspace = true }
 
 [features]
-codespan = ["wdl-ast/codespan"]
 default = []
+codespan = ["wdl-ast/codespan"]
 
 [[test]]
 name = "analysis"
-harness = false
 required-features = ["codespan"]
+harness = false
