@@ -1,30 +1,47 @@
 [package]
 name = "wdl-grammar"
-version = "0.8.0"
+version = "0.9.0"
 authors = ["Clay McLeod <clay.l.mcleod@gmail.com>"]
-rust-version.workspace = true
-edition.workspace = true
-license.workspace = true
 description = "A parse tree for Workflow Description Language (WDL) documents"
 homepage = "https://github.com/stjude-rust-labs/wdl"
-repository = "https://github.com/stjude-rust-labs/wdl"
 documentation = "https://docs.rs/wdl-grammar"
+repository = "https://github.com/stjude-rust-labs/wdl"
 
-[dependencies]
-logos = { workspace = true }
-rowan = { workspace = true }
-codespan-reporting = { workspace = true, optional = true }
+[package.edition]
+workspace = true
 
-[dev-dependencies]
-pretty_assertions = { workspace = true }
-rayon = { workspace = true }
-colored = { workspace = true }
-codespan-reporting = { workspace = true }
+[package.rust-version]
+workspace = true
+
+[package.license]
+workspace = true
+
+[dependencies.codespan-reporting]
+optional = true
+workspace = true
+
+[dependencies.logos]
+workspace = true
+
+[dependencies.rowan]
+workspace = true
+
+[dev-dependencies.codespan-reporting]
+workspace = true
+
+[dev-dependencies.colored]
+workspace = true
+
+[dev-dependencies.pretty_assertions]
+workspace = true
+
+[dev-dependencies.rayon]
+workspace = true
 
 [features]
 codespan = ["dep:codespan-reporting"]
 
 [[test]]
 name = "parsing"
-required-features = ["codespan"]
 harness = false
+required-features = ["codespan"]

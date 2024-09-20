@@ -1,14 +1,30 @@
 [package]
 name = "ci"
-version = "0.1.0"
-license.workspace = true
-edition.workspace = true
-authors.workspace = true
-homepage.workspace = true
-repository.workspace = true
-rust-version.workspace = true
+version = "0.2.0"
+
+[package.edition]
+workspace = true
+
+[package.rust-version]
+workspace = true
+
+[package.authors]
+workspace = true
+
+[package.homepage]
+workspace = true
+
+[package.license]
+workspace = true
+
+[package.repository]
+workspace = true
 
 [dependencies]
 cargo_toml = "0.20.4"
-clap.workspace = true
-toml.workspace = true
+
+[dependencies.clap]
+workspace = true
+
+[dependencies.toml]
+workspace = true

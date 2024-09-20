@@ -1,32 +1,57 @@
 [package]
 name = "wdl-lint"
-version = "0.6.0"
+version = "0.7.0"
 description = "Lint rules for Workflow Description Language (WDL) documents"
-rust-version.workspace = true
-authors.workspace = true
-license.workspace = true
-edition.workspace = true
-homepage.workspace = true
-repository.workspace = true
 documentation = "https://docs.rs/wdl-lint"
 readme = "../README.md"
 
-[dependencies]
-wdl-ast = { path = "../wdl-ast", version = "0.7.1" }
-convert_case = { workspace = true }
-indexmap = { workspace = true }
-rowan = { workspace = true }
+[package.edition]
+workspace = true
 
-[dev-dependencies]
-codespan-reporting = { workspace = true }
-pretty_assertions = { workspace = true }
-rayon = { workspace = true }
-colored = { workspace = true }
+[package.rust-version]
+workspace = true
+
+[package.authors]
+workspace = true
+
+[package.homepage]
+workspace = true
+
+[package.license]
+workspace = true
+
+[package.repository]
+workspace = true
+
+[dependencies.convert_case]
+workspace = true
+
+[dependencies.indexmap]
+workspace = true
+
+[dependencies.rowan]
+workspace = true
+
+[dependencies.wdl-ast]
+version = "0.8.0"
+path = "../wdl-ast"
+
+[dev-dependencies.codespan-reporting]
+workspace = true
+
+[dev-dependencies.colored]
+workspace = true
+
+[dev-dependencies.pretty_assertions]
+workspace = true
+
+[dev-dependencies.rayon]
+workspace = true
 
 [features]
 codespan = ["wdl-ast/codespan"]
 
 [[test]]
 name = "lints"
-required-features = ["codespan"]
 harness = false
+required-features = ["codespan"]
