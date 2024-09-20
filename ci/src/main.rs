@@ -94,7 +94,7 @@ fn main() {
                 println!("no crates found to bump");
                 return;
             }
-            for krate in crates_to_bump {
+            for krate in &crates_to_bump {
                 bump_version(krate, &crates_to_bump, patch);
             }
             // update the lock file
@@ -188,7 +188,7 @@ fn read_crate(manifest_path: &Path) -> Option<Crate> {
     })
 }
 
-fn bump_version(krate: &Crate, crates: &[Crate], patch: bool) {
+fn bump_version(krate: &Crate, crates: &[&Crate], patch: bool) {
     let next_version = bump(&krate.version, patch);
 
     let mut new_manifest = krate.manifest.clone();
