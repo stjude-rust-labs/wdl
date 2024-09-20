@@ -1,32 +1,46 @@
 [package]
 name = "wdl-lint"
-version = "0.6.0"
+version = "0.7.0"
+edition = "2021"
+rust-version = "1.80.0"
+authors = ["The Rust WDL project developers"]
 description = "Lint rules for Workflow Description Language (WDL) documents"
-rust-version.workspace = true
-authors.workspace = true
-license.workspace = true
-edition.workspace = true
-homepage.workspace = true
-repository.workspace = true
+homepage = "https://github.com/stjude-rust-labs/wdl"
 documentation = "https://docs.rs/wdl-lint"
 readme = "../README.md"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/stjude-rust-labs/wdl"
 
 [dependencies]
-wdl-ast = { path = "../wdl-ast", version = "0.7.1" }
-convert_case = { workspace = true }
-indexmap = { workspace = true }
-rowan = { workspace = true }
+convert_case = "0.6.0"
+rowan = "0.15.15"
+
+[dependencies.indexmap]
+version = "2.2.6"
+features = ["serde"]
+
+[dependencies.wdl-ast]
+version = "0.8.0"
+path = "../wdl-ast"
 
 [dev-dependencies]
-codespan-reporting = { workspace = true }
-pretty_assertions = { workspace = true }
-rayon = { workspace = true }
-colored = { workspace = true }
+codespan-reporting = "0.11.1"
+colored = "2.1.0"
+pretty_assertions = "1.4.0"
+rayon = "1.10.0"
 
 [features]
 codespan = ["wdl-ast/codespan"]
 
+[lib]
+path = "src/lib.rs"
+name = "wdl_lint"
+edition = "2021"
+crate-type = ["lib"]
+required-features = []
+
 [[test]]
+path = "tests/lints.rs"
 name = "lints"
-required-features = ["codespan"]
 harness = false
+required-features = ["codespan"]

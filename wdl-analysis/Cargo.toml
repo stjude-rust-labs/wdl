@@ -1,46 +1,70 @@
 [package]
 name = "wdl-analysis"
-version = "0.3.0"
-rust-version.workspace = true
-license.workspace = true
-edition.workspace = true
-authors.workspace = true
-homepage.workspace = true
-repository.workspace = true
+version = "0.4.0"
+edition = "2021"
+rust-version = "1.80.0"
+authors = ["The Rust WDL project developers"]
 description = "Analysis of Workflow Description Language (WDL) documents."
+homepage = "https://github.com/stjude-rust-labs/wdl"
 documentation = "https://docs.rs/wdl-analysis"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/stjude-rust-labs/wdl"
 
 [dependencies]
-wdl-ast = { path = "../wdl-ast", version = "0.7.1" }
-wdl-lint = { path = "../wdl-lint", version = "0.6.0", optional = true }
-anyhow = { workspace = true }
-rowan = { workspace = true }
-url = { workspace = true }
-tokio = { workspace = true }
-parking_lot = { workspace = true }
-rayon = { workspace = true }
-reqwest = { workspace = true }
-petgraph = { workspace = true }
-futures = { workspace = true }
-path-clean = { workspace = true }
-indexmap = { workspace = true }
-line-index = { workspace = true }
-uuid = { workspace = true, features = ["v4"] }
-walkdir = { workspace = true }
-id-arena = { workspace = true }
-tracing = { workspace = true }
+anyhow = "1.0.86"
+futures = "0.3.30"
+id-arena = "2.2.1"
+line-index = "0.1.1"
+parking_lot = "0.12.3"
+path-clean = "1.0.1"
+petgraph = "0.6.5"
+rayon = "1.10.0"
+reqwest = "0.12.5"
+rowan = "0.15.15"
+tracing = "0.1.40"
+url = "2.5.2"
+walkdir = "2.5.0"
+
+[dependencies.indexmap]
+version = "2.2.6"
+features = ["serde"]
+
+[dependencies.tokio]
+version = "1.38.0"
+features = ["full"]
+
+[dependencies.uuid]
+version = "1.10.0"
+features = ["v4"]
+
+[dependencies.wdl-ast]
+version = "0.8.0"
+path = "../wdl-ast"
+
+[dependencies.wdl-lint]
+version = "0.7.0"
+path = "../wdl-lint"
+optional = true
 
 [dev-dependencies]
-pretty_assertions = { workspace = true }
-colored = { workspace = true }
-codespan-reporting = { workspace = true }
-tempfile = { workspace = true }
+codespan-reporting = "0.11.1"
+colored = "2.1.0"
+pretty_assertions = "1.4.0"
+tempfile = "3.10.1"
 
 [features]
-default = []
 codespan = ["wdl-ast/codespan"]
+default = []
+
+[lib]
+path = "src/lib.rs"
+name = "wdl_analysis"
+edition = "2021"
+crate-type = ["lib"]
+required-features = []
 
 [[test]]
+path = "tests/analysis.rs"
 name = "analysis"
-required-features = ["codespan"]
 harness = false
+required-features = ["codespan"]

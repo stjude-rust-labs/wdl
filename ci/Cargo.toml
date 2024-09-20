@@ -1,14 +1,23 @@
 [package]
 name = "ci"
-version = "0.1.0"
-license.workspace = true
-edition.workspace = true
-authors.workspace = true
-homepage.workspace = true
-repository.workspace = true
-rust-version.workspace = true
+version = "0.2.0"
+edition = "2021"
+rust-version = "1.80.0"
+authors = ["The Rust WDL project developers"]
+homepage = "https://github.com/stjude-rust-labs/wdl"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/stjude-rust-labs/wdl"
 
 [dependencies]
 cargo_toml = "0.20.4"
-clap.workspace = true
-toml.workspace = true
+toml = "0.8.14"
+
+[dependencies.clap]
+version = "4.5.7"
+features = ["derive"]
+
+[[bin]]
+path = "src/main.rs"
+name = "ci"
+edition = "2021"
+required-features = []
