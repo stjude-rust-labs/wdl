@@ -28,6 +28,7 @@ const SORTED_CRATES_TO_PUBLISH: &[&str] = &[
 struct Crate {
     manifest: cargo_toml::Manifest,
     path: PathBuf,
+    string: String,
     name: String,
     version: String,
     publish: bool,
@@ -136,8 +137,8 @@ fn find_crates(dir: &Path, dst: &mut Vec<Crate>) {
 }
 
 fn read_crate(manifest_path: &Path) -> Option<Crate> {
-    let manifest =
-        cargo_toml::Manifest::from_path(manifest_path).expect("failed to parse manifest");
+    let contents = fs::read_to_string(manifest_path).expect("failed to read manifest");
+    let manifest = cargo_toml::Manifest::from_str(&contents).expect("failed to parse manifest");
     let package = match manifest.package {
         Some(ref p) => p,
         None => return None, // workspace manifests don't have a package section
@@ -151,6 +152,7 @@ fn read_crate(manifest_path: &Path) -> Option<Crate> {
     Some(Crate {
         manifest,
         path: manifest_path.to_path_buf(),
+        string: contents,
         name,
         version,
         publish,
