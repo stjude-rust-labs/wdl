@@ -38,6 +38,7 @@ mod todo;
 mod trailing_comma;
 mod unknown_rule;
 mod whitespace;
+mod malformed_lint_directive;
 
 pub use blank_lines_between_elements::*;
 pub use call_input_spacing::*;
@@ -59,6 +60,7 @@ pub use inconsistent_newlines::*;
 pub use input_not_sorted::*;
 pub use key_value_pairs::*;
 pub use line_width::*;
+pub use malformed_lint_directive::*;
 pub use matching_parameter_meta::*;
 pub use misplaced_lint_directive::*;
 pub use missing_metas::*;
