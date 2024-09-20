@@ -64,11 +64,11 @@ async fn analyze(path: PathBuf, lint: bool) -> Result<Vec<AnalysisResult>> {
 
     let analyzer = Analyzer::new_with_validator(
         move |bar: ProgressBar, kind, completed, total| async move {
+            bar.set_position(completed.try_into().unwrap());
             if completed == 0 {
                 bar.set_length(total.try_into().unwrap());
                 bar.set_message(format!("{kind}"));
             }
-            bar.set_position(completed.try_into().unwrap());
         },
         move || {
             let mut validator = Validator::default();
@@ -84,6 +84,8 @@ async fn analyze(path: PathBuf, lint: bool) -> Result<Vec<AnalysisResult>> {
         .analyze(bar.clone())
         .await
         .context("failed to analyze documents")?;
+
+    drop(bar);
 
     let cwd = std::env::current_dir().ok();
     for result in &results {

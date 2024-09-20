@@ -1,7 +1,6 @@
 //! Representation of scopes for for WDL documents.
 
 use std::collections::HashMap;
-use std::fmt;
 use std::sync::Arc;
 
 use indexmap::IndexMap;
@@ -10,12 +9,10 @@ use url::Url;
 use wdl_ast::Ast;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
-use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
 use wdl_ast::ToSpan;
-use wdl_ast::TokenStrHash;
 use wdl_ast::WorkflowDescriptionLanguage;
 use wdl_ast::support::token;
 
@@ -66,97 +63,6 @@ fn scope_span(
 
     // The span starts after the opening brace and before the closing brace
     Span::new(open.end(), close.start() - open.end())
-}
-
-/// Represents the context for diagnostic reporting.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Context {
-    /// The name is a workflow name.
-    Workflow(Span),
-    /// The name is a task name.
-    Task(Span),
-    /// The name is a struct name.
-    Struct(Span),
-    /// The name is a struct member name.
-    StructMember(Span),
-    /// A name from a scope.
-    Name(NameContext),
-}
-
-impl Context {
-    /// Gets the span of the name.
-    fn span(&self) -> Span {
-        match self {
-            Self::Workflow(s) => *s,
-            Self::Task(s) => *s,
-            Self::Struct(s) => *s,
-            Self::StructMember(s) => *s,
-            Self::Name(n) => n.span(),
-        }
-    }
-}
-
-impl fmt::Display for Context {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Workflow(_) => write!(f, "workflow"),
-            Self::Task(_) => write!(f, "task"),
-            Self::Struct(_) => write!(f, "struct"),
-            Self::StructMember(_) => write!(f, "struct member"),
-            Self::Name(n) => n.fmt(f),
-        }
-    }
-}
-
-/// Represents the context of a name in a scope.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum NameContext {
-    /// The name was introduced by an task or workflow input.
-    Input(Span),
-    /// The name was introduced by an task or workflow output.
-    Output(Span),
-    /// The name was introduced by a private declaration.
-    Decl(Span),
-    /// The name was introduced by a workflow call statement.
-    Call(Span),
-    /// The name was introduced by a variable in workflow scatter statement.
-    ScatterVariable(Span),
-    /// The name was introduced for the special `task` name in task command and
-    /// outputs sections for WDL 1.2.
-    Task(Span),
-}
-
-impl NameContext {
-    /// Gets the span of the name.
-    pub fn span(&self) -> Span {
-        match self {
-            Self::Input(s) => *s,
-            Self::Output(s) => *s,
-            Self::Decl(s) => *s,
-            Self::Call(s) => *s,
-            Self::ScatterVariable(s) => *s,
-            Self::Task(s) => *s,
-        }
-    }
-}
-
-impl fmt::Display for NameContext {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Input(_) => write!(f, "input"),
-            Self::Output(_) => write!(f, "output"),
-            Self::Decl(_) => write!(f, "declaration"),
-            Self::Call(_) => write!(f, "call"),
-            Self::ScatterVariable(_) => write!(f, "scatter variable"),
-            Self::Task(_) => write!(f, "task"),
-        }
-    }
-}
-
-impl From<NameContext> for Context {
-    fn from(context: NameContext) -> Self {
-        Self::Name(context)
-    }
 }
 
 /// Represents a namespace introduced by an import.
@@ -227,34 +133,6 @@ impl Struct {
     }
 }
 
-/// Represents a name in a scope.
-#[derive(Debug, Clone, Copy)]
-pub struct Name {
-    /// The context of the name.
-    context: NameContext,
-    /// The type of the name.
-    ty: Type,
-}
-
-impl Name {
-    /// Constructs a new name with the given context.
-    fn new(context: NameContext, ty: Type) -> Self {
-        Self { context, ty }
-    }
-
-    /// Gets the context of the name.
-    pub(crate) fn context(&self) -> NameContext {
-        self.context
-    }
-
-    /// Gets the type of the name.
-    ///
-    /// A value of `Type::Union` indicates a reference to an unknown type name.
-    pub fn ty(&self) -> Type {
-        self.ty
-    }
-}
-
 /// Represents an index into a document's collection of scopes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) struct ScopeIndex(usize);
@@ -268,8 +146,8 @@ struct Scope {
     parent: Option<ScopeIndex>,
     /// The span in the document where the names of the scope are visible.
     span: Span,
-    /// The names in the scope.
-    names: IndexMap<String, Name>,
+    /// The map of names in scope to their span and types.
+    names: IndexMap<String, (Span, Type)>,
     /// The child scope indexes of this scope.
     ///
     /// Child scopes are from output sections, workflow conditional statements,
@@ -299,11 +177,11 @@ pub struct ScopeRef<'a> {
     /// The input type map.
     ///
     /// This is `None` when `input` hidden types are not supported.
-    inputs: Option<&'a HashMap<TokenStrHash<Ident>, Type>>,
+    inputs: Option<&'a HashMap<String, Type>>,
     /// The output type map.
     ///
     /// This is `None` when `output` hidden types are not supported.
-    outputs: Option<&'a HashMap<TokenStrHash<Ident>, Type>>,
+    outputs: Option<&'a HashMap<String, Type>>,
     /// Whether or not `hints` hidden types are supported in this scope.
     ///
     /// This is `true` only when evaluating the `hints` section in a task.
@@ -347,24 +225,24 @@ impl<'a> ScopeRef<'a> {
     }
 
     /// Gets all of the names available at this scope.
-    pub fn names(&self) -> impl Iterator<Item = (&str, Name)> {
+    pub fn names(&self) -> impl Iterator<Item = (&str, (Span, Type))> {
         self.scopes[self.scope.0]
             .names
             .iter()
-            .map(|(s, name)| (s.as_str(), *name))
+            .map(|(name, span_ty)| (name.as_str(), *span_ty))
     }
 
     /// Gets a name local to this scope.
     ///
     /// Returns `None` if a name local to this scope was not found.
-    pub fn local(&self, name: &str) -> Option<Name> {
+    pub fn local(&self, name: &str) -> Option<(Span, Type)> {
         self.scopes[self.scope.0].names.get(name).copied()
     }
 
     /// Lookups a name in the scope.
     ///
     /// Returns `None` if the name is not available in the scope.
-    pub fn lookup(&self, name: &str) -> Option<Name> {
+    pub fn lookup(&self, name: &str) -> Option<(Span, Type)> {
         let mut scope = Some(self.scope);
 
         while let Some(index) = scope {
@@ -438,13 +316,10 @@ struct ScopeRefMut<'a> {
 
 impl<'a> ScopeRefMut<'a> {
     /// Inserts a name into the scope.
-    pub fn insert(&mut self, key: String, name: Name) {
-        self.scopes[self.scope.0].names.insert(key, name);
-    }
-
-    /// Adds a child scope to the scope.
-    pub fn add_child(&mut self, child: ScopeIndex) {
-        self.scopes[self.scope.0].children.push(child);
+    pub fn insert(&mut self, name: impl Into<String>, span: Span, ty: Type) {
+        self.scopes[self.scope.0]
+            .names
+            .insert(name.into(), (span, ty));
     }
 }
 
@@ -455,6 +330,10 @@ struct Task {
     name_span: Span,
     /// The root scope index for the task.
     scope: ScopeIndex,
+    /// The inputs of the task.
+    inputs: HashMap<String, Type>,
+    /// The outputs of the task.
+    outputs: HashMap<String, Type>,
 }
 
 /// Represents a workflow in a document.
@@ -466,6 +345,10 @@ struct Workflow {
     name: String,
     /// The scope index of the workflow.
     scope: ScopeIndex,
+    /// The inputs of the workflow.
+    inputs: HashMap<String, Type>,
+    /// The outputs of the workflow.
+    outputs: HashMap<String, Type>,
 }
 
 /// Represents the scope of a document.
@@ -513,10 +396,17 @@ impl DocumentScope {
             }
         };
 
-        let scope = match document.ast() {
+        let mut scope = match document.ast() {
             Ast::Unsupported => Default::default(),
             Ast::V1(ast) => v1::scope_from_ast(graph, index, &ast, &version, &mut diagnostics),
         };
+
+        // Sort the scopes by their start position so that we can do a binary search by
+        // position; this works without having to remap a task's or workflow's scope
+        // index because those are always added in order
+        scope
+            .scopes
+            .sort_by(|a, b| a.span.start().cmp(&b.span.start()));
 
         // Perform a type check
         (scope, diagnostics)
@@ -618,17 +508,12 @@ impl DocumentScope {
 
     /// Adds an inner scope to the document scope.
     fn add_scope(&mut self, scope: Scope) -> ScopeIndex {
-        // Scopes are added in order, so the span start should always be increasing
-        assert!(
-            self.scopes
-                .last()
-                .map(|s| s.span.start() < scope.span.start())
-                .unwrap_or(true)
-        );
-
-        let index = self.scopes.len();
+        let index = ScopeIndex(self.scopes.len());
+        if let Some(parent) = scope.parent {
+            self.scopes[parent.0].children.push(index);
+        }
         self.scopes.push(scope);
-        ScopeIndex(index)
+        index
     }
 
     /// Gets a reference to a scope.
