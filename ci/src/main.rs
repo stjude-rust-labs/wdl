@@ -158,22 +158,34 @@ fn read_crate(manifest_path: &Path) -> Option<Crate> {
 }
 
 fn bump_version(krate: &Crate, crates: &[Crate], patch: bool) {
-    let next_version = |krate: &Crate| -> String {
-        if SORTED_CRATES_TO_PUBLISH.contains(&&krate.name[..]) {
-            bump(&krate.version, patch)
-        } else {
-            krate.version.clone()
-        }
-    };
+    let next_version = bump(&krate.version, patch);
 
     let mut new_manifest = krate.manifest.clone();
     new_manifest
         .package
         .as_mut()
         .expect("should be a package")
-        .version = cargo_toml::Inheritable::Set(next_version(krate));
+        .version = cargo_toml::Inheritable::Set(next_version.clone());
 
-    // TODO: update dependencies
+    for (other_name, dep) in new_manifest.dependencies.iter_mut() {
+        if crates.iter().any(|k| k.name == *other_name) {
+            dep.detail_mut().version = match dep.detail() {
+                Some(detail) => {
+                    match &detail.version {
+                        Some(v) => Some(bump(v, patch)),
+                        None => {
+                            // No version to bump
+                            continue;
+                        }
+                    }
+                }
+                None => {
+                    // No version to bump
+                    continue;
+                }
+            }
+        }
+    }
 
     fs::write(
         &krate.path,
