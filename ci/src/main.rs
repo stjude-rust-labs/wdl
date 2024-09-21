@@ -4,12 +4,14 @@
 //! * `./publish verify` - verify crates can be published to crates.io
 //! * `./publish publish` - actually publish crates to crates.io
 
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command;
 use std::process::Stdio;
+use std::rc::Rc;
 use std::str::FromStr;
 use std::thread;
 use std::time::Duration;
@@ -31,10 +33,10 @@ const SORTED_CRATES_TO_PUBLISH: &[&str] = &[
 struct Crate {
     manifest: DocumentMut,
     path: PathBuf,
-    string: String,
     name: String,
     version: String,
-    publish: bool,
+    should_bump: bool,
+    should_publish: bool,
 }
 
 #[derive(Parser)]
@@ -66,7 +68,7 @@ struct Publish {}
 struct Verify {}
 
 fn main() {
-    let mut all_crates = Vec::new();
+    let mut all_crates: Vec<Rc<RefCell<Crate>>> = Vec::new();
     find_crates(".".as_ref(), &mut all_crates);
 
     let publish_order = SORTED_CRATES_TO_PUBLISH
@@ -74,7 +76,7 @@ fn main() {
         .enumerate()
         .map(|(i, c)| (*c, i))
         .collect::<HashMap<_, _>>();
-    all_crates.sort_by_key(|krate| publish_order.get(&krate.name[..]));
+    all_crates.sort_by_key(|krate| publish_order.get(&krate.borrow().name[..]));
 
     let opts = Opts::parse();
     match opts.subcmd {
@@ -82,20 +84,26 @@ fn main() {
             patch,
             crates_to_bump,
         }) => {
-            let crates_to_bump: Vec<&Crate> = if !crates_to_bump.is_empty() {
+            let crates_to_bump: Vec<Rc<RefCell<Crate>>> = if !crates_to_bump.is_empty() {
                 all_crates
                     .iter()
-                    .skip_while(|krate| !crates_to_bump.contains(&krate.name))
+                    .skip_while(|krate| !crates_to_bump.contains(&krate.borrow().name))
+                    .cloned()
                     .collect()
             } else {
-                all_crates.iter().collect()
+                all_crates.to_vec()
             };
             if crates_to_bump.is_empty() {
                 println!("no crates found to bump");
                 return;
             }
-            for krate in &crates_to_bump {
-                bump_version(krate, &crates_to_bump, patch);
+            for krate in all_crates.iter() {
+                krate.borrow_mut().should_bump = crates_to_bump
+                    .iter()
+                    .any(|k| k.borrow().name == krate.borrow().name);
+            }
+            for krate in &all_crates {
+                bump_version(&krate.borrow(), &all_crates, patch);
             }
             // update the lock file
             assert!(
@@ -122,7 +130,7 @@ fn main() {
             // published. Failed-to-publish crates get enqueued for another try
             // later on.
             for _ in 0..10 {
-                all_crates.retain(|krate| !publish(krate));
+                all_crates.retain(|krate| !publish(&krate.borrow()));
 
                 if all_crates.is_empty() {
                     break;
@@ -149,10 +157,10 @@ fn main() {
     }
 }
 
-fn find_crates(dir: &Path, dst: &mut Vec<Crate>) {
+fn find_crates(dir: &Path, dst: &mut Vec<Rc<RefCell<Crate>>>) {
     if dir.join("Cargo.toml").exists() {
         if let Some(krate) = read_crate(&dir.join("Cargo.toml")) {
-            dst.push(krate);
+            dst.push(Rc::new(RefCell::new(krate)));
         }
     }
 
@@ -181,14 +189,14 @@ fn read_crate(manifest_path: &Path) -> Option<Crate> {
     Some(Crate {
         manifest,
         path: manifest_path.to_path_buf(),
-        string: contents,
         name,
         version,
-        publish,
+        should_bump: false,
+        should_publish: publish,
     })
 }
 
-fn bump_version(krate: &Crate, crates: &[&Crate], patch: bool) {
+fn bump_version(krate: &Crate, crates: &[Rc<RefCell<Crate>>], patch: bool) {
     let next_version = bump(&krate.version, patch);
 
     let mut new_manifest = krate.manifest.clone();
@@ -201,7 +209,7 @@ fn bump_version(krate: &Crate, crates: &[&Crate], patch: bool) {
         None => return,
     };
     for (dep_name, dep) in dependencies.iter_mut() {
-        if crates.iter().any(|k| *k.name == *dep_name) {
+        if crates.iter().any(|k| *k.borrow().name == *dep_name) {
             let dep_version = bump(dep["version"].as_str().expect("dep version"), patch);
             dep["version"] = toml_edit::value(dep_version.clone());
         }
@@ -313,7 +321,7 @@ fn publish(krate: &Crate) -> bool {
 // it were published to crates.io. This requires using an incrementally-built
 // directory registry generated from `cargo vendor` because the versions
 // referenced from `Cargo.toml` may not exist on crates.io.
-fn verify(crates: &[Crate]) {
+fn verify(crates: &[Rc<RefCell<Crate>>]) {
     drop(fs::remove_dir_all(".cargo"));
     drop(fs::remove_dir_all("vendor"));
     let vendor = Command::new("cargo")
@@ -327,10 +335,10 @@ fn verify(crates: &[Crate]) {
     fs::write(".cargo/config.toml", vendor.stdout).unwrap();
 
     for krate in crates {
-        if !krate.publish {
+        if !krate.borrow().should_publish {
             continue;
         }
-        verify_and_vendor(krate);
+        verify_and_vendor(&krate.borrow());
     }
 
     fn verify_and_vendor(krate: &Crate) {
