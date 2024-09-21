@@ -77,6 +77,7 @@ fn main() {
         .map(|(i, c)| (*c, i))
         .collect::<HashMap<_, _>>();
     all_crates.sort_by_key(|krate| publish_order.get(&krate.borrow().name[..]));
+    dbg!(all_crates.iter().map(|krate| krate.borrow().name.clone()).collect::<Vec<_>>());
 
     let opts = Opts::parse();
     match opts.subcmd {
@@ -97,6 +98,7 @@ fn main() {
                 println!("no crates found to bump");
                 return;
             }
+            dbg!(crates_to_bump.iter().map(|krate| krate.borrow().name.clone()).collect::<Vec<_>>());
             for krate in all_crates.iter() {
                 krate.borrow_mut().should_bump = crates_to_bump
                     .iter()
@@ -197,10 +199,12 @@ fn read_crate(manifest_path: &Path) -> Option<Crate> {
 }
 
 fn bump_version(krate: &Crate, crates: &[Rc<RefCell<Crate>>], patch: bool) {
-    let next_version = bump(&krate.version, patch);
-
     let mut new_manifest = krate.manifest.clone();
-    new_manifest["package"]["version"] = toml_edit::value(next_version);
+
+    if krate.should_bump {
+        let next_version = bump(&krate.version, patch);
+        new_manifest["package"]["version"] = toml_edit::value(next_version);
+    }
 
     // Update the dependencies of this crate to point to the new version of
     // crates that we're bumping.
