@@ -77,7 +77,6 @@ fn main() {
         .map(|(i, c)| (*c, i))
         .collect::<HashMap<_, _>>();
     all_crates.sort_by_key(|krate| publish_order.get(&krate.borrow().name[..]));
-    dbg!(all_crates.iter().map(|krate| krate.borrow().name.clone()).collect::<Vec<_>>());
 
     let opts = Opts::parse();
     match opts.subcmd {
@@ -98,14 +97,13 @@ fn main() {
                 println!("no crates found to bump");
                 return;
             }
-            dbg!(crates_to_bump.iter().map(|krate| krate.borrow().name.clone()).collect::<Vec<_>>());
             for krate in all_crates.iter() {
                 krate.borrow_mut().should_bump = crates_to_bump
                     .iter()
                     .any(|k| k.borrow().name == krate.borrow().name);
             }
             for krate in &all_crates {
-                bump_version(&krate.borrow(), &all_crates, patch);
+                bump_version(&krate.borrow(), &crates_to_bump, patch);
             }
             // update the lock file
             assert!(
