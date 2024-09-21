@@ -91,7 +91,13 @@ fn main() {
                     .cloned()
                     .collect()
             } else {
-                all_crates.to_vec()
+                all_crates
+                    .iter()
+                    .filter(|krate| {
+                        SORTED_CRATES_TO_PUBLISH.contains(&krate.borrow().name.as_str())
+                    })
+                    .cloned()
+                    .collect()
             };
             if crates_to_bump.is_empty() {
                 println!("no crates found to bump");
