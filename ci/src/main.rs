@@ -271,7 +271,7 @@ fn publish(krate: &Crate, dry_run: bool) -> bool {
     // binary may be re-run and there's no need to re-attempt previous work.
     let client = reqwest::blocking::Client::new();
     let response = client
-        .get(&format!("https://crates.io/api/v1/crates/{}", krate.name))
+        .get(format!("https://crates.io/api/v1/crates/{}", krate.name))
         .send()
         .expect("failed to get crate info");
     if response.status().is_success() {
