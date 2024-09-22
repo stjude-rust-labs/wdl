@@ -3,15 +3,18 @@
 //! root of the repository and will recursively search for all `Cargo.toml`
 //! files to bump the version of all crates.
 //!
+//! The binary was adapted from this script written by the bytecodealliance
+//! team: https://github.com/bytecodealliance/cargo-component/blob/5cf73a6e8fee84c12f6f0c13bf74ebe938fa9514/ci/publish.rs
+//!
 //! The binary is intended to be run in two phases:
 //!
-//! 1. `cargo run --bin ci -- bump` - this will bump the version of all crates in the
-//!    repository. By default this will bump the major version of all crates.
-//!    This can be overridden with the `--patch` flag to bump the patch version
-//!    instead.
+//! 1. `cargo run --bin ci -- bump` - this will bump the version of all crates
+//!    in the repository. By default this will bump the major version of all
+//!    crates. This can be overridden with the `--patch` flag to bump the patch
+//!    version instead.
 //!
-//! 2. `cargo run --bin ci -- publish` - this will publish all crates in the repository
-//!    to crates.io.
+//! 2. `cargo run --bin ci -- publish` - this will publish all crates in the
+//!    repository to crates.io.
 //!
 //! The binary will automatically skip crates that have already been published
 //! at the version that we're trying to publish. This means that the binary can
