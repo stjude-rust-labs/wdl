@@ -1,8 +1,35 @@
-//! Helper script to publish the warg suites of crates
+//! This binary is used to bump the version of all crates in this repository and
+//! then publish them to crates.io. The binary is intended to be run from the
+//! root of the repository and will recursively search for all `Cargo.toml`
+//! files to bump the version of all crates.
 //!
-//! * `./publish bump` - bump crate versions in-tree
-//! * `./publish verify` - verify crates can be published to crates.io
-//! * `./publish publish` - actually publish crates to crates.io
+//! The binary is intended to be run in two phases:
+//!
+//! 1. `cargo run --bin ci -- bump` - this will bump the version of all crates in the
+//!    repository. By default this will bump the major version of all crates.
+//!    This can be overridden with the `--patch` flag to bump the patch version
+//!    instead.
+//!
+//! 2. `cargo run --bin ci -- publish` - this will publish all crates in the repository
+//!    to crates.io.
+//!
+//! The binary will automatically skip crates that have already been published
+//! at the version that we're trying to publish. This means that the binary can
+//! be re-run if necessary and it will only attempt to publish new crates.
+//!
+//! The binary will also automatically update the dependencies of crates to
+//! point to the new version of crates that we're bumping. This means that if
+//! `wdl-ast` depends on `wdl-grammar` and we're bumping `wdl-grammar` then
+//! `wdl-ast` will be updated to depend on the new version of `wdl-grammar`.
+//!
+//! The binary will also automatically retry publishing crates that fail to
+//! publish. This is because crates.io can sometimes be rate-limited or have
+//! other issues that prevent crates from being published. The binary will
+//! automatically retry publishing crates that fail to publish up to 10 times.
+//!
+//! The binary will also automatically skip crates that are not in the list of
+//! crates to publish. This is to ensure that we only publish crates that are
+//! intended to be published.
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -10,7 +37,6 @@ use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command;
-use std::process::Stdio;
 use std::rc::Rc;
 use std::str::FromStr;
 use std::thread;
@@ -29,6 +55,8 @@ const SORTED_CRATES_TO_PUBLISH: &[&str] = &[
     "wdl",
 ];
 
+const IGNORE_PATHS: &[&str] = &["target", "tests", "examples", "benches", "book", "docs"];
+
 #[derive(Debug, Clone)]
 struct Crate {
     manifest: DocumentMut,
@@ -36,7 +64,6 @@ struct Crate {
     name: String,
     version: String,
     should_bump: bool,
-    should_publish: bool,
 }
 
 #[derive(Parser)]
@@ -49,7 +76,6 @@ struct Opts {
 enum SubCommand {
     Bump(Bump),
     Publish(Publish),
-    Verify(Verify),
 }
 
 #[derive(Parser)]
@@ -62,10 +88,10 @@ struct Bump {
 }
 
 #[derive(Parser)]
-struct Publish {}
-
-#[derive(Parser)]
-struct Verify {}
+struct Publish {
+    #[clap(short, long)]
+    dry_run: bool,
+}
 
 fn main() {
     let mut all_crates: Vec<Rc<RefCell<Crate>>> = Vec::new();
@@ -114,20 +140,13 @@ fn main() {
             // update the lock file
             assert!(
                 Command::new("cargo")
-                    .arg("update")
-                    .status()
-                    .unwrap()
-                    .success()
-            );
-            assert!(
-                Command::new("cargo")
                     .arg("fetch")
                     .status()
                     .unwrap()
                     .success()
             );
         }
-        SubCommand::Publish(_) => {
+        SubCommand::Publish(Publish { dry_run }) => {
             // We have so many crates to publish we're frequently either
             // rate-limited or we run into issues where crates can't publish
             // successfully because they're waiting on the index entries of
@@ -136,7 +155,7 @@ fn main() {
             // published. Failed-to-publish crates get enqueued for another try
             // later on.
             for _ in 0..10 {
-                all_crates.retain(|krate| !publish(&krate.borrow()));
+                all_crates.retain(|krate| !publish(&krate.borrow(), dry_run));
 
                 if all_crates.is_empty() {
                     break;
@@ -150,15 +169,6 @@ fn main() {
             }
 
             assert!(all_crates.is_empty(), "failed to publish all crates");
-
-            println!();
-            println!("===================================================================");
-            println!();
-            println!("Don't forget to push a git tag for this release!");
-            println!("    $ git push git@github.com:bytecodealliance/cargo-component.git vX.Y.Z");
-        }
-        SubCommand::Verify(_) => {
-            verify(&all_crates);
         }
     }
 }
@@ -172,6 +182,9 @@ fn find_crates(dir: &Path, dst: &mut Vec<Rc<RefCell<Crate>>>) {
 
     for entry in dir.read_dir().unwrap() {
         let entry = entry.unwrap();
+        if IGNORE_PATHS.iter().any(|p| entry.path().ends_with(p)) {
+            continue;
+        }
         if entry.file_type().unwrap().is_dir() {
             find_crates(&entry.path(), dst);
         }
@@ -188,17 +201,12 @@ fn read_crate(manifest_path: &Path) -> Option<Crate> {
     };
     let name = package["name"].as_str().expect("name").to_string();
     let version = package["version"].as_str().expect("version").to_string();
-    let publish = match &package.get("publish") {
-        Some(p) => p.as_bool().expect("publish"),
-        None => true,
-    };
     Some(Crate {
         manifest,
         path: manifest_path.to_path_buf(),
         name,
         version,
         should_bump: false,
-        should_publish: publish,
     })
 }
 
@@ -251,129 +259,43 @@ fn bump(version: &str, patch_bump: bool) -> String {
     }
 }
 
-fn publish(krate: &Crate) -> bool {
+fn publish(krate: &Crate, dry_run: bool) -> bool {
     if !SORTED_CRATES_TO_PUBLISH.iter().any(|s| *s == krate.name) {
         return true;
     }
 
     // First make sure the crate isn't already published at this version. This
-    // script may be re-run and there's no need to re-attempt previous work.
-    let output = Command::new("curl")
-        .arg(&format!("https://crates.io/api/v1/crates/{}", krate.name))
-        .output()
-        .expect("failed to invoke `curl`");
-    if output.status.success()
-        && String::from_utf8_lossy(&output.stdout)
-            .contains(&format!("\"newest_version\":\"{}\"", krate.version))
-    {
-        println!(
-            "skip publish {} because {} is latest version",
-            krate.name, krate.version,
-        );
-        return true;
+    // binary may be re-run and there's no need to re-attempt previous work.
+    let client = reqwest::blocking::Client::new();
+    let response = client
+        .get(&format!("https://crates.io/api/v1/crates/{}", krate.name))
+        .send()
+        .expect("failed to get crate info");
+    if response.status().is_success() {
+        let text = response.text().expect("failed to get response text");
+        if text.contains(&format!("\"newest_version\":\"{}\"", krate.version)) {
+            println!(
+                "skip publish {} because {} is latest version",
+                krate.name, krate.version,
+            );
+            return true;
+        }
     }
 
-    let status = Command::new("cargo")
+    let mut command = Command::new("cargo");
+    let command = command
         .arg("publish")
-        .current_dir(krate.path.parent().unwrap())
-        .arg("--no-verify")
-        .status()
-        .expect("failed to run cargo");
+        .current_dir(krate.path.parent().unwrap());
+    let status = if dry_run {
+        command.arg("--dry-run").status().unwrap()
+    } else {
+        command.status().unwrap()
+    };
+
     if !status.success() {
         println!("FAIL: failed to publish `{}`: {}", krate.name, status);
         return false;
     }
 
-    // After we've published then make sure that the `wasmtime-publish` group is
-    // added to this crate for future publications. If it's already present
-    // though we can skip the `cargo owner` modification.
-    let output = Command::new("curl")
-        .arg(&format!(
-            "https://crates.io/api/v1/crates/{}/owners",
-            krate.name
-        ))
-        .output()
-        .expect("failed to invoke `curl`");
-    if output.status.success()
-        && String::from_utf8_lossy(&output.stdout).contains("wasmtime-publish")
-    {
-        println!(
-            "wasmtime-publish already listed as an owner of {}",
-            krate.name
-        );
-        return true;
-    }
-
-    // Note that the status is ignored here. This fails most of the time because
-    // the owner is already set and present, so we only want to add this to
-    // crates which haven't previously been published.
-    let status = Command::new("cargo")
-        .arg("owner")
-        .arg("-a")
-        .arg("github:bytecodealliance:wasmtime-publish")
-        .arg(&krate.name)
-        .status()
-        .expect("failed to run cargo");
-    if !status.success() {
-        panic!(
-            "FAIL: failed to add wasmtime-publish as owner `{}`: {}",
-            krate.name, status
-        );
-    }
-
     true
-}
-
-// Verify the current tree is publish-able to crates.io. The intention here is
-// that we'll run `cargo package` on everything which verifies the build as-if
-// it were published to crates.io. This requires using an incrementally-built
-// directory registry generated from `cargo vendor` because the versions
-// referenced from `Cargo.toml` may not exist on crates.io.
-fn verify(crates: &[Rc<RefCell<Crate>>]) {
-    drop(fs::remove_dir_all(".cargo"));
-    drop(fs::remove_dir_all("vendor"));
-    let vendor = Command::new("cargo")
-        .arg("vendor")
-        .stderr(Stdio::inherit())
-        .output()
-        .unwrap();
-    assert!(vendor.status.success());
-
-    fs::create_dir_all(".cargo").unwrap();
-    fs::write(".cargo/config.toml", vendor.stdout).unwrap();
-
-    for krate in crates {
-        if !krate.borrow().should_publish {
-            continue;
-        }
-        verify_and_vendor(&krate.borrow());
-    }
-
-    fn verify_and_vendor(krate: &Crate) {
-        let mut cmd = Command::new("cargo");
-        cmd.arg("package")
-            .arg("--manifest-path")
-            .arg(&krate.path)
-            .env("CARGO_TARGET_DIR", "./target");
-        let status = cmd.status().unwrap();
-        assert!(status.success(), "failed to verify {:?}", &krate.manifest);
-        let tar = Command::new("tar")
-            .arg("xf")
-            .arg(format!(
-                "../target/package/{}-{}.crate",
-                krate.name, krate.version
-            ))
-            .current_dir("./vendor")
-            .status()
-            .unwrap();
-        assert!(tar.success());
-        fs::write(
-            format!(
-                "./vendor/{}-{}/.cargo-checksum.json",
-                krate.name, krate.version
-            ),
-            "{\"files\":{}}",
-        )
-        .unwrap();
-    }
 }

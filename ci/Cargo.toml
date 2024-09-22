@@ -11,5 +11,6 @@ rust-version.workspace = true
 
 [dependencies]
 clap.workspace = true
+reqwest = { workspace = true, features = ["blocking"] }
 toml.workspace = true
 toml_edit = { version = "0.22.21", features = ["serde"] }
