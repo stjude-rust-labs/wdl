@@ -12,4 +12,5 @@ jobs:
       - run: cargo run --release --bin ci -- bump
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
-        branch: chore/bump-version
+        with:
+          branch: chore/bump-version
