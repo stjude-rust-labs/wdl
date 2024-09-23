@@ -11,5 +11,5 @@ jobs:
           run: rustup update stable && rustup default stable
         - run: cargo run --release --bin ci -- bump
         - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        branch: chore/bump-version
+          uses: peter-evans/create-pull-request@v7
+          branch: chore/bump-version
