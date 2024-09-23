@@ -1,6 +1,19 @@
 name: Release
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      crate:
+        description: Crate to bump (anything which depends on this crate will also be bumped)
+        type: choice
+        default: wdl-grammar
+        options:
+          - wdl-grammar
+          - wdl-ast
+          - wdl-lint
+          - wdl-analysis
+          - wdl-lsp
+          - wdl
 
 jobs:
   bump:
@@ -9,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Update Rust
         run: rustup update stable && rustup default stable
-      - run: cargo run --release --bin ci -- bump
+      - run: cargo run --release --bin ci -- bump --crates-to-bump ${{ inputs.crate }}
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
