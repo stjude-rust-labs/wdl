@@ -1,0 +1,15 @@
+name: Release
+
+on: workflow_dispatch
+
+jobs:
+  bump:
+    runs-on: ubuntu-22.04
+      steps:
+        - uses: actions/checkout@v4
+        - name: Update Rust
+          run: rustup update stable && rustup default stable
+        - run: cargo run --release --bin ci -- bump
+        - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        branch: chore/bump-version
