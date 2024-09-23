@@ -1,9 +1,6 @@
 name: Release
 
-on:
-  push:
-    branches:
-      - a-frantz/ci
+on: workflow_dispatch
 
 jobs:
   bump:
@@ -17,3 +14,4 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           branch: chore/bump
+          title: "release: bump versions"
