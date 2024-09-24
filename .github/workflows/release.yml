@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - name: Create Release
-        uses: "marvinpinto/action-automatic-releases@v1.2.1"
+      - name: Release
+        uses: softprops/action-gh-release@v2
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: true
+          generate_release_notes: true
+          make_latest: true
