@@ -63,7 +63,8 @@ const IGNORE_PATHS: &[&str] = &["target", "tests", "examples", "benches", "book"
 #[derive(Debug, Clone)]
 struct Crate {
     manifest: DocumentMut,
-    path: PathBuf,
+    manifest_path: PathBuf,
+    changelog_path: Option<PathBuf>,
     name: String,
     version: String,
     should_bump: bool,
@@ -198,15 +199,24 @@ fn read_crate(manifest_path: &Path) -> Option<Crate> {
     let contents = fs::read_to_string(manifest_path).expect("failed to read manifest");
     let mut manifest =
         toml_edit::DocumentMut::from_str(&contents).expect("failed to parse manifest");
+
     let package = match manifest.get_mut("package") {
         Some(p) => p,
         None => return None, // workspace manifests don't have a package section
     };
     let name = package["name"].as_str().expect("name").to_string();
     let version = package["version"].as_str().expect("version").to_string();
+
+    let changelog_path = manifest_path.with_file_name("CHANGELOG.md");
+
     Some(Crate {
         manifest,
-        path: manifest_path.to_path_buf(),
+        manifest_path: manifest_path.to_path_buf(),
+        changelog_path: if changelog_path.exists() {
+            Some(changelog_path)
+        } else {
+            None
+        },
         name,
         version,
         should_bump: false,
@@ -223,18 +233,35 @@ fn bump_version(krate: &Crate, crates: &[Rc<RefCell<Crate>>], patch: bool) {
 
     // Update the dependencies of this crate to point to the new version of
     // crates that we're bumping.
-    let dependencies = match new_manifest["dependencies"].as_table_mut() {
-        Some(d) => d,
-        None => return,
-    };
-    for (dep_name, dep) in dependencies.iter_mut() {
-        if crates.iter().any(|k| *k.borrow().name == *dep_name) {
-            let dep_version = bump(dep["version"].as_str().expect("dep version"), patch);
-            dep["version"] = toml_edit::value(dep_version.clone());
+    let dependencies = new_manifest["dependencies"].as_table_mut();
+    if let Some(dependencies) = dependencies {
+        for (dep_name, dep) in dependencies.iter_mut() {
+            if crates.iter().any(|k| *k.borrow().name == *dep_name) {
+                let dep_version = bump(dep["version"].as_str().expect("dep version"), patch);
+                dep["version"] = toml_edit::value(dep_version.clone());
+            }
         }
     }
 
-    fs::write(&krate.path, new_manifest.to_string()).expect("failed to write new manifest");
+    fs::write(&krate.manifest_path, new_manifest.to_string())
+        .expect("failed to write new manifest");
+
+    if let Some(changelog_path) = &krate.changelog_path {
+        if krate.should_bump {
+            let todays_date = chrono::Local::now().format("%m-%d-%Y");
+            let mut changelog =
+                fs::read_to_string(changelog_path).expect("failed to read changelog");
+            changelog = changelog.replace(
+                "## Unreleased",
+                &format!(
+                    "## Unreleased\n\n## {} - {}",
+                    bump(&krate.version, patch),
+                    todays_date
+                ),
+            );
+            fs::write(changelog_path, changelog).expect("failed to write changelog");
+        }
+    }
 }
 
 /// Performs a major version bump increment on the semver version `version`.
@@ -288,7 +315,7 @@ fn publish(krate: &Crate, dry_run: bool) -> bool {
     let mut command = Command::new("cargo");
     let command = command
         .arg("publish")
-        .current_dir(krate.path.parent().unwrap());
+        .current_dir(krate.manifest_path.parent().unwrap());
     let status = if dry_run {
         command.arg("--dry-run").status().unwrap()
     } else {

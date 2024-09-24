@@ -10,6 +10,7 @@ repository.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+chrono = "0.4.38"
 clap.workspace = true
 reqwest = { workspace = true, features = ["blocking"] }
 toml.workspace = true
