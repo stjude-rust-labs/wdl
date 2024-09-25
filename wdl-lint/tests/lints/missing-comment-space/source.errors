@@ -6,3 +6,11 @@ note[PreambleFormatting]: preamble comments must start with `##` followed by a s
   │
   = fix: change each preamble comment to start with `##` followed by a space
 
+note[Whitespace]: line contains trailing whitespace
+  ┌─ tests/lints/missing-comment-space/source.wdl:4:3
+  │
+4 │ ## 
+  │   ^
+  │
+  = fix: remove this trailing whitespace
+
