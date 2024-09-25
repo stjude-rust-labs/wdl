@@ -158,7 +158,7 @@ fn main() {
             // publish in a loop and we remove crates once they're successfully
             // published. Failed-to-publish crates get enqueued for another try
             // later on.
-            for _ in 0..10 {
+            for _ in 0..3 {
                 all_crates.retain(|krate| !publish(&krate.borrow(), dry_run));
 
                 if all_crates.is_empty() {
