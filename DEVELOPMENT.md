@@ -28,7 +28,7 @@ We also appreciate feedback on our documentation. Feel free to look over any of 
 
 ## What is gauntlet?
 
-[Gauntlet](https://github.com/stjude-rust-labs/wdl/tree/main/gauntlet) is the main driver of our CI. Take a look at the file [`Gauntlet.toml`](https://github.com/stjude-rust-labs/wdl/blob/main/Gauntlet.toml). The entires at the top are all GitHub repositories of WDL code. The remaining entries are diagnositcs emitted while analyzing those repositories. These should remain relatively static between PRs, and any change in emitted diagnostics should be reviewed carefully.
+[Gauntlet](https://github.com/stjude-rust-labs/wdl/tree/main/gauntlet) is the main driver of our CI. Take a look at the file [`Gauntlet.toml`](https://github.com/stjude-rust-labs/wdl/blob/main/Gauntlet.toml). The entries at the top are all GitHub repositories of WDL code. The remaining entries are diagnostics emitted while analyzing those repositories. These should remain relatively static between PRs, and any change in emitted diagnostics should be reviewed carefully.
 
 In order to turn the Gauntlet CI green, try running `cargo run --release --bin gauntlet -- --refresh`. The `--refresh` flag will save any changes to the `Gauntlet.toml` file. This should then be committed and included in your PR.
 
