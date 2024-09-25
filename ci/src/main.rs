@@ -310,6 +310,19 @@ fn publish(krate: &Crate, dry_run: bool) -> bool {
             );
             return true;
         }
+    } else if response.status().as_u16() == 404 {
+        println!(
+            "skip publish {} because it doesn't exist on crates.io",
+            krate.name,
+        );
+        return true;
+    } else {
+        println!(
+            "skip publish {} because failed to get crate info: {}",
+            krate.name,
+            response.status()
+        );
+        return false;
     }
 
     let mut command = Command::new("cargo");
