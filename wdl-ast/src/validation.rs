@@ -7,11 +7,11 @@ use wdl_grammar::SyntaxElement;
 use wdl_grammar::SyntaxKind;
 use wdl_grammar::SyntaxNode;
 
-use super::v1;
 use super::Comment;
 use super::Diagnostic;
 use super::VisitReason;
 use super::Whitespace;
+use super::v1;
 use crate::Document;
 use crate::SupportedVersion;
 use crate::VersionStatement;
@@ -303,14 +303,25 @@ impl Visitor for Validator {
         }
     }
 
-    fn hints_section(
+    fn task_hints_section(
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        section: &v1::HintsSection,
+        section: &v1::TaskHintsSection,
     ) {
         for visitor in self.visitors.iter_mut() {
-            visitor.hints_section(state, reason, section);
+            visitor.task_hints_section(state, reason, section);
+        }
+    }
+
+    fn workflow_hints_section(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        section: &v1::WorkflowHintsSection,
+    ) {
+        for visitor in self.visitors.iter_mut() {
+            visitor.workflow_hints_section(state, reason, section);
         }
     }
 

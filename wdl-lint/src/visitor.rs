@@ -3,7 +3,6 @@
 use std::collections::HashSet;
 
 use indexmap::IndexMap;
-use wdl_ast::v1;
 use wdl_ast::AstNode;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostics;
@@ -13,9 +12,10 @@ use wdl_ast::VersionStatement;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::Whitespace;
+use wdl_ast::v1;
 
-use crate::rules;
 use crate::Rule;
+use crate::rules;
 
 /// A visitor that runs linting rules.
 ///
@@ -216,14 +216,25 @@ impl Visitor for LintVisitor {
         });
     }
 
-    fn hints_section(
+    fn task_hints_section(
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        section: &v1::HintsSection,
+        section: &v1::TaskHintsSection,
     ) {
         self.each_enabled_rule(state, |state, rule| {
-            rule.hints_section(state, reason, section)
+            rule.task_hints_section(state, reason, section)
+        });
+    }
+
+    fn workflow_hints_section(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        section: &v1::WorkflowHintsSection,
+    ) {
+        self.each_enabled_rule(state, |state, rule| {
+            rule.workflow_hints_section(state, reason, section)
         });
     }
 

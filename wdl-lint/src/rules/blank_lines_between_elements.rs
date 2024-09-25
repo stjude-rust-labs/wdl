@@ -1,22 +1,6 @@
 //! A lint rule for blank spacing between elements.
 
 use rowan::NodeOrToken;
-use wdl_ast::v1::BoundDecl;
-use wdl_ast::v1::CallStatement;
-use wdl_ast::v1::CommandSection;
-use wdl_ast::v1::ConditionalStatement;
-use wdl_ast::v1::HintsSection;
-use wdl_ast::v1::InputSection;
-use wdl_ast::v1::MetadataSection;
-use wdl_ast::v1::OutputSection;
-use wdl_ast::v1::ParameterMetadataSection;
-use wdl_ast::v1::RequirementsSection;
-use wdl_ast::v1::RuntimeSection;
-use wdl_ast::v1::ScatterStatement;
-use wdl_ast::v1::StructDefinition;
-use wdl_ast::v1::TaskDefinition;
-use wdl_ast::v1::UnboundDecl;
-use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -30,6 +14,23 @@ use wdl_ast::SyntaxToken;
 use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
+use wdl_ast::v1::BoundDecl;
+use wdl_ast::v1::CallStatement;
+use wdl_ast::v1::CommandSection;
+use wdl_ast::v1::ConditionalStatement;
+use wdl_ast::v1::InputSection;
+use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::OutputSection;
+use wdl_ast::v1::ParameterMetadataSection;
+use wdl_ast::v1::RequirementsSection;
+use wdl_ast::v1::RuntimeSection;
+use wdl_ast::v1::ScatterStatement;
+use wdl_ast::v1::StructDefinition;
+use wdl_ast::v1::TaskDefinition;
+use wdl_ast::v1::TaskHintsSection;
+use wdl_ast::v1::UnboundDecl;
+use wdl_ast::v1::WorkflowDefinition;
+use wdl_ast::v1::WorkflowHintsSection;
 
 use crate::Rule;
 use crate::Tag;
@@ -116,7 +117,8 @@ impl Rule for BlankLinesBetweenElementsRule {
             SyntaxKind::MetadataSectionNode,
             SyntaxKind::ParameterMetadataSectionNode,
             SyntaxKind::RequirementsSectionNode,
-            SyntaxKind::HintsSectionNode,
+            SyntaxKind::TaskHintsSectionNode,
+            SyntaxKind::WorkflowHintsSectionNode,
             SyntaxKind::CommandSectionNode,
         ])
     }
@@ -350,11 +352,27 @@ impl Visitor for BlankLinesBetweenElementsRule {
         flag_all_blank_lines_within(section.syntax(), state, &self.exceptable_nodes());
     }
 
-    fn hints_section(
+    fn task_hints_section(
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        section: &HintsSection,
+        section: &TaskHintsSection,
+    ) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+
+        let first = is_first_element(section.syntax());
+        let actual_start = skip_preceding_comments(section.syntax());
+        check_prior_spacing(&actual_start, state, true, first, &self.exceptable_nodes());
+        flag_all_blank_lines_within(section.syntax(), state, &self.exceptable_nodes());
+    }
+
+    fn workflow_hints_section(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        section: &WorkflowHintsSection,
     ) {
         if reason == VisitReason::Exit {
             return;
@@ -602,7 +620,8 @@ fn is_first_body(syntax: &SyntaxNode) -> bool {
                 | SyntaxKind::MetadataSectionNode
                 | SyntaxKind::ParameterMetadataSectionNode
                 | SyntaxKind::RequirementsSectionNode
-                | SyntaxKind::HintsSectionNode
+                | SyntaxKind::TaskHintsSectionNode
+                | SyntaxKind::WorkflowHintsSectionNode
                 | SyntaxKind::CommandSectionNode
         )
     })

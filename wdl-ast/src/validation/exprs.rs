@@ -4,8 +4,6 @@ use std::fmt;
 
 use rowan::ast::support::token;
 
-use crate::v1;
-use crate::version::V1;
 use crate::AstNode;
 use crate::Diagnostic;
 use crate::Diagnostics;
@@ -16,6 +14,8 @@ use crate::SyntaxKind;
 use crate::ToSpan;
 use crate::VisitReason;
 use crate::Visitor;
+use crate::v1;
+use crate::version::V1;
 
 /// Creates a "hints scope required" diagnostic.
 fn hints_scope_required(literal: &Literal) -> Diagnostic {
@@ -97,7 +97,12 @@ impl Visitor for ScopedExprVisitor {
         self.version = Some(version);
     }
 
-    fn hints_section(&mut self, _: &mut Self::State, reason: VisitReason, _: &v1::HintsSection) {
+    fn task_hints_section(
+        &mut self,
+        _: &mut Self::State,
+        reason: VisitReason,
+        _: &v1::TaskHintsSection,
+    ) {
         self.in_hints_section = reason == VisitReason::Enter;
     }
 

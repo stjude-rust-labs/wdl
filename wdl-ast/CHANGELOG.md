@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+* Split hint section representation into `TaskHintsSection` and
+  `WorkflowHintsSection` as workflow hints [do not support expressions](https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#workflow-hints) ([#176](https://github.com/stjude-rust-labs/wdl/pull/176))
+
+
+## 0.7.1 - 09-16-2024
+
+### Fixed
+
+* updated to latest wdl-grammar (v0.8.0)
+
+## 0.7.0 - 09-16-2024
+
 ### Added
 
 * moved "except comment" logic from `wdl-lint` into `wdl-ast`.
