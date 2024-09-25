@@ -296,65 +296,28 @@ fn publish(krate: &Crate, dry_run: bool) -> bool {
 
     // First make sure the crate isn't already published at this version. This
     // binary may be re-run and there's no need to re-attempt previous work.
-    let command = Command::new("curl")
-        .arg("-v")
-        .arg(format!(
-            "https://crates.io/api/v1/crates/{}/{}",
-            krate.name, krate.version
-        ))
-        .output()
-        .expect("failed to get crate info");
-    if !command.status.success() {
+    let client = reqwest::blocking::Client::new();
+    let req = client
+        .get(format!("https://crates.io/api/v1/crates/{}", krate.name))
+        .header("User-Agent", "curl/8.7.1"); // crates.io requires a user agent apparently
+    let response = req.send().expect("failed to get crate info");
+    if response.status().is_success() {
+        let text = response.text().expect("failed to get response text");
+        if text.contains(&format!("\"newest_version\":\"{}\"", krate.version)) {
+            println!(
+                "skip publish {} because {} is latest version",
+                krate.name, krate.version,
+            );
+            return true;
+        }
+    } else {
         println!(
             "skip publish {} because failed to get crate info: {}",
             krate.name,
-            command.status
+            response.status()
         );
         return false;
     }
-    let text = String::from_utf8(command.stdout).expect("failed to get response text");
-    dbg!("response");
-    dbg!(&text);
-    if text.contains(&format!("\"newest_version\":\"{}\"", krate.version)) {
-        println!(
-            "skip publish {} because {} is latest version",
-            krate.name, krate.version,
-        );
-        return true;
-    }
-    // let client = reqwest::blocking::Client::new();
-    // let req = client.get(format!(
-    //     "https://crates.io/api/v1/crates/{}/{}",
-    //     krate.name, krate.version
-    // ));
-    // dbg!("requesting crate info");
-    // dbg!(&req);
-    // let response = req.send().expect("failed to get crate info");
-    // dbg!("response");
-    // dbg!(&response);
-    // if response.status().is_success() {
-    //     let text = response.text().expect("failed to get response text");
-    //     if text.contains(&format!("\"newest_version\":\"{}\"", krate.version)) {
-    //         println!(
-    //             "skip publish {} because {} is latest version",
-    //             krate.name, krate.version,
-    //         );
-    //         return true;
-    //     }
-    // } else if response.status().as_u16() == 404 {
-    //     println!(
-    //         "skip publish {} because it doesn't exist on crates.io",
-    //         krate.name,
-    //     );
-    //     return true;
-    // } else {
-    //     println!(
-    //         "skip publish {} because failed to get crate info: {}",
-    //         krate.name,
-    //         response.status()
-    //     );
-    //     return false;
-    // }
 
     let mut command = Command::new("cargo");
     let command = command
