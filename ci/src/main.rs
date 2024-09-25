@@ -297,7 +297,7 @@ fn publish(krate: &Crate, dry_run: bool) -> bool {
     // First make sure the crate isn't already published at this version. This
     // binary may be re-run and there's no need to re-attempt previous work.
     let command = Command::new("curl")
-        .arg("-s")
+        .arg("-v")
         .arg(format!(
             "https://crates.io/api/v1/crates/{}/{}",
             krate.name, krate.version
