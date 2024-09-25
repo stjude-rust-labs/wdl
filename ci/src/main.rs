@@ -313,6 +313,8 @@ fn publish(krate: &Crate, dry_run: bool) -> bool {
         return false;
     }
     let text = String::from_utf8(command.stdout).expect("failed to get response text");
+    dbg!("response");
+    dbg!(&text);
     if text.contains(&format!("\"newest_version\":\"{}\"", krate.version)) {
         println!(
             "skip publish {} because {} is latest version",
