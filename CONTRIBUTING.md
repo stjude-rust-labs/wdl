@@ -24,7 +24,7 @@ Most of this team uses VScode with the `rust-analyzer` extension but that prefer
 
 ### What's a good first issue?
 
-We will try to keep a handful of [issues](https://github.com/stjude-rust-labs/wdl/issues) marked `good first issue` open and ready for new contributors.
+We will try to keep a handful of [issues][issues] marked `good first issue` open and ready for new contributors.
 
 ### I don't want to write code, can I still contribute?
 
