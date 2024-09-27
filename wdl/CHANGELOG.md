@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Added a `verbosity` flag to the `wdl` CLI tool (https://github.com/stjude-rust-labs/wdl/pull/199).
+* Added a `verbosity` flag to the `wdl` CLI tool ([#199](https://github.com/stjude-rust-labs/wdl/pull/199)).
 
 ## 0.8.0 - 09-16-2024
 
