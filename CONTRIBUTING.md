@@ -37,6 +37,7 @@ We also appreciate feedback on our documentation. Feel free to look over any of 
 ### What's the difference between `error`, `warning`, and `note`?
 
 - an `error` is emitted when the source WDL is incorrect or invalid in some way
+    - errors should not be emitted by `wdl-lint`
 - a `warning` is emitted when the source WDL is confusing, problematic, error-prone, etc. but not invalid or incorrect
 - a `note` is emitted in all other cases and is mostly used for issues of style or conformity
 
@@ -65,5 +66,17 @@ There are a handful of reasons the CI may have turned red. Try the following fix
 - `cargo run --release --bin gauntlet -- --refresh --arena`
     - see the `What is arena?` question for more information
 - `rustup update` to update your local toolchains
+
+### What's the general workflow for writing a new lint rule?
+
+1. create a `wdl-lint/src/rules/<>.rs` file and tinker until you are calling `exceptable_add()` in some case
+    - review the existing rules in `wdl-lint/src/rules/` for guidance on this
+2. write a `wdl-lint/tests/lints/<>/source.wdl` that has cases that should and should not trigger the above call to `exceptable_add()`
+3. run `BLESS=1 cargo test -p wdl-lint --all-features` to generate a `source.errors`
+    - this file should not be edited by hand
+4. review `source.errors` to see if it matches our expectations
+    - this isn't exactly true, but I conceptualize `source.errors` as the output if a user ran a `lint` command on `source.wdl`
+    - while reviewing, ask yourself if the printed diagnostics are clear and informative
+5. repeat
 
 [issues]: https://github.com/stjude-rust-labs/wdl/issues
