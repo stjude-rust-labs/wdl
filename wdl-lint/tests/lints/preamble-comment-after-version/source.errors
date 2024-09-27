@@ -4,3 +4,19 @@ note[PreambleFormatting]: unnecessary whitespace in document preamble
 4 │        ## Bad leading whitespace!
   │ ^^^^^^^
 
+error[PreambleCommentAfterVersion]: preamble comment after the version statement
+   ┌─ tests/lints/preamble-comment-after-version/source.wdl:8:1
+   │  
+ 8 │ ╭ ## This is a preamble comment after the version
+ 9 │ │ 
+10 │ │ ## Also a preamble comment
+11 │ │ 
+12 │ │ ## And this one is bad too!
+   │ ╰───────────────────────────^
+
+error[PreambleCommentAfterVersion]: preamble comment after the version statement
+   ┌─ tests/lints/preamble-comment-after-version/source.wdl:21:5
+   │
+21 │     ## This one is bad!
+   │     ^^^^^^^^^^^^^^^^^^^
+
