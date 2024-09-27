@@ -8,11 +8,11 @@ Community contributions rock and we are psyched you're reading this document!
 - Feature requests are welcome and go [here](https://github.com/stjude-rust-labs/wdl/discussions/categories/feature-requests)
 - Lint rule proposals go [here](https://github.com/stjude-rust-labs/wdl/discussions/categories/rule-proposals)
 
-## How to contribute?
+## FAQs
+
+### How do I start contributing?
 
 We encourage you to reach out to the core team prior to writing up a pull request. This is to ensure there isn't any wasted effort or duplication of work caused by miscommunication. You can get in touch with us via the [issues][issues] or hop over to the [discussions](https://github.com/stjude-rust-labs/wdl/discussions). We are also active on the [openwdl Slack workspace](https://openwdl.slack.com). (Discussion about this repo best belongs in the #sprocket channel 😃)
-
-## FAQs
 
 ### How do I set up Rust?
 
@@ -30,7 +30,7 @@ We will try to keep a handful of [issues][issues] marked `good first issue` open
 
 Sure!
 
-You can always open a [discussion](https://github.com/stjude-rust-labs/wdl/discussions/categories/rule-proposals) with a propsal for a new lint rule. Or contribute to any open discussions.
+You can always open a [discussion](https://github.com/stjude-rust-labs/wdl/discussions/categories/rule-proposals) with a propsal for a new lint rule or contribute to any open discussions.
 
 We also appreciate feedback on our documentation. Feel free to look over any of our `*.md` files and note any issues you find. You can also explore our lint rule documentation by [installing `sprocket`](https://stjude-rust-labs.github.io/sprocket/installation.html) and reading the output of `sprocket explain`. (n.b.: we hope to replace `sprocket explain` with a website where each rule will have a dedicated page, but that has not been realized yet)
 

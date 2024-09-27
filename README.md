@@ -185,9 +185,8 @@ cargo doc
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome! Feel free to check the
-[issues page](https://github.com/stjude-rust-labs/wdl/issues) and read our
-[contributing FAQs](https://github.com/stjude-rust-labs/wdl/blob/main/CONTRIBUTING.md).
+Contributions, issues, and feature requests are all welcome! Feel free to read our
+[contributing guide](https://github.com/stjude-rust-labs/wdl/blob/main/CONTRIBUTING.md).
 
 ## 📝 License
 
