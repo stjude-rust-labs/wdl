@@ -3,6 +3,4 @@ note[PreambleFormatting]: unnecessary whitespace in document preamble
   │
 4 │        ## Bad leading whitespace!
   │ ^^^^^^^
-  │
-  = fix: remove the unnecessary whitespace
 

@@ -9,6 +9,4 @@ note[PreambleFormatting]: preamble comments must start with `##` followed by a s
 12 │ │ # as a single diagnostic
 13 │ │ # warning
    │ ╰─────────^
-   │  
-   = fix: change each preamble comment to start with `##` followed by a space
 

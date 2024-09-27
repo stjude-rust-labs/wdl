@@ -1,0 +1,8 @@
+note[VersionFormatting]: expected exactly one blank line between the last comment and the version statement
+  ┌─ tests/lints/missing-preamble-ws/source.wdl:3:50
+  │  
+3 │   ## This is a test of missing preamble whitespace.
+  │ ╭─────────────────────────────────────────────────^
+4 │ │ version 1.1
+  │ ╰^
+

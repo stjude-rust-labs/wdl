@@ -1,3 +1,13 @@
+note[VersionFormatting]: expected exactly one blank line after the version statement
+  ┌─ tests/lints/comment-whitespace/source.wdl:3:12
+  │  
+3 │   version 1.2
+  │ ╭───────────^
+4 │ │ 
+5 │ │ 
+6 │ │ ################
+  │ ╰^
+
 note[CommentWhitespace]: comment delimiter should be followed by a single space
   ┌─ tests/lints/comment-whitespace/source.wdl:8:1
   │

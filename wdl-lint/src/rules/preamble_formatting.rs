@@ -27,7 +27,6 @@ fn invalid_preamble_comment(span: Span) -> Diagnostic {
     Diagnostic::note("preamble comments must start with `##` followed by a space")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("change each preamble comment to start with `##` followed by a space")
 }
 
 /// Creates a "preamble comment before directive" diagnostic.
@@ -35,7 +34,6 @@ fn preamble_comment_before_directive(span: Span) -> Diagnostic {
     Diagnostic::note("preamble comments must come after lint directives")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("move the preamble comment after the lint directive")
 }
 
 /// Creates a "directive after preamble comment" diagnostic.
@@ -43,7 +41,6 @@ fn directive_after_preamble_comment(span: Span) -> Diagnostic {
     Diagnostic::note("lint directives must come before preamble comments")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("move the lint directive before the preamble comment")
 }
 
 /// Creates an "unnecessary whitespace" diagnostic.
@@ -51,7 +48,6 @@ fn unnecessary_whitespace(span: Span) -> Diagnostic {
     Diagnostic::note("unnecessary whitespace in document preamble")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("remove the unnecessary whitespace")
 }
 
 /// Creates an "expected a blank line before" diagnostic.
@@ -59,7 +55,6 @@ fn expected_blank_line_before_version(span: Span) -> Diagnostic {
     Diagnostic::note("expected exactly one blank line before the version statement")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("add a blank line between the last preamble comment and the version statement")
 }
 
 /// Creates an "expected a blank line before preamble comment" diagnostic.
@@ -69,7 +64,6 @@ fn expected_blank_line_before_preamble_comment(span: Span) -> Diagnostic {
     )
     .with_rule(ID)
     .with_highlight(span)
-    .with_fix("add a blank line between the last lint directive and the first preamble comment")
 }
 
 /// Detects if a comment is a lint directive.
@@ -265,14 +259,17 @@ impl Visitor for PreambleFormattingRule {
                 }
                 (false, true, true, false) => {
                     // Preamble comment followed by lint directive
+                    // Handled by comment visitor
                     return;
                 }
                 (_, _, false, false) => {
                     // anything followed by invalid comment
+                    // Handled by comment visitor
                     return;
                 }
                 (false, false, ..) => {
                     // Invalid comment followed by anything
+                    // Handled by comment visitor
                     return;
                 }
                 _ => {
@@ -366,7 +363,7 @@ impl Visitor for PreambleFormattingRule {
             }
         }
 
-        // Otherwise, look for the next siblings that might also be invalid;
+        // Otherwise, look for the next siblings that might also be problematic;
         // if so, consolidate them into a single diagnostic
         let mut span = comment.span();
         let mut current = comment.syntax().next_sibling_or_token();
