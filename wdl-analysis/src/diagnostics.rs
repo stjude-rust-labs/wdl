@@ -797,3 +797,13 @@ pub fn recursive_workflow_call(name: &Ident) -> Diagnostic {
     ))
     .with_highlight(name.span())
 }
+
+/// Creates a "missing call input" diagnostic.
+pub fn missing_call_input(workflow: bool, target: &Ident, input: &str) -> Diagnostic {
+    Diagnostic::error(format!(
+        "missing required call input `{input}` for {kind} `{target}`",
+        kind = if workflow { "workflow" } else { "task" },
+        target = target.as_str(),
+    ))
+    .with_highlight(target.span())
+}

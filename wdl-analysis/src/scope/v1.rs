@@ -1,5 +1,6 @@
 //! Conversion of a V1 AST to a document scope.
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::str::FromStr;
 use std::sync::Arc;
 
@@ -18,6 +19,7 @@ use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxNode;
 use wdl_ast::ToSpan;
+use wdl_ast::TokenStrHash;
 use wdl_ast::Version;
 use wdl_ast::v1::Ast;
 use wdl_ast::v1::CallStatement;
@@ -53,6 +55,7 @@ use crate::diagnostics::import_missing_version;
 use crate::diagnostics::imported_struct_conflict;
 use crate::diagnostics::incompatible_import;
 use crate::diagnostics::invalid_relative_import;
+use crate::diagnostics::missing_call_input;
 use crate::diagnostics::name_conflict;
 use crate::diagnostics::namespace_conflict;
 use crate::diagnostics::only_one_namespace;
@@ -318,14 +321,14 @@ fn add_struct(
 /// Converts an AST type to an analysis type.
 fn convert_ast_type(
     document: &mut DocumentScope,
-    ty: wdl_ast::v1::Type,
+    ty: &wdl_ast::v1::Type,
     diagnostics: &mut Vec<Diagnostic>,
 ) -> Type {
     let mut converter = AstTypeConverter::new(&mut document.types, |name, span| {
         lookup_type(&document.structs, name, span)
     });
 
-    match converter.convert_type(&ty) {
+    match converter.convert_type(ty) {
         Ok(ty) => ty,
         Err(diagnostic) => {
             diagnostics.push(diagnostic);
@@ -334,8 +337,32 @@ fn convert_ast_type(
     }
 }
 
-/// Creates a map of declaration name to declared type.
-fn create_type_map(
+/// Creates an input type map.
+fn create_input_type_map(
+    document: &mut DocumentScope,
+    declarations: impl Iterator<Item = Decl>,
+    diagnostics: &mut Vec<Diagnostic>,
+) -> HashMap<String, (Type, bool)> {
+    let mut map = HashMap::new();
+    for decl in declarations {
+        let name = decl.name();
+        if map.contains_key(name.as_str()) {
+            // Ignore the duplicate
+            continue;
+        }
+
+        let ty = convert_ast_type(document, &decl.ty(), diagnostics);
+        map.insert(
+            name.as_str().to_string(),
+            (ty, decl.expr().is_none() && !ty.is_optional()),
+        );
+    }
+
+    map
+}
+
+/// Creates an output type map.
+fn create_output_type_map(
     document: &mut DocumentScope,
     declarations: impl Iterator<Item = Decl>,
     diagnostics: &mut Vec<Diagnostic>,
@@ -344,21 +371,11 @@ fn create_type_map(
     for decl in declarations {
         let name = decl.name();
         if map.contains_key(name.as_str()) {
+            // Ignore the duplicate
             continue;
         }
 
-        let mut converter = AstTypeConverter::new(&mut document.types, |name, span| {
-            lookup_type(&document.structs, name, span)
-        });
-
-        let ty = match converter.convert_type(&decl.ty()) {
-            Ok(ty) => ty,
-            Err(diagnostic) => {
-                diagnostics.push(diagnostic);
-                Type::Union
-            }
-        };
-
+        let ty = convert_ast_type(document, &decl.ty(), diagnostics);
         map.insert(name.as_str().to_string(), ty);
     }
 
@@ -411,12 +428,12 @@ fn add_task(
     }
 
     // Populate type maps for the task's inputs and outputs
-    let inputs = create_type_map(
+    let inputs = create_input_type_map(
         document,
         task.input().into_iter().flat_map(|s| s.declarations()),
         diagnostics,
     );
-    let outputs = create_type_map(
+    let outputs = create_output_type_map(
         document,
         task.output()
             .into_iter()
@@ -433,10 +450,22 @@ fn add_task(
     for node in graph.toposort() {
         match node {
             TaskGraphNode::Input(decl) => {
-                add_decl(document, scope, &decl, Some(&inputs), diagnostics);
+                add_decl(
+                    document,
+                    scope,
+                    &decl,
+                    |_, n, _, _| inputs[n].0,
+                    diagnostics,
+                );
             }
             TaskGraphNode::Decl(decl) => {
-                add_decl(document, scope, &decl, None, diagnostics);
+                add_decl(
+                    document,
+                    scope,
+                    &decl,
+                    |doc, _, decl, diag| convert_ast_type(doc, &decl.ty(), diag),
+                    diagnostics,
+                );
             }
             TaskGraphNode::Output(decl) => {
                 let scope = *output_scope.get_or_insert_with(|| {
@@ -447,7 +476,7 @@ fn add_task(
                         braced_scope_span(&task.output().expect("should have output section")),
                     )
                 });
-                add_decl(document, scope, &decl, Some(&outputs), diagnostics);
+                add_decl(document, scope, &decl, |_, n, _, _| outputs[n], diagnostics);
             }
             TaskGraphNode::Command(section) => {
                 let scope = *command_scope.get_or_insert_with(|| {
@@ -541,19 +570,16 @@ fn add_decl(
     document: &mut DocumentScope,
     scope: ScopeIndex,
     decl: &Decl,
-    type_map: Option<&HashMap<String, Type>>,
+    ty: impl FnOnce(&mut DocumentScope, &str, &Decl, &mut Vec<Diagnostic>) -> Type,
     diagnostics: &mut Vec<Diagnostic>,
 ) {
-    let (name, ty, expr) = (decl.name(), decl.ty(), decl.expr());
+    let (name, expr) = (decl.name(), decl.expr());
     if document.scope(scope).lookup(name.as_str()).is_some() {
         // The declaration is conflicting; don't add to the scope
         return;
     }
 
-    let ty = match type_map {
-        Some(map) => map[name.as_str()],
-        None => convert_ast_type(document, ty, diagnostics),
-    };
+    let ty = ty(document, name.as_str(), decl, diagnostics);
 
     document
         .scope_mut(scope)
@@ -608,7 +634,7 @@ fn populate_workflow_scope(
     diagnostics: &mut Vec<Diagnostic>,
 ) {
     // Populate type maps for the workflow's inputs and outputs
-    let inputs = create_type_map(
+    let inputs = create_input_type_map(
         document,
         definition
             .input()
@@ -616,7 +642,7 @@ fn populate_workflow_scope(
             .flat_map(|s| s.declarations()),
         diagnostics,
     );
-    let outputs = create_type_map(
+    let outputs = create_output_type_map(
         document,
         definition
             .output()
@@ -638,14 +664,26 @@ fn populate_workflow_scope(
     for node in graph.toposort() {
         match node {
             WorkflowGraphNode::Input(decl) => {
-                add_decl(document, workflow_scope, &decl, Some(&inputs), diagnostics);
+                add_decl(
+                    document,
+                    workflow_scope,
+                    &decl,
+                    |_, n, _, _| inputs[n].0,
+                    diagnostics,
+                );
             }
             WorkflowGraphNode::Decl(decl) => {
                 let scope = scopes
                     .get(&decl.syntax().parent().expect("should have parent"))
                     .copied()
                     .unwrap_or(workflow_scope);
-                add_decl(document, scope, &decl, None, diagnostics);
+                add_decl(
+                    document,
+                    scope,
+                    &decl,
+                    |doc, _, decl, diag| convert_ast_type(doc, &decl.ty(), diag),
+                    diagnostics,
+                );
             }
             WorkflowGraphNode::Output(decl) => {
                 let scope = *output_scope.get_or_insert_with(|| {
@@ -656,7 +694,7 @@ fn populate_workflow_scope(
                         ),
                     ))
                 });
-                add_decl(document, scope, &decl, Some(&outputs), diagnostics);
+                add_decl(document, scope, &decl, |_, n, _, _| outputs[n], diagnostics);
             }
             WorkflowGraphNode::Conditional(statement) => {
                 let parent = scopes
@@ -792,23 +830,29 @@ fn add_call_statement(
     statement: &CallStatement,
     diagnostics: &mut Vec<Diagnostic>,
 ) {
-    let name = statement.alias().map(|a| a.name()).unwrap_or_else(|| {
-        statement
-            .target()
-            .names()
-            .last()
-            .expect("expected a last call target name")
-    });
+    let target_name = statement
+        .target()
+        .names()
+        .last()
+        .expect("expected a last call target name");
+
+    let name = statement
+        .alias()
+        .map(|a| a.name())
+        .unwrap_or_else(|| target_name.clone());
 
     let ty = match resolve_call_target(document, workflow_name, statement, diagnostics) {
         Some(target) => {
             // Type check the call inputs
+            let mut seen = HashSet::new();
             for input in statement.inputs() {
                 let input_name = input.name();
+
                 let expected_ty = target
                     .inputs
                     .get(input_name.as_str())
                     .copied()
+                    .map(|(ty, _)| ty)
                     .unwrap_or_else(|| {
                         diagnostics.push(unknown_input(
                             name.as_str(),
@@ -846,6 +890,14 @@ fn add_call_statement(
                         }
                     }
                 }
+
+                seen.insert(TokenStrHash::new(input_name));
+            }
+
+            for (input, (_, required)) in &target.inputs {
+                if *required && !seen.contains(input.as_str()) {
+                    diagnostics.push(missing_call_input(target.workflow, &target_name, input));
+                }
             }
 
             document.types.add_call_output(CallOutputType::new(
@@ -872,8 +924,13 @@ struct CallTarget {
     /// Whether or not the target is a workflow.
     workflow: bool,
     /// The inputs of the call target.
-    inputs: HashMap<String, Type>,
+    ///
+    /// The value is the pair of the input type and whether or not the input is
+    /// required.
+    inputs: HashMap<String, (Type, bool)>,
     /// The outputs of the call target.
+    ///
+    /// The value is the output type.
     outputs: HashMap<String, Type>,
 }
 
@@ -934,7 +991,7 @@ fn resolve_call_target(
     // If the target is from an import, we need to import its type definitions into
     // the current document scope
     if let Some(types) = namespace.map(|ns| &ns.scope.types) {
-        for ty in inputs.values_mut() {
+        for (ty, _) in inputs.values_mut() {
             *ty = document.types.import(types, *ty);
         }
 

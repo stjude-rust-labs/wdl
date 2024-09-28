@@ -1177,7 +1177,7 @@ where
                 span = Some(name.span());
 
                 match if input {
-                    scope.input_type(name.as_str()).unwrap()
+                    scope.input_type(name.as_str()).unwrap().map(|(ty, _)| ty)
                 } else {
                     scope.output_type(name.as_str()).unwrap()
                 } {

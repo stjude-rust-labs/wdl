@@ -177,7 +177,7 @@ pub struct ScopeRef<'a> {
     /// The input type map.
     ///
     /// This is `None` when `input` hidden types are not supported.
-    inputs: Option<&'a HashMap<String, Type>>,
+    inputs: Option<&'a HashMap<String, (Type, bool)>>,
     /// The output type map.
     ///
     /// This is `None` when `output` hidden types are not supported.
@@ -265,7 +265,7 @@ impl<'a> ScopeRef<'a> {
     ///
     /// Returns `Ok(Some)` if input hidden types are supported and the name is
     /// known.
-    pub(crate) fn input_type(&self, name: &str) -> Result<Option<Type>, ()> {
+    pub(crate) fn input_type(&self, name: &str) -> Result<Option<(Type, bool)>, ()> {
         match self.inputs {
             Some(map) => Ok(map.get(name).copied()),
             None => Err(()),
@@ -331,8 +331,13 @@ struct Task {
     /// The root scope index for the task.
     scope: ScopeIndex,
     /// The inputs of the task.
-    inputs: HashMap<String, Type>,
+    ///
+    /// The value is the pair of the input type and whether or not the input is
+    /// required.
+    inputs: HashMap<String, (Type, bool)>,
     /// The outputs of the task.
+    ///
+    /// The value is the output type.
     outputs: HashMap<String, Type>,
 }
 
@@ -346,8 +351,13 @@ struct Workflow {
     /// The scope index of the workflow.
     scope: ScopeIndex,
     /// The inputs of the workflow.
-    inputs: HashMap<String, Type>,
+    ///
+    /// The value is the pair of the input type and whether or not the input is
+    /// required.
+    inputs: HashMap<String, (Type, bool)>,
     /// The outputs of the workflow.
+    ///
+    /// The value is the output type.
     outputs: HashMap<String, Type>,
 }
 
