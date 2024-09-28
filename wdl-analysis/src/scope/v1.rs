@@ -29,10 +29,12 @@ use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::Expr;
 use wdl_ast::v1::ImportStatement;
+use wdl_ast::v1::MetadataValue;
 use wdl_ast::v1::ScatterStatement;
 use wdl_ast::v1::StructDefinition;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::WorkflowDefinition;
+use wdl_ast::v1::WorkflowHintsItemValue;
 use wdl_ast::version::V1;
 
 use super::DocumentScope;
@@ -627,6 +629,58 @@ fn add_workflow(
     true
 }
 
+/// Determines if nested inputs are allowed for a workflow.
+fn is_nested_inputs_allowed(document: &DocumentScope, definition: &WorkflowDefinition) -> bool {
+    match document.version() {
+        Some(SupportedVersion::V1(V1::Zero)) => return true,
+        Some(SupportedVersion::V1(V1::One)) => {
+            // Fall through to below
+        }
+        Some(SupportedVersion::V1(V1::Two)) => {
+            // Check the hints section
+            let allow = definition.hints().and_then(|s| {
+                s.items().find_map(|i| {
+                    if matches!(
+                        i.name().as_str(),
+                        "allow_nested_inputs" | "allowNestedInputs"
+                    ) {
+                        match i.value() {
+                            WorkflowHintsItemValue::Boolean(v) => Some(v.value()),
+                            _ => Some(false),
+                        }
+                    } else {
+                        None
+                    }
+                })
+            });
+
+            if let Some(allow) = allow {
+                return allow;
+            }
+
+            // Fall through to below
+        }
+        _ => return false,
+    }
+
+    // Check the metadata section
+    definition
+        .metadata()
+        .and_then(|s| {
+            s.items().find_map(|i| {
+                if i.name().as_str() == "allowNestedInputs" {
+                    match i.value() {
+                        MetadataValue::Boolean(v) => Some(v.value()),
+                        _ => Some(false),
+                    }
+                } else {
+                    None
+                }
+            })
+        })
+        .unwrap_or(false)
+}
+
 /// Finishes processing a workflow by populating its scope.
 fn populate_workflow_scope(
     document: &mut DocumentScope,
@@ -650,6 +704,8 @@ fn populate_workflow_scope(
             .flat_map(|s| s.declarations().map(Decl::Bound)),
         diagnostics,
     );
+
+    let nested_inputs_allowed = is_nested_inputs_allowed(document, definition);
 
     // Keep a map of scopes from syntax node that introduced the scope to the scope
     // index
@@ -720,6 +776,7 @@ fn populate_workflow_scope(
                     definition.name().as_str(),
                     scope,
                     &statement,
+                    nested_inputs_allowed,
                     diagnostics,
                 );
             }
@@ -828,6 +885,7 @@ fn add_call_statement(
     workflow_name: &str,
     scope: ScopeIndex,
     statement: &CallStatement,
+    nested_inputs_allowed: bool,
     diagnostics: &mut Vec<Diagnostic>,
 ) {
     let target_name = statement
@@ -891,12 +949,17 @@ fn add_call_statement(
                     }
                 }
 
-                seen.insert(TokenStrHash::new(input_name));
+                // Don't bother keeping track of seen inputs if nested inputs are allowed
+                if !nested_inputs_allowed {
+                    seen.insert(TokenStrHash::new(input_name));
+                }
             }
 
-            for (input, (_, required)) in &target.inputs {
-                if *required && !seen.contains(input.as_str()) {
-                    diagnostics.push(missing_call_input(target.workflow, &target_name, input));
+            if !nested_inputs_allowed {
+                for (input, (_, required)) in &target.inputs {
+                    if *required && !seen.contains(input.as_str()) {
+                        diagnostics.push(missing_call_input(target.workflow, &target_name, input));
+                    }
                 }
             }
 

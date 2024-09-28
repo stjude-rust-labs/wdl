@@ -212,7 +212,7 @@ impl Visitor for UniqueKeysVisitor {
 
         check_duplicate_keys(
             &mut self.0,
-            &[],
+            &[("allow_nested_inputs", "allowNestedInputs")],
             section.items().map(|i| i.name()),
             Context::HintsSection,
             state,
