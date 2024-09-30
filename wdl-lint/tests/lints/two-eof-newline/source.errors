@@ -1,4 +1,4 @@
-warning[EndingNewline]: multiple empty lines at the end of file
+note[EndingNewline]: multiple empty lines at the end of file
    ┌─ tests/lints/two-eof-newline/source.wdl:10:2
    │  
 10 │   }

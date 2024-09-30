@@ -32,6 +32,14 @@ note[KeyValuePairs]: item should be followed by a newline
   │
   = fix: add a newline after this element
 
+note[TrailingComma]: item missing trailing comma
+  ┌─ tests/lints/key-value-pairs/source.wdl:9:19
+  │
+9 │         "value2", "value3"]
+  │                   ^^^^^^^^
+  │
+  = fix: add a comma after this element
+
 note[KeyValuePairs]: item should be followed by a newline
    ┌─ tests/lints/key-value-pairs/source.wdl:10:19
    │
@@ -96,6 +104,14 @@ note[KeyValuePairs]: item should be followed by a newline
    │
    = fix: add a newline after this element
 
+note[TrailingComma]: item missing trailing comma
+   ┌─ tests/lints/key-value-pairs/source.wdl:20:22
+   │
+20 │                 "m", "n"],
+   │                      ^^^
+   │
+   = fix: add a comma after this element
+
 note[KeyValuePairs]: item should be followed by a newline
    ┌─ tests/lints/key-value-pairs/source.wdl:21:16
    │
@@ -111,6 +127,14 @@ note[KeyValuePairs]: incorrect indentation
    │ ^^^^^^^^
    │
    = fix: add 4 spaces to indentation
+
+note[TrailingComma]: item missing trailing comma
+   ┌─ tests/lints/key-value-pairs/source.wdl:34:13
+   │
+34 │             choices: ["yes", "reverse", "no"]
+   │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = fix: add a comma after this element
 
 note[KeyValuePairs]: all items in an array or object should be on separate lines
    ┌─ tests/lints/key-value-pairs/source.wdl:34:22

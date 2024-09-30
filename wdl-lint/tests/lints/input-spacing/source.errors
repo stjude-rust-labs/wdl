@@ -40,6 +40,14 @@ note[CallInputSpacing]: call inputs must be separated by newline
    │
    = fix: add newline before the input
 
+note[TrailingComma]: item missing trailing comma
+   ┌─ tests/lints/input-spacing/source.wdl:20:24
+   │
+20 │         a="something", b="somethingelse"
+   │                        ^^^^^^^^^^^^^^^^^
+   │
+   = fix: add a comma after this element
+
 note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace
    ┌─ tests/lints/input-spacing/source.wdl:20:25
    │

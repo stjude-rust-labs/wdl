@@ -1,8 +1,10 @@
-note[UnknownRule]: unknown lint rule `PreambleWhitespace`
-  ┌─ tests/lints/inconsistent-newlines/source.wdl:1:26
-  │
-1 │ #@ except: EndingNewline,PreambleWhitespace,MissingMetas,MissingOutput
-  │                          ^^^^^^^^^^^^^^^^^^ cannot make an exception for this rule
-  │
-  = fix: remove the rule from the exception list
+note[InconsistentNewlines]: inconsistent newlines detected
+  ┌─ tests/lints/inconsistent-newlines/source.wdl:5:12
+  │  
+5 │   version 1.1
+  │ ╭───────────^
+6 │ │ 
+  │ ╰^ the first occurrence of a mismatched newline is here
+  │  
+  = fix: use either "/n" or "/r/n" consistently in the file
 

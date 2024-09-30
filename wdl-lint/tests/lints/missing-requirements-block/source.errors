@@ -14,7 +14,7 @@ warning[MissingRequirements]: task `deprecated_runtime` is missing a `requiremen
    │
    = fix: add a `requirements` section to the task
 
-warning[MissingRequirements]: task `deprecated_runtime` contains a deprecated `runtime` section
+note[MissingRequirements]: task `deprecated_runtime` contains a deprecated `runtime` section
    ┌─ tests/lints/missing-requirements-block/source.wdl:27:5
    │  
 27 │ ╭     runtime {

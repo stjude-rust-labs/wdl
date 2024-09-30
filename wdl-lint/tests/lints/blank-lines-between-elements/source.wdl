@@ -1,8 +1,3 @@
-#@ except: ContainerValue, DescriptionMissing, DisallowedInputName, DisallowedOutputName
-#@ except: InputSorting, LineWidth, MissingMetas, MissingOutput, MissingRuntime
-
-## CommentWhitespace, ImportWhitespace, and Whitespace are left enabled to understand all whitespace diagnostics.
-
 version 1.1
 
 import "baz"  # following whitespace will be caught by ImportWhitespace rule
@@ -14,7 +9,7 @@ import "qux"  # following whitespace duplication is caught be Whitespace rule
 workflow foo {
 
     # This is OK (but the prior line is not).
-    # So is this.
+    #@ except: DescriptionMissing
     meta {}
     parameter_meta {}
     # what about this comment?
@@ -45,6 +40,8 @@ workflow foo {
     call bar as qux { input:  # Calls may optionally be separated by whitespace.
         s = s
     }
+
+    output {}
 }
 task bar {
 

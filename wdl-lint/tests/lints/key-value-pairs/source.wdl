@@ -1,4 +1,4 @@
-#@ except: MatchingParameterMeta, MissingRequirements, TrailingComma
+#@ except: MatchingParameterMeta, MissingRequirements
 
 version 1.2
 
