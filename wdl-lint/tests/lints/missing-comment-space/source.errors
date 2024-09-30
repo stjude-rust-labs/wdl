@@ -1,21 +1,21 @@
 note[CommentWhitespace]: comment delimiter should be followed by a single space
-  ┌─ tests/lints/missing-comment-space/source.wdl:1:1
+  ┌─ tests/lints/missing-comment-space/source.wdl:3:1
   │
-1 │ ##This preamble comment is missing a space.
+3 │ ##This preamble comment is missing a space.
   │ ^^
   │
   = fix: follow this comment delimiter with a single space
 
 note[PreambleFormatting]: preamble comments must start with `##` followed by a space
-  ┌─ tests/lints/missing-comment-space/source.wdl:1:1
+  ┌─ tests/lints/missing-comment-space/source.wdl:3:1
   │
-1 │ ##This preamble comment is missing a space.
+3 │ ##This preamble comment is missing a space.
   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 note[Whitespace]: line contains trailing whitespace
-  ┌─ tests/lints/missing-comment-space/source.wdl:2:3
+  ┌─ tests/lints/missing-comment-space/source.wdl:4:3
   │
-2 │ ## 
+4 │ ## 
   │   ^
   │
   = fix: remove this trailing whitespace

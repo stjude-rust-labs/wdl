@@ -1,11 +1,12 @@
 note[VersionFormatting]: expected exactly one blank line between the last comment and the version statement
-  ┌─ tests/lints/unnecessary-preamble-ws/source.wdl:5:88
+  ┌─ tests/lints/unnecessary-preamble-ws/source.wdl:1:57
   │  
-5 │   ## The second is for the whitespace between the end of that line to the version keyword
-  │ ╭───────────────────────────────────────────────────────────────────────────────────────^
-6 │ │            
-7 │ │ 
-8 │ │ 
-9 │ │   version 1.1
+1 │   #@ except: BlankLinesBetweenElements, DescriptionMissing
+  │ ╭────────────────────────────────────────────────────────^
+2 │ │ 
+3 │ │            
+4 │ │ 
+5 │ │ 
+6 │ │   version 1.1
   │ ╰──^
 

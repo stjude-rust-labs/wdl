@@ -7,19 +7,18 @@ warning[MissingRequirements]: task `bad` is missing a `requirements` section
   = fix: add a `requirements` section to the task
 
 warning[MissingRequirements]: task `deprecated_runtime` is missing a `requirements` section
-   ┌─ tests/lints/missing-requirements-block/source.wdl:21:6
+   ┌─ tests/lints/missing-requirements-block/source.wdl:25:6
    │
-21 │ task deprecated_runtime {
+25 │ task deprecated_runtime {
    │      ^^^^^^^^^^^^^^^^^^ this task is missing a `requirements` section
    │
    = fix: add a `requirements` section to the task
 
 note[MissingRequirements]: task `deprecated_runtime` contains a deprecated `runtime` section
-   ┌─ tests/lints/missing-requirements-block/source.wdl:27:5
+   ┌─ tests/lints/missing-requirements-block/source.wdl:33:5
    │  
-27 │ ╭     runtime {
-28 │ │ 
-29 │ │     }
+33 │ ╭     runtime {
+34 │ │     }
    │ ╰─────^
    │  
    = fix: replace the `runtime` section with a `requirements` section

@@ -24,18 +24,24 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 10 │ │ 
 11 │ │     # This is OK (but the prior line is not).
    │ ╰────^
+   │  
+   = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: missing blank line
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:14:5
    │
 14 │     parameter_meta {}
    │     ^^^^^^^^^^^^^^^^^
+   │
+   = fix: add a blank line before this element
 
 note[BlankLinesBetweenElements]: missing blank line
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:15:5
    │
 15 │     # what about this comment?
    │     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = fix: add a blank line before this element
 
 note[BlankLinesBetweenElements]: missing blank line
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:17:5
@@ -44,6 +50,8 @@ note[BlankLinesBetweenElements]: missing blank line
 18 │ │         call bar { input: s = i }
 19 │ │     }
    │ ╰─────^
+   │  
+   = fix: add a blank line before this element
 
 note[Whitespace]: more than one blank line in a row
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:25:1
@@ -83,6 +91,8 @@ note[BlankLinesBetweenElements]: missing blank line
 69 │ │ 
 70 │ │ }
    │ ╰─^
+   │  
+   = fix: add a blank line before this element
 
 note[MissingMetas]: task `bar` is missing a `parameter_meta` section
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:46:6
@@ -108,6 +118,8 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 47 │ │ 
 48 │ │     meta {
    │ ╰────^
+   │  
+   = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:48:11
@@ -117,6 +129,8 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 49 │ │ 
 50 │ │         description: "bar"
    │ ╰────────^
+   │  
+   = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:50:27
@@ -126,6 +140,8 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 51 │ │ 
 52 │ │         outputs: {
    │ ╰────────^
+   │  
+   = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:53:19
@@ -135,6 +151,8 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 54 │ │ 
 55 │ │         }
    │ ╰────────^
+   │  
+   = fix: remove the blank line(s)
 
 note[InputSorting]: input not sorted
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:58:5
@@ -166,6 +184,8 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 60 │ │ 
 61 │ │         String? t
    │ ╰────────^
+   │  
+   = fix: remove the blank line(s)
 
 note[DisallowedInputName]: declaration identifier must be at least 3 characters
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:61:17
@@ -208,6 +228,8 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 85 │ │ 
 86 │ │         disks: "50 GB"
    │ ╰────────^
+   │  
+   = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:87:23
@@ -217,6 +239,8 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 88 │ │ 
 89 │ │         container: "ubuntu:latest"
    │ ╰────────^
+   │  
+   = fix: remove the blank line(s)
 
 note[ContainerValue]: container URI uses a mutable tag
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:89:20
@@ -234,4 +258,6 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 90 │ │ 
 91 │ │     }
    │ ╰────^
+   │  
+   = fix: remove the blank line(s)
 

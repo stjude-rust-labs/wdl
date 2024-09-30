@@ -1,8 +1,17 @@
 warning[MissingRuntime]: task `bad` is missing a `runtime` section
-  ┌─ tests/lints/missing-runtime-block/source.wdl:8:6
+  ┌─ tests/lints/missing-runtime-block/source.wdl:7:6
   │
-8 │ task bad {
+7 │ task bad {
   │      ^^^ this task is missing a `runtime` section
   │
   = fix: add a `runtime` section to the task
+
+note[RuntimeSectionKeys]: the following runtime key is recommended by the WDL v1.1 specification: `container`
+   ┌─ tests/lints/missing-runtime-block/source.wdl:22:5
+   │  
+22 │ ╭     runtime {
+23 │ │     }
+   │ ╰─────^
+   │  
+   = fix: include an entry for the `container` key in the `runtime` section
 

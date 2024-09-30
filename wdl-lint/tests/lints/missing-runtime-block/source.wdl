@@ -1,5 +1,4 @@
-#@ except: BlankLinesBetweenElements, DescriptionMissing, LineWidth, RuntimeSectionKeys
-#@ except: SectionOrdering
+#@ except: DescriptionMissing
 
 ## This is a test of the `missing_runtime_block` lint
 
@@ -7,16 +6,19 @@ version 1.1
 
 task bad {
     meta {}
-    output {}
+
     command <<<>>>
+
+    output {}
 }
 
 task good {
     meta {}
-    output {}
-    runtime {
-
-    }
 
     command <<<>>>
+
+    output {}
+
+    runtime {
+    }
 }

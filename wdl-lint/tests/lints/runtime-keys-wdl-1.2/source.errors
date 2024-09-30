@@ -1,0 +1,24 @@
+note[Todo]: remaining `TODO` item found
+  ┌─ tests/lints/runtime-keys-wdl-1.2/source.wdl:1:4
+  │
+1 │ ## TODO: A strange one: this emits two errors, both from MissingRequiremnts.
+  │    ^^^^
+  │
+  = fix: implement this todo item and remove the `TODO` statement
+
+warning[MissingRequirements]: task `a_task_with_no_keys` is missing a `requirements` section
+  ┌─ tests/lints/runtime-keys-wdl-1.2/source.wdl:5:6
+  │
+5 │ task a_task_with_no_keys {
+  │      ^^^^^^^^^^^^^^^^^^^ this task is missing a `requirements` section
+  │
+  = fix: add a `requirements` section to the task
+
+note[MissingRequirements]: task `a_task_with_no_keys` contains a deprecated `runtime` section
+   ┌─ tests/lints/runtime-keys-wdl-1.2/source.wdl:13:5
+   │
+13 │     runtime {}
+   │     ^^^^^^^^^^
+   │
+   = fix: replace the `runtime` section with a `requirements` section
+

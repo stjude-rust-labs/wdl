@@ -1,14 +1,14 @@
 error: there must be at least one task, workflow, or struct definition in the file
-  ┌─ tests/lints/one-line-after-version/source.wdl:6:1
+  ┌─ tests/lints/one-line-after-version/source.wdl:9:1
   │
-6 │ 
+9 │ 
   │  
 
 note[VersionFormatting]: expected exactly one blank line after the version statement
-  ┌─ tests/lints/one-line-after-version/source.wdl:5:12
+  ┌─ tests/lints/one-line-after-version/source.wdl:8:12
   │  
-5 │   version 1.1
+8 │   version 1.1
   │ ╭───────────^
-6 │ │ 
+9 │ │ 
   │ ╰^
 

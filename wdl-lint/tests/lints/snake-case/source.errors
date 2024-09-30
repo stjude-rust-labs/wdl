@@ -1,18 +1,18 @@
 warning[SnakeCase]: workflow name `BadWorkflow` is not snake_case
-  ┌─ tests/lints/snake-case/source.wdl:7:10
+  ┌─ tests/lints/snake-case/source.wdl:5:10
   │
-7 │ workflow BadWorkflow {
+5 │ workflow BadWorkflow {
   │          ^^^^^^^^^^^ this name must be snake_case
   │
   = fix: replace `BadWorkflow` with `bad_workflow`
 
 warning[SnakeCase]: private declaration name `badPrivateDecl` is not snake_case
-   ┌─ tests/lints/snake-case/source.wdl:10:11
-   │
-10 │     Float badPrivateDecl = 3.14
-   │           ^^^^^^^^^^^^^^ this name must be snake_case
-   │
-   = fix: replace `badPrivateDecl` with `bad_private_decl`
+  ┌─ tests/lints/snake-case/source.wdl:8:11
+  │
+8 │     Float badPrivateDecl = 3.14
+  │           ^^^^^^^^^^^^^^ this name must be snake_case
+  │
+  = fix: replace `badPrivateDecl` with `bad_private_decl`
 
 warning[SnakeCase]: task name `BadTask` is not snake_case
    ┌─ tests/lints/snake-case/source.wdl:15:6
@@ -23,25 +23,25 @@ warning[SnakeCase]: task name `BadTask` is not snake_case
    = fix: replace `BadTask` with `bad_task`
 
 warning[SnakeCase]: input name `BadInput` is not snake_case
-   ┌─ tests/lints/snake-case/source.wdl:19:16
+   ┌─ tests/lints/snake-case/source.wdl:24:16
    │
-19 │         String BadInput
+24 │         String BadInput
    │                ^^^^^^^^ this name must be snake_case
    │
    = fix: replace `BadInput` with `bad_input`
 
 warning[SnakeCase]: output name `badOut` is not snake_case
-   ┌─ tests/lints/snake-case/source.wdl:32:14
+   ┌─ tests/lints/snake-case/source.wdl:33:14
    │
-32 │         File badOut = "out.txt"
+33 │         File badOut = "out.txt"
    │              ^^^^^^ this name must be snake_case
    │
    = fix: replace `badOut` with `bad_out`
 
 warning[SnakeCase]: struct member name `bAdFiElD` is not snake_case
-   ┌─ tests/lints/snake-case/source.wdl:61:12
+   ┌─ tests/lints/snake-case/source.wdl:67:12
    │
-61 │     String bAdFiElD  # unfortunately, `convert-case` doesn't understand sarcasm case
+67 │     String bAdFiElD  # unfortunately, `convert-case` doesn't understand sarcasm case
    │            ^^^^^^^^ this name must be snake_case
    │
    = fix: replace `bAdFiElD` with `b_ad_fi_el_d`

@@ -1,30 +1,35 @@
-#@ except: BlankLinesBetweenElements, DescriptionMissing, SectionOrdering
+#@ except: DescriptionMissing, Todo
 
 version 1.2
 
 task bad {
     meta {}
-    output {}
+
     command <<<>>>
+
+    output {}
 }
 
 task good {
     meta {}
-    output {}
+
     command <<<>>>
 
-    requirements {
+    output {}
 
+    requirements {
     }
 }
 
+# TODO: This emits two diagnostics but should only emit one.
 task deprecated_runtime {
     meta {}
-    output {}
+
     command <<<>>>
+
+    output {}
 
     # This `runtime` section should be flagged as deprecated.
     runtime {
-
     }
 }
