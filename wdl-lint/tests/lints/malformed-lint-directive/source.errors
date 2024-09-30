@@ -1,32 +1,38 @@
-note[LineWidth]: line exceeds maximum width of 90
-   ┌─ tests/lints/malformed-lint-directive/source.wdl:12:1
-   │
-12 │             this is going to be a really long line that is almost certainly going to be longer than the maximum line length I would hope /
-   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │
-   = fix: split the line into multiple lines
+note[PreambleWhitespace]: expected a blank line after the version statement
+  ┌─ tests/lints/malformed-lint-directive/source.wdl:1:14
+  │
+1 │ version 1.1  #@ except: BlankLinesBetweenElements, CommentWhitespace
+  │              ^ add a blank line before this
+  │
+  = fix: add a blank line immediately after the version statement
 
-note[LineWidth]: line exceeds maximum width of 90
-   ┌─ tests/lints/malformed-lint-directive/source.wdl:14:1
-   │
-14 │             this line is also going to be very very very long just to trip up our maximum line lint /
-   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │
-   = fix: split the line into multiple lines
+warning[MalformedLintDirective]: lint directive must be on its own line
+  ┌─ tests/lints/malformed-lint-directive/source.wdl:1:14
+  │
+1 │ version 1.1  #@ except: BlankLinesBetweenElements, CommentWhitespace
+  │              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ malformed lint directive
+  │
+  = fix: place lint directive on new line
 
-note[LineWidth]: line exceeds maximum width of 90
-   ┌─ tests/lints/malformed-lint-directive/source.wdl:49:1
-   │
-49 │     command <<< this is a task that has a very very very long command section on the first line. >>>
-   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │
-   = fix: split the line into multiple lines
+warning[MissingRuntime]: task `test1` is missing a `runtime` section
+  ┌─ tests/lints/malformed-lint-directive/source.wdl:3:6
+  │
+3 │ task test1 {
+  │      ^^^^^ this task is missing a `runtime` section
+  │
+  = fix: add a `runtime` section to the task
 
-note[LineWidth]: line exceeds maximum width of 90
-   ┌─ tests/lints/malformed-lint-directive/source.wdl:55:1
-   │
-55 │ # Here is a very very very very very very very very very long comment that should absolutely eclipse 90 characters.
-   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │
-   = fix: split the line into multiple lines
+error: task `test1` is missing a command section
+  ┌─ tests/lints/malformed-lint-directive/source.wdl:3:6
+  │
+3 │ task test1 {
+  │      ^^^^^ this task must have a command section
+
+note[DescriptionMissing]: task `test1` is missing a description key
+  ┌─ tests/lints/malformed-lint-directive/source.wdl:5:5
+  │
+5 │     meta {}
+  │     ^^^^
+  │
+  = fix: add a `description` key to this meta section
 

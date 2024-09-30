@@ -1,5 +1,16 @@
 //! A module for utility functions for the lint rules.
 
+use wdl_ast::{AstToken, Comment, SyntaxKind};
+
+/// Detect is a comment is in-line or not by looking for `\n` in the prior
+/// whitespace. Used in CommentWhitespace and MalformedLintDirective rules.
+pub fn is_inline_comment(token: &Comment) -> bool {
+    if let Some(prior) = token.syntax().prev_sibling_or_token() {
+        return prior.kind() != SyntaxKind::Whitespace || !prior.to_string().contains('\n');
+    }
+    false
+}
+
 /// Iterates over the lines of a string and returns the line, starting offset,
 /// and next possible starting offset.
 pub fn lines_with_offset(s: &str) -> impl Iterator<Item = (&str, usize, usize)> {
