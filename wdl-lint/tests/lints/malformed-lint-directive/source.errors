@@ -1,0 +1,38 @@
+note[PreambleWhitespace]: expected a blank line after the version statement
+  ┌─ tests/lints/malformed-lint-directive/source.wdl:1:14
+  │
+1 │ version 1.1  #@ except: BlankLinesBetweenElements, CommentWhitespace
+  │              ^ add a blank line before this
+  │
+  = fix: add a blank line immediately after the version statement
+
+warning[MalformedLintDirective]: lint directive must be on its own line
+  ┌─ tests/lints/malformed-lint-directive/source.wdl:1:14
+  │
+1 │ version 1.1  #@ except: BlankLinesBetweenElements, CommentWhitespace
+  │              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ malformed lint directive
+  │
+  = fix: place lint directive on new line
+
+warning[MissingRuntime]: task `test1` is missing a `runtime` section
+  ┌─ tests/lints/malformed-lint-directive/source.wdl:3:6
+  │
+3 │ task test1 {
+  │      ^^^^^ this task is missing a `runtime` section
+  │
+  = fix: add a `runtime` section to the task
+
+error: task `test1` is missing a command section
+  ┌─ tests/lints/malformed-lint-directive/source.wdl:3:6
+  │
+3 │ task test1 {
+  │      ^^^^^ this task must have a command section
+
+note[DescriptionMissing]: task `test1` is missing a description key
+  ┌─ tests/lints/malformed-lint-directive/source.wdl:5:5
+  │
+5 │     meta {}
+  │     ^^^^
+  │
+  = fix: add a `description` key to this meta section
+
