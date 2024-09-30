@@ -1,3 +1,5 @@
+#@ except: InputSorting, DisallowedInputName, DisallowedOutputName
+
 version 1.1
 
 import "baz"  # following whitespace will be caught by ImportWhitespace rule
@@ -81,6 +83,7 @@ task bax {
 
     output {}
 
+    #@ except: ContainerValue
     runtime {
 
         disks: "50 GB"
