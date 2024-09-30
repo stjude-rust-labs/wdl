@@ -79,4 +79,15 @@ There are a handful of reasons the CI may have turned red. Try the following fix
     - while reviewing, ask yourself if the printed diagnostics are clear and informative
 5. repeat
 
+### Can you explain how rules use `exceptable_nodes()` and `exceptable_add()`?
+
+Every lint rule has an ID which can be used in lint directives (comments beginning with `#@ except:`) to prevent them from emitting diagnostics for portions of a WDL document. Rules "excepted" during the preamble (comments which are before the version statement) will be turned off for the entire document; otherwise, lint directives will shut off a rule while processing the children of whatever node it comes before, but only if that node is in the rule's `exceptable_nodes()` list. `exceptable_add()` will check all the ancestors of `element` for nodes that match the `exceptable_nodes()` list and see if they have a lint directive disabling the current rule; if so, the diagnostic will not be added to the validation output.
+
+#### Further reading
+
+* `exceptable_add()` defined [here](https://github.com/stjude-rust-labs/wdl/blob/wdl-v0.8.0/wdl-ast/src/validation.rs#L50).
+* See [here](https://docs.rs/wdl/latest/wdl/grammar/type.SyntaxNode.html) for the `SyntaxNode` docs.
+* The PR which introduced `exceptable_nodes()` and `exceptable_add()` is [#162](https://github.com/stjude-rust-labs/wdl/pull/162).
+* That PR fixed issue [#135](https://github.com/stjude-rust-labs/wdl/issues/135)
+
 [issues]: https://github.com/stjude-rust-labs/wdl/issues
