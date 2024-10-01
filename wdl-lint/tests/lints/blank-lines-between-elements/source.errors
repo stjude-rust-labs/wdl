@@ -51,17 +51,6 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
    │  
    = fix: remove the blank line(s)
 
-note[BlankLinesBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:18:21
-   │  
-18 │       parameter_meta {
-   │ ╭────────────────────^
-19 │ │ 
-20 │ │     }
-   │ ╰────^
-   │  
-   = fix: remove the blank line(s)
-
 note[BlankLinesBetweenElements]: missing blank line
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:21:5
    │
@@ -236,17 +225,6 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
    = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:69:10
-   │  
-69 │           }
-   │ ╭─────────^
-70 │ │ 
-71 │ │     }
-   │ ╰────^
-   │  
-   = fix: remove the blank line(s)
-
-note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:74:27
    │  
 74 │           String s = "hello"
@@ -299,17 +277,6 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
 105 │ │ 
 106 │ │         container: "ubuntu:latest"
     │ ╰────────^
-    │  
-    = fix: remove the blank line(s)
-
-note[BlankLinesBetweenElements]: extra blank line(s) found
-    ┌─ tests/lints/blank-lines-between-elements/source.wdl:106:35
-    │  
-106 │           container: "ubuntu:latest"
-    │ ╭──────────────────────────────────^
-107 │ │ 
-108 │ │     }
-    │ ╰────^
     │  
     = fix: remove the blank line(s)
 

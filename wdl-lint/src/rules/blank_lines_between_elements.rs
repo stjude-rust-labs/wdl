@@ -191,7 +191,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         let actual_start = skip_preceding_comments(section.syntax());
         check_prior_spacing(&actual_start, state, true, first, &self.exceptable_nodes());
         flag_all_blank_lines_within(section.syntax(), state, &self.exceptable_nodes());
-        check_last_token(section.syntax(), state, &self.exceptable_nodes());
+        // flag_all_blank_lines_within() covers check_last_token()
     }
 
     fn parameter_metadata_section(
@@ -211,7 +211,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         let actual_start = skip_preceding_comments(section.syntax());
         check_prior_spacing(&actual_start, state, true, first, &self.exceptable_nodes());
         flag_all_blank_lines_within(section.syntax(), state, &self.exceptable_nodes());
-        check_last_token(section.syntax(), state, &self.exceptable_nodes());
+        // flag_all_blank_lines_within() covers check_last_token()
     }
 
     fn input_section(
@@ -280,11 +280,11 @@ impl Visitor for BlankLinesBetweenElementsRule {
             self.state = State::RuntimeSection;
         }
 
-        flag_all_blank_lines_within(section.syntax(), state, &self.exceptable_nodes());
         let first = is_first_element(section.syntax());
         let actual_start = skip_preceding_comments(section.syntax());
         check_prior_spacing(&actual_start, state, true, first, &self.exceptable_nodes());
-        check_last_token(section.syntax(), state, &self.exceptable_nodes());
+        flag_all_blank_lines_within(section.syntax(), state, &self.exceptable_nodes());
+        // flag_all_blank_lines_within() covers check_last_token()
     }
 
     // call statement internal spacing is handled by the CallInputSpacing rule
@@ -360,7 +360,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         let actual_start = skip_preceding_comments(section.syntax());
         check_prior_spacing(&actual_start, state, true, first, &self.exceptable_nodes());
         flag_all_blank_lines_within(section.syntax(), state, &self.exceptable_nodes());
-        check_last_token(section.syntax(), state, &self.exceptable_nodes());
+        // flag_all_blank_lines_within() covers check_last_token()
     }
 
     fn task_hints_section(
@@ -377,7 +377,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         let actual_start = skip_preceding_comments(section.syntax());
         check_prior_spacing(&actual_start, state, true, first, &self.exceptable_nodes());
         flag_all_blank_lines_within(section.syntax(), state, &self.exceptable_nodes());
-        check_last_token(section.syntax(), state, &self.exceptable_nodes());
+        // flag_all_blank_lines_within() covers check_last_token()
     }
 
     fn workflow_hints_section(
@@ -394,7 +394,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         let actual_start = skip_preceding_comments(section.syntax());
         check_prior_spacing(&actual_start, state, true, first, &self.exceptable_nodes());
         flag_all_blank_lines_within(section.syntax(), state, &self.exceptable_nodes());
-        check_last_token(section.syntax(), state, &self.exceptable_nodes());
+        // flag_all_blank_lines_within() covers check_last_token()
     }
 
     fn unbound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &UnboundDecl) {
