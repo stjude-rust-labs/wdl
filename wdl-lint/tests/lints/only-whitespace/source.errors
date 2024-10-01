@@ -34,33 +34,33 @@ note[Whitespace]: line contains trailing whitespace
    = fix: remove this trailing whitespace
 
 note[Whitespace]: line contains trailing whitespace
-   ┌─ tests/lints/only-whitespace/source.wdl:13:34
+   ┌─ tests/lints/only-whitespace/source.wdl:14:34
    │
-13 │     #@ except: DescriptionMissing        
+14 │     #@ except: DescriptionMissing        
    │                                  ^^^^^^^^
    │
    = fix: remove this trailing whitespace
 
 note[Whitespace]: line contains only whitespace
-   ┌─ tests/lints/only-whitespace/source.wdl:15:1
+   ┌─ tests/lints/only-whitespace/source.wdl:16:1
    │
-15 │     
+16 │     
    │ ^^^^
    │
    = fix: remove the whitespace from this line
 
 note[Whitespace]: line contains trailing whitespace
-   ┌─ tests/lints/only-whitespace/source.wdl:18:18
+   ┌─ tests/lints/only-whitespace/source.wdl:19:18
    │
-18 │     String x = ""           
+19 │     String x = ""           
    │                  ^^^^^^^^^^^
    │
    = fix: remove this trailing whitespace
 
 note[Whitespace]: line contains only whitespace
-   ┌─ tests/lints/only-whitespace/source.wdl:22:1
+   ┌─ tests/lints/only-whitespace/source.wdl:23:1
    │
-22 │      
+23 │      
    │ ^^^^^
    │
    = fix: remove the whitespace from this line

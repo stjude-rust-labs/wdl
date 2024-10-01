@@ -17,7 +17,7 @@ workflow foo {
     call bar as ba
 
     call bar as ba2 {input:
-        a="something", b="somethingelse"
+        a="something", b="somethingelse",
     }
 
     call bar as ba3 { input: a = "something"}

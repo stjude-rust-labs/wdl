@@ -10,6 +10,7 @@ version 1.1
 
 
 workflow test {    
+    # lines above and below have trailing whitespace
     #@ except: DescriptionMissing        
     meta {}
     

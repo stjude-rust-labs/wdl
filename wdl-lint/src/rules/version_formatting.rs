@@ -73,8 +73,7 @@ impl Rule for VersionFormattingRule {
     }
 
     fn explanation(&self) -> &'static str {
-        "The version statement should be formatted correctly. This rule checks that the version \
-         statement is correctly formatted."
+        "The version statement should be formatted correctly. This rule checks that the version statement is followed by a blank line and that there is exactly one space between 'version' and the version number. It also checks that if there are comments before the version statement, they are separated by exactly one blank line. If there are no comments, there should be no whitespace before the version statement."
     }
 
     fn tags(&self) -> TagSet {

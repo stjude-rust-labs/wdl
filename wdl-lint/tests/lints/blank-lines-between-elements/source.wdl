@@ -45,6 +45,7 @@ workflow foo {
 
     output {}
 }
+#@ except: MissingMetas, MissingRuntime
 task bar {
 
     meta {
@@ -72,6 +73,7 @@ task bar {
 }
 
 task bax {
+    #@ except: DescriptionMissing
     meta {}
 
     parameter_meta {}

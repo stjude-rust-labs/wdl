@@ -82,135 +82,105 @@ note[Whitespace]: more than one blank line in a row
 
 note[BlankLinesBetweenElements]: missing blank line
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:48:1
-   │  
-48 │ ╭ task bar {
-49 │ │ 
-50 │ │     meta {
-51 │ │ 
-   · │
-71 │ │ 
-72 │ │ }
-   │ ╰─^
-   │  
+   │
+48 │ #@ except: MissingMetas, MissingRuntime
+   │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
    = fix: add a blank line before this element
 
-note[MissingMetas]: task `bar` is missing a `parameter_meta` section
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:48:6
-   │
-48 │ task bar {
-   │      ^^^ this task is missing a `parameter_meta` section
-   │
-   = fix: add a `parameter_meta` section to the task
-
-warning[MissingRuntime]: task `bar` is missing a `runtime` section
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:48:6
-   │
-48 │ task bar {
-   │      ^^^ this task is missing a `runtime` section
-   │
-   = fix: add a `runtime` section to the task
-
 note[BlankLinesBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:48:11
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:49:11
    │  
-48 │   task bar {
+49 │   task bar {
    │ ╭──────────^
-49 │ │ 
-50 │ │     meta {
+50 │ │ 
+51 │ │     meta {
    │ ╰────^
    │  
    = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:50:11
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:51:11
    │  
-50 │       meta {
+51 │       meta {
    │ ╭──────────^
-51 │ │ 
-52 │ │         description: "bar"
+52 │ │ 
+53 │ │         description: "bar"
    │ ╰────────^
    │  
    = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:52:27
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:53:27
    │  
-52 │           description: "bar"
+53 │           description: "bar"
    │ ╭──────────────────────────^
-53 │ │ 
-54 │ │         outputs: {
+54 │ │ 
+55 │ │         outputs: {
    │ ╰────────^
    │  
    = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:55:19
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:56:19
    │  
-55 │               u: "u"
+56 │               u: "u"
    │ ╭──────────────────^
-56 │ │ 
-57 │ │         }
+57 │ │ 
+58 │ │         }
    │ ╰────────^
    │  
    = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:61:27
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:62:27
    │  
-61 │           String s = "hello"
+62 │           String s = "hello"
    │ ╭──────────────────────────^
-62 │ │ 
-63 │ │         String? t
+63 │ │ 
+64 │ │         String? t
    │ ╰────────^
    │  
    = fix: remove the blank line(s)
-
-note[DescriptionMissing]: task `bax` is missing a description key
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:75:5
-   │
-75 │     meta {}
-   │     ^^^^
-   │
-   = fix: add a `description` key to this meta section
 
 note[Whitespace]: more than one blank line in a row
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:79:1
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:81:1
    │  
-79 │ ╭ 
-80 │ │     input {}
+81 │ ╭ 
+82 │ │     input {}
    │ ╰────^
    │  
    = fix: remove the unnecessary blank lines
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:87:14
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:89:14
    │  
-87 │       runtime {
+89 │       runtime {
    │ ╭─────────────^
-88 │ │ 
-89 │ │         disks: "50 GB"
+90 │ │ 
+91 │ │         disks: "50 GB"
    │ ╰────────^
    │  
    = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:90:23
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:92:23
    │  
-90 │           memory: "4 GB"
+92 │           memory: "4 GB"
    │ ╭──────────────────────^
-91 │ │ 
-92 │ │         container: "ubuntu:latest"
+93 │ │ 
+94 │ │         container: "ubuntu:latest"
    │ ╰────────^
    │  
    = fix: remove the blank line(s)
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:92:35
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:94:35
    │  
-92 │           container: "ubuntu:latest"
+94 │           container: "ubuntu:latest"
    │ ╭──────────────────────────────────^
-93 │ │ 
-94 │ │     }
+95 │ │ 
+96 │ │     }
    │ ╰────^
    │  
    = fix: remove the blank line(s)

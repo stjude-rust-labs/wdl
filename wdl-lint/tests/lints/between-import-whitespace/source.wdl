@@ -21,6 +21,6 @@ import "zam.wdl"  # 2 blanks will be caught be a _different_ check
 workflow test {
     #@ except: DescriptionMissing
     meta {}
-    
+
     output {}
 }

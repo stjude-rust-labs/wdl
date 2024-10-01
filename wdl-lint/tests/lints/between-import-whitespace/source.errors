@@ -51,11 +51,3 @@ note[Whitespace]: more than one blank line in a row
    │  
    = fix: remove the unnecessary blank lines
 
-note[Whitespace]: line contains only whitespace
-   ┌─ tests/lints/between-import-whitespace/source.wdl:24:1
-   │
-24 │     
-   │ ^^^^
-   │
-   = fix: remove the whitespace from this line
-
