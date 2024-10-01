@@ -28,13 +28,6 @@ fn invalid_preamble_comment(span: Span) -> Diagnostic {
         .with_highlight(span)
 }
 
-/// Creates a "preamble comment before directive" diagnostic.
-fn preamble_comment_before_directive(span: Span) -> Diagnostic {
-    Diagnostic::note("preamble comments must come after lint directives")
-        .with_rule(ID)
-        .with_highlight(span)
-}
-
 /// Creates a "directive after preamble comment" diagnostic.
 fn directive_after_preamble_comment(span: Span) -> Diagnostic {
     Diagnostic::note("lint directives must come before preamble comments")
@@ -93,8 +86,6 @@ enum PreambleState {
 enum ExtendDiagnostic {
     /// Extend a lint directive diagnostic.
     LintDirective,
-    /// Extend a preamble comment diagnostic.
-    PreambleComment,
     /// Extend an invalid comment diagnostic.
     InvalidComment,
 }
@@ -104,8 +95,6 @@ enum ExtendDiagnostic {
 pub struct PreambleFormattingRule {
     /// The current state of preamble processing.
     state: PreambleState,
-    /// Whether the preamble comment block has been finished.
-    preamble_comment_block_finished: bool,
     /// The number of comment tokens to skip.
     ///
     /// This is used to skip comments that were consolidated in a prior
@@ -328,15 +317,10 @@ impl Visitor for PreambleFormattingRule {
                 return;
             }
             if preamble_comment {
-                if self.preamble_comment_block_finished {
-                    // Preamble block has already been processed. This is an error.
-                    extend = Some(ExtendDiagnostic::PreambleComment);
-                } else {
-                    // We are switching from the lint directive block to the preamble comment block
-                    // Whitespace will be handled by the whitespace visitor.
-                    self.state = PreambleState::PreambleCommentBlock;
-                    return;
-                }
+                // We are switching from the lint directive block to the preamble comment block
+                // Whitespace will be handled by the whitespace visitor.
+                self.state = PreambleState::PreambleCommentBlock;
+                return;
             }
         } else if self.state == PreambleState::PreambleCommentBlock {
             if preamble_comment {
@@ -371,22 +355,6 @@ impl Visitor for PreambleFormattingRule {
                                 );
                             } else {
                                 // Sibling should not be part of this diagnostic
-                                break;
-                            }
-                        }
-                        Some(ExtendDiagnostic::PreambleComment) => {
-                            if sibling_is_preamble_comment {
-                                // As we're processing this sibling comment here, increment the skip
-                                // count
-                                self.skip_count += 1;
-
-                                span = Span::new(
-                                    span.start(),
-                                    usize::from(sibling.text_range().end()) - span.start(),
-                                );
-                            } else {
-                                // Sibling should not be part of this diagnostic
-                                self.preamble_comment_block_finished = true;
                                 break;
                             }
                         }
@@ -425,9 +393,6 @@ impl Visitor for PreambleFormattingRule {
         match extend {
             Some(ExtendDiagnostic::LintDirective) => {
                 state.add(directive_after_preamble_comment(span));
-            }
-            Some(ExtendDiagnostic::PreambleComment) => {
-                state.add(preamble_comment_before_directive(span));
             }
             Some(ExtendDiagnostic::InvalidComment) => {
                 state.add(invalid_preamble_comment(span));
