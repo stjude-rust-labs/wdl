@@ -23,9 +23,12 @@ const ID: &str = "PreambleFormatting";
 
 /// Creates an "invalid preamble comment" diagnostic.
 fn invalid_preamble_comment(span: Span) -> Diagnostic {
-    Diagnostic::note("preamble comments must start with `##` followed by a space")
-        .with_rule(ID)
-        .with_highlight(span)
+    Diagnostic::note(
+        "preamble comments must start with `##` and have at least one space between the `##` and \
+         the comment text",
+    )
+    .with_rule(ID)
+    .with_highlight(span)
 }
 
 /// Creates a "directive after preamble comment" diagnostic.
@@ -36,15 +39,8 @@ fn directive_after_preamble_comment(span: Span) -> Diagnostic {
 }
 
 /// Creates an "unnecessary whitespace" diagnostic.
-fn unnecessary_whitespace(span: Span) -> Diagnostic {
+fn leading_whitespace(span: Span) -> Diagnostic {
     Diagnostic::note("unnecessary whitespace in document preamble")
-        .with_rule(ID)
-        .with_highlight(span)
-}
-
-/// Creates an "expected a blank line before" diagnostic.
-fn expected_blank_line_before_version(span: Span) -> Diagnostic {
-    Diagnostic::note("expected exactly one blank line before the version statement")
         .with_rule(ID)
         .with_highlight(span)
 }
@@ -56,6 +52,13 @@ fn expected_blank_line_before_preamble_comment(span: Span) -> Diagnostic {
     )
     .with_rule(ID)
     .with_highlight(span)
+}
+
+/// Creates an "expected a blank line before" diagnostic.
+fn expected_blank_line_before_version(span: Span) -> Diagnostic {
+    Diagnostic::note("expected exactly one blank line before the version statement")
+        .with_rule(ID)
+        .with_highlight(span)
 }
 
 /// Detects if a comment is a lint directive.
@@ -271,7 +274,7 @@ impl Visitor for PreambleFormattingRule {
                     0
                 };
 
-                state.add(unnecessary_whitespace(Span::new(
+                state.add(leading_whitespace(Span::new(
                     span.start() + offset,
                     span.len() - offset,
                 )));
@@ -280,7 +283,7 @@ impl Visitor for PreambleFormattingRule {
             }
         } else {
             // Whitespace is not allowed to start the document.
-            state.add(unnecessary_whitespace(whitespace.span()));
+            state.add(leading_whitespace(whitespace.span()));
         }
     }
 
@@ -317,8 +320,6 @@ impl Visitor for PreambleFormattingRule {
                 return;
             }
             if preamble_comment {
-                // We are switching from the lint directive block to the preamble comment block
-                // Whitespace will be handled by the whitespace visitor.
                 self.state = PreambleState::PreambleCommentBlock;
                 return;
             }
