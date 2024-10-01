@@ -26,7 +26,7 @@ fn preamble_comment_outside_preamble(span: Span) -> Diagnostic {
 }
 
 /// A lint rule for flagging preamble comments which are outside the preamble.
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, Copy)]
 pub struct PreambleCommentAfterVersionRule {
     /// Exited the preamble.
     exited_preamble: bool,

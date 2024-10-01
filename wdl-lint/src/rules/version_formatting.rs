@@ -60,7 +60,7 @@ fn unexpected_whitespace_inside_version(span: Span) -> Diagnostic {
 }
 
 /// Detects incorrect formatting of the version statement.
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, Copy)]
 pub struct VersionFormattingRule;
 
 impl Rule for VersionFormattingRule {

@@ -92,7 +92,7 @@ enum PreambleState {
 
 /// A struct that tracks the last processed preamble comment, whitespace, and
 /// lint directive.
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, Copy)]
 struct LastProcessed {
     /// The last lint directive.
     lint_directive: Option<Span>,
@@ -111,7 +111,7 @@ enum ExtendDiagnostic {
 }
 
 /// Detects incorrect comments in a document preamble.
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, Copy)]
 pub struct PreambleFormattingRule {
     /// The current state of preamble processing.
     state: PreambleState,
