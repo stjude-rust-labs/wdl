@@ -1,5 +1,6 @@
 ## This is a test of lines that only contain whitespace
-
+## The next line has spaces (TODO: diagnostic not very clear)
+          
 version 1.1
 
 # The next line only contains whitespace

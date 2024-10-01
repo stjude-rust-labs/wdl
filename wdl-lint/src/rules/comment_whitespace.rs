@@ -66,7 +66,10 @@ fn excess_indentation(span: Span, expected: usize, actual: usize) -> Diagnostic 
 
 /// Detects improperly spaced comments.
 #[derive(Default, Debug, Clone, Copy)]
-pub struct CommentWhitespaceRule;
+pub struct CommentWhitespaceRule {
+    /// Whether or not the visitor has exited the preamble of the document.
+    exited_preamble: bool,
+}
 
 impl Rule for CommentWhitespaceRule {
     fn id(&self) -> &'static str {
@@ -111,7 +114,23 @@ impl Visitor for CommentWhitespaceRule {
         *self = Default::default();
     }
 
+    fn version_statement(
+        &mut self,
+        _: &mut Self::State,
+        reason: VisitReason,
+        _: &wdl_ast::VersionStatement,
+    ) {
+        if reason == VisitReason::Exit {
+            self.exited_preamble = true;
+        }
+    }
+
     fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
+        if !self.exited_preamble {
+            // Handled by `PreambleFormatting` rule
+            return;
+        }
+
         if is_inline_comment(comment) {
             // check preceding whitespace for two spaces
             if let Some(prior) = comment.syntax().prev_sibling_or_token() {

@@ -1,16 +1,21 @@
 note[ImportWhitespace]: blank lines are not allowed between imports
-  ┌─ tests/lints/blank-lines-between-elements/source.wdl:6:1
+  ┌─ tests/lints/blank-lines-between-elements/source.wdl:5:77
   │  
-6 │ ╭ 
+5 │   import "baz"  # following whitespace will be caught by ImportWhitespace rule
+  │ ╭────────────────────────────────────────────────────────────────────────────^
+6 │ │ 
 7 │ │ import "qux"  # following whitespace duplication is caught be Whitespace rule
   │ ╰^
   │  
   = fix: remove any blank lines between imports
 
 note[Whitespace]: more than one blank line in a row
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:9:1
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:7:78
    │  
- 9 │ ╭ 
+ 7 │   import "qux"  # following whitespace duplication is caught be Whitespace rule
+   │ ╭─────────────────────────────────────────────────────────────────────────────^
+ 8 │ │ 
+ 9 │ │ 
 10 │ │ # test comment
    │ ╰^
    │  
@@ -54,27 +59,36 @@ note[BlankLinesBetweenElements]: missing blank line
    = fix: add a blank line before this element
 
 note[Whitespace]: more than one blank line in a row
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:27:1
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:25:21
    │  
-27 │ ╭ 
+25 │       String p = "pip"
+   │ ╭────────────────────^
+26 │ │ 
+27 │ │ 
 28 │ │     String q = "bar"  # The following whitespace is allowable between private declarations
    │ ╰────^
    │  
    = fix: remove the unnecessary blank lines
 
 note[Whitespace]: more than one blank line in a row
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:33:1
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:31:88
    │  
-33 │ ╭ 
+31 │       String s = "hello"  # following whitespace duplication is caught be Whitespace rule
+   │ ╭───────────────────────────────────────────────────────────────────────────────────────^
+32 │ │ 
+33 │ │ 
 34 │ │     call bar { input:
    │ ╰────^
    │  
    = fix: remove the unnecessary blank lines
 
 note[Whitespace]: more than one blank line in a row
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:38:1
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:36:71
    │  
-38 │ ╭ 
+36 │       }  # following whitespace duplication is caught be Whitespace rule
+   │ ╭──────────────────────────────────────────────────────────────────────^
+37 │ │ 
+38 │ │ 
 39 │ │     call bar as baz { input:
    │ ╰────^
    │  
@@ -144,9 +158,12 @@ note[BlankLinesBetweenElements]: extra blank line(s) found
    = fix: remove the blank line(s)
 
 note[Whitespace]: more than one blank line in a row
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:81:1
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:79:22
    │  
-81 │ ╭ 
+79 │       parameter_meta {}
+   │ ╭─────────────────────^
+80 │ │ 
+81 │ │ 
 82 │ │     input {}
    │ ╰────^
    │  

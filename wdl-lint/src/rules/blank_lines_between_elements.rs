@@ -525,8 +525,14 @@ fn check_prior_spacing(
             SyntaxKind::Whitespace => {
                 let count = prior.to_string().chars().filter(|c| *c == '\n').count();
                 if first || !element_spacing_required {
-                    // first element cannot have a blank line before it
-                    if count > 1 {
+                    // first element cannot have a blank line before it.
+                    // Whitespace following the version statement is handled by the
+                    // `VerisonFormatting` rule.
+                    if count > 1
+                        && prior
+                            .prev_sibling_or_token()
+                            .is_some_and(|p| p.kind() != SyntaxKind::VersionStatementNode)
+                    {
                         state.exceptable_add(
                             excess_blank_line(prior.text_range().to_span()),
                             SyntaxElement::from(syntax.clone()),
