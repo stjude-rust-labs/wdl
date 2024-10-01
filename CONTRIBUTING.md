@@ -30,7 +30,7 @@ We will try to keep a handful of [issues][issues] marked `good first issue` open
 
 Sure!
 
-You can always open a [discussion](https://github.com/stjude-rust-labs/wdl/discussions/categories/rule-proposals) with a propsal for a new lint rule or contribute to any open discussions.
+You can always open a [discussion](https://github.com/stjude-rust-labs/wdl/discussions/categories/rule-proposals) with a proposal for a new lint rule or contribute to any open discussions.
 
 We also appreciate feedback on our documentation. Feel free to look over any of our `*.md` files and note any issues you find. You can also explore our lint rule documentation by [installing `sprocket`](https://stjude-rust-labs.github.io/sprocket/installation.html) and reading the output of `sprocket explain`. (n.b.: we hope to replace `sprocket explain` with a website where each rule will have a dedicated page, but that has not been realized yet)
 
