@@ -98,7 +98,7 @@ impl Rule for BlankLinesBetweenElementsRule {
          `requirements`, or `hints` section. For workflows, the `workflow body` includes any \
          private declarations, call statements, conditional statements, and scatter statements. A \
          `task body` is any and all private declarations. Within a workflow or task body, \
-         individual elements may optionally be separated by a blank line. "
+         individual elements may optionally be separated by a blank line."
     }
 
     fn tags(&self) -> TagSet {
@@ -141,7 +141,6 @@ impl Visitor for BlankLinesBetweenElementsRule {
     }
 
     // Import spacing is handled by the ImportWhitespace rule
-    // fn import_statement
 
     fn task_definition(
         &mut self,
@@ -156,6 +155,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         let first = is_first_element(task.syntax());
         let actual_start = skip_preceding_comments(task.syntax());
         check_prior_spacing(&actual_start, state, true, first, &self.exceptable_nodes());
+        check_last_token(task.syntax(), state, &self.exceptable_nodes());
     }
 
     fn workflow_definition(
@@ -171,6 +171,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         let first = is_first_element(workflow.syntax());
         let actual_start = skip_preceding_comments(workflow.syntax());
         check_prior_spacing(&actual_start, state, true, first, &self.exceptable_nodes());
+        check_last_token(workflow.syntax(), state, &self.exceptable_nodes());
     }
 
     fn metadata_section(
@@ -190,6 +191,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         let actual_start = skip_preceding_comments(section.syntax());
         check_prior_spacing(&actual_start, state, true, first, &self.exceptable_nodes());
         flag_all_blank_lines_within(section.syntax(), state, &self.exceptable_nodes());
+        check_last_token(section.syntax(), state, &self.exceptable_nodes());
     }
 
     fn parameter_metadata_section(
@@ -560,6 +562,29 @@ fn check_prior_spacing(
                 }
             }
         }
+    }
+}
+
+/// Check that the node's last token does not have a blank before it.
+fn check_last_token(
+    syntax: &SyntaxNode,
+    state: &mut Diagnostics,
+    exceptable_nodes: &Option<&'static [SyntaxKind]>,
+) {
+    if syntax
+        .last_token()
+        .expect("Node should have last token")
+        .prev_sibling_or_token()
+        .is_some_and(|p| {
+            p.kind() == SyntaxKind::Whitespace
+                && p.to_string().chars().filter(|c| *c == '\n').count() > 1
+        })
+    {
+        state.exceptable_add(
+            excess_blank_line(syntax.text_range().to_span()),
+            SyntaxElement::from(syntax.clone()),
+            exceptable_nodes,
+        );
     }
 }
 

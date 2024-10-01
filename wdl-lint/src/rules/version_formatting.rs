@@ -149,7 +149,9 @@ impl Visitor for VersionFormattingRule {
         if let Some(next) = stmt.syntax().next_sibling_or_token() {
             if let Some(ws) = next.as_token().and_then(|s| Whitespace::cast(s.clone())) {
                 let s = ws.as_str();
-                if s != "\n\n" && s != "\r\n\r\n" {
+                // Don't add diagnostic if there's nothing but whitespace after the version
+                // statement
+                if s != "\n\n" && s != "\r\n\r\n" && next.next_sibling_or_token().is_some() {
                     state.add(expected_blank_line_after_version(ws.span()));
                 }
             }
