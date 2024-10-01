@@ -1,4 +1,4 @@
-## This is a test of having an unknown import in a call statement.
+## This is a test of having an unknown input in a call statement.
 
 version 1.2
 
