@@ -9,7 +9,6 @@ use wdl_ast::EXCEPT_COMMENT_PREFIX;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
-use wdl_ast::ToSpan;
 use wdl_ast::VersionStatement;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -90,16 +89,6 @@ enum PreambleState {
     Finished,
 }
 
-/// A struct that tracks the last processed preamble comment, whitespace, and
-/// lint directive.
-#[derive(Default, Debug, Clone, Copy)]
-struct LastProcessed {
-    /// The last lint directive.
-    lint_directive: Option<Span>,
-    /// The last preamble comment.
-    preamble_comment: Option<Span>,
-}
-
 /// An enum that represents the type of diagnostic to extend.
 enum ExtendDiagnostic {
     /// Extend a lint directive diagnostic.
@@ -115,8 +104,8 @@ enum ExtendDiagnostic {
 pub struct PreambleFormattingRule {
     /// The current state of preamble processing.
     state: PreambleState,
-    /// The last processed preamble comment, whitespace, and lint directive.
-    last_processed: LastProcessed,
+    /// Whether the preamble comment block has been finished.
+    preamble_comment_block_finished: bool,
     /// The number of comment tokens to skip.
     ///
     /// This is used to skip comments that were consolidated in a prior
@@ -277,22 +266,22 @@ impl Visitor for PreambleFormattingRule {
                 }
             };
 
-            // Don't include the newline separating the previous comment from the
-            // whitespace
-            let offset = if s.starts_with("\r\n") {
-                2
-            } else if s.starts_with('\n') {
-                1
-            } else {
-                0
-            };
-
             let span = whitespace.span();
             if expect_single_blank {
                 if s != "\r\n\r\n" && s != "\n\n" {
                     state.add(expected_blank_line_before_preamble_comment(span));
                 }
             } else if s != "\r\n" && s != "\n" {
+                // Don't include the newline separating the previous comment from the
+                // leading whitespace
+                let offset = if s.starts_with("\r\n") {
+                    2
+                } else if s.starts_with('\n') {
+                    1
+                } else {
+                    0
+                };
+
                 state.add(unnecessary_whitespace(Span::new(
                     span.start() + offset,
                     span.len() - offset,
@@ -329,33 +318,28 @@ impl Visitor for PreambleFormattingRule {
         } else if self.state == PreambleState::Start {
             if lint_directive {
                 self.state = PreambleState::LintDirectiveBlock;
-                self.last_processed.lint_directive = Some(comment.span());
             }
             if preamble_comment {
                 self.state = PreambleState::PreambleCommentBlock;
-                self.last_processed.preamble_comment = Some(comment.span());
             }
             return;
         } else if self.state == PreambleState::LintDirectiveBlock {
             if lint_directive {
-                self.last_processed.lint_directive = Some(comment.span());
                 return;
             }
             if preamble_comment {
-                if self.last_processed.preamble_comment.is_some() {
+                if self.preamble_comment_block_finished {
                     // Preamble block has already been processed. This is an error.
                     extend = Some(ExtendDiagnostic::PreambleComment);
                 } else {
                     // We are switching from the lint directive block to the preamble comment block
                     // Whitespace will be handled by the whitespace visitor.
                     self.state = PreambleState::PreambleCommentBlock;
-                    self.last_processed.preamble_comment = Some(comment.span());
                     return;
                 }
             }
         } else if self.state == PreambleState::PreambleCommentBlock {
             if preamble_comment {
-                self.last_processed.preamble_comment = Some(comment.span());
                 return;
             }
             if lint_directive {
@@ -385,8 +369,6 @@ impl Visitor for PreambleFormattingRule {
                                     span.start(),
                                     usize::from(sibling.text_range().end()) - span.start(),
                                 );
-                                self.last_processed.lint_directive =
-                                    Some(sibling.text_range().to_span());
                             } else {
                                 // Sibling should not be part of this diagnostic
                                 break;
@@ -402,10 +384,9 @@ impl Visitor for PreambleFormattingRule {
                                     span.start(),
                                     usize::from(sibling.text_range().end()) - span.start(),
                                 );
-                                self.last_processed.preamble_comment =
-                                    Some(sibling.text_range().to_span());
                             } else {
                                 // Sibling should not be part of this diagnostic
+                                self.preamble_comment_block_finished = true;
                                 break;
                             }
                         }
