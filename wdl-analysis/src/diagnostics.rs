@@ -431,16 +431,6 @@ pub fn not_a_task_member(member: &Ident) -> Diagnostic {
     .with_highlight(member.span())
 }
 
-/// Creates a "not an I/O name" diagnostic.
-pub fn not_io_name(name: &Ident, input: bool) -> Diagnostic {
-    Diagnostic::error(format!(
-        "an {kind} with name `{name}` does not exist",
-        kind = if input { "input" } else { "output" },
-        name = name.as_str(),
-    ))
-    .with_highlight(name.span())
-}
-
 /// Creates a "not a struct" diagnostic.
 pub fn not_a_struct(member: &Ident, input: bool) -> Diagnostic {
     Diagnostic::error(format!(
@@ -769,24 +759,20 @@ pub fn unknown_task_or_workflow(namespace: Option<Span>, name: &Ident) -> Diagno
     diagnostic
 }
 
-/// Creates an "unknown output" diagnostic.
-pub fn unknown_output(name: &str, output_name: &Ident, is_workflow: bool) -> Diagnostic {
+/// Creates an "unknown input/output name" diagnostic.
+pub fn unknown_io_name(
+    name: &str,
+    io_name: &Ident,
+    is_workflow: bool,
+    is_input: bool,
+) -> Diagnostic {
     Diagnostic::error(format!(
-        "{kind} `{name}` does not have an output named `{output_name}`",
+        "{kind} `{name}` does not have an {io_kind} named `{io_name}`",
         kind = if is_workflow { "workflow" } else { "task" },
-        output_name = output_name.as_str()
+        io_name = io_name.as_str(),
+        io_kind = if is_input { "input" } else { "output" }
     ))
-    .with_highlight(output_name.span())
-}
-
-/// Creates an "unknown input" diagnostic.
-pub fn unknown_input(name: &str, input_name: &Ident, is_workflow: bool) -> Diagnostic {
-    Diagnostic::error(format!(
-        "{kind} `{name}` does not have an input named `{input_name}`",
-        kind = if is_workflow { "workflow" } else { "task" },
-        input_name = input_name.as_str()
-    ))
-    .with_highlight(input_name.span())
+    .with_highlight(io_name.span())
 }
 
 /// Creates a "recursive workflow call" diagnostic.

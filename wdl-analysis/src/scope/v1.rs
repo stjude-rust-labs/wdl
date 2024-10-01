@@ -67,7 +67,7 @@ use crate::diagnostics::struct_conflicts_with_import;
 use crate::diagnostics::struct_not_in_scope;
 use crate::diagnostics::type_is_not_array;
 use crate::diagnostics::type_mismatch;
-use crate::diagnostics::unknown_input;
+use crate::diagnostics::unknown_io_name;
 use crate::diagnostics::unknown_namespace;
 use crate::diagnostics::unknown_task_or_workflow;
 use crate::diagnostics::unknown_type;
@@ -547,9 +547,9 @@ fn add_task(
                 let scope = ScopeRef {
                     scopes: &document.scopes,
                     scope,
+                    task_name: Some(name.as_str()),
                     inputs: Some(&inputs),
                     outputs: Some(&outputs),
-                    hints: true,
                 };
 
                 for item in section.items() {
@@ -912,10 +912,11 @@ fn add_call_statement(
                     .copied()
                     .map(|(ty, _)| ty)
                     .unwrap_or_else(|| {
-                        diagnostics.push(unknown_input(
+                        diagnostics.push(unknown_io_name(
                             name.as_str(),
                             &input_name,
                             target.workflow,
+                            true,
                         ));
                         Type::Union
                     });

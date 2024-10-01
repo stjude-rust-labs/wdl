@@ -174,18 +174,18 @@ pub struct ScopeRef<'a> {
     scopes: &'a [Scope],
     /// The index of the scope.
     scope: ScopeIndex,
+    /// The name of the task associated with the scope.
+    ///
+    /// This is `Some` only when evaluating a task `hints` section.
+    task_name: Option<&'a str>,
     /// The input type map.
     ///
-    /// This is `None` when `input` hidden types are not supported.
+    /// This is `Some` only when evaluating a task `hints` section.
     inputs: Option<&'a HashMap<String, (Type, bool)>>,
     /// The output type map.
     ///
-    /// This is `None` when `output` hidden types are not supported.
+    /// This is `Some` only when evaluating a task `hints` section.
     outputs: Option<&'a HashMap<String, Type>>,
-    /// Whether or not `hints` hidden types are supported in this scope.
-    ///
-    /// This is `true` only when evaluating the `hints` section in a task.
-    hints: bool,
 }
 
 impl<'a> ScopeRef<'a> {
@@ -194,9 +194,9 @@ impl<'a> ScopeRef<'a> {
         Self {
             scopes,
             scope,
+            task_name: None,
             inputs: None,
             outputs: None,
-            hints: false,
         }
     }
 
@@ -207,9 +207,9 @@ impl<'a> ScopeRef<'a> {
         self.scopes[self.scope.0].parent.map(|p| Self {
             scopes: self.scopes,
             scope: p,
+            task_name: self.task_name,
             inputs: self.inputs,
             outputs: self.outputs,
-            hints: self.hints,
         })
     }
 
@@ -218,9 +218,9 @@ impl<'a> ScopeRef<'a> {
         self.scopes[self.scope.0].children.iter().map(|c| Self {
             scopes: self.scopes,
             scope: *c,
+            task_name: self.task_name,
             inputs: self.inputs,
             outputs: self.outputs,
-            hints: self.hints,
         })
     }
 
@@ -289,9 +289,14 @@ impl<'a> ScopeRef<'a> {
         }
     }
 
+    /// The task name associated with the scope.
+    pub(crate) fn task_name(&self) -> Option<&str> {
+        self.task_name
+    }
+
     /// Whether or not `hints` hidden types are supported by this scope.
     pub(crate) fn supports_hints(&self) -> bool {
-        self.hints
+        self.task_name.is_some()
     }
 
     /// Whether or not `input` hidden types are supported by this scope.

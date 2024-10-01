@@ -63,7 +63,6 @@ use crate::diagnostics::not_a_pair_accessor;
 use crate::diagnostics::not_a_struct;
 use crate::diagnostics::not_a_struct_member;
 use crate::diagnostics::not_a_task_member;
-use crate::diagnostics::not_io_name;
 use crate::diagnostics::numeric_mismatch;
 use crate::diagnostics::string_concat_mismatch;
 use crate::diagnostics::too_few_arguments;
@@ -71,7 +70,7 @@ use crate::diagnostics::too_many_arguments;
 use crate::diagnostics::type_mismatch;
 use crate::diagnostics::type_mismatch_custom;
 use crate::diagnostics::unknown_function;
-use crate::diagnostics::unknown_output;
+use crate::diagnostics::unknown_io_name;
 use crate::diagnostics::unsupported_function;
 use crate::scope::ScopeRef;
 use crate::stdlib::FunctionBindError;
@@ -1183,7 +1182,12 @@ where
                 } {
                     Some(ty) => ty,
                     None => {
-                        self.diagnostics.push(not_io_name(&name, input));
+                        self.diagnostics.push(unknown_io_name(
+                            scope.task_name().expect("should have task name"),
+                            &name,
+                            false,
+                            input,
+                        ));
                         break;
                     }
                 }
@@ -1732,7 +1736,7 @@ where
                 }
 
                 self.diagnostics
-                    .push(unknown_output(ty.name(), &name, ty.is_workflow()));
+                    .push(unknown_io_name(ty.name(), &name, ty.is_workflow(), false));
                 return None;
             }
         }
