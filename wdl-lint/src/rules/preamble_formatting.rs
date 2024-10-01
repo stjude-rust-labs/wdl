@@ -54,13 +54,6 @@ fn expected_blank_line_before_preamble_comment(span: Span) -> Diagnostic {
     .with_highlight(span)
 }
 
-/// Creates an "expected a blank line before" diagnostic.
-fn expected_blank_line_before_version(span: Span) -> Diagnostic {
-    Diagnostic::note("expected exactly one blank line before the version statement")
-        .with_rule(ID)
-        .with_highlight(span)
-}
-
 /// Detects if a comment is a lint directive.
 fn is_lint_directive(text: &str) -> bool {
     text.starts_with(EXCEPT_COMMENT_PREFIX)
@@ -208,12 +201,9 @@ impl Visitor for PreambleFormattingRule {
                 .expect("should have a next token");
             if next_token.kind() != SyntaxKind::Comment {
                 // The next token must be part of the version statement
-                // and since we've already established there's a prior comment,
-                // this whitespace must be _exactly_ two newlines.
-                if s != "\r\n\r\n" && s != "\n\n" {
-                    state.add(expected_blank_line_before_version(whitespace.span()));
-                }
-                return;
+                // and we should have already returned during the above check
+                // for the version statement
+                unreachable!("next token should be a comment");
             }
 
             let next_text = next_token.text();

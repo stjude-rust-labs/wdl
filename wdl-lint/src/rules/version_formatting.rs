@@ -17,6 +17,7 @@ use wdl_ast::Whitespace;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
+use crate::util::lines_with_offset;
 
 /// The ID of the rule.
 const ID: &str = "VersionFormatting";
@@ -40,21 +41,21 @@ fn expected_blank_line_after_version(span: Span) -> Diagnostic {
 
 /// Creates a diagnostic for unexpected whitespace before the version statement.
 fn whitespace_before_version(span: Span) -> Diagnostic {
-    Diagnostic::error("unexpected whitespace before the version statement")
+    Diagnostic::note("unexpected whitespace before the version statement")
         .with_rule(ID)
         .with_highlight(span)
 }
 
 /// Creates a diagnostic for a comment inside the version statement.
 fn comment_inside_version(span: Span) -> Diagnostic {
-    Diagnostic::error("unexpected comment inside the version statement")
+    Diagnostic::note("unexpected comment inside the version statement")
         .with_rule(ID)
         .with_highlight(span)
 }
 
 /// Creates a diagnostic for unexpected whitespace inside the version statement.
 fn unexpected_whitespace_inside_version(span: Span) -> Diagnostic {
-    Diagnostic::error("expected exactly one space between 'version' and the version number")
+    Diagnostic::note("expected exactly one space between 'version' and the version number")
         .with_rule(ID)
         .with_highlight(span)
 }
@@ -118,6 +119,30 @@ impl Visitor for VersionFormattingRule {
                     state.add(expected_blank_line_before_version(
                         prev_ws.text_range().to_span(),
                     ));
+
+                    // There's a special case where the blank line has extra whitespace
+                    // but that doesn't appear in the printed diagnostic.
+                    // So here we check for that case and log an extra diagnostic.
+                    // If ws has exactly 2 newline characters and is in this block, it must have
+                    // extra whitespace.
+                    if ws.chars().filter(|&c| c == '\n').count() == 2 {
+                        for (line, start, end) in lines_with_offset(ws) {
+                            if !line.is_empty() {
+                                let end_offset = if ws.ends_with('\n') {
+                                    1
+                                } else if ws.ends_with("\r\n") {
+                                    2
+                                } else {
+                                    0
+                                };
+                                state.add(whitespace_before_version(Span::new(
+                                    prev_ws.text_range().to_span().start() + start,
+                                    end - start - end_offset,
+                                )));
+                                break;
+                            }
+                        }
+                    }
                 }
             } else {
                 state.add(whitespace_before_version(prev_ws.text_range().to_span()));
