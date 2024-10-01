@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, Todo
+#@ except: DescriptionMissing
 
 version 1.2
 
@@ -21,7 +21,6 @@ task good {
     }
 }
 
-# TODO: This emits two diagnostics but should only emit one.
 task deprecated_runtime {
     meta {}
 

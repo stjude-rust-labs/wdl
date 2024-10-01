@@ -1,7 +1,5 @@
-#@ except: DeprecatedObject, DescriptionMissing, InputSorting, Todo
+#@ except: DeprecatedObject, DescriptionMissing, InputSorting
 #@ except: MatchingParameterMeta, MissingMetas, MissingOutput, MissingRequirements
-
-## TODO: line 110 is not emitting a BlankLinesBetweenElements error. This is a bug.
 
 version 1.2
 

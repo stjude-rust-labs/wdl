@@ -419,7 +419,6 @@ impl Visitor for PreambleFormattingRule {
                                     span.start(),
                                     usize::from(sibling.text_range().end()) - span.start(),
                                 );
-                                // TODO: need to track this span?
                             } else {
                                 // Sibling should not be part of this diagnostic
                                 break;
