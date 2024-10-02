@@ -170,7 +170,11 @@ pub async fn gauntlet(args: Args) -> Result<()> {
         let analyzer = Analyzer::new_with_validator(
             move |_: (), _, _, _| async move {},
             move || {
-                let mut validator = Validator::default();
+                let mut validator = if !args.arena {
+                    Validator::default()
+                } else {
+                    Validator::empty()
+                };
                 if args.arena {
                     validator.add_visitor(LintVisitor::default());
                 }
@@ -228,6 +232,11 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                 };
 
                 for diagnostic in diagnostics.iter() {
+                    if args.arena {
+                        if diagnostic.severity() == wdl::ast::Severity::Error {
+                            continue;
+                        }
+                    }
                     let mut buffer = Buffer::no_color();
                     term::emit(&mut buffer, &config, &file, &diagnostic.to_codespan())
                         .context("failed to write diagnostic")?;
@@ -239,15 +248,15 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                         .unwrap_or_default();
                     // The `+1` here is because line_index() is 0-based.
                     let line_no = file.line_index((), byte_start).unwrap_or_default() + 1;
-                    // Removed an assertion here because it was causing a panic.
-                    // This will now just skip duplicates.
-                    actual.insert((
-                        std::str::from_utf8(buffer.as_slice())
-                            .context("diagnostic should be UTF-8")?
-                            .trim()
-                            .to_string(),
-                        line_no,
-                    ));
+                    assert!(
+                        actual.insert((
+                            std::str::from_utf8(buffer.as_slice())
+                                .context("diagnostic should be UTF-8")?
+                                .trim()
+                                .to_string(),
+                            line_no,
+                        ))
+                    );
                 }
             }
 

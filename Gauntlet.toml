@@ -20,7 +20,7 @@ commit_hash = "4536dd2c6719b86f4c50348f0ce354818260cadb"
 
 [repositories."broadinstitute/palantir-workflows"]
 identifier = "broadinstitute/palantir-workflows"
-commit_hash = "8ecf5f7bcf49254c2672fae31032313f8b9a909c"
+commit_hash = "56575fff0bfb76cf873f94f944d673f87734e237"
 
 [repositories."broadinstitute/warp"]
 identifier = "broadinstitute/warp"
@@ -1009,682 +1009,682 @@ permalink = "https://github.com/broadinstitute/gatk-tool-wdls/blob/4536dd2c6719b
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:104:32: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L104"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L104"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:148:32: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L148"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L148"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:204:32: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L204"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L204"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:216:32: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L216"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L216"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:242:26: error: type mismatch: expected type `Array[String]`, but found type `Array[File]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L242"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L242"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:243:34: error: type mismatch: argument to function `flatten` expects type `Array[Array[X]]`, but found type `Array[Union]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L243"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L243"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:243:46: error: type mismatch: argument to function `select_all` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L243"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L243"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:457:40: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L457"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L457"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:457:49: error: cannot coerce type `Array[Int]` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L457"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L457"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:485:43: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L485"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L485"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:485:52: error: cannot coerce type `Array[Int]` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L485"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L485"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:772:43: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L772"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L772"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:772:52: error: cannot coerce type `Array[Int]` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L772"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L772"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:77:28: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L77"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L77"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:789:36: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L789"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L789"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:789:49: error: cannot coerce type `Array[String]` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L789"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L789"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:790:42: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L790"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L790"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:790:51: error: cannot coerce type `Array[Int]` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L790"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L790"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:890:36: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L890"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L890"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:890:49: error: cannot coerce type `Array[File]` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/BenchmarkSVs.wdl/#L890"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/BenchmarkSVs.wdl/#L890"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/CleanSVs.wdl"
 message = "CleanSVs.wdl:23:29: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/CleanSVs.wdl/#L23"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/CleanSVs.wdl/#L23"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/CleanSVs.wdl"
 message = "CleanSVs.wdl:33:29: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/CleanSVs.wdl/#L33"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/CleanSVs.wdl/#L33"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/CleanSVs.wdl"
 message = "CleanSVs.wdl:42:29: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/CleanSVs.wdl/#L42"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/CleanSVs.wdl/#L42"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/CleanSVs.wdl"
 message = "CleanSVs.wdl:51:29: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/CleanSVs.wdl/#L51"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/CleanSVs.wdl/#L51"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/WittyerTasks.wdl"
 message = "WittyerTasks.wdl:74:14: error: conflicting output name `wittyer_config`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkSVs/WittyerTasks.wdl/#L74"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkSVs/WittyerTasks.wdl/#L74"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkAndCompareVCFs.wdl"
 message = "BenchmarkAndCompareVCFs.wdl:75:32: error: type mismatch: expected type `Array[String]`, but found type `Array[String]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkAndCompareVCFs.wdl/#L75"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkAndCompareVCFs.wdl/#L75"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkAndCompareVCFs.wdl"
 message = "BenchmarkAndCompareVCFs.wdl:76:39: error: type mismatch: expected type `Array[String]`, but found type `Array[String]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkAndCompareVCFs.wdl/#L76"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkAndCompareVCFs.wdl/#L76"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkAndCompareVCFs.wdl"
 message = "BenchmarkAndCompareVCFs.wdl:77:22: error: type mismatch: expected type `Array[Int]`, but found type `Array[Int]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkAndCompareVCFs.wdl/#L77"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkAndCompareVCFs.wdl/#L77"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:178:37: error: type mismatch: argument to function `select_all` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkVCFs.wdl/#L178"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkVCFs.wdl/#L178"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:179:38: error: type mismatch: argument to function `select_all` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkVCFs.wdl/#L179"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkVCFs.wdl/#L179"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:180:37: error: type mismatch: argument to function `select_all` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkVCFs.wdl/#L180"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkVCFs.wdl/#L180"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:189:18: error: type mismatch: expected type `Array[String]`, but found type `Array[File]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkVCFs.wdl/#L189"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkVCFs.wdl/#L189"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:613:36: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkVCFs.wdl/#L613"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkVCFs.wdl/#L613"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:613:49: error: cannot coerce type `Array[File]` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkVCFs.wdl/#L613"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkVCFs.wdl/#L613"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:621:36: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkVCFs.wdl/#L621"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkVCFs.wdl/#L621"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:621:49: error: cannot coerce type `Array[File]` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkVCFs.wdl/#L621"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkVCFs.wdl/#L621"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:626:36: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkVCFs.wdl/#L626"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkVCFs.wdl/#L626"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:626:49: error: cannot coerce type `Array[File]` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkVCFs.wdl/#L626"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkVCFs.wdl/#L626"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:631:36: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkVCFs.wdl/#L631"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkVCFs.wdl/#L631"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:631:49: error: cannot coerce type `Array[File]` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkVCFs.wdl/#L631"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkVCFs.wdl/#L631"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:91:54: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/BenchmarkVCFs.wdl/#L91"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/BenchmarkVCFs.wdl/#L91"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/CompareBenchmarks.wdl"
 message = "CompareBenchmarks.wdl:31:22: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/CompareBenchmarks.wdl/#L31"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/CompareBenchmarks.wdl/#L31"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/CompareBenchmarks.wdl"
 message = "CompareBenchmarks.wdl:32:27: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/CompareBenchmarks.wdl/#L32"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/CompareBenchmarks.wdl/#L32"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/FindSamplesAndBenchmark.wdl"
 message = "FindSamplesAndBenchmark.wdl:127:31: error: type mismatch: argument to function `select_all` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/FindSamplesAndBenchmark.wdl/#L127"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/FindSamplesAndBenchmark.wdl/#L127"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/FindSamplesAndBenchmark.wdl"
 message = "FindSamplesAndBenchmark.wdl:135:31: error: type mismatch: argument to function `select_all` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/FindSamplesAndBenchmark.wdl/#L135"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/FindSamplesAndBenchmark.wdl/#L135"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/FindSamplesAndBenchmark.wdl"
 message = "FindSamplesAndBenchmark.wdl:143:31: error: type mismatch: argument to function `select_all` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/FindSamplesAndBenchmark.wdl/#L143"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/FindSamplesAndBenchmark.wdl/#L143"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/FindSamplesAndBenchmark.wdl"
 message = "FindSamplesAndBenchmark.wdl:151:31: error: type mismatch: argument to function `select_all` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/BenchmarkVCFs/FindSamplesAndBenchmark.wdl/#L151"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/BenchmarkVCFs/FindSamplesAndBenchmark.wdl/#L151"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Fingerprints/GetFingerprintMetrics.wdl"
 message = "GetFingerprintMetrics.wdl:45:11: error: type mismatch: expected type `Int` or type `Float`, but found type `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Fingerprints/GetFingerprintMetrics.wdl/#L45"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Fingerprints/GetFingerprintMetrics.wdl/#L45"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:119:38: error: type mismatch: expected type `Array[File]`, but found type `Array[File]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L119"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L119"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:120:35: error: type mismatch: expected type `Array[String]`, but found type `Array[String]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L120"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L120"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:125:64: error: type mismatch: expected every array element to be type `String`, but found type `Int`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L125"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L125"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:166:38: error: type mismatch: expected type `Array[File]`, but found type `Array[File]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L166"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L166"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:167:35: error: type mismatch: expected type `Array[String]`, but found type `Array[String]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L167"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L167"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:170:64: error: type mismatch: expected every array element to be type `String`, but found type `Int`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L170"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L170"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:195:42: error: type mismatch: expected type `Array[File]`, but found type `Array[File]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L195"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L195"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:196:39: error: type mismatch: expected type `Array[String]`, but found type `Array[String]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L196"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L196"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:199:76: error: type mismatch: expected every array element to be type `String`, but found type `Int`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L199"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L199"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:224:42: error: type mismatch: expected type `Array[File]`, but found type `Array[File]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L224"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L224"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:225:39: error: type mismatch: expected type `Array[String]`, but found type `Array[String]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L225"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L225"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:228:76: error: type mismatch: expected every array element to be type `String`, but found type `Int`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L228"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L228"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:236:45: error: type mismatch: argument to function `flatten` expects type `Array[Array[X]]`, but found type `Array[Union]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L236"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L236"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:236:57: error: type mismatch: argument to function `select_all` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L236"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L236"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:283:30: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L283"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L283"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:65:190: error: type mismatch: expected every map value to be type `String`, but found type `Int`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L65"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L65"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:65:32: error: type mismatch: expected type `VcfFile`, but found type `Map[String, String]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L65"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L65"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:69:190: error: type mismatch: expected every map value to be type `String`, but found type `Int`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L69"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L69"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:69:32: error: type mismatch: expected type `VcfFile`, but found type `Map[String, String]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L69"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L69"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:92:38: error: type mismatch: expected type `Array[File]`, but found type `Array[File]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L92"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L92"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:93:35: error: type mismatch: expected type `Array[String]`, but found type `Array[String]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L93"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L93"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/FunctionalEquivalence.wdl"
 message = "FunctionalEquivalence.wdl:98:64: error: type mismatch: expected every array element to be type `String`, but found type `Int`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/FunctionalEquivalence.wdl/#L98"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/FunctionalEquivalence.wdl/#L98"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/subworkflows/FEEvaluation.wdl"
 message = "FEEvaluation.wdl:11:69: error: type mismatch: string concatenation is not supported for type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/subworkflows/FEEvaluation.wdl/#L11"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/subworkflows/FEEvaluation.wdl/#L11"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/subworkflows/FEEvaluation.wdl"
 message = "FEEvaluation.wdl:124:35: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[Int]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/subworkflows/FEEvaluation.wdl/#L124"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/subworkflows/FEEvaluation.wdl/#L124"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/subworkflows/PlotROC.wdl"
 message = "PlotROC.wdl:43:95: error: type mismatch: string concatenation is not supported for type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/FunctionalEquivalence/subworkflows/PlotROC.wdl/#L43"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/FunctionalEquivalence/subworkflows/PlotROC.wdl/#L43"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
 message = "Glimpse2ImputationAndCheckQC.wdl:48:21: error: type mismatch: expected type `Array[File]`, but found type `Array[File]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L48"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L48"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
 message = "Glimpse2ImputationAndCheckQC.wdl:49:28: error: type mismatch: expected type `Array[File]`, but found type `Array[File]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L49"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L49"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
 message = "Glimpse2ImputationAndCheckQC.wdl:55:46: error: type mismatch: expected type `Boolean`, but found type `Boolean?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L55"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L55"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
 message = "Glimpse2ImputationAndCheckQC.wdl:56:27: error: type mismatch: expected type `Boolean`, but found type `Boolean?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L56"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L56"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
 message = "Glimpse2ImputationAndCheckQC.wdl:61:27: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L61"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L61"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
 message = "Glimpse2ImputationAndCheckQC.wdl:62:22: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L62"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L62"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
 message = "Glimpse2ImputationAndCheckQC.wdl:63:61: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L63"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L63"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
 message = "Glimpse2ImputationAndCheckQC.wdl:64:26: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L64"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L64"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
 message = "Glimpse2ImputationAndCheckQC.wdl:65:29: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L65"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L65"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
 message = "Glimpse2ImputationAndCheckQC.wdl:74:27: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L74"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L74"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
 message = "Glimpse2ImputationAndCheckQC.wdl:75:22: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L75"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L75"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
 message = "Glimpse2ImputationAndCheckQC.wdl:76:19: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L76"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L76"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
 message = "Glimpse2ImputationAndCheckQC.wdl:77:22: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L77"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L77"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl"
 message = "Glimpse2ImputationInBatches.wdl:60:38: error: type mismatch: expected type `Boolean`, but found type `Boolean?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L60"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L60"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl"
 message = "Glimpse2ImputationInBatches.wdl:62:50: error: type mismatch: expected type `Boolean`, but found type `Boolean?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L62"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L62"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl"
 message = "Glimpse2ImputationInBatches.wdl:63:31: error: type mismatch: expected type `Boolean`, but found type `Boolean?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L63"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L63"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl"
 message = "Glimpse2ImputationInBatches.wdl:67:31: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L67"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L67"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl"
 message = "Glimpse2ImputationInBatches.wdl:68:26: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L68"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L68"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl"
 message = "Glimpse2ImputationInBatches.wdl:69:65: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L69"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L69"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl"
 message = "Glimpse2ImputationInBatches.wdl:70:30: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L70"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L70"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl"
 message = "Glimpse2ImputationInBatches.wdl:71:33: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L71"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L71"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl"
 message = "Glimpse2ImputationInBatches.wdl:91:26: error: type mismatch: expected type `Array[File]`, but found type `Array[File]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L91"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L91"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl"
 message = "Glimpse2ImputationInBatches.wdl:92:28: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L92"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L92"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl"
 message = "Glimpse2ImputationInBatches.wdl:93:42: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L93"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L93"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl"
 message = "Glimpse2ImputationInBatches.wdl:94:36: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L94"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L94"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl"
 message = "Glimpse2ImputationInBatches.wdl:95:28: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L95"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/GlimpseImputationPipeline/Glimpse2ImputationInBatches.wdl/#L95"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/HaplotypeMap/BuildHaplotypeMap.wdl"
 message = "BuildHaplotypeMap.wdl:17:1: error: a WDL document must start with a version statement"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/HaplotypeMap/BuildHaplotypeMap.wdl/#L17"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/HaplotypeMap/BuildHaplotypeMap.wdl/#L17"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/ImputationPipeline/Imputation.wdl"
 message = "Imputation.wdl:1062:11: error: type mismatch: expected type `String` or type `Array[String]`, but found type `Int`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/ImputationPipeline/Imputation.wdl/#L1062"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/ImputationPipeline/Imputation.wdl/#L1062"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/ImputationPipeline/Imputation.wdl"
 message = "Imputation.wdl:294:31: error: type mismatch: expected type `Int`, but found type `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/ImputationPipeline/Imputation.wdl/#L294"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/ImputationPipeline/Imputation.wdl/#L294"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/ImputationPipeline/Imputation.wdl"
 message = "Imputation.wdl:487:10: error: type mismatch: expected type `Int` or type `Float`, but found type `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/ImputationPipeline/Imputation.wdl/#L487"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/ImputationPipeline/Imputation.wdl/#L487"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/ImputationPipeline/Imputation.wdl"
 message = "Imputation.wdl:519:10: error: type mismatch: expected type `Int` or type `Float`, but found type `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/ImputationPipeline/Imputation.wdl/#L519"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/ImputationPipeline/Imputation.wdl/#L519"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/ImputationPipeline/Imputation.wdl"
 message = "Imputation.wdl:85:17: error: type mismatch: expected type `Int`, but found type `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/ImputationPipeline/Imputation.wdl/#L85"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/ImputationPipeline/Imputation.wdl/#L85"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/ImputationPipeline/PRSWrapper.wdl"
 message = "PRSWrapper.wdl:50:30: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/ImputationPipeline/PRSWrapper.wdl/#L50"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/ImputationPipeline/PRSWrapper.wdl/#L50"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/ImputationPipeline/PRSWrapper.wdl"
 message = "PRSWrapper.wdl:68:25: error: type mismatch: expected type `Int`, but found type `Int?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/ImputationPipeline/PRSWrapper.wdl/#L68"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/ImputationPipeline/PRSWrapper.wdl/#L68"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/ImputationPipeline/PerformPopulationPCA.wdl"
 message = "PerformPopulationPCA.wdl:407:41: error: type mismatch: expected every array element to be type `File`, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/ImputationPipeline/PerformPopulationPCA.wdl/#L407"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/ImputationPipeline/PerformPopulationPCA.wdl/#L407"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/ImputationPipeline/ScoreBGE/ScoreBGE.wdl"
 message = "ScoreBGE.wdl:38:32: error: type mismatch: expected type `String`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/ImputationPipeline/ScoreBGE/ScoreBGE.wdl/#L38"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/ImputationPipeline/ScoreBGE/ScoreBGE.wdl/#L38"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/ImputationPipeline/Validation/FullImputationPRSValidation.wdl"
 message = "FullImputationPRSValidation.wdl:52:18: error: type mismatch: expected type `Array[String]`, but found type `Array[String]?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/ImputationPipeline/Validation/FullImputationPRSValidation.wdl/#L52"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/ImputationPipeline/Validation/FullImputationPRSValidation.wdl/#L52"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/ImputationPipeline/Validation/SubsetWeightSet.wdl"
 message = "SubsetWeightSet.wdl:27:15: error: type mismatch: argument to function `defined` expects type `X` where `X`: any optional type, but found type `SelfExclusiveSites`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/ImputationPipeline/Validation/SubsetWeightSet.wdl/#L27"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/ImputationPipeline/Validation/SubsetWeightSet.wdl/#L27"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/ImputationPipeline/Validation/SubsetWeightSet.wdl"
 message = "SubsetWeightSet.wdl:28:66: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[SelfExclusiveSites]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/ImputationPipeline/Validation/SubsetWeightSet.wdl/#L28"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/ImputationPipeline/Validation/SubsetWeightSet.wdl/#L28"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/JointCalling/CreateSampleMap.wdl"
 message = "CreateSampleMap.wdl:57:14: error: type mismatch: expected type `Int` or type `Float`, but found type `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/JointCalling/CreateSampleMap.wdl/#L57"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/JointCalling/CreateSampleMap.wdl/#L57"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl"
 message = "IsoformDiscoveryBenchmark.wdl:143:24: error: type mismatch: expected type `Array[File]+`, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L143"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L143"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl"
 message = "IsoformDiscoveryBenchmark.wdl:147:13: error: conflicting scatter variable name `gtf`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L147"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L147"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl"
 message = "IsoformDiscoveryBenchmark.wdl:157:29: error: type mismatch: expected type `Array[File]+`, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L157"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L157"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl"
 message = "IsoformDiscoveryBenchmark.wdl:158:25: error: type mismatch: expected type `Array[String]+`, but found type `Array[String]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L158"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L158"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl"
 message = "IsoformDiscoveryBenchmark.wdl:164:25: error: type mismatch: expected type `Array[File]+`, but found type `Array[File]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L164"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L164"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl"
 message = "IsoformDiscoveryBenchmark.wdl:165:25: error: type mismatch: expected type `Array[String]+`, but found type `Array[String]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L165"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L165"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl"
 message = "IsoformDiscoveryBenchmark.wdl:172:25: error: type mismatch: expected type `Array[String]+`, but found type `Array[String]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L172"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/LongReadRNABenchmark/IsoformDiscoveryBenchmark.wdl/#L172"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/LongReadRNABenchmark/IsoformDiscoveryBenchmarkTasks.wdl"
 message = "IsoformDiscoveryBenchmarkTasks.wdl:69:32: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[String]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/LongReadRNABenchmark/IsoformDiscoveryBenchmarkTasks.wdl/#L69"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/LongReadRNABenchmark/IsoformDiscoveryBenchmarkTasks.wdl/#L69"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl"
 message = "ComputeIntervalBamStats.wdl:223:37: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L223"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L223"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl"
 message = "ComputeIntervalBamStats.wdl:223:50: error: cannot coerce type `Array[File]` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L223"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L223"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl"
 message = "ComputeIntervalBamStats.wdl:270:37: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L270"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L270"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl"
 message = "ComputeIntervalBamStats.wdl:270:50: error: cannot coerce type `Array[File]` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L270"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L270"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
 message = "CreateIGVSession.wdl:51:36: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/WDLs/CreateIGVSession.wdl/#L51"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/WDLs/CreateIGVSession.wdl/#L51"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
 message = "CreateIGVSession.wdl:51:50: error: cannot coerce type `Array[String]?` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/WDLs/CreateIGVSession.wdl/#L51"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/WDLs/CreateIGVSession.wdl/#L51"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
 message = "CreateIGVSession.wdl:52:36: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/WDLs/CreateIGVSession.wdl/#L52"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/WDLs/CreateIGVSession.wdl/#L52"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
 message = "CreateIGVSession.wdl:52:50: error: cannot coerce type `Array[String]?` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/WDLs/CreateIGVSession.wdl/#L52"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/WDLs/CreateIGVSession.wdl/#L52"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
 message = "CreateIGVSession.wdl:53:46: error: a placeholder cannot have more than one option"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/WDLs/CreateIGVSession.wdl/#L53"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/WDLs/CreateIGVSession.wdl/#L53"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
 message = "CreateIGVSession.wdl:53:60: error: cannot coerce type `Array[String]?` to `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/WDLs/CreateIGVSession.wdl/#L53"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/WDLs/CreateIGVSession.wdl/#L53"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/DownsampleAndCollectCoverage.wdl"
 message = "DownsampleAndCollectCoverage.wdl:173:91: error: type mismatch: expected type `Float?`, but found type `String?`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/WDLs/DownsampleAndCollectCoverage.wdl/#L173"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/WDLs/DownsampleAndCollectCoverage.wdl/#L173"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/DownsampleAndCollectCoverage.wdl"
 message = "DownsampleAndCollectCoverage.wdl:196:14: error: type mismatch: expected type `Int` or type `Float`, but found type `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/WDLs/DownsampleAndCollectCoverage.wdl/#L196"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/WDLs/DownsampleAndCollectCoverage.wdl/#L196"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/IndexCramOrBam.wdl"
 message = "IndexCramOrBam.wdl:36:8: error: type mismatch: expected type `Int` or type `Float`, but found type `String`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/WDLs/IndexCramOrBam.wdl/#L36"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/WDLs/IndexCramOrBam.wdl/#L36"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/MatchFingerprints.wdl"
 message = "MatchFingerprints.wdl:67:13: error: ambiguous call to function `length` with conflicting signatures `(String) -> Int` and `(Object) -> Int`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/WDLs/MatchFingerprints.wdl/#L67"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/WDLs/MatchFingerprints.wdl/#L67"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/MatchFingerprints.wdl"
 message = "MatchFingerprints.wdl:67:33: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[Array[String]]`"
-permalink = "https://github.com/broadinstitute/palantir-workflows/blob/8ecf5f7bcf49254c2672fae31032313f8b9a909c/Utilities/WDLs/MatchFingerprints.wdl/#L67"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/56575fff0bfb76cf873f94f944d673f87734e237/Utilities/WDLs/MatchFingerprints.wdl/#L67"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/pipelines/broad/annotation_filtration/AnnotationFiltration.wdl"
