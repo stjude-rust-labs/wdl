@@ -232,10 +232,8 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                 };
 
                 for diagnostic in diagnostics.iter() {
-                    if args.arena {
-                        if diagnostic.severity() == wdl::ast::Severity::Error {
-                            continue;
-                        }
+                    if args.arena && diagnostic.severity() == wdl::ast::Severity::Error {
+                        continue;
                     }
                     let mut buffer = Buffer::no_color();
                     term::emit(&mut buffer, &config, &file, &diagnostic.to_codespan())
