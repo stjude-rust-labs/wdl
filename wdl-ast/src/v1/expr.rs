@@ -2691,14 +2691,12 @@ pub struct LiteralPair(SyntaxNode);
 impl LiteralPair {
     /// Gets the first and second expressions in the literal pair.
     pub fn exprs(&self) -> (Expr, Expr) {
-        let mut children = Expr::children(&self.0);
-        let first = children
+        let mut children = self.0.children().filter_map(Expr::cast);
+        let left = children.next().expect("pair should have a left expression");
+        let right = children
             .next()
-            .expect("pair should have a first expression");
-        let second = children
-            .next()
-            .expect("pair should have a second expression");
-        (first, second)
+            .expect("pair should have a right expression");
+        (left, right)
     }
 }
 
@@ -4435,10 +4433,9 @@ task test {
         assert_eq!(decls[0].ty().to_string(), "Pair[Int, Int]");
         assert_eq!(decls[0].name().as_str(), "a");
         let p = decls[0].expr().unwrap_literal().unwrap_pair();
-        let (first, second) = p.exprs();
+        let (left, right) = p.exprs();
         assert_eq!(
-            first
-                .clone()
+            left.clone()
                 .unwrap_literal()
                 .unwrap_integer()
                 .value()
@@ -4446,7 +4443,7 @@ task test {
             1000
         );
         assert_eq!(
-            second
+            right
                 .clone()
                 .unwrap_literal()
                 .unwrap_integer()
@@ -4459,10 +4456,9 @@ task test {
         assert_eq!(decls[1].ty().to_string(), "Pair[String, Int]");
         assert_eq!(decls[1].name().as_str(), "b");
         let p = decls[1].expr().unwrap_literal().unwrap_pair();
-        let (first, second) = p.exprs();
+        let (left, right) = p.exprs();
         assert_eq!(
-            first
-                .clone()
+            left.clone()
                 .unwrap_literal()
                 .unwrap_string()
                 .text()
@@ -4471,7 +4467,7 @@ task test {
             "0x1000"
         );
         assert_eq!(
-            second
+            right
                 .clone()
                 .unwrap_literal()
                 .unwrap_integer()
@@ -4487,10 +4483,9 @@ task test {
         let elements: Vec<_> = a.elements().collect();
         assert_eq!(elements.len(), 3);
         let p = elements[0].clone().unwrap_literal().unwrap_pair();
-        let (first, second) = p.exprs();
+        let (left, right) = p.exprs();
         assert_eq!(
-            first
-                .clone()
+            left.clone()
                 .unwrap_literal()
                 .unwrap_integer()
                 .value()
@@ -4498,7 +4493,7 @@ task test {
             1
         );
         assert_eq!(
-            second
+            right
                 .clone()
                 .unwrap_literal()
                 .unwrap_string()
@@ -4508,10 +4503,9 @@ task test {
             "hello"
         );
         let p = elements[1].clone().unwrap_literal().unwrap_pair();
-        let (first, second) = p.exprs();
+        let (left, right) = p.exprs();
         assert_eq!(
-            first
-                .clone()
+            left.clone()
                 .unwrap_literal()
                 .unwrap_integer()
                 .value()
@@ -4519,7 +4513,7 @@ task test {
             2
         );
         assert_eq!(
-            second
+            right
                 .clone()
                 .unwrap_literal()
                 .unwrap_string()
@@ -4529,10 +4523,9 @@ task test {
             "world"
         );
         let p = elements[2].clone().unwrap_literal().unwrap_pair();
-        let (first, second) = p.exprs();
+        let (left, right) = p.exprs();
         assert_eq!(
-            first
-                .clone()
+            left.clone()
                 .unwrap_literal()
                 .unwrap_integer()
                 .value()
@@ -4540,7 +4533,7 @@ task test {
             3
         );
         assert_eq!(
-            second
+            right
                 .clone()
                 .unwrap_literal()
                 .unwrap_string()
@@ -4571,9 +4564,9 @@ task test {
                 }
 
                 if let Expr::Literal(LiteralExpr::Pair(p)) = expr {
-                    let (first, second) = p.exprs();
+                    let (left, right) = p.exprs();
 
-                    let first = match first {
+                    let left = match left {
                         Expr::Literal(LiteralExpr::String(s)) => {
                             s.text().unwrap().as_str().to_string()
                         }
@@ -4581,7 +4574,7 @@ task test {
                         _ => panic!("expected a string or integer"),
                     };
 
-                    let second = match second {
+                    let right = match right {
                         Expr::Literal(LiteralExpr::String(s)) => {
                             s.text().unwrap().as_str().to_string()
                         }
@@ -4589,7 +4582,7 @@ task test {
                         _ => panic!("expected a string or integer"),
                     };
 
-                    self.0.push((first, second));
+                    self.0.push((left, right));
                 }
             }
         }
