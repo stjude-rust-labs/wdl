@@ -17,6 +17,7 @@ use wdl_ast::Whitespace;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
+use crate::util::lines_with_offset;
 
 /// The identifier for the preamble formatting rule.
 const ID: &str = "PreambleFormatting";
@@ -251,7 +252,29 @@ impl Visitor for PreambleFormattingRule {
             let span = whitespace.span();
             if expect_single_blank {
                 if s != "\r\n\r\n" && s != "\n\n" {
-                    state.add(expected_blank_line_before_preamble_comment(span));
+                    // There's a special case where the blank line has extra whitespace
+                    // but that doesn't appear in the printed diagnostic.
+                    let mut diagnostic = expected_blank_line_before_preamble_comment(span);
+
+                    if s.chars().filter(|&c| c == '\n').count() == 2 {
+                        for (line, start, end) in lines_with_offset(s) {
+                            if !line.is_empty() {
+                                let end_offset = if s.ends_with('\n') {
+                                    1
+                                } else if s.ends_with("\r\n") {
+                                    2
+                                } else {
+                                    0
+                                };
+
+                                diagnostic = diagnostic.with_highlight(Span::new(
+                                    span.start() + start,
+                                    end - start - end_offset,
+                                ));
+                            }
+                        }
+                    }
+                    state.add(diagnostic);
                 }
             } else if s != "\r\n" && s != "\n" {
                 // Don't include the newline separating the previous comment from the
