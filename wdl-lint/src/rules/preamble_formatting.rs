@@ -200,12 +200,10 @@ impl Visitor for PreambleFormattingRule {
                 .syntax()
                 .next_token()
                 .expect("should have a next token");
-            if next_token.kind() != SyntaxKind::Comment {
-                // The next token must be part of the version statement
-                // and we should have already returned during the above check
-                // for the version statement
-                unreachable!("next token should be a comment");
-            }
+            assert!(
+                next_token.kind() == SyntaxKind::Comment,
+                "next token should be a comment"
+            );
 
             let next_text = next_token.text();
             let next_is_lint_directive = is_lint_directive(next_text);
