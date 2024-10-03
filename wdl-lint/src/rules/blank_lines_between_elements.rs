@@ -586,10 +586,11 @@ fn check_last_token(
     let prev = syntax
         .last_token()
         .expect("Node should have last token")
-        .prev_sibling_or_token();
+        .prev_sibling_or_token()
+        .and_then(SyntaxElement::into_token);
     if let Some(prev) = prev {
         if prev.kind() == SyntaxKind::Whitespace {
-            let count = prev.to_string().chars().filter(|c| *c == '\n').count();
+            let count = prev.text().chars().filter(|c| *c == '\n').count();
             if count > 1 {
                 state.exceptable_add(
                     excess_blank_line(prev.text_range().to_span()),
