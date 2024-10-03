@@ -402,10 +402,13 @@ impl Visitor for BlankLinesBetweenElementsRule {
             return;
         }
 
-        let prior = decl.syntax().prev_sibling_or_token();
+        let prior = decl
+            .syntax()
+            .prev_sibling_or_token()
+            .and_then(SyntaxElement::into_token);
         if let Some(p) = prior {
             if p.kind() == SyntaxKind::Whitespace {
-                let count = p.to_string().chars().filter(|c| *c == '\n').count();
+                let count = p.text().chars().filter(|c| *c == '\n').count();
                 // If we're in an `input` or `output`, we should have no blank lines, so only
                 // one `\n` is allowed.
                 if self.state == State::InputSection || self.state == State::OutputSection {
@@ -436,10 +439,12 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
         let actual_start = skip_preceding_comments(decl.syntax());
 
-        let prior = actual_start.prev_sibling_or_token();
+        let prior = actual_start
+            .prev_sibling_or_token()
+            .and_then(SyntaxElement::into_token);
         if let Some(p) = prior {
             if p.kind() == SyntaxKind::Whitespace {
-                let count = p.to_string().chars().filter(|c| *c == '\n').count();
+                let count = p.text().chars().filter(|c| *c == '\n').count();
                 // If we're in an `input` or `output`, we should have no blank lines, so only
                 // one `\n` is allowed.
                 if self.state == State::InputSection || self.state == State::OutputSection {
@@ -511,7 +516,13 @@ fn flag_all_blank_lines_within(
 ) {
     syntax.descendants_with_tokens().for_each(|c| {
         if c.kind() == SyntaxKind::Whitespace {
-            let count = c.to_string().chars().filter(|c| *c == '\n').count();
+            let count = c
+                .as_token()
+                .expect("should be a token")
+                .text()
+                .chars()
+                .filter(|c| *c == '\n')
+                .count();
             if count > 1 {
                 state.exceptable_add(
                     excess_blank_line(c.text_range().to_span()),
@@ -537,7 +548,13 @@ fn check_prior_spacing(
     if let Some(prior) = syntax.prev_sibling_or_token() {
         match prior.kind() {
             SyntaxKind::Whitespace => {
-                let count = prior.to_string().chars().filter(|c| *c == '\n').count();
+                let count = prior
+                    .as_token()
+                    .expect("should be a token")
+                    .text()
+                    .chars()
+                    .filter(|c| *c == '\n')
+                    .count();
                 if first || !element_spacing_required {
                     // first element cannot have a blank line before it.
                     // Whitespace following the version statement is handled by the
@@ -608,7 +625,9 @@ fn check_last_token(
 fn skip_preceding_comments(syntax: &SyntaxNode) -> NodeOrToken<SyntaxNode, SyntaxToken> {
     let mut preceding_comments = Vec::new();
 
-    let mut prev = syntax.prev_sibling_or_token();
+    let mut prev = syntax
+        .prev_sibling_or_token()
+        .and_then(SyntaxElement::into_token);
     while let Some(cur) = prev {
         match cur.kind() {
             SyntaxKind::Comment => {
@@ -616,10 +635,10 @@ fn skip_preceding_comments(syntax: &SyntaxNode) -> NodeOrToken<SyntaxNode, Synta
                 // A preceding comment on a blank line is considered to belong to the element.
                 // Otherwise, the comment "belongs" to whatever
                 // else is on that line.
-                if let Some(before_cur) = cur.prev_sibling_or_token() {
+                if let Some(before_cur) = cur.prev_token() {
                     match before_cur.kind() {
                         SyntaxKind::Whitespace => {
-                            if before_cur.to_string().contains('\n') {
+                            if before_cur.text().contains('\n') {
                                 // The 'cur' comment is on is on its own line.
                                 // It "belongs" to the current element.
                                 preceding_comments.push(cur.clone());
@@ -634,8 +653,7 @@ fn skip_preceding_comments(syntax: &SyntaxNode) -> NodeOrToken<SyntaxNode, Synta
                 }
             }
             SyntaxKind::Whitespace => {
-                // Ignore
-                if cur.to_string().chars().filter(|c| *c == '\n').count() > 1 {
+                if cur.text().chars().filter(|c| *c == '\n').count() > 1 {
                     // We've backed up to an empty line, so we can stop
                     break;
                 }
@@ -645,13 +663,13 @@ fn skip_preceding_comments(syntax: &SyntaxNode) -> NodeOrToken<SyntaxNode, Synta
                 break;
             }
         }
-        prev = cur.prev_sibling_or_token()
+        prev = cur.prev_token()
     }
 
-    return preceding_comments
-        .last()
-        .unwrap_or(&NodeOrToken::Node(syntax.clone()))
-        .clone();
+    return preceding_comments.last().map_or_else(
+        || SyntaxElement::from(syntax.clone()),
+        |c| SyntaxElement::from(c.clone()),
+    );
 }
 
 /// Is first body element?
