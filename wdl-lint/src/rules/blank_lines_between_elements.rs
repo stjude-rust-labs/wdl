@@ -602,9 +602,8 @@ fn check_last_token(
 ) {
     let prev = syntax
         .last_token()
-        .expect("Node should have last token")
-        .prev_sibling_or_token()
-        .and_then(SyntaxElement::into_token);
+        .expect("node should have last token")
+        .prev_token();
     if let Some(prev) = prev {
         if prev.kind() == SyntaxKind::Whitespace {
             let count = prev.text().chars().filter(|c| *c == '\n').count();
