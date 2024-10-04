@@ -7,8 +7,8 @@ use std::sync::LazyLock;
 
 use indexmap::IndexMap;
 use indexmap::IndexSet;
-use wdl_ast::version::V1;
 use wdl_ast::SupportedVersion;
+use wdl_ast::version::V1;
 
 use crate::types::ArrayType;
 use crate::types::Coercible;
@@ -1441,57 +1441,62 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
     let mut functions = IndexMap::new();
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#floor
-    assert!(functions
-        .insert(
-            "floor",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::Float)
-                    .ret(PrimitiveTypeKind::Integer)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "floor",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::Float)
+                        .ret(PrimitiveTypeKind::Integer)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#ceil
-    assert!(functions
-        .insert(
-            "ceil",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::Float)
-                    .ret(PrimitiveTypeKind::Integer)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "ceil",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::Float)
+                        .ret(PrimitiveTypeKind::Integer)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#round
-    assert!(functions
-        .insert(
-            "round",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::Float)
-                    .ret(PrimitiveTypeKind::Integer)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "round",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::Float)
+                        .ret(PrimitiveTypeKind::Integer)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#min
-    assert!(functions
-        .insert(
-            "min",
-            PolymorphicFunction::new(
-                SupportedVersion::V1(V1::One),
-                vec![
+    assert!(
+        functions
+            .insert(
+                "min",
+                PolymorphicFunction::new(SupportedVersion::V1(V1::One), vec![
                     FunctionSignature::builder()
                         .parameter(PrimitiveTypeKind::Integer)
                         .parameter(PrimitiveTypeKind::Integer)
@@ -1512,19 +1517,18 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(PrimitiveTypeKind::Float)
                         .ret(PrimitiveTypeKind::Float)
                         .build(),
-                ],
+                ],)
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#max
-    assert!(functions
-        .insert(
-            "max",
-            PolymorphicFunction::new(
-                SupportedVersion::V1(V1::One),
-                vec![
+    assert!(
+        functions
+            .insert(
+                "max",
+                PolymorphicFunction::new(SupportedVersion::V1(V1::One), vec![
                     FunctionSignature::builder()
                         .parameter(PrimitiveTypeKind::Integer)
                         .parameter(PrimitiveTypeKind::Integer)
@@ -1545,68 +1549,73 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(PrimitiveTypeKind::Float)
                         .ret(PrimitiveTypeKind::Float)
                         .build(),
-                ],
+                ],)
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-find
-    assert!(functions
-        .insert(
-            "find",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Two),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::String)
-                    .parameter(PrimitiveTypeKind::String)
-                    .ret(PrimitiveType::optional(PrimitiveTypeKind::String))
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "find",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Two),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::String)
+                        .parameter(PrimitiveTypeKind::String)
+                        .ret(PrimitiveType::optional(PrimitiveTypeKind::String))
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-matches
-    assert!(functions
-        .insert(
-            "matches",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Two),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::String)
-                    .parameter(PrimitiveTypeKind::String)
-                    .ret(PrimitiveTypeKind::Boolean)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "matches",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Two),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::String)
+                        .parameter(PrimitiveTypeKind::String)
+                        .ret(PrimitiveTypeKind::Boolean)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#sub
-    assert!(functions
-        .insert(
-            "sub",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::String)
-                    .parameter(PrimitiveTypeKind::String)
-                    .parameter(PrimitiveTypeKind::String)
-                    .ret(PrimitiveTypeKind::String)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "sub",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::String)
+                        .parameter(PrimitiveTypeKind::String)
+                        .parameter(PrimitiveTypeKind::String)
+                        .ret(PrimitiveTypeKind::String)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#basename
-    assert!(functions
-        .insert(
-            "basename",
-            PolymorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                vec![
+    assert!(
+        functions
+            .insert(
+                "basename",
+                PolymorphicFunction::new(SupportedVersion::V1(V1::Zero), vec![
                     FunctionSignature::builder()
                         .required(1)
                         .parameter(PrimitiveTypeKind::File)
@@ -1629,19 +1638,18 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(PrimitiveTypeKind::String)
                         .ret(PrimitiveTypeKind::String)
                         .build(),
-                ],
+                ],)
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-join_paths
-    assert!(functions
-        .insert(
-            "join_paths",
-            PolymorphicFunction::new(
-                SupportedVersion::V1(V1::Two),
-                vec![
+    assert!(
+        functions
+            .insert(
+                "join_paths",
+                PolymorphicFunction::new(SupportedVersion::V1(V1::Two), vec![
                     FunctionSignature::builder()
                         .parameter(PrimitiveTypeKind::File)
                         .parameter(PrimitiveTypeKind::String)
@@ -1656,34 +1664,35 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(array_string_non_empty)
                         .ret(PrimitiveTypeKind::File)
                         .build(),
-                ],
+                ],)
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#glob
-    assert!(functions
-        .insert(
-            "glob",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::String)
-                    .ret(array_file)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "glob",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::String)
+                        .ret(array_file)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#size
-    assert!(functions
-        .insert(
-            "size",
-            PolymorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                vec![
+    assert!(
+        functions
+            .insert(
+                "size",
+                PolymorphicFunction::new(SupportedVersion::V1(V1::Zero), vec![
                     FunctionSignature::builder()
                         .required(1)
                         .parameter(PrimitiveType::optional(PrimitiveTypeKind::File))
@@ -1713,137 +1722,152 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(PrimitiveTypeKind::String)
                         .ret(PrimitiveTypeKind::Float)
                         .build(),
-                ],
+                ],)
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#stdout
-    assert!(functions
-        .insert(
-            "stdout",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .ret(PrimitiveTypeKind::File)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "stdout",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .ret(PrimitiveTypeKind::File)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#stderr
-    assert!(functions
-        .insert(
-            "stderr",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .ret(PrimitiveTypeKind::File)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "stderr",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .ret(PrimitiveTypeKind::File)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_string
-    assert!(functions
-        .insert(
-            "read_string",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::File)
-                    .ret(PrimitiveTypeKind::String)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "read_string",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::File)
+                        .ret(PrimitiveTypeKind::String)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_int
-    assert!(functions
-        .insert(
-            "read_int",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::File)
-                    .ret(PrimitiveTypeKind::Integer)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "read_int",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::File)
+                        .ret(PrimitiveTypeKind::Integer)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_float
-    assert!(functions
-        .insert(
-            "read_float",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::File)
-                    .ret(PrimitiveTypeKind::Float)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "read_float",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::File)
+                        .ret(PrimitiveTypeKind::Float)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_boolean
-    assert!(functions
-        .insert(
-            "read_boolean",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::File)
-                    .ret(PrimitiveTypeKind::Boolean)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "read_boolean",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::File)
+                        .ret(PrimitiveTypeKind::Boolean)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_lines
-    assert!(functions
-        .insert(
-            "read_lines",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::File)
-                    .ret(array_string)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "read_lines",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::File)
+                        .ret(array_string)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#write_lines
-    assert!(functions
-        .insert(
-            "write_lines",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(array_string)
-                    .ret(PrimitiveTypeKind::File)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "write_lines",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(array_string)
+                        .ret(PrimitiveTypeKind::File)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_tsv
-    assert!(functions
-        .insert(
-            "read_tsv",
-            PolymorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                vec![
+    assert!(
+        functions
+            .insert(
+                "read_tsv",
+                PolymorphicFunction::new(SupportedVersion::V1(V1::Zero), vec![
                     FunctionSignature::builder()
                         .parameter(PrimitiveTypeKind::File)
                         .ret(array_array_string)
@@ -1859,19 +1883,18 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(array_string)
                         .ret(array_object)
                         .build(),
-                ],
+                ],)
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#write_tsv
-    assert!(functions
-        .insert(
-            "write_tsv",
-            PolymorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                vec![
+    assert!(
+        functions
+            .insert(
+                "write_tsv",
+                PolymorphicFunction::new(SupportedVersion::V1(V1::Zero), vec![
                     FunctionSignature::builder()
                         .parameter(array_array_string)
                         .ret(PrimitiveTypeKind::File)
@@ -1894,110 +1917,121 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(array_string)
                         .ret(PrimitiveTypeKind::File)
                         .build(),
-                ],
+                ],)
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_map
-    assert!(functions
-        .insert(
-            "read_map",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::File)
-                    .ret(map_string_string)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "read_map",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::File)
+                        .ret(map_string_string)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#write_map
-    assert!(functions
-        .insert(
-            "write_map",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(map_string_string)
-                    .ret(PrimitiveTypeKind::File)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "write_map",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(map_string_string)
+                        .ret(PrimitiveTypeKind::File)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_json
-    assert!(functions
-        .insert(
-            "read_json",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::File)
-                    .ret(Type::Union)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "read_json",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::File)
+                        .ret(Type::Union)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#write_json
-    assert!(functions
-        .insert(
-            "write_json",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .type_parameter("X", JsonSerializableConstraint)
-                    .parameter(GenericType::Parameter("X"))
-                    .ret(PrimitiveTypeKind::File)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "write_json",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .type_parameter("X", JsonSerializableConstraint)
+                        .parameter(GenericType::Parameter("X"))
+                        .ret(PrimitiveTypeKind::File)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_object
-    assert!(functions
-        .insert(
-            "read_object",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::File)
-                    .ret(Type::Object)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "read_object",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::File)
+                        .ret(Type::Object)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_objects
-    assert!(functions
-        .insert(
-            "read_objects",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::File)
-                    .ret(array_object)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "read_objects",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::File)
+                        .ret(array_object)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#write_object
-    assert!(functions
-        .insert(
-            "write_object",
-            PolymorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                vec![
+    assert!(
+        functions
+            .insert(
+                "write_object",
+                PolymorphicFunction::new(SupportedVersion::V1(V1::Zero), vec![
                     FunctionSignature::builder()
                         .parameter(Type::Object)
                         .ret(PrimitiveTypeKind::File)
@@ -2007,19 +2041,18 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(GenericType::Parameter("S"))
                         .ret(PrimitiveTypeKind::File)
                         .build(),
-                ],
+                ],)
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#write_objects
-    assert!(functions
-        .insert(
-            "write_objects",
-            PolymorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                vec![
+    assert!(
+        functions
+            .insert(
+                "write_objects",
+                PolymorphicFunction::new(SupportedVersion::V1(V1::Zero), vec![
                     FunctionSignature::builder()
                         .parameter(array_object)
                         .ret(PrimitiveTypeKind::File)
@@ -2029,256 +2062,281 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(GenericArrayType::new(GenericType::Parameter("S")))
                         .ret(PrimitiveTypeKind::File)
                         .build(),
-                ],
+                ],)
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#prefix
-    assert!(functions
-        .insert(
-            "prefix",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .type_parameter("P", RequiredPrimitiveTypeConstraint)
-                    .parameter(PrimitiveTypeKind::String)
-                    .parameter(GenericArrayType::new(GenericType::Parameter("P")))
-                    .ret(array_string)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "prefix",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .type_parameter("P", RequiredPrimitiveTypeConstraint)
+                        .parameter(PrimitiveTypeKind::String)
+                        .parameter(GenericArrayType::new(GenericType::Parameter("P")))
+                        .ret(array_string)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#suffix
-    assert!(functions
-        .insert(
-            "suffix",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::One),
-                FunctionSignature::builder()
-                    .type_parameter("P", RequiredPrimitiveTypeConstraint)
-                    .parameter(PrimitiveTypeKind::String)
-                    .parameter(GenericArrayType::new(GenericType::Parameter("P")))
-                    .ret(array_string)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "suffix",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::One),
+                    FunctionSignature::builder()
+                        .type_parameter("P", RequiredPrimitiveTypeConstraint)
+                        .parameter(PrimitiveTypeKind::String)
+                        .parameter(GenericArrayType::new(GenericType::Parameter("P")))
+                        .ret(array_string)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#quote
-    assert!(functions
-        .insert(
-            "quote",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::One),
-                FunctionSignature::builder()
-                    .type_parameter("P", RequiredPrimitiveTypeConstraint)
-                    .parameter(GenericArrayType::new(GenericType::Parameter("P")))
-                    .ret(array_string)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "quote",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::One),
+                    FunctionSignature::builder()
+                        .type_parameter("P", RequiredPrimitiveTypeConstraint)
+                        .parameter(GenericArrayType::new(GenericType::Parameter("P")))
+                        .ret(array_string)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#squote
-    assert!(functions
-        .insert(
-            "squote",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::One),
-                FunctionSignature::builder()
-                    .type_parameter("P", RequiredPrimitiveTypeConstraint)
-                    .parameter(GenericArrayType::new(GenericType::Parameter("P")))
-                    .ret(array_string)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "squote",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::One),
+                    FunctionSignature::builder()
+                        .type_parameter("P", RequiredPrimitiveTypeConstraint)
+                        .parameter(GenericArrayType::new(GenericType::Parameter("P")))
+                        .ret(array_string)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#sep
-    assert!(functions
-        .insert(
-            "sep",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::One),
-                FunctionSignature::builder()
-                    .type_parameter("P", RequiredPrimitiveTypeConstraint)
-                    .parameter(PrimitiveTypeKind::String)
-                    .parameter(GenericArrayType::new(GenericType::Parameter("P")))
-                    .ret(PrimitiveTypeKind::String)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "sep",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::One),
+                    FunctionSignature::builder()
+                        .type_parameter("P", RequiredPrimitiveTypeConstraint)
+                        .parameter(PrimitiveTypeKind::String)
+                        .parameter(GenericArrayType::new(GenericType::Parameter("P")))
+                        .ret(PrimitiveTypeKind::String)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#range
-    assert!(functions
-        .insert(
-            "range",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .parameter(PrimitiveTypeKind::Integer)
-                    .ret(array_int)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "range",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .parameter(PrimitiveTypeKind::Integer)
+                        .ret(array_int)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#transpose
-    assert!(functions
-        .insert(
-            "transpose",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .any_type_parameter("X")
-                    .parameter(GenericArrayType::new(GenericArrayType::new(
-                        GenericType::Parameter("X"),
-                    )))
-                    .ret(GenericArrayType::new(GenericArrayType::new(
-                        GenericType::Parameter("X"),
-                    )))
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "transpose",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .any_type_parameter("X")
+                        .parameter(GenericArrayType::new(GenericArrayType::new(
+                            GenericType::Parameter("X"),
+                        )))
+                        .ret(GenericArrayType::new(GenericArrayType::new(
+                            GenericType::Parameter("X"),
+                        )))
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#cross
-    assert!(functions
-        .insert(
-            "cross",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .any_type_parameter("X")
-                    .any_type_parameter("Y")
-                    .parameter(GenericArrayType::new(GenericType::Parameter("X")))
-                    .parameter(GenericArrayType::new(GenericType::Parameter("Y")))
-                    .ret(GenericArrayType::new(GenericPairType::new(
-                        GenericType::Parameter("X"),
-                        GenericType::Parameter("Y"),
-                    )))
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "cross",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .any_type_parameter("X")
+                        .any_type_parameter("Y")
+                        .parameter(GenericArrayType::new(GenericType::Parameter("X")))
+                        .parameter(GenericArrayType::new(GenericType::Parameter("Y")))
+                        .ret(GenericArrayType::new(GenericPairType::new(
+                            GenericType::Parameter("X"),
+                            GenericType::Parameter("Y"),
+                        )))
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#zip
-    assert!(functions
-        .insert(
-            "zip",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .any_type_parameter("X")
-                    .any_type_parameter("Y")
-                    .parameter(GenericArrayType::new(GenericType::Parameter("X")))
-                    .parameter(GenericArrayType::new(GenericType::Parameter("Y")))
-                    .ret(GenericArrayType::new(GenericPairType::new(
-                        GenericType::Parameter("X"),
-                        GenericType::Parameter("Y"),
-                    )))
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "zip",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .any_type_parameter("X")
+                        .any_type_parameter("Y")
+                        .parameter(GenericArrayType::new(GenericType::Parameter("X")))
+                        .parameter(GenericArrayType::new(GenericType::Parameter("Y")))
+                        .ret(GenericArrayType::new(GenericPairType::new(
+                            GenericType::Parameter("X"),
+                            GenericType::Parameter("Y"),
+                        )))
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#unzip
-    assert!(functions
-        .insert(
-            "unzip",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::One),
-                FunctionSignature::builder()
-                    .any_type_parameter("X")
-                    .any_type_parameter("Y")
-                    .parameter(GenericArrayType::new(GenericPairType::new(
-                        GenericType::Parameter("X"),
-                        GenericType::Parameter("Y"),
-                    )))
-                    .ret(GenericPairType::new(
-                        GenericArrayType::new(GenericType::Parameter("X")),
-                        GenericArrayType::new(GenericType::Parameter("Y")),
-                    ))
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "unzip",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::One),
+                    FunctionSignature::builder()
+                        .any_type_parameter("X")
+                        .any_type_parameter("Y")
+                        .parameter(GenericArrayType::new(GenericPairType::new(
+                            GenericType::Parameter("X"),
+                            GenericType::Parameter("Y"),
+                        )))
+                        .ret(GenericPairType::new(
+                            GenericArrayType::new(GenericType::Parameter("X")),
+                            GenericArrayType::new(GenericType::Parameter("Y")),
+                        ))
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-contains
-    assert!(functions
-        .insert(
-            "contains",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Two),
-                FunctionSignature::builder()
-                    .type_parameter("P", AnyPrimitiveTypeConstraint)
-                    .parameter(GenericArrayType::new(GenericType::Parameter("P")))
-                    .parameter(GenericType::Parameter("P"))
-                    .ret(PrimitiveTypeKind::Boolean)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "contains",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Two),
+                    FunctionSignature::builder()
+                        .type_parameter("P", AnyPrimitiveTypeConstraint)
+                        .parameter(GenericArrayType::new(GenericType::Parameter("P")))
+                        .parameter(GenericType::Parameter("P"))
+                        .ret(PrimitiveTypeKind::Boolean)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-chunk
-    assert!(functions
-        .insert(
-            "chunk",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Two),
-                FunctionSignature::builder()
-                    .any_type_parameter("X")
-                    .parameter(GenericArrayType::new(GenericType::Parameter("X")))
-                    .parameter(PrimitiveTypeKind::Integer)
-                    .ret(GenericArrayType::new(GenericArrayType::new(
-                        GenericType::Parameter("X"),
-                    )))
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "chunk",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Two),
+                    FunctionSignature::builder()
+                        .any_type_parameter("X")
+                        .parameter(GenericArrayType::new(GenericType::Parameter("X")))
+                        .parameter(PrimitiveTypeKind::Integer)
+                        .ret(GenericArrayType::new(GenericArrayType::new(
+                            GenericType::Parameter("X"),
+                        )))
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#flatten
-    assert!(functions
-        .insert(
-            "flatten",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .any_type_parameter("X")
-                    .parameter(GenericArrayType::new(GenericArrayType::new(
-                        GenericType::Parameter("X")
-                    )))
-                    .ret(GenericArrayType::new(GenericType::Parameter("X")))
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "flatten",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .any_type_parameter("X")
+                        .parameter(GenericArrayType::new(GenericArrayType::new(
+                            GenericType::Parameter("X")
+                        )))
+                        .ret(GenericArrayType::new(GenericType::Parameter("X")))
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#select_first
-    assert!(functions
-        .insert(
-            "select_first",
-            PolymorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                vec![
+    assert!(
+        functions
+            .insert(
+                "select_first",
+                PolymorphicFunction::new(SupportedVersion::V1(V1::Zero), vec![
                     FunctionSignature::builder()
                         .type_parameter("X", OptionalTypeConstraint)
                         .parameter(GenericArrayType::non_empty(GenericType::Parameter("X")))
@@ -2291,83 +2349,88 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(GenericType::UnqualifiedParameter("X"))
                         .ret(GenericType::UnqualifiedParameter("X"))
                         .build(),
-                ]
+                ])
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#select_all
-    assert!(functions
-        .insert(
-            "select_all",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .type_parameter("X", OptionalTypeConstraint)
-                    .parameter(GenericArrayType::new(GenericType::Parameter("X")))
-                    .ret(GenericArrayType::new(GenericType::UnqualifiedParameter(
-                        "X"
-                    )))
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "select_all",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .type_parameter("X", OptionalTypeConstraint)
+                        .parameter(GenericArrayType::new(GenericType::Parameter("X")))
+                        .ret(GenericArrayType::new(GenericType::UnqualifiedParameter(
+                            "X"
+                        )))
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#as_pairs
-    assert!(functions
-        .insert(
-            "as_pairs",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::One),
-                FunctionSignature::builder()
-                    .type_parameter("K", RequiredPrimitiveTypeConstraint)
-                    .any_type_parameter("V")
-                    .parameter(GenericMapType::new(
-                        GenericType::Parameter("K"),
-                        GenericType::Parameter("V")
-                    ))
-                    .ret(GenericArrayType::new(GenericPairType::new(
-                        GenericType::Parameter("K"),
-                        GenericType::Parameter("V")
-                    )))
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "as_pairs",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::One),
+                    FunctionSignature::builder()
+                        .type_parameter("K", RequiredPrimitiveTypeConstraint)
+                        .any_type_parameter("V")
+                        .parameter(GenericMapType::new(
+                            GenericType::Parameter("K"),
+                            GenericType::Parameter("V")
+                        ))
+                        .ret(GenericArrayType::new(GenericPairType::new(
+                            GenericType::Parameter("K"),
+                            GenericType::Parameter("V")
+                        )))
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#as_map
-    assert!(functions
-        .insert(
-            "as_map",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::One),
-                FunctionSignature::builder()
-                    .type_parameter("K", RequiredPrimitiveTypeConstraint)
-                    .any_type_parameter("V")
-                    .parameter(GenericArrayType::new(GenericPairType::new(
-                        GenericType::Parameter("K"),
-                        GenericType::Parameter("V")
-                    )))
-                    .ret(GenericMapType::new(
-                        GenericType::Parameter("K"),
-                        GenericType::Parameter("V")
-                    ))
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "as_map",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::One),
+                    FunctionSignature::builder()
+                        .type_parameter("K", RequiredPrimitiveTypeConstraint)
+                        .any_type_parameter("V")
+                        .parameter(GenericArrayType::new(GenericPairType::new(
+                            GenericType::Parameter("K"),
+                            GenericType::Parameter("V")
+                        )))
+                        .ret(GenericMapType::new(
+                            GenericType::Parameter("K"),
+                            GenericType::Parameter("V")
+                        ))
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#keys
-    assert!(functions
-        .insert(
-            "keys",
-            PolymorphicFunction::new(
-                SupportedVersion::V1(V1::One),
-                vec![
+    assert!(
+        functions
+            .insert(
+                "keys",
+                PolymorphicFunction::new(SupportedVersion::V1(V1::One), vec![
                     FunctionSignature::builder()
                         .type_parameter("K", RequiredPrimitiveTypeConstraint)
                         .any_type_parameter("V")
@@ -2386,19 +2449,18 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(Type::Object)
                         .ret(array_string)
                         .build(),
-                ]
+                ])
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#contains_key
-    assert!(functions
-        .insert(
-            "contains_key",
-            PolymorphicFunction::new(
-                SupportedVersion::V1(V1::Two),
-                vec![
+    assert!(
+        functions
+            .insert(
+                "contains_key",
+                PolymorphicFunction::new(SupportedVersion::V1(V1::Two), vec![
                     FunctionSignature::builder()
                         .type_parameter("K", RequiredPrimitiveTypeConstraint)
                         .any_type_parameter("V")
@@ -2434,78 +2496,83 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(array_string)
                         .ret(PrimitiveTypeKind::Boolean)
                         .build(),
-                ]
+                ])
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-values
-    assert!(functions
-        .insert(
-            "values",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Two),
-                FunctionSignature::builder()
-                    .type_parameter("K", RequiredPrimitiveTypeConstraint)
-                    .any_type_parameter("V")
-                    .parameter(GenericMapType::new(
-                        GenericType::Parameter("K"),
-                        GenericType::Parameter("V")
-                    ))
-                    .ret(GenericArrayType::new(GenericType::Parameter("V")))
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "values",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Two),
+                    FunctionSignature::builder()
+                        .type_parameter("K", RequiredPrimitiveTypeConstraint)
+                        .any_type_parameter("V")
+                        .parameter(GenericMapType::new(
+                            GenericType::Parameter("K"),
+                            GenericType::Parameter("V")
+                        ))
+                        .ret(GenericArrayType::new(GenericType::Parameter("V")))
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#collect_by_key
-    assert!(functions
-        .insert(
-            "collect_by_key",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::One),
-                FunctionSignature::builder()
-                    .type_parameter("K", RequiredPrimitiveTypeConstraint)
-                    .any_type_parameter("V")
-                    .parameter(GenericArrayType::new(GenericPairType::new(
-                        GenericType::Parameter("K"),
-                        GenericType::Parameter("V")
-                    )))
-                    .ret(GenericMapType::new(
-                        GenericType::Parameter("K"),
-                        GenericArrayType::new(GenericType::Parameter("V"))
-                    ))
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "collect_by_key",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::One),
+                    FunctionSignature::builder()
+                        .type_parameter("K", RequiredPrimitiveTypeConstraint)
+                        .any_type_parameter("V")
+                        .parameter(GenericArrayType::new(GenericPairType::new(
+                            GenericType::Parameter("K"),
+                            GenericType::Parameter("V")
+                        )))
+                        .ret(GenericMapType::new(
+                            GenericType::Parameter("K"),
+                            GenericArrayType::new(GenericType::Parameter("V"))
+                        ))
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#defined
-    assert!(functions
-        .insert(
-            "defined",
-            MonomorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                FunctionSignature::builder()
-                    .type_parameter("X", OptionalTypeConstraint)
-                    .parameter(GenericType::Parameter("X"))
-                    .ret(PrimitiveTypeKind::Boolean)
-                    .build(),
+    assert!(
+        functions
+            .insert(
+                "defined",
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
+                    FunctionSignature::builder()
+                        .type_parameter("X", OptionalTypeConstraint)
+                        .parameter(GenericType::Parameter("X"))
+                        .ret(PrimitiveTypeKind::Boolean)
+                        .build(),
+                )
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     // https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#length
-    assert!(functions
-        .insert(
-            "length",
-            PolymorphicFunction::new(
-                SupportedVersion::V1(V1::Zero),
-                vec![
+    assert!(
+        functions
+            .insert(
+                "length",
+                PolymorphicFunction::new(SupportedVersion::V1(V1::Zero), vec![
                     FunctionSignature::builder()
                         .any_type_parameter("X")
                         .parameter(GenericArrayType::new(GenericType::Parameter("X")))
@@ -2528,11 +2595,11 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(PrimitiveTypeKind::String)
                         .ret(PrimitiveTypeKind::Integer)
                         .build(),
-                ]
+                ])
+                .into(),
             )
-            .into(),
-        )
-        .is_none());
+            .is_none()
+    );
 
     StandardLibrary {
         types,
@@ -2672,13 +2739,10 @@ mod test {
         assert_eq!(e, FunctionBindError::TooFewArguments(1));
 
         let e = f
-            .bind(
-                &mut types,
-                &[
-                    PrimitiveTypeKind::String.into(),
-                    PrimitiveTypeKind::Boolean.into(),
-                ],
-            )
+            .bind(&mut types, &[
+                PrimitiveTypeKind::String.into(),
+                PrimitiveTypeKind::Boolean.into(),
+            ])
             .expect_err("bind should fail");
         assert_eq!(e, FunctionBindError::TooManyArguments(1));
 
@@ -2686,13 +2750,10 @@ mod test {
         let e = f
             .bind(&mut types, &[PrimitiveTypeKind::String.into()])
             .expect_err("bind should fail");
-        assert_eq!(
-            e,
-            FunctionBindError::ArgumentTypeMismatch {
-                index: 0,
-                expected: "`Float`".into()
-            }
-        );
+        assert_eq!(e, FunctionBindError::ArgumentTypeMismatch {
+            index: 0,
+            expected: "`Float`".into()
+        });
 
         // Check for Union (i.e. indeterminate)
         let ty = f
@@ -2723,13 +2784,10 @@ mod test {
         assert_eq!(e, FunctionBindError::TooFewArguments(1));
 
         let e = f
-            .bind(
-                &mut types,
-                &[
-                    PrimitiveTypeKind::String.into(),
-                    PrimitiveTypeKind::Boolean.into(),
-                ],
-            )
+            .bind(&mut types, &[
+                PrimitiveTypeKind::String.into(),
+                PrimitiveTypeKind::Boolean.into(),
+            ])
             .expect_err("bind should fail");
         assert_eq!(e, FunctionBindError::TooManyArguments(1));
 
@@ -2737,13 +2795,10 @@ mod test {
         let e = f
             .bind(&mut types, &[PrimitiveTypeKind::String.into()])
             .expect_err("bind should fail");
-        assert_eq!(
-            e,
-            FunctionBindError::ArgumentTypeMismatch {
-                index: 0,
-                expected: "`Map[K, V]` where `K`: any required primitive type".into()
-            }
-        );
+        assert_eq!(e, FunctionBindError::ArgumentTypeMismatch {
+            index: 0,
+            expected: "`Map[K, V]` where `K`: any required primitive type".into()
+        });
 
         // Check for Union (i.e. indeterminate)
         let ty = f
@@ -2770,13 +2825,10 @@ mod test {
             PrimitiveTypeKind::Boolean,
         ));
         let e = f.bind(&mut types, &[ty]).expect_err("bind should fail");
-        assert_eq!(
-            e,
-            FunctionBindError::ArgumentTypeMismatch {
-                index: 0,
-                expected: "`Map[K, Boolean]` where `K`: any required primitive type".into()
-            }
-        );
+        assert_eq!(e, FunctionBindError::ArgumentTypeMismatch {
+            index: 0,
+            expected: "`Map[K, Boolean]` where `K`: any required primitive type".into()
+        });
     }
 
     #[test]
@@ -2791,13 +2843,10 @@ mod test {
         let e = f
             .bind(&mut types, &[array_string])
             .expect_err("bind should fail");
-        assert_eq!(
-            e,
-            FunctionBindError::ArgumentTypeMismatch {
-                index: 0,
-                expected: "`Array[X]` where `X`: any optional type".into()
-            }
-        );
+        assert_eq!(e, FunctionBindError::ArgumentTypeMismatch {
+            index: 0,
+            expected: "`Array[X]` where `X`: any optional type".into()
+        });
 
         // Check for a Array[String?] -> Array[String]
         let array_optional_string = types.add_array(ArrayType::new(PrimitiveType::optional(
@@ -2836,136 +2885,97 @@ mod test {
         assert_eq!(e, FunctionBindError::TooFewArguments(2));
 
         let e = f
-            .bind(
-                &mut types,
-                &[
-                    PrimitiveTypeKind::String.into(),
-                    PrimitiveTypeKind::Boolean.into(),
-                    PrimitiveTypeKind::File.into(),
-                ],
-            )
+            .bind(&mut types, &[
+                PrimitiveTypeKind::String.into(),
+                PrimitiveTypeKind::Boolean.into(),
+                PrimitiveTypeKind::File.into(),
+            ])
             .expect_err("bind should fail");
         assert_eq!(e, FunctionBindError::TooManyArguments(2));
 
         // Check for `(Int, Int)`
         let ty = f
-            .bind(
-                &mut types,
-                &[
-                    PrimitiveTypeKind::Integer.into(),
-                    PrimitiveTypeKind::Integer.into(),
-                ],
-            )
+            .bind(&mut types, &[
+                PrimitiveTypeKind::Integer.into(),
+                PrimitiveTypeKind::Integer.into(),
+            ])
             .expect("binding should succeed");
         assert_eq!(ty.display(&types).to_string(), "Int");
 
         // Check for `(Int, Float)`
         let ty = f
-            .bind(
-                &mut types,
-                &[
-                    PrimitiveTypeKind::Integer.into(),
-                    PrimitiveTypeKind::Float.into(),
-                ],
-            )
+            .bind(&mut types, &[
+                PrimitiveTypeKind::Integer.into(),
+                PrimitiveTypeKind::Float.into(),
+            ])
             .expect("binding should succeed");
         assert_eq!(ty.display(&types).to_string(), "Float");
 
         // Check for `(Float, Int)`
         let ty = f
-            .bind(
-                &mut types,
-                &[
-                    PrimitiveTypeKind::Float.into(),
-                    PrimitiveTypeKind::Integer.into(),
-                ],
-            )
+            .bind(&mut types, &[
+                PrimitiveTypeKind::Float.into(),
+                PrimitiveTypeKind::Integer.into(),
+            ])
             .expect("binding should succeed");
         assert_eq!(ty.display(&types).to_string(), "Float");
 
         // Check for `(Float, Float)`
         let ty = f
-            .bind(
-                &mut types,
-                &[
-                    PrimitiveTypeKind::Float.into(),
-                    PrimitiveTypeKind::Float.into(),
-                ],
-            )
+            .bind(&mut types, &[
+                PrimitiveTypeKind::Float.into(),
+                PrimitiveTypeKind::Float.into(),
+            ])
             .expect("binding should succeed");
         assert_eq!(ty.display(&types).to_string(), "Float");
 
         // Check for `(String, Int)`
         let e = f
-            .bind(
-                &mut types,
-                &[
-                    PrimitiveTypeKind::String.into(),
-                    PrimitiveTypeKind::Integer.into(),
-                ],
-            )
+            .bind(&mut types, &[
+                PrimitiveTypeKind::String.into(),
+                PrimitiveTypeKind::Integer.into(),
+            ])
             .expect_err("binding should fail");
-        assert_eq!(
-            e,
-            FunctionBindError::ArgumentTypeMismatch {
-                index: 0,
-                expected: "`Int` or `Float`".into()
-            }
-        );
+        assert_eq!(e, FunctionBindError::ArgumentTypeMismatch {
+            index: 0,
+            expected: "`Int` or `Float`".into()
+        });
 
         // Check for `(Int, String)`
         let e = f
-            .bind(
-                &mut types,
-                &[
-                    PrimitiveTypeKind::Integer.into(),
-                    PrimitiveTypeKind::String.into(),
-                ],
-            )
+            .bind(&mut types, &[
+                PrimitiveTypeKind::Integer.into(),
+                PrimitiveTypeKind::String.into(),
+            ])
             .expect_err("binding should fail");
-        assert_eq!(
-            e,
-            FunctionBindError::ArgumentTypeMismatch {
-                index: 1,
-                expected: "`Int` or `Float`".into()
-            }
-        );
+        assert_eq!(e, FunctionBindError::ArgumentTypeMismatch {
+            index: 1,
+            expected: "`Int` or `Float`".into()
+        });
 
         // Check for `(String, Float)`
         let e = f
-            .bind(
-                &mut types,
-                &[
-                    PrimitiveTypeKind::String.into(),
-                    PrimitiveTypeKind::Float.into(),
-                ],
-            )
+            .bind(&mut types, &[
+                PrimitiveTypeKind::String.into(),
+                PrimitiveTypeKind::Float.into(),
+            ])
             .expect_err("binding should fail");
-        assert_eq!(
-            e,
-            FunctionBindError::ArgumentTypeMismatch {
-                index: 0,
-                expected: "`Int` or `Float`".into()
-            }
-        );
+        assert_eq!(e, FunctionBindError::ArgumentTypeMismatch {
+            index: 0,
+            expected: "`Int` or `Float`".into()
+        });
 
         // Check for `(Float, String)`
         let e = f
-            .bind(
-                &mut types,
-                &[
-                    PrimitiveTypeKind::Float.into(),
-                    PrimitiveTypeKind::String.into(),
-                ],
-            )
+            .bind(&mut types, &[
+                PrimitiveTypeKind::Float.into(),
+                PrimitiveTypeKind::String.into(),
+            ])
             .expect_err("binding should fail");
-        assert_eq!(
-            e,
-            FunctionBindError::ArgumentTypeMismatch {
-                index: 1,
-                expected: "`Int` or `Float`".into()
-            }
-        );
+        assert_eq!(e, FunctionBindError::ArgumentTypeMismatch {
+            index: 1,
+            expected: "`Int` or `Float`".into()
+        });
     }
 
     #[test]
@@ -2980,14 +2990,11 @@ mod test {
         assert_eq!(e, FunctionBindError::TooFewArguments(1));
 
         let e = f
-            .bind(
-                &mut types,
-                &[
-                    PrimitiveTypeKind::String.into(),
-                    PrimitiveTypeKind::Boolean.into(),
-                    PrimitiveTypeKind::File.into(),
-                ],
-            )
+            .bind(&mut types, &[
+                PrimitiveTypeKind::String.into(),
+                PrimitiveTypeKind::Boolean.into(),
+                PrimitiveTypeKind::File.into(),
+            ])
             .expect_err("bind should fail");
         assert_eq!(e, FunctionBindError::TooManyArguments(2));
 
@@ -2995,13 +3002,10 @@ mod test {
         let e = f
             .bind(&mut types, &[PrimitiveTypeKind::Integer.into()])
             .expect_err("binding should fail");
-        assert_eq!(
-            e,
-            FunctionBindError::ArgumentTypeMismatch {
-                index: 0,
-                expected: "`Array[X]` where `X`: any optional type".into()
-            }
-        );
+        assert_eq!(e, FunctionBindError::ArgumentTypeMismatch {
+            index: 0,
+            expected: "`Array[X]` where `X`: any optional type".into()
+        });
 
         // Check `Array[String?]+`
         let array = types.add_array(ArrayType::non_empty(PrimitiveType::optional(
@@ -3022,13 +3026,10 @@ mod test {
         let e = f
             .bind(&mut types, &[array, PrimitiveTypeKind::Integer.into()])
             .expect_err("binding should fail");
-        assert_eq!(
-            e,
-            FunctionBindError::ArgumentTypeMismatch {
-                index: 1,
-                expected: "`String`".into()
-            }
-        );
+        assert_eq!(e, FunctionBindError::ArgumentTypeMismatch {
+            index: 1,
+            expected: "`String`".into()
+        });
 
         // Check `Array[String?]`
         let array = types.add_array(ArrayType::new(PrimitiveType::optional(
@@ -3049,12 +3050,9 @@ mod test {
         let e = f
             .bind(&mut types, &[array, PrimitiveTypeKind::Integer.into()])
             .expect_err("binding should fail");
-        assert_eq!(
-            e,
-            FunctionBindError::ArgumentTypeMismatch {
-                index: 1,
-                expected: "`String`".into()
-            }
-        );
+        assert_eq!(e, FunctionBindError::ArgumentTypeMismatch {
+            index: 1,
+            expected: "`String`".into()
+        });
     }
 }
