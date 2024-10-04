@@ -5,7 +5,7 @@ use std::sync::LazyLock;
 
 /// The default indentation.
 pub static DEFAULT_INDENT: LazyLock<Indent> =
-    LazyLock::new(|| Indent::Spaces(NonZeroUsize::new(2).unwrap()));
+    LazyLock::new(|| Indent::Spaces(NonZeroUsize::new(4).unwrap()));
 
 /// An indentation level.
 #[derive(Clone, Copy, Debug)]
