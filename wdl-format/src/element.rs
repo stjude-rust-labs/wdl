@@ -9,10 +9,10 @@ use wdl_ast::Element;
 use wdl_ast::Node;
 use wdl_ast::SyntaxKind;
 
-use crate::NEWLINE;
 use crate::PreToken;
 use crate::TokenStream;
 use crate::Writable;
+use crate::NEWLINE;
 
 pub mod node;
 
@@ -21,17 +21,17 @@ pub mod node;
 /// Trivia would be things like comments and whitespace.
 #[derive(Clone, Debug, Default)]
 pub struct Trivia {
-    /// Any preceeding trivia.
-    preceeding: Option<NonEmpty<Box<FormatElement>>>,
+    /// Any preceding trivia.
+    preceding: Option<NonEmpty<Box<FormatElement>>>,
 
     /// Any inline trivia.
     inline: Option<NonEmpty<Box<FormatElement>>>,
 }
 
 impl Trivia {
-    /// Any preceeding trivia that are not whitespaces.
-    pub fn preceeding(&self) -> Option<impl Iterator<Item = &FormatElement>> {
-        self.preceeding.as_ref().map(|trivia| {
+    /// Any preceding trivia that are not whitespaces.
+    pub fn preceding(&self) -> Option<impl Iterator<Item = &FormatElement>> {
+        self.preceding.as_ref().map(|trivia| {
             trivia
                 .into_iter()
                 .filter(|t| !matches!(t.element().kind(), SyntaxKind::Whitespace))
@@ -119,9 +119,9 @@ impl FormatElement {
         results
     }
 
-    /// Writes any preceeding trivia to the stream.
-    pub fn write_preceeding_trivia(&self, stream: &mut TokenStream<PreToken>) {
-        if let Some(trivia) = self.trivia().preceeding() {
+    /// Writes any preceding trivia to the stream.
+    pub fn write_preceding_trivia(&self, stream: &mut TokenStream<PreToken>) {
+        if let Some(trivia) = self.trivia().preceding() {
             for t in trivia.filter(|t| !matches!(t.element().kind(), SyntaxKind::Whitespace)) {
                 t.write(stream);
             }
@@ -202,7 +202,7 @@ fn collate(node: &Node) -> Option<NonEmpty<Box<FormatElement>>> {
         .peekable();
 
     while stream.peek().is_some() {
-        let preceeding = collect_optional(
+        let preceding = collect_optional(
             take_while_peek(stream.by_ref(), |node| node.is_trivia())
                 .map(|item| Box::new(item.into_format_element())),
         );
@@ -251,7 +251,7 @@ fn collate(node: &Node) -> Option<NonEmpty<Box<FormatElement>>> {
 
         results.push(Box::new(FormatElement {
             element,
-            trivia: Trivia { preceeding, inline },
+            trivia: Trivia { preceding, inline },
             children,
         }));
     }
@@ -311,7 +311,7 @@ workflow bar # This is an inline comment on the workflow ident.
             SyntaxKind::VersionStatementNode
         );
 
-        assert!(version.trivia().preceeding().is_none());
+        assert!(version.trivia().preceding().is_none());
         assert!(version.trivia().inline().is_none());
 
         let mut version_children = version.children().unwrap();
@@ -336,9 +336,9 @@ workflow bar # This is an inline comment on the workflow ident.
 
         // Preceeding.
 
-        let mut preceeding = task.trivia().preceeding().unwrap();
+        let mut preceding = task.trivia().preceding().unwrap();
 
-        let comment = preceeding
+        let comment = preceding
             .next()
             .unwrap()
             .element()
@@ -413,9 +413,9 @@ workflow bar # This is an inline comment on the workflow ident.
 
         // Preceeding.
 
-        let mut preceeding = workflow.trivia().preceeding().unwrap();
+        let mut preceding = workflow.trivia().preceding().unwrap();
 
-        let comment = preceeding
+        let comment = preceding
             .next()
             .unwrap()
             .element()
@@ -484,9 +484,9 @@ workflow bar # This is an inline comment on the workflow ident.
         let call = workflow_children.next().unwrap();
         assert_eq!(call.element().kind(), SyntaxKind::CallStatementNode);
 
-        let mut call_preceeding = call.trivia().preceeding().unwrap();
+        let mut call_preceding = call.trivia().preceding().unwrap();
 
-        let comment = call_preceeding
+        let comment = call_preceding
             .next()
             .unwrap()
             .element()
@@ -496,7 +496,7 @@ workflow bar # This is an inline comment on the workflow ident.
         assert_eq!(comment.kind(), SyntaxKind::Comment);
         assert_eq!(comment.text(), "# This is attached to the call.");
 
-        assert!(call_preceeding.next().is_none());
+        assert!(call_preceding.next().is_none());
 
         assert_eq!(
             workflow_children.next().unwrap().element().kind(),

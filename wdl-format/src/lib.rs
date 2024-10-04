@@ -47,7 +47,7 @@ pub trait Writable {
 
 impl Writable for &FormatElement {
     fn write(&self, stream: &mut TokenStream<PreToken>) {
-        self.write_preceeding_trivia(stream);
+        self.write_preceding_trivia(stream);
 
         match self.element() {
             Element::Node(node) => match node {
@@ -197,8 +197,8 @@ mod tests {
     use wdl_ast::Document;
     use wdl_ast::Node;
 
-    use crate::Formatter;
     use crate::element::node::AstNodeFormatExt as _;
+    use crate::Formatter;
 
     #[test]
     fn smoke() {
