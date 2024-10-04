@@ -44,9 +44,20 @@ pub fn format_call_statement(element: &FormatElement, stream: &mut TokenStream<P
 pub fn format_call_target(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     let mut children = element.children_by_kind();
 
-    if let Some(mut idents) = children.remove(&SyntaxKind::Ident) {
-        let keyword = exactly_one!(idents, "idents");
-        (&keyword).write(stream);
+    if let Some(idents) = children.remove(&SyntaxKind::Ident) {
+        let mut idents = idents.into_iter();
+        let first_ident = idents.next().expect("at least one ident");
+        (&first_ident).write(stream);
+
+        if let Some(mut dots) = children.remove(&SyntaxKind::Dot) {
+            let dot = exactly_one!(dots, "dots");
+            (&dot).write(stream);
+
+            let second_ident = idents.next().expect("second ident");
+            (&second_ident).write(stream);
+        
+            assert!(idents.next().is_none(), "too many idents");
+        }
     }
 
     if !children.is_empty() {
