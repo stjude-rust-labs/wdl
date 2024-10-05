@@ -158,7 +158,13 @@ fn collate(node: &Node) -> Option<NonEmpty<Box<FormatElement>>> {
     let mut stream = node
         .syntax()
         .children_with_tokens()
-        .map(Element::cast)
+        .filter_map(|syntax| {
+            if syntax.kind().is_trivia() {
+                None
+            } else {
+                Some(Element::cast(syntax))
+            }
+        })
         .peekable();
 
     while stream.peek().is_some() {

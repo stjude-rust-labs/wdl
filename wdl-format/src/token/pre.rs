@@ -73,16 +73,21 @@ impl TokenStream<PreToken> {
         let mut inline_comment = None;
         if !kind.is_trivia() {
             let preceding_trivia = syntax.preceding_trivia();
-            for raw_trivia in preceding_trivia {
-                let trivia = match raw_trivia.as_str() {
-                    "\n" => PreToken::Literal(raw_trivia, SyntaxKind::Whitespace),
-                    _ => PreToken::Literal(raw_trivia.to_owned(), SyntaxKind::Comment),
+            for token in preceding_trivia {
+                let trivia = match token.kind() {
+                    SyntaxKind::Whitespace => {
+                        PreToken::Literal(String::from("\n"), SyntaxKind::Whitespace)
+                    }
+                    SyntaxKind::Comment => {
+                        PreToken::Literal(token.text().to_owned(), SyntaxKind::Comment)
+                    }
+                    _ => unreachable!("unexpected trivia: {:?}", token),
                 };
                 self.0.push(trivia);
             }
-            if let Some(raw_inline_comment) = syntax.inline_comment() {
+            if let Some(token) = syntax.inline_comment() {
                 inline_comment = Some(PreToken::Literal(
-                    raw_inline_comment.to_owned(),
+                    token.text().to_owned(),
                     SyntaxKind::Comment,
                 ));
             }

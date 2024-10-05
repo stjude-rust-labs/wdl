@@ -718,26 +718,33 @@ impl fmt::Debug for SyntaxTree {
     }
 }
 
-/// Gathers comments and blank lines from a [`SyntaxExt`].
-fn gather_trivia<T: SyntaxExt>(
+/// Gathers substantial trivia (comments and blank lines) from a [`SyntaxExt`].
+///
+/// Whitespace is considered substantial if it contains more than one newline.
+/// Comments are always considered substantial.
+fn gather_substantial_trivia<T: SyntaxExt>(
     source: &T,
     direction: Direction,
     break_on_newline: bool,
-) -> Box<[String]> {
+) -> Box<[SyntaxToken]> {
     let iter = source.siblings_with_tokens(direction);
 
-    /// Adds the text to the currently collecting buffer in the right place
+    /// Adds the token to the currently collecting buffer in the right place
     /// depending in the direction we are traversing.
-    fn push_results(text: String, results: &mut VecDeque<String>, direction: &Direction) {
+    fn push_results(
+        token: SyntaxToken,
+        results: &mut VecDeque<SyntaxToken>,
+        direction: &Direction,
+    ) {
         match direction {
-            Direction::Next => results.push_back(text),
-            Direction::Prev => results.push_front(text),
+            Direction::Next => results.push_back(token),
+            Direction::Prev => results.push_front(token),
         }
     }
 
-    let comments = iter
+    let trivia = iter
         .skip_while(|e| source.matches(e))
-        .take_while(|e| matches!(e.kind(), SyntaxKind::Comment | SyntaxKind::Whitespace))
+        .take_while(|e| e.kind().is_trivia())
         .fold_while(VecDeque::new(), |mut results, e| {
             match e.kind() {
                 SyntaxKind::Comment => {
@@ -751,7 +758,7 @@ fn gather_trivia<T: SyntaxExt>(
                                     .clone()
                                     .into_token()
                                     .expect("whitespace should always be a token")
-                                    .to_string()
+                                    .text()
                                     .chars()
                                     .filter(|c| *c == '\n')
                                     .count();
@@ -771,30 +778,20 @@ fn gather_trivia<T: SyntaxExt>(
                         }
                     }
 
-                    let text = e
-                        .into_token()
-                        .expect("comment should always be a token")
-                        .to_string()
-                        .trim_end()
-                        .to_string();
+                    let comment = e.into_token().expect("comment should always be a token");
 
-                    push_results(text, &mut results, &direction);
+                    push_results(comment, &mut results, &direction);
                 }
                 SyntaxKind::Whitespace => {
-                    let newlines = e
-                        .into_token()
-                        .expect("whitespace should always be a token")
-                        .to_string()
-                        .chars()
-                        .filter(|c| *c == '\n')
-                        .count();
+                    let token = e.into_token().expect("whitespace should always be a token");
+                    let newlines = token.text().chars().filter(|c| *c == '\n').count();
 
                     if break_on_newline && newlines > 0 {
                         return FoldWhile::Done(results);
                     }
 
                     if newlines > 1 {
-                        push_results("\n".to_string(), &mut results, &direction)
+                        push_results(token, &mut results, &direction)
                     }
                 }
                 // SAFETY: we just filtered out any non-comment and
@@ -809,7 +806,7 @@ fn gather_trivia<T: SyntaxExt>(
     // NOTE: most of the time, this conversion will be O(1). Occassionally
     // it will be O(n). No allocations will ever be done. Thus, the
     // ammortized cost of this is quite cheap.
-    Vec::from(comments).into_boxed_slice()
+    Vec::from(trivia).into_boxed_slice()
 }
 
 /// An extension trait for [`SyntaxNode`]s, [`SyntaxToken`]s, and
@@ -877,29 +874,29 @@ pub trait SyntaxExt {
         results.into_boxed_slice()
     }
 
-    /// Gets all of the preceding comments for an element.
-    fn preceding_trivia(&self) -> Box<[String]>
+    /// Gets all of the substantial preceding trivia for an element.
+    fn preceding_trivia(&self) -> Box<[SyntaxToken]>
     where
         Self: Sized,
     {
-        gather_trivia(self, Direction::Prev, false)
+        gather_substantial_trivia(self, Direction::Prev, false)
     }
 
-    /// Gets all of the succeeding comments for an element.
-    fn succeeding_comments(&self) -> Box<[String]>
+    /// Gets all of the substantial succeeding trivia for an element.
+    fn succeeding_trivia(&self) -> Box<[SyntaxToken]>
     where
         Self: Sized,
     {
-        gather_trivia(self, Direction::Next, false)
+        gather_substantial_trivia(self, Direction::Next, false)
     }
 
     /// Get any inline comment directly following an element on the
     /// same line.
-    fn inline_comment(&self) -> Option<String>
+    fn inline_comment(&self) -> Option<SyntaxToken>
     where
         Self: Sized,
     {
-        gather_trivia(self, Direction::Next, true)
+        gather_substantial_trivia(self, Direction::Next, true)
             // NOTE: at most, there can be one contiguous comment on a line.
             .first()
             .cloned()
@@ -965,7 +962,7 @@ task foo {} # This comment should not be included
 # comments
 # are
 # long
-
+    
 # Others are short
 
 #     and, yet    another
@@ -978,17 +975,18 @@ workflow foo {} # This should not be collected.
 
         let workflow = tree.root().last_child().unwrap();
         assert_eq!(workflow.kind(), SyntaxKind::WorkflowDefinitionNode);
-        assert_eq!(workflow.preceding_trivia().as_ref(), vec![
-            "\n",
-            "# Some",
-            "# comments",
-            "# are",
-            "# long",
-            "\n",
-            "# Others are short",
-            "\n",
-            "#     and, yet    another"
-        ]);
+        let trivia = workflow.preceding_trivia();
+        let mut trivia_iter = trivia.iter();
+        assert_eq!(trivia_iter.next().unwrap().text(), "\n\n");
+        assert_eq!(trivia_iter.next().unwrap().text(), "# Some");
+        assert_eq!(trivia_iter.next().unwrap().text(), "# comments");
+        assert_eq!(trivia_iter.next().unwrap().text(), "# are");
+        assert_eq!(trivia_iter.next().unwrap().text(), "# long");
+        assert_eq!(trivia_iter.next().unwrap().text(), "\n    \n");
+        assert_eq!(trivia_iter.next().unwrap().text(), "# Others are short");
+        assert_eq!(trivia_iter.next().unwrap().text(), "\n\n");
+        assert_eq!(trivia_iter.next().unwrap().text(), "#     and, yet    another");
+        assert!(trivia_iter.next().is_none());
     }
 
     #[test]
@@ -1009,11 +1007,12 @@ workflow foo {} # Here is a comment that should be collected.
 
         let workflow = tree.root().last_child().unwrap();
         assert_eq!(workflow.kind(), SyntaxKind::WorkflowDefinitionNode);
-        assert_eq!(workflow.succeeding_comments().as_ref(), vec![
-            "# Here is a comment that should be collected.",
-            "\n",
-            "# This comment should be included too."
-        ]);
+        let trivia = workflow.succeeding_trivia();
+        let mut trivia_iter = trivia.iter();
+        assert_eq!(trivia_iter.next().unwrap().text(), "# Here is a comment that should be collected.");
+        assert_eq!(trivia_iter.next().unwrap().text(), "\n\n");
+        assert_eq!(trivia_iter.next().unwrap().text(), "# This comment should be included too.");
+        assert!(trivia_iter.next().is_none());
     }
 
     #[test]
@@ -1034,9 +1033,7 @@ workflow foo {} # Here is a comment that should be collected.
 
         let workflow = tree.root().last_child().unwrap();
         assert_eq!(workflow.kind(), SyntaxKind::WorkflowDefinitionNode);
-        assert_eq!(
-            workflow.inline_comment().as_deref(),
-            Some("# Here is a comment that should be collected.")
-        );
+        let comment = workflow.inline_comment().unwrap();
+        assert_eq!(comment.text(), "# Here is a comment that should be collected.");
     }
 }
