@@ -1,5 +1,6 @@
 //! Tokens emitted during the formatting of particular elements.
 
+use wdl_ast::SyntaxExt;
 use wdl_ast::SyntaxKind;
 
 use crate::Token;
@@ -62,10 +63,36 @@ impl TokenStream<PreToken> {
     }
 
     /// Pushes an AST token into the stream.
+    ///
+    /// This will also push any preceding or inline trivia into the stream.
+    /// Any token may have preceding or inline trivia, unless that token is
+    /// itself trivia (i.e. trivia cannot have trivia).
     pub fn push_ast_token(&mut self, token: &wdl_ast::Token) {
         let syntax = token.syntax();
-        let token = PreToken::Literal(syntax.text().to_owned(), syntax.kind());
+        let kind = syntax.kind();
+        let mut inline_comment = None;
+        if !kind.is_trivia() {
+            let preceding_trivia = syntax.preceding_trivia();
+            for raw_trivia in preceding_trivia {
+                let trivia = match raw_trivia.as_str() {
+                    "\n" => PreToken::Literal(raw_trivia, SyntaxKind::Whitespace),
+                    _ => PreToken::Literal(raw_trivia.to_owned(), SyntaxKind::Comment),
+                };
+                self.0.push(trivia);
+            }
+            if let Some(raw_inline_comment) = syntax.inline_comment() {
+                inline_comment = Some(PreToken::Literal(
+                    raw_inline_comment.to_owned(),
+                    SyntaxKind::Comment,
+                ));
+            }
+        }
+        let token = PreToken::Literal(syntax.text().to_owned(), kind);
         self.0.push(token);
+
+        if let Some(inline_comment) = inline_comment {
+            self.0.push(inline_comment);
+        }
     }
 
     /// Gets an iterator of references to each token in the stream.

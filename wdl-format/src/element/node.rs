@@ -18,6 +18,6 @@ impl AstNodeFormatExt for Node {
         Self: Sized,
     {
         let children = collate(&self);
-        FormatElement::new(Element::Node(self), Default::default(), children)
+        FormatElement::new(Element::Node(self), children)
     }
 }

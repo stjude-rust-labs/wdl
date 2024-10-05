@@ -4,19 +4,13 @@ use std::collections::HashMap;
 use std::iter::Peekable;
 
 use nonempty::NonEmpty;
-use wdl_ast::AstToken as _;
 use wdl_ast::Element;
 use wdl_ast::Node;
 use wdl_ast::SyntaxKind;
 
-use crate::PreToken;
-use crate::TokenStream;
-use crate::Writable;
-use crate::NEWLINE;
-
 pub mod node;
 
-/// Trivia associated with some more formidable element.
+/// Trivia associated with a token.
 ///
 /// Trivia would be things like comments and whitespace.
 #[derive(Clone, Debug, Default)]
@@ -56,35 +50,19 @@ pub struct FormatElement {
     /// The inner element.
     element: Element,
 
-    /// Trivia associated with the element.
-    trivia: Trivia,
-
     /// Children as format elements.
     children: Option<NonEmpty<Box<FormatElement>>>,
 }
 
 impl FormatElement {
     /// Creates a new [`FormatElement`].
-    pub fn new(
-        element: Element,
-        trivia: Trivia,
-        children: Option<NonEmpty<Box<FormatElement>>>,
-    ) -> Self {
-        Self {
-            element,
-            trivia,
-            children,
-        }
+    pub fn new(element: Element, children: Option<NonEmpty<Box<FormatElement>>>) -> Self {
+        Self { element, children }
     }
 
     /// Gets the inner element.
     pub fn element(&self) -> &Element {
         &self.element
-    }
-
-    /// Gets the trivia.
-    pub fn trivia(&self) -> &Trivia {
-        &self.trivia
     }
 
     /// Gets the children for this node.
@@ -118,24 +96,6 @@ impl FormatElement {
 
         results
     }
-
-    /// Writes any preceding trivia to the stream.
-    pub fn write_preceding_trivia(&self, stream: &mut TokenStream<PreToken>) {
-        if let Some(trivia) = self.trivia().preceding() {
-            for t in trivia.filter(|t| !matches!(t.element().kind(), SyntaxKind::Whitespace)) {
-                t.write(stream);
-            }
-        }
-    }
-
-    /// Writes any inline trivia to the stream.
-    pub fn write_inline_trivia(&self, stream: &mut TokenStream<PreToken>) {
-        if let Some(trivia) = self.trivia().inline() {
-            for t in trivia.filter(|t| !matches!(t.element().kind(), SyntaxKind::Whitespace)) {
-                t.write(stream);
-            }
-        }
-    }
 }
 
 /// An extension trait for formatting [`Element`]s.
@@ -154,7 +114,7 @@ impl AstElementFormatExt for Element {
             Element::Token(_) => None,
         };
 
-        FormatElement::new(self, Default::default(), children)
+        FormatElement::new(self, children)
     }
 }
 
@@ -202,58 +162,17 @@ fn collate(node: &Node) -> Option<NonEmpty<Box<FormatElement>>> {
         .peekable();
 
     while stream.peek().is_some() {
-        let preceding = collect_optional(
-            take_while_peek(stream.by_ref(), |node| node.is_trivia())
-                .map(|item| Box::new(item.into_format_element())),
-        );
-
         let element = match stream.next() {
             Some(node) => node,
             None => break,
         };
-
-        let inline = collect_optional(
-            take_while_peek(stream.by_ref(), |element| {
-                if element.is_trivia() {
-                    // If the element is trivia, we need to check if it contains a
-                    // newline.
-                    match element {
-                        Element::Node(_) => {
-                            // SAFETY: if this is reached, then the code needs to be
-                            // altered. The fact that nodes should not be trivia is
-                            // not baked into the code per se, but it's not expected
-                            // to ever occur. If this ends up happening and it makes
-                            // sense to change this, feel free to do so.
-                            unreachable!("nodes should not be trivia")
-                        }
-                        Element::Token(token) => {
-                            // NOTE: if the token _is_ whitespace, then return false
-                            // only if the token contains a newline. Else, this
-                            // should continue consuming the whitespace.
-                            token
-                                .as_whitespace()
-                                .map(|whitespace| !whitespace.syntax().text().contains(NEWLINE))
-                                .unwrap_or(true)
-                        }
-                    }
-                } else {
-                    // If the element isn't trivia, we don't consume it.
-                    false
-                }
-            })
-            .map(|item| Box::new(item.into_format_element())),
-        );
 
         let children = match element {
             Element::Node(ref node) => collate(node),
             Element::Token(_) => None,
         };
 
-        results.push(Box::new(FormatElement {
-            element,
-            trivia: Trivia { preceding, inline },
-            children,
-        }));
+        results.push(Box::new(FormatElement { element, children }));
     }
 
     if !results.is_empty() {
@@ -311,9 +230,6 @@ workflow bar # This is an inline comment on the workflow ident.
             SyntaxKind::VersionStatementNode
         );
 
-        assert!(version.trivia().preceding().is_none());
-        assert!(version.trivia().inline().is_none());
-
         let mut version_children = version.children().unwrap();
         assert_eq!(
             version_children.next().unwrap().element().kind(),
@@ -334,36 +250,6 @@ workflow bar # This is an inline comment on the workflow ident.
             SyntaxKind::TaskDefinitionNode
         );
 
-        // Preceeding.
-
-        let mut preceding = task.trivia().preceding().unwrap();
-
-        let comment = preceding
-            .next()
-            .unwrap()
-            .element()
-            .syntax()
-            .into_token()
-            .unwrap();
-        assert_eq!(comment.kind(), SyntaxKind::Comment);
-        assert_eq!(comment.text(), "# This is a comment attached to the task.");
-
-        // Inline.
-
-        let mut inline = task.trivia().inline().unwrap();
-
-        let comment = inline
-            .next()
-            .unwrap()
-            .element()
-            .syntax()
-            .into_token()
-            .unwrap();
-        assert_eq!(comment.kind(), SyntaxKind::Comment);
-        assert_eq!(comment.text(), "# This is an inline comment on the task.");
-
-        assert!(inline.next().is_none());
-
         // Children.
 
         let mut task_children = task.children().unwrap();
@@ -374,21 +260,6 @@ workflow bar # This is an inline comment on the workflow ident.
 
         let ident = task_children.next().unwrap();
         assert_eq!(ident.element().kind(), SyntaxKind::Ident);
-
-        let mut ident_inline = ident.trivia().inline().unwrap();
-
-        let inline_comment = ident_inline
-            .next()
-            .unwrap()
-            .element()
-            .syntax()
-            .into_token()
-            .unwrap();
-        assert_eq!(inline_comment.kind(), SyntaxKind::Comment);
-        assert_eq!(
-            inline_comment.text(),
-            "# This is an inline comment on the task ident."
-        );
 
         assert_eq!(
             task_children.next().unwrap().element().kind(),
@@ -411,42 +282,6 @@ workflow bar # This is an inline comment on the workflow ident.
             SyntaxKind::WorkflowDefinitionNode
         );
 
-        // Preceeding.
-
-        let mut preceding = workflow.trivia().preceding().unwrap();
-
-        let comment = preceding
-            .next()
-            .unwrap()
-            .element()
-            .syntax()
-            .into_token()
-            .unwrap();
-        assert_eq!(comment.kind(), SyntaxKind::Comment);
-        assert_eq!(
-            comment.text(),
-            "# This is a comment attached to the workflow."
-        );
-
-        // Inline.
-
-        let mut inline = workflow.trivia().inline().unwrap();
-
-        let comment = inline
-            .next()
-            .unwrap()
-            .element()
-            .syntax()
-            .into_token()
-            .unwrap();
-        assert_eq!(comment.kind(), SyntaxKind::Comment);
-        assert_eq!(
-            comment.text(),
-            "# This is an inline comment on the workflow."
-        );
-
-        assert!(inline.next().is_none());
-
         // Children.
 
         let mut workflow_children = workflow.children().unwrap();
@@ -459,23 +294,6 @@ workflow bar # This is an inline comment on the workflow ident.
         let ident = workflow_children.next().unwrap();
         assert_eq!(ident.element().kind(), SyntaxKind::Ident);
 
-        let mut ident_inline = ident.trivia().inline().unwrap();
-
-        let inline_comment = ident_inline
-            .next()
-            .unwrap()
-            .element()
-            .syntax()
-            .into_token()
-            .unwrap();
-        assert_eq!(inline_comment.kind(), SyntaxKind::Comment);
-        assert_eq!(
-            inline_comment.text(),
-            "# This is an inline comment on the workflow ident."
-        );
-
-        assert!(ident_inline.next().is_none());
-
         assert_eq!(
             workflow_children.next().unwrap().element().kind(),
             SyntaxKind::OpenBrace
@@ -483,20 +301,6 @@ workflow bar # This is an inline comment on the workflow ident.
 
         let call = workflow_children.next().unwrap();
         assert_eq!(call.element().kind(), SyntaxKind::CallStatementNode);
-
-        let mut call_preceding = call.trivia().preceding().unwrap();
-
-        let comment = call_preceding
-            .next()
-            .unwrap()
-            .element()
-            .syntax()
-            .into_token()
-            .unwrap();
-        assert_eq!(comment.kind(), SyntaxKind::Comment);
-        assert_eq!(comment.text(), "# This is attached to the call.");
-
-        assert!(call_preceding.next().is_none());
 
         assert_eq!(
             workflow_children.next().unwrap().element().kind(),

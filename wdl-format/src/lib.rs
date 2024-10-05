@@ -47,8 +47,6 @@ pub trait Writable {
 
 impl Writable for &FormatElement {
     fn write(&self, stream: &mut TokenStream<PreToken>) {
-        self.write_preceding_trivia(stream);
-
         match self.element() {
             Element::Node(node) => match node {
                 AstNode::AccessExpr(_) => todo!(),
@@ -144,8 +142,6 @@ impl Writable for &FormatElement {
                 stream.push_ast_token(token);
             }
         }
-
-        self.write_inline_trivia(stream);
     }
 }
 
@@ -197,8 +193,8 @@ mod tests {
     use wdl_ast::Document;
     use wdl_ast::Node;
 
-    use crate::element::node::AstNodeFormatExt as _;
     use crate::Formatter;
+    use crate::element::node::AstNodeFormatExt as _;
 
     #[test]
     fn smoke() {
