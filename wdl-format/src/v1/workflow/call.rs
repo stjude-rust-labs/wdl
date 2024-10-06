@@ -55,7 +55,7 @@ pub fn format_call_target(element: &FormatElement, stream: &mut TokenStream<PreT
 
             let second_ident = idents.next().expect("second ident");
             (&second_ident).write(stream);
-        
+
             assert!(idents.next().is_none(), "too many idents");
         }
     }
