@@ -12,6 +12,7 @@ use anyhow::bail;
 use clap::Args;
 use clap::Parser;
 use clap::Subcommand;
+use clap::ValueEnum;
 use clap_verbosity_flag::Verbosity;
 use codespan_reporting::files::SimpleFile;
 use codespan_reporting::term::Config;
@@ -29,6 +30,7 @@ use wdl::ast::Validator;
 use wdl::lint::LintVisitor;
 use wdl_analysis::AnalysisResult;
 use wdl_analysis::Analyzer;
+use wdl_ast::Severity;
 
 /// Emits the given diagnostics to the output stream.
 ///
@@ -55,7 +57,11 @@ fn emit_diagnostics(path: &str, source: &str, diagnostics: &[Diagnostic]) -> Res
     Ok(())
 }
 
-async fn analyze(path: PathBuf, lint: bool) -> Result<Vec<AnalysisResult>> {
+async fn analyze(
+    config: wdl_analysis::Config,
+    path: PathBuf,
+    lint: bool,
+) -> Result<Vec<AnalysisResult>> {
     let bar = ProgressBar::new(0);
     bar.set_style(
         ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {msg} {pos}/{len}")
@@ -63,6 +69,7 @@ async fn analyze(path: PathBuf, lint: bool) -> Result<Vec<AnalysisResult>> {
     );
 
     let analyzer = Analyzer::new_with_validator(
+        config,
         move |bar: ProgressBar, kind, completed, total| async move {
             bar.set_position(completed.try_into().unwrap());
             if completed == 0 {
@@ -161,6 +168,103 @@ impl ParseCommand {
     }
 }
 
+/// Represents a configurable diagnostic.
+#[derive(ValueEnum, Debug, Clone, Copy, PartialEq, Eq)]
+#[clap(rename_all = "PascalCase")]
+pub enum ConfigurableDiagnostic {
+    /// Diagnostic for unused imports.
+    UnusedImport,
+    /// Diagnostic for unused inputs.
+    UnusedInput,
+    /// Diagnostic for unused declarations.
+    UnusedDeclaration,
+    /// Diagnostic for unused calls.
+    UnusedCall,
+}
+
+/// Represents common analysis options.
+#[derive(Args)]
+pub struct AnalysisOptions {
+    /// Denies all analysis warnings by treating them as errors.
+    #[clap(long, conflicts_with = "deny", conflicts_with = "except_all_warnings")]
+    pub deny_all_warnings: bool,
+
+    /// Except (ignores) all analysis warnings.
+    #[clap(long, conflicts_with = "except")]
+    pub except_all_warnings: bool,
+
+    /// Excepts (ignores) an analysis warning.
+    #[clap(long)]
+    pub except: Vec<ConfigurableDiagnostic>,
+
+    /// Denies an analysis warning by treating it as an error.
+    #[clap(long)]
+    pub deny: Vec<ConfigurableDiagnostic>,
+}
+
+impl AnalysisOptions {
+    /// Checks for conflicts in the analysis options.
+    pub fn check_for_conflicts(&self) -> Result<()> {
+        if let Some(d) = self
+            .except
+            .iter()
+            .find(|d: &&ConfigurableDiagnostic| self.deny.contains(*d))
+        {
+            bail!(
+                "diagnostic {d:?} cannot be specified for both the `--except` and `--deny`",
+                d = d.to_possible_value().unwrap().get_name()
+            );
+        }
+
+        Ok(())
+    }
+
+    /// Converts the analysis options into an analysis configuration.
+    pub fn into_config(self) -> wdl_analysis::Config {
+        let mut config = wdl_analysis::Config::default();
+
+        // Process the denies first
+        if self.deny_all_warnings {
+            config.diagnostics = wdl_analysis::DiagnosticsConfig::deny_all();
+        } else {
+            for deny in self.deny {
+                match deny {
+                    ConfigurableDiagnostic::UnusedImport => {
+                        config.diagnostics.unused_import = Some(Severity::Error)
+                    }
+                    ConfigurableDiagnostic::UnusedInput => {
+                        config.diagnostics.unused_input = Some(Severity::Error)
+                    }
+                    ConfigurableDiagnostic::UnusedDeclaration => {
+                        config.diagnostics.unused_declaration = Some(Severity::Error)
+                    }
+                    ConfigurableDiagnostic::UnusedCall => {
+                        config.diagnostics.unused_call = Some(Severity::Error)
+                    }
+                }
+            }
+        }
+
+        // Next process the excepts
+        if self.except_all_warnings {
+            config.diagnostics = wdl_analysis::DiagnosticsConfig::except_all();
+        } else {
+            for except in self.except {
+                match except {
+                    ConfigurableDiagnostic::UnusedImport => config.diagnostics.unused_import = None,
+                    ConfigurableDiagnostic::UnusedInput => config.diagnostics.unused_input = None,
+                    ConfigurableDiagnostic::UnusedDeclaration => {
+                        config.diagnostics.unused_declaration = None
+                    }
+                    ConfigurableDiagnostic::UnusedCall => config.diagnostics.unused_call = None,
+                }
+            }
+        }
+
+        config
+    }
+}
+
 /// Checks a WDL source file for errors.
 #[derive(Args)]
 #[clap(disable_version_flag = true)]
@@ -168,11 +272,15 @@ pub struct CheckCommand {
     /// The path to the source WDL file.
     #[clap(value_name = "PATH")]
     pub path: PathBuf,
+
+    #[clap(flatten)]
+    pub options: AnalysisOptions,
 }
 
 impl CheckCommand {
     async fn exec(self) -> Result<()> {
-        analyze(self.path, false).await?;
+        self.options.check_for_conflicts()?;
+        analyze(self.options.into_config(), self.path, false).await?;
         Ok(())
     }
 }
@@ -224,6 +332,9 @@ pub struct AnalyzeCommand {
     #[clap(value_name = "PATH")]
     pub path: PathBuf,
 
+    #[clap(flatten)]
+    pub options: AnalysisOptions,
+
     /// Whether or not to run lints as part of analysis.
     #[clap(long)]
     pub lint: bool,
@@ -231,7 +342,8 @@ pub struct AnalyzeCommand {
 
 impl AnalyzeCommand {
     async fn exec(self) -> Result<()> {
-        let results = analyze(self.path, self.lint).await?;
+        self.options.check_for_conflicts()?;
+        let results = analyze(self.options.into_config(), self.path, self.lint).await?;
         println!("{:#?}", results);
         Ok(())
     }

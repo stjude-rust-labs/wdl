@@ -12,6 +12,18 @@ use wdl_ast::Version;
 use crate::types::Type;
 use crate::types::Types;
 
+/// The rule identifier for unused import warnings.
+pub const UNUSED_IMPORT_RULE_ID: &str = "UnusedImport";
+
+/// The rule identifier for unused input warnings.
+pub const UNUSED_INPUT_RULE_ID: &str = "UnusedInput";
+
+/// The rule identifier for unused declaration warnings.
+pub const UNUSED_DECL_RULE_ID: &str = "UnusedDeclaration";
+
+/// The rule identifier for unused call warnings.
+pub const UNUSED_CALL_RULE_ID: &str = "UnusedCall";
+
 /// Represents the context for diagnostic reporting.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Context {
@@ -788,4 +800,32 @@ pub fn missing_call_input(workflow: bool, target: &Ident, input: &str) -> Diagno
         target = target.as_str(),
     ))
     .with_highlight(target.span())
+}
+
+/// Creates an "unused import" diagnostic.
+pub fn unused_import(name: &str, span: Span) -> Diagnostic {
+    Diagnostic::warning(format!("unused import namespace `{name}`"))
+        .with_rule(UNUSED_IMPORT_RULE_ID)
+        .with_highlight(span)
+}
+
+/// Creates an "unused input" diagnostic.
+pub fn unused_input(name: &str, span: Span) -> Diagnostic {
+    Diagnostic::warning(format!("unused input `{name}`"))
+        .with_rule(UNUSED_INPUT_RULE_ID)
+        .with_highlight(span)
+}
+
+/// Creates an "unused declaration" diagnostic.
+pub fn unused_declaration(name: &str, span: Span) -> Diagnostic {
+    Diagnostic::warning(format!("unused declaration `{name}`"))
+        .with_rule(UNUSED_DECL_RULE_ID)
+        .with_highlight(span)
+}
+
+/// Creates an "unused call" diagnostic.
+pub fn unused_call(name: &str, span: Span) -> Diagnostic {
+    Diagnostic::warning(format!("unused call `{name}`"))
+        .with_rule(UNUSED_CALL_RULE_ID)
+        .with_highlight(span)
 }

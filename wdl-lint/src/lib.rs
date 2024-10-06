@@ -42,6 +42,14 @@ pub use tags::*;
 pub use visitor::*;
 pub use wdl_ast as ast;
 
+/// The reserved rule names that are used by analysis.
+const RESERVED_RULE_NAMES: &[&str] = &[
+    "UnusedImport",
+    "UnusedInput",
+    "UnusedDeclaration",
+    "UnusedCall",
+];
+
 /// A trait implemented by lint rules.
 pub trait Rule: Visitor<State = Diagnostics> {
     /// The unique identifier for the lint rule.
@@ -129,6 +137,10 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
 
             if !set.insert(r.id()) {
                 panic!("duplicate rule id `{id}`", id = r.id());
+            }
+
+            if RESERVED_RULE_NAMES.contains(&r.id()) {
+                panic!("rule id `{id}` is reserved", id = r.id());
             }
         }
     }

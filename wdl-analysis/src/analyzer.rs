@@ -29,9 +29,15 @@ use url::Url;
 use walkdir::WalkDir;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
+use wdl_ast::Severity;
 use wdl_ast::SyntaxNode;
+use wdl_ast::SyntaxNodeExt;
 use wdl_ast::Validator;
 
+use crate::diagnostics::UNUSED_CALL_RULE_ID;
+use crate::diagnostics::UNUSED_DECL_RULE_ID;
+use crate::diagnostics::UNUSED_IMPORT_RULE_ID;
+use crate::diagnostics::UNUSED_INPUT_RULE_ID;
 use crate::graph::DocumentGraphNode;
 use crate::graph::ParseState;
 use crate::queue::AddRequest;
@@ -163,6 +169,99 @@ impl From<&ParseState> for ParseResult {
             },
         }
     }
+}
+
+/// Configuration for analysis diagnostics.
+///
+/// Only the analysis diagnostics that aren't inherently treated as errors are
+/// represented here.
+///
+/// These diagnostics default to a warning severity.
+#[derive(Debug, Clone, Copy)]
+pub struct DiagnosticsConfig {
+    /// The severity for the "unused import" diagnostic.
+    ///
+    /// A value of `None` disables the diagnostic.
+    pub unused_import: Option<Severity>,
+    /// The severity for the "unused input" diagnostic.
+    ///
+    /// A value of `None` disables the diagnostic.
+    pub unused_input: Option<Severity>,
+    /// The severity for the "unused declaration" diagnostic.
+    ///
+    /// A value of `None` disables the diagnostic.
+    pub unused_declaration: Option<Severity>,
+    /// The severity for the "unused call" diagnostic.
+    ///
+    /// A value of `None` disables the diagnostic.
+    pub unused_call: Option<Severity>,
+}
+
+impl DiagnosticsConfig {
+    /// Creates a diagnostics config that treats all diagnostics as errors.
+    pub fn deny_all() -> Self {
+        Self {
+            unused_import: Some(Severity::Error),
+            unused_input: Some(Severity::Error),
+            unused_declaration: Some(Severity::Error),
+            unused_call: Some(Severity::Error),
+        }
+    }
+
+    /// Creates a diagnostics config that excepts all diagnostics.
+    pub fn except_all() -> Self {
+        Self {
+            unused_import: None,
+            unused_input: None,
+            unused_declaration: None,
+            unused_call: None,
+        }
+    }
+
+    /// Gets the excepted set of diagnostics based on any `#@ except` comments
+    /// that precede the given syntax node.
+    pub fn excepted_for_node(mut self, node: &SyntaxNode) -> Self {
+        let exceptions = node
+            .parent()
+            .expect("token should have parent")
+            .rule_exceptions();
+
+        if exceptions.contains(UNUSED_IMPORT_RULE_ID) {
+            self.unused_import = None;
+        }
+
+        if exceptions.contains(UNUSED_INPUT_RULE_ID) {
+            self.unused_input = None;
+        }
+
+        if exceptions.contains(UNUSED_DECL_RULE_ID) {
+            self.unused_declaration = None;
+        }
+
+        if exceptions.contains(UNUSED_CALL_RULE_ID) {
+            self.unused_call = None;
+        }
+
+        self
+    }
+}
+
+impl Default for DiagnosticsConfig {
+    fn default() -> Self {
+        Self {
+            unused_import: Some(Severity::Warning),
+            unused_input: Some(Severity::Warning),
+            unused_declaration: Some(Severity::Warning),
+            unused_call: Some(Severity::Warning),
+        }
+    }
+}
+
+/// Configuration for analysis.
+#[derive(Debug, Default, Clone, Copy)]
+pub struct Config {
+    /// The configuration for analysis diagnostics.
+    pub diagnostics: DiagnosticsConfig,
 }
 
 /// Represents the result of an analysis.
@@ -391,12 +490,12 @@ where
     /// The analyzer will use a default validator for validation.
     ///
     /// The analyzer must be constructed from the context of a Tokio runtime.
-    pub fn new<Progress, Return>(progress: Progress) -> Self
+    pub fn new<Progress, Return>(config: Config, progress: Progress) -> Self
     where
         Progress: Fn(Context, ProgressKind, usize, usize) -> Return + Send + 'static,
         Return: Future<Output = ()>,
     {
-        Self::new_with_validator(progress, Validator::default)
+        Self::new_with_validator(config, progress, Validator::default)
     }
 
     /// Constructs a new analyzer with the given validator function.
@@ -408,6 +507,7 @@ where
     ///
     /// The analyzer must be constructed from the context of a Tokio runtime.
     pub fn new_with_validator<Progress, Return, Validator>(
+        config: Config,
         progress: Progress,
         validator: Validator,
     ) -> Self
@@ -419,7 +519,7 @@ where
         let (tx, rx) = mpsc::unbounded_channel();
         let tokio = Handle::current();
         let handle = std::thread::spawn(move || {
-            let queue = AnalysisQueue::new(tokio, progress, validator);
+            let queue = AnalysisQueue::new(config, tokio, progress, validator);
             queue.run(rx);
         });
 
@@ -649,7 +749,7 @@ mod test {
 
     #[tokio::test]
     async fn it_returns_empty_results() {
-        let analyzer = Analyzer::new(|_: (), _, _, _| async {});
+        let analyzer = Analyzer::new(Default::default(), |_: (), _, _, _| async {});
         let results = analyzer.analyze(()).await.unwrap();
         assert!(results.is_empty());
     }
@@ -673,7 +773,7 @@ workflow test {
         .expect("failed to create test file");
 
         // Analyze the file and check the resulting diagnostic
-        let analyzer = Analyzer::new(|_: (), _, _, _| async {});
+        let analyzer = Analyzer::new(Default::default(), |_: (), _, _, _| async {});
         analyzer
             .add_documents(vec![path])
             .await
@@ -722,7 +822,7 @@ workflow test {
         .expect("failed to create test file");
 
         // Analyze the file and check the resulting diagnostic
-        let analyzer = Analyzer::new(|_: (), _, _, _| async {});
+        let analyzer = Analyzer::new(Default::default(), |_: (), _, _, _| async {});
         analyzer
             .add_documents(vec![path.clone()])
             .await
@@ -791,7 +891,7 @@ workflow test {
         .expect("failed to create test file");
 
         // Analyze the file and check the resulting diagnostic
-        let analyzer = Analyzer::new(|_: (), _, _, _| async {});
+        let analyzer = Analyzer::new(Default::default(), |_: (), _, _, _| async {});
         analyzer
             .add_documents(vec![path.clone()])
             .await
@@ -864,7 +964,7 @@ workflow test {
         .expect("failed to create test file");
 
         // Add all three documents to the analyzer
-        let analyzer = Analyzer::new(|_: (), _, _, _| async {});
+        let analyzer = Analyzer::new(Default::default(), |_: (), _, _, _| async {});
         analyzer
             .add_documents(vec![dir.path().to_path_buf()])
             .await

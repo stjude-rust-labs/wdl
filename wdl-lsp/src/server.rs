@@ -205,6 +205,7 @@ impl Server {
                 client,
                 options,
                 analyzer: Analyzer::<ProgressToken>::new_with_validator(
+                    Default::default(),
                     move |token, kind, current, total| {
                         let client = analyzer_client.clone();
                         async move {

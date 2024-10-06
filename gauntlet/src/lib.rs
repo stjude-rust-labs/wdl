@@ -168,6 +168,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             .context("failed to write next section")?;
 
         let analyzer = Analyzer::new_with_validator(
+            Default::default(),
             move |_: (), _, _, _| async move {},
             move || {
                 let mut validator = if !args.arena {

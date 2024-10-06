@@ -12,6 +12,7 @@ use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
+use crate::RESERVED_RULE_NAMES;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -78,7 +79,7 @@ impl Visitor for UnknownRule {
                 offset += id.len() - trimmed.len();
 
                 // Check if the rule is known
-                if !RULE_MAP.contains_key(&trimmed) {
+                if !RESERVED_RULE_NAMES.contains(&trimmed) && !RULE_MAP.contains_key(&trimmed) {
                     // Since this rule can only be excepted in a document-wide fashion,
                     // if the rule is running we can directly add the diagnostic
                     // without checking for the exceptable nodes
