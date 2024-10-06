@@ -17,20 +17,28 @@ pub fn format_call_statement(element: &FormatElement, stream: &mut TokenStream<P
         (&keyword).write(stream);
     }
 
+    stream.end_word();
+
     if let Some(mut call_nodes) = children.remove(&SyntaxKind::CallTargetNode) {
         let call_node = exactly_one!(call_nodes, "call target nodes");
         (&call_node).write(stream);
     }
+
+    stream.end_word();
 
     if let Some(mut open_braces) = children.remove(&SyntaxKind::OpenBrace) {
         let open_brace = exactly_one!(open_braces, "open braces");
         (&open_brace).write(stream);
     }
 
+    stream.end_word();
+
     if let Some(mut close_braces) = children.remove(&SyntaxKind::CloseBrace) {
         let close_brace = exactly_one!(close_braces, "close braces");
         (&close_brace).write(stream);
     }
+
+    stream.end_line();
 
     if !children.is_empty() {
         todo!(

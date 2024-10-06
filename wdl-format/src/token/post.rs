@@ -5,6 +5,7 @@
 
 use wdl_ast::SyntaxKind;
 
+use crate::CommentKind;
 use crate::NEWLINE;
 use crate::PreToken;
 use crate::SPACE;
@@ -25,6 +26,9 @@ pub enum PostToken {
     /// A newline.
     Newline,
 
+    /// One indentation.
+    Indent,
+
     /// A string literal.
     Literal(String),
 }
@@ -34,6 +38,7 @@ impl std::fmt::Debug for PostToken {
         match self {
             Self::Space => write!(f, "<SPACE>"),
             Self::Newline => write!(f, "<NEWLINE>"),
+            Self::Indent => write!(f, "<INDENT>"),
             Self::Literal(value) => write!(f, "<LITERAL> {value}"),
         }
     }
@@ -44,6 +49,7 @@ impl std::fmt::Display for PostToken {
         match self {
             PostToken::Space => write!(f, "{SPACE}"),
             PostToken::Newline => write!(f, "{NEWLINE}"),
+            PostToken::Indent => write!(f, "    "), // 4 spaces TODO replace
             PostToken::Literal(value) => write!(f, "{value}"),
         }
     }
@@ -51,10 +57,10 @@ impl std::fmt::Display for PostToken {
 
 impl Token for PostToken {}
 
-/// The state of the postprocessor.
+/// Current position in a line.
 #[derive(Default, Eq, PartialEq)]
-enum State {
-    /// The start of a line in the document.
+enum LinePosition {
+    /// The start of a line.
     #[default]
     StartOfLine,
 
@@ -64,7 +70,13 @@ enum State {
 
 /// A postprocessor of [tokens](PreToken).
 #[derive(Default)]
-pub struct Postprocessor(State);
+pub struct Postprocessor {
+    /// The current position in the line.
+    position: LinePosition,
+
+    /// The current indentation level.
+    indent_level: usize,
+}
 
 impl Postprocessor {
     /// Runs the postprocessor.
@@ -75,7 +87,8 @@ impl Postprocessor {
             self.step(token, &mut output)
         }
 
-        output.trim_while(|token| matches!(token, PostToken::Space | PostToken::Newline));
+        self.trim_whitespace(&mut output);
+        output.push(PostToken::Newline);
         output.push(PostToken::Newline);
 
         output
@@ -85,34 +98,92 @@ impl Postprocessor {
     /// [`PostToken`]s.
     pub fn step(&mut self, token: PreToken, stream: &mut TokenStream<PostToken>) {
         match token {
-            PreToken::SectionSpacer => {
-                if self.0 != State::StartOfLine {
-                    self.newline(stream)
-                }
+            PreToken::BlankLine => {
+                self.trim_whitespace(stream);
+                stream.push(PostToken::Newline);
+                stream.push(PostToken::Newline);
+            }
+            PreToken::LineEnd => {
+                self.end_line(stream);
+            }
+            PreToken::WordEnd => {
+                stream.trim_end(&PostToken::Space);
 
-                self.newline(stream);
+                if self.position == LinePosition::MiddleOfLine {
+                    stream.push(PostToken::Space);
+                } else {
+                    // We're at the start of a line, so we don't need to add a
+                    // space.
+                }
+            }
+            PreToken::IndentStart => {
+                self.indent_level += 1;
+                self.end_line(stream);
+            }
+            PreToken::IndentEnd => {
+                self.indent_level = self.indent_level.saturating_sub(1);
+                self.end_line(stream);
             }
             PreToken::Literal(value, kind) => {
-                match self.0 {
-                    State::StartOfLine | State::MiddleOfLine => {
-                        stream.push(PostToken::Literal(value));
+                assert!(kind != SyntaxKind::Comment);
+                stream.push(PostToken::Literal(value));
+                self.position = LinePosition::MiddleOfLine;
+            }
+            PreToken::Comment(value, kind) => {
+                match kind {
+                    CommentKind::Inline => {
+                        assert!(self.position == LinePosition::MiddleOfLine);
+                        stream.trim_end(&PostToken::Space);
+                        stream.push(PostToken::Space);
+                        stream.push(PostToken::Space);
+                    }
+                    CommentKind::Preceding => {
+                        self.end_line(stream);
                     }
                 }
-
-                if kind == SyntaxKind::Comment {
-                    self.newline(stream);
-                } else {
-                    stream.push(PostToken::Space);
-                    self.0 = State::MiddleOfLine;
-                }
+                stream.push(PostToken::Literal(value));
+                self.position = LinePosition::MiddleOfLine;
+                self.end_line(stream);
             }
         }
     }
 
-    /// Adds a newline to the stream and modifies the state accordingly.
-    fn newline(&mut self, stream: &mut TokenStream<PostToken>) {
-        stream.trim_end(&PostToken::Space);
-        stream.push(PostToken::Newline);
-        self.0 = State::StartOfLine;
+    /// Trims any and all whitespace from the end of the stream.
+    fn trim_whitespace(&mut self, stream: &mut TokenStream<PostToken>) {
+        stream.trim_while(|token| {
+            matches!(
+                token,
+                PostToken::Space | PostToken::Newline | PostToken::Indent
+            )
+        });
+    }
+
+    /// Trims spaces and indents (and not newlines) from the end of the stream.
+    fn trim_last_line(&mut self, stream: &mut TokenStream<PostToken>) {
+        stream.trim_while(|token| matches!(token, PostToken::Space | PostToken::Indent));
+    }
+
+    /// Ends the current line.
+    ///
+    /// Removes any trailing spaces or indents and adds a newline only if state
+    /// is not [`LinePosition::StartOfLine`]. State is then set to
+    /// [`LinePosition::StartOfLine`]. Safe to call multiple times in a row.
+    fn end_line(&mut self, stream: &mut TokenStream<PostToken>) {
+        self.trim_last_line(stream);
+        if self.position != LinePosition::StartOfLine {
+            stream.push(PostToken::Newline);
+        }
+        self.position = LinePosition::StartOfLine;
+        self.indent(stream);
+    }
+
+    /// Pushes the current indentation level to the stream.
+    /// This should only be called when the state is
+    /// [`LinePosition::StartOfLine`].
+    fn indent(&self, stream: &mut TokenStream<PostToken>) {
+        assert!(self.position == LinePosition::StartOfLine);
+        for _ in 0..self.indent_level {
+            stream.push(PostToken::Indent);
+        }
     }
 }

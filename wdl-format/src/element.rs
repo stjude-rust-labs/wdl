@@ -1,7 +1,6 @@
 //! Elements used during formatting.
 
 use std::collections::HashMap;
-use std::iter::Peekable;
 
 use nonempty::NonEmpty;
 use wdl_ast::Element;
@@ -9,40 +8,6 @@ use wdl_ast::Node;
 use wdl_ast::SyntaxKind;
 
 pub mod node;
-
-/// Trivia associated with a token.
-///
-/// Trivia would be things like comments and whitespace.
-#[derive(Clone, Debug, Default)]
-pub struct Trivia {
-    /// Any preceding trivia.
-    preceding: Option<NonEmpty<Box<FormatElement>>>,
-
-    /// Any inline trivia.
-    inline: Option<NonEmpty<Box<FormatElement>>>,
-}
-
-impl Trivia {
-    /// Any preceding trivia that are not whitespaces.
-    pub fn preceding(&self) -> Option<impl Iterator<Item = &FormatElement>> {
-        self.preceding.as_ref().map(|trivia| {
-            trivia
-                .into_iter()
-                .filter(|t| !matches!(t.element().kind(), SyntaxKind::Whitespace))
-                .map(|t| &**t)
-        })
-    }
-
-    /// Any inline trivia that are not whitespaces.
-    pub fn inline(&self) -> Option<impl Iterator<Item = &FormatElement>> {
-        self.inline.as_ref().map(|trivia| {
-            trivia
-                .into_iter()
-                .filter(|t| !matches!(t.element().kind(), SyntaxKind::Whitespace))
-                .map(|t| &**t)
-        })
-    }
-}
 
 /// A formattable element.
 #[derive(Clone, Debug)]
@@ -118,40 +83,6 @@ impl AstElementFormatExt for Element {
     }
 }
 
-/// Collects a list of iterables into an [`Option<NonEmpty>`].
-fn collect_optional<T>(mut iter: impl Iterator<Item = T>) -> Option<NonEmpty<T>> {
-    if let Some(first) = iter.next() {
-        let mut vec = NonEmpty::new(first);
-        vec.extend(iter);
-        Some(vec)
-    } else {
-        None
-    }
-}
-
-/// Takes elements while a particular predicate is true _without_ consuming the
-/// element that breaks the chain.
-fn take_while_peek<'a, I, P>(
-    iter: &'a mut Peekable<I>,
-    predicate: P,
-) -> impl Iterator<Item = I::Item> + 'a
-where
-    I: Iterator,
-    P: Fn(&I::Item) -> bool + 'a,
-{
-    std::iter::from_fn(move || {
-        if let Some(next_item) = iter.peek() {
-            if predicate(next_item) {
-                iter.next()
-            } else {
-                None
-            }
-        } else {
-            None
-        }
-    })
-}
-
 /// Collates the children of a particular node.
 fn collate(node: &Node) -> Option<NonEmpty<Box<FormatElement>>> {
     let mut results = Vec::new();
@@ -204,20 +135,21 @@ mod tests {
     #[test]
     fn smoke() {
         let (document, diagnostics) = Document::parse(
-            "version 1.2
+            "## WDL
+version 1.2  # This is a comment attached to the version.
 
-# This is a comment attached to the task.
+# This is a comment attached to the task keyword.
 task foo # This is an inline comment on the task ident.
 {
 
-} # This is an inline comment on the task.
+} # This is an inline comment on the task close brace.
 
-# This is a comment attached to the workflow.
+# This is a comment attached to the workflow keyword.
 workflow bar # This is an inline comment on the workflow ident.
 {
-  # This is attached to the call.
+  # This is attached to the call keyword.
   call foo {}
-} # This is an inline comment on the workflow.",
+} # This is an inline comment on the workflow close brace.",
         );
 
         assert!(diagnostics.is_empty());

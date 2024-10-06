@@ -53,6 +53,7 @@ pub use wdl_grammar::SyntaxExt;
 pub use wdl_grammar::SyntaxKind;
 pub use wdl_grammar::SyntaxNode;
 pub use wdl_grammar::SyntaxToken;
+pub use wdl_grammar::SyntaxTokenExt;
 pub use wdl_grammar::SyntaxTree;
 pub use wdl_grammar::ToSpan;
 pub use wdl_grammar::WorkflowDescriptionLanguage;

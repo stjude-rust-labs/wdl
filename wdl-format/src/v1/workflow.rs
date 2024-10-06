@@ -19,25 +19,36 @@ pub fn format_workflow_definition(element: &FormatElement, stream: &mut TokenStr
         (&keyword).write(stream);
     }
 
+    stream.end_word();
+
     if let Some(mut idents) = children.remove(&SyntaxKind::Ident) {
         let idents = exactly_one!(idents, "idents");
         (&idents).write(stream);
     }
+
+    stream.end_word();
 
     if let Some(mut braces) = children.remove(&SyntaxKind::OpenBrace) {
         let brace = exactly_one!(braces, "open braces");
         (&brace).write(stream);
     }
 
+    stream.end_line();
+    stream.increment_indent();
+
     if let Some(calls) = children.remove(&SyntaxKind::CallStatementNode) {
         for call in calls {
             (&call).write(stream);
+            stream.end_line();
         }
     }
+
+    stream.decrement_indent();
 
     if let Some(mut braces) = children.remove(&SyntaxKind::CloseBrace) {
         let brace = exactly_one!(braces, "closed braces");
         (&brace).write(stream);
+        stream.end_line();
     }
 
     if !children.is_empty() {

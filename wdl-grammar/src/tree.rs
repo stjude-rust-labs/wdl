@@ -6,8 +6,6 @@ use std::borrow::Cow;
 use std::collections::VecDeque;
 use std::fmt;
 
-use itertools::FoldWhile;
-use itertools::Itertools as _;
 use rowan::Direction;
 use rowan::GreenNodeBuilder;
 use rowan::GreenNodeData;
@@ -718,17 +716,16 @@ impl fmt::Debug for SyntaxTree {
     }
 }
 
-/// Gathers substantial trivia (comments and blank lines) from a [`SyntaxExt`].
+/// Gathers substantial trivia (comments and blank lines) from a
+/// [`SyntaxToken`].
 ///
-/// Whitespace is considered substantial if it contains more than one newline.
-/// Comments are always considered substantial.
-fn gather_substantial_trivia<T: SyntaxExt>(
-    source: &T,
+/// Whitespace is only considered substantial if it contains more than one
+/// newline and is between comments. Comments are always considered substantial.
+fn gather_substantial_trivia(
+    source: &SyntaxToken,
     direction: Direction,
     break_on_newline: bool,
 ) -> Box<[SyntaxToken]> {
-    let iter = source.siblings_with_tokens(direction);
-
     /// Adds the token to the currently collecting buffer in the right place
     /// depending in the direction we are traversing.
     fn push_results(
@@ -742,71 +739,83 @@ fn gather_substantial_trivia<T: SyntaxExt>(
         }
     }
 
-    let trivia = iter
-        .skip_while(|e| source.matches(e))
-        .take_while(|e| e.kind().is_trivia())
-        .fold_while(VecDeque::new(), |mut results, e| {
-            match e.kind() {
-                SyntaxKind::Comment => {
-                    // Check if e is a comment on its own line.
-                    // If direction is 'Next' then we already know that the
-                    // comment is on its own line.
-                    if direction == Direction::Prev {
-                        if let Some(prev) = e.prev_sibling_or_token() {
-                            if prev.kind() == SyntaxKind::Whitespace {
-                                let newlines = prev
-                                    .clone()
-                                    .into_token()
-                                    .expect("whitespace should always be a token")
-                                    .text()
-                                    .chars()
-                                    .filter(|c| *c == '\n')
-                                    .count();
+    let mut results = VecDeque::new();
+    let mut cur = match direction {
+        Direction::Next => source.next_token(),
+        Direction::Prev => source.prev_token(),
+    };
+    while let Some(t) = cur {
+        if !t.kind().is_trivia() {
+            break;
+        }
 
-                                // If there are newlines in 'prev' then we know
-                                // that the comment is on its own line.
-                                // The comment may still be on its own line if
-                                // 'prev' does not have newlines and nothing comes
-                                // before 'prev'.
-                                if newlines == 0 && prev.prev_sibling_or_token().is_some() {
-                                    return FoldWhile::Done(results);
-                                }
-                            } else {
-                                // There is something else on this line before the comment.
-                                return FoldWhile::Done(results);
+        match t.kind() {
+            SyntaxKind::Comment => {
+                // Check if t is a comment on its own line.
+                // If direction is 'Next' then we already know that the
+                // comment is on its own line.
+                if direction == Direction::Prev {
+                    if let Some(prev) = t.prev_token() {
+                        if prev.kind() == SyntaxKind::Whitespace {
+                            let newlines = prev.text().chars().filter(|c| *c == '\n').count();
+
+                            // If there are newlines in 'prev' then we know
+                            // that the comment is on its own line.
+                            // The comment may still be on its own line if
+                            // 'prev' does not have newlines and nothing comes
+                            // before 'prev'.
+                            if newlines == 0 && prev.prev_token().is_some() {
+                                break;
                             }
+                        } else {
+                            // There is something else on this line before the comment.
+                            break;
                         }
                     }
-
-                    let comment = e.into_token().expect("comment should always be a token");
-
-                    push_results(comment, &mut results, &direction);
                 }
-                SyntaxKind::Whitespace => {
-                    let token = e.into_token().expect("whitespace should always be a token");
-                    let newlines = token.text().chars().filter(|c| *c == '\n').count();
-
-                    if break_on_newline && newlines > 0 {
-                        return FoldWhile::Done(results);
-                    }
-
-                    if newlines > 1 {
-                        push_results(token, &mut results, &direction)
-                    }
-                }
-                // SAFETY: we just filtered out any non-comment and
-                // non-whitespace nodes above, so this should never occur.
-                _ => unreachable!(),
+                push_results(t.clone(), &mut results, &direction);
             }
+            SyntaxKind::Whitespace => {
+                let newlines = t.text().chars().filter(|c| *c == '\n').count();
 
-            FoldWhile::Continue(results)
-        })
-        .into_inner();
+                if break_on_newline && newlines > 0 {
+                    break;
+                }
+
+                if newlines > 1 {
+                    push_results(t.clone(), &mut results, &direction);
+                }
+            }
+            // SAFETY: we just filtered out any non-comment and
+            // non-whitespace nodes above, so this should never occur.
+            _ => unreachable!(),
+        }
+        cur = match direction {
+            Direction::Next => t.next_token(),
+            Direction::Prev => t.prev_token(),
+        };
+    }
+
+    // // Remove leading and trailing whitespace from results.
+    // while let Some(t) = results.front() {
+    //     if t.kind() == SyntaxKind::Whitespace {
+    //         results.pop_front();
+    //     } else {
+    //         break;
+    //     }
+    // }
+    // while let Some(t) = results.back() {
+    //     if t.kind() == SyntaxKind::Whitespace {
+    //         results.pop_back();
+    //     } else {
+    //         break;
+    //     }
+    // }
 
     // NOTE: most of the time, this conversion will be O(1). Occassionally
     // it will be O(n). No allocations will ever be done. Thus, the
     // ammortized cost of this is quite cheap.
-    Vec::from(trivia).into_boxed_slice()
+    Vec::from(results).into_boxed_slice()
 }
 
 /// An extension trait for [`SyntaxNode`]s, [`SyntaxToken`]s, and
@@ -873,34 +882,6 @@ pub trait SyntaxExt {
         // allocations.
         results.into_boxed_slice()
     }
-
-    /// Gets all of the substantial preceding trivia for an element.
-    fn preceding_trivia(&self) -> Box<[SyntaxToken]>
-    where
-        Self: Sized,
-    {
-        gather_substantial_trivia(self, Direction::Prev, false)
-    }
-
-    /// Gets all of the substantial succeeding trivia for an element.
-    fn succeeding_trivia(&self) -> Box<[SyntaxToken]>
-    where
-        Self: Sized,
-    {
-        gather_substantial_trivia(self, Direction::Next, false)
-    }
-
-    /// Get any inline comment directly following an element on the
-    /// same line.
-    fn inline_comment(&self) -> Option<SyntaxToken>
-    where
-        Self: Sized,
-    {
-        gather_substantial_trivia(self, Direction::Next, true)
-            // NOTE: at most, there can be one contiguous comment on a line.
-            .first()
-            .cloned()
-    }
 }
 
 impl SyntaxExt for SyntaxNode {
@@ -945,6 +926,57 @@ impl SyntaxExt for SyntaxElement {
     }
 }
 
+/// An extension trait for [`SyntaxToken`]s.
+pub trait SyntaxTokenExt {
+    /// Gets all of the substantial preceding trivia for an element.
+    fn preceding_trivia(&self) -> Box<[SyntaxToken]>
+    where
+        Self: Sized,
+        Self: SyntaxExt;
+
+    /// Gets all of the substantial succeeding trivia for an element.
+    fn succeeding_trivia(&self) -> Box<[SyntaxToken]>
+    where
+        Self: Sized,
+        Self: SyntaxExt;
+
+    /// Get any inline comment directly following an element on the
+    /// same line.
+    fn inline_comment(&self) -> Option<SyntaxToken>
+    where
+        Self: Sized,
+        Self: SyntaxExt;
+}
+
+impl SyntaxTokenExt for SyntaxToken {
+    fn preceding_trivia(&self) -> Box<[SyntaxToken]>
+    where
+        Self: Sized,
+        Self: SyntaxExt,
+    {
+        gather_substantial_trivia(self, Direction::Prev, false)
+    }
+
+    fn succeeding_trivia(&self) -> Box<[SyntaxToken]>
+    where
+        Self: Sized,
+        Self: SyntaxExt,
+    {
+        gather_substantial_trivia(self, Direction::Next, false)
+    }
+
+    fn inline_comment(&self) -> Option<SyntaxToken>
+    where
+        Self: Sized,
+        Self: SyntaxExt,
+    {
+        gather_substantial_trivia(self, Direction::Next, true)
+            // NOTE: at most, there can be one contiguous comment on a line.
+            .first()
+            .cloned()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -975,7 +1007,7 @@ workflow foo {} # This should not be collected.
 
         let workflow = tree.root().last_child().unwrap();
         assert_eq!(workflow.kind(), SyntaxKind::WorkflowDefinitionNode);
-        let trivia = workflow.preceding_trivia();
+        let trivia = workflow.first_token().unwrap().preceding_trivia();
         let mut trivia_iter = trivia.iter();
         assert_eq!(trivia_iter.next().unwrap().text(), "\n\n");
         assert_eq!(trivia_iter.next().unwrap().text(), "# Some");
@@ -985,7 +1017,10 @@ workflow foo {} # This should not be collected.
         assert_eq!(trivia_iter.next().unwrap().text(), "\n    \n");
         assert_eq!(trivia_iter.next().unwrap().text(), "# Others are short");
         assert_eq!(trivia_iter.next().unwrap().text(), "\n\n");
-        assert_eq!(trivia_iter.next().unwrap().text(), "#     and, yet    another");
+        assert_eq!(
+            trivia_iter.next().unwrap().text(),
+            "#     and, yet    another"
+        );
         assert!(trivia_iter.next().is_none());
     }
 
@@ -1007,11 +1042,17 @@ workflow foo {} # Here is a comment that should be collected.
 
         let workflow = tree.root().last_child().unwrap();
         assert_eq!(workflow.kind(), SyntaxKind::WorkflowDefinitionNode);
-        let trivia = workflow.succeeding_trivia();
+        let trivia = workflow.last_token().unwrap().succeeding_trivia();
         let mut trivia_iter = trivia.iter();
-        assert_eq!(trivia_iter.next().unwrap().text(), "# Here is a comment that should be collected.");
+        assert_eq!(
+            trivia_iter.next().unwrap().text(),
+            "# Here is a comment that should be collected."
+        );
         assert_eq!(trivia_iter.next().unwrap().text(), "\n\n");
-        assert_eq!(trivia_iter.next().unwrap().text(), "# This comment should be included too.");
+        assert_eq!(
+            trivia_iter.next().unwrap().text(),
+            "# This comment should be included too."
+        );
         assert!(trivia_iter.next().is_none());
     }
 
@@ -1033,7 +1074,10 @@ workflow foo {} # Here is a comment that should be collected.
 
         let workflow = tree.root().last_child().unwrap();
         assert_eq!(workflow.kind(), SyntaxKind::WorkflowDefinitionNode);
-        let comment = workflow.inline_comment().unwrap();
-        assert_eq!(comment.text(), "# Here is a comment that should be collected.");
+        let comment = workflow.last_token().unwrap().inline_comment().unwrap();
+        assert_eq!(
+            comment.text(),
+            "# Here is a comment that should be collected."
+        );
     }
 }

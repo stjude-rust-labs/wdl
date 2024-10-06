@@ -199,25 +199,34 @@ mod tests {
     #[test]
     fn smoke() {
         let (document, diagnostics) = Document::parse(
-            "version 1.2
+            "## WDL
+version 1.2  # This is a comment attached to the version.
 
-# This is a comment attached to the task.
+# This is a comment attached to the task keyword.
 task foo # This is an inline comment on the task ident.
 {
 
-} # This is an inline comment on the task.
+} # This is an inline comment on the task close brace.
 
-# This is a comment attached to the workflow.
+# This is a comment attached to the workflow keyword.
 workflow bar # This is an inline comment on the workflow ident.
 {
-  # This is attached to the call.
+  # This is attached to the call keyword.
   call foo {}
-} # This is an inline comment on the workflow.",
+} # This is an inline comment on the workflow close brace.",
         );
 
         assert!(diagnostics.is_empty());
         let document = Node::Ast(document.ast().into_v1().unwrap()).into_format_element();
-        let stream = Formatter::default().to_stream(&document).to_string();
-        println!("{stream}");
+        let formatter = Formatter::default();
+        let result = formatter.format(&document);
+        match result {
+            Ok(s) => {
+                print!("{}", s);
+            }
+            Err(err) => {
+                panic!("failed to format document: {}", err);
+            }
+        }
     }
 }

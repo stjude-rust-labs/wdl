@@ -1,10 +1,21 @@
 //! Tokens emitted during the formatting of particular elements.
 
-use wdl_ast::SyntaxExt;
 use wdl_ast::SyntaxKind;
+use wdl_ast::SyntaxTokenExt;
 
 use crate::Token;
 use crate::TokenStream;
+
+/// The kind of comment.
+#[derive(Debug, Eq, PartialEq)]
+pub enum CommentKind {
+    /// A comment on it's own line, indented to the same level as the code
+    /// following it.
+    Preceding,
+
+    /// A comment on the same line as the code preceding it.
+    Inline,
+}
 
 /// A token that can be written by elements.
 ///
@@ -16,11 +27,26 @@ use crate::TokenStream;
 /// expected to write [`PostToken`](super::PostToken)s directly).
 #[derive(Debug, Eq, PartialEq)]
 pub enum PreToken {
-    /// A section spacer.
-    SectionSpacer,
+    /// The end of a section.
+    BlankLine,
 
-    /// Includes text literally in the output.
+    /// The end of a line.
+    LineEnd,
+
+    /// The end of a word.
+    WordEnd,
+
+    /// The start of an indented block.
+    IndentStart,
+
+    /// The end of an indented block.
+    IndentEnd,
+
+    /// Literal text.
     Literal(String, SyntaxKind),
+
+    /// A comment.
+    Comment(String, CommentKind),
 }
 
 impl PreToken {
@@ -28,23 +54,45 @@ impl PreToken {
     /// [`PreToken::Literal`].
     pub fn kind(&self) -> Option<&SyntaxKind> {
         match self {
+            PreToken::BlankLine => None,
+            PreToken::LineEnd => None,
+            PreToken::WordEnd => None,
+            PreToken::IndentStart => None,
+            PreToken::IndentEnd => None,
             PreToken::Literal(_, kind) => Some(kind),
-            _ => None,
+            PreToken::Comment(..) => None,
         }
     }
 }
 
 /// The line length to use when displaying pretokens.
-const DISPLAY_LINE_LENGTH: usize = 88;
+const DISPLAY_LINE_LENGTH: usize = 90;
 
 impl std::fmt::Display for PreToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            PreToken::SectionSpacer => write!(f, "{}<SPACER>", " ".repeat(DISPLAY_LINE_LENGTH)),
+            PreToken::BlankLine => write!(f, "{}<BlankLine>", " ".repeat(DISPLAY_LINE_LENGTH)),
+            PreToken::LineEnd => write!(f, "<EOL>"),
+            PreToken::WordEnd => write!(f, "<WordEnd>"),
+            PreToken::IndentStart => write!(f, "<IndentStart>"),
+            PreToken::IndentEnd => write!(f, "<IndentEnd>"),
             PreToken::Literal(value, kind) => {
                 write!(
                     f,
                     "{:width$}<Literal@{:?}>",
+                    value,
+                    kind,
+                    width = DISPLAY_LINE_LENGTH
+                )
+            }
+            PreToken::Comment(value, kind) => {
+                let kind = match kind {
+                    CommentKind::Preceding => "Preceding",
+                    CommentKind::Inline => "Inline",
+                };
+                write!(
+                    f,
+                    "{:width$}<Comment@{:?}>",
                     value,
                     kind,
                     width = DISPLAY_LINE_LENGTH
@@ -57,9 +105,35 @@ impl std::fmt::Display for PreToken {
 impl Token for PreToken {}
 
 impl TokenStream<PreToken> {
-    /// Inserts an element spacer to the stream.
-    pub fn section_spacer(&mut self) {
-        self.0.push(PreToken::SectionSpacer);
+    /// Inserts a blank line token to the stream if the stream does not already
+    /// end with a blank line. Multiple blank lines are not allowed.
+    pub fn blank_line(&mut self) {
+        self.trim_end(&PreToken::BlankLine);
+        self.0.push(PreToken::BlankLine);
+    }
+
+    /// Inserts an end of line token to the stream if the stream does not
+    /// already end with an end of line token.
+    pub fn end_line(&mut self) {
+        self.trim_end(&PreToken::LineEnd);
+        self.0.push(PreToken::LineEnd);
+    }
+
+    /// Inserts a word end token to the stream if the stream does not already
+    /// end with a word end token.
+    pub fn end_word(&mut self) {
+        self.trim_end(&PreToken::WordEnd);
+        self.0.push(PreToken::WordEnd);
+    }
+
+    /// Inserts an indent start token to the stream.
+    pub fn increment_indent(&mut self) {
+        self.0.push(PreToken::IndentStart);
+    }
+
+    /// Inserts an indent end token to the stream.
+    pub fn decrement_indent(&mut self) {
+        self.0.push(PreToken::IndentEnd);
     }
 
     /// Pushes an AST token into the stream.
@@ -74,21 +148,22 @@ impl TokenStream<PreToken> {
         if !kind.is_trivia() {
             let preceding_trivia = syntax.preceding_trivia();
             for token in preceding_trivia {
-                let trivia = match token.kind() {
-                    SyntaxKind::Whitespace => {
-                        PreToken::Literal(String::from("\n"), SyntaxKind::Whitespace)
-                    }
+                match token.kind() {
+                    SyntaxKind::Whitespace => self.blank_line(),
                     SyntaxKind::Comment => {
-                        PreToken::Literal(token.text().to_owned(), SyntaxKind::Comment)
+                        let comment = PreToken::Comment(
+                            token.text().trim_end().to_owned(),
+                            CommentKind::Preceding,
+                        );
+                        self.0.push(comment);
                     }
                     _ => unreachable!("unexpected trivia: {:?}", token),
                 };
-                self.0.push(trivia);
             }
             if let Some(token) = syntax.inline_comment() {
-                inline_comment = Some(PreToken::Literal(
-                    token.text().to_owned(),
-                    SyntaxKind::Comment,
+                inline_comment = Some(PreToken::Comment(
+                    token.text().trim_end().to_owned(),
+                    CommentKind::Inline,
                 ));
             }
         }

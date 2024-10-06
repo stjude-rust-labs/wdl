@@ -17,20 +17,32 @@ pub fn format_task_definition(element: &FormatElement, stream: &mut TokenStream<
         (&keyword).write(stream);
     }
 
+    stream.end_word();
+
     if let Some(mut idents) = children.remove(&SyntaxKind::Ident) {
-        let idents = exactly_one!(idents, "idents");
-        (&idents).write(stream);
+        let ident = exactly_one!(idents, "idents");
+        (&ident).write(stream);
     }
+
+    stream.end_word();
 
     if let Some(mut braces) = children.remove(&SyntaxKind::OpenBrace) {
         let brace = exactly_one!(braces, "open braces");
         (&brace).write(stream);
     }
 
+    stream.end_line();
+    stream.increment_indent();
+
+    // TODO: Implement task body formatting.
+    stream.decrement_indent();
+
     if let Some(mut braces) = children.remove(&SyntaxKind::CloseBrace) {
         let brace = exactly_one!(braces, "closed braces");
         (&brace).write(stream);
     }
+
+    stream.end_line();
 
     if !children.is_empty() {
         todo!(

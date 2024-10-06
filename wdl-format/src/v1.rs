@@ -22,19 +22,19 @@ pub fn format_ast(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
         (&version).write(stream);
     }
 
-    stream.section_spacer();
+    stream.blank_line();
 
     if let Some(tasks) = children.remove(&SyntaxKind::TaskDefinitionNode) {
         for task in tasks {
             (&task).write(stream);
-            stream.section_spacer();
+            stream.blank_line();
         }
     }
 
     if let Some(workflows) = children.remove(&SyntaxKind::WorkflowDefinitionNode) {
         for workflow in workflows {
             (&workflow).write(stream);
-            stream.section_spacer();
+            stream.blank_line();
         }
     }
 
@@ -52,10 +52,14 @@ pub fn format_version_statement(element: &FormatElement, stream: &mut TokenStrea
         (&keyword).write(stream);
     }
 
+    stream.end_word();
+
     if let Some(mut versions) = children.remove(&SyntaxKind::Version) {
         let version = exactly_one!(versions, "versions");
         (&version).write(stream);
     }
+
+    stream.end_line();
 
     if !children.is_empty() {
         todo!(
