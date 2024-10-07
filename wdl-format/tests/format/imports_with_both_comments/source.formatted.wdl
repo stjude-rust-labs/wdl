@@ -1,7 +1,5 @@
 version 1.1
 
-# this comment belongs to fileB
-import "fileB.wdl" as foo  # also fileB
 # fileA 1.1
 import  # fileA 1.2
 # fileA 2.1
@@ -19,6 +17,8 @@ qux  # fileA 6.2
 as  # fileA 7.2
 # fileA 8.1
 Qux  # fileA 8.2
+# this comment belongs to fileB
+import "fileB.wdl" as foo  # also fileB
 # this comment belongs to fileC
 import "fileC.wdl"  # also fileC
 

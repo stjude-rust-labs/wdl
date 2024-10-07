@@ -1,5 +1,6 @@
 //! Formatting of WDL v1.x elements.
 
+use wdl_ast::AstToken;
 use wdl_ast::SyntaxKind;
 
 pub mod import;
@@ -10,45 +11,54 @@ use crate::PreToken;
 use crate::TokenStream;
 use crate::Writable as _;
 use crate::element::FormatElement;
-use crate::exactly_one;
 
 /// Formats an [`Ast`](wdl_ast::Ast).
 pub fn format_ast(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
-    let mut children = element.children_by_kind();
+    let mut children = element.children().expect("AST children");
 
-    if let Some(mut versions) = children.remove(&SyntaxKind::VersionStatementNode) {
-        let version = exactly_one!(versions, "version statements");
+    let version_statement = children.next().expect("version statement");
+    assert!(version_statement.element().kind() == SyntaxKind::VersionStatementNode);
+    (&version_statement).write(stream);
 
-        // TODO(clay): improve this by removing the reference.
-        (&version).write(stream);
+    stream.blank_line();
+
+    let mut imports = Vec::new();
+    let mut remainder = Vec::new();
+
+    for child in children {
+        match child.element().kind() {
+            SyntaxKind::ImportStatementNode => imports.push(child),
+            _ => remainder.push(child),
+        }
+    }
+
+    imports.sort_by(|a, b| {
+        let a = a
+            .element()
+            .as_node()
+            .expect("import statement node")
+            .as_import_statement()
+            .expect("import statement");
+        let b = b
+            .element()
+            .as_node()
+            .expect("import statement node")
+            .as_import_statement()
+            .expect("import statement");
+        let a_uri = a.uri().text().expect("import uri");
+        let b_uri = b.uri().text().expect("import uri");
+        a_uri.as_str().cmp(b_uri.as_str())
+    });
+
+    for import in imports {
+        (&import).write(stream);
     }
 
     stream.blank_line();
 
-    if let Some(imports) = children.remove(&SyntaxKind::ImportStatementNode) {
-        for import in imports {
-            (&import).write(stream);
-        }
-    }
-
-    stream.blank_line();
-
-    if let Some(tasks) = children.remove(&SyntaxKind::TaskDefinitionNode) {
-        for task in tasks {
-            (&task).write(stream);
-            stream.blank_line();
-        }
-    }
-
-    if let Some(workflows) = children.remove(&SyntaxKind::WorkflowDefinitionNode) {
-        for workflow in workflows {
-            (&workflow).write(stream);
-            stream.blank_line();
-        }
-    }
-
-    if !children.is_empty() {
-        todo!("unhandled children for AST: {:#?}", children.keys());
+    for child in remainder {
+        (&child).write(stream);
+        stream.blank_line();
     }
 }
 
