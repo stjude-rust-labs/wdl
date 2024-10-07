@@ -221,10 +221,7 @@ impl DiagnosticsConfig {
     /// Gets the excepted set of diagnostics based on any `#@ except` comments
     /// that precede the given syntax node.
     pub fn excepted_for_node(mut self, node: &SyntaxNode) -> Self {
-        let exceptions = node
-            .parent()
-            .expect("token should have parent")
-            .rule_exceptions();
+        let exceptions = node.rule_exceptions();
 
         if exceptions.contains(UNUSED_IMPORT_RULE_ID) {
             self.unused_import = None;
