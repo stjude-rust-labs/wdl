@@ -67,3 +67,35 @@ impl<T: Token> IntoIterator for TokenStream<T> {
         self.0.into_iter()
     }
 }
+
+/// The kind of comment.
+#[derive(Debug, Eq, PartialEq)]
+pub enum Comment {
+    /// A comment on it's own line, indented to the same level as the code
+    /// following it.
+    Preceding(String),
+
+    /// A comment on the same line as the code preceding it.
+    Inline(String),
+}
+
+/// Trivia.
+#[derive(Debug, Eq, PartialEq)]
+pub enum Trivia {
+    /// A blank line. This may be ignored by the postprocessor.
+    BlankLine,
+    /// A comment.
+    Comment(Comment),
+}
+
+/// Whether blank lines are allowed in the current context.
+#[derive(Eq, PartialEq, Default, Debug, Clone, Copy)]
+pub enum BlankLinesAllowed {
+    /// Blank lines are allowed between comments.
+    #[default]
+    BetweenComments,
+    /// Blank lines are always allowed.
+    Yes,
+    /// Blank lines are not allowed.
+    No,
+}

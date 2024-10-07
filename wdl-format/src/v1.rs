@@ -2,6 +2,7 @@
 
 use wdl_ast::SyntaxKind;
 
+pub mod import;
 pub mod task;
 pub mod workflow;
 
@@ -20,6 +21,14 @@ pub fn format_ast(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
 
         // TODO(clay): improve this by removing the reference.
         (&version).write(stream);
+    }
+
+    stream.blank_line();
+
+    if let Some(imports) = children.remove(&SyntaxKind::ImportStatementNode) {
+        for import in imports {
+            (&import).write(stream);
+        }
     }
 
     stream.blank_line();

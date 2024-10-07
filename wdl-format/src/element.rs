@@ -86,24 +86,15 @@ impl AstElementFormatExt for Element {
 /// Collates the children of a particular node.
 fn collate(node: &Node) -> Option<NonEmpty<Box<FormatElement>>> {
     let mut results = Vec::new();
-    let mut stream = node
-        .syntax()
-        .children_with_tokens()
-        .filter_map(|syntax| {
-            if syntax.kind().is_trivia() {
-                None
-            } else {
-                Some(Element::cast(syntax))
-            }
-        })
-        .peekable();
+    let stream = node.syntax().children_with_tokens().filter_map(|syntax| {
+        if syntax.kind().is_trivia() {
+            None
+        } else {
+            Some(Element::cast(syntax))
+        }
+    });
 
-    while stream.peek().is_some() {
-        let element = match stream.next() {
-            Some(node) => node,
-            None => break,
-        };
-
+    for element in stream {
         let children = match element {
             Element::Node(ref node) => collate(node),
             Element::Token(_) => None,

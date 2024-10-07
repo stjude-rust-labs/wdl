@@ -3,19 +3,11 @@
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxTokenExt;
 
+use crate::Comment;
 use crate::Token;
 use crate::TokenStream;
-
-/// The kind of comment.
-#[derive(Debug, Eq, PartialEq)]
-pub enum CommentKind {
-    /// A comment on it's own line, indented to the same level as the code
-    /// following it.
-    Preceding,
-
-    /// A comment on the same line as the code preceding it.
-    Inline,
-}
+use crate::Trivia;
+use crate::BlankLinesAllowed;
 
 /// A token that can be written by elements.
 ///
@@ -27,7 +19,7 @@ pub enum CommentKind {
 /// expected to write [`PostToken`](super::PostToken)s directly).
 #[derive(Debug, Eq, PartialEq)]
 pub enum PreToken {
-    /// The end of a section.
+    /// A blank line.
     BlankLine,
 
     /// The end of a line.
@@ -42,27 +34,14 @@ pub enum PreToken {
     /// The end of an indented block.
     IndentEnd,
 
+    /// The context for blank lines.
+    BlankLinesContext(BlankLinesAllowed),
+
     /// Literal text.
     Literal(String, SyntaxKind),
 
-    /// A comment.
-    Comment(String, CommentKind),
-}
-
-impl PreToken {
-    /// Gets the [`SyntaxKind`] of the token if the token is a
-    /// [`PreToken::Literal`].
-    pub fn kind(&self) -> Option<&SyntaxKind> {
-        match self {
-            PreToken::BlankLine => None,
-            PreToken::LineEnd => None,
-            PreToken::WordEnd => None,
-            PreToken::IndentStart => None,
-            PreToken::IndentEnd => None,
-            PreToken::Literal(_, kind) => Some(kind),
-            PreToken::Comment(..) => None,
-        }
-    }
+    /// Trivia.
+    Trivia(Trivia),
 }
 
 /// The line length to use when displaying pretokens.
@@ -76,6 +55,9 @@ impl std::fmt::Display for PreToken {
             PreToken::WordEnd => write!(f, "<WordEnd>"),
             PreToken::IndentStart => write!(f, "<IndentStart>"),
             PreToken::IndentEnd => write!(f, "<IndentEnd>"),
+            PreToken::BlankLinesContext(context) => {
+                write!(f, "<BlankLinesContext@{:?}>", context)
+            }
             PreToken::Literal(value, kind) => {
                 write!(
                     f,
@@ -85,19 +67,29 @@ impl std::fmt::Display for PreToken {
                     width = DISPLAY_LINE_LENGTH
                 )
             }
-            PreToken::Comment(value, kind) => {
-                let kind = match kind {
-                    CommentKind::Preceding => "Preceding",
-                    CommentKind::Inline => "Inline",
-                };
-                write!(
-                    f,
-                    "{:width$}<Comment@{:?}>",
-                    value,
-                    kind,
-                    width = DISPLAY_LINE_LENGTH
-                )
-            }
+            PreToken::Trivia(trivia) => match trivia {
+                Trivia::BlankLine => {
+                    write!(f, "{}<OptionalBlankLine>", " ".repeat(DISPLAY_LINE_LENGTH))
+                }
+                Trivia::Comment(comment) => match comment {
+                    Comment::Preceding(value) => {
+                        write!(
+                            f,
+                            "{:width$}<Comment@Preceding>",
+                            value,
+                            width = DISPLAY_LINE_LENGTH
+                        )
+                    }
+                    Comment::Inline(value) => {
+                        write!(
+                            f,
+                            "{:width$}<Comment@Inline>",
+                            value,
+                            width = DISPLAY_LINE_LENGTH
+                        )
+                    }
+                },
+            },
         }
     }
 }
@@ -106,16 +98,19 @@ impl Token for PreToken {}
 
 impl TokenStream<PreToken> {
     /// Inserts a blank line token to the stream if the stream does not already
-    /// end with a blank line. Multiple blank lines are not allowed.
+    /// end with a blank line. This will replace any [`Trivia::BlankLine`]
+    /// tokens with [`PreToken::BlankLine`].
     pub fn blank_line(&mut self) {
-        self.trim_end(&PreToken::BlankLine);
+        self.trim_while(|t| matches!(t, PreToken::BlankLine | PreToken::Trivia(Trivia::BlankLine)));
         self.0.push(PreToken::BlankLine);
     }
 
     /// Inserts an end of line token to the stream if the stream does not
     /// already end with an end of line token.
+    ///
+    /// This will also trim any trailing [`PreToken::WordEnd`] tokens.
     pub fn end_line(&mut self) {
-        self.trim_end(&PreToken::LineEnd);
+        self.trim_while(|t| matches!(t, PreToken::WordEnd | PreToken::LineEnd));
         self.0.push(PreToken::LineEnd);
     }
 
@@ -136,6 +131,21 @@ impl TokenStream<PreToken> {
         self.0.push(PreToken::IndentEnd);
     }
 
+    /// Inserts a blank lines allowed context change.
+    pub fn blank_lines_allowed(&mut self) {
+        self.0.push(PreToken::BlankLinesContext(BlankLinesAllowed::Yes));
+    }
+
+    /// Inserts a blank lines disallowed context change.
+    pub fn blank_lines_disallowed(&mut self) {
+        self.0.push(PreToken::BlankLinesContext(BlankLinesAllowed::No));
+    }
+
+    /// Inserts a blank lines allowed between comments context change.
+    pub fn blank_lines_allowed_between_comments(&mut self) {
+        self.0.push(PreToken::BlankLinesContext(BlankLinesAllowed::BetweenComments));
+    }
+
     /// Pushes an AST token into the stream.
     ///
     /// This will also push any preceding or inline trivia into the stream.
@@ -149,23 +159,29 @@ impl TokenStream<PreToken> {
             let preceding_trivia = syntax.preceding_trivia();
             for token in preceding_trivia {
                 match token.kind() {
-                    SyntaxKind::Whitespace => self.blank_line(),
+                    SyntaxKind::Whitespace => {
+                        if !self.0.last().map_or(false, |t| {
+                            matches!(t, PreToken::BlankLine | PreToken::Trivia(Trivia::BlankLine))
+                        }) {
+                            self.0.push(PreToken::Trivia(Trivia::BlankLine));
+                        }
+                    }
                     SyntaxKind::Comment => {
-                        let comment = PreToken::Comment(
+                        let comment = PreToken::Trivia(Trivia::Comment(Comment::Preceding(
                             token.text().trim_end().to_owned(),
-                            CommentKind::Preceding,
-                        );
+                        )));
                         self.0.push(comment);
                     }
                     _ => unreachable!("unexpected trivia: {:?}", token),
                 };
             }
             if let Some(token) = syntax.inline_comment() {
-                inline_comment = Some(PreToken::Comment(
+                inline_comment = Some(PreToken::Trivia(Trivia::Comment(Comment::Inline(
                     token.text().trim_end().to_owned(),
-                    CommentKind::Inline,
-                ));
+                ))));
             }
+        } else {
+            unreachable!("unexpected trivia: {:?}", syntax);
         }
         let token = PreToken::Literal(syntax.text().to_owned(), kind);
         self.0.push(token);

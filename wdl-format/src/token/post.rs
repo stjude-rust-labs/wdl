@@ -5,19 +5,16 @@
 
 use wdl_ast::SyntaxKind;
 
-use crate::CommentKind;
+use crate::Comment;
 use crate::NEWLINE;
 use crate::PreToken;
 use crate::SPACE;
 use crate::Token;
 use crate::TokenStream;
+use crate::Trivia;
+use crate::BlankLinesAllowed;
 
 /// A postprocessed token.
-///
-/// Note that this will transformed into a [`TokenStream`](super::TokenStream)
-/// of [`PostToken`](super::PostToken)s by a
-/// [`Postprocessor`](super::Postprocessor) (authors of elements are never
-/// expected to write [`PostToken`](super::PostToken)s directly).
 #[derive(Eq, PartialEq)]
 pub enum PostToken {
     /// A space.
@@ -76,6 +73,9 @@ pub struct Postprocessor {
 
     /// The current indentation level.
     indent_level: usize,
+
+    /// Whether blank lines are allowed in the current context.
+    blank_lines_allowed: BlankLinesAllowed,
 }
 
 impl Postprocessor {
@@ -83,12 +83,12 @@ impl Postprocessor {
     pub fn run(&mut self, input: TokenStream<PreToken>) -> TokenStream<PostToken> {
         let mut output = TokenStream::<PostToken>::default();
 
-        for token in input {
-            self.step(token, &mut output)
+        let mut stream = input.iter().peekable();
+        while let Some(token) = stream.next() {
+            self.step(token, stream.peek().cloned(), &mut output)
         }
 
         self.trim_whitespace(&mut output);
-        output.push(PostToken::Newline);
         output.push(PostToken::Newline);
 
         output
@@ -96,9 +96,16 @@ impl Postprocessor {
 
     /// Takes a step of a [`PreToken`] stream and processes the appropriate
     /// [`PostToken`]s.
-    pub fn step(&mut self, token: PreToken, stream: &mut TokenStream<PostToken>) {
+    pub fn step(
+        &mut self,
+        token: &PreToken,
+        _next: Option<&PreToken>,
+        stream: &mut TokenStream<PostToken>,
+    ) {
+        dbg!(token);
         match token {
             PreToken::BlankLine => {
+                assert!(self.blank_lines_allowed != BlankLinesAllowed::No);
                 self.trim_whitespace(stream);
                 stream.push(PostToken::Newline);
                 stream.push(PostToken::Newline);
@@ -124,27 +131,39 @@ impl Postprocessor {
                 self.indent_level = self.indent_level.saturating_sub(1);
                 self.end_line(stream);
             }
+            PreToken::BlankLinesContext(context) => {
+                self.blank_lines_allowed = *context;
+            }
             PreToken::Literal(value, kind) => {
-                assert!(kind != SyntaxKind::Comment);
-                stream.push(PostToken::Literal(value));
+                assert!(*kind != SyntaxKind::Comment);
+                stream.push(PostToken::Literal(value.to_owned()));
                 self.position = LinePosition::MiddleOfLine;
             }
-            PreToken::Comment(value, kind) => {
-                match kind {
-                    CommentKind::Inline => {
-                        assert!(self.position == LinePosition::MiddleOfLine);
-                        stream.trim_end(&PostToken::Space);
-                        stream.push(PostToken::Space);
-                        stream.push(PostToken::Space);
-                    }
-                    CommentKind::Preceding => {
-                        self.end_line(stream);
+            PreToken::Trivia(trivia) => match trivia {
+                Trivia::BlankLine => {
+                    if self.blank_lines_allowed == BlankLinesAllowed::Yes {
+                        self.trim_whitespace(stream);
+                        stream.push(PostToken::Newline);
+                        stream.push(PostToken::Newline);
                     }
                 }
-                stream.push(PostToken::Literal(value));
-                self.position = LinePosition::MiddleOfLine;
-                self.end_line(stream);
-            }
+                Trivia::Comment(comment) => match comment {
+                    Comment::Preceding(value) => {
+                        self.end_line(stream);
+                        stream.push(PostToken::Literal(value.to_owned()));
+                        self.position = LinePosition::MiddleOfLine;
+                        self.end_line(stream);
+                    }
+                    Comment::Inline(value) => {
+                        assert!(self.position == LinePosition::MiddleOfLine);
+                        self.trim_last_line(stream);
+                        stream.push(PostToken::Space);
+                        stream.push(PostToken::Space);
+                        stream.push(PostToken::Literal(value.to_owned()));
+                        self.end_line(stream);
+                    }
+                },
+            },
         }
     }
 
