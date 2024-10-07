@@ -4,10 +4,10 @@ use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxTokenExt;
 
 use crate::Comment;
+use crate::LineSpacingPolicy;
 use crate::Token;
 use crate::TokenStream;
 use crate::Trivia;
-use crate::BlankLinesAllowed;
 
 /// A token that can be written by elements.
 ///
@@ -35,7 +35,7 @@ pub enum PreToken {
     IndentEnd,
 
     /// The context for blank lines.
-    BlankLinesContext(BlankLinesAllowed),
+    BlankLinesContext(LineSpacingPolicy),
 
     /// Literal text.
     Literal(String, SyntaxKind),
@@ -133,17 +133,50 @@ impl TokenStream<PreToken> {
 
     /// Inserts a blank lines allowed context change.
     pub fn blank_lines_allowed(&mut self) {
-        self.0.push(PreToken::BlankLinesContext(BlankLinesAllowed::Yes));
-    }
-
-    /// Inserts a blank lines disallowed context change.
-    pub fn blank_lines_disallowed(&mut self) {
-        self.0.push(PreToken::BlankLinesContext(BlankLinesAllowed::No));
+        self.0
+            .push(PreToken::BlankLinesContext(LineSpacingPolicy::Yes));
     }
 
     /// Inserts a blank lines allowed between comments context change.
     pub fn blank_lines_allowed_between_comments(&mut self) {
-        self.0.push(PreToken::BlankLinesContext(BlankLinesAllowed::BetweenComments));
+        self.0.push(PreToken::BlankLinesContext(
+            LineSpacingPolicy::BetweenComments,
+        ));
+    }
+
+    /// Inserts any preceding trivia into the stream.
+    fn push_preceding_trivia(&mut self, token: &wdl_ast::Token) {
+        assert!(!token.syntax().kind().is_trivia());
+        let preceding_trivia = token.syntax().preceding_trivia();
+        for token in preceding_trivia {
+            match token.kind() {
+                SyntaxKind::Whitespace => {
+                    if !self.0.last().map_or(false, |t| {
+                        matches!(t, PreToken::BlankLine | PreToken::Trivia(Trivia::BlankLine))
+                    }) {
+                        self.0.push(PreToken::Trivia(Trivia::BlankLine));
+                    }
+                }
+                SyntaxKind::Comment => {
+                    let comment = PreToken::Trivia(Trivia::Comment(Comment::Preceding(
+                        token.text().trim_end().to_owned(),
+                    )));
+                    self.0.push(comment);
+                }
+                _ => unreachable!("unexpected trivia: {:?}", token),
+            };
+        }
+    }
+
+    /// Inserts any inline trivia into the stream.
+    fn push_inline_trivia(&mut self, token: &wdl_ast::Token) {
+        assert!(!token.syntax().kind().is_trivia());
+        if let Some(token) = token.syntax().inline_comment() {
+            let inline_comment = PreToken::Trivia(Trivia::Comment(Comment::Inline(
+                token.text().trim_end().to_owned(),
+            )));
+            self.0.push(inline_comment);
+        }
     }
 
     /// Pushes an AST token into the stream.
@@ -152,47 +185,21 @@ impl TokenStream<PreToken> {
     /// Any token may have preceding or inline trivia, unless that token is
     /// itself trivia (i.e. trivia cannot have trivia).
     pub fn push_ast_token(&mut self, token: &wdl_ast::Token) {
-        let syntax = token.syntax();
-        let kind = syntax.kind();
-        let mut inline_comment = None;
-        if !kind.is_trivia() {
-            let preceding_trivia = syntax.preceding_trivia();
-            for token in preceding_trivia {
-                match token.kind() {
-                    SyntaxKind::Whitespace => {
-                        if !self.0.last().map_or(false, |t| {
-                            matches!(t, PreToken::BlankLine | PreToken::Trivia(Trivia::BlankLine))
-                        }) {
-                            self.0.push(PreToken::Trivia(Trivia::BlankLine));
-                        }
-                    }
-                    SyntaxKind::Comment => {
-                        let comment = PreToken::Trivia(Trivia::Comment(Comment::Preceding(
-                            token.text().trim_end().to_owned(),
-                        )));
-                        self.0.push(comment);
-                    }
-                    _ => unreachable!("unexpected trivia: {:?}", token),
-                };
-            }
-            if let Some(token) = syntax.inline_comment() {
-                inline_comment = Some(PreToken::Trivia(Trivia::Comment(Comment::Inline(
-                    token.text().trim_end().to_owned(),
-                ))));
-            }
-        } else {
-            unreachable!("unexpected trivia: {:?}", syntax);
-        }
-        let token = PreToken::Literal(syntax.text().to_owned(), kind);
-        self.0.push(token);
-
-        if let Some(inline_comment) = inline_comment {
-            self.0.push(inline_comment);
-        }
+        self.push_preceding_trivia(token);
+        self.0.push(PreToken::Literal(
+            token.syntax().text().to_owned(),
+            token.syntax().kind(),
+        ));
+        self.push_inline_trivia(token);
     }
 
-    /// Gets an iterator of references to each token in the stream.
-    pub fn iter(&self) -> impl Iterator<Item = &PreToken> {
-        self.0.iter()
+    /// Pushes a literal string into the stream in place of an AST token.
+    /// This will insert any trivia that would have been inserted with the AST
+    /// token.
+    pub fn push_literal_in_place_of_token(&mut self, token: &wdl_ast::Token, replacement: String) {
+        self.push_preceding_trivia(token);
+        self.0
+            .push(PreToken::Literal(replacement, token.syntax().kind()));
+        self.push_inline_trivia(token);
     }
 }

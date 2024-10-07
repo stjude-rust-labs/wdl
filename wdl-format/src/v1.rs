@@ -54,26 +54,26 @@ pub fn format_ast(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
 
 /// Formats a [`VersionStatement`](wdl_ast::VersionStatement).
 pub fn format_version_statement(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
-    let mut children = element.children_by_kind();
-
-    if let Some(mut keywords) = children.remove(&SyntaxKind::VersionKeyword) {
-        let keyword = exactly_one!(keywords, "`version` keywords");
-        (&keyword).write(stream);
+    for child in element.children().expect("version statement children") {
+        (&child).write(stream);
+        stream.end_word();
     }
-
-    stream.end_word();
-
-    if let Some(mut versions) = children.remove(&SyntaxKind::Version) {
-        let version = exactly_one!(versions, "versions");
-        (&version).write(stream);
-    }
-
     stream.end_line();
+}
 
-    if !children.is_empty() {
-        todo!(
-            "unhandled children for version statement: {:#?}",
-            children.keys()
-        );
+/// Formats a [`LiteralString`](wdl_ast::v1::LiteralString).
+pub fn format_literal_string(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    for child in element.children().expect("literal string children") {
+        match child.element().kind() {
+            SyntaxKind::SingleQuote => {
+                stream.push_literal_in_place_of_token(
+                    child.element().as_token().expect("token"),
+                    "\"".to_owned(),
+                );
+            }
+            _ => {
+                (&child).write(stream);
+            }
+        }
     }
 }

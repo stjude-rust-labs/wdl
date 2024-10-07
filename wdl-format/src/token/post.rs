@@ -6,13 +6,13 @@
 use wdl_ast::SyntaxKind;
 
 use crate::Comment;
+use crate::LineSpacingPolicy;
 use crate::NEWLINE;
 use crate::PreToken;
 use crate::SPACE;
 use crate::Token;
 use crate::TokenStream;
 use crate::Trivia;
-use crate::BlankLinesAllowed;
 
 /// A postprocessed token.
 #[derive(Eq, PartialEq)]
@@ -75,7 +75,7 @@ pub struct Postprocessor {
     indent_level: usize,
 
     /// Whether blank lines are allowed in the current context.
-    blank_lines_allowed: BlankLinesAllowed,
+    blank_lines_allowed: LineSpacingPolicy,
 }
 
 impl Postprocessor {
@@ -83,9 +83,9 @@ impl Postprocessor {
     pub fn run(&mut self, input: TokenStream<PreToken>) -> TokenStream<PostToken> {
         let mut output = TokenStream::<PostToken>::default();
 
-        let mut stream = input.iter().peekable();
+        let mut stream = input.into_iter().peekable();
         while let Some(token) = stream.next() {
-            self.step(token, stream.peek().cloned(), &mut output)
+            self.step(token, stream.peek(), &mut output)
         }
 
         self.trim_whitespace(&mut output);
@@ -98,14 +98,12 @@ impl Postprocessor {
     /// [`PostToken`]s.
     pub fn step(
         &mut self,
-        token: &PreToken,
+        token: PreToken,
         _next: Option<&PreToken>,
         stream: &mut TokenStream<PostToken>,
     ) {
-        dbg!(token);
         match token {
             PreToken::BlankLine => {
-                assert!(self.blank_lines_allowed != BlankLinesAllowed::No);
                 self.trim_whitespace(stream);
                 stream.push(PostToken::Newline);
                 stream.push(PostToken::Newline);
@@ -131,20 +129,22 @@ impl Postprocessor {
                 self.indent_level = self.indent_level.saturating_sub(1);
                 self.end_line(stream);
             }
-            PreToken::BlankLinesContext(context) => {
-                self.blank_lines_allowed = *context;
+            PreToken::BlankLinesContext(policy) => {
+                self.blank_lines_allowed = policy;
             }
             PreToken::Literal(value, kind) => {
-                assert!(*kind != SyntaxKind::Comment);
+                assert!(kind != SyntaxKind::Comment);
                 stream.push(PostToken::Literal(value.to_owned()));
                 self.position = LinePosition::MiddleOfLine;
             }
             PreToken::Trivia(trivia) => match trivia {
                 Trivia::BlankLine => {
-                    if self.blank_lines_allowed == BlankLinesAllowed::Yes {
+                    if self.blank_lines_allowed == LineSpacingPolicy::Yes {
                         self.trim_whitespace(stream);
                         stream.push(PostToken::Newline);
                         stream.push(PostToken::Newline);
+                    } else {
+                        todo!("handle line spacing policy")
                     }
                 }
                 Trivia::Comment(comment) => match comment {

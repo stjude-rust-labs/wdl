@@ -88,14 +88,12 @@ pub enum Trivia {
     Comment(Comment),
 }
 
-/// Whether blank lines are allowed in the current context.
+/// Whether optional blank lines are allowed in the current context.
 #[derive(Eq, PartialEq, Default, Debug, Clone, Copy)]
-pub enum BlankLinesAllowed {
+pub enum LineSpacingPolicy {
     /// Blank lines are allowed between comments.
-    #[default]
     BetweenComments,
     /// Blank lines are always allowed.
+    #[default]
     Yes,
-    /// Blank lines are not allowed.
-    No,
 }

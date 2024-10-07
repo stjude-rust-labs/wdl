@@ -14,10 +14,11 @@ use crate::exactly_one;
 pub fn format_workflow_definition(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     let mut children = element.children_by_kind();
 
-    if let Some(mut keywords) = children.remove(&SyntaxKind::WorkflowKeyword) {
-        let keyword = exactly_one!(keywords, "workflow keywords");
-        (&keyword).write(stream);
-    }
+    let mut keywords = children
+        .remove(&SyntaxKind::WorkflowKeyword)
+        .expect("workflow keywords");
+    let keyword = exactly_one!(keywords, "workflow keywords");
+    (&keyword).write(stream);
 
     stream.end_word();
 

@@ -95,7 +95,7 @@ impl Writable for &FormatElement {
                 AstNode::LiteralOutput(_) => todo!(),
                 AstNode::LiteralOutputItem(_) => todo!(),
                 AstNode::LiteralPair(_) => todo!(),
-                AstNode::LiteralString(_) => todo!(),
+                AstNode::LiteralString(_) => v1::format_literal_string(self, stream),
                 AstNode::LiteralStruct(_) => todo!(),
                 AstNode::LiteralStructItem(_) => todo!(),
                 AstNode::LogicalAndExpr(_) => todo!(),
