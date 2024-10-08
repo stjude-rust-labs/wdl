@@ -4,6 +4,7 @@ use wdl_ast::AstToken;
 use wdl_ast::SyntaxKind;
 
 pub mod import;
+pub mod r#struct;
 pub mod task;
 pub mod workflow;
 
@@ -86,4 +87,242 @@ pub fn format_literal_string(element: &FormatElement, stream: &mut TokenStream<P
             }
         }
     }
+}
+
+/// Formats a [`LiteralBoolean`](wdl_ast::v1::LiteralBoolean).
+pub fn format_literal_boolean(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("literal boolean children");
+    let bool = children.next().expect("literal boolean token");
+    (&bool).write(stream);
+    assert!(children.next().is_none());
+}
+
+/// Formats a [`LiteralInteger`](wdl_ast::v1::LiteralInteger).
+pub fn format_literal_integer(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    for child in element.children().expect("literal integer children") {
+        (&child).write(stream);
+    }
+}
+/// Formats a [`LiteralFloat`](wdl_ast::v1::LiteralFloat).
+pub fn format_literal_float(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    for child in element.children().expect("literal float children") {
+        (&child).write(stream);
+    }
+}
+
+/// Formats a [`LiteralNull`](wdl_ast::v1::LiteralNull).
+pub fn format_literal_null(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("literal null children");
+    let null = children.next().expect("literal null token");
+    (&null).write(stream);
+    assert!(children.next().is_none());
+}
+
+/// Formats a [`PrimitiveType`](wdl_ast::v1::PrimitiveType).
+pub fn format_primitive_type(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("primitive type children");
+    let t = children.next().expect("primitive type token");
+    (&t).write(stream);
+    assert!(children.next().is_none());
+}
+
+/// Formats a [`TypeRef`](wdl_ast::v1::TypeRef).
+pub fn format_type_ref(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("type ref children");
+    let t = children.next().expect("type ref type");
+    (&t).write(stream);
+    assert!(children.next().is_none());
+}
+
+/// Formats an [`UnboundDecl`](wdl_ast::v1::UnboundDecl).
+pub fn format_unbound_decl(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    for child in element.children().expect("unbound decl children") {
+        (&child).write(stream);
+        stream.end_word();
+    }
+    stream.end_line();
+}
+
+/// Formats a [`BoundDecl`](wdl_ast::v1::BoundDecl).
+pub fn format_bound_decl(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    for child in element.children().expect("bound decl children") {
+        (&child).write(stream);
+        stream.end_word();
+    }
+    stream.end_line();
+}
+
+/// Formats an [`InputSection`](wdl_ast::v1::InputSection).
+pub fn format_input_section(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("input section children");
+
+    let input_keyword = children.next().expect("input section input keyword");
+    assert!(input_keyword.element().kind() == SyntaxKind::InputKeyword);
+    (&input_keyword).write(stream);
+    stream.end_word();
+
+    let open_brace = children.next().expect("input section open brace");
+    assert!(open_brace.element().kind() == SyntaxKind::OpenBrace);
+    (&open_brace).write(stream);
+    stream.end_line();
+    stream.increment_indent();
+
+    let mut close_brace = None;
+    let inputs = children
+        .filter_map(|child| {
+            if child.element().kind() == SyntaxKind::BoundDeclNode {
+                Some(child)
+            } else {
+                assert!(child.element().kind() == SyntaxKind::CloseBrace);
+                close_brace = Some(child.clone());
+                None
+            }
+        })
+        .collect::<Vec<_>>();
+
+    // TODO: sort inputs
+    for input in inputs {
+        (&input).write(stream);
+    }
+
+    stream.decrement_indent();
+    (&close_brace.expect("input section close brace")).write(stream);
+    stream.end_line();
+}
+
+/// Formats a [`MetadataObject`](wdl_ast::v1::MetadataObject).
+pub fn format_metadata_object(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("metadata object children");
+
+    let open_brace = children.next().expect("metadata object open brace");
+    assert!(open_brace.element().kind() == SyntaxKind::OpenBrace);
+    (&open_brace).write(stream);
+    stream.end_line();
+    stream.increment_indent();
+
+    let mut close_brace = None;
+    let mut commas = Vec::new();
+    let items = children
+        .filter(|child| {
+            if child.element().kind() == SyntaxKind::MetadataObjectItemNode {
+                true
+            } else if child.element().kind() == SyntaxKind::Comma {
+                commas.push(child.to_owned());
+                false
+            } else {
+                assert!(child.element().kind() == SyntaxKind::CloseBrace);
+                close_brace = Some(child.to_owned());
+                false
+            }
+        })
+        .collect::<Vec<_>>();
+
+    let mut commas = commas.iter();
+    for item in items {
+        (&item).write(stream);
+        if let Some(comma) = commas.next() {
+            (&comma).write(stream);
+            stream.end_line();
+        } else {
+            stream.push_literal(",".to_string(), SyntaxKind::Comma);
+            stream.end_line();
+        }
+    }
+}
+
+/// Formats a [`MetadataObjectItem`](wdl_ast::v1::MetadataObjectItem).
+pub fn format_metadata_object_item(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("metadata object item children");
+
+    let key = children.next().expect("metadata object item key");
+    assert!(key.element().kind() == SyntaxKind::Ident);
+    (&key).write(stream);
+
+    let colon = children.next().expect("metadata object item colon");
+    assert!(colon.element().kind() == SyntaxKind::Colon);
+    (&colon).write(stream);
+    stream.end_word();
+
+    let value = children.next().expect("metadata object item value");
+    (&value).write(stream);
+    stream.end_line();
+
+    assert!(children.next().is_none());
+}
+
+/// Formats a [MetadataSection](wdl_ast::v1::MetadataSection).
+pub fn format_metadata_section(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("meta section children");
+
+    let meta_keyword = children.next().expect("meta keyword");
+    assert!(meta_keyword.element().kind() == SyntaxKind::MetaKeyword);
+    (&meta_keyword).write(stream);
+    stream.end_word();
+
+    let open_brace = children.next().expect("metadata section open brace");
+    assert!(open_brace.element().kind() == SyntaxKind::OpenBrace);
+    (&open_brace).write(stream);
+    stream.end_line();
+    stream.increment_indent();
+
+    let mut close_brace = None;
+    let metadata = children
+        .filter_map(|child| {
+            if child.element().kind() == SyntaxKind::MetadataObjectItemNode {
+                Some(child)
+            } else {
+                assert!(child.element().kind() == SyntaxKind::CloseBrace);
+                close_brace = Some(child.clone());
+                None
+            }
+        })
+        .collect::<Vec<_>>();
+
+    for item in metadata {
+        (&item).write(stream);
+    }
+
+    stream.decrement_indent();
+    (&close_brace.expect("metadata section close brace")).write(stream);
+    stream.end_line();
+}
+
+/// Formats a [`ParameterMetadataSection`](wdl_ast::v1::ParameterMetadataSection).
+pub fn format_parameter_metadata_section(
+    element: &FormatElement,
+    stream: &mut TokenStream<PreToken>,
+) {
+    let mut children = element.children().expect("parameter meta section children");
+
+    let parameter_meta_keyword = children.next().expect("parameter meta keyword");
+    assert!(parameter_meta_keyword.element().kind() == SyntaxKind::ParameterMetaKeyword);
+    (&parameter_meta_keyword).write(stream);
+    stream.end_word();
+
+    let open_brace = children.next().expect("parameter metadata section open brace");
+    assert!(open_brace.element().kind() == SyntaxKind::OpenBrace);
+    (&open_brace).write(stream);
+    stream.end_line();
+    stream.increment_indent();
+
+    let mut close_brace = None;
+    let metadata = children
+        .filter_map(|child| {
+            if child.element().kind() == SyntaxKind::MetadataObjectItemNode {
+                Some(child)
+            } else {
+                assert!(child.element().kind() == SyntaxKind::CloseBrace);
+                close_brace = Some(child.clone());
+                None
+            }
+        })
+        .collect::<Vec<_>>();
+
+    for item in metadata {
+        (&item).write(stream);
+    }
+
+    stream.decrement_indent();
+    (&close_brace.expect("parameter metadata section close brace")).write(stream);
+    stream.end_line();
 }

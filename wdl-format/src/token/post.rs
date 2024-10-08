@@ -74,6 +74,9 @@ pub struct Postprocessor {
     /// The current indentation level.
     indent_level: usize,
 
+    /// Whether the current line has been interrupted by trivia.
+    interrupted: bool,
+
     /// Whether blank lines are allowed in the current context.
     blank_lines_allowed: LineSpacingPolicy,
 }
@@ -85,7 +88,7 @@ impl Postprocessor {
 
         let mut stream = input.into_iter().peekable();
         while let Some(token) = stream.next() {
-            self.step(token, stream.peek(), &mut output)
+            self.step(token, stream.peek(), &mut output);
         }
 
         self.trim_whitespace(&mut output);
@@ -99,7 +102,7 @@ impl Postprocessor {
     pub fn step(
         &mut self,
         token: PreToken,
-        _next: Option<&PreToken>,
+        next: Option<&PreToken>,
         stream: &mut TokenStream<PostToken>,
     ) {
         match token {
@@ -109,6 +112,7 @@ impl Postprocessor {
                 stream.push(PostToken::Newline);
             }
             PreToken::LineEnd => {
+                self.interrupted = false;
                 self.end_line(stream);
             }
             PreToken::WordEnd => {
@@ -133,7 +137,19 @@ impl Postprocessor {
                 self.blank_lines_allowed = policy;
             }
             PreToken::Literal(value, kind) => {
-                assert!(kind != SyntaxKind::Comment);
+                assert!(kind != SyntaxKind::Comment && kind != SyntaxKind::Whitespace);
+                if self.interrupted
+                    && matches!(
+                        kind,
+                        SyntaxKind::OpenBrace
+                            | SyntaxKind::OpenBracket
+                            | SyntaxKind::OpenParen
+                            | SyntaxKind::OpenHeredoc
+                    )
+                    && stream.0.last() == Some(&PostToken::Indent)
+                {
+                    stream.0.pop();
+                }
                 stream.push(PostToken::Literal(value.to_owned()));
                 self.position = LinePosition::MiddleOfLine;
             }
@@ -149,6 +165,9 @@ impl Postprocessor {
                 }
                 Trivia::Comment(comment) => match comment {
                     Comment::Preceding(value) => {
+                        if stream.0.last() != Some(&PostToken::Newline) {
+                            self.interrupted = true;
+                        }
                         self.end_line(stream);
                         stream.push(PostToken::Literal(value.to_owned()));
                         self.position = LinePosition::MiddleOfLine;
@@ -156,6 +175,11 @@ impl Postprocessor {
                     }
                     Comment::Inline(value) => {
                         assert!(self.position == LinePosition::MiddleOfLine);
+                        if let Some(next) = next {
+                            if next != &PreToken::LineEnd {
+                                self.interrupted = true;
+                            }
+                        }
                         self.trim_last_line(stream);
                         stream.push(PostToken::Space);
                         stream.push(PostToken::Space);
@@ -201,7 +225,14 @@ impl Postprocessor {
     /// [`LinePosition::StartOfLine`].
     fn indent(&self, stream: &mut TokenStream<PostToken>) {
         assert!(self.position == LinePosition::StartOfLine);
-        for _ in 0..self.indent_level {
+
+        let level = if self.interrupted {
+            self.indent_level + 1
+        } else {
+            self.indent_level
+        };
+
+        for _ in 0..level {
             stream.push(PostToken::Indent);
         }
     }

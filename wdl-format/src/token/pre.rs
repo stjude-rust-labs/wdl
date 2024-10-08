@@ -202,4 +202,10 @@ impl TokenStream<PreToken> {
             .push(PreToken::Literal(replacement, token.syntax().kind()));
         self.push_inline_trivia(token);
     }
+
+    /// Pushes a literal string into the stream.
+    /// This will not insert any trivia.
+    pub fn push_literal(&mut self, value: String, kind: SyntaxKind) {
+        self.0.push(PreToken::Literal(value, kind));
+    }
 }
