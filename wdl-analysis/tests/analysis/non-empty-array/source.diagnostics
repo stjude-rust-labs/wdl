@@ -4,7 +4,7 @@ error: cannot assign an empty array to a non-empty array type
 16 │     Array[Int]+ x = []
    │                 -   ^^ this is an empty array
    │                 │    
-   │                 this expected a non-empty array
+   │                 this expects a non-empty array
 
 error: cannot assign an empty array to a non-empty array type
    ┌─ tests/analysis/non-empty-array/source.wdl:30:31
@@ -12,5 +12,5 @@ error: cannot assign an empty array to a non-empty array type
 30 │     call t as t4 { input: x = ((([]))) }
    │                           -   ^^^^^^^^ this is an empty array
    │                           │    
-   │                           this expected a non-empty array
+   │                           this expects a non-empty array
 

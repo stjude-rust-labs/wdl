@@ -358,7 +358,7 @@ pub fn type_mismatch(
 pub fn non_empty_array_assignment(expected_span: Span, actual_span: Span) -> Diagnostic {
     Diagnostic::error("cannot assign an empty array to a non-empty array type")
         .with_label("this is an empty array", actual_span)
-        .with_label("this expected a non-empty array", expected_span)
+        .with_label("this expects a non-empty array", expected_span)
 }
 
 /// Creates a "call input type mismatch" diagnostic.
