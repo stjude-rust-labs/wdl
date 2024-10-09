@@ -168,7 +168,14 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             .context("failed to write next section")?;
 
         let analyzer = Analyzer::new_with_validator(
-            Default::default(),
+            // Don't bother duplicating analysis warnings for arena mode
+            if args.arena {
+                wdl::analysis::Config {
+                    diagnostics: wdl::analysis::DiagnosticsConfig::except_all(),
+                }
+            } else {
+                Default::default()
+            },
             move |_: (), _, _, _| async move {},
             move || {
                 let mut validator = if !args.arena {

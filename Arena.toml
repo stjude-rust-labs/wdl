@@ -1227,11 +1227,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:362:10: warning[UnusedInput]: unused input `dbSNP_vcf`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L362"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:36:17: warning[SnakeCase]: input name `known_indels_sites_VCFs` is not snake_case"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L36"
 
@@ -1289,36 +1284,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:422:10: note[DisallowedInputName]: declaration identifier starts with 'input'"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L422"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:427:11: warning[UnusedInput]: unused input `ref_alt`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L427"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:428:10: warning[UnusedInput]: unused input `ref_amb`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L428"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:429:10: warning[UnusedInput]: unused input `ref_ann`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L429"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:430:10: warning[UnusedInput]: unused input `ref_bwt`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L430"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:431:10: warning[UnusedInput]: unused input `ref_pac`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L431"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:432:10: warning[UnusedInput]: unused input `ref_sa`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L432"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
@@ -1774,26 +1739,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 document = "stjudecloud/workflows:/data_structures/flag_filter.wdl"
 message = "flag_filter.wdl:119:20: note[ContainerValue]: container URI uses a mutable tag"
 permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/data_structures/flag_filter.wdl/#L119"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/flag_filter.wdl"
-message = "flag_filter.wdl:140:53: warning[UnusedCall]: unused call `validate_include_if_any`"
-permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/data_structures/flag_filter.wdl/#L140"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/flag_filter.wdl"
-message = "flag_filter.wdl:143:53: warning[UnusedCall]: unused call `validate_include_if_all`"
-permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/data_structures/flag_filter.wdl/#L143"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/flag_filter.wdl"
-message = "flag_filter.wdl:146:53: warning[UnusedCall]: unused call `validate_exclude_if_any`"
-permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/data_structures/flag_filter.wdl/#L146"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/flag_filter.wdl"
-message = "flag_filter.wdl:149:53: warning[UnusedCall]: unused call `validate_exclude_if_all`"
-permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/data_structures/flag_filter.wdl/#L149"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/flag_filter.wdl"
@@ -4062,18 +4007,8 @@ permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:130:17: warning[UnusedCall]: unused call `validate_bam`"
-permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/chipseq/chipseq-standard.wdl/#L130"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
 message = "chipseq-standard.wdl:21:13: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/chipseq/chipseq-standard.wdl/#L21"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:76:20: warning[UnusedCall]: unused call `read_length`"
-permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/chipseq/chipseq-standard.wdl/#L76"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
@@ -4164,11 +4099,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
 message = "dnaseq-standard-fastq.wdl:36:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L36"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:49:10: warning[UnusedCall]: unused call `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L49"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
@@ -4271,11 +4201,6 @@ message = "bam-to-fastqs.wdl:11:13: note[TrailingComma]: item missing trailing c
 permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/general/bam-to-fastqs.wdl/#L11"
 
 [[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:28:19: warning[UnusedCall]: unused call `quickcheck`"
-permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/general/bam-to-fastqs.wdl/#L28"
-
-[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
 message = "samtools-merge.wdl:15:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/general/samtools-merge.wdl/#L15"
@@ -4289,11 +4214,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350
 document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
 message = "markdups-post.wdl:25:13: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/qc/markdups-post.wdl/#L25"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:161:15: warning[UnusedCall]: unused call `compression_integrity`"
-permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/qc/quality-check-standard.wdl/#L161"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
@@ -4687,11 +4607,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
-message = "10x-bam-to-fastqs.wdl:34:19: warning[UnusedCall]: unused call `quickcheck`"
-permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L34"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/10x-bam-to-fastqs.wdl"
 message = "10x-bam-to-fastqs.wdl:64:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/scrnaseq/10x-bam-to-fastqs.wdl/#L64"
 
@@ -4709,11 +4624,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
 message = "scrnaseq-standard.wdl:32:5: note[BlankLinesBetweenElements]: missing blank line"
 permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/scrnaseq/scrnaseq-standard.wdl/#L32"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
-message = "scrnaseq-standard.wdl:78:17: warning[UnusedCall]: unused call `validate_bam`"
-permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/scrnaseq/scrnaseq-standard.wdl/#L78"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/scrnaseq/scrnaseq-standard.wdl"
