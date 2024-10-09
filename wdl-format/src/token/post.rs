@@ -107,9 +107,7 @@ impl Postprocessor {
     ) {
         match token {
             PreToken::BlankLine => {
-                self.trim_whitespace(stream);
-                stream.push(PostToken::Newline);
-                stream.push(PostToken::Newline);
+                self.blank_line(stream);
             }
             PreToken::LineEnd => {
                 self.interrupted = false;
@@ -156,16 +154,17 @@ impl Postprocessor {
             PreToken::Trivia(trivia) => match trivia {
                 Trivia::BlankLine => {
                     if self.blank_lines_allowed == LineSpacingPolicy::Yes {
-                        self.trim_whitespace(stream);
-                        stream.push(PostToken::Newline);
-                        stream.push(PostToken::Newline);
+                        self.blank_line(stream);
                     } else {
                         todo!("handle line spacing policy")
                     }
                 }
                 Trivia::Comment(comment) => match comment {
                     Comment::Preceding(value) => {
-                        if stream.0.last() != Some(&PostToken::Newline) {
+                        if !matches!(
+                            stream.0.last(),
+                            Some(&PostToken::Newline) | Some(&PostToken::Indent)
+                        ) {
                             self.interrupted = true;
                         }
                         self.end_line(stream);
@@ -206,7 +205,7 @@ impl Postprocessor {
         stream.trim_while(|token| matches!(token, PostToken::Space | PostToken::Indent));
     }
 
-    /// Ends the current line.
+    /// Ends the current line without resetting the interrupted flag.
     ///
     /// Removes any trailing spaces or indents and adds a newline only if state
     /// is not [`LinePosition::StartOfLine`]. State is then set to
@@ -235,5 +234,14 @@ impl Postprocessor {
         for _ in 0..level {
             stream.push(PostToken::Indent);
         }
+    }
+
+    /// Creates a blank line and then indents.
+    fn blank_line(&mut self, stream: &mut TokenStream<PostToken>) {
+        self.trim_whitespace(stream);
+        stream.push(PostToken::Newline);
+        stream.push(PostToken::Newline);
+        self.position = LinePosition::StartOfLine;
+        self.indent(stream);
     }
 }

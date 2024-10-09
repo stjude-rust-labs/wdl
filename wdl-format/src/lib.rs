@@ -49,43 +49,47 @@ impl Writable for &FormatElement {
     fn write(&self, stream: &mut TokenStream<PreToken>) {
         match self.element() {
             Element::Node(node) => match node {
-                AstNode::AccessExpr(_) => todo!(),
-                AstNode::AdditionExpr(_) => todo!(),
-                AstNode::ArrayType(_) => todo!(),
+                AstNode::AccessExpr(_) => v1::expr::format_access_expr(self, stream),
+                AstNode::AdditionExpr(_) => v1::expr::format_addition_expr(self, stream),
+                AstNode::ArrayType(_) => v1::format_array_type(self, stream),
                 AstNode::Ast(_) => v1::format_ast(self, stream),
                 AstNode::BoundDecl(_) => v1::format_bound_decl(self, stream),
-                AstNode::CallAfter(_) => todo!(),
-                AstNode::CallAlias(_) => todo!(),
-                AstNode::CallExpr(_) => todo!(),
-                AstNode::CallInputItem(_) => todo!(),
+                AstNode::CallAfter(_) => v1::workflow::call::format_call_after(self, stream),
+                AstNode::CallAlias(_) => v1::workflow::call::format_call_alias(self, stream),
+                AstNode::CallExpr(_) => v1::expr::format_call_expr(self, stream),
+                AstNode::CallInputItem(_) => {
+                    v1::workflow::call::format_call_input_item(self, stream)
+                }
                 AstNode::CallStatement(_) => {
                     v1::workflow::call::format_call_statement(self, stream)
                 }
                 AstNode::CallTarget(_) => v1::workflow::call::format_call_target(self, stream),
                 AstNode::CommandSection(_) => todo!(),
-                AstNode::ConditionalStatement(_) => todo!(),
+                AstNode::ConditionalStatement(_) => {
+                    v1::workflow::format_conditional_statement(self, stream)
+                }
                 AstNode::DefaultOption(_) => todo!(),
                 AstNode::DivisionExpr(_) => todo!(),
-                AstNode::EqualityExpr(_) => todo!(),
+                AstNode::EqualityExpr(_) => v1::expr::format_equality_expr(self, stream),
                 AstNode::ExponentiationExpr(_) => todo!(),
-                AstNode::GreaterEqualExpr(_) => todo!(),
-                AstNode::GreaterExpr(_) => todo!(),
-                AstNode::IfExpr(_) => todo!(),
+                AstNode::GreaterEqualExpr(_) => v1::expr::format_greater_equal_expr(self, stream),
+                AstNode::GreaterExpr(_) => v1::expr::format_greater_expr(self, stream),
+                AstNode::IfExpr(_) => v1::expr::format_if_expr(self, stream),
                 AstNode::ImportAlias(_) => v1::import::format_import_alias(self, stream),
                 AstNode::ImportStatement(_) => v1::import::format_import_statement(self, stream),
-                AstNode::IndexExpr(_) => todo!(),
-                AstNode::InequalityExpr(_) => todo!(),
+                AstNode::IndexExpr(_) => v1::expr::format_index_expr(self, stream),
+                AstNode::InequalityExpr(_) => v1::expr::format_inequality_expr(self, stream),
                 AstNode::InputSection(_) => v1::format_input_section(self, stream),
-                AstNode::LessEqualExpr(_) => todo!(),
-                AstNode::LessExpr(_) => todo!(),
-                AstNode::LiteralArray(_) => todo!(),
-                AstNode::LiteralBoolean(_) => v1::format_literal_boolean(self, stream),
-                AstNode::LiteralFloat(_) => v1::format_literal_float(self, stream),
+                AstNode::LessEqualExpr(_) => v1::expr::format_less_equal_expr(self, stream),
+                AstNode::LessExpr(_) => v1::expr::format_less_expr(self, stream),
+                AstNode::LiteralArray(_) => v1::expr::format_literal_array(self, stream),
+                AstNode::LiteralBoolean(_) => v1::expr::format_literal_boolean(self, stream),
+                AstNode::LiteralFloat(_) => v1::expr::format_literal_float(self, stream),
                 AstNode::LiteralHints(_) => todo!(),
                 AstNode::LiteralHintsItem(_) => todo!(),
                 AstNode::LiteralInput(_) => todo!(),
                 AstNode::LiteralInputItem(_) => todo!(),
-                AstNode::LiteralInteger(_) => v1::format_literal_integer(self, stream),
+                AstNode::LiteralInteger(_) => v1::expr::format_literal_integer(self, stream),
                 AstNode::LiteralMap(_) => todo!(),
                 AstNode::LiteralMapItem(_) => todo!(),
                 AstNode::LiteralNone(_) => todo!(),
@@ -95,33 +99,41 @@ impl Writable for &FormatElement {
                 AstNode::LiteralOutput(_) => todo!(),
                 AstNode::LiteralOutputItem(_) => todo!(),
                 AstNode::LiteralPair(_) => todo!(),
-                AstNode::LiteralString(_) => v1::format_literal_string(self, stream),
-                AstNode::LiteralStruct(_) => todo!(),
-                AstNode::LiteralStructItem(_) => todo!(),
-                AstNode::LogicalAndExpr(_) => todo!(),
-                AstNode::LogicalNotExpr(_) => todo!(),
-                AstNode::LogicalOrExpr(_) => todo!(),
+                AstNode::LiteralString(_) => v1::expr::format_literal_string(self, stream),
+                AstNode::LiteralStruct(_) => v1::r#struct::format_literal_struct(self, stream),
+                AstNode::LiteralStructItem(_) => {
+                    v1::r#struct::format_literal_struct_item(self, stream)
+                }
+                AstNode::LogicalAndExpr(_) => v1::expr::format_logical_and_expr(self, stream),
+                AstNode::LogicalNotExpr(_) => v1::expr::format_logical_not_expr(self, stream),
+                AstNode::LogicalOrExpr(_) => v1::expr::format_logical_or_expr(self, stream),
                 AstNode::MapType(_) => todo!(),
-                AstNode::MetadataArray(_) => todo!(),
+                AstNode::MetadataArray(_) => v1::format_metadata_array(self, stream),
                 AstNode::MetadataObject(_) => v1::format_metadata_object(self, stream),
                 AstNode::MetadataObjectItem(_) => v1::format_metadata_object_item(self, stream),
                 AstNode::MetadataSection(_) => v1::format_metadata_section(self, stream),
                 AstNode::ModuloExpr(_) => todo!(),
-                AstNode::MultiplicationExpr(_) => todo!(),
-                AstNode::NameRef(_) => todo!(),
-                AstNode::NegationExpr(_) => todo!(),
-                AstNode::OutputSection(_) => todo!(),
+                AstNode::MultiplicationExpr(_) => {
+                    v1::expr::format_multiplication_expr(self, stream)
+                }
+                AstNode::NameRef(_) => v1::expr::format_name_ref(self, stream),
+                AstNode::NegationExpr(_) => v1::expr::format_negation_expr(self, stream),
+                AstNode::OutputSection(_) => v1::format_output_section(self, stream),
                 AstNode::PairType(_) => todo!(),
                 AstNode::ObjectType(_) => todo!(),
-                AstNode::ParameterMetadataSection(_) => todo!(),
-                AstNode::ParenthesizedExpr(_) => todo!(),
+                AstNode::ParameterMetadataSection(_) => {
+                    v1::format_parameter_metadata_section(self, stream)
+                }
+                AstNode::ParenthesizedExpr(_) => v1::expr::format_parenthesized_expr(self, stream),
                 AstNode::Placeholder(_) => todo!(),
                 AstNode::PrimitiveType(_) => v1::format_primitive_type(self, stream),
                 AstNode::RequirementsItem(_) => todo!(),
                 AstNode::RequirementsSection(_) => todo!(),
                 AstNode::RuntimeItem(_) => todo!(),
                 AstNode::RuntimeSection(_) => todo!(),
-                AstNode::ScatterStatement(_) => todo!(),
+                AstNode::ScatterStatement(_) => {
+                    v1::workflow::format_scatter_statement(self, stream)
+                }
                 AstNode::SepOption(_) => todo!(),
                 AstNode::StructDefinition(_) => {
                     v1::r#struct::format_struct_definition(self, stream)

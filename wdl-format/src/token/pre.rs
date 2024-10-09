@@ -121,13 +121,17 @@ impl TokenStream<PreToken> {
         self.0.push(PreToken::WordEnd);
     }
 
-    /// Inserts an indent start token to the stream.
+    /// Inserts an indent start token to the stream. This will also end the
+    /// current line.
     pub fn increment_indent(&mut self) {
+        self.end_line();
         self.0.push(PreToken::IndentStart);
     }
 
-    /// Inserts an indent end token to the stream.
+    /// Inserts an indent end token to the stream. This will also end the
+    /// current line.
     pub fn decrement_indent(&mut self) {
+        self.end_line();
         self.0.push(PreToken::IndentEnd);
     }
 
