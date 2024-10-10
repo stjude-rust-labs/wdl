@@ -39,12 +39,12 @@ workflow chip {
             input_genomic_data: {
                 title: "Input genomic data",
                 description: "Genomic input files for experiment.",
-                help: "Pipeline can start with any types of experiment data (e.g. FASTQ, BAM, NODUP_BAM, TAG-ALIGN, PEAK). Choose one type and leave others empty. FASTQs have a variable for each biological replicate. e.g. chip.fastqs_rep1_R1 and chip.fastqs_rep2_R1. You can define up to 10 experiment replicates. For other types, there is an array to define file for each biological replicate. e.g. chip.bams: ["rep1.bam", "rep1.bam"]. Define sequential endedness with chip.paired_end, if you have mixed SE and PE replicates then define chip.paired_ends instead for each replicate. e.g. chip.paired_ends: [false, true].",
+                help: "Pipeline can start with any types of experiment data (e.g. FASTQ, BAM, NODUP_BAM, TAG-ALIGN, PEAK). Choose one type and leave others empty. FASTQs have a variable for each biological replicate. e.g. chip.fastqs_rep1_R1 and chip.fastqs_rep2_R1. You can define up to 10 experiment replicates. For other types, there is an array to define file for each biological replicate. e.g. chip.bams: [\"rep1.bam\", \"rep1.bam\"]. Define sequential endedness with chip.paired_end, if you have mixed SE and PE replicates then define chip.paired_ends instead for each replicate. e.g. chip.paired_ends: [false, true].",
             },
             input_genomic_data_control: {
                 title: "Input genomic data (control)",
                 description: "Genomic input files for control. TF ChIP-seq requires control for peak calling but histone ChIP-seq does not.",
-                help: "Pipeline can start with any types of control data (e.g. FASTQ, BAM, NODUP_BAM, TAG-ALIGN). Choose one type and leave others empty. FASTQs have a variable for each control replicate. e.g. chip.ctl_fastqs_rep1_R1 and chip.ctl_fastqs_rep2_R1. You can define up to 10 control replicates. For other types, there is an array to define file for each control replicate. e.g. chip.ctl_bams: ["ctl1.bam", "ctl1.bam"]. Define sequential endedness with chip.ctl_paired_end, if you have mixed SE and PE control replicates then define chip.ctl_paired_ends instead for each replicate. e.g. chip.ctl_paired_ends: [false, true]. If none of these are defined, pipeline will use chip.paired_end for controls.",
+                help: "Pipeline can start with any types of control data (e.g. FASTQ, BAM, NODUP_BAM, TAG-ALIGN). Choose one type and leave others empty. FASTQs have a variable for each control replicate. e.g. chip.ctl_fastqs_rep1_R1 and chip.ctl_fastqs_rep2_R1. You can define up to 10 control replicates. For other types, there is an array to define file for each control replicate. e.g. chip.ctl_bams: [\"ctl1.bam\", \"ctl1.bam\"]. Define sequential endedness with chip.ctl_paired_end, if you have mixed SE and PE control replicates then define chip.ctl_paired_ends instead for each replicate. e.g. chip.ctl_paired_ends: [false, true]. If none of these are defined, pipeline will use chip.paired_end for controls.",
             },
             pipeline_parameter: {
                 title: "Pipeline parameter",
@@ -124,7 +124,7 @@ workflow chip {
             group: "reference_genome",
         }
         custom_aligner_idx_tar: {
-            description: "Index TAR file for a custom aligner. To use a custom aligner, define "chip.custom_align_py" too.",
+            description: "Index TAR file for a custom aligner. To use a custom aligner, define \"chip.custom_align_py\" too.",
             group: "reference_genome",
         }
         chrsz: {
@@ -144,7 +144,7 @@ workflow chip {
         mito_chr_name: {
             description: "Mitochondrial chromosome name.",
             group: "reference_genome",
-            help: "e.g. chrM, MT. Mitochondrial reads defined here will be filtered out during filtering BAMs in "filter" task.",
+            help: "e.g. chrM, MT. Mitochondrial reads defined here will be filtered out during filtering BAMs in \"filter\" task.",
         }
         regex_bfilt_peak_chr_name: {
             description: "Reg-ex for chromosomes to keep while filtering peaks.",
@@ -152,7 +152,7 @@ workflow chip {
             help: "Chromosomes defined here will be kept. All other chromosomes will be filtered out in .bfilt. peak file. This is done along with blacklist filtering peak file.",
         }
         gensz: {
-            description: "Genome sizes. "hs" for human, "mm" for mouse or sum of 2nd columnin chromosome sizes file.",
+            description: "Genome sizes. \"hs\" for human, \"mm\" for mouse or sum of 2nd columnin chromosome sizes file.",
             group: "reference_genome",
         }
         paired_end: {
@@ -316,12 +316,12 @@ workflow chip {
         peak_ppr1: {
             description: "NARROWPEAK file for pooled pseudo replicate 1.",
             group: "input_genomic_data",
-            help: "Define if you want to start pipeline from PEAK files. Define if you have multiple biological replicates and chip.true_rep_only flag is off. PPR1 means analysis on pooled 1st pseudo replicates. Each biological replicate is shuf/split into two pseudos. This is a pooling of each replicate\'s 1st pseudos.",
+            help: "Define if you want to start pipeline from PEAK files. Define if you have multiple biological replicates and chip.true_rep_only flag is off. PPR1 means analysis on pooled 1st pseudo replicates. Each biological replicate is shuf/split into two pseudos. This is a pooling of each replicate's 1st pseudos.",
         }
         peak_ppr2: {
             description: "NARROWPEAK file for pooled pseudo replicate 2.",
             group: "input_genomic_data",
-            help: "Define if you want to start pipeline from PEAK files. Define if you have multiple biological replicates and chip.true_rep_only flag is off. PPR1 means analysis on pooled 2nd pseudo replicates. Each biological replicate is shuf/split into two pseudos. This is a pooling of each replicate\'s 2nd pseudos.",
+            help: "Define if you want to start pipeline from PEAK files. Define if you have multiple biological replicates and chip.true_rep_only flag is off. PPR1 means analysis on pooled 2nd pseudo replicates. Each biological replicate is shuf/split into two pseudos. This is a pooling of each replicate's 2nd pseudos.",
         }
 
         ctl_paired_end: {
@@ -465,7 +465,7 @@ workflow chip {
         pipeline_type: {
             description: "Pipeline type. tf for TF ChIP-Seq, histone for Histone ChIP-Seq or control for mapping controls only.",
             group: "pipeline_parameter",
-            help: "Default peak caller is different for each type. spp For TF ChIP-Seq and macs2 for histone ChIP-Seq. Regardless of pipeline type, spp always requires controls but macs2 doesn\'t. For control mode, chip.align_only is automatically turned on and cross-correlation analysis is disabled. Do not define ctl_* for control mode. Define fastqs_repX_RY instead.",
+            help: "Default peak caller is different for each type. spp For TF ChIP-Seq and macs2 for histone ChIP-Seq. Regardless of pipeline type, spp always requires controls but macs2 doesn't. For control mode, chip.align_only is automatically turned on and cross-correlation analysis is disabled. Do not define ctl_* for control mode. Define fastqs_repX_RY instead.",
             choices: [
                 "tf",
                 "histone",
@@ -515,7 +515,7 @@ workflow chip {
         custom_align_py: {
             description: "Python script for a custom aligner.",
             group: "alignment",
-            help: "There is a template included in the documentation for inputs. Defining this parameter will automatically change "chip.aligner" to "custom". You should also define "chip.custom_aligner_idx_tar".",
+            help: "There is a template included in the documentation for inputs. Defining this parameter will automatically change \"chip.aligner\" to \"custom\". You should also define \"chip.custom_aligner_idx_tar\".",
         }
         use_bwa_mem_for_pe: {
             description: "For paired end dataset with read length >= chip.bwa_mem_read_len_limit (default 70) bp, use bwa mem instead of bwa aln.",
@@ -528,12 +528,12 @@ workflow chip {
             help: "If chip.use_bwa_mem_for_pe is activated and reads are shorter than this limit, then bwa aln will be used instead of bwa mem.",
         }
         use_bowtie2_local_mode: {
-            description: "Use bowtie2\'s local mode (soft-clipping).",
+            description: "Use bowtie2's local mode (soft-clipping).",
             group: "alignment",
             help: "This will add --local to bowtie2 command line so that it will replace the default end-to-end mode.",
         }
         crop_length: {
-            description: "Crop FASTQs\' reads longer than this length.",
+            description: "Crop FASTQs' reads longer than this length.",
             group: "alignment",
             help: "Also drop all reads shorter than chip.crop_length - chip.crop_length_tol.",
         }
@@ -550,7 +550,7 @@ workflow chip {
                 "phred33",
                 "phred64",
             ],
-            help: "This is used for Trimmomatic only. It is auto by default, which means that Trimmomatic automatically detect it from FASTQs. Otherwise -phred33 or -phred64 will be passed to the Trimmomatic command line. Use this if you see an error like "Error: Unable to detect quality encoding".",
+            help: "This is used for Trimmomatic only. It is auto by default, which means that Trimmomatic automatically detect it from FASTQs. Otherwise -phred33 or -phred64 will be passed to the Trimmomatic command line. Use this if you see an error like \"Error: Unable to detect quality encoding\".",
         }
         xcor_trim_bp: {
             description: "Trim experiment read1 FASTQ (for both SE and PE) for cross-correlation analysis.",
@@ -615,17 +615,17 @@ workflow chip {
         pseudoreplication_random_seed: {
             description: "Random seed (positive integer) used for pseudo-replication (shuffling reads in TAG-ALIGN and then split it into two).",
             group: "alignment",
-            help: "Pseudo-replication (task spr) is done by using GNU "shuf --random-source=sha256(random_seed)". If this parameter == 0, then pipeline uses input TAG-ALIGN file\'s size (in bytes) for the random_seed.",
+            help: "Pseudo-replication (task spr) is done by using GNU \"shuf --random-source=sha256(random_seed)\". If this parameter == 0, then pipeline uses input TAG-ALIGN file's size (in bytes) for the random_seed.",
         }
         ctl_depth_limit: {
-            description: "Hard limit for chosen control\'s depth.",
+            description: "Hard limit for chosen control's depth.",
             group: "peak_calling",
             help: "If control chosen by chip.always_use_pooled_ctl and chip.ctl_depth_ratio is deeper than this hard limit, then such control is subsampled.",
         }
         exp_ctl_depth_ratio_limit: {
-            description: "Second limit for chosen control\'s depth.",
+            description: "Second limit for chosen control's depth.",
             group: "peak_calling",
-            help: "If control chosen by chip.always_use_pooled_ctl and chip.ctl_depth_ratio is deeper than experiment replicate\'s read depth multiplied by this factor then such control is subsampled down to maximum of multiplied value and hard limit chip.ctl_depth_limit.",
+            help: "If control chosen by chip.always_use_pooled_ctl and chip.ctl_depth_ratio is deeper than experiment replicate's read depth multiplied by this factor then such control is subsampled down to maximum of multiplied value and hard limit chip.ctl_depth_limit.",
         }
         fraglen: {
             description: "Fragment length for each biological replicate.",
@@ -847,17 +847,17 @@ workflow chip {
         align_trimmomatic_java_heap: {
             description: "Maximum Java heap (java -Xmx) in task align.",
             group: "resource_parameter",
-            help: "Maximum memory for Trimmomatic. If not defined, 90% of align task\'s memory will be used.",
+            help: "Maximum memory for Trimmomatic. If not defined, 90% of align task's memory will be used.",
         }
         filter_picard_java_heap: {
             description: "Maximum Java heap (java -Xmx) in task filter.",
             group: "resource_parameter",
-            help: "Maximum memory for Picard tools MarkDuplicates. If not defined, 90% of filter task\'s memory will be used.",
+            help: "Maximum memory for Picard tools MarkDuplicates. If not defined, 90% of filter task's memory will be used.",
         }
         gc_bias_picard_java_heap: {
             description: "Maximum Java heap (java -Xmx) in task gc_bias.",
             group: "resource_parameter",
-            help: "Maximum memory for Picard tools CollectGcBiasMetrics. If not defined, 90% of gc_bias task\'s memory will be used.",
+            help: "Maximum memory for Picard tools CollectGcBiasMetrics. If not defined, 90% of gc_bias task's memory will be used.",
         }
     }
 
@@ -1380,13 +1380,13 @@ workflow chip {
     # sanity check for inputs
     if (num_rep == 0 && num_ctl == 0) {
         call raise_exception as error_input_data { input:
-            msg = "No FASTQ/BAM/TAG-ALIGN/PEAK defined in your input JSON. Check if your FASTQs are defined as "chip.fastqs_repX_RY". DO NOT MISS suffix _R1 even for single ended FASTQ.",
+            msg = "No FASTQ/BAM/TAG-ALIGN/PEAK defined in your input JSON. Check if your FASTQs are defined as \"chip.fastqs_repX_RY\". DO NOT MISS suffix _R1 even for single ended FASTQ.",
             runtime_environment = runtime_environment,
         }
     }
     if (!align_only_ && peak_caller_ == "spp" && num_ctl == 0) {
         call raise_exception as error_control_required { input:
-            msg = "SPP requires control inputs. Define control input files ("chip.ctl_*") in an input JSON file.",
+            msg = "SPP requires control inputs. Define control input files (\"chip.ctl_*\") in an input JSON file.",
             runtime_environment = runtime_environment,
         }
     }
@@ -1417,7 +1417,7 @@ workflow chip {
 
     if ((ctl_depth_limit > 0 || exp_ctl_depth_ratio_limit > 0) && num_ctl > 1 && length(ctl_paired_ends) > 1) {
         call raise_exception as error_subsample_pooled_control_with_mixed_endedness { input:
-            msg = "Cannot use automatic control subsampling ("chip.ctl_depth_limit">0 and "chip.exp_ctl_depth_limit">0) for " + "multiple controls with mixed endedness (e.g. SE ctl-rep1 and PE ctl-rep2). " + "Automatic control subsampling is enabled by default. " + "Disable automatic control subsampling by explicitly defining the above two parameters as 0 in your input JSON file. " + "You can still use manual control subsamping ("chip.ctl_subsample_reads">0) since it is done " + "for individual control\'s TAG-ALIGN output according to each control\'s endedness. ",
+            msg = "Cannot use automatic control subsampling (\"chip.ctl_depth_limit\">0 and \"chip.exp_ctl_depth_limit\">0) for " + "multiple controls with mixed endedness (e.g. SE ctl-rep1 and PE ctl-rep2). " + "Automatic control subsampling is enabled by default. " + "Disable automatic control subsampling by explicitly defining the above two parameters as 0 in your input JSON file. " + "You can still use manual control subsamping (\"chip.ctl_subsample_reads\">0) since it is done " + "for individual control's TAG-ALIGN output according to each control's endedness. ",
             runtime_environment = runtime_environment,
         }
     }
@@ -3040,7 +3040,7 @@ task call_peak {
         python3 $(which encode_task_post_call_peak_chip.py) \
             $(ls *Peak.gz) \
             ~{"--ta " + tas[0]} \
-            ~{"--regex-bfilt-peak-chr-name \'" + regex_bfilt_peak_chr_name + "\'"} \
+            ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"} \
             ~{"--chrsz " + chrsz} \
             ~{"--fraglen " + fraglen} \
             ~{"--peak-type " + peak_type} \
@@ -3159,7 +3159,7 @@ task idr {
             ~{"--fraglen " + fraglen} \
             ~{"--chrsz " + chrsz} \
             ~{"--blacklist " + blacklist} \
-            ~{"--regex-bfilt-peak-chr-name \'" + regex_bfilt_peak_chr_name + "\'"} \
+            ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"} \
             ~{"--ta " + ta}
     
     >>>
@@ -3219,7 +3219,7 @@ task overlap {
             ~{"--chrsz " + chrsz} \
             ~{"--blacklist " + blacklist} \
             --nonamecheck \
-            ~{"--regex-bfilt-peak-chr-name \'" + regex_bfilt_peak_chr_name + "\'"} \
+            ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"} \
             ~{"--ta " + ta}
     
     >>>

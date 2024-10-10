@@ -65,8 +65,51 @@ pub fn format_literal_string(element: &FormatElement, stream: &mut TokenStream<P
                     "\"".to_owned(),
                 );
             }
-            _ => {
+            SyntaxKind::DoubleQuote => {
                 (&child).write(stream);
+            }
+            SyntaxKind::LiteralStringText => {
+                let mut replacement = String::new();
+                let syntax = child.element().syntax();
+                let mut chars = syntax.as_token().expect("token").text().chars().peekable();
+                let mut prev_c = None;
+                while let Some(c) = chars.next() {
+                    match c {
+                        '\\' => {
+                            if let Some(next_c) = chars.peek() {
+                                if *next_c == '\'' {
+                                    // Do not write this backslash
+                                    prev_c = Some(c);
+                                    continue;
+                                }
+                            }
+                            replacement.push(c);
+                        }
+                        '"' => {
+                            if let Some(pc) = prev_c {
+                                if pc != '\\' {
+                                    replacement.push('\\');
+                                }
+                            }
+                            replacement.push(c);
+                        }
+                        _ => {
+                            replacement.push(c);
+                        }
+                    }
+                    prev_c = Some(c);
+                }
+
+                stream.push_literal_in_place_of_token(
+                    child.element().as_token().expect("token"),
+                    replacement,
+                );
+            }
+            SyntaxKind::PlaceholderNode => {
+                (&child).write(stream);
+            }
+            _ => {
+                unreachable!("unexpected child in literal string: {:?}", child.element().kind());
             }
         }
     }
