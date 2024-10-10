@@ -51,9 +51,9 @@ impl Writable for &FormatElement {
             Element::Node(node) => match node {
                 AstNode::AccessExpr(_) => v1::expr::format_access_expr(self, stream),
                 AstNode::AdditionExpr(_) => v1::expr::format_addition_expr(self, stream),
-                AstNode::ArrayType(_) => v1::format_array_type(self, stream),
+                AstNode::ArrayType(_) => v1::decl::format_array_type(self, stream),
                 AstNode::Ast(_) => v1::format_ast(self, stream),
-                AstNode::BoundDecl(_) => v1::format_bound_decl(self, stream),
+                AstNode::BoundDecl(_) => v1::decl::format_bound_decl(self, stream),
                 AstNode::CallAfter(_) => v1::workflow::call::format_call_after(self, stream),
                 AstNode::CallAlias(_) => v1::workflow::call::format_call_alias(self, stream),
                 AstNode::CallExpr(_) => v1::expr::format_call_expr(self, stream),
@@ -95,7 +95,7 @@ impl Writable for &FormatElement {
                 AstNode::LiteralMap(_) => v1::expr::format_literal_map(self, stream),
                 AstNode::LiteralMapItem(_) => v1::expr::format_literal_map_item(self, stream),
                 AstNode::LiteralNone(_) => v1::expr::format_literal_none(self, stream),
-                AstNode::LiteralNull(_) => v1::format_literal_null(self, stream),
+                AstNode::LiteralNull(_) => v1::meta::format_literal_null(self, stream),
                 AstNode::LiteralObject(_) => v1::expr::format_literal_object(self, stream),
                 AstNode::LiteralObjectItem(_) => v1::expr::format_literal_object_item(self, stream),
                 AstNode::LiteralOutput(_) => v1::format_literal_output(self, stream),
@@ -109,11 +109,13 @@ impl Writable for &FormatElement {
                 AstNode::LogicalAndExpr(_) => v1::expr::format_logical_and_expr(self, stream),
                 AstNode::LogicalNotExpr(_) => v1::expr::format_logical_not_expr(self, stream),
                 AstNode::LogicalOrExpr(_) => v1::expr::format_logical_or_expr(self, stream),
-                AstNode::MapType(_) => v1::format_map_type(self, stream),
-                AstNode::MetadataArray(_) => v1::format_metadata_array(self, stream),
-                AstNode::MetadataObject(_) => v1::format_metadata_object(self, stream),
-                AstNode::MetadataObjectItem(_) => v1::format_metadata_object_item(self, stream),
-                AstNode::MetadataSection(_) => v1::format_metadata_section(self, stream),
+                AstNode::MapType(_) => v1::decl::format_map_type(self, stream),
+                AstNode::MetadataArray(_) => v1::meta::format_metadata_array(self, stream),
+                AstNode::MetadataObject(_) => v1::meta::format_metadata_object(self, stream),
+                AstNode::MetadataObjectItem(_) => {
+                    v1::meta::format_metadata_object_item(self, stream)
+                }
+                AstNode::MetadataSection(_) => v1::meta::format_metadata_section(self, stream),
                 AstNode::ModuloExpr(_) => v1::expr::format_modulo_expr(self, stream),
                 AstNode::MultiplicationExpr(_) => {
                     v1::expr::format_multiplication_expr(self, stream)
@@ -121,14 +123,14 @@ impl Writable for &FormatElement {
                 AstNode::NameRef(_) => v1::expr::format_name_ref(self, stream),
                 AstNode::NegationExpr(_) => v1::expr::format_negation_expr(self, stream),
                 AstNode::OutputSection(_) => v1::format_output_section(self, stream),
-                AstNode::PairType(_) => v1::format_pair_type(self, stream),
-                AstNode::ObjectType(_) => v1::format_object_type(self, stream),
+                AstNode::PairType(_) => v1::decl::format_pair_type(self, stream),
+                AstNode::ObjectType(_) => v1::decl::format_object_type(self, stream),
                 AstNode::ParameterMetadataSection(_) => {
-                    v1::format_parameter_metadata_section(self, stream)
+                    v1::meta::format_parameter_metadata_section(self, stream)
                 }
                 AstNode::ParenthesizedExpr(_) => v1::expr::format_parenthesized_expr(self, stream),
                 AstNode::Placeholder(_) => v1::expr::format_placeholder(self, stream),
-                AstNode::PrimitiveType(_) => v1::format_primitive_type(self, stream),
+                AstNode::PrimitiveType(_) => v1::decl::format_primitive_type(self, stream),
                 AstNode::RequirementsItem(_) => v1::task::format_requirements_item(self, stream),
                 AstNode::RequirementsSection(_) => {
                     v1::task::format_requirements_section(self, stream)
@@ -147,8 +149,8 @@ impl Writable for &FormatElement {
                 AstNode::TaskHintsItem(_) => v1::task::format_task_hints_item(self, stream),
                 AstNode::TaskHintsSection(_) => v1::task::format_task_hints_section(self, stream),
                 AstNode::TrueFalseOption(_) => v1::expr::format_true_false_option(self, stream),
-                AstNode::TypeRef(_) => v1::format_type_ref(self, stream),
-                AstNode::UnboundDecl(_) => v1::format_unbound_decl(self, stream),
+                AstNode::TypeRef(_) => v1::decl::format_type_ref(self, stream),
+                AstNode::UnboundDecl(_) => v1::decl::format_unbound_decl(self, stream),
                 AstNode::VersionStatement(_) => v1::format_version_statement(self, stream),
                 AstNode::WorkflowDefinition(_) => {
                     v1::workflow::format_workflow_definition(self, stream)
