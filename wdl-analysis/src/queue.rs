@@ -26,7 +26,7 @@ use wdl_ast::Ast;
 use wdl_ast::AstToken;
 
 use crate::AnalysisResult;
-use crate::Config;
+use crate::DiagnosticsConfig;
 use crate::IncrementalChange;
 use crate::ProgressKind;
 use crate::graph::Analysis;
@@ -109,8 +109,8 @@ enum Cancelable<T> {
 pub struct AnalysisQueue<Progress, Context, Return, Validator> {
     /// The document graph maintained by the analysis queue.
     graph: Arc<RwLock<DocumentGraph>>,
-    /// The analysis configuration to use.
-    config: Config,
+    /// The diagnostics configuration to use.
+    config: DiagnosticsConfig,
     /// The handle to the tokio runtime for blocking on async tasks.
     tokio: Handle,
     /// The HTTP client to use for fetching documents.
@@ -131,7 +131,12 @@ where
     Validator: Fn() -> wdl_ast::Validator + Send + Sync + 'static,
 {
     /// Constructs a new analysis queue.
-    pub fn new(config: Config, tokio: Handle, progress: Progress, validator: Validator) -> Self {
+    pub fn new(
+        config: DiagnosticsConfig,
+        tokio: Handle,
+        progress: Progress,
+        validator: Validator,
+    ) -> Self {
         Self {
             graph: Default::default(),
             config,
@@ -596,7 +601,7 @@ where
 
     /// Analyzes a node in the document graph.
     fn analyze_node(
-        config: Config,
+        config: DiagnosticsConfig,
         graph: Arc<RwLock<DocumentGraph>>,
         index: NodeIndex,
     ) -> (NodeIndex, Analysis) {

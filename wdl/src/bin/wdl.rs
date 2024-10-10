@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::collections::HashSet;
 use std::fs;
 use std::io::IsTerminal;
 use std::io::Read;
@@ -12,7 +13,6 @@ use anyhow::bail;
 use clap::Args;
 use clap::Parser;
 use clap::Subcommand;
-use clap::ValueEnum;
 use clap_verbosity_flag::Verbosity;
 use codespan_reporting::files::SimpleFile;
 use codespan_reporting::term::Config;
@@ -30,7 +30,8 @@ use wdl::ast::Validator;
 use wdl::lint::LintVisitor;
 use wdl_analysis::AnalysisResult;
 use wdl_analysis::Analyzer;
-use wdl_ast::Severity;
+use wdl_analysis::Rule;
+use wdl_analysis::rules;
 
 /// Emits the given diagnostics to the output stream.
 ///
@@ -57,8 +58,8 @@ fn emit_diagnostics(path: &str, source: &str, diagnostics: &[Diagnostic]) -> Res
     Ok(())
 }
 
-async fn analyze(
-    config: wdl_analysis::Config,
+async fn analyze<T: AsRef<dyn Rule>>(
+    rules: impl IntoIterator<Item = T>,
     path: PathBuf,
     lint: bool,
 ) -> Result<Vec<AnalysisResult>> {
@@ -69,7 +70,7 @@ async fn analyze(
     );
 
     let analyzer = Analyzer::new_with_validator(
-        config,
+        rules,
         move |bar: ProgressBar, kind, completed, total| async move {
             bar.set_position(completed.try_into().unwrap());
             if completed == 0 {
@@ -168,100 +169,58 @@ impl ParseCommand {
     }
 }
 
-/// Represents a configurable diagnostic.
-#[derive(ValueEnum, Debug, Clone, Copy, PartialEq, Eq)]
-#[clap(rename_all = "PascalCase")]
-pub enum ConfigurableDiagnostic {
-    /// Diagnostic for unused imports.
-    UnusedImport,
-    /// Diagnostic for unused inputs.
-    UnusedInput,
-    /// Diagnostic for unused declarations.
-    UnusedDeclaration,
-    /// Diagnostic for unused calls.
-    UnusedCall,
-}
-
 /// Represents common analysis options.
 #[derive(Args)]
 pub struct AnalysisOptions {
-    /// Denies all analysis warnings by treating them as errors.
-    #[clap(long, conflicts_with = "deny", conflicts_with = "except_all_warnings")]
-    pub deny_all_warnings: bool,
+    /// Denies all analysis rules by treating them as errors.
+    #[clap(long, conflicts_with = "deny", conflicts_with = "except_all")]
+    pub deny_all: bool,
 
-    /// Except (ignores) all analysis warnings.
+    /// Except (ignores) all analysis rules.
     #[clap(long, conflicts_with = "except")]
-    pub except_all_warnings: bool,
+    pub except_all: bool,
 
-    /// Excepts (ignores) an analysis warning.
+    /// Excepts (ignores) an analysis rule.
     #[clap(long)]
-    pub except: Vec<ConfigurableDiagnostic>,
+    pub except: Vec<String>,
 
-    /// Denies an analysis warning by treating it as an error.
+    /// Denies an analysis rule by treating it as an error.
     #[clap(long)]
-    pub deny: Vec<ConfigurableDiagnostic>,
+    pub deny: Vec<String>,
 }
 
 impl AnalysisOptions {
     /// Checks for conflicts in the analysis options.
     pub fn check_for_conflicts(&self) -> Result<()> {
-        if let Some(d) = self
-            .except
-            .iter()
-            .find(|d: &&ConfigurableDiagnostic| self.deny.contains(*d))
-        {
-            bail!(
-                "diagnostic {d:?} cannot be specified for both the `--except` and `--deny`",
-                d = d.to_possible_value().unwrap().get_name()
-            );
+        if let Some(id) = self.except.iter().find(|id| self.deny.contains(*id)) {
+            bail!("rule `{id}` cannot be specified for both the `--except` and `--deny`",);
         }
 
         Ok(())
     }
 
-    /// Converts the analysis options into an analysis configuration.
-    pub fn into_config(self) -> wdl_analysis::Config {
-        let mut config = wdl_analysis::Config::default();
+    /// Converts the analysis options into an analysis rules set.
+    pub fn into_rules(self) -> impl Iterator<Item = Box<dyn Rule>> {
+        let Self {
+            deny_all,
+            except_all,
+            except,
+            deny,
+        } = self;
 
-        // Process the denies first
-        if self.deny_all_warnings {
-            config.diagnostics = wdl_analysis::DiagnosticsConfig::deny_all();
-        } else {
-            for deny in self.deny {
-                match deny {
-                    ConfigurableDiagnostic::UnusedImport => {
-                        config.diagnostics.unused_import = Some(Severity::Error)
-                    }
-                    ConfigurableDiagnostic::UnusedInput => {
-                        config.diagnostics.unused_input = Some(Severity::Error)
-                    }
-                    ConfigurableDiagnostic::UnusedDeclaration => {
-                        config.diagnostics.unused_declaration = Some(Severity::Error)
-                    }
-                    ConfigurableDiagnostic::UnusedCall => {
-                        config.diagnostics.unused_call = Some(Severity::Error)
-                    }
+        let except: HashSet<_> = except.into_iter().collect();
+        let deny: HashSet<_> = deny.into_iter().collect();
+
+        rules()
+            .into_iter()
+            .filter(move |r| !except_all && !except.contains(r.id()))
+            .map(move |mut r| {
+                if deny_all || deny.contains(r.id()) {
+                    r.deny();
                 }
-            }
-        }
 
-        // Next process the excepts
-        if self.except_all_warnings {
-            config.diagnostics = wdl_analysis::DiagnosticsConfig::except_all();
-        } else {
-            for except in self.except {
-                match except {
-                    ConfigurableDiagnostic::UnusedImport => config.diagnostics.unused_import = None,
-                    ConfigurableDiagnostic::UnusedInput => config.diagnostics.unused_input = None,
-                    ConfigurableDiagnostic::UnusedDeclaration => {
-                        config.diagnostics.unused_declaration = None
-                    }
-                    ConfigurableDiagnostic::UnusedCall => config.diagnostics.unused_call = None,
-                }
-            }
-        }
-
-        config
+                r
+            })
     }
 }
 
@@ -280,7 +239,7 @@ pub struct CheckCommand {
 impl CheckCommand {
     async fn exec(self) -> Result<()> {
         self.options.check_for_conflicts()?;
-        analyze(self.options.into_config(), self.path, false).await?;
+        analyze(self.options.into_rules(), self.path, false).await?;
         Ok(())
     }
 }
@@ -343,7 +302,7 @@ pub struct AnalyzeCommand {
 impl AnalyzeCommand {
     async fn exec(self) -> Result<()> {
         self.options.check_for_conflicts()?;
-        let results = analyze(self.options.into_config(), self.path, self.lint).await?;
+        let results = analyze(self.options.into_rules(), self.path, self.lint).await?;
         println!("{:#?}", results);
         Ok(())
     }

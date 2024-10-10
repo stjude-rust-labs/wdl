@@ -9,20 +9,12 @@ use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::Version;
 
+use crate::UNUSED_CALL_RULE_ID;
+use crate::UNUSED_DECL_RULE_ID;
+use crate::UNUSED_IMPORT_RULE_ID;
+use crate::UNUSED_INPUT_RULE_ID;
 use crate::types::Type;
 use crate::types::Types;
-
-/// The rule identifier for unused import warnings.
-pub const UNUSED_IMPORT_RULE_ID: &str = "UnusedImport";
-
-/// The rule identifier for unused input warnings.
-pub const UNUSED_INPUT_RULE_ID: &str = "UnusedInput";
-
-/// The rule identifier for unused declaration warnings.
-pub const UNUSED_DECL_RULE_ID: &str = "UnusedDeclaration";
-
-/// The rule identifier for unused call warnings.
-pub const UNUSED_CALL_RULE_ID: &str = "UnusedCall";
 
 /// Represents the context for diagnostic reporting.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

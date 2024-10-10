@@ -49,12 +49,12 @@ use super::Task;
 use super::Workflow;
 use super::braced_scope_span;
 use super::heredoc_scope_span;
-use crate::Config;
+use crate::DiagnosticsConfig;
+use crate::UNUSED_CALL_RULE_ID;
+use crate::UNUSED_DECL_RULE_ID;
+use crate::UNUSED_IMPORT_RULE_ID;
+use crate::UNUSED_INPUT_RULE_ID;
 use crate::diagnostics::Context;
-use crate::diagnostics::UNUSED_CALL_RULE_ID;
-use crate::diagnostics::UNUSED_DECL_RULE_ID;
-use crate::diagnostics::UNUSED_IMPORT_RULE_ID;
-use crate::diagnostics::UNUSED_INPUT_RULE_ID;
 use crate::diagnostics::call_input_type_mismatch;
 use crate::diagnostics::duplicate_workflow;
 use crate::diagnostics::if_conditional_mismatch;
@@ -151,7 +151,7 @@ fn is_input_used(document: &DocumentScope, name: &str, ty: Type) -> bool {
 
 /// Creates a new document scope for a V1 AST.
 pub(crate) fn scope_from_ast(
-    config: Config,
+    config: DiagnosticsConfig,
     graph: &DocumentGraph,
     index: NodeIndex,
     ast: &Ast,
@@ -449,7 +449,7 @@ fn create_output_type_map(
 
 /// Adds a task to the document's scope.
 fn add_task(
-    config: Config,
+    config: DiagnosticsConfig,
     document: &mut DocumentScope,
     task: &TaskDefinition,
     diagnostics: &mut Vec<Diagnostic>,
@@ -527,7 +527,7 @@ fn add_task(
                 }
 
                 // Check for unused input
-                if let Some(severity) = config.diagnostics.unused_input {
+                if let Some(severity) = config.unused_input {
                     let name = decl.name();
                     if graph
                         .edges_directed(index, Direction::Outgoing)
@@ -559,7 +559,7 @@ fn add_task(
                 }
 
                 // Check for unused declaration
-                if let Some(severity) = config.diagnostics.unused_declaration {
+                if let Some(severity) = config.unused_declaration {
                     let name = decl.name();
                     if graph
                         .edges_directed(index, Direction::Outgoing)
@@ -797,7 +797,7 @@ fn is_nested_inputs_allowed(document: &DocumentScope, definition: &WorkflowDefin
 
 /// Finishes processing a workflow by populating its scope.
 fn populate_workflow_scope(
-    config: Config,
+    config: DiagnosticsConfig,
     document: &mut DocumentScope,
     definition: &WorkflowDefinition,
     diagnostics: &mut Vec<Diagnostic>,
@@ -847,7 +847,7 @@ fn populate_workflow_scope(
                 }
 
                 // Check for unused input
-                if let Some(severity) = config.diagnostics.unused_input {
+                if let Some(severity) = config.unused_input {
                     let name = decl.name();
                     if graph
                         .edges_directed(index, Direction::Outgoing)
@@ -884,7 +884,7 @@ fn populate_workflow_scope(
                 }
 
                 // Check for unused declaration
-                if let Some(severity) = config.diagnostics.unused_declaration {
+                if let Some(severity) = config.unused_declaration {
                     let name = decl.name();
                     if graph
                         .edges_directed(index, Direction::Outgoing)
@@ -938,7 +938,7 @@ fn populate_workflow_scope(
                 );
 
                 // Check for unused call
-                if let Some(severity) = config.diagnostics.unused_call {
+                if let Some(severity) = config.unused_call {
                     if graph
                         .edges_directed(index, Direction::Outgoing)
                         .next()

@@ -18,7 +18,7 @@ use wdl_ast::ToSpan;
 use wdl_ast::WorkflowDescriptionLanguage;
 use wdl_ast::support::token;
 
-use crate::Config;
+use crate::DiagnosticsConfig;
 use crate::diagnostics::unused_import;
 use crate::graph::DocumentGraph;
 use crate::graph::ParseState;
@@ -405,7 +405,7 @@ pub struct DocumentScope {
 impl DocumentScope {
     /// Creates a new document scope for a given document.
     pub(crate) fn new(
-        mut config: Config,
+        config: DiagnosticsConfig,
         graph: &DocumentGraph,
         index: NodeIndex,
     ) -> (Self, Vec<Diagnostic>) {
@@ -428,9 +428,8 @@ impl DocumentScope {
             }
         };
 
-        config.diagnostics = config
-            .diagnostics
-            .excepted_for_node(&version.syntax().parent().expect("token should have parent"));
+        let config =
+            config.excepted_for_node(&version.syntax().parent().expect("token should have parent"));
 
         let mut scope = match document.ast() {
             Ast::Unsupported => Default::default(),
@@ -440,7 +439,7 @@ impl DocumentScope {
         };
 
         // Check for unused imports
-        if let Some(severity) = config.diagnostics.unused_import {
+        if let Some(severity) = config.unused_import {
             for (name, ns) in scope
                 .namespaces()
                 .filter(|(_, ns)| !ns.used && !ns.excepted)

@@ -42,8 +42,8 @@ pub use tags::*;
 pub use visitor::*;
 pub use wdl_ast as ast;
 
-/// The reserved rule names that are used by analysis.
-const RESERVED_RULE_NAMES: &[&str] = &[
+/// The reserved rule identifiers that are used by analysis.
+pub const RESERVED_RULE_IDS: &[&str] = &[
     "UnusedImport",
     "UnusedInput",
     "UnusedDeclaration",
@@ -139,7 +139,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
                 panic!("duplicate rule id `{id}`", id = r.id());
             }
 
-            if RESERVED_RULE_NAMES.contains(&r.id()) {
+            if RESERVED_RULE_IDS.contains(&r.id()) {
                 panic!("rule id `{id}` is reserved", id = r.id());
             }
         }
