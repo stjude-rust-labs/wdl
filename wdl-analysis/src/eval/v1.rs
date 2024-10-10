@@ -168,7 +168,7 @@ impl TaskGraph {
                     graph.requirements =
                         Some(graph.inner.add_node(TaskGraphNode::Requirements(section)));
                 }
-                TaskItem::Hints(section)
+                TaskItem::TaskHints(section)
                     if version >= SupportedVersion::V1(V1::Two)
                         && graph.hints.is_none()
                         && graph.runtime.is_none() =>

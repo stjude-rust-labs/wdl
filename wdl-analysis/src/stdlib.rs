@@ -2445,10 +2445,12 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
         functions
             .insert(
                 "select_first",
-                // This differs from the definition of `select_first` in that we can have a single
-                // signature of `X select_first(Array[X?], [X])`.
-                MonomorphicFunction::new(
-                    SupportedVersion::V1(V1::Zero),
+                PolymorphicFunction::new(SupportedVersion::V1(V1::Zero), vec![
+                    FunctionSignature::builder()
+                        .type_parameter("X", OptionalTypeConstraint)
+                        .parameter(GenericArrayType::non_empty(GenericType::Parameter("X")))
+                        .ret(GenericType::UnqualifiedParameter("X"))
+                        .build(),
                     FunctionSignature::builder()
                         .type_parameter("X", OptionalTypeConstraint)
                         .required(1)
@@ -2456,7 +2458,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(GenericType::UnqualifiedParameter("X"))
                         .ret(GenericType::UnqualifiedParameter("X"))
                         .build(),
-                )
+                ])
                 .into(),
             )
             .is_none()
