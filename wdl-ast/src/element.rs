@@ -293,8 +293,14 @@ pub enum Node {
     VersionStatement(VersionStatement),
     /// A workflow definition.
     WorkflowDefinition(WorkflowDefinition),
-    /// A task item within a hints section.
+    /// An array within a workflow hints section.
+    WorkflowHintsArray(WorkflowHintsArray),
+    /// A hints item within a workflow hints section.
     WorkflowHintsItem(WorkflowHintsItem),
+    /// An object within a workflow hints section.
+    WorkflowHintsObject(WorkflowHintsObject),
+    /// An item within an object within a workflow hints section.
+    WorkflowHintsObjectItem(WorkflowHintsObjectItem),
     /// A hints section within a workflow.
     WorkflowHintsSection(WorkflowHintsSection),
 }
@@ -386,7 +392,10 @@ ast_element_impl!(
         unbound_decl(): UnboundDeclNode => UnboundDecl => UnboundDecl,
         version_statement(): VersionStatementNode => VersionStatement => VersionStatement,
         workflow_definition(): WorkflowDefinitionNode => WorkflowDefinition => WorkflowDefinition,
+        workflow_hints_array(): WorkflowHintsArrayNode => WorkflowHintsArray => WorkflowHintsArray,
         workflow_hints_item(): WorkflowHintsItemNode => WorkflowHintsItem => WorkflowHintsItem,
+        workflow_hints_object(): WorkflowHintsObjectNode => WorkflowHintsObject => WorkflowHintsObject,
+        workflow_hints_object_item(): WorkflowHintsObjectItemNode => WorkflowHintsObjectItem => WorkflowHintsObjectItem,
         workflow_hints_section(): WorkflowHintsSectionNode => WorkflowHintsSection => WorkflowHintsSection
     ]
 );

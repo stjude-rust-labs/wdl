@@ -115,6 +115,7 @@ pub fn format_workflow_definition(element: &FormatElement, stream: &mut TokenStr
     let mut input = None;
     let mut body = Vec::new();
     let mut output = None;
+    let mut hints = None;
     let mut close_brace = None;
 
     for child in children {
@@ -143,6 +144,9 @@ pub fn format_workflow_definition(element: &FormatElement, stream: &mut TokenStr
             SyntaxKind::OutputSectionNode => {
                 output = Some(child.clone());
             }
+            SyntaxKind::WorkflowHintsSectionNode => {
+                hints = Some(child.clone());
+            }
             SyntaxKind::CloseBrace => {
                 close_brace = Some(child.clone());
             }
@@ -170,16 +174,18 @@ pub fn format_workflow_definition(element: &FormatElement, stream: &mut TokenStr
         stream.blank_line();
     }
 
-    let need_blank = !body.is_empty();
     for child in body {
         (&child).write(stream);
     }
-    if need_blank {
-        stream.blank_line();
-    }
+    stream.blank_line();
 
     if let Some(output) = output {
         (&output).write(stream);
+        stream.blank_line();
+    }
+
+    if let Some(hints) = hints {
+        (&hints).write(stream);
         stream.blank_line();
     }
 
@@ -188,4 +194,134 @@ pub fn format_workflow_definition(element: &FormatElement, stream: &mut TokenStr
     stream.decrement_indent();
     (&close_brace.expect("workflow close brace")).write(stream);
     stream.end_line();
+}
+
+/// Formats a [`WorkflowHintsArray`](wdl_ast::v1::WorkflowHintsArray).
+pub fn format_workflow_hints_array(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("workflow hints array children");
+
+    let open_bracket = children.next().expect("open bracket");
+    assert!(open_bracket.element().kind() == SyntaxKind::OpenBracket);
+    (&open_bracket).write(stream);
+    stream.increment_indent();
+
+    let mut items = Vec::new();
+    let mut commas = Vec::new();
+    let mut close_bracket = None;
+
+    for child in children {
+        match child.element().kind() {
+            SyntaxKind::Comma => {
+                commas.push(child.clone());
+            }
+            SyntaxKind::CloseBracket => {
+                close_bracket = Some(child.clone());
+            }
+            _ => {
+                items.push(child.clone());
+            }
+        }
+    }
+
+    let mut commas = commas.into_iter();
+    for item in items {
+        (&item).write(stream);
+        if let Some(comma) = commas.next() {
+            (&comma).write(stream);
+        } else {
+            stream.push_literal(",".to_string(), SyntaxKind::Comma);
+        }
+        stream.end_line();
+    }
+
+    stream.decrement_indent();
+    (&close_bracket.expect("workflow hints array close bracket")).write(stream);
+}
+
+/// Formats a [`WorkflowHintsItem`](wdl_ast::v1::WorkflowHintsItem).
+pub fn format_workflow_hints_item(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("workflow hints item children");
+
+    let key = children.next().expect("workflow hints item key");
+    assert!(key.element().kind() == SyntaxKind::Ident);
+    (&key).write(stream);
+
+    let colon = children.next().expect("workflow hints item colon");
+    assert!(colon.element().kind() == SyntaxKind::Colon);
+    (&colon).write(stream);
+    stream.end_word();
+
+    let value = children.next().expect("workflow hints item value");
+    (&value).write(stream);
+
+    stream.end_line();
+
+    assert!(children.next().is_none());
+}
+
+/// Formats a [`WorkflowHintsObjectItem`](wdl_ast::v1::WorkflowHintsObjectItem).
+pub fn format_workflow_hints_object_item(
+    element: &FormatElement,
+    stream: &mut TokenStream<PreToken>,
+) {
+    let mut children = element
+        .children()
+        .expect("workflow hints object item children");
+
+    let key = children.next().expect("workflow hints object item key");
+    assert!(key.element().kind() == SyntaxKind::Ident);
+    (&key).write(stream);
+
+    let colon = children.next().expect("workflow hints object item colon");
+    assert!(colon.element().kind() == SyntaxKind::Colon);
+    (&colon).write(stream);
+    stream.end_word();
+
+    let value = children.next().expect("workflow hints object item value");
+    (&value).write(stream);
+
+    stream.end_line();
+
+    assert!(children.next().is_none());
+}
+
+/// Formats a [`WorkflowHintsObject`](wdl_ast::v1::WorkflowHintsObject).
+pub fn format_workflow_hints_object(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("workflow hints object children");
+
+    let open_brace = children.next().expect("open brace");
+    assert!(open_brace.element().kind() == SyntaxKind::OpenBrace);
+    (&open_brace).write(stream);
+    stream.increment_indent();
+
+    for child in children {
+        if child.element().kind() == SyntaxKind::CloseBrace {
+            stream.decrement_indent();
+        }
+        (&child).write(stream);
+        stream.end_line();
+    }
+}
+
+/// Formats a [`WorkflowHintsSection`](wdl_ast::v1::WorkflowHintsSection).
+pub fn format_workflow_hints_section(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("workflow hints section children");
+
+    let hints_keyword = children.next().expect("hints keyword");
+    assert!(hints_keyword.element().kind() == SyntaxKind::HintsKeyword);
+    (&hints_keyword).write(stream);
+    stream.end_word();
+
+    let open_brace = children.next().expect("open brace");
+    assert!(open_brace.element().kind() == SyntaxKind::OpenBrace);
+    (&open_brace).write(stream);
+    stream.increment_indent();
+
+    for child in children {
+        if child.element().kind() == SyntaxKind::CloseBrace {
+            stream.decrement_indent();
+        }
+        (&child).write(stream);
+        stream.end_line();
+    }
 }

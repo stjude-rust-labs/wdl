@@ -68,10 +68,12 @@ impl Writable for &FormatElement {
                 AstNode::ConditionalStatement(_) => {
                     v1::workflow::format_conditional_statement(self, stream)
                 }
-                AstNode::DefaultOption(_) => todo!(),
-                AstNode::DivisionExpr(_) => todo!(),
+                AstNode::DefaultOption(_) => v1::expr::format_default_option(self, stream),
+                AstNode::DivisionExpr(_) => v1::expr::format_division_expr(self, stream),
                 AstNode::EqualityExpr(_) => v1::expr::format_equality_expr(self, stream),
-                AstNode::ExponentiationExpr(_) => todo!(),
+                AstNode::ExponentiationExpr(_) => {
+                    v1::expr::format_exponentiation_expr(self, stream)
+                }
                 AstNode::GreaterEqualExpr(_) => v1::expr::format_greater_equal_expr(self, stream),
                 AstNode::GreaterExpr(_) => v1::expr::format_greater_expr(self, stream),
                 AstNode::IfExpr(_) => v1::expr::format_if_expr(self, stream),
@@ -85,20 +87,20 @@ impl Writable for &FormatElement {
                 AstNode::LiteralArray(_) => v1::expr::format_literal_array(self, stream),
                 AstNode::LiteralBoolean(_) => v1::expr::format_literal_boolean(self, stream),
                 AstNode::LiteralFloat(_) => v1::expr::format_literal_float(self, stream),
-                AstNode::LiteralHints(_) => todo!(),
-                AstNode::LiteralHintsItem(_) => todo!(),
-                AstNode::LiteralInput(_) => todo!(),
-                AstNode::LiteralInputItem(_) => todo!(),
+                AstNode::LiteralHints(_) => v1::format_literal_hints(self, stream),
+                AstNode::LiteralHintsItem(_) => v1::format_literal_hints_item(self, stream),
+                AstNode::LiteralInput(_) => v1::format_literal_input(self, stream),
+                AstNode::LiteralInputItem(_) => v1::format_literal_input_item(self, stream),
                 AstNode::LiteralInteger(_) => v1::expr::format_literal_integer(self, stream),
                 AstNode::LiteralMap(_) => v1::expr::format_literal_map(self, stream),
                 AstNode::LiteralMapItem(_) => v1::expr::format_literal_map_item(self, stream),
-                AstNode::LiteralNone(_) => todo!(),
+                AstNode::LiteralNone(_) => v1::expr::format_literal_none(self, stream),
                 AstNode::LiteralNull(_) => v1::format_literal_null(self, stream),
                 AstNode::LiteralObject(_) => v1::expr::format_literal_object(self, stream),
                 AstNode::LiteralObjectItem(_) => v1::expr::format_literal_object_item(self, stream),
-                AstNode::LiteralOutput(_) => todo!(),
-                AstNode::LiteralOutputItem(_) => todo!(),
-                AstNode::LiteralPair(_) => todo!(),
+                AstNode::LiteralOutput(_) => v1::format_literal_output(self, stream),
+                AstNode::LiteralOutputItem(_) => v1::format_literal_output_item(self, stream),
+                AstNode::LiteralPair(_) => v1::expr::format_literal_pair(self, stream),
                 AstNode::LiteralString(_) => v1::expr::format_literal_string(self, stream),
                 AstNode::LiteralStruct(_) => v1::r#struct::format_literal_struct(self, stream),
                 AstNode::LiteralStructItem(_) => {
@@ -112,7 +114,7 @@ impl Writable for &FormatElement {
                 AstNode::MetadataObject(_) => v1::format_metadata_object(self, stream),
                 AstNode::MetadataObjectItem(_) => v1::format_metadata_object_item(self, stream),
                 AstNode::MetadataSection(_) => v1::format_metadata_section(self, stream),
-                AstNode::ModuloExpr(_) => todo!(),
+                AstNode::ModuloExpr(_) => v1::expr::format_modulo_expr(self, stream),
                 AstNode::MultiplicationExpr(_) => {
                     v1::expr::format_multiplication_expr(self, stream)
                 }
@@ -140,19 +142,32 @@ impl Writable for &FormatElement {
                 AstNode::StructDefinition(_) => {
                     v1::r#struct::format_struct_definition(self, stream)
                 }
-                AstNode::SubtractionExpr(_) => todo!(),
+                AstNode::SubtractionExpr(_) => v1::expr::format_subtraction_expr(self, stream),
                 AstNode::TaskDefinition(_) => v1::task::format_task_definition(self, stream),
                 AstNode::TaskHintsItem(_) => v1::task::format_task_hints_item(self, stream),
                 AstNode::TaskHintsSection(_) => v1::task::format_task_hints_section(self, stream),
-                AstNode::TrueFalseOption(_) => todo!(),
+                AstNode::TrueFalseOption(_) => v1::expr::format_true_false_option(self, stream),
                 AstNode::TypeRef(_) => v1::format_type_ref(self, stream),
                 AstNode::UnboundDecl(_) => v1::format_unbound_decl(self, stream),
                 AstNode::VersionStatement(_) => v1::format_version_statement(self, stream),
                 AstNode::WorkflowDefinition(_) => {
                     v1::workflow::format_workflow_definition(self, stream)
                 }
-                AstNode::WorkflowHintsItem(_) => todo!(),
-                AstNode::WorkflowHintsSection(_) => todo!(),
+                AstNode::WorkflowHintsArray(_) => {
+                    v1::workflow::format_workflow_hints_array(self, stream)
+                }
+                AstNode::WorkflowHintsItem(_) => {
+                    v1::workflow::format_workflow_hints_item(self, stream)
+                }
+                AstNode::WorkflowHintsObject(_) => {
+                    v1::workflow::format_workflow_hints_object(self, stream)
+                }
+                AstNode::WorkflowHintsObjectItem(_) => {
+                    v1::workflow::format_workflow_hints_object_item(self, stream)
+                }
+                AstNode::WorkflowHintsSection(_) => {
+                    v1::workflow::format_workflow_hints_section(self, stream)
+                }
             },
             Element::Token(token) => {
                 stream.push_ast_token(token);

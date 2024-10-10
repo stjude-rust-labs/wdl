@@ -70,9 +70,7 @@ task a_task {
     # the TextMate language that it's a custom struct.
     }
 
-    command <<<
-         
-    >>>
+    command <<< >>>
 
     output
         # Here is a comment before the output.

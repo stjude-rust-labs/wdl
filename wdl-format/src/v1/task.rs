@@ -3,8 +3,8 @@
 use wdl_ast::SyntaxKind;
 
 use crate::PreToken;
-use crate::Trivia;
 use crate::TokenStream;
+use crate::Trivia;
 use crate::Writable as _;
 use crate::element::FormatElement;
 
@@ -145,27 +145,44 @@ pub fn format_command_section(element: &FormatElement, stream: &mut TokenStream<
     let open_delimiter = children.next().expect("open delimiter");
     match open_delimiter.element().kind() {
         SyntaxKind::OpenBrace => {
-            stream.push_literal_in_place_of_token(open_delimiter.element().as_token().expect("open brace should be token"), "<<<".to_string());
-        },
+            stream.push_literal_in_place_of_token(
+                open_delimiter
+                    .element()
+                    .as_token()
+                    .expect("open brace should be token"),
+                "<<<".to_string(),
+            );
+        }
         SyntaxKind::OpenHeredoc => {
             (&open_delimiter).write(stream);
-        },
+        }
         _ => {
-            unreachable!("unexpected open delimiter in command section: {:?}", open_delimiter.element().kind());
+            unreachable!(
+                "unexpected open delimiter in command section: {:?}",
+                open_delimiter.element().kind()
+            );
         }
     }
-    stream.increment_indent();
-
+    // Technically there's no trivia inside the command section,
+    // so we don't want to increment indent here.
+    // All the indentation should be handled by the command text itself.
     for child in children {
         let kind = child.element().kind();
         if kind == SyntaxKind::CloseBrace {
-            stream.decrement_indent();
-            stream.push_literal_in_place_of_token(child.element().as_token().expect("close brace should be token"), ">>>".to_string());
+            stream.push_literal_in_place_of_token(
+                child
+                    .element()
+                    .as_token()
+                    .expect("close brace should be token"),
+                ">>>".to_string(),
+            );
         } else if kind == SyntaxKind::CloseHeredoc {
-            stream.decrement_indent();
             (&child).write(stream);
         } else {
-            assert!(matches!(kind, SyntaxKind::LiteralCommandText | SyntaxKind::PlaceholderNode));
+            assert!(matches!(
+                kind,
+                SyntaxKind::LiteralCommandText | SyntaxKind::PlaceholderNode
+            ));
             (&child).write(stream);
         }
     }
@@ -227,6 +244,7 @@ pub fn format_requirements_section(element: &FormatElement, stream: &mut TokenSt
 
     for item in items {
         (&item).write(stream);
+        stream.end_line();
     }
 
     stream.decrement_indent();
@@ -352,6 +370,7 @@ pub fn format_task_hints_section(element: &FormatElement, stream: &mut TokenStre
 
     for item in items {
         (&item).write(stream);
+        stream.end_line();
     }
 
     stream.decrement_indent();

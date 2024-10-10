@@ -27,6 +27,77 @@ pub fn format_sep_option(element: &FormatElement, stream: &mut TokenStream<PreTo
     assert!(children.next().is_none());
 }
 
+/// Formats a [`DefaultOption`](wdl_ast::v1::DefaultOption).
+pub fn format_default_option(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("default option children");
+
+    let default_keyword = children.next().expect("default keyword");
+    assert!(default_keyword.element().kind() == SyntaxKind::Ident);
+    (&default_keyword).write(stream);
+
+    let equals = children.next().expect("default equals");
+    assert!(equals.element().kind() == SyntaxKind::Assignment);
+    (&equals).write(stream);
+
+    let default_value = children.next().expect("default value");
+    (&default_value).write(stream);
+    stream.end_word();
+
+    assert!(children.next().is_none());
+}
+
+/// Formats a [`TrueFalseOption`](wdl_ast::v1::TrueFalseOption).
+pub fn format_true_false_option(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("true false option children");
+
+    let first_keyword = children.next().expect("true false option first keyword");
+    let first_keyword_kind = first_keyword.element().kind();
+    assert!(
+        first_keyword_kind == SyntaxKind::TrueKeyword
+            || first_keyword_kind == SyntaxKind::FalseKeyword
+    );
+
+    let first_equals = children.next().expect("true false option first equals");
+    assert!(first_equals.element().kind() == SyntaxKind::Assignment);
+
+    let first_value = children.next().expect("true false option first value");
+
+    let second_keyword = children.next().expect("true false option second keyword");
+    let second_keyword_kind = second_keyword.element().kind();
+    assert!(
+        second_keyword_kind == SyntaxKind::TrueKeyword
+            || second_keyword_kind == SyntaxKind::FalseKeyword
+    );
+
+    let second_equals = children.next().expect("true false option second equals");
+    assert!(second_equals.element().kind() == SyntaxKind::Assignment);
+
+    let second_value = children.next().expect("true false option second value");
+
+    if first_keyword_kind == SyntaxKind::TrueKeyword {
+        assert!(second_keyword_kind == SyntaxKind::FalseKeyword);
+        (&first_keyword).write(stream);
+        (&first_equals).write(stream);
+        (&first_value).write(stream);
+        stream.end_word();
+        (&second_keyword).write(stream);
+        (&second_equals).write(stream);
+        (&second_value).write(stream);
+    } else {
+        assert!(second_keyword_kind == SyntaxKind::TrueKeyword);
+        (&second_keyword).write(stream);
+        (&second_equals).write(stream);
+        (&second_value).write(stream);
+        stream.end_word();
+        (&first_keyword).write(stream);
+        (&first_equals).write(stream);
+        (&first_value).write(stream);
+    }
+    stream.end_word();
+
+    assert!(children.next().is_none());
+}
+
 /// Formats a [`Placeholder`](wdl_ast::v1::Placeholder).
 pub fn format_placeholder(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     let mut children = element.children().expect("placeholder children");
@@ -109,10 +180,47 @@ pub fn format_literal_string(element: &FormatElement, stream: &mut TokenStream<P
                 (&child).write(stream);
             }
             _ => {
-                unreachable!("unexpected child in literal string: {:?}", child.element().kind());
+                unreachable!(
+                    "unexpected child in literal string: {:?}",
+                    child.element().kind()
+                );
             }
         }
     }
+}
+
+/// Formats a [`LiteralNone`](wdl_ast::v1::LiteralNone).
+pub fn format_literal_none(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("literal none children");
+    let none = children.next().expect("literal none token");
+    assert!(none.element().kind() == SyntaxKind::NoneKeyword);
+    (&none).write(stream);
+    assert!(children.next().is_none());
+}
+
+/// Formats a [`LiteralPair`](wdl_ast::v1::LiteralPair).
+pub fn format_literal_pair(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("literal pair children");
+
+    let open_paren = children.next().expect("literal pair open paren");
+    assert!(open_paren.element().kind() == SyntaxKind::OpenParen);
+    (&open_paren).write(stream);
+
+    let left = children.next().expect("literal pair left");
+    (&left).write(stream);
+
+    let comma = children.next().expect("literal pair comma");
+    assert!(comma.element().kind() == SyntaxKind::Comma);
+    (&comma).write(stream);
+    stream.end_word();
+
+    let right = children.next().expect("literal pair right");
+    (&right).write(stream);
+
+    let close_paren = children.next().expect("literal pair close paren");
+    assert!(close_paren.element().kind() == SyntaxKind::CloseParen);
+    (&close_paren).write(stream);
+    assert!(children.next().is_none());
 }
 
 /// Formats a [`LiteralBoolean`](wdl_ast::v1::LiteralBoolean).
@@ -353,10 +461,66 @@ pub fn format_addition_expr(element: &FormatElement, stream: &mut TokenStream<Pr
     }
 }
 
+/// Formats a [`SubtractionExpr`](wdl_ast::v1::SubtractionExpr).
+pub fn format_subtraction_expr(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    for child in element.children().expect("subtraction expr children") {
+        let should_end_word = child.element().kind() == SyntaxKind::Minus;
+        if should_end_word {
+            stream.end_word();
+        }
+        (&child).write(stream);
+        if should_end_word {
+            stream.end_word();
+        }
+    }
+}
+
 /// Formats a [`MultiplicationExpr`](wdl_ast::v1::MultiplicationExpr).
 pub fn format_multiplication_expr(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     for child in element.children().expect("multiplication expr children") {
         let should_end_word = child.element().kind() == SyntaxKind::Asterisk;
+        if should_end_word {
+            stream.end_word();
+        }
+        (&child).write(stream);
+        if should_end_word {
+            stream.end_word();
+        }
+    }
+}
+
+/// Formats a [`DivisionExpr`](wdl_ast::v1::DivisionExpr).
+pub fn format_division_expr(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    for child in element.children().expect("division expr children") {
+        let should_end_word = child.element().kind() == SyntaxKind::Slash;
+        if should_end_word {
+            stream.end_word();
+        }
+        (&child).write(stream);
+        if should_end_word {
+            stream.end_word();
+        }
+    }
+}
+
+/// Formats a [`ModuloExpr`](wdl_ast::v1::ModuloExpr).
+pub fn format_modulo_expr(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    for child in element.children().expect("modulo expr children") {
+        let should_end_word = child.element().kind() == SyntaxKind::Percent;
+        if should_end_word {
+            stream.end_word();
+        }
+        (&child).write(stream);
+        if should_end_word {
+            stream.end_word();
+        }
+    }
+}
+
+/// Formats an [`ExponentiationExpr`](wdl_ast::v1::ExponentiationExpr).
+pub fn format_exponentiation_expr(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    for child in element.children().expect("exponentiation expr children") {
+        let should_end_word = child.element().kind() == SyntaxKind::Exponentiation;
         if should_end_word {
             stream.end_word();
         }

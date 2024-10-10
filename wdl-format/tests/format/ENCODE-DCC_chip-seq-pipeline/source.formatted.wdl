@@ -2438,7 +2438,6 @@ task align {
     ])
 
     command <<<
-        
         set -e
 
         # check if pipeline dependencies can be found
@@ -2522,7 +2521,6 @@ task align {
             ~{"--mem-gb " + samtools_mem_gb} \
             ~{"--nth " + cpu}
         rm -rf R1 R2 R1$SUFFIX R2$SUFFIX
-    
     >>>
 
     output {
@@ -2575,7 +2573,6 @@ task filter {
     Int disk_gb = round(20.0 + disk_factor * input_file_size_gb)
 
     command <<<
-        
         set -e
         python3 $(which encode_task_filter.py) \
             ~{bam} \
@@ -2597,7 +2594,6 @@ task filter {
                 ~{"--ref-fa " + ref_fa} \
                 '--delete-original-bam'
         fi
-    
     >>>
 
     output {
@@ -2641,7 +2637,6 @@ task bam2ta {
     Int disk_gb = round(20.0 + disk_factor * input_file_size_gb)
 
     command <<<
-        
         set -e
         python3 $(which encode_task_bam2ta.py) \
             ~{bam} \
@@ -2651,7 +2646,6 @@ task bam2ta {
             ~{"--subsample " + subsample} \
             ~{"--mem-gb " + samtools_mem_gb} \
             ~{"--nth " + cpu}
-    
     >>>
 
     output {
@@ -2687,13 +2681,11 @@ task spr {
     Int disk_gb = round(20.0 + disk_factor * input_file_size_gb)
 
     command <<<
-        
         set -e
         python3 $(which encode_task_spr.py) \
             ~{ta} \
             ~{"--pseudoreplication-random-seed " + pseudoreplication_random_seed} \
             ~{if paired_end then "--paired-end" else ""}
-    
     >>>
 
     output {
@@ -2723,13 +2715,11 @@ task pool_ta {
     }
 
     command <<<
-        
         set -e
         python3 $(which encode_task_pool_ta.py) \
             ~{sep=" " select_all(tas)} \
             ~{"--prefix " + prefix} \
             ~{"--col " + col}
-    
     >>>
 
     output {
@@ -2773,7 +2763,6 @@ task xcor {
     Int disk_gb = round(20.0 + disk_factor * input_file_size_gb)
 
     command <<<
-        
         set -e
         python3 $(which encode_task_xcor.py) \
             ~{ta} \
@@ -2785,7 +2774,6 @@ task xcor {
             ~{"--exclusion-range-max " + exclusion_range_max} \
             ~{"--subsample " + subsample} \
             ~{"--nth " + cpu}
-    
     >>>
 
     output {
@@ -2828,7 +2816,6 @@ task jsd {
     Int disk_gb = round(20.0 + disk_factor * input_file_size_gb)
 
     command <<<
-        
         set -e
         python3 $(which encode_task_jsd.py) \
             ~{sep=" " select_all(nodup_bams)} \
@@ -2836,7 +2823,6 @@ task jsd {
             ~{"--mapq-thresh " + mapq_thresh} \
             ~{"--blacklist " + blacklist} \
             ~{"--nth " + cpu}
-    
     >>>
 
     output {
@@ -2872,7 +2858,6 @@ task choose_ctl {
     }
 
     command <<<
-        
         set -e
         python3 $(which encode_task_choose_ctl.py) \
             --tas ~{sep=" " select_all(tas)} \
@@ -2883,7 +2868,6 @@ task choose_ctl {
             ~{"--ctl-depth-ratio " + ctl_depth_ratio} \
             ~{"--ctl-depth-limit " + ctl_depth_limit} \
             ~{"--exp-ctl-depth-ratio-limit " + exp_ctl_depth_ratio_limit}
-    
     >>>
 
     output {
@@ -2918,13 +2902,11 @@ task count_signal_track {
     Float mem_gb = 8.0
 
     command <<<
-        
         set -e
         python3 $(which encode_task_count_signal_track.py) \
             ~{ta} \
             ~{"--chrsz " + chrsz} \
             ~{"--mem-gb " + mem_gb}
-    
     >>>
 
     output {
@@ -2961,12 +2943,10 @@ task subsample_ctl {
     Int disk_gb = round(20.0 + disk_factor * input_file_size_gb)
 
     command <<<
-        
         python3 $(which encode_task_subsample_ctl.py) \
             ~{ta} \
             ~{"--subsample " + subsample} \
             ~{if paired_end then "--paired-end" else ""} \
-    
     >>>
 
     output {
@@ -3014,7 +2994,6 @@ task call_peak {
     Int disk_gb = round(20.0 + disk_factor * input_file_size_gb)
 
     command <<<
-        
         set -e
 
         if [ '~{peak_caller}' == 'macs2' ]; then
@@ -3045,7 +3024,6 @@ task call_peak {
             ~{"--fraglen " + fraglen} \
             ~{"--peak-type " + peak_type} \
             ~{"--blacklist " + blacklist}        
-    
     >>>
 
     output {
@@ -3096,7 +3074,6 @@ task macs2_signal_track {
     Int disk_gb = round(20.0 + disk_factor * input_file_size_gb)
 
     command <<<
-        
         set -e
         python3 $(which encode_task_macs2_signal_track_chip.py) \
             ~{sep=" " select_all(tas)} \
@@ -3105,7 +3082,6 @@ task macs2_signal_track {
             ~{"--fraglen " + fraglen} \
             ~{"--pval-thresh " + pval_thresh} \
             ~{"--mem-gb " + mem_gb}
-    
     >>>
 
     output {
@@ -3146,7 +3122,6 @@ task idr {
     }
 
     command <<<
-        
         set -e
         ~{if defined(ta) then "" else "touch null.frip.qc"}
         touch null 
@@ -3161,7 +3136,6 @@ task idr {
             ~{"--blacklist " + blacklist} \
             ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"} \
             ~{"--ta " + ta}
-    
     >>>
 
     output {
@@ -3207,7 +3181,6 @@ task overlap {
     }
 
     command <<<
-        
         set -e
         ~{if defined(ta) then "" else "touch null.frip.qc"}
         touch null 
@@ -3221,7 +3194,6 @@ task overlap {
             --nonamecheck \
             ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"} \
             ~{"--ta " + ta}
-    
     >>>
 
     output {
@@ -3262,7 +3234,6 @@ task reproducibility {
     }
 
     command <<<
-        
         set -e
         python3 $(which encode_task_reproducibility.py) \
             ~{sep=" " peaks} \
@@ -3271,7 +3242,6 @@ task reproducibility {
             --prefix ~{prefix} \
             ~{"--peak-type " + peak_type} \
             ~{"--chrsz " + chrsz}
-    
     >>>
 
     output {
@@ -3320,13 +3290,11 @@ task gc_bias {
     Float picard_java_heap_factor = 0.9
 
     command <<<
-        
         set -e
         python3 $(which encode_task_gc_bias.py) \
             ~{"--nodup-bam " + nodup_bam} \
             ~{"--ref-fa " + ref_fa} \
             ~{"--picard-java-heap " + if defined(picard_java_heap) then picard_java_heap else (round(mem_gb * picard_java_heap_factor) + "G")}
-    
     >>>
 
     output {
@@ -3417,7 +3385,6 @@ task qc_report {
     }
 
     command <<<
-        
         set -e
         python3 $(which encode_task_qc_report.py) \
             --pipeline-prefix chip \
@@ -3479,7 +3446,6 @@ task qc_report {
             --out-qc-html qc.html \
             --out-qc-json qc.json \
             ~{"--qc-json-ref " + qc_json_ref}
-    
     >>>
 
     output {
@@ -3510,7 +3476,6 @@ task read_genome_tsv {
     }
 
     command <<<
-        
         echo "$(basename ~{genome_tsv})" > genome_name
         # create empty files for all entries
         touch ref_fa bowtie2_idx_tar bwa_idx_tar chrsz gensz blacklist blacklist2
@@ -3527,7 +3492,6 @@ task read_genome_tsv {
                     with open(key,'w') as fp2:
                         fp2.write(val)
         CODE
-    
     >>>
 
     output {
@@ -3564,7 +3528,6 @@ task rounded_mean {
     }
 
     command <<<
-        
         python <<CODE
         arr = [~{sep="," ints}]
         with open('tmp.txt','w') as fp:
@@ -3575,7 +3538,6 @@ task rounded_mean {
             else:
                 fp.write('0')
         CODE
-    
     >>>
 
     output {
@@ -3602,10 +3564,8 @@ task raise_exception {
     }
 
     command <<<
-        
         echo -e "\n* Error: ~{msg}\n" >&2
         exit 2
-    
     >>>
 
     output {

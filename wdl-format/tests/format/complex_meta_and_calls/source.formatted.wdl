@@ -92,7 +92,7 @@ workflow test_wf {
         String a = "friend"
         Int b = 1 + 2
         String c = "Hello, ~{a}"
-        Map[String,Int] d = {
+        Map[String, Int] d = {
             "a": 0,
             "b": 1,
             "c": 2,
@@ -113,8 +113,7 @@ task test_task {
         String bowchicka
     }
 
-    command <<<
-    >>>
+    command <<<>>>
 }
 
 struct SpliceJunctionMotifs {
