@@ -64,7 +64,7 @@ impl Writable for &FormatElement {
                     v1::workflow::call::format_call_statement(self, stream)
                 }
                 AstNode::CallTarget(_) => v1::workflow::call::format_call_target(self, stream),
-                AstNode::CommandSection(_) => todo!(),
+                AstNode::CommandSection(_) => v1::task::format_command_section(self, stream),
                 AstNode::ConditionalStatement(_) => {
                     v1::workflow::format_conditional_statement(self, stream)
                 }
@@ -90,12 +90,12 @@ impl Writable for &FormatElement {
                 AstNode::LiteralInput(_) => todo!(),
                 AstNode::LiteralInputItem(_) => todo!(),
                 AstNode::LiteralInteger(_) => v1::expr::format_literal_integer(self, stream),
-                AstNode::LiteralMap(_) => todo!(),
-                AstNode::LiteralMapItem(_) => todo!(),
+                AstNode::LiteralMap(_) => v1::expr::format_literal_map(self, stream),
+                AstNode::LiteralMapItem(_) => v1::expr::format_literal_map_item(self, stream),
                 AstNode::LiteralNone(_) => todo!(),
                 AstNode::LiteralNull(_) => v1::format_literal_null(self, stream),
-                AstNode::LiteralObject(_) => todo!(),
-                AstNode::LiteralObjectItem(_) => todo!(),
+                AstNode::LiteralObject(_) => v1::expr::format_literal_object(self, stream),
+                AstNode::LiteralObjectItem(_) => v1::expr::format_literal_object_item(self, stream),
                 AstNode::LiteralOutput(_) => todo!(),
                 AstNode::LiteralOutputItem(_) => todo!(),
                 AstNode::LiteralPair(_) => todo!(),
@@ -107,7 +107,7 @@ impl Writable for &FormatElement {
                 AstNode::LogicalAndExpr(_) => v1::expr::format_logical_and_expr(self, stream),
                 AstNode::LogicalNotExpr(_) => v1::expr::format_logical_not_expr(self, stream),
                 AstNode::LogicalOrExpr(_) => v1::expr::format_logical_or_expr(self, stream),
-                AstNode::MapType(_) => todo!(),
+                AstNode::MapType(_) => v1::format_map_type(self, stream),
                 AstNode::MetadataArray(_) => v1::format_metadata_array(self, stream),
                 AstNode::MetadataObject(_) => v1::format_metadata_object(self, stream),
                 AstNode::MetadataObjectItem(_) => v1::format_metadata_object_item(self, stream),
@@ -119,29 +119,31 @@ impl Writable for &FormatElement {
                 AstNode::NameRef(_) => v1::expr::format_name_ref(self, stream),
                 AstNode::NegationExpr(_) => v1::expr::format_negation_expr(self, stream),
                 AstNode::OutputSection(_) => v1::format_output_section(self, stream),
-                AstNode::PairType(_) => todo!(),
-                AstNode::ObjectType(_) => todo!(),
+                AstNode::PairType(_) => v1::format_pair_type(self, stream),
+                AstNode::ObjectType(_) => v1::format_object_type(self, stream),
                 AstNode::ParameterMetadataSection(_) => {
                     v1::format_parameter_metadata_section(self, stream)
                 }
                 AstNode::ParenthesizedExpr(_) => v1::expr::format_parenthesized_expr(self, stream),
-                AstNode::Placeholder(_) => todo!(),
+                AstNode::Placeholder(_) => v1::expr::format_placeholder(self, stream),
                 AstNode::PrimitiveType(_) => v1::format_primitive_type(self, stream),
-                AstNode::RequirementsItem(_) => todo!(),
-                AstNode::RequirementsSection(_) => todo!(),
-                AstNode::RuntimeItem(_) => todo!(),
-                AstNode::RuntimeSection(_) => todo!(),
+                AstNode::RequirementsItem(_) => v1::task::format_requirements_item(self, stream),
+                AstNode::RequirementsSection(_) => {
+                    v1::task::format_requirements_section(self, stream)
+                }
+                AstNode::RuntimeItem(_) => v1::task::format_runtime_item(self, stream),
+                AstNode::RuntimeSection(_) => v1::task::format_runtime_section(self, stream),
                 AstNode::ScatterStatement(_) => {
                     v1::workflow::format_scatter_statement(self, stream)
                 }
-                AstNode::SepOption(_) => todo!(),
+                AstNode::SepOption(_) => v1::expr::format_sep_option(self, stream),
                 AstNode::StructDefinition(_) => {
                     v1::r#struct::format_struct_definition(self, stream)
                 }
                 AstNode::SubtractionExpr(_) => todo!(),
                 AstNode::TaskDefinition(_) => v1::task::format_task_definition(self, stream),
-                AstNode::TaskHintsItem(_) => todo!(),
-                AstNode::TaskHintsSection(_) => todo!(),
+                AstNode::TaskHintsItem(_) => v1::task::format_task_hints_item(self, stream),
+                AstNode::TaskHintsSection(_) => v1::task::format_task_hints_section(self, stream),
                 AstNode::TrueFalseOption(_) => todo!(),
                 AstNode::TypeRef(_) => v1::format_type_ref(self, stream),
                 AstNode::UnboundDecl(_) => v1::format_unbound_decl(self, stream),

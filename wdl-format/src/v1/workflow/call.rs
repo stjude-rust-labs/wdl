@@ -36,15 +36,16 @@ pub fn format_call_input_item(element: &FormatElement, stream: &mut TokenStream<
 
     let name = children.next().expect("call input item name");
     (&name).write(stream);
-    stream.end_word();
+    // Don't call end_word() here in case the name is alone
 
-    let equals = children.next();
-    if let Some(equals) = equals {
+    if let Some(equals) = children.next() {
+        stream.end_word();
         (&equals).write(stream);
         stream.end_word();
 
         let value = children.next().expect("call input item value");
         (&value).write(stream);
+        assert!(children.next().is_none());
     }
 }
 

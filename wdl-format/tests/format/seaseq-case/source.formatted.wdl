@@ -935,5 +935,4 @@ workflow seaseq {
             merge_overallsummary.summarytxt,
         ])
     }
-
 }

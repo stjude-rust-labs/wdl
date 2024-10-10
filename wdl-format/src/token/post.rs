@@ -163,7 +163,7 @@ impl Postprocessor {
                     Comment::Preceding(value) => {
                         if !matches!(
                             stream.0.last(),
-                            Some(&PostToken::Newline) | Some(&PostToken::Indent)
+                            Some(&PostToken::Newline) | Some(&PostToken::Indent) | None
                         ) {
                             self.interrupted = true;
                         }

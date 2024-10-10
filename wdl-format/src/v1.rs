@@ -95,6 +95,27 @@ pub fn format_array_type(element: &FormatElement, stream: &mut TokenStream<PreTo
     }
 }
 
+/// Formats a [`MapType`](wdl_ast::v1::MapType).
+pub fn format_map_type(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    for child in element.children().expect("map type children") {
+        (&child).write(stream);
+    }
+}
+
+/// Formats an [`ObjectType`](wdl_ast::v1::ObjectType).
+pub fn format_object_type(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    for child in element.children().expect("object type children") {
+        (&child).write(stream);
+    }
+}
+
+/// Formats a [`PairType`](wdl_ast::v1::PairType).
+pub fn format_pair_type(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    for child in element.children().expect("pair type children") {
+        (&child).write(stream);
+    }
+}
+
 /// Formats a [`TypeRef`](wdl_ast::v1::TypeRef).
 pub fn format_type_ref(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     let mut children = element.children().expect("type ref children");

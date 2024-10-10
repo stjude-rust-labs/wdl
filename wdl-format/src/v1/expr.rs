@@ -7,6 +7,54 @@ use crate::TokenStream;
 use crate::Writable as _;
 use crate::element::FormatElement;
 
+/// Formats a [`SepOption`](wdl_ast::v1::SepOption).
+pub fn format_sep_option(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("sep option children");
+
+    let sep_keyword = children.next().expect("sep keyword");
+    assert!(sep_keyword.element().kind() == SyntaxKind::Ident);
+    (&sep_keyword).write(stream);
+
+    let equals = children.next().expect("sep equals");
+    assert!(equals.element().kind() == SyntaxKind::Assignment);
+    (&equals).write(stream);
+
+    let sep_value = children.next().expect("sep value");
+    assert!(sep_value.element().kind() == SyntaxKind::LiteralStringNode);
+    (&sep_value).write(stream);
+    stream.end_word();
+
+    assert!(children.next().is_none());
+}
+
+/// Formats a [`Placeholder`](wdl_ast::v1::Placeholder).
+pub fn format_placeholder(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("placeholder children");
+
+    let open = children.next().expect("placeholder open");
+    assert!(open.element().kind() == SyntaxKind::PlaceholderOpen);
+    let syntax = open.element().syntax();
+    let text = syntax.as_token().expect("token").text();
+    match text {
+        "${" => {
+            stream.push_literal_in_place_of_token(
+                open.element().as_token().expect("token"),
+                "~{".to_owned(),
+            );
+        }
+        "~{" => {
+            (&open).write(stream);
+        }
+        _ => {
+            unreachable!("unexpected placeholder open: {:?}", text);
+        }
+    }
+
+    for child in children {
+        (&child).write(stream);
+    }
+}
+
 /// Formats a [`LiteralString`](wdl_ast::v1::LiteralString).
 pub fn format_literal_string(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     for child in element.children().expect("literal string children") {
@@ -58,7 +106,7 @@ pub fn format_literal_float(element: &FormatElement, stream: &mut TokenStream<Pr
     }
 }
 
-/// Formats a [`NameReference`](wdl_ast::v1::NameRef).
+/// Formats a [`NameRef`](wdl_ast::v1::NameRef).
 pub fn format_name_ref(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     let mut children = element.children().expect("name ref children");
     let name = children.next().expect("name ref name");
@@ -107,6 +155,123 @@ pub fn format_literal_array(element: &FormatElement, stream: &mut TokenStream<Pr
     (&close_bracket.expect("literal array close bracket")).write(stream);
 }
 
+/// Formats a [`LiteralMapItem`](wdl_ast::v1::LiteralMapItem).
+pub fn format_literal_map_item(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("literal map item children");
+
+    let key = children.next().expect("literal map item key");
+    (&key).write(stream);
+
+    let colon = children.next().expect("literal map item colon");
+    assert!(colon.element().kind() == SyntaxKind::Colon);
+    (&colon).write(stream);
+    stream.end_word();
+
+    let value = children.next().expect("literal map item value");
+    (&value).write(stream);
+    assert!(children.next().is_none());
+}
+
+/// Formats a [`LiteralMap`](wdl_ast::v1::LiteralMap).
+pub fn format_literal_map(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("literal map children");
+
+    let open_brace = children.next().expect("literal map open brace");
+    assert!(open_brace.element().kind() == SyntaxKind::OpenBrace);
+    (&open_brace).write(stream);
+    stream.increment_indent();
+
+    let mut close_brace = None;
+    let mut commas = Vec::new();
+    let items = children
+        .filter(|child| {
+            if child.element().kind() == SyntaxKind::CloseBrace {
+                close_brace = Some(child.to_owned());
+                false
+            } else if child.element().kind() == SyntaxKind::Comma {
+                commas.push(child.to_owned());
+                false
+            } else {
+                true
+            }
+        })
+        .collect::<Vec<_>>();
+
+    let mut commas = commas.iter();
+    for item in items {
+        (&item).write(stream);
+        if let Some(comma) = commas.next() {
+            (comma).write(stream);
+            stream.end_line();
+        } else {
+            stream.push_literal(",".to_string(), SyntaxKind::Comma);
+            stream.end_line();
+        }
+    }
+
+    stream.decrement_indent();
+    (&close_brace.expect("literal map close brace")).write(stream);
+}
+
+/// Formats a [`LiteralObjectItem`](wdl_ast::v1::LiteralObjectItem).
+pub fn format_literal_object_item(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("literal object item children");
+
+    let key = children.next().expect("literal object item key");
+    assert!(key.element().kind() == SyntaxKind::Ident);
+    (&key).write(stream);
+
+    let colon = children.next().expect("literal object item colon");
+    assert!(colon.element().kind() == SyntaxKind::Colon);
+    (&colon).write(stream);
+    stream.end_word();
+
+    let value = children.next().expect("literal object item value");
+    (&value).write(stream);
+    assert!(children.next().is_none());
+}
+
+/// Formats a [`LiteralObject`](wdl_ast::v1::LiteralObject).
+pub fn format_literal_object(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
+    let mut children = element.children().expect("literal object children");
+
+    let open_brace = children.next().expect("literal object open brace");
+    assert!(open_brace.element().kind() == SyntaxKind::OpenBrace);
+    (&open_brace).write(stream);
+    stream.increment_indent();
+
+    let mut close_brace = None;
+    let mut commas = Vec::new();
+    let members = children
+        .filter(|child| {
+            if child.element().kind() == SyntaxKind::CloseBrace {
+                close_brace = Some(child.to_owned());
+                false
+            } else if child.element().kind() == SyntaxKind::Comma {
+                commas.push(child.to_owned());
+                false
+            } else {
+                true
+            }
+        })
+        .collect::<Vec<_>>();
+
+    let mut commas = commas.iter();
+    for member in members {
+        (&member).write(stream);
+        if let Some(comma) = commas.next() {
+            (comma).write(stream);
+            stream.end_line();
+        } else {
+            stream.push_literal(",".to_string(), SyntaxKind::Comma);
+            stream.end_line();
+        }
+    }
+
+    stream.decrement_indent();
+    (&close_brace.expect("literal object close brace")).write(stream);
+}
+
 /// Formats a [`AccessExpr`](wdl_ast::v1::AccessExpr).
 pub fn format_access_expr(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     for child in element.children().expect("access expr children") {
@@ -134,12 +299,12 @@ pub fn format_index_expr(element: &FormatElement, stream: &mut TokenStream<PreTo
 /// Formats an [`AdditionExpr`](wdl_ast::v1::AdditionExpr).
 pub fn format_addition_expr(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     for child in element.children().expect("addition expr children") {
-        let kind = child.element().kind();
-        if kind == SyntaxKind::Plus {
+        let should_end_word = child.element().kind() == SyntaxKind::Plus;
+        if should_end_word {
             stream.end_word();
         }
         (&child).write(stream);
-        if kind == SyntaxKind::Plus {
+        if should_end_word {
             stream.end_word();
         }
     }
@@ -148,12 +313,12 @@ pub fn format_addition_expr(element: &FormatElement, stream: &mut TokenStream<Pr
 /// Formats a [`MultiplicationExpr`](wdl_ast::v1::MultiplicationExpr).
 pub fn format_multiplication_expr(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     for child in element.children().expect("multiplication expr children") {
-        let kind = child.element().kind();
-        if kind == SyntaxKind::Asterisk {
+        let should_end_word = child.element().kind() == SyntaxKind::Asterisk;
+        if should_end_word {
             stream.end_word();
         }
         (&child).write(stream);
-        if kind == SyntaxKind::Asterisk {
+        if should_end_word {
             stream.end_word();
         }
     }
@@ -162,12 +327,12 @@ pub fn format_multiplication_expr(element: &FormatElement, stream: &mut TokenStr
 /// Formats a [`LogicalAndExpr`](wdl_ast::v1::LogicalAndExpr).
 pub fn format_logical_and_expr(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     for child in element.children().expect("logical and expr children") {
-        let kind = child.element().kind();
-        if kind == SyntaxKind::LogicalAnd {
+        let should_end_word = child.element().kind() == SyntaxKind::LogicalAnd;
+        if should_end_word {
             stream.end_word();
         }
         (&child).write(stream);
-        if kind == SyntaxKind::LogicalAnd {
+        if should_end_word {
             stream.end_word();
         }
     }

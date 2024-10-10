@@ -6,6 +6,7 @@ use wdl_ast::SyntaxKind;
 
 use crate::PreToken;
 use crate::TokenStream;
+use crate::Trivia;
 use crate::Writable as _;
 use crate::element::FormatElement;
 
@@ -169,14 +170,20 @@ pub fn format_workflow_definition(element: &FormatElement, stream: &mut TokenStr
         stream.blank_line();
     }
 
+    let need_blank = !body.is_empty();
     for child in body {
         (&child).write(stream);
+    }
+    if need_blank {
+        stream.blank_line();
     }
 
     if let Some(output) = output {
         (&output).write(stream);
         stream.blank_line();
     }
+
+    stream.trim_while(|t| matches!(t, PreToken::BlankLine | PreToken::Trivia(Trivia::BlankLine)));
 
     stream.decrement_indent();
     (&close_brace.expect("workflow close brace")).write(stream);
