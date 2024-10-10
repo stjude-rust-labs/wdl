@@ -272,7 +272,6 @@ pub fn format_literal_array(element: &FormatElement, stream: &mut TokenStream<Pr
     let open_bracket = children.next().expect("literal array open bracket");
     assert!(open_bracket.element().kind() == SyntaxKind::OpenBracket);
     (&open_bracket).write(stream);
-    stream.increment_indent();
 
     let mut close_bracket = None;
     let mut commas = Vec::new();
@@ -290,19 +289,24 @@ pub fn format_literal_array(element: &FormatElement, stream: &mut TokenStream<Pr
         })
         .collect::<Vec<_>>();
 
+    let empty = items.is_empty();
+    if !empty {
+        stream.increment_indent();
+    }
     let mut commas = commas.iter();
     for item in items {
         (&item).write(stream);
         if let Some(comma) = commas.next() {
             (comma).write(stream);
-            stream.end_line();
         } else {
             stream.push_literal(",".to_string(), SyntaxKind::Comma);
-            stream.end_line();
         }
+        stream.end_line();
     }
 
-    stream.decrement_indent();
+    if !empty {
+        stream.decrement_indent();
+    }
     (&close_bracket.expect("literal array close bracket")).write(stream);
 }
 

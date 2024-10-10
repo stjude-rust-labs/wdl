@@ -889,113 +889,62 @@ workflow chip {
 
         # group: input_genomic_data
         Boolean? paired_end
-        Array[Boolean] paired_ends = [
-        ]
-        Array[File] fastqs_rep1_R1 = [
-        ]
-        Array[File] fastqs_rep1_R2 = [
-        ]
-        Array[File] fastqs_rep2_R1 = [
-        ]
-        Array[File] fastqs_rep2_R2 = [
-        ]
-        Array[File] fastqs_rep3_R1 = [
-        ]
-        Array[File] fastqs_rep3_R2 = [
-        ]
-        Array[File] fastqs_rep4_R1 = [
-        ]
-        Array[File] fastqs_rep4_R2 = [
-        ]
-        Array[File] fastqs_rep5_R1 = [
-        ]
-        Array[File] fastqs_rep5_R2 = [
-        ]
-        Array[File] fastqs_rep6_R1 = [
-        ]
-        Array[File] fastqs_rep6_R2 = [
-        ]
-        Array[File] fastqs_rep7_R1 = [
-        ]
-        Array[File] fastqs_rep7_R2 = [
-        ]
-        Array[File] fastqs_rep8_R1 = [
-        ]
-        Array[File] fastqs_rep8_R2 = [
-        ]
-        Array[File] fastqs_rep9_R1 = [
-        ]
-        Array[File] fastqs_rep9_R2 = [
-        ]
-        Array[File] fastqs_rep10_R1 = [
-        ]
-        Array[File] fastqs_rep10_R2 = [
-        ]
-        Array[File] bams = [
-        ]
-        Array[File] nodup_bams = [
-        ]
-        Array[File] tas = [
-        ]
-        Array[File] peaks = [
-        ]
-        Array[File] peaks_pr1 = [
-        ]
-        Array[File] peaks_pr2 = [
-        ]
+        Array[Boolean] paired_ends = []
+        Array[File] fastqs_rep1_R1 = []
+        Array[File] fastqs_rep1_R2 = []
+        Array[File] fastqs_rep2_R1 = []
+        Array[File] fastqs_rep2_R2 = []
+        Array[File] fastqs_rep3_R1 = []
+        Array[File] fastqs_rep3_R2 = []
+        Array[File] fastqs_rep4_R1 = []
+        Array[File] fastqs_rep4_R2 = []
+        Array[File] fastqs_rep5_R1 = []
+        Array[File] fastqs_rep5_R2 = []
+        Array[File] fastqs_rep6_R1 = []
+        Array[File] fastqs_rep6_R2 = []
+        Array[File] fastqs_rep7_R1 = []
+        Array[File] fastqs_rep7_R2 = []
+        Array[File] fastqs_rep8_R1 = []
+        Array[File] fastqs_rep8_R2 = []
+        Array[File] fastqs_rep9_R1 = []
+        Array[File] fastqs_rep9_R2 = []
+        Array[File] fastqs_rep10_R1 = []
+        Array[File] fastqs_rep10_R2 = []
+        Array[File] bams = []
+        Array[File] nodup_bams = []
+        Array[File] tas = []
+        Array[File] peaks = []
+        Array[File] peaks_pr1 = []
+        Array[File] peaks_pr2 = []
         File? peak_ppr1
         File? peak_ppr2
         File? peak_pooled
 
         Boolean? ctl_paired_end
-        Array[Boolean] ctl_paired_ends = [
-        ]
-        Array[File] ctl_fastqs_rep1_R1 = [
-        ]
-        Array[File] ctl_fastqs_rep1_R2 = [
-        ]
-        Array[File] ctl_fastqs_rep2_R1 = [
-        ]
-        Array[File] ctl_fastqs_rep2_R2 = [
-        ]
-        Array[File] ctl_fastqs_rep3_R1 = [
-        ]
-        Array[File] ctl_fastqs_rep3_R2 = [
-        ]
-        Array[File] ctl_fastqs_rep4_R1 = [
-        ]
-        Array[File] ctl_fastqs_rep4_R2 = [
-        ]
-        Array[File] ctl_fastqs_rep5_R1 = [
-        ]
-        Array[File] ctl_fastqs_rep5_R2 = [
-        ]
-        Array[File] ctl_fastqs_rep6_R1 = [
-        ]
-        Array[File] ctl_fastqs_rep6_R2 = [
-        ]
-        Array[File] ctl_fastqs_rep7_R1 = [
-        ]
-        Array[File] ctl_fastqs_rep7_R2 = [
-        ]
-        Array[File] ctl_fastqs_rep8_R1 = [
-        ]
-        Array[File] ctl_fastqs_rep8_R2 = [
-        ]
-        Array[File] ctl_fastqs_rep9_R1 = [
-        ]
-        Array[File] ctl_fastqs_rep9_R2 = [
-        ]
-        Array[File] ctl_fastqs_rep10_R1 = [
-        ]
-        Array[File] ctl_fastqs_rep10_R2 = [
-        ]
-        Array[File] ctl_bams = [
-        ]
-        Array[File] ctl_nodup_bams = [
-        ]
-        Array[File] ctl_tas = [
-        ]
+        Array[Boolean] ctl_paired_ends = []
+        Array[File] ctl_fastqs_rep1_R1 = []
+        Array[File] ctl_fastqs_rep1_R2 = []
+        Array[File] ctl_fastqs_rep2_R1 = []
+        Array[File] ctl_fastqs_rep2_R2 = []
+        Array[File] ctl_fastqs_rep3_R1 = []
+        Array[File] ctl_fastqs_rep3_R2 = []
+        Array[File] ctl_fastqs_rep4_R1 = []
+        Array[File] ctl_fastqs_rep4_R2 = []
+        Array[File] ctl_fastqs_rep5_R1 = []
+        Array[File] ctl_fastqs_rep5_R2 = []
+        Array[File] ctl_fastqs_rep6_R1 = []
+        Array[File] ctl_fastqs_rep6_R2 = []
+        Array[File] ctl_fastqs_rep7_R1 = []
+        Array[File] ctl_fastqs_rep7_R2 = []
+        Array[File] ctl_fastqs_rep8_R1 = []
+        Array[File] ctl_fastqs_rep8_R2 = []
+        Array[File] ctl_fastqs_rep9_R1 = []
+        Array[File] ctl_fastqs_rep9_R2 = []
+        Array[File] ctl_fastqs_rep10_R1 = []
+        Array[File] ctl_fastqs_rep10_R2 = []
+        Array[File] ctl_bams = []
+        Array[File] ctl_nodup_bams = []
+        Array[File] ctl_tas = []
 
         # group: pipeline_parameter
         String pipeline_type
@@ -1020,8 +969,7 @@ workflow chip {
         String dup_marker = "picard"
         Boolean no_dup_removal = false
         Int mapq_thresh = 30
-        Array[String] filter_chrs = [
-        ]
+        Array[String] filter_chrs = []
         Int subsample_reads = 0
         Int ctl_subsample_reads = 0
         Int xcor_subsample_reads = 15000000
@@ -1032,8 +980,7 @@ workflow chip {
         # group: peak_calling
         Int ctl_depth_limit = 200000000
         Float exp_ctl_depth_ratio_limit = 5.0
-        Array[Int?] fraglen = [
-        ]
+        Array[Int?] fraglen = []
         String? peak_caller
         Boolean always_use_pooled_ctl = true
         Float ctl_depth_ratio = 1.2
@@ -1263,8 +1210,7 @@ workflow chip {
         fastqs_rep2_R1,
     ] else if length(fastqs_rep1_R1) > 0 then [
         fastqs_rep1_R1,
-    ] else [
-    ]
+    ] else []
     # no need to do that for R2 (R1 array will be used to determine presense of fastq for each rep)
     Array[Array[File]] fastqs_R2 = [
         fastqs_rep1_R2,
@@ -1345,8 +1291,7 @@ workflow chip {
         ctl_fastqs_rep2_R1,
     ] else if length(ctl_fastqs_rep1_R1) > 0 then [
         ctl_fastqs_rep1_R1,
-    ] else [
-    ]
+    ] else []
     # no need to do that for R2 (R1 array will be used to determine presense of fastq for each rep)
     Array[Array[File]] ctl_fastqs_R2 = [
         ctl_fastqs_rep1_R2,
@@ -1447,8 +1392,7 @@ workflow chip {
         if (has_input_of_align && !has_output_of_align) {
             call align { input:
                 fastqs_R1 = fastqs_R1[i],
-                fastqs_R2 = if paired_end_ then fastqs_R2[i] else [
-                ],
+                fastqs_R2 = if paired_end_ then fastqs_R2[i] else [],
                 crop_length = crop_length,
                 crop_length_tol = crop_length_tol,
                 trimmomatic_phred_score_format = trimmomatic_phred_score_format,
@@ -1552,8 +1496,7 @@ workflow chip {
         if (has_input_of_align) {
             call align as align_R1 { input:
                 fastqs_R1 = fastqs_R1[i],
-                fastqs_R2 = [
-                ],
+                fastqs_R2 = [],
                 trim_bp = xcor_trim_bp,
                 crop_length = 0,
                 crop_length_tol = 0,
@@ -1687,8 +1630,7 @@ workflow chip {
         if (has_input_of_align_ctl && !has_output_of_align_ctl) {
             call align as align_ctl { input:
                 fastqs_R1 = ctl_fastqs_R1[i],
-                fastqs_R2 = if ctl_paired_end_ then ctl_fastqs_R2[i] else [
-                ],
+                fastqs_R2 = if ctl_paired_end_ then ctl_fastqs_R2[i] else [],
                 crop_length = crop_length,
                 crop_length_tol = crop_length_tol,
                 trimmomatic_phred_score_format = trimmomatic_phred_score_format,
@@ -1871,8 +1813,7 @@ workflow chip {
                 runtime_environment = runtime_environment,
             }
         }
-        Array[File] chosen_ctl_tas = if chosen_ctl_ta_id <= -2 then [
-        ] else if chosen_ctl_ta_subsample > 0 then [
+        Array[File] chosen_ctl_tas = if chosen_ctl_ta_id <= -2 then [] else if chosen_ctl_ta_subsample > 0 then [
             select_first([
                 subsample_ctl.ta_subsampled,
             ]),
@@ -2030,8 +1971,7 @@ workflow chip {
         }
     }
     # actually not an array
-    Array[File?] chosen_ctl_ta_pooled = if !has_all_input_of_choose_ctl || align_only_ then [
-    ] else if chosen_ctl_ta_pooled_subsample > 0 then [
+    Array[File?] chosen_ctl_ta_pooled = if !has_all_input_of_choose_ctl || align_only_ then [] else if chosen_ctl_ta_pooled_subsample > 0 then [
         subsample_ctl_pooled.ta_subsampled,
     ] else if num_ctl < 2 then [
         ctl_ta_[0],
@@ -2281,8 +2221,7 @@ workflow chip {
             peaks = select_all(overlap.bfilt_overlap_peak),
             peaks_pr = if defined(overlap_pr.bfilt_overlap_peak) then select_first([
                 overlap_pr.bfilt_overlap_peak,
-            ]) else [
-            ],
+            ]) else [],
             peak_ppr = overlap_ppr.bfilt_overlap_peak,
             peak_type = peak_type_,
             chrsz = chrsz_,
@@ -2297,8 +2236,7 @@ workflow chip {
             peaks = select_all(idr.bfilt_idr_peak),
             peaks_pr = if defined(idr_pr.bfilt_idr_peak) then select_first([
                 idr_pr.bfilt_idr_peak,
-            ]) else [
-            ],
+            ]) else [],
             peak_ppr = idr_ppr.bfilt_idr_peak,
             peak_type = peak_type_,
             chrsz = chrsz_,
@@ -2339,8 +2277,7 @@ workflow chip {
         jsd_plot = jsd.plot,
         jsd_qcs = if defined(jsd.jsd_qcs) then select_first([
             jsd.jsd_qcs,
-        ]) else [
-        ],
+        ]) else [],
 
         frip_qcs = select_all(call_peak.frip_qc),
         frip_qcs_pr1 = select_all(call_peak_pr1.frip_qc),
@@ -2352,20 +2289,17 @@ workflow chip {
         idr_plots = select_all(idr.idr_plot),
         idr_plots_pr = if defined(idr_pr.idr_plot) then select_first([
             idr_pr.idr_plot,
-        ]) else [
-        ],
+        ]) else [],
         idr_plot_ppr = idr_ppr.idr_plot,
         frip_idr_qcs = select_all(idr.frip_qc),
         frip_idr_qcs_pr = if defined(idr_pr.frip_qc) then select_first([
             idr_pr.frip_qc,
-        ]) else [
-        ],
+        ]) else [],
         frip_idr_qc_ppr = idr_ppr.frip_qc,
         frip_overlap_qcs = select_all(overlap.frip_qc),
         frip_overlap_qcs_pr = if defined(overlap_pr.frip_qc) then select_first([
             overlap_pr.frip_qc,
-        ]) else [
-        ],
+        ]) else [],
         frip_overlap_qc_ppr = overlap_ppr.frip_qc,
         idr_reproducibility_qc = reproducibility_idr.reproducibility_qc,
         overlap_reproducibility_qc = reproducibility_overlap.reproducibility_qc,

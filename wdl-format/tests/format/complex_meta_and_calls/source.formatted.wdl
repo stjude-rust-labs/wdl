@@ -75,8 +75,7 @@ workflow test_wf {
     }
     call aliased as x call aliased as x { input:
     }
-    call f after x after y call f after x after y { input: a = [
-    ] }
+    call f after x after y call f after x after y { input: a = [] }
     call f as x after x call f as x after x after y { input: name = "hello" }
     call test_task as foo { input: bowchicka = "wowwow" }
     if (true) {
