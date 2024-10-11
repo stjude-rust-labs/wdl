@@ -35,11 +35,11 @@ use wdl::ast::Validator;
 use wdl::lint::LintVisitor;
 use wdl_analysis::AnalysisResult;
 use wdl_analysis::Analyzer;
+use wdl_analysis::Rule;
+use wdl_analysis::rules;
 use wdl_ast::Node;
 use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt as _;
-use wdl_analysis::Rule;
-use wdl_analysis::rules;
 
 /// Emits the given diagnostics to the output stream.
 ///
@@ -242,6 +242,7 @@ pub struct CheckCommand {
     #[clap(value_name = "PATH")]
     pub path: PathBuf,
 
+    /// The analysis options.
     #[clap(flatten)]
     pub options: AnalysisOptions,
 }
@@ -303,6 +304,7 @@ pub struct AnalyzeCommand {
     #[clap(value_name = "PATH")]
     pub path: PathBuf,
 
+    /// The analysis options.
     #[clap(flatten)]
     pub options: AnalysisOptions,
 

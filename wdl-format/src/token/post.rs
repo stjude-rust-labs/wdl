@@ -152,18 +152,16 @@ impl Postprocessor {
                 self.position = LinePosition::MiddleOfLine;
             }
             PreToken::Trivia(trivia) => match trivia {
-                Trivia::BlankLine => {
-                    match self.line_spacing_policy {
-                        LineSpacingPolicy::Yes => {
+                Trivia::BlankLine => match self.line_spacing_policy {
+                    LineSpacingPolicy::Yes => {
+                        self.blank_line(stream);
+                    }
+                    LineSpacingPolicy::BetweenComments => {
+                        if matches!(next, Some(&PreToken::Trivia(Trivia::Comment(_)))) {
                             self.blank_line(stream);
                         }
-                        LineSpacingPolicy::BetweenComments => {
-                            if matches!(next, Some(&PreToken::Trivia(Trivia::Comment(_)))) {
-                                self.blank_line(stream);
-                            }
-                        }
                     }
-                }
+                },
                 Trivia::Comment(comment) => {
                     match comment {
                         Comment::Preceding(value) => {
@@ -191,7 +189,7 @@ impl Postprocessor {
                         }
                     }
                     self.end_line(stream);
-                },
+                }
             },
         }
     }
