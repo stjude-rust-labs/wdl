@@ -131,7 +131,7 @@ impl Postprocessor {
                 self.indent_level = self.indent_level.saturating_sub(1);
                 self.end_line(stream);
             }
-            PreToken::BlankLinesContext(policy) => {
+            PreToken::LineSpacingPolicy(policy) => {
                 self.blank_lines_allowed = policy;
             }
             PreToken::Literal(value, kind) => {

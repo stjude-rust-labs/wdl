@@ -34,8 +34,8 @@ pub enum PreToken {
     /// The end of an indented block.
     IndentEnd,
 
-    /// The context for blank lines.
-    BlankLinesContext(LineSpacingPolicy),
+    /// How to handle blank lines from this point onwards.
+    LineSpacingPolicy(LineSpacingPolicy),
 
     /// Literal text.
     Literal(String, SyntaxKind),
@@ -55,8 +55,8 @@ impl std::fmt::Display for PreToken {
             PreToken::WordEnd => write!(f, "<WordEnd>"),
             PreToken::IndentStart => write!(f, "<IndentStart>"),
             PreToken::IndentEnd => write!(f, "<IndentEnd>"),
-            PreToken::BlankLinesContext(context) => {
-                write!(f, "<BlankLinesContext@{:?}>", context)
+            PreToken::LineSpacingPolicy(policy) => {
+                write!(f, "<LineSpacingPolicy@{:?}>", policy)
             }
             PreToken::Literal(value, kind) => {
                 write!(
@@ -138,12 +138,12 @@ impl TokenStream<PreToken> {
     /// Inserts a blank lines allowed context change.
     pub fn blank_lines_allowed(&mut self) {
         self.0
-            .push(PreToken::BlankLinesContext(LineSpacingPolicy::Yes));
+            .push(PreToken::LineSpacingPolicy(LineSpacingPolicy::Yes));
     }
 
     /// Inserts a blank lines allowed between comments context change.
     pub fn blank_lines_allowed_between_comments(&mut self) {
-        self.0.push(PreToken::BlankLinesContext(
+        self.0.push(PreToken::LineSpacingPolicy(
             LineSpacingPolicy::BetweenComments,
         ));
     }
