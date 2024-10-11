@@ -4,6 +4,7 @@
 //! probably looking for
 //! [Sprocket](https://github.com/stjude-rust-labs/sprocket) instead.
 use std::borrow::Cow;
+use std::collections::HashSet;
 use std::fs;
 use std::io::IsTerminal;
 use std::io::Read;
@@ -37,6 +38,8 @@ use wdl_analysis::Analyzer;
 use wdl_ast::Node;
 use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt as _;
+use wdl_analysis::Rule;
+use wdl_analysis::rules;
 
 /// Emits the given diagnostics to the output stream.
 ///
@@ -64,7 +67,11 @@ fn emit_diagnostics(path: &str, source: &str, diagnostics: &[Diagnostic]) -> Res
 }
 
 /// Analyzes a path.
-async fn analyze(path: PathBuf, lint: bool) -> Result<Vec<AnalysisResult>> {
+async fn analyze<T: AsRef<dyn Rule>>(
+    rules: impl IntoIterator<Item = T>,
+    path: PathBuf,
+    lint: bool,
+) -> Result<Vec<AnalysisResult>> {
     let bar = ProgressBar::new(0);
     bar.set_style(
         ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {msg} {pos}/{len}")
@@ -72,6 +79,7 @@ async fn analyze(path: PathBuf, lint: bool) -> Result<Vec<AnalysisResult>> {
     );
 
     let analyzer = Analyzer::new_with_validator(
+        rules,
         move |bar: ProgressBar, kind, completed, total| async move {
             bar.set_position(completed.try_into().unwrap());
             if completed == 0 {
@@ -171,6 +179,61 @@ impl ParseCommand {
     }
 }
 
+/// Represents common analysis options.
+#[derive(Args)]
+pub struct AnalysisOptions {
+    /// Denies all analysis rules by treating them as errors.
+    #[clap(long, conflicts_with = "deny", conflicts_with = "except_all")]
+    pub deny_all: bool,
+
+    /// Except (ignores) all analysis rules.
+    #[clap(long, conflicts_with = "except")]
+    pub except_all: bool,
+
+    /// Excepts (ignores) an analysis rule.
+    #[clap(long)]
+    pub except: Vec<String>,
+
+    /// Denies an analysis rule by treating it as an error.
+    #[clap(long)]
+    pub deny: Vec<String>,
+}
+
+impl AnalysisOptions {
+    /// Checks for conflicts in the analysis options.
+    pub fn check_for_conflicts(&self) -> Result<()> {
+        if let Some(id) = self.except.iter().find(|id| self.deny.contains(*id)) {
+            bail!("rule `{id}` cannot be specified for both the `--except` and `--deny`",);
+        }
+
+        Ok(())
+    }
+
+    /// Converts the analysis options into an analysis rules set.
+    pub fn into_rules(self) -> impl Iterator<Item = Box<dyn Rule>> {
+        let Self {
+            deny_all,
+            except_all,
+            except,
+            deny,
+        } = self;
+
+        let except: HashSet<_> = except.into_iter().collect();
+        let deny: HashSet<_> = deny.into_iter().collect();
+
+        rules()
+            .into_iter()
+            .filter(move |r| !except_all && !except.contains(r.id()))
+            .map(move |mut r| {
+                if deny_all || deny.contains(r.id()) {
+                    r.deny();
+                }
+
+                r
+            })
+    }
+}
+
 /// Checks a WDL source file for errors.
 #[derive(Args)]
 #[clap(disable_version_flag = true)]
@@ -178,12 +241,16 @@ pub struct CheckCommand {
     /// The path to the source WDL file.
     #[clap(value_name = "PATH")]
     pub path: PathBuf,
+
+    #[clap(flatten)]
+    pub options: AnalysisOptions,
 }
 
 impl CheckCommand {
     /// Executes the `check` subcommand.
     async fn exec(self) -> Result<()> {
-        analyze(self.path, false).await?;
+        self.options.check_for_conflicts()?;
+        analyze(self.options.into_rules(), self.path, false).await?;
         Ok(())
     }
 }
@@ -236,6 +303,9 @@ pub struct AnalyzeCommand {
     #[clap(value_name = "PATH")]
     pub path: PathBuf,
 
+    #[clap(flatten)]
+    pub options: AnalysisOptions,
+
     /// Whether or not to run lints as part of analysis.
     #[clap(long)]
     pub lint: bool,
@@ -244,7 +314,8 @@ pub struct AnalyzeCommand {
 impl AnalyzeCommand {
     /// Executes the `analyze` subcommand.
     async fn exec(self) -> Result<()> {
-        let results = analyze(self.path, self.lint).await?;
+        self.options.check_for_conflicts()?;
+        let results = analyze(self.options.into_rules(), self.path, self.lint).await?;
         println!("{:#?}", results);
         Ok(())
     }

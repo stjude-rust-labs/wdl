@@ -9,6 +9,10 @@ use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::Version;
 
+use crate::UNUSED_CALL_RULE_ID;
+use crate::UNUSED_DECL_RULE_ID;
+use crate::UNUSED_IMPORT_RULE_ID;
+use crate::UNUSED_INPUT_RULE_ID;
 use crate::types::Type;
 use crate::types::Types;
 
@@ -350,6 +354,13 @@ pub fn type_mismatch(
     )
 }
 
+/// Creates a "non-empty array assignment" diagnostic.
+pub fn non_empty_array_assignment(expected_span: Span, actual_span: Span) -> Diagnostic {
+    Diagnostic::error("cannot assign an empty array to a non-empty array type")
+        .with_label("this is an empty array", actual_span)
+        .with_label("this expects a non-empty array", expected_span)
+}
+
 /// Creates a "call input type mismatch" diagnostic.
 pub fn call_input_type_mismatch(
     types: &Types,
@@ -373,30 +384,26 @@ pub fn call_input_type_mismatch(
     )
 }
 
-/// Creates a "element type mismatch" diagnostic.
-pub fn element_type_mismatch(
+/// Creates a "no common type" diagnostic.
+pub fn no_common_type(
     types: &Types,
-    kind: &str,
     expected: Type,
     expected_span: Span,
     actual: Type,
     actual_span: Span,
 ) -> Diagnostic {
     Diagnostic::error(format!(
-        "type mismatch: expected every {kind} to be type `{expected}`, but found type `{actual}`",
+        "type mismatch: a type common to both type `{expected}` and type `{actual}` does not exist",
         expected = expected.display(types),
         actual = actual.display(types)
     ))
     .with_label(
-        format!(
-            "this {kind} is type `{actual}`",
-            actual = actual.display(types)
-        ),
+        format!("this is type `{actual}`", actual = actual.display(types)),
         actual_span,
     )
     .with_label(
         format!(
-            "this {kind} is type `{expected}`",
+            "this is type `{expected}`",
             expected = expected.display(types)
         ),
         expected_span,
@@ -792,4 +799,32 @@ pub fn missing_call_input(workflow: bool, target: &Ident, input: &str) -> Diagno
         target = target.as_str(),
     ))
     .with_highlight(target.span())
+}
+
+/// Creates an "unused import" diagnostic.
+pub fn unused_import(name: &str, span: Span) -> Diagnostic {
+    Diagnostic::warning(format!("unused import namespace `{name}`"))
+        .with_rule(UNUSED_IMPORT_RULE_ID)
+        .with_highlight(span)
+}
+
+/// Creates an "unused input" diagnostic.
+pub fn unused_input(name: &str, span: Span) -> Diagnostic {
+    Diagnostic::warning(format!("unused input `{name}`"))
+        .with_rule(UNUSED_INPUT_RULE_ID)
+        .with_highlight(span)
+}
+
+/// Creates an "unused declaration" diagnostic.
+pub fn unused_declaration(name: &str, span: Span) -> Diagnostic {
+    Diagnostic::warning(format!("unused declaration `{name}`"))
+        .with_rule(UNUSED_DECL_RULE_ID)
+        .with_highlight(span)
+}
+
+/// Creates an "unused call" diagnostic.
+pub fn unused_call(name: &str, span: Span) -> Diagnostic {
+    Diagnostic::warning(format!("unused call `{name}`"))
+        .with_rule(UNUSED_CALL_RULE_ID)
+        .with_highlight(span)
 }
