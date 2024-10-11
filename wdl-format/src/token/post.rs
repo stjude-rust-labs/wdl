@@ -156,7 +156,7 @@ impl Postprocessor {
                     LineSpacingPolicy::Yes => {
                         self.blank_line(stream);
                     }
-                    LineSpacingPolicy::BetweenComments => {
+                    LineSpacingPolicy::BeforeComments => {
                         if matches!(next, Some(&PreToken::Trivia(Trivia::Comment(_)))) {
                             self.blank_line(stream);
                         }

@@ -144,7 +144,7 @@ impl TokenStream<PreToken> {
     /// Inserts a blank lines allowed between comments context change.
     pub fn blank_lines_allowed_between_comments(&mut self) {
         self.0.push(PreToken::LineSpacingPolicy(
-            LineSpacingPolicy::BetweenComments,
+            LineSpacingPolicy::BeforeComments,
         ));
     }
 
