@@ -357,11 +357,10 @@ pub fn format_literal_map(element: &FormatElement, stream: &mut TokenStream<PreT
         (&item).write(stream);
         if let Some(comma) = commas.next() {
             (comma).write(stream);
-            stream.end_line();
         } else {
             stream.push_literal(",".to_string(), SyntaxKind::Comma);
-            stream.end_line();
         }
+        stream.end_line();
     }
 
     stream.decrement_indent();
@@ -416,11 +415,10 @@ pub fn format_literal_object(element: &FormatElement, stream: &mut TokenStream<P
         (&member).write(stream);
         if let Some(comma) = commas.next() {
             (comma).write(stream);
-            stream.end_line();
         } else {
             stream.push_literal(",".to_string(), SyntaxKind::Comma);
-            stream.end_line();
         }
+        stream.end_line();
     }
 
     stream.decrement_indent();
@@ -670,6 +668,11 @@ pub fn format_parenthesized_expr(element: &FormatElement, stream: &mut TokenStre
 pub fn format_if_expr(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     let mut children = element.children().expect("if expr children");
 
+    let nested_else_if = match stream.last_literal_kind() {
+        Some(SyntaxKind::ElseKeyword) => true,
+        _ => false,
+    };
+
     let if_keyword = children.next().expect("if keyword");
     assert!(if_keyword.element().kind() == SyntaxKind::IfKeyword);
     (&if_keyword).write(stream);
@@ -677,13 +680,21 @@ pub fn format_if_expr(element: &FormatElement, stream: &mut TokenStream<PreToken
 
     for child in children {
         let kind = child.element().kind();
-        let should_end_word = kind == SyntaxKind::ThenKeyword || kind == SyntaxKind::ElseKeyword;
-        if should_end_word {
-            stream.end_word();
+        if kind == SyntaxKind::ThenKeyword {
+            if !nested_else_if {
+                stream.increment_indent();
+            } else {
+                stream.end_word();
+            }
+        } else if kind == SyntaxKind::ElseKeyword {
+            stream.end_line();
         }
         (&child).write(stream);
-        if should_end_word {
+        if matches!(kind, SyntaxKind::ElseKeyword | SyntaxKind::ThenKeyword) {
             stream.end_word();
         }
+    }
+    if !nested_else_if {
+        stream.decrement_indent();
     }
 }
