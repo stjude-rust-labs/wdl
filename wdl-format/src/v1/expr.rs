@@ -668,10 +668,7 @@ pub fn format_parenthesized_expr(element: &FormatElement, stream: &mut TokenStre
 pub fn format_if_expr(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     let mut children = element.children().expect("if expr children");
 
-    let nested_else_if = match stream.last_literal_kind() {
-        Some(SyntaxKind::ElseKeyword) => true,
-        _ => false,
-    };
+    let nested_else_if = matches!(stream.last_literal_kind(), Some(SyntaxKind::ElseKeyword));
 
     let if_keyword = children.next().expect("if keyword");
     assert!(if_keyword.element().kind() == SyntaxKind::IfKeyword);

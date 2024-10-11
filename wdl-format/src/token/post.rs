@@ -79,9 +79,6 @@ pub struct Postprocessor {
 
     /// Whether blank lines are allowed in the current context.
     line_spacing_policy: LineSpacingPolicy,
-
-    /// Whether the last token was a comment.
-    prior_is_comment: bool,
 }
 
 impl Postprocessor {
@@ -111,7 +108,6 @@ impl Postprocessor {
         match token {
             PreToken::BlankLine => {
                 self.blank_line(stream);
-                self.prior_is_comment = false;
             }
             PreToken::LineEnd => {
                 self.interrupted = false;
@@ -154,7 +150,6 @@ impl Postprocessor {
                 }
                 stream.push(PostToken::Literal(value.to_owned()));
                 self.position = LinePosition::MiddleOfLine;
-                self.prior_is_comment = false;
             }
             PreToken::Trivia(trivia) => match trivia {
                 Trivia::BlankLine => {
@@ -163,7 +158,7 @@ impl Postprocessor {
                             self.blank_line(stream);
                         }
                         LineSpacingPolicy::BetweenComments => {
-                            if self.prior_is_comment || matches!(next, Some(&PreToken::Trivia(Trivia::Comment(_)))) {
+                            if matches!(next, Some(&PreToken::Trivia(Trivia::Comment(_)))) {
                                 self.blank_line(stream);
                             }
                         }
@@ -196,7 +191,6 @@ impl Postprocessor {
                         }
                     }
                     self.end_line(stream);
-                    self.prior_is_comment = true;
                 },
             },
         }

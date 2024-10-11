@@ -2859,7 +2859,6 @@ task pool_ta {
         Array[File?] tas
         Int? col  # number of columns in pooled TA
         String? prefix  # basename prefix
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3044,7 +3043,6 @@ task count_signal_track {
     input {
         File? ta  # tag-align
         File chrsz  # 2-col chromosome sizes file
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3125,7 +3123,6 @@ task call_peak {
         Int cap_num_peak  # cap number of raw peaks called from MACS2
         Float pval_thresh  # p.value threshold for MACS2
         Float? fdr_thresh  # FDR threshold for SPP
-
         File? blacklist  # blacklist BED to filter raw peaks
         String? regex_bfilt_peak_chr_name
         Int cpu
@@ -3208,7 +3205,6 @@ task macs2_signal_track {
         # chr. sizes file, or hs for human, ms for mouse)
         File chrsz  # 2-col chromosome sizes file
         Float pval_thresh  # p.value threshold
-
         Float mem_factor
         Int time_hr
         Float disk_factor
@@ -3380,7 +3376,6 @@ task reproducibility {
         File? peak_ppr  # Peak file from pooled pseudo replicate.
         String peak_type
         File chrsz  # 2-col chromosome sizes file
-
         RuntimeEnvironment runtime_environment
     }
 
