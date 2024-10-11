@@ -7,21 +7,16 @@ struct RuntimeEnvironment {
 }
 
 workflow chip {
-
     meta {
         version: "v2.2.2"
-
         author: "Jin wook Lee"
         email: "leepc12@gmail.com"
         description: "ENCODE TF/Histone ChIP-Seq pipeline. See https://github.com/ENCODE-DCC/chip-seq-pipeline2 for more details. e.g. example input JSON for Terra/Anvil."
         organization: "ENCODE DCC"
-
         specification_document: "https://docs.google.com/document/d/1lG_Rd7fnYgRpSIqrIfuVlAz2dW1VaSQThzk836Db99c/edit?usp=sharing"
-
         default_docker: "encodedcc/chip-seq-pipeline:v2.2.2"
         default_singularity: "https://encode-pipeline-singularity-image.s3.us-west-2.amazonaws.com/chip-seq-pipeline_v2.2.2.sif"
         croo_out_def: "https://storage.googleapis.com/encode-pipeline-output-definition/chip.croo.v5.json"
-
         parameter_group: {
             runtime_environment: {
                 title: "Runtime environment",
@@ -323,7 +318,6 @@ workflow chip {
             group: "input_genomic_data",
             help: "Define if you want to start pipeline from PEAK files. Define if you have multiple biological replicates and chip.true_rep_only flag is off. PPR1 means analysis on pooled 2nd pseudo replicates. Each biological replicate is shuf/split into two pseudos. This is a pooling of each replicate's 2nd pseudos.",
         }
-
         ctl_paired_end: {
             description: "Sequencing endedness for all controls.",
             group: "input_genomic_data_control",
@@ -461,7 +455,6 @@ workflow chip {
             group: "input_genomic_data_control",
             help: "Define if you want to start pipeline from TAG-ALIGN files. TAG-ALIGN is in a 6-col BED format. It is a simplified version of BAM. Each entry for each control replicate. e.g. [ctl1.tagAlign.gz, ctl2.tagAlign.gz, ...].",
         }
-
         pipeline_type: {
             description: "Pipeline type. tf for TF ChIP-Seq, histone for Histone ChIP-Seq or control for mapping controls only.",
             group: "pipeline_parameter",
@@ -500,7 +493,6 @@ workflow chip {
             description: "Enables GC bias calculation.",
             group: "pipeline_parameter",
         }
-
         aligner: {
             description: "Aligner. bowtie2, bwa or custom",
             group: "alignment",
@@ -648,7 +640,6 @@ workflow chip {
             group: "peak_calling",
             help: "If ratio of depth between any two controls is higher than this, then always use a pooled control for all experiment replicates.",
         }
-
         cap_num_peak: {
             description: "Upper limit on the number of peaks.",
             group: "peak_calling",
@@ -668,7 +659,6 @@ workflow chip {
             description: "IDR threshold.",
             group: "peak_calling",
         }
-
         align_cpu: {
             description: "Number of cores for task align.",
             group: "resource_parameter",
@@ -919,7 +909,6 @@ workflow chip {
         File? peak_ppr1
         File? peak_ppr2
         File? peak_pooled
-
         Boolean? ctl_paired_end
         Array[Boolean] ctl_paired_ends = []
         Array[File] ctl_fastqs_rep1_R1 = []
@@ -996,44 +985,35 @@ workflow chip {
         Int align_time_hr = 48
         Float align_bowtie2_disk_factor = 8.0
         Float align_bwa_disk_factor = 8.0
-
         Int filter_cpu = 4
         Float filter_mem_factor = 0.4
         Int filter_time_hr = 24
         Float filter_disk_factor = 8.0
-
         Int bam2ta_cpu = 2
         Float bam2ta_mem_factor = 0.35
         Int bam2ta_time_hr = 6
         Float bam2ta_disk_factor = 4.0
-
         Float spr_mem_factor = 20.0
         Float spr_disk_factor = 30.0
-
         Int jsd_cpu = 4
         Float jsd_mem_factor = 0.1
         Int jsd_time_hr = 6
         Float jsd_disk_factor = 2.0
-
         Int xcor_cpu = 2
         Float xcor_mem_factor = 1.0
         Int xcor_time_hr = 24
         Float xcor_disk_factor = 4.5
-
         Float subsample_ctl_mem_factor = 22.0
         Float subsample_ctl_disk_factor = 15.0
-
         Float macs2_signal_track_mem_factor = 12.0
         Int macs2_signal_track_time_hr = 24
         Float macs2_signal_track_disk_factor = 80.0
-
         Int call_peak_cpu = 6
         Float call_peak_spp_mem_factor = 5.0
         Float call_peak_macs2_mem_factor = 5.0
         Int call_peak_time_hr = 72
         Float call_peak_spp_disk_factor = 5.0
         Float call_peak_macs2_disk_factor = 30.0
-
         String? align_trimmomatic_java_heap
         String? filter_picard_java_heap
         String? gc_bias_picard_java_heap
@@ -2529,9 +2509,7 @@ task align {
         Int crop_length
         Int crop_length_tol
         String? trimmomatic_phred_score_format
-
         String aligner
-
         String mito_chr_name
         Int? multimapping
         File? custom_align_py
@@ -2540,13 +2518,11 @@ task align {
         Boolean use_bwa_mem_for_pe
         Int bwa_mem_read_len_limit
         Boolean use_bowtie2_local_mode
-
         String? trimmomatic_java_heap
         Int cpu
         Float mem_factor
         Int time_hr
         Float disk_factor
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -2703,7 +2679,6 @@ task align {
         time: time_hr
         disks: "local-disk ~{disk_gb} SSD"
         preemptible: 0
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2723,13 +2698,11 @@ task filter {
         File chrsz  # 2-col chromosome sizes file
         Boolean no_dup_removal  # no dupe reads removal when filtering BAM
         String mito_chr_name
-
         Int cpu
         Float mem_factor
         String? picard_java_heap
         Int time_hr
         Float disk_factor
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -2785,7 +2758,6 @@ task filter {
         memory: "~{mem_gb} GB"
         time: time_hr
         disks: "local-disk ~{disk_gb} SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2803,7 +2775,6 @@ task bam2ta {
         Float mem_factor
         Int time_hr
         Float disk_factor
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -2836,7 +2807,6 @@ task bam2ta {
         memory: "~{mem_gb} GB"
         time: time_hr
         disks: "local-disk ~{disk_gb} SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2848,10 +2818,8 @@ task spr {
         File? ta
         Boolean paired_end
         Int pseudoreplication_random_seed
-
         Float mem_factor
         Float disk_factor
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -2880,7 +2848,6 @@ task spr {
         memory: "~{mem_gb} GB"
         time: 4
         disks: "local-disk ~{disk_gb} SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2913,7 +2880,6 @@ task pool_ta {
         memory: "8 GB"
         time: 4
         disks: "local-disk 100 SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2931,12 +2897,10 @@ task xcor {
         String? chip_seq_type
         Int? exclusion_range_min
         Int? exclusion_range_max
-
         Int cpu
         Float mem_factor
         Int time_hr
         Float disk_factor
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -2974,7 +2938,6 @@ task xcor {
         memory: "~{mem_gb} GB"
         time: time_hr
         disks: "local-disk ~{disk_gb} SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -2987,12 +2950,10 @@ task jsd {
         Array[File?] ctl_bams
         File? blacklist
         Int mapq_thresh
-
         Int cpu
         Float mem_factor
         Int time_hr
         Float disk_factor
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3023,7 +2984,6 @@ task jsd {
         memory: "~{mem_gb} GB"
         time: time_hr
         disks: "local-disk ~{disk_gb} SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3041,7 +3001,6 @@ task choose_ctl {
         # then always use pooled control for all exp rep.
         Int ctl_depth_limit
         Float exp_ctl_depth_ratio_limit
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3075,7 +3034,6 @@ task choose_ctl {
         memory: "4 GB"
         time: 4
         disks: "local-disk 50 SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3110,7 +3068,6 @@ task count_signal_track {
         memory: "~{mem_gb} GB"
         time: 4
         disks: "local-disk 50 SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3122,10 +3079,8 @@ task subsample_ctl {
         File? ta
         Boolean paired_end
         Int subsample
-
         Float mem_factor
         Float disk_factor
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3152,7 +3107,6 @@ task subsample_ctl {
         memory: "~{mem_gb} GB"
         time: 4
         disks: "local-disk ~{disk_gb} SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3174,12 +3128,10 @@ task call_peak {
 
         File? blacklist  # blacklist BED to filter raw peaks
         String? regex_bfilt_peak_chr_name
-
         Int cpu
         Float mem_factor
         Int time_hr
         Float disk_factor
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3242,7 +3194,6 @@ task call_peak {
         time: time_hr
         disks: "local-disk ~{disk_gb} SSD"
         preemptible: 0
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3261,7 +3212,6 @@ task macs2_signal_track {
         Float mem_factor
         Int time_hr
         Float disk_factor
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3291,7 +3241,6 @@ task macs2_signal_track {
         time: time_hr
         disks: "local-disk ~{disk_gb} SSD"
         preemptible: 0
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3313,7 +3262,6 @@ task idr {
         File chrsz  # 2-col chromosome sizes file
         String peak_type
         String rank
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3357,7 +3305,6 @@ task idr {
         memory: "4 GB"
         time: 4
         disks: "local-disk 50 SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3377,7 +3324,6 @@ task overlap {
         Int? fraglen  # fragment length from xcor (for FRIP)
         File chrsz  # 2-col chromosome sizes file
         String peak_type
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3417,7 +3363,6 @@ task overlap {
         memory: "4 GB"
         time: 4
         disks: "local-disk 50 SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3473,7 +3418,6 @@ task reproducibility {
         memory: "4 GB"
         time: 4
         disks: "local-disk 50 SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3484,9 +3428,7 @@ task gc_bias {
     input {
         File? nodup_bam
         File ref_fa
-
         String? picard_java_heap
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3516,7 +3458,6 @@ task gc_bias {
         memory: "~{mem_gb} GB"
         time: 6
         disks: "local-disk 250 SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3573,23 +3514,17 @@ task qc_report {
         File? frip_overlap_qc_ppr
         File? idr_reproducibility_qc
         File? overlap_reproducibility_qc
-
         Array[File] gc_plots
-
         Array[File] peak_region_size_qcs
         Array[File] peak_region_size_plots
         Array[File] num_peak_qcs
-
         File? idr_opt_peak_region_size_qc
         File? idr_opt_peak_region_size_plot
         File? idr_opt_num_peak_qc
-
         File? overlap_opt_peak_region_size_qc
         File? overlap_opt_peak_region_size_plot
         File? overlap_opt_num_peak_qc
-
         File? qc_json_ref
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3671,7 +3606,6 @@ task qc_report {
         memory: "4 GB"
         time: 4
         disks: "local-disk 50 SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3683,7 +3617,6 @@ task read_genome_tsv {
     input {
         File? genome_tsv
         String? null_s
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3743,7 +3676,6 @@ task read_genome_tsv {
         memory: "2 GB"
         time: 4
         disks: "local-disk 10 SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3753,7 +3685,6 @@ task read_genome_tsv {
 task rounded_mean {
     input {
         Array[Int] ints
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3779,7 +3710,6 @@ task rounded_mean {
         memory: "2 GB"
         time: 4
         disks: "local-disk 10 SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda
@@ -3789,7 +3719,6 @@ task rounded_mean {
 task raise_exception {
     input {
         String msg
-
         RuntimeEnvironment runtime_environment
     }
 
@@ -3808,7 +3737,6 @@ task raise_exception {
         memory: "2 GB"
         time: 4
         disks: "local-disk 10 SSD"
-
         docker: runtime_environment.docker
         singularity: runtime_environment.singularity
         conda: runtime_environment.conda

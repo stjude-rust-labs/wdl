@@ -17,7 +17,6 @@ import "workflows/workflows/motifs.wdl"
 import "workflows/workflows/visualization.wdl" as viz
 
 workflow seaseq {
-
     meta {
         title: "SEAseq Analysis"
         summary: "Single-End Antibody Sequencing (SEAseq) Pipeline"
@@ -155,7 +154,6 @@ workflow seaseq {
         # group: analysis_parameter
         String? results_name
         Boolean run_motifs = true
-
     }
 
     String pipeline_ver = "v2.0.0"
@@ -782,10 +780,8 @@ workflow seaseq {
         Array[File?]? indv_s_zipfile = indv_fastqc.zipfile
         Array[File?]? indv_s_bam_htmlfile = indv_bamfqc.htmlfile
         Array[File?]? indv_s_bam_zipfile = indv_bamfqc.zipfile
-
         File? s_mergebam_htmlfile = mergebamfqc.htmlfile
         File? s_mergebam_zipfile = mergebamfqc.zipfile
-
         File? uno_s_htmlfile = uno_fastqc.htmlfile
         File? uno_s_zipfile = uno_fastqc.zipfile
         File? uno_s_bam_htmlfile = uno_bamfqc.htmlfile
@@ -802,14 +798,12 @@ workflow seaseq {
         Array[File?]? indv_s_bkindexbam = indv_mapping.bklist_index
         Array[File?]? indv_s_rmbam = indv_mapping.mkdup_bam
         Array[File?]? indv_s_rmindexbam = indv_mapping.mkdup_index
-
         File? uno_s_sortedbam = mapping.sorted_bam
         File? uno_s_indexstatsbam = mapping.bam_index
         File? uno_s_bkbam = mapping.bklist_bam
         File? uno_s_bkindexbam = mapping.bklist_index
         File? uno_s_rmbam = mapping.mkdup_bam
         File? uno_s_rmindexbam = mapping.mkdup_index
-
         File? s_mergebamfile = mergebam.mergebam
         File? s_mergebamindex = mergeindexstats.indexbam
         File? s_bkbam = merge_rmblklist.intersect_out
@@ -858,13 +852,11 @@ workflow seaseq {
 
         #MOTIFS
         File? flankbedfile = flankbed.flankbedfile
-
         File? ame_tsv = motifs.ame_tsv
         File? ame_html = motifs.ame_html
         File? ame_seq = motifs.ame_seq
         File? meme = motifs.meme_out
         File? meme_summary = motifs.meme_summary
-
         File? summit_ame_tsv = flank.ame_tsv
         File? summit_ame_html = flank.ame_html
         File? summit_ame_seq = flank.ame_seq
@@ -891,7 +883,6 @@ workflow seaseq {
         File? peak_comparison = peaksanno.peak_comparison
         File? gene_comparison = peaksanno.gene_comparison
         File? pdf_comparison = peaksanno.pdf_comparison
-
         File? all_peak_promoters = all_peaksanno.peak_promoters
         File? all_peak_genebody = all_peaksanno.peak_genebody
         File? all_peak_window = all_peaksanno.peak_window
@@ -899,7 +890,6 @@ workflow seaseq {
         File? all_peak_comparison = all_peaksanno.peak_comparison
         File? all_gene_comparison = all_peaksanno.gene_comparison
         File? all_pdf_comparison = all_peaksanno.pdf_comparison
-
         File? nomodel_peak_promoters = nomodel_peaksanno.peak_promoters
         File? nomodel_peak_genebody = nomodel_peaksanno.peak_genebody
         File? nomodel_peak_window = nomodel_peaksanno.peak_window
@@ -907,7 +897,6 @@ workflow seaseq {
         File? nomodel_peak_comparison = nomodel_peaksanno.peak_comparison
         File? nomodel_gene_comparison = nomodel_peaksanno.gene_comparison
         File? nomodel_pdf_comparison = nomodel_peaksanno.pdf_comparison
-
         File? sicer_peak_promoters = sicer_peaksanno.peak_promoters
         File? sicer_peak_genebody = sicer_peaksanno.peak_genebody
         File? sicer_peak_window = sicer_peaksanno.peak_window
@@ -926,7 +915,6 @@ workflow seaseq {
         File? a_bigwig = vizall.bigwig
         File? a_norm_wig = vizall.norm_wig
         File? a_tdffile = vizall.tdffile
-
         File? s_bigwig = vizsicer.bigwig
         File? s_norm_wig = vizsicer.norm_wig
         File? s_tdffile = vizsicer.tdffile
@@ -936,15 +924,12 @@ workflow seaseq {
         Array[File?]? s_qc_htmlfile = indv_summarystats.htmlfile
         Array[File?]? s_qc_textfile = indv_summarystats.textfile
         File? s_qc_mergehtml = mergehtml.mergefile
-
         File? s_uno_statsfile = uno_summarystats.statsfile
         File? s_uno_htmlfile = uno_summarystats.htmlfile
         File? s_uno_textfile = uno_summarystats.textfile
-
         File? statsfile = merge_summarystats.statsfile
         File? htmlfile = merge_summarystats.htmlfile
         File? textfile = merge_summarystats.textfile
-
         File? summaryhtml = select_first([
             uno_overallsummary.summaryhtml,
             merge_overallsummary.summaryhtml,

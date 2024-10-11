@@ -95,6 +95,8 @@ pub fn format_scatter_statement(element: &FormatElement, stream: &mut TokenStrea
 pub fn format_workflow_definition(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     let mut children = element.children().expect("workflow definition children");
 
+    stream.blank_lines_allowed_between_comments();
+
     let workflow_keyword = children.next().expect("workflow keyword");
     assert!(workflow_keyword.element().kind() == SyntaxKind::WorkflowKeyword);
     (&workflow_keyword).write(stream);
@@ -174,9 +176,11 @@ pub fn format_workflow_definition(element: &FormatElement, stream: &mut TokenStr
         stream.blank_line();
     }
 
+    stream.blank_lines_allowed();
     for child in body {
         (&child).write(stream);
     }
+    stream.blank_lines_allowed_between_comments();
     stream.blank_line();
 
     if let Some(output) = output {

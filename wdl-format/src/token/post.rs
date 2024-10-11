@@ -78,7 +78,10 @@ pub struct Postprocessor {
     interrupted: bool,
 
     /// Whether blank lines are allowed in the current context.
-    blank_lines_allowed: LineSpacingPolicy,
+    line_spacing_policy: LineSpacingPolicy,
+
+    /// Whether the last token was a comment.
+    prior_is_comment: bool,
 }
 
 impl Postprocessor {
@@ -108,6 +111,7 @@ impl Postprocessor {
         match token {
             PreToken::BlankLine => {
                 self.blank_line(stream);
+                self.prior_is_comment = false;
             }
             PreToken::LineEnd => {
                 self.interrupted = false;
@@ -132,7 +136,7 @@ impl Postprocessor {
                 self.end_line(stream);
             }
             PreToken::LineSpacingPolicy(policy) => {
-                self.blank_lines_allowed = policy;
+                self.line_spacing_policy = policy;
             }
             PreToken::Literal(value, kind) => {
                 assert!(kind != SyntaxKind::Comment && kind != SyntaxKind::Whitespace);
@@ -150,41 +154,49 @@ impl Postprocessor {
                 }
                 stream.push(PostToken::Literal(value.to_owned()));
                 self.position = LinePosition::MiddleOfLine;
+                self.prior_is_comment = false;
             }
             PreToken::Trivia(trivia) => match trivia {
                 Trivia::BlankLine => {
-                    if self.blank_lines_allowed == LineSpacingPolicy::Yes {
-                        self.blank_line(stream);
-                    } else {
-                        todo!("handle line spacing policy")
-                    }
-                }
-                Trivia::Comment(comment) => match comment {
-                    Comment::Preceding(value) => {
-                        if !matches!(
-                            stream.0.last(),
-                            Some(&PostToken::Newline) | Some(&PostToken::Indent) | None
-                        ) {
-                            self.interrupted = true;
+                    match self.line_spacing_policy {
+                        LineSpacingPolicy::Yes => {
+                            self.blank_line(stream);
                         }
-                        self.end_line(stream);
-                        stream.push(PostToken::Literal(value.to_owned()));
-                        self.position = LinePosition::MiddleOfLine;
-                        self.end_line(stream);
-                    }
-                    Comment::Inline(value) => {
-                        assert!(self.position == LinePosition::MiddleOfLine);
-                        if let Some(next) = next {
-                            if next != &PreToken::LineEnd {
-                                self.interrupted = true;
+                        LineSpacingPolicy::BetweenComments => {
+                            if self.prior_is_comment || matches!(next, Some(&PreToken::Trivia(Trivia::Comment(_)))) {
+                                self.blank_line(stream);
                             }
                         }
-                        self.trim_last_line(stream);
-                        stream.push(PostToken::Space);
-                        stream.push(PostToken::Space);
-                        stream.push(PostToken::Literal(value.to_owned()));
-                        self.end_line(stream);
                     }
+                }
+                Trivia::Comment(comment) => {
+                    match comment {
+                        Comment::Preceding(value) => {
+                            if !matches!(
+                                stream.0.last(),
+                                Some(&PostToken::Newline) | Some(&PostToken::Indent) | None
+                            ) {
+                                self.interrupted = true;
+                            }
+                            self.end_line(stream);
+                            stream.push(PostToken::Literal(value.to_owned()));
+                            self.position = LinePosition::MiddleOfLine;
+                        }
+                        Comment::Inline(value) => {
+                            assert!(self.position == LinePosition::MiddleOfLine);
+                            if let Some(next) = next {
+                                if next != &PreToken::LineEnd {
+                                    self.interrupted = true;
+                                }
+                            }
+                            self.trim_last_line(stream);
+                            stream.push(PostToken::Space);
+                            stream.push(PostToken::Space);
+                            stream.push(PostToken::Literal(value.to_owned()));
+                        }
+                    }
+                    self.end_line(stream);
+                    self.prior_is_comment = true;
                 },
             },
         }

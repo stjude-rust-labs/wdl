@@ -12,6 +12,8 @@ use crate::element::FormatElement;
 pub fn format_task_definition(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
     let mut children = element.children().expect("task definition children");
 
+    stream.blank_lines_allowed_between_comments();
+
     let task_keyword = children.next().expect("task keyword");
     assert!(task_keyword.element().kind() == SyntaxKind::TaskKeyword);
     (&task_keyword).write(stream);
@@ -95,13 +97,12 @@ pub fn format_task_definition(element: &FormatElement, stream: &mut TokenStream<
         stream.blank_line();
     }
 
-    let need_blank = !body.is_empty();
+    stream.blank_lines_allowed();
     for child in body {
         (&child).write(stream);
     }
-    if need_blank {
-        stream.blank_line();
-    }
+    stream.blank_lines_allowed_between_comments();
+    stream.blank_line();
 
     if let Some(command) = command {
         (&command).write(stream);

@@ -97,7 +97,6 @@ workflow test_wf {
             "c": 2,
         }
     }
-
 }
 
 task test_task {

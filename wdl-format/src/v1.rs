@@ -54,6 +54,7 @@ pub fn format_ast(element: &FormatElement, stream: &mut TokenStream<PreToken>) {
         a_uri.as_str().cmp(b_uri.as_str())
     });
 
+    stream.blank_lines_allowed_between_comments();
     for import in imports {
         (&import).write(stream);
     }
