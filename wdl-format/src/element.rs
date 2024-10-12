@@ -156,9 +156,7 @@ workflow bar # This is an inline comment on the workflow ident.
         let format_element = Node::Ast(document).into_format_element();
         let mut children = format_element.children().unwrap();
 
-        ////////////////////////////////////////////////////////////////////////////////
         // Version statement
-        ////////////////////////////////////////////////////////////////////////////////
 
         let version = children.next().expect("version statement element");
         assert_eq!(
@@ -176,9 +174,7 @@ workflow bar # This is an inline comment on the workflow ident.
             SyntaxKind::Version
         );
 
-        ////////////////////////////////////////////////////////////////////////////////
         // Task Definition
-        ////////////////////////////////////////////////////////////////////////////////
 
         let task = children.next().expect("task element");
         assert_eq!(
@@ -208,9 +204,7 @@ workflow bar # This is an inline comment on the workflow ident.
 
         assert!(task_children.next().is_none());
 
-        ////////////////////////////////////////////////////////////////////////////////
         // Workflow Definition
-        ////////////////////////////////////////////////////////////////////////////////
 
         let workflow = children.next().expect("workflow element");
         assert_eq!(
@@ -244,5 +238,29 @@ workflow bar # This is an inline comment on the workflow ident.
         );
 
         assert!(workflow_children.next().is_none());
+    }
+
+    #[test]
+    #[should_panic]
+    fn unconsumed_children_panic() {
+        let (document, diagnostics) = Document::parse(
+            "## WDL
+version 1.2  # This is a comment attached to the version.
+
+# This is a comment attached to the task keyword.
+task foo # This is an inline comment on the task ident.
+{
+
+} # This is an inline comment on the task close brace.",
+        );
+
+        assert!(diagnostics.is_empty());
+        let document = document.ast().into_v1().unwrap();
+
+        let format_element = Node::Ast(document).into_format_element();
+        fn inner(format_element: &crate::element::FormatElement) {
+            let mut _children = format_element.children().unwrap();
+        }
+        inner(&format_element);
     }
 }
