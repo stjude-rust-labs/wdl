@@ -670,9 +670,10 @@ pub fn format_if_expr(element: &FormatElement, stream: &mut TokenStream<PreToken
 
     let last = stream.last_literal_kind();
 
-    // Nested `if` expressions are a special case where we don't want to add parentheses
-    // or increment the indent level.
-    // Otherwise, we need to add parentheses and increment the indent if the last token is not an open parenthesis.
+    // Nested `if` expressions are a special case where we don't want to add
+    // parentheses or increment the indent level.
+    // Otherwise, we need to add parentheses and increment the indent if the last
+    // token is not an open parenthesis.
     let nested_else_if = matches!(last, Some(SyntaxKind::ElseKeyword));
     let paren_needed = !matches!(last, Some(SyntaxKind::OpenParen)) && !nested_else_if;
 
