@@ -1,13 +1,45 @@
 //! Elements used during formatting.
 
-use std::collections::HashMap;
+use std::iter::Peekable;
 
 use nonempty::NonEmpty;
 use wdl_ast::Element;
 use wdl_ast::Node;
-use wdl_ast::SyntaxKind;
 
 pub mod node;
+
+/// An iterator that asserts that all items have been consumed when dropped.
+pub struct AssertConsumedIter<I: Iterator>(Peekable<I>);
+
+impl<I> AssertConsumedIter<I>
+where
+    I: Iterator,
+{
+    /// Creates a new [`AssertConsumedIter`].
+    pub fn new(iter: I) -> Self {
+        Self(iter.peekable())
+    }
+}
+
+impl<I> Iterator for AssertConsumedIter<I>
+where
+    I: Iterator,
+{
+    type Item = I::Item;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.next()
+    }
+}
+
+impl<I> Drop for AssertConsumedIter<I>
+where
+    I: Iterator,
+{
+    fn drop(&mut self) {
+        assert!(self.0.peek().is_none(), "not all iterator items consumed!");
+    }
+}
 
 /// A formattable element.
 #[derive(Clone, Debug)]
@@ -31,35 +63,10 @@ impl FormatElement {
     }
 
     /// Gets the children for this node.
-    pub fn children(&self) -> Option<impl Iterator<Item = &FormatElement>> {
+    pub fn children(&self) -> Option<AssertConsumedIter<impl Iterator<Item = &FormatElement>>> {
         self.children
             .as_ref()
-            .map(|children| children.into_iter().map(|child| &**child))
-    }
-
-    /// Collects all of the children into a hashmap based on their
-    /// [`SyntaxKind`]. This is often useful when formatting if you want to,
-    /// say, iterate through all children of a certain kind.
-    ///
-    /// # Notes
-    ///
-    /// * This clones the underlying children. It's meant to be a cheap clone,
-    ///   but you should be aware of the (relatively small) performance hit.
-    pub fn children_by_kind(&self) -> HashMap<SyntaxKind, Vec<FormatElement>> {
-        let mut results = HashMap::new();
-
-        if let Some(children) = self.children() {
-            for child in children {
-                results
-                    .entry(child.element().kind())
-                    .or_insert(Vec::new())
-                    // NOTE: this clone is very cheap, as the underlying
-                    // elements are mostly reference counts.
-                    .push(child.to_owned())
-            }
-        }
-
-        results
+            .map(|children| AssertConsumedIter::new(children.iter().map(|c| c.as_ref())))
     }
 }
 
