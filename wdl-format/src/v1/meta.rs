@@ -22,7 +22,6 @@ pub fn format_metadata_array(element: &FormatElement, stream: &mut TokenStream<P
     let open_bracket = children.next().expect("metadata array open bracket");
     assert!(open_bracket.element().kind() == SyntaxKind::OpenBracket);
     (&open_bracket).write(stream);
-    stream.increment_indent();
 
     let mut close_bracket = None;
     let mut commas = Vec::new();
@@ -40,6 +39,11 @@ pub fn format_metadata_array(element: &FormatElement, stream: &mut TokenStream<P
         })
         .collect::<Vec<_>>();
 
+    let empty = items.is_empty();
+    if !empty {
+        stream.increment_indent();
+    }
+
     let mut commas = commas.iter();
     for item in items {
         (&item).write(stream);
@@ -51,7 +55,9 @@ pub fn format_metadata_array(element: &FormatElement, stream: &mut TokenStream<P
         stream.end_line();
     }
 
-    stream.decrement_indent();
+    if !empty {
+        stream.decrement_indent();
+    }
     (&close_bracket.expect("metadata array close bracket")).write(stream);
 }
 
@@ -62,7 +68,6 @@ pub fn format_metadata_object(element: &FormatElement, stream: &mut TokenStream<
     let open_brace = children.next().expect("metadata object open brace");
     assert!(open_brace.element().kind() == SyntaxKind::OpenBrace);
     (&open_brace).write(stream);
-    stream.increment_indent();
 
     let mut close_brace = None;
     let mut commas = Vec::new();
@@ -81,6 +86,11 @@ pub fn format_metadata_object(element: &FormatElement, stream: &mut TokenStream<
         })
         .collect::<Vec<_>>();
 
+    let empty = items.is_empty();
+    if !empty {
+        stream.increment_indent();
+    }
+
     let mut commas = commas.iter();
     for item in items {
         (&item).write(stream);
@@ -92,7 +102,9 @@ pub fn format_metadata_object(element: &FormatElement, stream: &mut TokenStream<
         stream.end_line();
     }
 
-    stream.decrement_indent();
+    if !empty {
+        stream.decrement_indent();
+    }
     (&close_brace.expect("metadata object close brace")).write(stream);
 }
 
