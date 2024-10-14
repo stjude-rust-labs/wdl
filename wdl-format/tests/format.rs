@@ -5,9 +5,9 @@
 //! Each directory is expected to contain:
 //!
 //! * `source.wdl` - the test input source to parse.
-//! * `source.formatted` - the expected formatted output.
+//! * `source.formatted.wdl` - the expected formatted output.
 //!
-//! The `source.formatted` file may be automatically generated or updated by
+//! The `source.formatted.wdl` file may be automatically generated or updated by
 //! setting the `BLESS` environment variable when running this test.
 
 use std::collections::HashSet;
@@ -33,6 +33,7 @@ use wdl_ast::Node;
 use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt;
 
+/// Find all the tests in the `tests/format` directory.
 fn find_tests() -> Vec<PathBuf> {
     // Check for filter arguments consisting of test names
     let mut filter = HashSet::new();
@@ -60,6 +61,7 @@ fn find_tests() -> Vec<PathBuf> {
     tests
 }
 
+/// Format a list of diagnostics.
 fn format_diagnostics(diagnostics: &[Diagnostic], path: &Path, source: &str) -> String {
     let file = SimpleFile::new(path.as_os_str().to_str().unwrap(), source);
     let mut buffer = Buffer::no_color();
@@ -76,6 +78,7 @@ fn format_diagnostics(diagnostics: &[Diagnostic], path: &Path, source: &str) -> 
     String::from_utf8(buffer.into_inner()).expect("should be UTF-8")
 }
 
+/// Compare the result of a test to the expected result.
 fn compare_result(path: &Path, result: &str) -> Result<(), String> {
     if env::var_os("BLESS").is_some() {
         fs::write(path, &result).map_err(|e| {
@@ -106,6 +109,7 @@ fn compare_result(path: &Path, result: &str) -> Result<(), String> {
     Ok(())
 }
 
+/// Run a test.
 fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), String> {
     let path = test.join("source.wdl");
     let source = std::fs::read_to_string(&path).map_err(|e| {
@@ -144,6 +148,7 @@ fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), String> {
     Ok(())
 }
 
+/// Run all the tests.
 fn main() {
     let tests = find_tests();
     println!("\nrunning {} tests\n", tests.len());
