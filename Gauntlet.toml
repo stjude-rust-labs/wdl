@@ -1408,12 +1408,27 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a000
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
+message = "BenchmarkSVs.wdl:457:49: error: cannot coerce type `Array[Int]` to `String`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkSVs/BenchmarkSVs.wdl/#L457"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:485:43: error: a placeholder cannot have more than one option"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkSVs/BenchmarkSVs.wdl/#L485"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
+message = "BenchmarkSVs.wdl:485:52: error: cannot coerce type `Array[Int]` to `String`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkSVs/BenchmarkSVs.wdl/#L485"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:772:43: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkSVs/BenchmarkSVs.wdl/#L772"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
+message = "BenchmarkSVs.wdl:772:52: error: cannot coerce type `Array[Int]` to `String`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkSVs/BenchmarkSVs.wdl/#L772"
 
 [[diagnostics]]
@@ -1428,12 +1443,27 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a000
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
+message = "BenchmarkSVs.wdl:789:49: error: cannot coerce type `Array[String]` to `String`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkSVs/BenchmarkSVs.wdl/#L789"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:790:42: error: a placeholder cannot have more than one option"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkSVs/BenchmarkSVs.wdl/#L790"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
+message = "BenchmarkSVs.wdl:790:51: error: cannot coerce type `Array[Int]` to `String`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkSVs/BenchmarkSVs.wdl/#L790"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:890:36: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkSVs/BenchmarkSVs.wdl/#L890"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
+message = "BenchmarkSVs.wdl:890:49: error: cannot coerce type `Array[File]` to `String`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkSVs/BenchmarkSVs.wdl/#L890"
 
 [[diagnostics]]
@@ -1513,7 +1543,17 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a000
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
+message = "BenchmarkVCFs.wdl:613:49: error: cannot coerce type `Array[File]` to `String`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkVCFs/BenchmarkVCFs.wdl/#L613"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:621:36: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkVCFs/BenchmarkVCFs.wdl/#L621"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
+message = "BenchmarkVCFs.wdl:621:49: error: cannot coerce type `Array[File]` to `String`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkVCFs/BenchmarkVCFs.wdl/#L621"
 
 [[diagnostics]]
@@ -1523,7 +1563,17 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a000
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
+message = "BenchmarkVCFs.wdl:626:49: error: cannot coerce type `Array[File]` to `String`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkVCFs/BenchmarkVCFs.wdl/#L626"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:631:36: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkVCFs/BenchmarkVCFs.wdl/#L631"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
+message = "BenchmarkVCFs.wdl:631:49: error: cannot coerce type `Array[File]` to `String`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkVCFs/BenchmarkVCFs.wdl/#L631"
 
 [[diagnostics]]
@@ -2038,7 +2088,17 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a000
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl"
+message = "ComputeIntervalBamStats.wdl:223:50: error: cannot coerce type `Array[File]` to `String`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L223"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl"
 message = "ComputeIntervalBamStats.wdl:270:37: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L270"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl"
+message = "ComputeIntervalBamStats.wdl:270:50: error: cannot coerce type `Array[File]` to `String`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L270"
 
 [[diagnostics]]
@@ -2053,12 +2113,27 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a000
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
+message = "CreateIGVSession.wdl:51:50: error: cannot coerce type `Array[String]?` to `String`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/Utilities/WDLs/CreateIGVSession.wdl/#L51"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
 message = "CreateIGVSession.wdl:52:36: error: a placeholder cannot have more than one option"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/Utilities/WDLs/CreateIGVSession.wdl/#L52"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
+message = "CreateIGVSession.wdl:52:50: error: cannot coerce type `Array[String]?` to `String`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/Utilities/WDLs/CreateIGVSession.wdl/#L52"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
 message = "CreateIGVSession.wdl:53:46: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/Utilities/WDLs/CreateIGVSession.wdl/#L53"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
+message = "CreateIGVSession.wdl:53:60: error: cannot coerce type `Array[String]?` to `String`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/Utilities/WDLs/CreateIGVSession.wdl/#L53"
 
 [[diagnostics]]
@@ -2838,13 +2913,28 @@ permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e2955
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
+message = "Funcotator.wdl:163:118: error: cannot coerce type `Array[String]?` to `String`"
+permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/tasks/broad/Funcotator.wdl/#L163"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
 message = "Funcotator.wdl:163:92: error: a placeholder cannot have more than one option"
 permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/tasks/broad/Funcotator.wdl/#L163"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
+message = "Funcotator.wdl:164:118: error: cannot coerce type `Array[String]?` to `String`"
+permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/tasks/broad/Funcotator.wdl/#L164"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
 message = "Funcotator.wdl:164:89: error: a placeholder cannot have more than one option"
 permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/tasks/broad/Funcotator.wdl/#L164"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
+message = "Funcotator.wdl:165:121: error: cannot coerce type `Array[String]?` to `String`"
+permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/tasks/broad/Funcotator.wdl/#L165"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
@@ -3039,6 +3129,11 @@ permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e2955
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/Qc.wdl"
 message = "Qc.wdl:434:31: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/tasks/broad/Qc.wdl/#L434"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/Qc.wdl"
+message = "Qc.wdl:434:46: error: cannot coerce type `Array[String]?` to `String`"
 permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/tasks/broad/Qc.wdl/#L434"
 
 [[diagnostics]]
@@ -3418,6 +3513,11 @@ permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e2955
 
 [[diagnostics]]
 document = "broadinstitute/warp:/verification/VerifyMetrics.wdl"
+message = "VerifyMetrics.wdl:87:117: error: cannot coerce type `Array[String]` to `String`"
+permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/verification/VerifyMetrics.wdl/#L87"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/verification/VerifyMetrics.wdl"
 message = "VerifyMetrics.wdl:87:89: error: a placeholder cannot have more than one option"
 permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/verification/VerifyMetrics.wdl/#L87"
 
@@ -3698,6 +3798,11 @@ permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e2955
 
 [[diagnostics]]
 document = "broadinstitute/warp:/verification/VerifyUltimaGenomicsWholeGenomeCramOnly.wdl"
+message = "VerifyUltimaGenomicsWholeGenomeCramOnly.wdl:102:115: error: cannot coerce type `Array[String]` to `String`"
+permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/verification/VerifyUltimaGenomicsWholeGenomeCramOnly.wdl/#L102"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/verification/VerifyUltimaGenomicsWholeGenomeCramOnly.wdl"
 message = "VerifyUltimaGenomicsWholeGenomeCramOnly.wdl:102:87: error: a placeholder cannot have more than one option"
 permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/verification/VerifyUltimaGenomicsWholeGenomeCramOnly.wdl/#L102"
 
@@ -3735,6 +3840,11 @@ permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e2955
 document = "broadinstitute/warp:/verification/VerifyUltimaGenomicsWholeGenomeGermline.wdl"
 message = "VerifyUltimaGenomicsWholeGenomeGermline.wdl:161:11: warning[UnusedInput]: unused input `dependency_input`"
 permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/verification/VerifyUltimaGenomicsWholeGenomeGermline.wdl/#L161"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/verification/VerifyUltimaGenomicsWholeGenomeGermline.wdl"
+message = "VerifyUltimaGenomicsWholeGenomeGermline.wdl:174:115: error: cannot coerce type `Array[String]` to `String`"
+permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/verification/VerifyUltimaGenomicsWholeGenomeGermline.wdl/#L174"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/verification/VerifyUltimaGenomicsWholeGenomeGermline.wdl"
