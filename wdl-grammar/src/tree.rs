@@ -720,7 +720,7 @@ impl fmt::Debug for SyntaxTree {
 /// [`SyntaxToken`].
 ///
 /// Whitespace is only considered substantial if it contains more than one
-/// newline and is between comments. Comments are always considered substantial.
+/// newline. Comments are always considered substantial.
 fn gather_substantial_trivia(
     source: &SyntaxToken,
     direction: Direction,
@@ -795,22 +795,6 @@ fn gather_substantial_trivia(
             Direction::Prev => t.prev_token(),
         };
     }
-
-    // // Remove leading and trailing whitespace from results.
-    // while let Some(t) = results.front() {
-    //     if t.kind() == SyntaxKind::Whitespace {
-    //         results.pop_front();
-    //     } else {
-    //         break;
-    //     }
-    // }
-    // while let Some(t) = results.back() {
-    //     if t.kind() == SyntaxKind::Whitespace {
-    //         results.pop_back();
-    //     } else {
-    //         break;
-    //     }
-    // }
 
     // NOTE: most of the time, this conversion will be O(1). Occassionally
     // it will be O(n). No allocations will ever be done. Thus, the
