@@ -166,7 +166,7 @@ impl Visitor for SectionOrderingRule {
                 TaskItem::Requirements(_) if encountered <= State::Requirements => {
                     encountered = State::Requirements;
                 }
-                TaskItem::TaskHints(_) if encountered <= State::Hints => {
+                TaskItem::Hints(_) if encountered <= State::Hints => {
                     encountered = State::Hints;
                 }
                 _ => {
@@ -218,7 +218,7 @@ impl Visitor for SectionOrderingRule {
                 WorkflowItem::Output(_) if encountered <= State::Output => {
                     encountered = State::Output;
                 }
-                WorkflowItem::WorkflowHints(_) if encountered <= State::Hints => {
+                WorkflowItem::Hints(_) if encountered <= State::Hints => {
                     encountered = State::Hints;
                 }
                 _ => {

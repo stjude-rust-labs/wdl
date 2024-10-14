@@ -23,7 +23,6 @@ use crate::support;
 use crate::support::child;
 use crate::support::children;
 use crate::token;
-use crate::v1::WorkflowHintsSection;
 
 pub mod common;
 pub mod requirements;
@@ -127,9 +126,7 @@ pub enum TaskItem {
     /// The item is a requirements section.
     Requirements(RequirementsSection),
     /// The item is a task hints section.
-    TaskHints(TaskHintsSection),
-    /// The item is a workflow hints section.
-    WorkflowHints(WorkflowHintsSection),
+    Hints(TaskHintsSection),
     /// The item is a runtime section.
     Runtime(RuntimeSection),
     /// The item is a metadata section.
@@ -189,11 +186,8 @@ impl TaskItem {
             SyntaxKind::ParameterMetadataSectionNode => Some(Self::ParameterMetadata(
                 ParameterMetadataSection::cast(syntax).expect("parameter metadata section to cast"),
             )),
-            SyntaxKind::TaskHintsSectionNode => Some(Self::TaskHints(
+            SyntaxKind::TaskHintsSectionNode => Some(Self::Hints(
                 TaskHintsSection::cast(syntax).expect("task hints section to cast"),
-            )),
-            SyntaxKind::WorkflowHintsSectionNode => Some(Self::WorkflowHints(
-                WorkflowHintsSection::cast(syntax).expect("workflow hints section to cast"),
             )),
             SyntaxKind::BoundDeclNode => Some(Self::Declaration(
                 BoundDecl::cast(syntax).expect("bound decl to cast"),
@@ -209,8 +203,7 @@ impl TaskItem {
             Self::Output(element) => element.syntax(),
             Self::Command(element) => element.syntax(),
             Self::Requirements(element) => element.syntax(),
-            Self::TaskHints(element) => element.syntax(),
-            Self::WorkflowHints(element) => element.syntax(),
+            Self::Hints(element) => element.syntax(),
             Self::Runtime(element) => element.syntax(),
             Self::Metadata(element) => element.syntax(),
             Self::ParameterMetadata(element) => element.syntax(),
@@ -317,49 +310,24 @@ impl TaskItem {
 
     /// Attempts to get a reference to the inner [`TaskHintsSection`].
     ///
-    /// * If `self` is a [`TaskItem::TaskHints`], then a reference to the inner
+    /// * If `self` is a [`TaskItem::Hints`], then a reference to the inner
     ///   [`TaskHintsSection`] is returned wrapped in [`Some`].
     /// * Else, [`None`] is returned.
-    pub fn as_task_hints_section(&self) -> Option<&TaskHintsSection> {
+    pub fn as_hints_section(&self) -> Option<&TaskHintsSection> {
         match self {
-            Self::TaskHints(task_hints_section) => Some(task_hints_section),
+            Self::Hints(hints_section) => Some(hints_section),
             _ => None,
         }
     }
 
     /// Consumes `self` and attempts to return the inner [`TaskHintsSection`].
     ///
-    /// * If `self` is a [`TaskItem::TaskHints`], then the inner
+    /// * If `self` is a [`TaskItem::Hints`], then the inner
     ///   [`TaskHintsSection`] is returned wrapped in [`Some`].
     /// * Else, [`None`] is returned.
-    pub fn into_task_hints_section(self) -> Option<TaskHintsSection> {
+    pub fn into_hints_section(self) -> Option<TaskHintsSection> {
         match self {
-            Self::TaskHints(task_hints_section) => Some(task_hints_section),
-            _ => None,
-        }
-    }
-
-    /// Attempts to get a reference to the inner [`WorkflowHintsSection`].
-    ///
-    /// * If `self` is a [`WorkflowItem::WorkflowHints`], then a reference to
-    ///   the inner [`WorkflowHintsSection`] is returned wrapped in [`Some`].
-    /// * Else, [`None`] is returned.
-    pub fn as_workflow_hints_section(&self) -> Option<&WorkflowHintsSection> {
-        match self {
-            Self::WorkflowHints(workflow_hints_section) => Some(workflow_hints_section),
-            _ => None,
-        }
-    }
-
-    /// Consumes `self` and attempts to return the inner
-    /// [`WorkflowHintsSection`].
-    ///
-    /// * If `self` is a [`WorkflowItem::WorkflowHints`], then the inner
-    ///   [`WorkflowHintsSection`] is returned wrapped in [`Some`].
-    /// * Else, [`None`] is returned.
-    pub fn into_workflow_hints_section(self) -> Option<WorkflowHintsSection> {
-        match self {
-            Self::WorkflowHints(workflow_hints_section) => Some(workflow_hints_section),
+            Self::Hints(hints_section) => Some(hints_section),
             _ => None,
         }
     }
