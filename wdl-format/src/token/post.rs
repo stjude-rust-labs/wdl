@@ -153,7 +153,7 @@ impl Postprocessor {
             }
             PreToken::Trivia(trivia) => match trivia {
                 Trivia::BlankLine => match self.line_spacing_policy {
-                    LineSpacingPolicy::Yes => {
+                    LineSpacingPolicy::Always => {
                         self.blank_line(stream);
                     }
                     LineSpacingPolicy::BeforeComments => {

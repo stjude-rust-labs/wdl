@@ -73,7 +73,6 @@ impl<T: Token> IntoIterator for TokenStream<T> {
 pub enum Comment {
     /// A comment on it's own line.
     Preceding(String),
-
     /// A comment on the same line as the code preceding it.
     Inline(String),
 }
@@ -94,5 +93,5 @@ pub enum LineSpacingPolicy {
     BeforeComments,
     /// Blank lines are always allowed.
     #[default]
-    Yes,
+    Always,
 }

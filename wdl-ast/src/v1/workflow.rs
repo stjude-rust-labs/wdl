@@ -369,8 +369,8 @@ impl WorkflowItem {
 
     /// Attempts to get a reference to the inner [`WorkflowHintsSection`].
     ///
-    /// * If `self` is a [`WorkflowItem::Hints`], then a reference to the
-    ///   inner [`WorkflowHintsSection`] is returned wrapped in [`Some`].
+    /// * If `self` is a [`WorkflowItem::Hints`], then a reference to the inner
+    ///   [`WorkflowHintsSection`] is returned wrapped in [`Some`].
     /// * Else, [`None`] is returned.
     pub fn as_hints_section(&self) -> Option<&WorkflowHintsSection> {
         match self {
