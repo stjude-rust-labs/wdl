@@ -21,15 +21,15 @@ use std::sync::LazyLock;
 use wdl_grammar::ALL_SYNTAX_KIND;
 use wdl_grammar::WorkflowDescriptionLanguage;
 
-use crate::AstNode;
-use crate::AstToken;
-use crate::Comment;
-use crate::Ident;
-use crate::SyntaxKind;
-use crate::Version;
-use crate::VersionStatement;
-use crate::Whitespace;
-use crate::v1;
+use wdl_ast::AstNode;
+use wdl_ast::AstToken;
+use wdl_ast::Comment;
+use wdl_ast::Ident;
+use wdl_ast::SyntaxKind;
+use wdl_ast::Version;
+use wdl_ast::VersionStatement;
+use wdl_ast::Whitespace;
+use wdl_ast::v1;
 
 /// A private module for sealed traits.
 ///
@@ -298,84 +298,79 @@ impl<T: AstToken + 'static> AstTokenRegistrant for T {
     }
 }
 
-mod tests {
-    use super::*;
+/// This test ensures there is a one-to-one mapping between CST elements
+/// ([`SyntaxKind`]\(s)) and AST elements (Rust types that implement
+/// the [`AstNode`] trait or the [`AstToken`] trait).
+///
+/// The importance of this is described at the top of the module.
+fn main() {
+    let mut missing = Vec::new();
+    let mut multiple = Vec::new();
 
-    /// This test ensures there is a one-to-one mapping between CST elements
-    /// ([`SyntaxKind`]\(s)) and AST elements (Rust types that implement
-    /// the [`AstNode`] trait or the [`AstToken`] trait).
-    ///
-    /// The importance of this is described at the top of the module.
-    #[test]
-    fn ensure_one_to_one() {
-        let mut missing = Vec::new();
-        let mut multiple = Vec::new();
+    let inverse_registry = inverse();
 
-        let inverse_registry = inverse();
+    for kind in ALL_SYNTAX_KIND {
+        // NOTE: these are symbolic elements and should not be included in
+        // the analysis here.
+        if kind.is_symbolic() {
+            continue;
+        }
 
-        for kind in ALL_SYNTAX_KIND {
-            // NOTE: these are symbolic elements and should not be included in
-            // the analysis here.
-            if kind.is_symbolic() {
-                continue;
+        match inverse_registry.get(kind) {
+            // SAFETY: because this is an inverse registry, only
+            // [`SyntaxKind`]s with at least one registered implementing
+            // type would be registered here. Thus, by design of the
+            // `inverse()` method, this will never occur.
+            Some(values) if values.is_empty() => {
+                unreachable!("the inverse registry should never contain an empty array")
             }
+            Some(values) if values.len() > 1 => multiple.push((kind, values)),
+            None => missing.push(kind),
+            // NOTE: this is essentially only if the values exist and the
+            // length is 1—in that case, there is a one to one mapping,
+            // which is what we would like the case to be.
+            _ => {}
+        }
+    }
 
-            match inverse_registry.get(kind) {
-                // SAFETY: because this is an inverse registry, only
-                // [`SyntaxKind`]s with at least one registered implementing
-                // type would be registered here. Thus, by design of the
-                // `inverse()` method, this will never occur.
-                Some(values) if values.is_empty() => {
-                    unreachable!("the inverse registry should never contain an empty array")
+    if !missing.is_empty() {
+        let mut missing = missing
+            .into_iter()
+            .map(|kind| format!("{:?}", kind))
+            .collect::<Vec<_>>();
+        missing.sort();
+
+        panic!(
+            "detected `SyntaxKind`s without an associated `AstNode`/`AstToken` (n={}): {}",
+            missing.len(),
+            missing.join(", ")
+        )
+    }
+
+    if !multiple.is_empty() {
+        multiple.sort();
+        let mut multiple = multiple
+            .into_iter()
+            .map(|(kind, types)| {
+                let mut types = types.clone();
+                types.sort();
+
+                let mut result = format!("== {:?} ==", kind);
+                for r#type in types {
+                    result.push_str("\n* ");
+                    result.push_str(r#type);
                 }
-                Some(values) if values.len() > 1 => multiple.push((kind, values)),
-                None => missing.push(kind),
-                // NOTE: this is essentially only if the values exist and the
-                // length is 1—in that case, there is a one to one mapping,
-                // which is what we would like the case to be.
-                _ => {}
-            }
-        }
 
-        if !missing.is_empty() {
-            let mut missing = missing
-                .into_iter()
-                .map(|kind| format!("{:?}", kind))
-                .collect::<Vec<_>>();
-            missing.sort();
+                result
+            })
+            .collect::<Vec<_>>();
+        multiple.sort();
 
-            panic!(
-                "detected `SyntaxKind`s without an associated `AstNode`/`AstToken` (n={}): {}",
-                missing.len(),
-                missing.join(", ")
-            )
-        }
-
-        if !multiple.is_empty() {
-            multiple.sort();
-            let mut multiple = multiple
-                .into_iter()
-                .map(|(kind, types)| {
-                    let mut types = types.clone();
-                    types.sort();
-
-                    let mut result = format!("== {:?} ==", kind);
-                    for r#type in types {
-                        result.push_str("\n* ");
-                        result.push_str(r#type);
-                    }
-
-                    result
-                })
-                .collect::<Vec<_>>();
-            multiple.sort();
-
-            panic!(
-                "detected `SyntaxKind`s associated with multiple `AstNode`s/`AstToken`s \
-                 (n={}):\n\n{}",
-                multiple.len(),
-                multiple.join("\n\n")
-            )
-        }
+        panic!(
+            "detected `SyntaxKind`s associated with multiple `AstNode`s/`AstToken`s \
+                (n={}):\n\n{}",
+            multiple.len(),
+            multiple.join("\n\n")
+        )
     }
 }

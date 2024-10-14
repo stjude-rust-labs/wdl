@@ -63,8 +63,6 @@ pub use wdl_grammar::version;
 pub mod v1;
 
 mod element;
-#[cfg(test)]
-mod registry;
 mod validation;
 mod visitor;
 
