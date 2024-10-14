@@ -3,13 +3,11 @@
 mod post;
 mod pre;
 
-use std::fmt::Display;
-
 pub use post::*;
 pub use pre::*;
 
 /// Tokens that are streamable.
-pub trait Token: Display + Eq + PartialEq {}
+pub trait Token: Eq + PartialEq {}
 
 /// A stream of tokens. Tokens in this case are either [`PreToken`]s or
 /// [`PostToken`]s. Note that, unless you are working on formatting
@@ -21,16 +19,6 @@ pub struct TokenStream<T: Token>(Vec<T>);
 impl<T: Token> Default for TokenStream<T> {
     fn default() -> Self {
         Self(Default::default())
-    }
-}
-
-impl<T: Token> std::fmt::Display for TokenStream<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for value in &self.0 {
-            write!(f, "{value}")?;
-        }
-
-        Ok(())
     }
 }
 

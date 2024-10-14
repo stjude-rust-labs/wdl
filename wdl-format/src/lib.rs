@@ -201,7 +201,7 @@ impl Formatter {
         let mut result = String::new();
 
         for token in self.to_stream(element) {
-            write!(result, "{token}")?;
+            write!(result, "{token}", token = token.display(self.config()))?;
         }
 
         Ok(result)

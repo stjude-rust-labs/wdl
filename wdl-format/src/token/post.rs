@@ -13,6 +13,7 @@ use crate::SPACE;
 use crate::Token;
 use crate::TokenStream;
 use crate::Trivia;
+use crate::config::Indent;
 
 /// A postprocessed token.
 #[derive(Eq, PartialEq)]
@@ -41,13 +42,17 @@ impl std::fmt::Debug for PostToken {
     }
 }
 
-impl std::fmt::Display for PostToken {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl PostToken {
+    /// Returns a displayable version of the token.
+    pub fn display<'a>(&'a self, config: &'a crate::Config) -> Box<dyn std::fmt::Display + 'a> {
         match self {
-            PostToken::Space => write!(f, "{SPACE}"),
-            PostToken::Newline => write!(f, "{NEWLINE}"),
-            PostToken::Indent => write!(f, "    "), // TODO(af): Make this configurable.
-            PostToken::Literal(value) => write!(f, "{value}"),
+            Self::Space => Box::new(SPACE),
+            Self::Newline => Box::new(NEWLINE),
+            Self::Indent => Box::new(match config.indent() {
+                Indent::Spaces(n) => " ".repeat((n).into()),
+                Indent::Tabs(n) => "\t".repeat((n).into()),
+            }),
+            Self::Literal(value) => Box::new(value),
         }
     }
 }
