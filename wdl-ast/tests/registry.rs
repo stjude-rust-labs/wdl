@@ -302,7 +302,8 @@ impl<T: AstToken + 'static> AstTokenRegistrant for T {
 /// the [`AstNode`] trait or the [`AstToken`] trait).
 ///
 /// The importance of this is described at the top of the module.
-fn main() {
+#[test]
+fn ensures_one_to_one() {
     let mut missing = Vec::new();
     let mut multiple = Vec::new();
 

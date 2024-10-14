@@ -35,7 +35,3 @@ workspace = true
 name = "validation"
 required-features = ["codespan"]
 harness = false
-
-[[test]]
-name = "registry"
-harness = false
