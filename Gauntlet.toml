@@ -233,7 +233,7 @@ permalink = "https://github.com/PacificBiosciences/HiFi-human-WGS-WDL/blob/1cf2b
 
 [[diagnostics]]
 document = "PacificBiosciences/HiFi-human-WGS-WDL:/workflows/tertiary_analysis/tertiary_analysis.wdl"
-message = "tertiary_analysis.wdl:46:38: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[Array[IndexData]]+`"
+message = "tertiary_analysis.wdl:46:38: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[Array[IndexData]]+`"
 permalink = "https://github.com/PacificBiosciences/HiFi-human-WGS-WDL/blob/1cf2b2e80024290d0ec1ea93b6a279ea2de519b0/workflows/tertiary_analysis/tertiary_analysis.wdl/#L46"
 
 [[diagnostics]]
@@ -893,7 +893,7 @@ permalink = "https://github.com/biowdl/tasks/blob/2bf875300d90a3c9c8d670b3d99026
 
 [[diagnostics]]
 document = "biowdl/tasks:/sambamba.wdl"
-message = "sambamba.wdl:157:44: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[String]+`"
+message = "sambamba.wdl:157:44: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[String]+`"
 permalink = "https://github.com/biowdl/tasks/blob/2bf875300d90a3c9c8d670b3d99026452d5dbae2/sambamba.wdl/#L157"
 
 [[diagnostics]]
@@ -928,7 +928,7 @@ permalink = "https://github.com/biowdl/tasks/blob/2bf875300d90a3c9c8d670b3d99026
 
 [[diagnostics]]
 document = "biowdl/tasks:/samtools.wdl"
-message = "samtools.wdl:470:44: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[String]+`"
+message = "samtools.wdl:470:44: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[String]+`"
 permalink = "https://github.com/biowdl/tasks/blob/2bf875300d90a3c9c8d670b3d99026452d5dbae2/samtools.wdl/#L470"
 
 [[diagnostics]]
@@ -968,7 +968,7 @@ permalink = "https://github.com/biowdl/tasks/blob/2bf875300d90a3c9c8d670b3d99026
 
 [[diagnostics]]
 document = "biowdl/tasks:/umi.wdl"
-message = "umi.wdl:39:44: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[String]+`"
+message = "umi.wdl:39:44: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[String]+`"
 permalink = "https://github.com/biowdl/tasks/blob/2bf875300d90a3c9c8d670b3d99026452d5dbae2/umi.wdl/#L39"
 
 [[diagnostics]]
@@ -1528,7 +1528,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a000
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
-message = "BenchmarkVCFs.wdl:91:54: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]`"
+message = "BenchmarkVCFs.wdl:91:54: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/BenchmarkVCFs/BenchmarkVCFs.wdl/#L91"
 
 [[diagnostics]]
@@ -1683,7 +1683,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a000
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/subworkflows/FEEvaluation.wdl"
-message = "FEEvaluation.wdl:124:35: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[Int]+`"
+message = "FEEvaluation.wdl:124:35: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[Int]+`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/FunctionalEquivalence/subworkflows/FEEvaluation.wdl/#L124"
 
 [[diagnostics]]
@@ -1743,7 +1743,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a000
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
-message = "Glimpse2ImputationAndCheckQC.wdl:70:39: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
+message = "Glimpse2ImputationAndCheckQC.wdl:70:39: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L70"
 
 [[diagnostics]]
@@ -1768,7 +1768,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a000
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
-message = "Glimpse2ImputationAndCheckQC.wdl:83:40: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
+message = "Glimpse2ImputationAndCheckQC.wdl:83:40: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl/#L83"
 
 [[diagnostics]]
@@ -1983,7 +1983,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a000
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/ImputationPipeline/Validation/SubsetWeightSet.wdl"
-message = "SubsetWeightSet.wdl:28:66: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[SelfExclusiveSites]+`"
+message = "SubsetWeightSet.wdl:28:66: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[SelfExclusiveSites]+`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/ImputationPipeline/Validation/SubsetWeightSet.wdl/#L28"
 
 [[diagnostics]]
@@ -2023,7 +2023,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a000
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/LongReadRNABenchmark/IsoformDiscoveryBenchmarkTasks.wdl"
-message = "IsoformDiscoveryBenchmarkTasks.wdl:69:32: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[String]+`"
+message = "IsoformDiscoveryBenchmarkTasks.wdl:69:32: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[String]+`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/LongReadRNABenchmark/IsoformDiscoveryBenchmarkTasks.wdl/#L69"
 
 [[diagnostics]]
@@ -2078,7 +2078,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a000
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/MatchFingerprints.wdl"
-message = "MatchFingerprints.wdl:67:33: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[Array[String]]`"
+message = "MatchFingerprints.wdl:67:33: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[Array[String]]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/f8833a0000cd441a3cc4be2718876a1433cb21ef/Utilities/WDLs/MatchFingerprints.wdl/#L67"
 
 [[diagnostics]]
@@ -2443,37 +2443,37 @@ permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e2955
 
 [[diagnostics]]
 document = "broadinstitute/warp:/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl"
-message = "BroadInternalUltimaGenomics.wdl:91:34: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
+message = "BroadInternalUltimaGenomics.wdl:91:34: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
 permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl/#L91"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl"
-message = "BroadInternalUltimaGenomics.wdl:92:48: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
+message = "BroadInternalUltimaGenomics.wdl:92:48: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
 permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl/#L92"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl"
-message = "BroadInternalUltimaGenomics.wdl:93:46: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
+message = "BroadInternalUltimaGenomics.wdl:93:46: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
 permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl/#L93"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl"
-message = "BroadInternalUltimaGenomics.wdl:94:40: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
+message = "BroadInternalUltimaGenomics.wdl:94:40: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
 permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl/#L94"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl"
-message = "BroadInternalUltimaGenomics.wdl:95:44: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
+message = "BroadInternalUltimaGenomics.wdl:95:44: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
 permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl/#L95"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl"
-message = "BroadInternalUltimaGenomics.wdl:96:38: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
+message = "BroadInternalUltimaGenomics.wdl:96:38: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
 permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl/#L96"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl"
-message = "BroadInternalUltimaGenomics.wdl:97:44: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
+message = "BroadInternalUltimaGenomics.wdl:97:44: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
 permalink = "https://github.com/broadinstitute/warp/blob/ec91e512235419b267e295583db3ec2594fcd717/pipelines/broad/internal/dna_seq/germline/single_sample/UltimaGenomics/BroadInternalUltimaGenomics.wdl/#L97"
 
 [[diagnostics]]
@@ -4138,7 +4138,7 @@ permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/a04293a527117
 
 [[diagnostics]]
 document = "chanzuckerberg/czid-workflows:/workflows/bulk-download/run.wdl"
-message = "run.wdl:91:31: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]`"
+message = "run.wdl:91:31: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]`"
 permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/a04293a5271176885ce7f876b6353b20da3f7b98/workflows/bulk-download/run.wdl/#L91"
 
 [[diagnostics]]
@@ -4418,7 +4418,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:110:45: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[Array[File]]+`"
+message = "chipseq-standard.wdl:110:45: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[Array[File]]+`"
 permalink = "https://github.com/stjudecloud/workflows/blob/a56ad9b8c7de5c9b13350f465c1543d0cb0b6b1a/workflows/chipseq/chipseq-standard.wdl/#L110"
 
 [[diagnostics]]
@@ -4688,27 +4688,27 @@ permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/be240
 
 [[diagnostics]]
 document = "theiagen/public_health_bioinformatics:/workflows/phylogenetics/wf_nextclade_addToRefTree.wdl"
-message = "wf_nextclade_addToRefTree.wdl:33:58: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[String]+`"
+message = "wf_nextclade_addToRefTree.wdl:33:58: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[String]+`"
 permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/be24047e2b64d02a187824909b91d04bda6074d8/workflows/phylogenetics/wf_nextclade_addToRefTree.wdl/#L33"
 
 [[diagnostics]]
 document = "theiagen/public_health_bioinformatics:/workflows/phylogenetics/wf_nextclade_addToRefTree.wdl"
-message = "wf_nextclade_addToRefTree.wdl:34:53: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
+message = "wf_nextclade_addToRefTree.wdl:34:53: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
 permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/be24047e2b64d02a187824909b91d04bda6074d8/workflows/phylogenetics/wf_nextclade_addToRefTree.wdl/#L34"
 
 [[diagnostics]]
 document = "theiagen/public_health_bioinformatics:/workflows/phylogenetics/wf_nextclade_addToRefTree.wdl"
-message = "wf_nextclade_addToRefTree.wdl:35:51: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
+message = "wf_nextclade_addToRefTree.wdl:35:51: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
 permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/be24047e2b64d02a187824909b91d04bda6074d8/workflows/phylogenetics/wf_nextclade_addToRefTree.wdl/#L35"
 
 [[diagnostics]]
 document = "theiagen/public_health_bioinformatics:/workflows/phylogenetics/wf_nextclade_addToRefTree.wdl"
-message = "wf_nextclade_addToRefTree.wdl:36:52: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
+message = "wf_nextclade_addToRefTree.wdl:36:52: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[File]+`"
 permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/be24047e2b64d02a187824909b91d04bda6074d8/workflows/phylogenetics/wf_nextclade_addToRefTree.wdl/#L36"
 
 [[diagnostics]]
 document = "theiagen/public_health_bioinformatics:/workflows/phylogenetics/wf_nextclade_addToRefTree.wdl"
-message = "wf_nextclade_addToRefTree.wdl:37:57: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[String]+`"
+message = "wf_nextclade_addToRefTree.wdl:37:57: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[String]+`"
 permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/be24047e2b64d02a187824909b91d04bda6074d8/workflows/phylogenetics/wf_nextclade_addToRefTree.wdl/#L37"
 
 [[diagnostics]]
@@ -4953,12 +4953,12 @@ permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/be240
 
 [[diagnostics]]
 document = "theiagen/public_health_bioinformatics:/workflows/theiaeuk/wf_theiaeuk_illumina_pe.wdl"
-message = "wf_theiaeuk_illumina_pe.wdl:118:40: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[Int]+`"
+message = "wf_theiaeuk_illumina_pe.wdl:118:40: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[Int]+`"
 permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/be24047e2b64d02a187824909b91d04bda6074d8/workflows/theiaeuk/wf_theiaeuk_illumina_pe.wdl/#L118"
 
 [[diagnostics]]
 document = "theiagen/public_health_bioinformatics:/workflows/theiaeuk/wf_theiaeuk_illumina_pe.wdl"
-message = "wf_theiaeuk_illumina_pe.wdl:127:40: error: type mismatch: argument to function `select_first` expects type `Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any optional type, but found type `Array[Int]+`"
+message = "wf_theiaeuk_illumina_pe.wdl:127:40: error: type mismatch: argument to function `select_first` expects type `Array[X]` where `X`: any optional type, but found type `Array[Int]+`"
 permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/be24047e2b64d02a187824909b91d04bda6074d8/workflows/theiaeuk/wf_theiaeuk_illumina_pe.wdl/#L127"
 
 [[diagnostics]]
