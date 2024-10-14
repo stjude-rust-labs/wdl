@@ -1,4 +1,4 @@
-//! Configuration for formatting.
+//! Formatting configuration.
 
 mod builder;
 mod indent;

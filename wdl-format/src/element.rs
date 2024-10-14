@@ -37,7 +37,7 @@ where
     I: Iterator,
 {
     fn drop(&mut self) {
-        assert!(self.0.peek().is_none(), "not all iterator items consumed!");
+        assert!(self.0.peek().is_none(), "not all iterator items were consumed!");
     }
 }
 
@@ -66,6 +66,9 @@ impl FormatElement {
     pub fn children(&self) -> Option<AssertConsumedIter<impl Iterator<Item = &FormatElement>>> {
         self.children
             .as_ref()
+            // NOTE: we wrap the iterator in an [`AssertConsumedIter`] to ensure
+            // that no children are ever forgotten to be formatted (they must be
+            // explicitly consumed and dropped).
             .map(|children| AssertConsumedIter::new(children.iter().map(|c| c.as_ref())))
     }
 }
@@ -158,7 +161,7 @@ workflow bar # This is an inline comment on the workflow ident.
         let format_element = Node::Ast(document).into_format_element();
         let mut children = format_element.children().unwrap();
 
-        // Version statement
+        // Version statement.
 
         let version = children.next().expect("version statement element");
         assert_eq!(
@@ -176,7 +179,7 @@ workflow bar # This is an inline comment on the workflow ident.
             SyntaxKind::Version
         );
 
-        // Task Definition
+        // Task Definition.
 
         let task = children.next().expect("task element");
         assert_eq!(
@@ -206,7 +209,7 @@ workflow bar # This is an inline comment on the workflow ident.
 
         assert!(task_children.next().is_none());
 
-        // Workflow Definition
+        // Workflow Definition.
 
         let workflow = children.next().expect("workflow element");
         assert_eq!(
@@ -244,7 +247,7 @@ workflow bar # This is an inline comment on the workflow ident.
 
     #[test]
     #[should_panic]
-    fn unconsumed_children_panic() {
+    fn unconsumed_children_nodes_panic() {
         let (document, diagnostics) = Document::parse(
             "## WDL
 version 1.2  # This is a comment attached to the version.

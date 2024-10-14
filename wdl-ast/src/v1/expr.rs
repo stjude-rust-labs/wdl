@@ -169,7 +169,7 @@ impl Expr {
                 ModuloExpr::cast(syntax).expect("modulo expr should cast"),
             )),
             SyntaxKind::ExponentiationExprNode => Some(Self::Exponentiation(
-                ExponentiationExpr::cast(syntax).expect("exponentation expr should cast"),
+                ExponentiationExpr::cast(syntax).expect("exponentiation expr should cast"),
             )),
             SyntaxKind::CallExprNode => Some(Self::Call(
                 CallExpr::cast(syntax).expect("call expr should cast"),

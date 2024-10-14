@@ -726,7 +726,7 @@ impl Type {
         }
     }
 
-    /// Finds the first child that can be cast to an [`Type`].
+    /// Finds the first child that can be cast to a [`Type`].
     ///
     /// This is meant to emulate the functionality of
     /// [`rowan::ast::support::child`] without requiring [`Type`] to implement
@@ -735,7 +735,7 @@ impl Type {
         syntax.children().find_map(Self::cast)
     }
 
-    /// Finds all children that can be cast to an [`Type`].
+    /// Finds all children that can be cast to a [`Type`].
     ///
     /// This is meant to emulate the functionality of
     /// [`rowan::ast::support::children`] without requiring [`Type`] to
@@ -987,7 +987,7 @@ impl Decl {
         }
     }
 
-    /// Finds the first child that can be cast to an [`Decl`].
+    /// Finds the first child that can be cast to a [`Decl`].
     ///
     /// This is meant to emulate the functionality of
     /// [`rowan::ast::support::child`] without requiring [`Decl`] to implement
@@ -996,7 +996,7 @@ impl Decl {
         syntax.children().find_map(Self::cast)
     }
 
-    /// Finds all children that can be cast to an [`Decl`].
+    /// Finds all children that can be cast to a [`Decl`].
     ///
     /// This is meant to emulate the functionality of
     /// [`rowan::ast::support::children`] without requiring [`Decl`] to

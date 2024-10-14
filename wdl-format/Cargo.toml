@@ -12,7 +12,7 @@ wdl-ast = { path = "../wdl-ast", version = "0.7.1", features = ["codespan"] }
 nonempty.workspace = true
 
 [dev-dependencies]
-pretty_assertions = { workspace = true }
+pretty_assertions.workspace = true
 approx = { workspace = true }
 rayon = { workspace = true }
 colored = { workspace = true }

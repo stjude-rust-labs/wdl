@@ -204,20 +204,6 @@ pub fn token_children<T: AstToken>(parent: &SyntaxNode) -> impl Iterator<Item = 
         .filter_map(|c| c.into_token().and_then(T::cast))
 }
 
-/// An extension trait for [`AstNode`].
-pub trait AstNodeChildrenExt {
-    /// Gets the children of this [`AstNode`].
-    fn children(&self) -> impl Iterator<Item = Token>;
-}
-
-impl<T: AstNode<Language = WorkflowDescriptionLanguage>> AstNodeChildrenExt for T {
-    fn children(&self) -> impl Iterator<Item = Token> {
-        self.syntax()
-            .clone()
-            .children_with_tokens()
-            .map(|c| Token::cast(c).expect("element to cast to an AST element"))
-    }
-}
 
 /// Represents the AST of a [Document].
 ///

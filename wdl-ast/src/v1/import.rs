@@ -35,7 +35,7 @@ impl ImportStatement {
         child(&self.0).expect("import should have a URI")
     }
 
-    /// Gets the `import`` keyword of the import statement.
+    /// Gets the `import` keyword of the import statement.
     pub fn keyword(&self) -> ImportKeyword {
         token(&self.0).expect("import should have a keyword")
     }
