@@ -87,7 +87,9 @@ impl Visitor for MalformedLintDirectiveRule {
                 state.add(inline_lint_directive(
                     comment.span(),
                 ));
-            } else if let Some(directive) = comment.as_str().strip_prefix("#@") {
+            }
+            if let Some(directive) = comment.as_str().strip_prefix("#@") {
+                let directive = directive.trim().split(" ").next().expect("directive").strip_suffix(":").expect("directive");
                 if !ACCEPTED_LINT_DIRECTIVES.contains(&directive) {
                     state.add(invalid_lint_directive(
                         comment.span(),

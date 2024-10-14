@@ -1,6 +1,4 @@
-#@ except: ContainerValue, DescriptionMissing, DisallowedInputName, DisallowedOutputName
-#@ except: InputSorting, LineWidth, MissingMetas, MissingOutput, MissingRuntime
-## CommentWhitespace, ImportWhitespace, and Whitespace are left enabled to understand all whitespace diagnostics.
+#@ except: InputSorting, DisallowedInputName, DisallowedOutputName
 
 version 1.1
 
@@ -13,16 +11,24 @@ import "qux"  # following whitespace duplication is caught be Whitespace rule
 workflow foo {
 
     # This is OK (but the prior line is not).
-    # So is this.
-    meta {}
-    parameter_meta {}
+    #@ except: DescriptionMissing
+    meta {
+    }
+    # above is ok but the next won't be
+    parameter_meta {
+
+    }
     # what about this comment?
-    input {}
+    input {
+
+    }
     scatter (i in ["hello", "world"]) {
         call bar { input: s = i }
+
     }
     if (true) {
         call bar { input: s = "world" }
+
     }
     String p = "pip"
 
@@ -35,6 +41,7 @@ workflow foo {
 
     call bar { input:
         s = s
+
     }  # following whitespace duplication is caught be Whitespace rule
 
 
@@ -44,7 +51,12 @@ workflow foo {
     call bar as qux { input:  # Calls may optionally be separated by whitespace.
         s = s
     }
+
+    output {
+
+    }
 }
+#@ except: MissingMetas, MissingRuntime
 task bar {
 
     meta {
@@ -55,6 +67,7 @@ task bar {
             u: "u"
 
         }
+
     }
 
     input {
@@ -72,6 +85,7 @@ task bar {
 }
 
 task bax {
+    #@ except: DescriptionMissing
     meta {}
 
     parameter_meta {}
@@ -83,6 +97,7 @@ task bax {
 
     output {}
 
+    #@ except: ContainerValue
     runtime {
 
         disks: "50 GB"

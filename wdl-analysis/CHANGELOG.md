@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+* Implemented `UnusedImport`, `UnusedInput`, `UnusedDeclaration`, and
+  `UnusedCall` analysis warnings ([#211](https://github.com/stjude-rust-labs/wdl/pull/211))
+* Implemented static analysis for workflows ([#199](https://github.com/stjude-rust-labs/wdl/pull/199)).
+
+### Fixed
+
+* Allow coercion of `Array[T]` to `Array[T]+` unless from an empty array
+  literal ([#213](https://github.com/stjude-rust-labs/wdl/pull/213)).
+* Improved type calculations in function calls and when determining common
+  types in certain expressions ([#209](https://github.com/stjude-rust-labs/wdl/pull/209)).
+* Treat a coercion to `T?` for a function argument of type `T` as a preference
+  over any other coercion ([#199](https://github.com/stjude-rust-labs/wdl/pull/199)).
+* Fix the signature of `select_first` such that it is monomorphic ([#199](https://github.com/stjude-rust-labs/wdl/pull/199)).
+* Only consider signatures in overload resolution that have sufficient
+  arguments ([#199](https://github.com/stjude-rust-labs/wdl/pull/199)).
+* Allow coercion from `File` and `Directory` to `String` ([#199](https://github.com/stjude-rust-labs/wdl/pull/199)).
+* Allow non-empty array literals to coerce to either empty or non-empty ([#199](https://github.com/stjude-rust-labs/wdl/pull/199)).
+* Fix element type calculations for `Array` and `Map` so that `[a, b]` and
+  `{"a": a, "b": b }` successfully calculates when `a` is coercible to `b` ([#199](https://github.com/stjude-rust-labs/wdl/pull/199)).
+* Fix `if` expression type calculation such that `if (x) then a else b` works
+  when `a` is coercible to `b` ([#199](https://github.com/stjude-rust-labs/wdl/pull/199)).
+* Ensure that only equality/inequality expressions are supported on `File` and
+  `Directory` now that there is a coercion to `String` ([#199](https://github.com/stjude-rust-labs/wdl/pull/199)).
+* Allow index expressions on `Map` ([#199](https://github.com/stjude-rust-labs/wdl/pull/199)).
+
 ## 0.3.0 - 09-16-2024
 
 ### Added

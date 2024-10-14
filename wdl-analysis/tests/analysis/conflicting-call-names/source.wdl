@@ -1,10 +1,29 @@
+#@ except: UnusedDeclaration,UnusedCall,UnusedInput
 ## This is a test of conflicting call names.
 
 version 1.1
 
+import "baz.wdl"
+
+task foo {
+    command <<<>>>
+}
+
+task bar {
+    command <<<>>>
+}
+
+task x {
+    command <<<>>>
+}
+
+task ok {
+    command <<<>>>
+}
+
 workflow test {
     Int my_int = 0      # FIRST
-    call my_int         # OK
+    call my_int         # NOT OK
 
     call foo            # FIRST
     call foo            # NOT OK
@@ -14,8 +33,8 @@ workflow test {
 
     call bar            # NOT OK
 
-    call foo.bar        # NOT OK
-    call foo.baz        # FIRST
+    call baz.bar        # NOT OK
+    call baz.baz        # FIRST
 
     call foo as baz     # NOT OK
 

@@ -10,13 +10,10 @@
     <a href="https://crates.io/crates/wdl" target="_blank">
       <img alt="crates.io version" src="https://img.shields.io/crates/v/wdl">
     </a>
+    <a href="https://rustseq.zulipchat.com" target="_blank">
+      <img alt="CI: Status" src="https://img.shields.io/badge/chat-%23workflows--lib--wdl-blue?logo=zulip&logoColor=f6f6f6" />
+    </a>
     <img alt="crates.io downloads" src="https://img.shields.io/crates/d/wdl">
-    <a href="https://github.com/stjude-rust-labs/wdl/blob/main/LICENSE-APACHE" target="_blank">
-      <img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache 2.0-blue.svg" />
-    </a>
-    <a href="https://github.com/stjude-rust-labs/wdl/blob/main/LICENSE-MIT" target="_blank">
-      <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" />
-    </a>
   </p>
 
   <p align="center">
@@ -185,8 +182,8 @@ cargo doc
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome! Feel free to check
-[issues page](https://github.com/stjude-rust-labs/wdl/issues).
+Contributions, issues, and feature requests are all welcome! Feel free to read our
+[contributing guide](https://github.com/stjude-rust-labs/wdl/blob/main/CONTRIBUTING.md).
 
 ## 📝 License
 

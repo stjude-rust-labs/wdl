@@ -1,7 +1,9 @@
 use std::borrow::Cow;
+use std::collections::HashSet;
 use std::fs;
 use std::io::IsTerminal;
 use std::io::Read;
+use std::io::stderr;
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -10,6 +12,8 @@ use anyhow::Result;
 use anyhow::bail;
 use clap::Args;
 use clap::Parser;
+use clap::Subcommand;
+use clap_verbosity_flag::Verbosity;
 use codespan_reporting::files::SimpleFile;
 use codespan_reporting::term::Config;
 use codespan_reporting::term::emit;
@@ -18,6 +22,7 @@ use codespan_reporting::term::termcolor::StandardStream;
 use colored::Colorize;
 use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
+use tracing_log::AsTrace;
 use wdl::ast::Diagnostic;
 use wdl::ast::Document;
 use wdl::ast::SyntaxNode;
@@ -25,6 +30,8 @@ use wdl::ast::Validator;
 use wdl::lint::LintVisitor;
 use wdl_analysis::AnalysisResult;
 use wdl_analysis::Analyzer;
+use wdl_analysis::Rule;
+use wdl_analysis::rules;
 
 /// Emits the given diagnostics to the output stream.
 ///
@@ -51,7 +58,11 @@ fn emit_diagnostics(path: &str, source: &str, diagnostics: &[Diagnostic]) -> Res
     Ok(())
 }
 
-async fn analyze(path: PathBuf, lint: bool) -> Result<Vec<AnalysisResult>> {
+async fn analyze<T: AsRef<dyn Rule>>(
+    rules: impl IntoIterator<Item = T>,
+    path: PathBuf,
+    lint: bool,
+) -> Result<Vec<AnalysisResult>> {
     let bar = ProgressBar::new(0);
     bar.set_style(
         ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {msg} {pos}/{len}")
@@ -59,12 +70,13 @@ async fn analyze(path: PathBuf, lint: bool) -> Result<Vec<AnalysisResult>> {
     );
 
     let analyzer = Analyzer::new_with_validator(
+        rules,
         move |bar: ProgressBar, kind, completed, total| async move {
+            bar.set_position(completed.try_into().unwrap());
             if completed == 0 {
                 bar.set_length(total.try_into().unwrap());
                 bar.set_message(format!("{kind}"));
             }
-            bar.set_position(completed.try_into().unwrap());
         },
         move || {
             let mut validator = Validator::default();
@@ -80,6 +92,8 @@ async fn analyze(path: PathBuf, lint: bool) -> Result<Vec<AnalysisResult>> {
         .analyze(bar.clone())
         .await
         .context("failed to analyze documents")?;
+
+    drop(bar);
 
     let cwd = std::env::current_dir().ok();
     for result in &results {
@@ -155,6 +169,61 @@ impl ParseCommand {
     }
 }
 
+/// Represents common analysis options.
+#[derive(Args)]
+pub struct AnalysisOptions {
+    /// Denies all analysis rules by treating them as errors.
+    #[clap(long, conflicts_with = "deny", conflicts_with = "except_all")]
+    pub deny_all: bool,
+
+    /// Except (ignores) all analysis rules.
+    #[clap(long, conflicts_with = "except")]
+    pub except_all: bool,
+
+    /// Excepts (ignores) an analysis rule.
+    #[clap(long)]
+    pub except: Vec<String>,
+
+    /// Denies an analysis rule by treating it as an error.
+    #[clap(long)]
+    pub deny: Vec<String>,
+}
+
+impl AnalysisOptions {
+    /// Checks for conflicts in the analysis options.
+    pub fn check_for_conflicts(&self) -> Result<()> {
+        if let Some(id) = self.except.iter().find(|id| self.deny.contains(*id)) {
+            bail!("rule `{id}` cannot be specified for both the `--except` and `--deny`",);
+        }
+
+        Ok(())
+    }
+
+    /// Converts the analysis options into an analysis rules set.
+    pub fn into_rules(self) -> impl Iterator<Item = Box<dyn Rule>> {
+        let Self {
+            deny_all,
+            except_all,
+            except,
+            deny,
+        } = self;
+
+        let except: HashSet<_> = except.into_iter().collect();
+        let deny: HashSet<_> = deny.into_iter().collect();
+
+        rules()
+            .into_iter()
+            .filter(move |r| !except_all && !except.contains(r.id()))
+            .map(move |mut r| {
+                if deny_all || deny.contains(r.id()) {
+                    r.deny();
+                }
+
+                r
+            })
+    }
+}
+
 /// Checks a WDL source file for errors.
 #[derive(Args)]
 #[clap(disable_version_flag = true)]
@@ -162,11 +231,15 @@ pub struct CheckCommand {
     /// The path to the source WDL file.
     #[clap(value_name = "PATH")]
     pub path: PathBuf,
+
+    #[clap(flatten)]
+    pub options: AnalysisOptions,
 }
 
 impl CheckCommand {
     async fn exec(self) -> Result<()> {
-        analyze(self.path, false).await?;
+        self.options.check_for_conflicts()?;
+        analyze(self.options.into_rules(), self.path, false).await?;
         Ok(())
     }
 }
@@ -218,6 +291,9 @@ pub struct AnalyzeCommand {
     #[clap(value_name = "PATH")]
     pub path: PathBuf,
 
+    #[clap(flatten)]
+    pub options: AnalysisOptions,
+
     /// Whether or not to run lints as part of analysis.
     #[clap(long)]
     pub lint: bool,
@@ -225,7 +301,8 @@ pub struct AnalyzeCommand {
 
 impl AnalyzeCommand {
     async fn exec(self) -> Result<()> {
-        let results = analyze(self.path, self.lint).await?;
+        self.options.check_for_conflicts()?;
+        let results = analyze(self.options.into_rules(), self.path, self.lint).await?;
         println!("{:#?}", results);
         Ok(())
     }
@@ -247,7 +324,16 @@ impl AnalyzeCommand {
     propagate_version = true,
     arg_required_else_help = true
 )]
-enum App {
+struct App {
+    #[command(subcommand)]
+    command: Command,
+
+    #[command(flatten)]
+    verbose: Verbosity,
+}
+
+#[derive(Subcommand)]
+enum Command {
     Parse(ParseCommand),
     Check(CheckCommand),
     Lint(LintCommand),
@@ -256,13 +342,20 @@ enum App {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    tracing_subscriber::fmt().with_target(false).init();
+    let app = App::parse();
 
-    if let Err(e) = match App::parse() {
-        App::Parse(cmd) => cmd.exec().await,
-        App::Check(cmd) => cmd.exec().await,
-        App::Lint(cmd) => cmd.exec().await,
-        App::Analyze(cmd) => cmd.exec().await,
+    let subscriber = tracing_subscriber::fmt::Subscriber::builder()
+        .with_max_level(app.verbose.log_level_filter().as_trace())
+        .with_writer(std::io::stderr)
+        .with_ansi(stderr().is_terminal())
+        .finish();
+    tracing::subscriber::set_global_default(subscriber)?;
+
+    if let Err(e) = match app.command {
+        Command::Parse(cmd) => cmd.exec().await,
+        Command::Check(cmd) => cmd.exec().await,
+        Command::Lint(cmd) => cmd.exec().await,
+        Command::Analyze(cmd) => cmd.exec().await,
     } {
         eprintln!(
             "{error}: {e:?}",

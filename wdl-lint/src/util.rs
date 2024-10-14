@@ -2,8 +2,8 @@
 
 use wdl_ast::{AstToken, Comment, SyntaxKind};
 
-/// Detect is a comment is in-line or not by looking for `\n` in the prior
-/// whitespace. Used in CommentWhitespace and MalformedLintDirective rules.
+/// Detect if a comment is in-line or not by looking for `\n` in the prior
+/// whitespace.
 pub fn is_inline_comment(token: &Comment) -> bool {
     if let Some(prior) = token.syntax().prev_sibling_or_token() {
         return prior.kind() != SyntaxKind::Whitespace || !prior.to_string().contains('\n');

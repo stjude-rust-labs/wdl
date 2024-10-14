@@ -18,7 +18,6 @@ use wdl_ast::Visitor;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
-use crate::util::is_inline_comment;
 
 /// Set indentation string
 const INDENT: &str = "    ";
@@ -67,7 +66,10 @@ fn excess_indentation(span: Span, expected: usize, actual: usize) -> Diagnostic 
 
 /// Detects improperly spaced comments.
 #[derive(Default, Debug, Clone, Copy)]
-pub struct CommentWhitespaceRule;
+pub struct CommentWhitespaceRule {
+    /// Whether or not the visitor has exited the preamble of the document.
+    exited_preamble: bool,
+}
 
 impl Rule for CommentWhitespaceRule {
     fn id(&self) -> &'static str {
@@ -112,11 +114,29 @@ impl Visitor for CommentWhitespaceRule {
         *self = Default::default();
     }
 
+    fn version_statement(
+        &mut self,
+        _: &mut Self::State,
+        reason: VisitReason,
+        _: &wdl_ast::VersionStatement,
+    ) {
+        if reason == VisitReason::Exit {
+            self.exited_preamble = true;
+        }
+    }
+
     fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
+        if !self.exited_preamble {
+            // Handled by `PreambleFormatting` rule
+            return;
+        }
+
         if is_inline_comment(comment) {
             // check preceding whitespace for two spaces
             if let Some(prior) = comment.syntax().prev_sibling_or_token() {
-                if prior.kind() != SyntaxKind::Whitespace || prior.to_string() != "  " {
+                if prior.kind() != SyntaxKind::Whitespace
+                    || prior.as_token().expect("should be a token").text() != "  "
+                {
                     // Report a diagnostic if there are not two spaces before the comment delimiter
                     state.exceptable_add(
                         inline_preceding_whitespace(comment.span()),
@@ -134,8 +154,12 @@ impl Visitor for CommentWhitespaceRule {
                 .count();
             let expected_indentation = INDENT.repeat(ancestors);
 
-            if let Some(leading_whitespace) = comment.syntax().prev_sibling_or_token() {
-                let this_whitespace = leading_whitespace.to_string();
+            if let Some(leading_whitespace) = comment
+                .syntax()
+                .prev_sibling_or_token()
+                .and_then(SyntaxElement::into_token)
+            {
+                let this_whitespace = leading_whitespace.text();
                 let this_indentation = this_whitespace
                     .split('\n')
                     .last()
@@ -200,12 +224,29 @@ impl Visitor for CommentWhitespaceRule {
     }
 }
 
+/// Detect is a comment is in-line or not by looking for `\n` in the prior
+/// whitespace.
+fn is_inline_comment(token: &Comment) -> bool {
+    if let Some(prior) = token.syntax().prev_sibling_or_token() {
+        return prior.kind() != SyntaxKind::Whitespace
+            || !prior
+                .as_token()
+                .expect("should be a token")
+                .text()
+                .contains('\n');
+    }
+    false
+}
+
 /// Filter parent nodes, removing any that don't contribute indentation.
 fn filter_parent_ancestors(node: &SyntaxNode) -> bool {
     // If the prior token is Whitespace with a newline, then this ancestor
     // contributes to indentation.
-    if let Some(prior) = node.prev_sibling_or_token() {
-        if prior.kind() == SyntaxKind::Whitespace && prior.to_string().contains('\n') {
+    if let Some(prior) = node
+        .prev_sibling_or_token()
+        .and_then(SyntaxElement::into_token)
+    {
+        if prior.kind() == SyntaxKind::Whitespace && prior.text().contains('\n') {
             return true;
         }
     }
@@ -217,7 +258,12 @@ fn filter_parent_ancestors(node: &SyntaxNode) -> bool {
             if p.as_node().is_some() {
                 break;
             }
-            if p.kind() == SyntaxKind::Whitespace && p.to_string().contains('\n') {
+            if p.kind() == SyntaxKind::Whitespace
+                && p.as_token()
+                    .expect("should be a token")
+                    .text()
+                    .contains('\n')
+            {
                 return true;
             }
             prior = p.prev_sibling_or_token();

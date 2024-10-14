@@ -28,6 +28,14 @@ error: task `test1` is missing a command section
 3 │ task test1 {
   │      ^^^^^ this task must have a command section
 
+warning[MalformedLintDirective]: lint directive not recognized
+  ┌─ tests/lints/malformed-lint-directive/source.wdl:4:5
+  │
+4 │     #@ stop: CommentWhitespace
+  │     ^^^^^^^^^^^^^^^^^^^^^^^^^^ lint directive not recognized
+  │
+  = fix: remove unrecognized lint directives, use any of the directives included: ["except"]
+
 note[DescriptionMissing]: task `test1` is missing a description key
   ┌─ tests/lints/malformed-lint-directive/source.wdl:5:5
   │

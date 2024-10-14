@@ -163,22 +163,33 @@ impl GenericType {
     }
 
     /// Infers any type parameters from the generic type.
-    fn infer_type_parameters(&self, types: &Types, ty: Type, params: &mut TypeParameters<'_>) {
+    fn infer_type_parameters(
+        &self,
+        types: &Types,
+        ty: Type,
+        params: &mut TypeParameters<'_>,
+        ignore_constraints: bool,
+    ) {
         match self {
             Self::Parameter(name) | Self::UnqualifiedParameter(name) => {
                 // Verify the type satisfies any constraint
                 let (param, _) = params.get(name).expect("should have parameter");
-                if let Some(constraint) = param.constraint() {
-                    if !constraint.satisfied(types, ty) {
-                        return;
+
+                if !ignore_constraints {
+                    if let Some(constraint) = param.constraint() {
+                        if !constraint.satisfied(types, ty) {
+                            return;
+                        }
                     }
                 }
 
                 params.set_inferred_type(name, ty);
             }
-            Self::Array(array) => array.infer_type_parameters(types, ty, params),
-            Self::Pair(pair) => pair.infer_type_parameters(types, ty, params),
-            Self::Map(map) => map.infer_type_parameters(types, ty, params),
+            Self::Array(array) => {
+                array.infer_type_parameters(types, ty, params, ignore_constraints)
+            }
+            Self::Pair(pair) => pair.infer_type_parameters(types, ty, params, ignore_constraints),
+            Self::Map(map) => map.infer_type_parameters(types, ty, params, ignore_constraints),
         }
     }
 
@@ -312,14 +323,33 @@ impl GenericArrayType {
     }
 
     /// Infers any type parameters from the generic type.
-    fn infer_type_parameters(&self, types: &Types, ty: Type, params: &mut TypeParameters<'_>) {
-        if let Type::Compound(ty) = ty {
-            if !ty.is_optional() {
+    fn infer_type_parameters(
+        &self,
+        types: &Types,
+        ty: Type,
+        params: &mut TypeParameters<'_>,
+        ignore_constraints: bool,
+    ) {
+        match ty {
+            Type::Union => {
+                self.element_type.infer_type_parameters(
+                    types,
+                    Type::Union,
+                    params,
+                    ignore_constraints,
+                );
+            }
+            Type::Compound(ty) if !ty.is_optional() => {
                 if let CompoundTypeDef::Array(ty) = types.type_definition(ty.definition()) {
-                    self.element_type
-                        .infer_type_parameters(types, ty.element_type(), params);
+                    self.element_type.infer_type_parameters(
+                        types,
+                        ty.element_type(),
+                        params,
+                        ignore_constraints,
+                    );
                 }
             }
+            _ => {}
         }
     }
 
@@ -408,16 +438,45 @@ impl GenericPairType {
     }
 
     /// Infers any type parameters from the generic type.
-    fn infer_type_parameters(&self, types: &Types, ty: Type, params: &mut TypeParameters<'_>) {
-        if let Type::Compound(ty) = ty {
-            if !ty.is_optional() {
+    fn infer_type_parameters(
+        &self,
+        types: &Types,
+        ty: Type,
+        params: &mut TypeParameters<'_>,
+        ignore_constraints: bool,
+    ) {
+        match ty {
+            Type::Union => {
+                self.first_type.infer_type_parameters(
+                    types,
+                    Type::Union,
+                    params,
+                    ignore_constraints,
+                );
+                self.second_type.infer_type_parameters(
+                    types,
+                    Type::Union,
+                    params,
+                    ignore_constraints,
+                );
+            }
+            Type::Compound(ty) if !ty.is_optional() => {
                 if let CompoundTypeDef::Pair(ty) = types.type_definition(ty.definition()) {
-                    self.first_type
-                        .infer_type_parameters(types, ty.first_type(), params);
-                    self.second_type
-                        .infer_type_parameters(types, ty.second_type(), params);
+                    self.first_type.infer_type_parameters(
+                        types,
+                        ty.first_type(),
+                        params,
+                        ignore_constraints,
+                    );
+                    self.second_type.infer_type_parameters(
+                        types,
+                        ty.second_type(),
+                        params,
+                        ignore_constraints,
+                    );
                 }
             }
+            _ => {}
         }
     }
 
@@ -498,16 +557,41 @@ impl GenericMapType {
     }
 
     /// Infers any type parameters from the generic type.
-    fn infer_type_parameters(&self, types: &Types, ty: Type, params: &mut TypeParameters<'_>) {
-        if let Type::Compound(ty) = ty {
-            if !ty.is_optional() {
+    fn infer_type_parameters(
+        &self,
+        types: &Types,
+        ty: Type,
+        params: &mut TypeParameters<'_>,
+        ignore_constraints: bool,
+    ) {
+        match ty {
+            Type::Union => {
+                self.key_type
+                    .infer_type_parameters(types, Type::Union, params, ignore_constraints);
+                self.value_type.infer_type_parameters(
+                    types,
+                    Type::Union,
+                    params,
+                    ignore_constraints,
+                );
+            }
+            Type::Compound(ty) if !ty.is_optional() => {
                 if let CompoundTypeDef::Map(ty) = types.type_definition(ty.definition()) {
-                    self.key_type
-                        .infer_type_parameters(types, ty.key_type(), params);
-                    self.value_type
-                        .infer_type_parameters(types, ty.value_type(), params);
+                    self.key_type.infer_type_parameters(
+                        types,
+                        ty.key_type(),
+                        params,
+                        ignore_constraints,
+                    );
+                    self.value_type.infer_type_parameters(
+                        types,
+                        ty.value_type(),
+                        params,
+                        ignore_constraints,
+                    );
                 }
             }
+            _ => {}
         }
     }
 
@@ -671,9 +755,15 @@ impl FunctionalType {
     }
 
     /// Infers any type parameters if the type is generic.
-    fn infer_type_parameters(&self, types: &Types, ty: Type, params: &mut TypeParameters<'_>) {
+    fn infer_type_parameters(
+        &self,
+        types: &Types,
+        ty: Type,
+        params: &mut TypeParameters<'_>,
+        ignore_constraints: bool,
+    ) {
         if let Self::Generic(generic) = self {
-            generic.infer_type_parameters(types, ty, params);
+            generic.infer_type_parameters(types, ty, params, ignore_constraints);
         }
     }
 
@@ -914,13 +1004,24 @@ impl FunctionSignature {
     /// signature.
     ///
     /// Returns the collection of type parameters.
-    fn infer_type_parameters(&self, types: &Types, arguments: &[Type]) -> TypeParameters<'_> {
+    fn infer_type_parameters(
+        &self,
+        types: &Types,
+        arguments: &[Type],
+        ignore_constraints: bool,
+    ) -> TypeParameters<'_> {
         let mut parameters = TypeParameters::new(&self.type_parameters);
         for (parameter, argument) in self.parameters.iter().zip(arguments.iter()) {
-            parameter.infer_type_parameters(types, *argument, &mut parameters);
+            parameter.infer_type_parameters(types, *argument, &mut parameters, ignore_constraints);
         }
 
         parameters
+    }
+
+    /// Determines if the there is an insufficient number of arguments to bind
+    /// to this signature.
+    fn insufficient_arguments(&self, arguments: &[Type]) -> bool {
+        arguments.len() < self.required() || arguments.len() > self.parameters.len()
     }
 
     /// Binds the function signature to the given arguments.
@@ -944,13 +1045,17 @@ impl FunctionSignature {
 
         // Ensure the argument types are correct for the function
         let mut coerced = false;
-        let type_parameters = self.infer_type_parameters(types, arguments);
+        let type_parameters = self.infer_type_parameters(types, arguments, false);
         for (i, (parameter, argument)) in self.parameters.iter().zip(arguments.iter()).enumerate() {
             match parameter.realize(types, &type_parameters) {
                 Some(ty) => {
                     // If a coercion hasn't occurred yet, check for type equivalence
-                    // Otherwise, fall back to coercion
-                    if !coerced && !argument.type_eq(types, &ty) {
+                    // For the purpose of this check, also accept equivalence of `T` if the
+                    // parameter type is `T?`; otherwise, fall back to coercion
+                    if !coerced
+                        && !argument.type_eq(types, &ty)
+                        && !argument.type_eq(types, &ty.require())
+                    {
                         coerced = true;
                     }
 
@@ -1118,26 +1223,40 @@ impl Function {
         }
     }
 
-    /// Gets the return type of the function.
+    /// Realizes the return type of the function without constraints.
     ///
-    /// Returns `None` if the function return type cannot be statically
-    /// determined.
+    /// This is typically called after a failure to bind a function so that the
+    /// return type can be calculated despite the failure.
     ///
-    /// This may occur for functions with a generic return type or if the
-    /// function is polymorphic and not every overload of the function has the
-    /// same return type.
-    pub fn ret(&self, types: &Types) -> Option<Type> {
+    /// As such, it attempts to realize any type parameters without constraints,
+    /// as an unsatisfied constraint likely caused the bind failure.
+    pub fn realize_unconstrained_return_type(&self, types: &mut Types, arguments: &[Type]) -> Type {
         match self {
-            Self::Monomorphic(f) => f.signature.ret.concrete_type(),
+            Self::Monomorphic(f) => {
+                let type_parameters = f.signature.infer_type_parameters(types, arguments, true);
+                f.signature
+                    .ret()
+                    .realize(types, &type_parameters)
+                    .unwrap_or(Type::Union)
+            }
             Self::Polymorphic(f) => {
-                let ty = f.signatures[0].ret.concrete_type()?;
-                for signature in f.signatures.iter().skip(1) {
-                    if signature.ret.concrete_type()?.type_eq(types, &ty) {
-                        return None;
+                let mut ty = None;
+
+                // For polymorphic functions, the calculated return type must be the same for
+                // each overload
+                for signature in &f.signatures {
+                    let type_parameters = signature.infer_type_parameters(types, arguments, true);
+                    let ret_ty = signature
+                        .ret()
+                        .realize(types, &type_parameters)
+                        .unwrap_or(Type::Union);
+
+                    if !ty.get_or_insert(ret_ty).type_eq(types, &ret_ty) {
+                        return Type::Union;
                     }
                 }
 
-                Some(ty)
+                ty.unwrap_or(Type::Union)
             }
         }
     }
@@ -1260,11 +1379,10 @@ impl PolymorphicFunction {
             let mut exact: Option<(usize, Type)> = None;
             let mut coercion1: Option<(usize, Type)> = None;
             let mut coercion2 = None;
-            for (index, signature) in self
-                .signatures
-                .iter()
-                .enumerate()
-                .filter(|(_, s)| s.is_generic() == generic)
+            for (index, signature) in
+                self.signatures.iter().enumerate().filter(|(_, s)| {
+                    s.is_generic() == generic && !s.insufficient_arguments(arguments)
+                })
             {
                 match signature.bind(types, arguments) {
                     Ok(Binding::Equivalence(ty)) => {
@@ -2327,12 +2445,10 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
         functions
             .insert(
                 "select_first",
-                PolymorphicFunction::new(SupportedVersion::V1(V1::Zero), vec![
-                    FunctionSignature::builder()
-                        .type_parameter("X", OptionalTypeConstraint)
-                        .parameter(GenericArrayType::non_empty(GenericType::Parameter("X")))
-                        .ret(GenericType::UnqualifiedParameter("X"))
-                        .build(),
+                // This differs from the definition of `select_first` in that we can have a single
+                // signature of `X select_first(Array[X?], [X])`.
+                MonomorphicFunction::new(
+                    SupportedVersion::V1(V1::Zero),
                     FunctionSignature::builder()
                         .type_parameter("X", OptionalTypeConstraint)
                         .required(1)
@@ -2340,7 +2456,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .parameter(GenericType::UnqualifiedParameter("X"))
                         .ret(GenericType::UnqualifiedParameter("X"))
                         .build(),
-                ])
+                )
                 .into(),
             )
             .is_none()
@@ -2697,7 +2813,6 @@ mod test {
             "contains(Array[P], P) -> Boolean where `P`: any primitive type",
             "chunk(Array[X], Int) -> Array[Array[X]]",
             "flatten(Array[Array[X]]) -> Array[X]",
-            "select_first(Array[X]+) -> X where `X`: any optional type",
             "select_first(Array[X], <X>) -> X where `X`: any optional type",
             "select_all(Array[X]) -> Array[X] where `X`: any optional type",
             "as_pairs(Map[K, V]) -> Array[Pair[K, V]] where `K`: any required primitive type",
@@ -2796,7 +2911,7 @@ mod test {
         let ty = f
             .bind(&mut types, &[Type::Union])
             .expect("bind should succeed");
-        assert_eq!(ty.display(&types).to_string(), "Union");
+        assert_eq!(ty.display(&types).to_string(), "Array[Union]");
 
         // Check for a Map[String, String]
         let ty = types.add_map(MapType::new(
@@ -2853,7 +2968,7 @@ mod test {
         let ty = f
             .bind(&mut types, &[Type::Union])
             .expect("bind should succeed");
-        assert_eq!(ty.display(&types).to_string(), "Union");
+        assert_eq!(ty.display(&types).to_string(), "Array[Union]");
 
         // Check for a Array[Array[String]?] -> Array[Array[String]]
         let array_string = types
@@ -2996,9 +3111,7 @@ mod test {
             .expect_err("binding should fail");
         assert_eq!(e, FunctionBindError::ArgumentTypeMismatch {
             index: 0,
-            expected: "`Array[X]+` where `X`: any optional type or `Array[X]` where `X`: any \
-                       optional type"
-                .into()
+            expected: "`Array[X]` where `X`: any optional type".into()
         });
 
         // Check `Array[String?]+`

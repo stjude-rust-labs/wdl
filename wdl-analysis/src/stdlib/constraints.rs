@@ -31,7 +31,8 @@ impl Constraint for OptionalTypeConstraint {
     }
 
     fn satisfied(&self, _: &Types, ty: Type) -> bool {
-        ty.is_optional()
+        // For the purpose of the constraint, treat `Union` as optional
+        ty == Type::Union || ty.is_optional()
     }
 }
 
@@ -71,6 +72,7 @@ impl Constraint for SizeableConstraint {
                 CompoundTypeDef::Struct(s) => {
                     s.members().values().any(|ty| type_is_sizable(types, *ty))
                 }
+                CompoundTypeDef::CallOutput(_) => false,
             }
         }
 
@@ -137,6 +139,7 @@ impl Constraint for JsonSerializableConstraint {
                     .members()
                     .values()
                     .all(|ty| type_is_serializable(types, *ty)),
+                CompoundTypeDef::CallOutput(_) => false,
             }
         }
 
@@ -256,7 +259,7 @@ mod test {
         assert!(!constraint.satisfied(&types, PrimitiveTypeKind::Directory.into()));
         assert!(!constraint.satisfied(&types, Type::Object));
         assert!(constraint.satisfied(&types, Type::OptionalObject));
-        assert!(!constraint.satisfied(&types, Type::Union));
+        assert!(constraint.satisfied(&types, Type::Union));
 
         let ty = types.add_array(ArrayType::new(PrimitiveType::optional(
             PrimitiveTypeKind::Boolean,

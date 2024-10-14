@@ -63,7 +63,7 @@ fn extra_output_in_meta(span: Span, name: &str, item_name: &str, ty: &str) -> Di
 
 /// Creates a diagnostic for out-of-order entries.
 fn out_of_order(span: Span, output_span: Span, item_name: &str, ty: &str) -> Diagnostic {
-    Diagnostic::warning(format!(
+    Diagnostic::note(format!(
         "`outputs` section of `meta` for the {ty} `{item_name}` is out of order"
     ))
     .with_rule(ID)
@@ -77,9 +77,8 @@ fn out_of_order(span: Span, output_span: Span, item_name: &str, ty: &str) -> Dia
 /// Creates a diagnostic for non-object `meta.outputs` entries.
 fn non_object_meta_outputs(span: Span, item_name: &str, ty: &str) -> Diagnostic {
     Diagnostic::warning(format!(
-        "`outputs` key in `meta` section is reserved for an object with keys corresponding to \
-         declared `output` values. {ty} `{item_name}` has a `meta.outputs` key that is not an \
-         object"
+        "{ty} `{item_name}` has a `meta.outputs` key that is not an object containing output \
+         descriptions"
     ))
     .with_rule(ID)
     .with_highlight(span)
