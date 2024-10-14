@@ -167,24 +167,30 @@ pub fn format_command_section(element: &FormatElement, stream: &mut TokenStream<
     // Technically there's no trivia inside the command section,
     // so we don't want to increment indent here.
     // All the indentation should be handled by the command text itself.
+    // TODO: multi-line placeholders need better formatting
     for child in children {
-        let kind = child.element().kind();
-        if kind == SyntaxKind::CloseBrace {
-            stream.push_literal_in_place_of_token(
-                child
-                    .element()
-                    .as_token()
-                    .expect("close brace should be token"),
-                ">>>".to_string(),
-            );
-        } else if kind == SyntaxKind::CloseHeredoc {
-            (&child).write(stream);
-        } else {
-            assert!(matches!(
-                kind,
-                SyntaxKind::LiteralCommandText | SyntaxKind::PlaceholderNode
-            ));
-            (&child).write(stream);
+        match child.element().kind() {
+            SyntaxKind::CloseBrace => {
+                stream.push_literal_in_place_of_token(
+                    child
+                        .element()
+                        .as_token()
+                        .expect("close brace should be token"),
+                    ">>>".to_string(),
+                );
+            }
+            SyntaxKind::CloseHeredoc => {
+                (&child).write(stream);
+            }
+            SyntaxKind::LiteralCommandText | SyntaxKind::PlaceholderNode => {
+                (&child).write(stream);
+            }
+            _ => {
+                unreachable!(
+                    "unexpected child in command section: {:?}",
+                    child.element().kind()
+                );
+            }
         }
     }
     stream.end_line();

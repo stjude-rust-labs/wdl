@@ -104,36 +104,41 @@ pub fn format_literal_struct(element: &FormatElement, stream: &mut TokenStream<P
     let open_brace = children.next().expect("literal struct open brace");
     assert!(open_brace.element().kind() == SyntaxKind::OpenBrace);
     (&open_brace).write(stream);
-    stream.end_line();
     stream.increment_indent();
 
-    let mut close_brace = None;
+    let mut members = Vec::new();
     let mut commas = Vec::new();
-    let members = children
-        .filter(|child| {
-            if child.element().kind() == SyntaxKind::LiteralStructItemNode {
-                true
-            } else if child.element().kind() == SyntaxKind::Comma {
-                commas.push(child.to_owned());
-                false
-            } else {
-                assert!(child.element().kind() == SyntaxKind::CloseBrace);
-                close_brace = Some(child.to_owned());
-                false
+    let mut close_brace = None;
+
+    for child in children {
+        match child.element().kind() {
+            SyntaxKind::LiteralStructItemNode => {
+                members.push(child.clone());
             }
-        })
-        .collect::<Vec<_>>();
+            SyntaxKind::Comma => {
+                commas.push(child.clone());
+            }
+            SyntaxKind::CloseBrace => {
+                close_brace = Some(child.clone());
+            }
+            _ => {
+                unreachable!(
+                    "unexpected child in literal struct: {:?}",
+                    child.element().kind()
+                );
+            }
+        }
+    }
 
     let mut commas = commas.iter();
     for member in members {
         (&member).write(stream);
         if let Some(comma) = commas.next() {
             (comma).write(stream);
-            stream.end_line();
         } else {
             stream.push_literal(",".to_string(), SyntaxKind::Comma);
-            stream.end_line();
         }
+        stream.end_line();
     }
 
     stream.decrement_indent();

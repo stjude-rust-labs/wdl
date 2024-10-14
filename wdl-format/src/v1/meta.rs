@@ -23,21 +23,23 @@ pub fn format_metadata_array(element: &FormatElement, stream: &mut TokenStream<P
     assert!(open_bracket.element().kind() == SyntaxKind::OpenBracket);
     (&open_bracket).write(stream);
 
-    let mut close_bracket = None;
+    let mut items = Vec::new();
     let mut commas = Vec::new();
-    let items = children
-        .filter(|child| {
-            if child.element().kind() == SyntaxKind::CloseBracket {
-                close_bracket = Some(child.to_owned());
-                false
-            } else if child.element().kind() == SyntaxKind::Comma {
-                commas.push(child.to_owned());
-                false
-            } else {
-                true
+    let mut close_bracket = None;
+
+    for child in children {
+        match child.element().kind() {
+            SyntaxKind::Comma => {
+                commas.push(child.clone());
             }
-        })
-        .collect::<Vec<_>>();
+            SyntaxKind::CloseBracket => {
+                close_bracket = Some(child.clone());
+            }
+            _ => {
+                items.push(child.clone());
+            }
+        }
+    }
 
     let empty = items.is_empty();
     if !empty {
@@ -69,22 +71,27 @@ pub fn format_metadata_object(element: &FormatElement, stream: &mut TokenStream<
     assert!(open_brace.element().kind() == SyntaxKind::OpenBrace);
     (&open_brace).write(stream);
 
-    let mut close_brace = None;
+    let mut items = Vec::new();
     let mut commas = Vec::new();
-    let items = children
-        .filter(|child| {
-            if child.element().kind() == SyntaxKind::MetadataObjectItemNode {
-                true
-            } else if child.element().kind() == SyntaxKind::Comma {
-                commas.push(child.to_owned());
-                false
-            } else {
-                assert!(child.element().kind() == SyntaxKind::CloseBrace);
-                close_brace = Some(child.to_owned());
-                false
+    let mut close_brace = None;
+
+    for child in children {
+        match child.element().kind() {
+            SyntaxKind::MetadataObjectItemNode => {
+                items.push(child.clone());
             }
-        })
-        .collect::<Vec<_>>();
+            SyntaxKind::Comma => {
+                commas.push(child.clone());
+            }
+            SyntaxKind::CloseBrace => {
+                close_brace = Some(child.clone());
+            }
+            _ => unreachable!(
+                "unexpected metadata object child: {:?}",
+                child.element().kind()
+            ),
+        }
+    }
 
     let empty = items.is_empty();
     if !empty {
@@ -141,18 +148,23 @@ pub fn format_metadata_section(element: &FormatElement, stream: &mut TokenStream
     (&open_brace).write(stream);
     stream.increment_indent();
 
+    let mut items = Vec::new();
     let mut close_brace = None;
-    let items = children
-        .filter(|child| {
-            if child.element().kind() == SyntaxKind::MetadataObjectItemNode {
-                true
-            } else {
-                assert!(child.element().kind() == SyntaxKind::CloseBrace);
-                close_brace = Some(child.to_owned());
-                false
+
+    for child in children {
+        match child.element().kind() {
+            SyntaxKind::MetadataObjectItemNode => {
+                items.push(child.clone());
             }
-        })
-        .collect::<Vec<_>>();
+            SyntaxKind::CloseBrace => {
+                close_brace = Some(child.clone());
+            }
+            _ => unreachable!(
+                "unexpected metadata section child: {:?}",
+                child.element().kind()
+            ),
+        }
+    }
 
     for item in items {
         (&item).write(stream);
@@ -183,18 +195,23 @@ pub fn format_parameter_metadata_section(
     (&open_brace).write(stream);
     stream.increment_indent();
 
+    let mut items = Vec::new();
     let mut close_brace = None;
-    let items = children
-        .filter(|child| {
-            if child.element().kind() == SyntaxKind::MetadataObjectItemNode {
-                true
-            } else {
-                assert!(child.element().kind() == SyntaxKind::CloseBrace);
-                close_brace = Some(child.to_owned());
-                false
+
+    for child in children {
+        match child.element().kind() {
+            SyntaxKind::MetadataObjectItemNode => {
+                items.push(child.clone());
             }
-        })
-        .collect::<Vec<_>>();
+            SyntaxKind::CloseBrace => {
+                close_brace = Some(child.clone());
+            }
+            _ => unreachable!(
+                "unexpected parameter metadata section child: {:?}",
+                child.element().kind()
+            ),
+        }
+    }
 
     for item in items {
         (&item).write(stream);

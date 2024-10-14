@@ -71,8 +71,7 @@ impl<T: Token> IntoIterator for TokenStream<T> {
 /// The kind of comment.
 #[derive(Debug, Eq, PartialEq)]
 pub enum Comment {
-    /// A comment on it's own line, indented to the same level as the code
-    /// following it.
+    /// A comment on it's own line.
     Preceding(String),
 
     /// A comment on the same line as the code preceding it.

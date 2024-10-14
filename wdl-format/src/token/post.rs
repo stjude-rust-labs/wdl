@@ -46,7 +46,7 @@ impl std::fmt::Display for PostToken {
         match self {
             PostToken::Space => write!(f, "{SPACE}"),
             PostToken::Newline => write!(f, "{NEWLINE}"),
-            PostToken::Indent => write!(f, "    "), // 4 spaces TODO replace
+            PostToken::Indent => write!(f, "    "), // TODO(af): Make this configurable.
             PostToken::Literal(value) => write!(f, "{value}"),
         }
     }

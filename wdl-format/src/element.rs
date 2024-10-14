@@ -91,6 +91,8 @@ impl AstElementFormatExt for Element {
 }
 
 /// Collates the children of a particular node.
+///
+/// This function ignores trivia.
 fn collate(node: &Node) -> Option<NonEmpty<Box<FormatElement>>> {
     let mut results = Vec::new();
     let stream = node.syntax().children_with_tokens().filter_map(|syntax| {

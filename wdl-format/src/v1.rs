@@ -90,21 +90,16 @@ pub fn format_input_section(element: &FormatElement, stream: &mut TokenStream<Pr
     (&open_brace).write(stream);
     stream.increment_indent();
 
+    let mut inputs = Vec::new();
     let mut close_brace = None;
-    let inputs = children
-        .filter(|child| {
-            if matches!(
-                child.element().kind(),
-                SyntaxKind::BoundDeclNode | SyntaxKind::UnboundDeclNode
-            ) {
-                true
-            } else {
-                assert!(child.element().kind() == SyntaxKind::CloseBrace);
-                close_brace = Some(child.to_owned());
-                false
-            }
-        })
-        .collect::<Vec<_>>();
+
+    for child in children {
+        match child.element().kind() {
+            SyntaxKind::BoundDeclNode | SyntaxKind::UnboundDeclNode => inputs.push(child),
+            SyntaxKind::CloseBrace => close_brace = Some(child),
+            _ => panic!("unexpected input section child"),
+        }
+    }
 
     // TODO: sort inputs
     for input in inputs {

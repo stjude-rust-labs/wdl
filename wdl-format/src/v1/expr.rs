@@ -273,21 +273,23 @@ pub fn format_literal_array(element: &FormatElement, stream: &mut TokenStream<Pr
     assert!(open_bracket.element().kind() == SyntaxKind::OpenBracket);
     (&open_bracket).write(stream);
 
-    let mut close_bracket = None;
+    let mut items = Vec::new();
     let mut commas = Vec::new();
-    let items = children
-        .filter(|child| {
-            if child.element().kind() == SyntaxKind::CloseBracket {
+    let mut close_bracket = None;
+
+    for child in children {
+        match child.element().kind() {
+            SyntaxKind::CloseBracket => {
                 close_bracket = Some(child.to_owned());
-                false
-            } else if child.element().kind() == SyntaxKind::Comma {
-                commas.push(child.to_owned());
-                false
-            } else {
-                true
             }
-        })
-        .collect::<Vec<_>>();
+            SyntaxKind::Comma => {
+                commas.push(child.to_owned());
+            }
+            _ => {
+                items.push(child.to_owned());
+            }
+        }
+    }
 
     let empty = items.is_empty();
     if !empty {
@@ -336,21 +338,23 @@ pub fn format_literal_map(element: &FormatElement, stream: &mut TokenStream<PreT
     (&open_brace).write(stream);
     stream.increment_indent();
 
-    let mut close_brace = None;
+    let mut items = Vec::new();
     let mut commas = Vec::new();
-    let items = children
-        .filter(|child| {
-            if child.element().kind() == SyntaxKind::CloseBrace {
+    let mut close_brace = None;
+
+    for child in children {
+        match child.element().kind() {
+            SyntaxKind::CloseBrace => {
                 close_brace = Some(child.to_owned());
-                false
-            } else if child.element().kind() == SyntaxKind::Comma {
-                commas.push(child.to_owned());
-                false
-            } else {
-                true
             }
-        })
-        .collect::<Vec<_>>();
+            SyntaxKind::Comma => {
+                commas.push(child.to_owned());
+            }
+            _ => {
+                items.push(child.to_owned());
+            }
+        }
+    }
 
     let mut commas = commas.iter();
     for item in items {
@@ -394,21 +398,23 @@ pub fn format_literal_object(element: &FormatElement, stream: &mut TokenStream<P
     (&open_brace).write(stream);
     stream.increment_indent();
 
-    let mut close_brace = None;
+    let mut members = Vec::new();
     let mut commas = Vec::new();
-    let members = children
-        .filter(|child| {
-            if child.element().kind() == SyntaxKind::CloseBrace {
+    let mut close_brace = None;
+
+    for child in children {
+        match child.element().kind() {
+            SyntaxKind::CloseBrace => {
                 close_brace = Some(child.to_owned());
-                false
-            } else if child.element().kind() == SyntaxKind::Comma {
-                commas.push(child.to_owned());
-                false
-            } else {
-                true
             }
-        })
-        .collect::<Vec<_>>();
+            SyntaxKind::Comma => {
+                commas.push(child.to_owned());
+            }
+            _ => {
+                members.push(child.to_owned());
+            }
+        }
+    }
 
     let mut commas = commas.iter();
     for member in members {
