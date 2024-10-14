@@ -18,9 +18,6 @@ use std::any::type_name;
 use std::collections::HashMap;
 use std::sync::LazyLock;
 
-use wdl_grammar::ALL_SYNTAX_KIND;
-use wdl_grammar::WorkflowDescriptionLanguage;
-
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
@@ -30,6 +27,8 @@ use wdl_ast::Version;
 use wdl_ast::VersionStatement;
 use wdl_ast::Whitespace;
 use wdl_ast::v1;
+use wdl_grammar::ALL_SYNTAX_KIND;
+use wdl_grammar::WorkflowDescriptionLanguage;
 
 /// A private module for sealed traits.
 ///
@@ -367,8 +366,7 @@ fn main() {
         multiple.sort();
 
         panic!(
-            "detected `SyntaxKind`s associated with multiple `AstNode`s/`AstToken`s \
-                (n={}):\n\n{}",
+            "detected `SyntaxKind`s associated with multiple `AstNode`s/`AstToken`s (n={}):\n\n{}",
             multiple.len(),
             multiple.join("\n\n")
         )
