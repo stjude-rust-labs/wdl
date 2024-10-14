@@ -37,7 +37,10 @@ where
     I: Iterator,
 {
     fn drop(&mut self) {
-        assert!(self.0.peek().is_none(), "not all iterator items were consumed!");
+        assert!(
+            self.0.peek().is_none(),
+            "not all iterator items were consumed!"
+        );
     }
 }
 

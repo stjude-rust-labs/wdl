@@ -204,7 +204,6 @@ pub fn token_children<T: AstToken>(parent: &SyntaxNode) -> impl Iterator<Item = 
         .filter_map(|c| c.into_token().and_then(T::cast))
 }
 
-
 /// Represents the AST of a [Document].
 ///
 /// See [Document::ast].
