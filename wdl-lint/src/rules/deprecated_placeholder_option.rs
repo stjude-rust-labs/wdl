@@ -142,7 +142,7 @@ impl Visitor for DeprecatedPlaceholderOptionRule {
             _ => return,
         };
 
-        for option in placeholder.options() {
+        if let Some(option) = placeholder.option() {
             let diagnostic = match option {
                 PlaceholderOption::Sep(option) => deprecated_sep_placeholder_option(option.span()),
                 PlaceholderOption::Default(option) => {

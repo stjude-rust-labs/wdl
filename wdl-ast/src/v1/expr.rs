@@ -2245,9 +2245,9 @@ impl Placeholder {
             .expect("should have a placeholder open token")
     }
 
-    /// Gets the options for the placeholder.
-    pub fn options(&self) -> impl Iterator<Item = PlaceholderOption> {
-        PlaceholderOption::children(&self.0)
+    /// Gets the option for the placeholder.
+    pub fn option(&self) -> Option<PlaceholderOption> {
+        child(&self.0)
     }
 
     /// Gets the placeholder expression.

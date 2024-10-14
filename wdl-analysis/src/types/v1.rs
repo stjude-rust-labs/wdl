@@ -504,20 +504,16 @@ where
                     // Check for a sep option is specified; if so, accept `Array[P]` where `P` is
                     // primitive.
                     let mut coercible = false;
-
-                    for option in placeholder.options() {
-                        if let PlaceholderOption::Sep(_) = option {
-                            if let Type::Compound(c) = ty {
-                                if let CompoundTypeDef::Array(a) =
-                                    self.types.type_definition(c.definition())
+                    if let Some(PlaceholderOption::Sep(_)) = placeholder.option() {
+                        if let Type::Compound(c) = ty {
+                            if let CompoundTypeDef::Array(a) =
+                                self.types.type_definition(c.definition())
+                            {
+                                if !a.element_type().is_optional()
+                                    && a.element_type().as_primitive().is_some()
                                 {
-                                    if !a.element_type().is_optional()
-                                        && a.element_type().as_primitive().is_some()
-                                    {
-                                        // OK
-                                        coercible = true;
-                                        break;
-                                    }
+                                    // OK
+                                    coercible = true;
                                 }
                             }
                         }
