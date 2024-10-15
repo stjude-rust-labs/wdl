@@ -94,7 +94,12 @@ impl std::fmt::Display for PreToken {
     }
 }
 
-impl Token for PreToken {}
+impl Token for PreToken {
+    /// Returns a displayable version of the token.
+    fn display(&self, _config: &crate::Config) -> impl std::fmt::Display {
+        format!("{}", self)
+    }
+}
 
 impl TokenStream<PreToken> {
     /// Inserts a blank line token to the stream if the stream does not already

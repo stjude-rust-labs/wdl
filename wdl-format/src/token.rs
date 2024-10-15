@@ -6,8 +6,14 @@ mod pre;
 pub use post::*;
 pub use pre::*;
 
+use crate::Config;
+use std::fmt::Display;
+
 /// Tokens that are streamable.
-pub trait Token: Eq + PartialEq {}
+pub trait Token: Eq + PartialEq {
+    /// Returns a displayable version of the token.
+    fn display(&self, config: &Config) -> impl Display;
+}
 
 /// A stream of tokens. Tokens in this case are either [`PreToken`]s or
 /// [`PostToken`]s. Note that, unless you are working on formatting

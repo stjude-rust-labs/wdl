@@ -3,6 +3,8 @@
 //! Generally speaking, unless you are working with the internals of code
 //! formatting, you're not going to be working with these.
 
+use std::fmt::Display;
+
 use wdl_ast::SyntaxKind;
 
 use crate::Comment;
@@ -42,22 +44,21 @@ impl std::fmt::Debug for PostToken {
     }
 }
 
-impl PostToken {
+impl Token for PostToken {
     /// Returns a displayable version of the token.
-    pub fn display<'a>(&'a self, config: &'a crate::Config) -> Box<dyn std::fmt::Display + 'a> {
+    fn display(&self, config: &crate::Config) -> impl Display {
+        let indent = match config.indent(){
+            Indent::Spaces(n) => " ".repeat((n).into()),
+            Indent::Tabs(n) => "\t".repeat((n).into()),
+        };
         match self {
-            Self::Space => Box::new(SPACE),
-            Self::Newline => Box::new(NEWLINE),
-            Self::Indent => Box::new(match config.indent() {
-                Indent::Spaces(n) => " ".repeat((n).into()),
-                Indent::Tabs(n) => "\t".repeat((n).into()),
-            }),
-            Self::Literal(value) => Box::new(value),
+            Self::Space => SPACE.to_string(),
+            Self::Newline => NEWLINE.to_string(),
+            Self::Indent => indent,
+            Self::Literal(value) => value.to_string(),
         }
     }
 }
-
-impl Token for PostToken {}
 
 /// Current position in a line.
 #[derive(Default, Eq, PartialEq)]

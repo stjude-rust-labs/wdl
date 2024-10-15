@@ -43,7 +43,6 @@ pub use rowan::Direction;
 pub use rowan::ast::AstChildren;
 pub use rowan::ast::AstNode;
 pub use rowan::ast::support;
-use v1::VersionKeyword;
 pub use wdl_grammar::Diagnostic;
 pub use wdl_grammar::Label;
 pub use wdl_grammar::Severity;
@@ -403,7 +402,7 @@ impl VersionStatement {
     }
 
     /// Gets the version keyword of the version statement.
-    pub fn keyword(&self) -> VersionKeyword {
+    pub fn keyword(&self) -> v1::VersionKeyword {
         token(&self.0).expect("version statement must have a version keyword")
     }
 }
