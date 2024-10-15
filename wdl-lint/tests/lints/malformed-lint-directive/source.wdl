@@ -1,8 +1,42 @@
-version 1.1  #@ except: BlankLinesBetweenElements, CommentWhitespace
+#@ except: DescriptionMissing, MissingRuntime, DescriptionMissing, UnknownRule
 
-task test1 {
-    #@ stop: CommentWhitespace
-    meta {}
-    parameter_meta {}
-    output {}
+## This is a test of the `MalformedLintDirective` rule
+
+version 1.2
+
+#@ stop: This should be flagged for using 'stop' instead of 'except'
+
+#@ except: MissingRequirements
+task foo {
+    #@except: this should be flagged for missing a space
+    meta {
+    }
+
+    command <<<>>>
+
+    output {
+    }
+
+    runtime {
+    }
+}
+
+workflow bar {
+    meta {
+    }
+
+    #@ except this should be flagged for missing a colon
+    output {
+    }
+}
+
+struct Baz {  #@ except: this should be flagged for being inlined
+    String x
+
+    meta {
+    }
+
+    parameter_meta {
+        x: "foo"
+    }
 }

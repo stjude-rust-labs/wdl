@@ -2,11 +2,16 @@
 
 use wdl_ast::{AstToken, Comment, SyntaxKind};
 
-/// Detect if a comment is in-line or not by looking for `\n` in the prior
+/// Detect is a comment is in-line or not by looking for `\n` in the prior
 /// whitespace.
 pub fn is_inline_comment(token: &Comment) -> bool {
     if let Some(prior) = token.syntax().prev_sibling_or_token() {
-        return prior.kind() != SyntaxKind::Whitespace || !prior.to_string().contains('\n');
+        return prior.kind() != SyntaxKind::Whitespace
+            || !prior
+            .as_token()
+            .expect("should be a token")
+            .text()
+            .contains('\n');
     }
     false
 }

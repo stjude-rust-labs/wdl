@@ -1,46 +1,32 @@
-note[PreambleWhitespace]: expected a blank line after the version statement
-  ┌─ tests/lints/malformed-lint-directive/source.wdl:1:14
-  │
-1 │ version 1.1  #@ except: BlankLinesBetweenElements, CommentWhitespace
-  │              ^ add a blank line before this
-  │
-  = fix: add a blank line immediately after the version statement
-
-warning[MalformedLintDirective]: lint directive must be on its own line
-  ┌─ tests/lints/malformed-lint-directive/source.wdl:1:14
-  │
-1 │ version 1.1  #@ except: BlankLinesBetweenElements, CommentWhitespace
-  │              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ malformed lint directive
-  │
-  = fix: place lint directive on new line
-
-warning[MissingRuntime]: task `test1` is missing a `runtime` section
-  ┌─ tests/lints/malformed-lint-directive/source.wdl:3:6
-  │
-3 │ task test1 {
-  │      ^^^^^ this task is missing a `runtime` section
-  │
-  = fix: add a `runtime` section to the task
-
-error: task `test1` is missing a command section
-  ┌─ tests/lints/malformed-lint-directive/source.wdl:3:6
-  │
-3 │ task test1 {
-  │      ^^^^^ this task must have a command section
-
 warning[MalformedLintDirective]: lint directive not recognized
-  ┌─ tests/lints/malformed-lint-directive/source.wdl:4:5
+  ┌─ tests/lints/malformed-lint-directive/source.wdl:1:4
   │
-4 │     #@ stop: CommentWhitespace
-  │     ^^^^^^^^^^^^^^^^^^^^^^^^^^ lint directive not recognized
+1 │ #@ except: DescriptionMissing, MissingRuntime, DescriptionMissing, UnknownRule
+  │    ^^^^ lint directive not recognized
   │
   = fix: remove unrecognized lint directives, use any of the directives included: ["except"]
 
-note[DescriptionMissing]: task `test1` is missing a description key
-  ┌─ tests/lints/malformed-lint-directive/source.wdl:5:5
+warning[MalformedLintDirective]: no colon detected following lint directive
+  ┌─ tests/lints/malformed-lint-directive/source.wdl:1:10
   │
-5 │     meta {}
-  │     ^^^^
+1 │ #@ except: DescriptionMissing, MissingRuntime, DescriptionMissing, UnknownRule
+  │          ^ no colon detected following lint directive
   │
-  = fix: add a `description` key to this meta section
+  = fix: add colon following lint directive
+
+note[CommentWhitespace]: comment delimiter should be followed by a single space
+   ┌─ tests/lints/malformed-lint-directive/source.wdl:11:5
+   │
+11 │     #@except: this should be flagged for missing a space
+   │     ^^
+   │
+   = fix: follow this comment delimiter with a single space
+
+warning[MalformedLintDirective]: lint directive must be on its own line
+   ┌─ tests/lints/malformed-lint-directive/source.wdl:33:15
+   │
+33 │ struct Baz {  #@ except: this should be flagged for being inlined
+   │               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ malformed lint directive
+   │
+   = fix: place lint directive on new line
 

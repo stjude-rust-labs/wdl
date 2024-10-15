@@ -6,9 +6,6 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
-use wdl_ast::SyntaxElement;
-use wdl_ast::SyntaxKind;
-use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use crate::Rule;
@@ -43,6 +40,14 @@ fn invalid_lint_directive(
         .with_rule(ID)
         .with_label("lint directive not recognized", span)
         .with_fix(format!("remove unrecognized lint directives, use any of the directives included: [{:#?}]", accepted_directives))
+}
+
+fn no_colon_detected(span: Span) -> Diagnostic {
+    Diagnostic::warning(
+        "no colon detected following lint directive")
+        .with_rule(ID)
+        .with_label("no colon detected following lint directive", span)
+        .with_fix("add colon following lint directive")
 }
 
 /// Detects a malformed lint directive.
@@ -82,24 +87,25 @@ impl Visitor for MalformedLintDirectiveRule {
     }
 
     fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
-        if comment.as_str().starts_with("#@") {
+        if let Some(lint_directive) = comment.as_str().strip_prefix("#@") {
             if is_inline_comment(comment) {
                 state.add(inline_lint_directive(
                     comment.span(),
                 ));
             }
-            if let Some(directive) = comment.as_str().strip_prefix("#@") {
-                let directive = directive.trim().split(" ").next().expect("directive").strip_suffix(":").expect("directive");
-                if !ACCEPTED_LINT_DIRECTIVES.contains(&directive) {
-                    state.add(invalid_lint_directive(
-                        comment.span(),
-                    ));
-                }
-            } else {
-                return;
+
+            let mut directive = lint_directive.trim().split(" ").next().expect("directive");
+            if !directive.ends_with(":") {
+                state.add(no_colon_detected(
+                    Span::new(3 + directive.chars().count(), 1),
+                ));
+            } else { directive = directive.strip_suffix(":").expect("stripped directive");}
+
+            if !ACCEPTED_LINT_DIRECTIVES.contains(&directive) {
+                state.add(invalid_lint_directive(
+                    Span::new(3, directive.chars().count()),
+                ));
             }
-        } else {
-            return;
         }
     }
 }
