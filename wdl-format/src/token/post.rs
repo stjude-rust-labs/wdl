@@ -47,7 +47,7 @@ impl std::fmt::Debug for PostToken {
 impl Token for PostToken {
     /// Returns a displayable version of the token.
     fn display(&self, config: &crate::Config) -> impl Display {
-        let indent = match config.indent(){
+        let indent = match config.indent() {
             Indent::Spaces(n) => " ".repeat((n).into()),
             Indent::Tabs(n) => "\t".repeat((n).into()),
         };

@@ -3,11 +3,12 @@
 mod post;
 mod pre;
 
+use std::fmt::Display;
+
 pub use post::*;
 pub use pre::*;
 
 use crate::Config;
-use std::fmt::Display;
 
 /// Tokens that are streamable.
 pub trait Token: Eq + PartialEq {
