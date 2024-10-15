@@ -153,7 +153,7 @@ impl Postprocessor {
                 {
                     stream.0.pop();
                 }
-                stream.push(PostToken::Literal(value.to_owned()));
+                stream.push(PostToken::Literal(value));
                 self.position = LinePosition::MiddleOfLine;
             }
             PreToken::Trivia(trivia) => match trivia {
@@ -177,7 +177,7 @@ impl Postprocessor {
                                 self.interrupted = true;
                             }
                             self.end_line(stream);
-                            stream.push(PostToken::Literal(value.to_owned()));
+                            stream.push(PostToken::Literal(value));
                             self.position = LinePosition::MiddleOfLine;
                         }
                         Comment::Inline(value) => {
@@ -190,7 +190,7 @@ impl Postprocessor {
                             self.trim_last_line(stream);
                             stream.push(PostToken::Space);
                             stream.push(PostToken::Space);
-                            stream.push(PostToken::Literal(value.to_owned()));
+                            stream.push(PostToken::Literal(value));
                         }
                     }
                     self.end_line(stream);

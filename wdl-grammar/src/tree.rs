@@ -5,7 +5,9 @@ pub mod dive;
 use std::borrow::Cow;
 use std::collections::VecDeque;
 use std::fmt;
+use std::iter;
 
+use itertools::Either;
 use rowan::Direction;
 use rowan::GreenNodeBuilder;
 use rowan::GreenNodeData;
@@ -716,97 +718,19 @@ impl fmt::Debug for SyntaxTree {
     }
 }
 
-/// Gathers substantial trivia (comments and blank lines) from a
-/// [`SyntaxToken`].
-///
-/// Whitespace is only considered substantial if it contains more than one
-/// newline. Comments are always considered substantial.
-fn gather_substantial_trivia(
-    source: &SyntaxToken,
-    direction: Direction,
-    break_on_newline: bool,
-) -> Box<[SyntaxToken]> {
-    /// Adds the token to the currently collecting buffer in the right place
-    /// depending in the direction we are traversing.
-    fn push_results(
-        token: SyntaxToken,
-        results: &mut VecDeque<SyntaxToken>,
-        direction: &Direction,
-    ) {
-        match direction {
-            Direction::Next => results.push_back(token),
-            Direction::Prev => results.push_front(token),
-        }
-    }
-
-    let mut results = VecDeque::new();
-    let mut cur = match direction {
-        Direction::Next => source.next_token(),
-        Direction::Prev => source.prev_token(),
-    };
-    while let Some(t) = cur {
-        if !t.kind().is_trivia() {
-            break;
-        }
-
-        match t.kind() {
-            SyntaxKind::Comment => {
-                // Check if t is a comment on its own line.
-                // If direction is 'Next' then we already know that the
-                // comment is on its own line.
-                if direction == Direction::Prev {
-                    if let Some(prev) = t.prev_token() {
-                        if prev.kind() == SyntaxKind::Whitespace {
-                            let newlines = prev.text().chars().filter(|c| *c == '\n').count();
-
-                            // If there are newlines in 'prev' then we know
-                            // that the comment is on its own line.
-                            // The comment may still be on its own line if
-                            // 'prev' does not have newlines and nothing comes
-                            // before 'prev'.
-                            if newlines == 0 && prev.prev_token().is_some() {
-                                break;
-                            }
-                        } else {
-                            // There is something else on this line before the comment.
-                            break;
-                        }
-                    }
-                }
-                push_results(t.clone(), &mut results, &direction);
-            }
-            SyntaxKind::Whitespace => {
-                let newlines = t.text().chars().filter(|c| *c == '\n').count();
-
-                if break_on_newline && newlines > 0 {
-                    break;
-                }
-
-                if newlines > 1 {
-                    push_results(t.clone(), &mut results, &direction);
-                }
-            }
-            // SAFETY: we just filtered out any non-comment and
-            // non-whitespace nodes above, so this should never occur.
-            _ => unreachable!(),
-        }
-        cur = match direction {
-            Direction::Next => t.next_token(),
-            Direction::Prev => t.prev_token(),
-        };
-    }
-
-    // NOTE: most of the time, this conversion will be O(1). Occassionally
-    // it will be O(n). No allocations will ever be done. Thus, the
-    // ammortized cost of this is quite cheap.
-    Vec::from(results).into_boxed_slice()
-}
-
 /// An extension trait for [`SyntaxNode`]s, [`SyntaxToken`]s, and
 /// [`SyntaxElement`]s.
 pub trait SyntaxExt {
     /// Returns whether `self` matches the provided element.
     fn matches(&self, other: &SyntaxElement) -> bool;
+
+    /// Gets the parent of the element.
+    ///
+    /// Returns `None` for the root node.
+    fn parent(&self) -> Option<SyntaxNode>;
+
+    /// Gets the child index of the element.
+    fn index(&self) -> usize;
 
     /// Gets the siblings with tokens.
     ///
@@ -815,42 +739,26 @@ pub trait SyntaxExt {
     /// provided by this extension trait can just be provided, which simplifies
     /// the code. Generally speaking, this should just defer to the underlying
     /// `siblings_with_tokens` method for each type.
-    fn siblings_with_tokens(&self, direction: Direction)
-    -> Box<dyn Iterator<Item = SyntaxElement>>;
+    fn siblings_with_tokens(&self, direction: Direction) -> impl Iterator<Item = SyntaxElement>;
 
     /// Returns all of the siblings _before_ the current element.
     ///
     /// The siblings are returned in the order they were parsed.
-    fn preceding_siblings(&self) -> Box<[SyntaxElement]> {
-        let mut results = VecDeque::new();
-
-        self.siblings_with_tokens(Direction::Prev)
-            // NOTE: this `skip_while` is necessary because
-            // `siblings_with_tokens` returns the current node.
-            .skip_while(|e| self.matches(e))
-            .for_each(|e| results.push_front(e));
-
-        // NOTE: most of the time, this conversion will be O(1). Occassionally
-        // it will be O(n). No allocations will ever be done. Thus, the
-        // ammortized cost of this is quite cheap.
-        Vec::from(results).into_boxed_slice()
+    fn preceding_siblings(&self) -> impl Iterator<Item = SyntaxElement> {
+        let index = self.index();
+        self.parent()
+            .into_iter()
+            .flat_map(move |p| p.children_with_tokens().take(index))
     }
 
     /// Returns all of the siblings _after_ the current element.
     ///
     /// The siblings are returned in the order they were parsed.
-    fn succeeding_siblings(&self) -> Box<[SyntaxElement]> {
-        let mut results = Vec::new();
-
+    fn succeeding_siblings(&self) -> impl Iterator<Item = SyntaxElement> {
         self.siblings_with_tokens(Direction::Next)
-            // NOTE: this `skip_while` is necessary because
-            // `siblings_with_tokens` returns the current node.
-            .skip_while(|e| self.matches(e))
-            .for_each(|e| results.push(e));
-
-        // NOTE: this should always be O(1) and never require any additional
-        // allocations.
-        results.into_boxed_slice()
+            // NOTE: this `skip` is necessary because `siblings_with_tokens` returns the current
+            // node.
+            .skip(1)
     }
 
     /// Gets all elements that are adjacent to a particular element (not
@@ -858,13 +766,8 @@ pub trait SyntaxExt {
     /// reverse direction.
     ///
     /// The siblings are returned in the order they were parsed.
-    fn adjacent(&self) -> Box<[SyntaxElement]> {
-        let mut results = Vec::from(self.preceding_siblings());
-        results.extend(self.succeeding_siblings().iter().cloned());
-
-        // NOTE: this should always be O(1) and never require any additional
-        // allocations.
-        results.into_boxed_slice()
+    fn adjacent(&self) -> impl Iterator<Item = SyntaxElement> {
+        self.preceding_siblings().chain(self.succeeding_siblings())
     }
 }
 
@@ -873,11 +776,16 @@ impl SyntaxExt for SyntaxNode {
         other.as_node().map(|n| n == self).unwrap_or(false)
     }
 
-    fn siblings_with_tokens(
-        &self,
-        direction: Direction,
-    ) -> Box<dyn Iterator<Item = SyntaxElement>> {
-        Box::new(self.siblings_with_tokens(direction))
+    fn siblings_with_tokens(&self, direction: Direction) -> impl Iterator<Item = SyntaxElement> {
+        self.siblings_with_tokens(direction)
+    }
+
+    fn parent(&self) -> Option<SyntaxNode> {
+        self.parent()
+    }
+
+    fn index(&self) -> usize {
+        self.index()
     }
 }
 
@@ -886,11 +794,16 @@ impl SyntaxExt for SyntaxToken {
         other.as_token().map(|n| n == self).unwrap_or(false)
     }
 
-    fn siblings_with_tokens(
-        &self,
-        direction: Direction,
-    ) -> Box<dyn Iterator<Item = SyntaxElement>> {
-        Box::new(self.siblings_with_tokens(direction))
+    fn siblings_with_tokens(&self, direction: Direction) -> impl Iterator<Item = SyntaxElement> {
+        self.siblings_with_tokens(direction)
+    }
+
+    fn parent(&self) -> Option<SyntaxNode> {
+        self.parent()
+    }
+
+    fn index(&self) -> usize {
+        self.index()
     }
 }
 
@@ -899,65 +812,119 @@ impl SyntaxExt for SyntaxElement {
         self == other
     }
 
-    fn siblings_with_tokens(
-        &self,
-        direction: Direction,
-    ) -> Box<dyn Iterator<Item = SyntaxElement>> {
+    fn siblings_with_tokens(&self, direction: Direction) -> impl Iterator<Item = SyntaxElement> {
         match self {
-            SyntaxElement::Node(node) => Box::new(node.siblings_with_tokens(direction)),
-            SyntaxElement::Token(token) => Box::new(token.siblings_with_tokens(direction)),
+            SyntaxElement::Node(node) => Either::Left(node.siblings_with_tokens(direction)),
+            SyntaxElement::Token(token) => Either::Right(token.siblings_with_tokens(direction)),
         }
+    }
+
+    fn parent(&self) -> Option<SyntaxNode> {
+        self.parent()
+    }
+
+    fn index(&self) -> usize {
+        self.index()
     }
 }
 
 /// An extension trait for [`SyntaxToken`]s.
 pub trait SyntaxTokenExt {
     /// Gets all of the substantial preceding trivia for an element.
-    fn preceding_trivia(&self) -> Box<[SyntaxToken]>
-    where
-        Self: Sized,
-        Self: SyntaxExt;
+    fn preceding_trivia(&self) -> impl Iterator<Item = SyntaxToken>;
 
     /// Gets all of the substantial succeeding trivia for an element.
-    fn succeeding_trivia(&self) -> Box<[SyntaxToken]>
-    where
-        Self: Sized,
-        Self: SyntaxExt;
+    fn succeeding_trivia(&self) -> impl Iterator<Item = SyntaxToken>;
 
     /// Get any inline comment directly following an element on the
     /// same line.
-    fn inline_comment(&self) -> Option<SyntaxToken>
-    where
-        Self: Sized,
-        Self: SyntaxExt;
+    fn inline_comment(&self) -> Option<SyntaxToken>;
 }
 
 impl SyntaxTokenExt for SyntaxToken {
-    fn preceding_trivia(&self) -> Box<[SyntaxToken]>
-    where
-        Self: Sized,
-        Self: SyntaxExt,
-    {
-        gather_substantial_trivia(self, Direction::Prev, false)
+    fn preceding_trivia(&self) -> impl Iterator<Item = SyntaxToken> {
+        let mut tokens = VecDeque::new();
+        let mut cur = self.prev_token();
+        while let Some(token) = cur {
+            cur = token.prev_token();
+            // Stop at first non-trivia
+            if !token.kind().is_trivia() {
+                break;
+            }
+            // Stop if a comment is not on its own line
+            if token.kind() == SyntaxKind::Comment {
+                if let Some(prev) = token.prev_token() {
+                    if prev.kind() == SyntaxKind::Whitespace {
+                        let has_newlines = prev.text().chars().any(|c| c == '\n');
+                        // If there are newlines in 'prev' then we know
+                        // that the comment is on its own line.
+                        // The comment may still be on its own line if
+                        // 'prev' does not have newlines and nothing comes
+                        // before 'prev'.
+                        if !has_newlines && prev.prev_token().is_some() {
+                            break;
+                        }
+                    } else {
+                        // There is something else on this line before the comment.
+                        break;
+                    }
+                }
+            }
+            // Filter out whitespace that is not substantial
+            match token.kind() {
+                SyntaxKind::Whitespace
+                    if token.text().chars().filter(|c| *c == '\n').count() > 1 =>
+                {
+                    tokens.push_front(token);
+                }
+                SyntaxKind::Comment => {
+                    tokens.push_front(token);
+                }
+                _ => {}
+            }
+        }
+        tokens.into_iter()
     }
 
-    fn succeeding_trivia(&self) -> Box<[SyntaxToken]>
-    where
-        Self: Sized,
-        Self: SyntaxExt,
-    {
-        gather_substantial_trivia(self, Direction::Next, false)
+    fn succeeding_trivia(&self) -> impl Iterator<Item = SyntaxToken> {
+        let mut next = self.next_token();
+        iter::from_fn(move || {
+            let cur = next.clone()?;
+            next = cur.next_token();
+            Some(cur)
+        })
+        .take_while(|t| {
+            // Stop at first non-trivia
+            t.kind().is_trivia()
+        })
+        .filter(|t| {
+            // Filter out whitespace that is not substantial
+            if t.kind() == SyntaxKind::Whitespace {
+                return t.text().chars().filter(|c| *c == '\n').count() > 1;
+            }
+            true
+        })
     }
 
-    fn inline_comment(&self) -> Option<SyntaxToken>
-    where
-        Self: Sized,
-        Self: SyntaxExt,
-    {
-        gather_substantial_trivia(self, Direction::Next, true)
-            // NOTE: at most, there can be one contiguous comment on a line.
-            .first()
-            .cloned()
+    fn inline_comment(&self) -> Option<SyntaxToken> {
+        let mut next = self.next_token();
+        iter::from_fn(move || {
+            let cur = next.clone()?;
+            next = cur.next_token();
+            Some(cur)
+        })
+        .take_while(|t| {
+            // Stop at non-trivia
+            if !t.kind().is_trivia() {
+                return false;
+            }
+            // Stop on first whitespace containing a newline
+            if t.kind() == SyntaxKind::Whitespace {
+                return !t.text().chars().any(|c| c == '\n');
+            }
+            true
+        })
+        .find(|t| t.kind() == SyntaxKind::Comment)
     }
 }
 
@@ -991,21 +958,18 @@ workflow foo {} # This should not be collected.
 
         let workflow = tree.root().last_child().unwrap();
         assert_eq!(workflow.kind(), SyntaxKind::WorkflowDefinitionNode);
-        let trivia = workflow.first_token().unwrap().preceding_trivia();
-        let mut trivia_iter = trivia.iter();
-        assert_eq!(trivia_iter.next().unwrap().text(), "\n\n");
-        assert_eq!(trivia_iter.next().unwrap().text(), "# Some");
-        assert_eq!(trivia_iter.next().unwrap().text(), "# comments");
-        assert_eq!(trivia_iter.next().unwrap().text(), "# are");
-        assert_eq!(trivia_iter.next().unwrap().text(), "# long");
-        assert_eq!(trivia_iter.next().unwrap().text(), "\n    \n");
-        assert_eq!(trivia_iter.next().unwrap().text(), "# Others are short");
-        assert_eq!(trivia_iter.next().unwrap().text(), "\n\n");
-        assert_eq!(
-            trivia_iter.next().unwrap().text(),
-            "#     and, yet    another"
-        );
-        assert!(trivia_iter.next().is_none());
+        let token = workflow.first_token().unwrap();
+        let mut trivia = token.preceding_trivia();
+        assert_eq!(trivia.next().unwrap().text(), "\n\n");
+        assert_eq!(trivia.next().unwrap().text(), "# Some");
+        assert_eq!(trivia.next().unwrap().text(), "# comments");
+        assert_eq!(trivia.next().unwrap().text(), "# are");
+        assert_eq!(trivia.next().unwrap().text(), "# long");
+        assert_eq!(trivia.next().unwrap().text(), "\n    \n");
+        assert_eq!(trivia.next().unwrap().text(), "# Others are short");
+        assert_eq!(trivia.next().unwrap().text(), "\n\n");
+        assert_eq!(trivia.next().unwrap().text(), "#     and, yet    another");
+        assert!(trivia.next().is_none());
     }
 
     #[test]
@@ -1026,18 +990,18 @@ workflow foo {} # Here is a comment that should be collected.
 
         let workflow = tree.root().last_child().unwrap();
         assert_eq!(workflow.kind(), SyntaxKind::WorkflowDefinitionNode);
-        let trivia = workflow.last_token().unwrap().succeeding_trivia();
-        let mut trivia_iter = trivia.iter();
+        let token = workflow.last_token().unwrap();
+        let mut trivia = token.succeeding_trivia();
         assert_eq!(
-            trivia_iter.next().unwrap().text(),
+            trivia.next().unwrap().text(),
             "# Here is a comment that should be collected."
         );
-        assert_eq!(trivia_iter.next().unwrap().text(), "\n\n");
+        assert_eq!(trivia.next().unwrap().text(), "\n\n");
         assert_eq!(
-            trivia_iter.next().unwrap().text(),
+            trivia.next().unwrap().text(),
             "# This comment should be included too."
         );
-        assert!(trivia_iter.next().is_none());
+        assert!(trivia.next().is_none());
     }
 
     #[test]
