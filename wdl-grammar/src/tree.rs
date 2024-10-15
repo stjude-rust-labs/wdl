@@ -734,7 +734,7 @@ pub trait SyntaxExt {
 
     /// Gets the siblings with tokens.
     ///
-    /// **NOTE:** this needed because Rowan does not encapsulate this
+    /// **NOTE:** this is needed because Rowan does not encapsulate this
     /// functionality in a trait. Once wrapped here, most of the functions
     /// provided by this extension trait can just be provided, which simplifies
     /// the code. Generally speaking, this should just defer to the underlying
