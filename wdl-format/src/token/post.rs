@@ -47,8 +47,11 @@ impl std::fmt::Debug for PostToken {
 impl Token for PostToken {
     /// Returns a displayable version of the token.
     fn display<'a>(&'a self, config: &'a crate::Config) -> impl Display + 'a {
+        /// A displayable version of a [`PostToken`].
         struct Display<'a> {
+            /// The token to display.
             token: &'a PostToken,
+            /// The configuration to use.
             config: &'a crate::Config,
         }
 
