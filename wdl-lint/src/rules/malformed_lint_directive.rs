@@ -27,7 +27,6 @@ fn inline_lint_directive(
         .with_rule(ID)
         .with_label("malformed lint directive", span,
         )
-        .with_fix("place lint directive on new line")
 }
 
 /// Creates an "Invalid Lint Directive" diagnostic.
@@ -39,15 +38,23 @@ fn invalid_lint_directive(
         "lint directive not recognized")
         .with_rule(ID)
         .with_label("lint directive not recognized", span)
-        .with_fix(format!("remove unrecognized lint directives, use any of the directives included: [{:#?}]", accepted_directives))
+        .with_fix(format!("use any of the recognized lint directives: [{:#?}]", accepted_directives))
 }
 
+/// Creates a "Missing Whitespace" diagnostic.
+fn missing_whitespace(span: Span) -> Diagnostic {
+    Diagnostic::warning(
+        "missing whitespace before lint directive")
+        .with_rule(ID)
+        .with_label("missing whitespace before lint directive", span)
+}
+
+/// Creates a "No Colon Detected" diagnostic.
 fn no_colon_detected(span: Span) -> Diagnostic {
     Diagnostic::warning(
         "no colon detected following lint directive")
         .with_rule(ID)
         .with_label("no colon detected following lint directive", span)
-        .with_fix("add colon following lint directive")
 }
 
 /// Detects a malformed lint directive.
@@ -74,7 +81,6 @@ impl Rule for MalformedLintDirectiveRule {
     }
 
     fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
-        // Some(&[SyntaxKind::VersionStatementNode])
         None
     }
 }
@@ -88,22 +94,30 @@ impl Visitor for MalformedLintDirectiveRule {
 
     fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
         if let Some(lint_directive) = comment.as_str().strip_prefix("#@") {
+            let base_offset = comment.span().start();
+
             if is_inline_comment(comment) {
                 state.add(inline_lint_directive(
                     comment.span(),
                 ));
             }
 
+            if !lint_directive.starts_with(" ") {
+                state.add(missing_whitespace(
+                    Span::new(base_offset + 2, 1),
+                ));
+            }
+
             let mut directive = lint_directive.trim().split(" ").next().expect("directive");
             if !directive.ends_with(":") {
                 state.add(no_colon_detected(
-                    Span::new(3 + directive.chars().count(), 1),
+                    Span::new(base_offset + 3 + directive.chars().count(), 1),
                 ));
             } else { directive = directive.strip_suffix(":").expect("stripped directive");}
 
             if !ACCEPTED_LINT_DIRECTIVES.contains(&directive) {
                 state.add(invalid_lint_directive(
-                    Span::new(3, directive.chars().count()),
+                    Span::new(base_offset + 3, directive.chars().count()),
                 ));
             }
         }
