@@ -46,16 +46,37 @@ impl std::fmt::Debug for PostToken {
 
 impl Token for PostToken {
     /// Returns a displayable version of the token.
-    fn display(&self, config: &crate::Config) -> impl Display {
-        let indent = match config.indent() {
-            Indent::Spaces(n) => " ".repeat((n).into()),
-            Indent::Tabs(n) => "\t".repeat((n).into()),
-        };
-        match self {
-            Self::Space => SPACE.to_string(),
-            Self::Newline => NEWLINE.to_string(),
-            Self::Indent => indent,
-            Self::Literal(value) => value.to_string(),
+    fn display<'a>(&'a self, config: &'a crate::Config) -> impl Display + 'a {
+        struct Display<'a> {
+            token: &'a PostToken,
+            config: &'a crate::Config,
+        }
+
+        impl std::fmt::Display for Display<'_> {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                match self.token {
+                    PostToken::Space => write!(f, "{SPACE}"),
+                    PostToken::Newline => write!(f, "{NEWLINE}"),
+                    PostToken::Indent => {
+                        let (c, n) = match self.config.indent() {
+                            Indent::Spaces(n) => (' ', n),
+                            Indent::Tabs(n) => ('\t', n),
+                        };
+
+                        for _ in 0..n.get() {
+                            write!(f, "{c}")?;
+                        }
+
+                        Ok(())
+                    }
+                    PostToken::Literal(value) => write!(f, "{value}"),
+                }
+            }
+        }
+
+        Display {
+            token: self,
+            config,
         }
     }
 }

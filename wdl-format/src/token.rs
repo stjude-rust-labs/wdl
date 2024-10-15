@@ -13,7 +13,7 @@ use crate::Config;
 /// Tokens that are streamable.
 pub trait Token: Eq + PartialEq {
     /// Returns a displayable version of the token.
-    fn display(&self, config: &Config) -> impl Display;
+    fn display<'a>(&'a self, config: &'a Config) -> impl Display + 'a;
 }
 
 /// A stream of tokens. Tokens in this case are either [`PreToken`]s or

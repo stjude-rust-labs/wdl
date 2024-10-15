@@ -96,8 +96,8 @@ impl std::fmt::Display for PreToken {
 
 impl Token for PreToken {
     /// Returns a displayable version of the token.
-    fn display(&self, _config: &crate::Config) -> impl std::fmt::Display {
-        format!("{}", self)
+    fn display<'a>(&'a self, _config: &'a crate::Config) -> impl std::fmt::Display {
+        self
     }
 }
 
