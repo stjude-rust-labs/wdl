@@ -1,6 +1,8 @@
 //! A module for utility functions for the lint rules.
 
-use wdl_ast::{AstToken, Comment, SyntaxKind};
+use wdl_ast::AstToken;
+use wdl_ast::Comment;
+use wdl_ast::SyntaxKind;
 
 /// Detect is a comment is in-line or not by looking for `\n` in the prior
 /// whitespace.
@@ -8,10 +10,10 @@ pub fn is_inline_comment(token: &Comment) -> bool {
     if let Some(prior) = token.syntax().prev_sibling_or_token() {
         return prior.kind() != SyntaxKind::Whitespace
             || !prior
-            .as_token()
-            .expect("should be a token")
-            .text()
-            .contains('\n');
+                .as_token()
+                .expect("should be a token")
+                .text()
+                .contains('\n');
     }
     false
 }

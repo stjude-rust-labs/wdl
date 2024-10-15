@@ -20,6 +20,7 @@ mod inconsistent_newlines;
 mod input_not_sorted;
 mod key_value_pairs;
 mod line_width;
+mod malformed_lint_directive;
 mod matching_parameter_meta;
 mod misplaced_lint_directive;
 mod missing_metas;
@@ -39,7 +40,6 @@ mod trailing_comma;
 mod unknown_rule;
 mod version_formatting;
 mod whitespace;
-mod malformed_lint_directive;
 
 pub use blank_lines_between_elements::*;
 pub use call_input_spacing::*;
