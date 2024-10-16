@@ -9,6 +9,7 @@ workflow foo {
         GT_AG_and_CT_AC_motif: 2
     }
     SpliceJunctionMotifs? optional = None
+    Object? deprecated = None
     input {
         SpliceJunctionMotifs? foo
     }
