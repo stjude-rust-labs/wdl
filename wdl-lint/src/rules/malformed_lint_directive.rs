@@ -23,40 +23,48 @@ const ACCEPTED_LINT_DIRECTIVES: [&str; 1] = ["except"];
 fn excessive_whitespace(span: Span) -> Diagnostic {
     Diagnostic::warning("expected exactly one space before lint directive")
         .with_rule(ID)
-        .with_label("excessive whitespace", span)
+        .with_label("replace this whitespace with a single space", span)
 }
 
 /// Creates an "Inline Lint Directive" diagnostic.
 fn inline_lint_directive(span: Span) -> Diagnostic {
     Diagnostic::warning("lint directive must be on its own line")
         .with_rule(ID)
-        .with_label("inlined lint directive", span)
+        .with_highlight(span)
+        .with_fix("move the lint directive to its own line")
 }
 
 /// Creates an "Invalid Lint Directive" diagnostic.
-fn invalid_lint_directive(span: Span) -> Diagnostic {
+fn invalid_lint_directive(name: &str, span: Span) -> Diagnostic {
     let accepted_directives = ACCEPTED_LINT_DIRECTIVES.join(", ");
-    Diagnostic::warning("lint directive not recognized")
+    Diagnostic::warning(format!("lint directive `{name}` is not recognized"))
         .with_rule(ID)
-        .with_label("lint directive not recognized", span)
+        .with_highlight(span)
         .with_fix(format!(
             "use any of the recognized lint directives: [{:#?}]",
             accepted_directives
         ))
 }
 
+/// Creates a "Missing Lint Directive" diagnostic.
+fn missing_lint_directive(span: Span) -> Diagnostic {
+    Diagnostic::warning("lint directive not found")
+        .with_rule(ID)
+        .with_label("missing lint directive", span)
+}
+
 /// Creates a "Missing Whitespace" diagnostic.
 fn missing_whitespace(span: Span) -> Diagnostic {
     Diagnostic::warning("expected exactly one space before lint directive")
         .with_rule(ID)
-        .with_label("missing whitespace", span)
+        .with_label("expected a single space before this", span)
 }
 
 /// Creates a "No Colon Detected" diagnostic.
 fn no_colon_detected(span: Span) -> Diagnostic {
-    Diagnostic::warning("expected colon following a lint directive")
+    Diagnostic::warning("expected a colon to follow a lint directive")
         .with_rule(ID)
-        .with_label("no colon detected", span)
+        .with_label("expected a colon here", span)
 }
 
 /// Detects a malformed lint directive.
@@ -103,6 +111,14 @@ impl Visitor for MalformedLintDirectiveRule {
                 state.add(inline_lint_directive(comment.span()));
             }
 
+            if lint_directive.trim().is_empty() {
+                state.add(missing_lint_directive(Span::new(
+                    base_offset + 2,
+                    lint_directive.len(),
+                )));
+                return;
+            }
+
             if !lint_directive.starts_with(" ") {
                 state.add(missing_whitespace(Span::new(base_offset + 2, 1)));
             }
@@ -116,7 +132,7 @@ impl Visitor for MalformedLintDirectiveRule {
                 )));
             }
 
-            let mut directive = lint_directive.trim().split(" ").next().expect("directive");
+            let mut directive = lint_directive.trim().split(" ").next().unwrap();
             if !directive.ends_with(":") {
                 state.add(no_colon_detected(Span::new(
                     base_offset + 3 + directive.chars().count(),
@@ -127,10 +143,10 @@ impl Visitor for MalformedLintDirectiveRule {
             }
 
             if !ACCEPTED_LINT_DIRECTIVES.contains(&directive) {
-                state.add(invalid_lint_directive(Span::new(
-                    base_offset + 3,
-                    directive.chars().count(),
-                )));
+                state.add(invalid_lint_directive(
+                    directive,
+                    Span::new(base_offset + 3, directive.chars().count()),
+                ));
             }
         }
     }

@@ -1,4 +1,4 @@
-#@ except: CommentWhitespace, DescriptionMissing, MissingRuntime, UnknownRule, LineWidth
+#@ except: CommentWhitespace, DescriptionMissing, MissingRuntime, UnknownRule, LineWidth, PreambleCommentAfterVersion
 
 ## This is a test of the `MalformedLintDirective` rule
 
@@ -46,6 +46,17 @@ workflow bar2 {
     }
 
     #@     except: this should be flagged for excessive whitespace
+    output {
+    }
+}
+
+workflow bar3 {
+    meta {
+    }
+
+    ## The following should be flagged for having a missing directive
+
+    #@
     output {
     }
 }

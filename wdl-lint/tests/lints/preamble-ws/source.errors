@@ -8,7 +8,9 @@ warning[MalformedLintDirective]: lint directive must be on its own line
   ┌─ tests/lints/preamble-ws/source.wdl:1:5
   │
 1 │     #@ except: DescriptionMissing
-  │     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ inlined lint directive
+  │     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │
+  = fix: move the lint directive to its own line
 
 note[PreambleFormatting]: expected exactly one blank line between lint directives and preamble comments
   ┌─ tests/lints/preamble-ws/source.wdl:1:34
