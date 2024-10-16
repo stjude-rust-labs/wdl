@@ -8,14 +8,18 @@ use wdl_ast::SyntaxKind;
 /// whitespace.
 pub fn is_inline_comment(token: &Comment) -> bool {
     if let Some(prior) = token.syntax().prev_sibling_or_token() {
-        let not_whitespace = prior.kind() != SyntaxKind::Whitespace;
+        let whitespace = prior.kind() == SyntaxKind::Whitespace;
+        if !whitespace {
+            return true;
+        }
+
         let contains_newline = prior
             .as_token()
-            .expect("should be a token")
+            .expect("whitespace should be a token")
             .text()
             .contains('\n');
         let first = prior.prev_sibling_or_token().is_none();
-        return not_whitespace || (!contains_newline && !first);
+        return !contains_newline && !first;
     }
     false
 }
