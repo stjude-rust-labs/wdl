@@ -92,8 +92,7 @@ task foo {  # an in-line comment
         assert!(!is_inline);
 
         let second = comments.next().expect("there should be a second comment");
-        let second =
-            Comment::cast(second.as_token().unwrap().clone()).unwrap();
+        let second = Comment::cast(second.as_token().unwrap().clone()).unwrap();
 
         let is_inline = is_inline_comment(&second);
 
