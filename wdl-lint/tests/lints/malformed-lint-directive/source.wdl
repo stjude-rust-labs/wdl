@@ -40,3 +40,12 @@ struct Baz {  #@ except: this should be flagged for being inlined
         x: "foo"
     }
 }
+
+workflow bar2 {
+    meta {
+    }
+
+    #@     except: this should be flagged for excessive whitespace
+    output {
+    }
+}

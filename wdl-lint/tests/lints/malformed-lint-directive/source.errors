@@ -6,21 +6,27 @@ warning[MalformedLintDirective]: lint directive not recognized
   │
   = fix: use any of the recognized lint directives: ["except"]
 
-warning[MalformedLintDirective]: missing whitespace before lint directive
+warning[MalformedLintDirective]: expected exactly one space before lint directive
    ┌─ tests/lints/malformed-lint-directive/source.wdl:11:7
    │
 11 │     #@except: this should be flagged for missing a space
-   │       ^ missing whitespace before lint directive
+   │       ^ missing whitespace
 
-warning[MalformedLintDirective]: no colon detected following lint directive
+warning[MalformedLintDirective]: expected colon following a lint directive
    ┌─ tests/lints/malformed-lint-directive/source.wdl:28:14
    │
 28 │     #@ except this should be flagged for missing a colon
-   │              ^ no colon detected following lint directive
+   │              ^ no colon detected
 
 warning[MalformedLintDirective]: lint directive must be on its own line
    ┌─ tests/lints/malformed-lint-directive/source.wdl:33:15
    │
 33 │ struct Baz {  #@ except: this should be flagged for being inlined
-   │               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ malformed lint directive
+   │               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ inlined lint directive
+
+warning[MalformedLintDirective]: expected exactly one space before lint directive
+   ┌─ tests/lints/malformed-lint-directive/source.wdl:48:7
+   │
+48 │     #@     except: this should be flagged for excessive whitespace
+   │       ^^^^^ excessive whitespace
 
