@@ -132,21 +132,22 @@ impl Visitor for MalformedLintDirectiveRule {
                 )));
             }
 
-            let mut directive = lint_directive.trim().split(" ").next().unwrap();
-            if !directive.ends_with(":") {
-                state.add(no_colon_detected(Span::new(
-                    base_offset + 3 + directive.chars().count(),
-                    1,
-                )));
-            } else {
-                directive = directive.strip_suffix(":").expect("stripped directive");
-            }
+            if let Some(mut directive) = lint_directive.trim().split(" ").next() {
+                if !directive.ends_with(":") {
+                    state.add(no_colon_detected(Span::new(
+                        base_offset + 3 + directive.chars().count(),
+                        1,
+                    )));
+                } else if let Some(stripped_directive) = directive.strip_suffix(":") {
+                    directive = stripped_directive;
+                }
 
-            if !ACCEPTED_LINT_DIRECTIVES.contains(&directive) {
-                state.add(invalid_lint_directive(
-                    directive,
-                    Span::new(base_offset + 3, directive.chars().count()),
-                ));
+                if !ACCEPTED_LINT_DIRECTIVES.contains(&directive) {
+                    state.add(invalid_lint_directive(
+                        directive,
+                        Span::new(base_offset + 3, directive.chars().count()),
+                    ));
+                }
             }
         }
     }
