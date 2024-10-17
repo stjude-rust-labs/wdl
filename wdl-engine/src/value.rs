@@ -171,9 +171,9 @@ impl Value {
         }
     }
 
-    /// Gets the value as a `File`.
+    /// Gets the value as a `Directory`.
     ///
-    /// Returns `None` if the value is not a `File`.
+    /// Returns `None` if the value is not a `Directory`.
     pub fn as_directory(self, engine: &Engine) -> Option<&str> {
         match self {
             Self::Directory(_) => self.as_str(engine),
