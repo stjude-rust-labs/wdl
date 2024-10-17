@@ -663,7 +663,7 @@ impl<'a> TypeParameters<'a> {
 
     /// Gets an iterator of the type parameters that have been referenced since
     /// the last reset.
-    pub fn referenced(&self) -> impl Iterator<Item = (&TypeParameter, Option<Type>)> {
+    pub fn referenced(&self) -> impl Iterator<Item = (&TypeParameter, Option<Type>)> + use<'_> {
         let mut bits = self.referenced.get();
         std::iter::from_fn(move || {
             if bits == 0 {

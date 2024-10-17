@@ -1055,7 +1055,7 @@ impl Expr {
     /// This is meant to emulate the functionality of
     /// [`rowan::ast::support::children`] without requiring [`Expr`] to
     /// implement the `AstNode` trait.
-    pub fn children(syntax: &SyntaxNode) -> impl Iterator<Item = Expr> {
+    pub fn children(syntax: &SyntaxNode) -> impl Iterator<Item = Expr> + use<> {
         syntax.children().filter_map(Self::cast)
     }
 
@@ -1782,7 +1782,7 @@ impl LiteralExpr {
     /// This is meant to emulate the functionality of
     /// [`rowan::ast::support::children`] without requiring [`LiteralExpr`] to
     /// implement the `AstNode` trait.
-    pub fn children(syntax: &SyntaxNode) -> impl Iterator<Item = LiteralExpr> {
+    pub fn children(syntax: &SyntaxNode) -> impl Iterator<Item = LiteralExpr> + use<> {
         syntax.children().filter_map(Self::cast)
     }
 }
@@ -2105,7 +2105,7 @@ impl LiteralString {
     /// Gets the parts of the string.
     ///
     /// A part may be literal text or an interpolated expression.
-    pub fn parts(&self) -> impl Iterator<Item = StringPart> {
+    pub fn parts(&self) -> impl Iterator<Item = StringPart> + use<> {
         self.0.children_with_tokens().filter_map(StringPart::cast)
     }
 
@@ -2460,7 +2460,7 @@ impl PlaceholderOption {
     /// This is meant to emulate the functionality of
     /// [`rowan::ast::support::children`] without requiring
     /// [`PlaceholderOption`] to implement the `AstNode` trait.
-    pub fn children(syntax: &SyntaxNode) -> impl Iterator<Item = PlaceholderOption> {
+    pub fn children(syntax: &SyntaxNode) -> impl Iterator<Item = PlaceholderOption> + use<> {
         syntax.children().filter_map(Self::cast)
     }
 }
@@ -2654,7 +2654,7 @@ pub struct LiteralArray(SyntaxNode);
 
 impl LiteralArray {
     /// Gets the elements of the literal array.
-    pub fn elements(&self) -> impl Iterator<Item = Expr> {
+    pub fn elements(&self) -> impl Iterator<Item = Expr> + use<> {
         Expr::children(&self.0)
     }
 }
@@ -3107,7 +3107,7 @@ impl LiteralInputItem {
     /// Gets the names of the input item.
     ///
     /// More than one name indicates a struct member path.
-    pub fn names(&self) -> impl Iterator<Item = Ident> {
+    pub fn names(&self) -> impl Iterator<Item = Ident> + use<> {
         self.0
             .children_with_tokens()
             .filter_map(SyntaxElement::into_token)
@@ -3189,7 +3189,7 @@ impl LiteralOutputItem {
     /// Gets the names of the output item.
     ///
     /// More than one name indicates a struct member path.
-    pub fn names(&self) -> impl Iterator<Item = Ident> {
+    pub fn names(&self) -> impl Iterator<Item = Ident> + use<> {
         self.0
             .children_with_tokens()
             .filter_map(SyntaxElement::into_token)
@@ -3462,7 +3462,7 @@ impl CallExpr {
     }
 
     /// Gets the call arguments.
-    pub fn arguments(&self) -> impl Iterator<Item = Expr> {
+    pub fn arguments(&self) -> impl Iterator<Item = Expr> + use<> {
         Expr::children(&self.0)
     }
 }

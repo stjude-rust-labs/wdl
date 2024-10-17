@@ -740,7 +740,7 @@ impl Type {
     /// This is meant to emulate the functionality of
     /// [`rowan::ast::support::children`] without requiring [`Type`] to
     /// implement the `AstNode` trait.
-    pub fn children(syntax: &SyntaxNode) -> impl Iterator<Item = Type> {
+    pub fn children(syntax: &SyntaxNode) -> impl Iterator<Item = Type> + use<> {
         syntax.children().filter_map(Self::cast)
     }
 }
@@ -1001,7 +1001,7 @@ impl Decl {
     /// This is meant to emulate the functionality of
     /// [`rowan::ast::support::children`] without requiring [`Decl`] to
     /// implement the `AstNode` trait.
-    pub fn children(syntax: &SyntaxNode) -> impl Iterator<Item = Decl> {
+    pub fn children(syntax: &SyntaxNode) -> impl Iterator<Item = Decl> + use<> {
         syntax.children().filter_map(Self::cast)
     }
 }

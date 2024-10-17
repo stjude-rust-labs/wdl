@@ -236,7 +236,7 @@ impl Type {
     }
 
     /// Returns an object that implements `Display` for formatting the type.
-    pub fn display<'a>(&self, types: &'a Types) -> impl fmt::Display + 'a {
+    pub fn display<'a>(&self, types: &'a Types) -> impl fmt::Display + use<'a> {
         #[allow(clippy::missing_docs_in_private_items)]
         struct Display<'a> {
             types: &'a Types,
@@ -443,7 +443,7 @@ impl CompoundType {
     }
 
     /// Returns an object that implements `Display` for formatting the type.
-    pub fn display<'a>(&self, types: &'a Types) -> impl fmt::Display + 'a {
+    pub fn display<'a>(&self, types: &'a Types) -> impl fmt::Display + use<'a> {
         #[allow(clippy::missing_docs_in_private_items)]
         struct Display<'a> {
             types: &'a Types,
