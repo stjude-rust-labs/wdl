@@ -190,7 +190,16 @@ async fn main() {
             for _ in 0..3 {
                 let mut retry = Vec::new();
                 for krate in all_crates {
-                    if !publish(&krate.borrow(), dry_run).await {
+                    let (name, version, manifest_path) = {
+                        let krate = krate.borrow();
+                        (
+                            krate.name.clone(),
+                            krate.version.clone(),
+                            krate.manifest_path.clone(),
+                        )
+                    };
+
+                    if !publish(&name, &version, &manifest_path, dry_run).await {
                         retry.push(krate);
                     }
                 }
@@ -328,8 +337,8 @@ fn bump(version: &str, patch_bump: bool) -> String {
 }
 
 /// Publishes a crate.
-async fn publish(krate: &Crate, dry_run: bool) -> bool {
-    if !SORTED_CRATES_TO_PUBLISH.iter().any(|s| *s == krate.name) {
+async fn publish(name: &str, version: &str, manifest_path: &Path, dry_run: bool) -> bool {
+    if !SORTED_CRATES_TO_PUBLISH.iter().any(|s| *s == name) {
         return true;
     }
 
@@ -337,22 +346,22 @@ async fn publish(krate: &Crate, dry_run: bool) -> bool {
     // binary may be re-run and there's no need to re-attempt previous work.
     let client = reqwest::Client::new();
     let req = client
-        .get(format!("https://crates.io/api/v1/crates/{}", krate.name))
+        .get(format!("https://crates.io/api/v1/crates/{}", name))
         .header("User-Agent", "curl/8.7.1"); // crates.io requires a user agent apparently
     let response = req.send().await.expect("failed to get crate info");
     if response.status().is_success() {
         let text = response.text().await.expect("failed to get response text");
-        if text.contains(&format!("\"newest_version\":\"{}\"", krate.version)) {
+        if text.contains(&format!("\"newest_version\":\"{}\"", version)) {
             println!(
                 "skip publish {} because {} is latest version",
-                krate.name, krate.version,
+                name, version,
             );
             return true;
         }
     } else {
         println!(
             "skip publish {} because failed to get crate info: {}",
-            krate.name,
+            name,
             response.status()
         );
         return false;
@@ -361,7 +370,7 @@ async fn publish(krate: &Crate, dry_run: bool) -> bool {
     let mut command = Command::new("cargo");
     let command = command
         .arg("publish")
-        .current_dir(krate.manifest_path.parent().unwrap());
+        .current_dir(manifest_path.parent().unwrap());
     let status = if dry_run {
         command.arg("--dry-run").status().unwrap()
     } else {
@@ -369,7 +378,7 @@ async fn publish(krate: &Crate, dry_run: bool) -> bool {
     };
 
     if !status.success() {
-        println!("FAIL: failed to publish `{}`: {}", krate.name, status);
+        println!("FAIL: failed to publish `{}`: {}", name, status);
         return false;
     }
 
