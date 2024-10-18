@@ -125,7 +125,8 @@ struct Publish {
 }
 
 /// The main function.
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut all_crates: Vec<Rc<RefCell<Crate>>> = Vec::new();
     find_crates(".".as_ref(), &mut all_crates);
 
@@ -187,8 +188,14 @@ fn main() {
             // published. Failed-to-publish crates get enqueued for another try
             // later on.
             for _ in 0..3 {
-                all_crates.retain(|krate| !publish(&krate.borrow(), dry_run));
+                let mut retry = Vec::new();
+                for krate in all_crates {
+                    if !publish(&krate.borrow(), dry_run).await {
+                        retry.push(krate);
+                    }
+                }
 
+                all_crates = retry;
                 if all_crates.is_empty() {
                     break;
                 }
@@ -321,20 +328,20 @@ fn bump(version: &str, patch_bump: bool) -> String {
 }
 
 /// Publishes a crate.
-fn publish(krate: &Crate, dry_run: bool) -> bool {
+async fn publish(krate: &Crate, dry_run: bool) -> bool {
     if !SORTED_CRATES_TO_PUBLISH.iter().any(|s| *s == krate.name) {
         return true;
     }
 
     // First make sure the crate isn't already published at this version. This
     // binary may be re-run and there's no need to re-attempt previous work.
-    let client = reqwest::blocking::Client::new();
+    let client = reqwest::Client::new();
     let req = client
         .get(format!("https://crates.io/api/v1/crates/{}", krate.name))
         .header("User-Agent", "curl/8.7.1"); // crates.io requires a user agent apparently
-    let response = req.send().expect("failed to get crate info");
+    let response = req.send().await.expect("failed to get crate info");
     if response.status().is_success() {
-        let text = response.text().expect("failed to get response text");
+        let text = response.text().await.expect("failed to get response text");
         if text.contains(&format!("\"newest_version\":\"{}\"", krate.version)) {
             println!(
                 "skip publish {} because {} is latest version",
