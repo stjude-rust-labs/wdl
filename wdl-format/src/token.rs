@@ -52,6 +52,36 @@ impl<T: Token> TokenStream<T> {
             let _ = self.0.pop();
         }
     }
+
+    /// Returns the number of tokens in the stream.
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    /// Returns whether the stream is empty.
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    /// Returns an iterator over the tokens in the stream.
+    pub fn iter(&self) -> std::slice::Iter<'_, T> {
+        self.0.iter()
+    }
+
+    /// Clears the stream.
+    pub fn clear(&mut self) {
+        self.0.clear();
+    }
+
+    /// Drains the stream.
+    pub fn drain(&mut self) -> std::vec::Drain<'_, T> {
+        self.0.drain(..)
+    }
+
+    /// Extends the stream with the tokens from another stream.
+    pub fn extend(&mut self, other: Self) {
+        self.0.extend(other.0);
+    }
 }
 
 impl<T: Token> IntoIterator for TokenStream<T> {
@@ -64,7 +94,7 @@ impl<T: Token> IntoIterator for TokenStream<T> {
 }
 
 /// The kind of comment.
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Comment {
     /// A comment on its own line.
     Preceding(String),
@@ -73,7 +103,7 @@ pub enum Comment {
 }
 
 /// Trivia.
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Trivia {
     /// A blank line. This may be ignored by the postprocessor.
     BlankLine,

@@ -17,7 +17,7 @@ use crate::Trivia;
 /// [`PostToken`](super::PostToken)s by a
 /// [`Postprocessor`](super::Postprocessor) (authors of elements are never
 /// expected to write [`PostToken`](super::PostToken)s directly).
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum PreToken {
     /// A blank line.
     BlankLine,

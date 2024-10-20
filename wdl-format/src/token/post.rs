@@ -115,14 +115,24 @@ impl Postprocessor {
     /// Runs the postprocessor.
     pub fn run(&mut self, input: TokenStream<PreToken>) -> TokenStream<PostToken> {
         let mut output = TokenStream::<PostToken>::default();
+        let mut buffer = TokenStream::<PreToken>::default();
 
-        let mut stream = input.into_iter().peekable();
-        while let Some(token) = stream.next() {
-            self.step(token, stream.peek(), &mut output);
+        for token in input {
+            match token {
+                PreToken::LineEnd => {
+                    self.flush(&mut buffer, &mut output);
+                    self.trim_whitespace(&mut output);
+                    output.push(PostToken::Newline);
+
+                    buffer.clear();
+                    buffer.push(token);
+                    self.position = LinePosition::StartOfLine;
+                }
+                _ => {
+                    buffer.push(token);
+                }
+            }
         }
-
-        self.trim_whitespace(&mut output);
-        output.push(PostToken::Newline);
 
         output
     }
@@ -224,8 +234,18 @@ impl Postprocessor {
         }
     }
 
+    fn flush(&mut self, in_stream: &mut TokenStream<PreToken>, out_stream: &mut TokenStream<PostToken>) {
+        let mut post_buffer = TokenStream::<PostToken>::default();
+        let mut pre_buffer = in_stream.iter().peekable();
+        while let Some(token) = pre_buffer.next() {
+            let next = pre_buffer.peek().map(|t| *t);
+            self.step(token.clone(), next, &mut post_buffer);
+        }
+        out_stream.extend(post_buffer);
+    }
+
     /// Trims any and all whitespace from the end of the stream.
-    fn trim_whitespace(&mut self, stream: &mut TokenStream<PostToken>) {
+    fn trim_whitespace(&self, stream: &mut TokenStream<PostToken>) {
         stream.trim_while(|token| {
             matches!(
                 token,
@@ -235,7 +255,7 @@ impl Postprocessor {
     }
 
     /// Trims spaces and indents (and not newlines) from the end of the stream.
-    fn trim_last_line(&mut self, stream: &mut TokenStream<PostToken>) {
+    fn trim_last_line(&self, stream: &mut TokenStream<PostToken>) {
         stream.trim_while(|token| matches!(token, PostToken::Space | PostToken::Indent));
     }
 
@@ -255,7 +275,7 @@ impl Postprocessor {
 
     /// Pushes the current indentation level to the stream.
     /// This should only be called when the state is
-    /// [`LinePosition::StartOfLine`].
+    /// [`LinePosition::StartOfLine`]. This does not change the state.
     fn indent(&self, stream: &mut TokenStream<PostToken>) {
         assert!(self.position == LinePosition::StartOfLine);
 
@@ -273,7 +293,9 @@ impl Postprocessor {
     /// Creates a blank line and then indents.
     fn blank_line(&mut self, stream: &mut TokenStream<PostToken>) {
         self.trim_whitespace(stream);
-        stream.push(PostToken::Newline);
+        if !stream.is_empty() {
+            stream.push(PostToken::Newline);
+        }
         stream.push(PostToken::Newline);
         self.position = LinePosition::StartOfLine;
         self.indent(stream);
