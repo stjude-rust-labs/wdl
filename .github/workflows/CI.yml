@@ -53,7 +53,11 @@ jobs:
       - run: cargo doc
 
   gauntlet:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
       - name: Update Rust
@@ -61,7 +65,11 @@ jobs:
       - run: cargo run --release --bin gauntlet
 
   arena:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
       - name: Update Rust
