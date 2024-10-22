@@ -198,7 +198,7 @@ impl Value {
     /// Returns `None` if the value is not a `Array`.
     pub fn as_array(self, engine: &Engine) -> Option<&[Value]> {
         match self {
-            Self::Compound(_, id) => match &engine.values[id] {
+            Self::Compound(_, id) => match engine.value(id) {
                 CompoundValue::Array(elements) => Some(elements),
                 _ => None,
             },
@@ -213,7 +213,7 @@ impl Value {
     /// Panics if the value is not an `Array`.
     pub fn unwrap_array(self, engine: &Engine) -> &[Value] {
         match self {
-            Self::Compound(_, id) => match &engine.values[id] {
+            Self::Compound(_, id) => match engine.value(id) {
                 CompoundValue::Array(elements) => elements,
                 _ => panic!("value is not an array"),
             },
@@ -228,7 +228,7 @@ impl Value {
     pub fn as_str<'a>(&self, engine: &'a Engine) -> Option<&'a str> {
         match self {
             Self::String(sym) | Self::File(sym) | Self::Directory(sym) => {
-                engine.interner.resolve(*sym)
+                engine.interner().resolve(*sym)
             }
             _ => None,
         }
@@ -268,7 +268,7 @@ impl Value {
                         write!(
                             f,
                             "{v}",
-                            v = self.engine.values[id].display(self.engine, self.types)
+                            v = self.engine.value(id).display(self.engine, self.types)
                         )
                     }
                 }
@@ -279,6 +279,18 @@ impl Value {
             engine,
             types,
             value: *self,
+        }
+    }
+
+    /// Asserts that the value is valid for the given engine.
+    pub(crate) fn assert_valid(&self, engine: &Engine) {
+        match self {
+            Self::Boolean(_) | Self::Integer(_) | Self::Float(_) | Self::None => {}
+            Self::String(sym) | Self::File(sym) | Self::Directory(sym) => assert!(
+                engine.interner().resolve(*sym).is_some(),
+                "value goes from a different engine"
+            ),
+            Self::Compound(_, id) => engine.assert_same_arena(*id),
         }
     }
 }
@@ -347,8 +359,8 @@ impl Coercible for Value {
             }
             Self::Compound(ty, id) => {
                 if ty.is_coercible_to(types, &target) {
-                    let v = engine.values[*id].clone().coerce(engine, types, target)?;
-                    let id = engine.values.alloc(v);
+                    let v = engine.value(*id).clone().coerce(engine, types, target)?;
+                    let id = engine.alloc(v);
                     Some(Self::Compound(target, id))
                 } else {
                     None
@@ -549,7 +561,7 @@ impl Coercible for CompoundValue {
 
                     let mut members = IndexMap::new();
                     for (name, ty) in target.members() {
-                        let v = elements.get(&Value::String(engine.interner.get(name)?))?;
+                        let v = elements.get(&Value::String(engine.interner().get(name)?))?;
                         members.insert(name.clone(), v.coerce(engine, types, *ty)?);
                     }
 
