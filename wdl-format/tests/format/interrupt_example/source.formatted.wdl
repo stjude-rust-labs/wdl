@@ -6,7 +6,10 @@ workflow
     test  # should this be indented?
     # interrupt
 {
-    meta  # interrupt
-    {  # how far should this bracket be indented?
+        meta  # interrupt
+        {
+  # how far should this bracket be indented?
+
     }
+
 }

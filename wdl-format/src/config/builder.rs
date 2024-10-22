@@ -3,6 +3,9 @@
 use crate::Config;
 use crate::config::Indent;
 
+/// The default maximum line length.
+pub const DEFAULT_MAX_LINE_LENGTH: usize = 90;
+
 /// An error related to a [`Builder`].
 #[derive(Debug)]
 pub enum Error {
@@ -30,6 +33,8 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub struct Builder {
     /// The number of characters to indent.
     indent: Option<Indent>,
+    /// The maximum line length.
+    max_line_length: Option<usize>,
 }
 
 impl Builder {
@@ -52,8 +57,12 @@ impl Builder {
     /// Consumes `self` and attempts to build a [`Config`].
     pub fn try_build(self) -> Result<Config> {
         let indent = self.indent.ok_or(Error::Missing("indent"))?;
+        let max_line_length = self.max_line_length.unwrap_or(DEFAULT_MAX_LINE_LENGTH);
 
-        Ok(Config { indent })
+        Ok(Config {
+            indent,
+            max_line_length,
+        })
     }
 }
 
@@ -61,6 +70,7 @@ impl Default for Builder {
     fn default() -> Self {
         Self {
             indent: Some(Default::default()),
+            max_line_length: Some(90),
         }
     }
 }

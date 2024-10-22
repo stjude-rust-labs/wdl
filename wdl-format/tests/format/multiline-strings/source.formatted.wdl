@@ -3,7 +3,12 @@
 version 1.2
 
 workflow test {
-    String x = <<<
-    ~{"foobar"}
-    >>>
-}
+
+                String x = <<<
+                
+    ~{"foobar"
+                }
+    
+                >>>
+
+        }

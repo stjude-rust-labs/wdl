@@ -5,4 +5,5 @@ import "fileB.wdl" as foo
 import "fileC.wdl" alias qux as Qux
 
 workflow test {
+
 }

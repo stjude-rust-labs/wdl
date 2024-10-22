@@ -4,6 +4,7 @@ mod post;
 mod pre;
 
 use std::fmt::Display;
+use std::rc::Rc;
 
 pub use post::*;
 pub use pre::*;
@@ -53,11 +54,6 @@ impl<T: Token> TokenStream<T> {
         }
     }
 
-    /// Returns the number of tokens in the stream.
-    pub fn len(&self) -> usize {
-        self.0.len()
-    }
-
     /// Returns whether the stream is empty.
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
@@ -97,9 +93,9 @@ impl<T: Token> IntoIterator for TokenStream<T> {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Comment {
     /// A comment on its own line.
-    Preceding(String),
+    Preceding(Rc<String>),
     /// A comment on the same line as the code preceding it.
-    Inline(String),
+    Inline(Rc<String>),
 }
 
 /// Trivia.
