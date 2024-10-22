@@ -29,7 +29,7 @@ impl MaxLineLength {
     pub fn with_value(value: usize) -> Result<Self, Error> {
         let val = match value {
             0 => Self(None),
-            60..=200 => Self(Some(value)),
+            60..=240 => Self(Some(value)),
             _ => return Err(Error::Invalid("max_line_length")),
         };
         Ok(val)
