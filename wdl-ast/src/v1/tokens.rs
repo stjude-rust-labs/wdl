@@ -116,7 +116,7 @@ define_token!(OutputKeyword, "the `output` keyword", "output");
 define_token!(PairTypeKeyword, "the `Pair` type keyword", "Pair");
 define_token!(
     ParameterMetaKeyword,
-    "the `parameter_meta` type keyword",
+    "the `parameter_meta` keyword",
     "parameter_meta"
 );
 define_token!(Percent, "the `%` symbol", "%");
