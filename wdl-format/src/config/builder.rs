@@ -39,8 +39,14 @@ pub struct Builder {
 
 impl Builder {
     /// Creates a new builder with default values.
-    pub fn new() -> Self {
-        Default::default()
+    pub fn new(
+        indent: Option<Indent>,
+        max_line_length: Option<usize>,
+    ) -> Self {
+        Self {
+            indent,
+            max_line_length,
+        }
     }
 
     /// Sets the indentation level.
@@ -54,10 +60,21 @@ impl Builder {
         self
     }
 
+    /// Sets the maximum line length.
+    /// 
+    /// # Notes
+    /// 
+    /// This silently overwrites any previously provided value for the maximum
+    /// line length.
+    pub fn max_line_length(mut self, max_line_length: usize) -> Self {
+        self.max_line_length = Some(max_line_length);
+        self
+    }
+
     /// Consumes `self` and attempts to build a [`Config`].
     pub fn try_build(self) -> Result<Config> {
         let indent = self.indent.ok_or(Error::Missing("indent"))?;
-        let max_line_length = self.max_line_length.unwrap_or(DEFAULT_MAX_LINE_LENGTH);
+        let max_line_length = self.max_line_length.ok_or(Error::Missing("max_line_length"))?;
 
         Ok(Config {
             indent,
@@ -70,7 +87,7 @@ impl Default for Builder {
     fn default() -> Self {
         Self {
             indent: Some(Default::default()),
-            max_line_length: Some(90),
+            max_line_length: Some(DEFAULT_MAX_LINE_LENGTH),
         }
     }
 }
