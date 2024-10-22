@@ -4,7 +4,8 @@ use crate::AstToken;
 use crate::SyntaxKind;
 use crate::SyntaxToken;
 
-macro_rules! token_struct {
+/// Defines an AST token struct.
+macro_rules! define_token_struct {
     ($name:ident, $doc:literal) => {
         #[derive(Clone, Debug)]
         #[doc = concat!("A token representing ", $doc, ".")]
@@ -36,9 +37,10 @@ macro_rules! token_struct {
     };
 }
 
+/// Defines an AST token.
 macro_rules! define_token {
     ($name:ident, $doc:literal, $display:literal) => {
-        token_struct!($name, $doc);
+        define_token_struct!($name, $doc);
 
         impl std::fmt::Display for $name {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -47,7 +49,7 @@ macro_rules! define_token {
         }
     };
     ($name:ident, $doc:literal) => {
-        token_struct!($name, $doc);
+        define_token_struct!($name, $doc);
 
         impl std::fmt::Display for $name {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -72,7 +74,11 @@ define_token!(CloseParen, "the `)` symbol", ")");
 define_token!(Colon, "the `:` symbol", ":");
 define_token!(Comma, "the `,` symbol", ",");
 define_token!(CommandKeyword, "the `command` keyword", "command");
-define_token!(DirectoryTypeKeyword, "the `Directory` type keyword", "Directory");
+define_token!(
+    DirectoryTypeKeyword,
+    "the `Directory` type keyword",
+    "Directory"
+);
 define_token!(Dot, "the `.` symbol", ".");
 define_token!(DoubleQuote, "the `\"` symbol", "\"");
 define_token!(ElseKeyword, "the `else` keyword", "else");
@@ -108,12 +114,20 @@ define_token!(OpenHeredoc, "the `<<<` symbol", "<<<");
 define_token!(OpenParen, "the `(` symbol", "(");
 define_token!(OutputKeyword, "the `output` keyword", "output");
 define_token!(PairTypeKeyword, "the `Pair` type keyword", "Pair");
-define_token!(ParameterMetaKeyword, "the `parameter_meta` type keyword", "parameter_meta");
+define_token!(
+    ParameterMetaKeyword,
+    "the `parameter_meta` type keyword",
+    "parameter_meta"
+);
 define_token!(Percent, "the `%` symbol", "%");
 define_token!(PlaceholderOpen, "a `${` or `~{` symbol");
 define_token!(Plus, "the `+` symbol", "+");
 define_token!(QuestionMark, "the `?` symbol", "?");
-define_token!(RequirementsKeyword, "the `requirements` keyword", "requirements");
+define_token!(
+    RequirementsKeyword,
+    "the `requirements` keyword",
+    "requirements"
+);
 define_token!(RuntimeKeyword, "the `runtime` keyword", "runtime");
 define_token!(ScatterKeyword, "the `scatter` keyword", "scatter");
 define_token!(SingleQuote, "the `'` symbol", "'");
