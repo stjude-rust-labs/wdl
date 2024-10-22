@@ -9,6 +9,9 @@ use crate::config::MaxLineLength;
 pub enum Error {
     /// A required value was missing for a builder field.
     Missing(&'static str),
+
+    /// An invalid value was provided for a builder field.
+    Invalid(&'static str),
 }
 
 impl std::fmt::Display for Error {
@@ -17,6 +20,10 @@ impl std::fmt::Display for Error {
             Error::Missing(field) => write!(
                 f,
                 "missing required value for '{field}' in a formatter configuration builder"
+            ),
+            Error::Invalid(field) => write!(
+                f,
+                "invalid value for '{field}' in a formatter configuration builder"
             ),
         }
     }
@@ -37,11 +44,12 @@ pub struct Builder {
 
 impl Builder {
     /// Creates a new builder with default values.
-    pub fn new(indent: Option<Indent>, max_line_length: Option<MaxLineLength>) -> Self {
-        Self {
-            indent,
-            max_line_length,
-        }
+    pub fn new(indent: Option<Indent>, max_line_length: Option<MaxLineLength>) -> Result<Self> {
+        let indent = indent.unwrap_or_default();
+        let max_line_length = max_line_length.unwrap_or_default();
+        Ok(Self::default()
+            .indent(indent)?
+            .max_line_length(max_line_length))
     }
 
     /// Sets the indentation level.
@@ -50,9 +58,14 @@ impl Builder {
     ///
     /// This silently overwrites any previously provided value for the
     /// indentation level.
-    pub fn indent(mut self, indent: Indent) -> Self {
+    pub fn indent(mut self, indent: Indent) -> Result<Self> {
+        if let Indent::Spaces(n) = indent {
+            if n > 16 {
+                return Err(Error::Invalid("indent"));
+            }
+        }
         self.indent = Some(indent);
-        self
+        Ok(self)
     }
 
     /// Sets the maximum line length.

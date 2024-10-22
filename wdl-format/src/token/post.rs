@@ -66,10 +66,10 @@ impl Token for PostToken {
                     PostToken::Indent => {
                         let (c, n) = match self.config.indent() {
                             Indent::Spaces(n) => (' ', n),
-                            Indent::Tabs(n) => ('\t', n),
+                            Indent::Tabs => ('\t', 1),
                         };
 
-                        for _ in 0..n.get() {
+                        for _ in 0..n {
                             write!(f, "{c}")?;
                         }
 
@@ -93,10 +93,7 @@ impl PostToken {
         match self {
             Self::Space => SPACE.len(),
             Self::Newline => 0,
-            Self::Indent => match config.indent() {
-                Indent::Spaces(n) => n.get(),
-                Indent::Tabs(n) => n.get(),
-            },
+            Self::Indent => config.indent().num(),
             Self::Literal(value) => value.len(),
         }
     }
