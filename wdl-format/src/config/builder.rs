@@ -2,9 +2,7 @@
 
 use crate::Config;
 use crate::config::Indent;
-
-/// The default maximum line length.
-pub const DEFAULT_MAX_LINE_LENGTH: usize = 90;
+use crate::config::MaxLineLength;
 
 /// An error related to a [`Builder`].
 #[derive(Debug)]
@@ -34,15 +32,12 @@ pub struct Builder {
     /// The number of characters to indent.
     indent: Option<Indent>,
     /// The maximum line length.
-    max_line_length: Option<usize>,
+    max_line_length: Option<MaxLineLength>,
 }
 
 impl Builder {
     /// Creates a new builder with default values.
-    pub fn new(
-        indent: Option<Indent>,
-        max_line_length: Option<usize>,
-    ) -> Self {
+    pub fn new(indent: Option<Indent>, max_line_length: Option<MaxLineLength>) -> Self {
         Self {
             indent,
             max_line_length,
@@ -61,12 +56,12 @@ impl Builder {
     }
 
     /// Sets the maximum line length.
-    /// 
+    ///
     /// # Notes
-    /// 
+    ///
     /// This silently overwrites any previously provided value for the maximum
     /// line length.
-    pub fn max_line_length(mut self, max_line_length: usize) -> Self {
+    pub fn max_line_length(mut self, max_line_length: MaxLineLength) -> Self {
         self.max_line_length = Some(max_line_length);
         self
     }
@@ -74,7 +69,9 @@ impl Builder {
     /// Consumes `self` and attempts to build a [`Config`].
     pub fn try_build(self) -> Result<Config> {
         let indent = self.indent.ok_or(Error::Missing("indent"))?;
-        let max_line_length = self.max_line_length.ok_or(Error::Missing("max_line_length"))?;
+        let max_line_length = self
+            .max_line_length
+            .ok_or(Error::Missing("max_line_length"))?;
 
         Ok(Config {
             indent,
@@ -87,7 +84,7 @@ impl Default for Builder {
     fn default() -> Self {
         Self {
             indent: Some(Default::default()),
-            max_line_length: Some(DEFAULT_MAX_LINE_LENGTH),
+            max_line_length: Some(Default::default()),
         }
     }
 }

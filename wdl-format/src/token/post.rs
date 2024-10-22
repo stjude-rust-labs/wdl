@@ -296,11 +296,14 @@ impl Postprocessor {
             self.step(token.clone(), next, &mut post_buffer);
         }
 
-        if post_buffer.len(config) <= config.max_line_length() {
+        if config.max_line_length().is_none()
+            || post_buffer.len(config) <= config.max_line_length().unwrap()
+        {
             dbg!("no line breaks needed");
             out_stream.extend(post_buffer);
             return;
         }
+        let max_length = config.max_line_length().unwrap();
         dbg!("splitting line");
         dbg!("in_stream ={:#?}", &in_stream);
         dbg!("post_buffer ={:#?}", &post_buffer);
@@ -347,7 +350,7 @@ impl Postprocessor {
                 .rev()
                 .take_while(|t| *t != &PostToken::Newline)
                 .for_each(|t| last_line.push(t.clone()));
-            if last_line.len(config) <= config.max_line_length() {
+            if last_line.len(config) <= max_length {
                 break;
             }
         }
