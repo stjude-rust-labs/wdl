@@ -10,14 +10,21 @@ use wdl_analysis::types::CompoundTypeDef;
 use wdl_analysis::types::Type;
 use wdl_analysis::types::Types;
 
+use crate::Array;
 use crate::Coercible;
 use crate::CompoundValue;
 use crate::CompoundValueId;
+use crate::Map;
+use crate::Object;
+use crate::Pair;
+use crate::Struct;
 use crate::Value;
 
 /// Represents a WDL evaluation engine.
 #[derive(Debug, Default)]
 pub struct Engine {
+    /// The engine's type collection.
+    types: Types,
     /// The storage arena for compound values.
     values: Arena<CompoundValue>,
     /// The string interner used to intern string/file/directory values.
@@ -28,6 +35,16 @@ impl Engine {
     /// Constructs a new WDL evaluation engine.
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Gets the engine's type collection.
+    pub fn types(&self) -> &Types {
+        &self.types
+    }
+
+    /// Gets a mutable reference to the engine's type collection.
+    pub fn types_mut(&mut self) -> &mut Types {
+        &mut self.types
     }
 
     /// Creates a new `String` value.
@@ -52,27 +69,37 @@ impl Engine {
     ///
     /// # Panics
     ///
-    /// Panics if the given type is not a pair type.
+    /// Panics if the given type is not a pair type from this engine's types
+    /// collection or if any of the values are not from this engine.
     pub fn new_pair(
         &mut self,
-        types: &Types,
         ty: Type,
         left: impl Into<Value>,
         right: impl Into<Value>,
     ) -> Option<Value> {
         if let Type::Compound(compound_ty) = ty {
-            if let CompoundTypeDef::Pair(pair_ty) = types.type_definition(compound_ty.definition())
+            if let CompoundTypeDef::Pair(pair_ty) =
+                self.types.type_definition(compound_ty.definition())
             {
-                let left = left.into().coerce(self, types, pair_ty.left_type())?;
+                let left_ty = pair_ty.left_type();
+                let right_ty = pair_ty.right_type();
+
+                let left = left.into().coerce(self, left_ty)?;
                 left.assert_valid(self);
-                let right = right.into().coerce(self, types, pair_ty.right_type())?;
+                let right = right.into().coerce(self, right_ty)?;
                 right.assert_valid(self);
-                let id = self.values.alloc(CompoundValue::Pair(left, right));
-                return Some(Value::Compound(ty, id));
+
+                let id = self
+                    .values
+                    .alloc(CompoundValue::Pair(Pair::new(ty, left, right)));
+                return Some(Value::Compound(id));
             }
         }
 
-        panic!("type `{ty}` is not a pair type", ty = ty.display(types));
+        panic!(
+            "type `{ty}` is not a pair type",
+            ty = ty.display(&self.types)
+        );
     }
 
     /// Creates a new `Array` value for the given array type.
@@ -81,50 +108,59 @@ impl Engine {
     ///
     /// # Panics
     ///
-    /// Panics if the given type is not an array type.
-    pub fn new_array<V>(
-        &mut self,
-        types: &Types,
-        ty: Type,
-        elements: impl IntoIterator<Item = V>,
-    ) -> Option<Value>
+    /// Panics if the given type is not an array type from this engine's types
+    /// collection or if any of the values are not from this engine.
+    pub fn new_array<V>(&mut self, ty: Type, elements: impl IntoIterator<Item = V>) -> Option<Value>
     where
         V: Into<Value>,
     {
         if let Type::Compound(compound_ty) = ty {
             if let CompoundTypeDef::Array(array_ty) =
-                types.type_definition(compound_ty.definition())
+                self.types.type_definition(compound_ty.definition())
             {
+                let element_type = array_ty.element_type();
                 let elements = elements
                     .into_iter()
                     .map(|v| {
                         let v = v.into();
                         v.assert_valid(self);
-                        v.coerce(self, types, array_ty.element_type())
+                        v.coerce(self, element_type)
                     })
                     .collect::<Option<_>>()?;
-                let id = self.values.alloc(CompoundValue::Array(elements));
-                return Some(Value::Compound(ty, id));
+                let id = self
+                    .values
+                    .alloc(CompoundValue::Array(Array::new(ty, elements)));
+                return Some(Value::Compound(id));
             }
         }
 
-        panic!("type `{ty}` is not an array type", ty = ty.display(types));
+        panic!(
+            "type `{ty}` is not an array type",
+            ty = ty.display(&self.types)
+        );
     }
 
     /// Creates a new empty `Array` value for the given array type.
     ///
     /// # Panics
     ///
-    /// Panics if the given type is not an array type.
-    pub fn new_empty_array(&mut self, types: &Types, ty: Type) -> Value {
+    /// Panics if the given type is not an array type from this engine's types
+    /// collection.
+    pub fn new_empty_array(&mut self, ty: Type) -> Value {
         if let Type::Compound(compound_ty) = ty {
-            if let CompoundTypeDef::Array(_) = types.type_definition(compound_ty.definition()) {
-                let id = self.values.alloc(CompoundValue::Array(Vec::new().into()));
-                return Value::Compound(ty, id);
+            if let CompoundTypeDef::Array(_) = self.types.type_definition(compound_ty.definition())
+            {
+                let id = self
+                    .values
+                    .alloc(CompoundValue::Array(Array::new(ty, Vec::new().into())));
+                return Value::Compound(id);
             }
         }
 
-        panic!("type `{ty}` is not an array type", ty = ty.display(types));
+        panic!(
+            "type `{ty}` is not an array type",
+            ty = ty.display(&self.types)
+        );
     }
 
     /// Creates a new `Map` value.
@@ -134,10 +170,10 @@ impl Engine {
     ///
     /// # Panics
     ///
-    /// Panics if the given type is not an array type.
+    /// Panics if the given type is not a map type from this engine's types
+    /// collection or if any of the values are not from this engine.
     pub fn new_map<K, V>(
         &mut self,
-        types: &Types,
         ty: Type,
         elements: impl IntoIterator<Item = (K, V)>,
     ) -> Option<Value>
@@ -146,7 +182,12 @@ impl Engine {
         V: Into<Value>,
     {
         if let Type::Compound(compound_ty) = ty {
-            if let CompoundTypeDef::Map(map_ty) = types.type_definition(compound_ty.definition()) {
+            if let CompoundTypeDef::Map(map_ty) =
+                self.types.type_definition(compound_ty.definition())
+            {
+                let key_type = map_ty.key_type();
+                let value_type = map_ty.value_type();
+
                 let elements = elements
                     .into_iter()
                     .map(|(k, v)| {
@@ -154,44 +195,56 @@ impl Engine {
                         k.assert_valid(self);
                         let v = v.into();
                         v.assert_valid(self);
-                        Some((
-                            k.coerce(self, types, map_ty.key_type())?,
-                            v.coerce(self, types, map_ty.value_type())?,
-                        ))
+                        Some((k.coerce(self, key_type)?, v.coerce(self, value_type)?))
                     })
                     .collect::<Option<_>>()?;
-                let id = self.values.alloc(CompoundValue::Map(Arc::new(elements)));
-                return Some(Value::Compound(ty, id));
+                let id = self
+                    .values
+                    .alloc(CompoundValue::Map(Map::new(ty, Arc::new(elements))));
+                return Some(Value::Compound(id));
             }
         }
 
-        panic!("type `{ty}` is not a map type", ty = ty.display(types));
+        panic!(
+            "type `{ty}` is not a map type",
+            ty = ty.display(&self.types)
+        );
     }
 
     /// Creates a new `Object` value.
+    ///
+    /// # Panics
+    ///
+    /// Panics if any of the values are not from this engine.
     pub fn new_object<S, V>(&mut self, items: impl IntoIterator<Item = (S, V)>) -> Value
     where
         S: Into<String>,
         V: Into<Value>,
     {
-        let id = self.values.alloc(CompoundValue::Object(Arc::new(
-            items
-                .into_iter()
-                .map(|(n, v)| {
-                    let n = n.into();
-                    let v = v.into();
-                    v.assert_valid(self);
-                    (n, v)
-                })
-                .collect(),
-        )));
-        Value::Compound(Type::Object, id)
+        let id = self
+            .values
+            .alloc(CompoundValue::Object(Object::new(Arc::new(
+                items
+                    .into_iter()
+                    .map(|(n, v)| {
+                        let n = n.into();
+                        let v = v.into();
+                        v.assert_valid(self);
+                        (n, v)
+                    })
+                    .collect(),
+            ))));
+        Value::Compound(id)
     }
 
     /// Creates a new struct value.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the given type is not a struct type from this engine's types
+    /// collection or if any of the values are not from this engine.
     pub fn new_struct<S, V>(
         &mut self,
-        types: &Types,
         ty: Type,
         members: impl IntoIterator<Item = (S, V)>,
     ) -> Option<Value>
@@ -200,8 +253,7 @@ impl Engine {
         V: Into<Value>,
     {
         if let Type::Compound(compound_ty) = ty {
-            if let CompoundTypeDef::Struct(struct_ty) =
-                types.type_definition(compound_ty.definition())
+            if let CompoundTypeDef::Struct(_) = self.types.type_definition(compound_ty.definition())
             {
                 let members = members
                     .into_iter()
@@ -209,19 +261,30 @@ impl Engine {
                         let n = n.into();
                         let v = v.into();
                         v.assert_valid(self);
-                        let v = v.coerce(self, types, *struct_ty.members().get(&n)?)?;
+                        let v = v.coerce(
+                            self,
+                            *self
+                                .types
+                                .type_definition(compound_ty.definition())
+                                .as_struct()
+                                .expect("should be a struct")
+                                .members()
+                                .get(&n)?,
+                        )?;
                         Some((n, v))
                     })
                     .collect::<Option<_>>()?;
-                let id = self.values.alloc(CompoundValue::Struct(
-                    compound_ty.definition(),
-                    Arc::new(members),
-                ));
-                return Some(Value::Compound(ty, id));
+                let id = self
+                    .values
+                    .alloc(CompoundValue::Struct(Struct::new(ty, Arc::new(members))));
+                return Some(Value::Compound(id));
             }
         }
 
-        panic!("type `{ty}` is not a struct type", ty = ty.display(types));
+        panic!(
+            "type `{ty}` is not a struct type",
+            ty = ty.display(&self.types)
+        );
     }
 
     /// Gets a compound value given its identifier.

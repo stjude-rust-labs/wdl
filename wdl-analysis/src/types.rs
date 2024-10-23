@@ -1270,43 +1270,52 @@ impl Types {
     pub fn import(&mut self, types: &Self, ty: Type) -> Type {
         match ty {
             Type::Primitive(ty) => Type::Primitive(ty),
-            Type::Compound(ty) => match &types.0[ty.definition] {
-                CompoundTypeDef::Array(ty) => {
-                    let element_type = self.import(types, ty.element_type);
-                    self.add_array(ArrayType {
-                        element_type,
-                        non_empty: ty.non_empty,
-                    })
+            Type::Compound(ty) => {
+                // Check to see if the compound type already comes from this type collection
+                if DefaultArenaBehavior::arena_id(ty.definition())
+                    == DefaultArenaBehavior::arena_id(self.0.next_id())
+                {
+                    return Type::Compound(ty);
                 }
-                CompoundTypeDef::Pair(ty) => {
-                    let left_type = self.import(types, ty.left_type);
-                    let right_type = self.import(types, ty.right_type);
-                    self.add_pair(PairType {
-                        left_type,
-                        right_type,
-                    })
-                }
-                CompoundTypeDef::Map(ty) => {
-                    let value_type = self.import(types, ty.value_type);
-                    self.add_map(MapType {
-                        key_type: ty.key_type,
-                        value_type,
-                    })
-                }
-                CompoundTypeDef::Struct(ty) => {
-                    let members = ty
-                        .members
-                        .iter()
-                        .map(|(k, v)| (k.clone(), self.import(types, *v)))
-                        .collect();
 
-                    self.add_struct(StructType {
-                        name: ty.name.clone(),
-                        members,
-                    })
+                match &types.0[ty.definition] {
+                    CompoundTypeDef::Array(ty) => {
+                        let element_type = self.import(types, ty.element_type);
+                        self.add_array(ArrayType {
+                            element_type,
+                            non_empty: ty.non_empty,
+                        })
+                    }
+                    CompoundTypeDef::Pair(ty) => {
+                        let left_type = self.import(types, ty.left_type);
+                        let right_type = self.import(types, ty.right_type);
+                        self.add_pair(PairType {
+                            left_type,
+                            right_type,
+                        })
+                    }
+                    CompoundTypeDef::Map(ty) => {
+                        let value_type = self.import(types, ty.value_type);
+                        self.add_map(MapType {
+                            key_type: ty.key_type,
+                            value_type,
+                        })
+                    }
+                    CompoundTypeDef::Struct(ty) => {
+                        let members = ty
+                            .members
+                            .iter()
+                            .map(|(k, v)| (k.clone(), self.import(types, *v)))
+                            .collect();
+
+                        self.add_struct(StructType {
+                            name: ty.name.clone(),
+                            members,
+                        })
+                    }
+                    CompoundTypeDef::Call(_) => panic!("call types cannot be imported"),
                 }
-                CompoundTypeDef::Call(_) => panic!("call types cannot be imported"),
-            },
+            }
             Type::Object => Type::Object,
             Type::OptionalObject => Type::OptionalObject,
             Type::Union => Type::Union,

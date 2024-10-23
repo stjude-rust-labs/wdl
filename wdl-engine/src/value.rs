@@ -9,11 +9,9 @@ use ordered_float::OrderedFloat;
 use string_interner::symbol::SymbolU32;
 use wdl_analysis::types::Coercible as _;
 use wdl_analysis::types::CompoundTypeDef;
-use wdl_analysis::types::CompoundTypeDefId;
 use wdl_analysis::types::Optional;
 use wdl_analysis::types::PrimitiveTypeKind;
 use wdl_analysis::types::Type;
-use wdl_analysis::types::Types;
 
 use crate::Engine;
 
@@ -22,7 +20,12 @@ pub trait Coercible: Sized {
     /// Coerces the value into the given type.
     ///
     /// Returns `None` if the coercion is not supported.
-    fn coerce(&self, engine: &mut Engine, types: &Types, target: Type) -> Option<Self>;
+    ///
+    /// # Panics
+    ///
+    /// Panics if the provided target type is not from the given engine's type
+    /// collection.
+    fn coerce(&self, engine: &mut Engine, target: Type) -> Option<Self>;
 }
 
 /// Represents a WDL runtime value.
@@ -43,12 +46,12 @@ pub enum Value {
     /// The value is a literal `None` value.
     None,
     /// The value is a compound value.
-    Compound(Type, CompoundValueId),
+    Compound(CompoundValueId),
 }
 
 impl Value {
     /// Gets the type of the value.
-    pub fn ty(&self) -> Type {
+    pub fn ty(&self, engine: &Engine) -> Type {
         match self {
             Self::Boolean(_) => PrimitiveTypeKind::Boolean.into(),
             Self::Integer(_) => PrimitiveTypeKind::Integer.into(),
@@ -57,7 +60,7 @@ impl Value {
             Self::File(_) => PrimitiveTypeKind::File.into(),
             Self::Directory(_) => PrimitiveTypeKind::Directory.into(),
             Self::None => Type::None,
-            Self::Compound(ty, _) => *ty,
+            Self::Compound(id) => engine.value(*id).ty(),
         }
     }
 
@@ -193,13 +196,41 @@ impl Value {
         }
     }
 
+    /// Gets the value as a `Pair`.
+    ///
+    /// Returns `None` if the value is not a `Pair`.
+    pub fn as_pair(self, engine: &Engine) -> Option<&Pair> {
+        match self {
+            Self::Compound(id) => match engine.value(id) {
+                CompoundValue::Pair(v) => Some(v),
+                _ => None,
+            },
+            _ => None,
+        }
+    }
+
+    /// Unwraps the value into a `Pair`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the value is not a `Pair`.
+    pub fn unwrap_pair(self, engine: &Engine) -> &Pair {
+        match self {
+            Self::Compound(id) => match engine.value(id) {
+                CompoundValue::Pair(v) => v,
+                _ => panic!("value is not a pair"),
+            },
+            _ => panic!("value is not a pair"),
+        }
+    }
+
     /// Gets the value as an `Array`.
     ///
-    /// Returns `None` if the value is not a `Array`.
-    pub fn as_array(self, engine: &Engine) -> Option<&[Value]> {
+    /// Returns `None` if the value is not an `Array`.
+    pub fn as_array(self, engine: &Engine) -> Option<&Array> {
         match self {
-            Self::Compound(_, id) => match engine.value(id) {
-                CompoundValue::Array(elements) => Some(elements),
+            Self::Compound(id) => match engine.value(id) {
+                CompoundValue::Array(v) => Some(v),
                 _ => None,
             },
             _ => None,
@@ -211,13 +242,97 @@ impl Value {
     /// # Panics
     ///
     /// Panics if the value is not an `Array`.
-    pub fn unwrap_array(self, engine: &Engine) -> &[Value] {
+    pub fn unwrap_array(self, engine: &Engine) -> &Array {
         match self {
-            Self::Compound(_, id) => match engine.value(id) {
-                CompoundValue::Array(elements) => elements,
+            Self::Compound(id) => match engine.value(id) {
+                CompoundValue::Array(v) => v,
                 _ => panic!("value is not an array"),
             },
             _ => panic!("value is not an array"),
+        }
+    }
+
+    /// Gets the value as a `Map`.
+    ///
+    /// Returns `None` if the value is not a `Map`.
+    pub fn as_map(self, engine: &Engine) -> Option<&Map> {
+        match self {
+            Self::Compound(id) => match engine.value(id) {
+                CompoundValue::Map(v) => Some(v),
+                _ => None,
+            },
+            _ => None,
+        }
+    }
+
+    /// Unwraps the value into a `Map`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the value is not a `Map`.
+    pub fn unwrap_map(self, engine: &Engine) -> &Map {
+        match self {
+            Self::Compound(id) => match engine.value(id) {
+                CompoundValue::Map(v) => v,
+                _ => panic!("value is not a map"),
+            },
+            _ => panic!("value is not a map"),
+        }
+    }
+
+    /// Gets the value as an `Object`.
+    ///
+    /// Returns `None` if the value is not an `Object`.
+    pub fn as_object(self, engine: &Engine) -> Option<&Object> {
+        match self {
+            Self::Compound(id) => match engine.value(id) {
+                CompoundValue::Object(v) => Some(v),
+                _ => None,
+            },
+            _ => None,
+        }
+    }
+
+    /// Unwraps the value into an `Object`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the value is not an `Object`.
+    pub fn unwrap_object(self, engine: &Engine) -> &Object {
+        match self {
+            Self::Compound(id) => match engine.value(id) {
+                CompoundValue::Object(v) => v,
+                _ => panic!("value is not an object"),
+            },
+            _ => panic!("value is not an object"),
+        }
+    }
+
+    /// Gets the value as a `Struct`.
+    ///
+    /// Returns `None` if the value is not a `Struct`.
+    pub fn as_struct(self, engine: &Engine) -> Option<&Struct> {
+        match self {
+            Self::Compound(id) => match engine.value(id) {
+                CompoundValue::Struct(v) => Some(v),
+                _ => None,
+            },
+            _ => None,
+        }
+    }
+
+    /// Unwraps the value into a `Struct`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the value is not a `Map`.
+    pub fn unwrap_struct(self, engine: &Engine) -> &Struct {
+        match self {
+            Self::Compound(id) => match engine.value(id) {
+                CompoundValue::Struct(v) => v,
+                _ => panic!("value is not a struct"),
+            },
+            _ => panic!("value is not a struct"),
         }
     }
 
@@ -235,13 +350,11 @@ impl Value {
     }
 
     /// Used to display the value.
-    pub fn display<'a>(&'a self, engine: &'a Engine, types: &'a Types) -> impl fmt::Display + 'a {
+    pub fn display<'a>(&'a self, engine: &'a Engine) -> impl fmt::Display + 'a {
         /// Helper type for implementing display.
         struct Display<'a> {
             /// A reference to the engine.
             engine: &'a Engine,
-            /// A reference to the types collection.
-            types: &'a Types,
             /// The value to display.
             value: Value,
         }
@@ -264,12 +377,8 @@ impl Value {
                         )
                     }
                     Value::None => write!(f, "None"),
-                    Value::Compound(_, id) => {
-                        write!(
-                            f,
-                            "{v}",
-                            v = self.engine.value(id).display(self.engine, self.types)
-                        )
+                    Value::Compound(id) => {
+                        write!(f, "{v}", v = self.engine.value(id).display(self.engine))
                     }
                 }
             }
@@ -277,7 +386,6 @@ impl Value {
 
         Display {
             engine,
-            types,
             value: *self,
         }
     }
@@ -288,15 +396,15 @@ impl Value {
             Self::Boolean(_) | Self::Integer(_) | Self::Float(_) | Self::None => {}
             Self::String(sym) | Self::File(sym) | Self::Directory(sym) => assert!(
                 engine.interner().resolve(*sym).is_some(),
-                "value goes from a different engine"
+                "value comes from a different engine"
             ),
-            Self::Compound(_, id) => engine.assert_same_arena(*id),
+            Self::Compound(id) => engine.assert_same_arena(*id),
         }
     }
 }
 
 impl Coercible for Value {
-    fn coerce(&self, engine: &mut Engine, types: &Types, target: Type) -> Option<Self> {
+    fn coerce(&self, engine: &mut Engine, target: Type) -> Option<Self> {
         match self {
             Self::Boolean(v) => {
                 match target.as_primitive()?.kind() {
@@ -357,11 +465,14 @@ impl Coercible for Value {
                     None
                 }
             }
-            Self::Compound(ty, id) => {
-                if ty.is_coercible_to(types, &target) {
-                    let v = engine.value(*id).clone().coerce(engine, types, target)?;
-                    let id = engine.alloc(v);
-                    Some(Self::Compound(target, id))
+            Self::Compound(id) => {
+                if engine
+                    .value(*id)
+                    .ty()
+                    .is_coercible_to(engine.types(), &target)
+                {
+                    let v = engine.value(*id).clone().coerce(engine, target)?;
+                    Some(Self::Compound(engine.alloc(v)))
                 } else {
                     None
                 }
@@ -388,30 +499,347 @@ impl From<f64> for Value {
     }
 }
 
-/// Represents a compound value.
-#[derive(Debug, Clone)]
-pub enum CompoundValue {
-    /// The value is a `Pair` of values.
-    Pair(Value, Value),
-    /// The value is an `Array` of values.
-    Array(Arc<[Value]>),
-    /// The value is a `Map` of values.
-    Map(Arc<IndexMap<Value, Value>>),
-    /// The value is an `Object.`
-    Object(Arc<IndexMap<String, Value>>),
-    /// The value is a struct.
-    Struct(CompoundTypeDefId, Arc<IndexMap<String, Value>>),
+/// Represents a `Pair` value.
+#[derive(Debug, Clone, Copy)]
+pub struct Pair {
+    /// The type of the pair.
+    ty: Type,
+    /// The left value of the pair.
+    left: Value,
+    /// The right value of the pair.
+    right: Value,
 }
 
-impl CompoundValue {
+impl Pair {
+    /// Constructs a new `Pair` value.
+    pub(crate) fn new(ty: Type, left: Value, right: Value) -> Self {
+        Self { ty, left, right }
+    }
+
+    /// Gets the type of the `Pair`.
+    pub fn ty(&self) -> Type {
+        self.ty
+    }
+
+    /// Gets the left value of the `Pair`.
+    pub fn left(&self) -> Value {
+        self.left
+    }
+
+    /// Gets the right value of the `Pair`.
+    pub fn right(&self) -> Value {
+        self.right
+    }
+
     /// Used to display the value.
-    pub fn display<'a>(&'a self, engine: &'a Engine, types: &'a Types) -> impl fmt::Display + 'a {
+    pub fn display<'a>(&'a self, engine: &'a Engine) -> impl fmt::Display + 'a {
         /// Helper type for implementing display.
         struct Display<'a> {
             /// A reference to the engine.
             engine: &'a Engine,
-            /// A reference to the types collection.
-            types: &'a Types,
+            /// The value to display.
+            value: &'a Pair,
+        }
+
+        impl fmt::Display for Display<'_> {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                write!(
+                    f,
+                    "({left}, {right})",
+                    left = self.value.left.display(self.engine),
+                    right = self.value.right.display(self.engine)
+                )
+            }
+        }
+
+        Display {
+            engine,
+            value: self,
+        }
+    }
+}
+
+/// Represents an `Array` value.
+#[derive(Debug, Clone)]
+pub struct Array {
+    /// The type of the array.
+    ty: Type,
+    /// The array's elements.
+    elements: Arc<[Value]>,
+}
+
+impl Array {
+    /// Constructs a new `Array` value.
+    pub(crate) fn new(ty: Type, elements: Arc<[Value]>) -> Self {
+        Self { ty, elements }
+    }
+
+    /// Gets the type of the `Array` value.
+    pub fn ty(&self) -> Type {
+        self.ty
+    }
+
+    /// Gets the elements of the `Array` value.
+    pub fn elements(&self) -> &[Value] {
+        &self.elements
+    }
+
+    /// Used to display the value.
+    pub fn display<'a>(&'a self, engine: &'a Engine) -> impl fmt::Display + 'a {
+        /// Helper type for implementing display.
+        struct Display<'a> {
+            /// A reference to the engine.
+            engine: &'a Engine,
+            /// The value to display.
+            value: &'a Array,
+        }
+
+        impl fmt::Display for Display<'_> {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                write!(f, "[")?;
+
+                for (i, element) in self.value.elements.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+
+                    write!(f, "{element}", element = element.display(self.engine))?;
+                }
+
+                write!(f, "]")
+            }
+        }
+
+        Display {
+            engine,
+            value: self,
+        }
+    }
+}
+
+/// Represents a `Map` value.
+#[derive(Debug, Clone)]
+pub struct Map {
+    /// The type of the map value.
+    ty: Type,
+    /// The elements of the map value.
+    elements: Arc<IndexMap<Value, Value>>,
+}
+
+impl Map {
+    /// Constructs a new `Map` value.
+    pub(crate) fn new(ty: Type, elements: Arc<IndexMap<Value, Value>>) -> Self {
+        Self { ty, elements }
+    }
+
+    /// Gets the type of the `Map` value.
+    pub fn ty(&self) -> Type {
+        self.ty
+    }
+
+    /// Gets the elements of the `Map` value.
+    pub fn elements(&self) -> &IndexMap<Value, Value> {
+        &self.elements
+    }
+
+    /// Used to display the value.
+    pub fn display<'a>(&'a self, engine: &'a Engine) -> impl fmt::Display + 'a {
+        /// Helper type for implementing display.
+        struct Display<'a> {
+            /// A reference to the engine.
+            engine: &'a Engine,
+            /// The value to display.
+            value: &'a Map,
+        }
+
+        impl fmt::Display for Display<'_> {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                write!(f, "{{")?;
+
+                for (i, (k, v)) in self.value.elements.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+
+                    write!(
+                        f,
+                        "{k}: {v}",
+                        k = k.display(self.engine),
+                        v = v.display(self.engine)
+                    )?;
+                }
+
+                write!(f, "}}")
+            }
+        }
+
+        Display {
+            engine,
+            value: self,
+        }
+    }
+}
+
+/// Represents an `Object` value.
+#[derive(Debug, Clone)]
+pub struct Object {
+    /// The members of the object.
+    members: Arc<IndexMap<String, Value>>,
+}
+
+impl Object {
+    /// Constructs a new `Object` value.
+    pub(crate) fn new(members: Arc<IndexMap<String, Value>>) -> Self {
+        Self { members }
+    }
+
+    /// Gets the type of the `Object` value.
+    pub fn ty(&self) -> Type {
+        Type::Object
+    }
+
+    /// Gets the members of the `Object` value.
+    pub fn members(&self) -> &IndexMap<String, Value> {
+        &self.members
+    }
+
+    /// Used to display the value.
+    pub fn display<'a>(&'a self, engine: &'a Engine) -> impl fmt::Display + 'a {
+        /// Helper type for implementing display.
+        struct Display<'a> {
+            /// A reference to the engine.
+            engine: &'a Engine,
+            /// The value to display.
+            value: &'a Object,
+        }
+
+        impl fmt::Display for Display<'_> {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                write!(f, "object {{")?;
+
+                for (i, (k, v)) in self.value.members.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+
+                    write!(f, "{k}: {v}", v = v.display(self.engine))?;
+                }
+
+                write!(f, "}}")
+            }
+        }
+
+        Display {
+            engine,
+            value: self,
+        }
+    }
+}
+
+/// Represents a `Struct` value.
+#[derive(Debug, Clone)]
+pub struct Struct {
+    /// The type of the struct value.
+    ty: Type,
+    /// The members of the struct value.
+    members: Arc<IndexMap<String, Value>>,
+}
+
+impl Struct {
+    /// Constructs a new `Struct` value.
+    pub(crate) fn new(ty: Type, members: Arc<IndexMap<String, Value>>) -> Self {
+        Self { ty, members }
+    }
+
+    /// Gets the type of the `Struct` value.
+    pub fn ty(&self) -> Type {
+        self.ty
+    }
+
+    /// Gets the members of the `Struct` value.
+    pub fn members(&self) -> &IndexMap<String, Value> {
+        &self.members
+    }
+
+    /// Used to display the value.
+    pub fn display<'a>(&'a self, engine: &'a Engine) -> impl fmt::Display + 'a {
+        /// Helper type for implementing display.
+        struct Display<'a> {
+            /// A reference to the engine.
+            engine: &'a Engine,
+            /// The value to display.
+            value: &'a Struct,
+        }
+
+        impl fmt::Display for Display<'_> {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                write!(
+                    f,
+                    "{name} {{",
+                    name = self
+                        .engine
+                        .types()
+                        .type_definition(match self.value.ty {
+                            Type::Compound(ty) => ty.definition(),
+                            _ => unreachable!("expected a struct type"),
+                        })
+                        .as_struct()
+                        .expect("should be a struct")
+                        .name()
+                )?;
+
+                for (i, (k, v)) in self.value.members.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+
+                    write!(f, "{k}: {v}", v = v.display(self.engine))?;
+                }
+
+                write!(f, "}}")
+            }
+        }
+
+        Display {
+            engine,
+            value: self,
+        }
+    }
+}
+
+/// Represents a compound value.
+#[derive(Debug, Clone)]
+pub enum CompoundValue {
+    /// The value is a `Pair` of values.
+    Pair(Pair),
+    /// The value is an `Array` of values.
+    Array(Array),
+    /// The value is a `Map` of values.
+    Map(Map),
+    /// The value is an `Object.`
+    Object(Object),
+    /// The value is a struct.
+    Struct(Struct),
+}
+
+impl CompoundValue {
+    /// Gets the type of the compound value.
+    pub fn ty(&self) -> Type {
+        match self {
+            CompoundValue::Pair(v) => v.ty(),
+            CompoundValue::Array(v) => v.ty(),
+            CompoundValue::Map(v) => v.ty(),
+            CompoundValue::Object(v) => v.ty(),
+            CompoundValue::Struct(v) => v.ty(),
+        }
+    }
+
+    /// Used to display the value.
+    pub fn display<'a>(&'a self, engine: &'a Engine) -> impl fmt::Display + 'a {
+        /// Helper type for implementing display.
+        struct Display<'a> {
+            /// A reference to the engine.
+            engine: &'a Engine,
             /// The value to display.
             value: &'a CompoundValue,
         }
@@ -419,83 +847,20 @@ impl CompoundValue {
         impl fmt::Display for Display<'_> {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 match self.value {
-                    CompoundValue::Pair(left, right) => {
-                        write!(
-                            f,
-                            "({left}, {right})",
-                            left = left.display(self.engine, self.types),
-                            right = right.display(self.engine, self.types)
-                        )
+                    CompoundValue::Pair(v) => {
+                        write!(f, "{v}", v = v.display(self.engine))
                     }
-                    CompoundValue::Array(elements) => {
-                        write!(f, "[")?;
-
-                        for (i, element) in elements.iter().enumerate() {
-                            if i > 0 {
-                                write!(f, ", ")?;
-                            }
-
-                            write!(
-                                f,
-                                "{element}",
-                                element = element.display(self.engine, self.types)
-                            )?;
-                        }
-
-                        write!(f, "]")
+                    CompoundValue::Array(v) => {
+                        write!(f, "{v}", v = v.display(self.engine))
                     }
-                    CompoundValue::Map(elements) => {
-                        write!(f, "{{")?;
-
-                        for (i, (k, v)) in elements.iter().enumerate() {
-                            if i > 0 {
-                                write!(f, ", ")?;
-                            }
-
-                            write!(
-                                f,
-                                "{k}: {v}",
-                                k = k.display(self.engine, self.types),
-                                v = v.display(self.engine, self.types)
-                            )?;
-                        }
-
-                        write!(f, "}}")
+                    CompoundValue::Map(v) => {
+                        write!(f, "{v}", v = v.display(self.engine))
                     }
-                    CompoundValue::Object(elements) => {
-                        write!(f, "object {{")?;
-
-                        for (i, (k, v)) in elements.iter().enumerate() {
-                            if i > 0 {
-                                write!(f, ", ")?;
-                            }
-
-                            write!(f, "{k}: {v}", v = v.display(self.engine, self.types))?;
-                        }
-
-                        write!(f, "}}")
+                    CompoundValue::Object(v) => {
+                        write!(f, "{v}", v = v.display(self.engine))
                     }
-                    CompoundValue::Struct(id, members) => {
-                        write!(
-                            f,
-                            "{name} {{",
-                            name = self
-                                .types
-                                .type_definition(*id)
-                                .as_struct()
-                                .expect("should be a struct")
-                                .name()
-                        )?;
-
-                        for (i, (k, v)) in members.iter().enumerate() {
-                            if i > 0 {
-                                write!(f, ", ")?;
-                            }
-
-                            write!(f, "{k}: {v}", v = v.display(self.engine, self.types))?;
-                        }
-
-                        write!(f, "}}")
+                    CompoundValue::Struct(v) => {
+                        write!(f, "{v}", v = v.display(self.engine))
                     }
                 }
             }
@@ -503,128 +868,181 @@ impl CompoundValue {
 
         Display {
             engine,
-            types,
             value: self,
         }
     }
 }
 
 impl Coercible for CompoundValue {
-    fn coerce(&self, engine: &mut Engine, types: &Types, target: Type) -> Option<Self> {
-        if let Type::Compound(target) = target {
-            let id = target.definition();
-            return match (self, types.type_definition(id)) {
+    fn coerce(&self, engine: &mut Engine, target: Type) -> Option<Self> {
+        if let Type::Compound(compound_ty) = target {
+            return match (
+                self,
+                engine.types().type_definition(compound_ty.definition()),
+            ) {
                 // Array[X] -> Array[Y](+) where X -> Y
-                (Self::Array(elements), CompoundTypeDef::Array(target)) => {
+                (Self::Array(v), CompoundTypeDef::Array(array_ty)) => {
                     // Don't allow coercion when the source is empty but the target has the
                     // non-empty qualifier
-                    if target.is_non_empty() && elements.is_empty() {
+                    if array_ty.is_non_empty() && v.elements.is_empty() {
                         return None;
                     }
 
-                    let element_type = target.element_type();
-                    Some(Self::Array(
-                        elements
+                    let element_type = array_ty.element_type();
+                    Some(Self::Array(Array::new(
+                        target,
+                        v.elements
                             .iter()
-                            .map(|e| e.coerce(engine, types, element_type))
+                            .map(|e| e.coerce(engine, element_type))
                             .collect::<Option<_>>()?,
-                    ))
+                    )))
                 }
                 // Map[W, Y] -> Map[X, Z] where W -> X and Y -> Z
-                (Self::Map(elements), CompoundTypeDef::Map(target)) => {
-                    let key_type = target.key_type();
-                    let value_type = target.value_type();
-                    Some(Self::Map(Arc::new(
-                        elements
-                            .iter()
-                            .map(|(k, v)| {
-                                let k = k.coerce(engine, types, key_type);
-                                let v = v.coerce(engine, types, value_type);
-                                Some((k?, v?))
-                            })
-                            .collect::<Option<_>>()?,
+                (Self::Map(v), CompoundTypeDef::Map(map_ty)) => {
+                    let key_type = map_ty.key_type();
+                    let value_type = map_ty.value_type();
+                    Some(Self::Map(Map::new(
+                        target,
+                        Arc::new(
+                            v.elements
+                                .iter()
+                                .map(|(k, v)| {
+                                    let k = k.coerce(engine, key_type);
+                                    let v = v.coerce(engine, value_type);
+                                    Some((k?, v?))
+                                })
+                                .collect::<Option<_>>()?,
+                        ),
                     )))
                 }
                 // Pair[W, Y] -> Pair[X, Z] where W -> X and Y -> Z
-                (Self::Pair(left, right), CompoundTypeDef::Pair(target)) => {
-                    let left_type = target.left_type();
-                    let right_type = target.right_type();
-                    let left = left.coerce(engine, types, left_type)?;
-                    let right = right.coerce(engine, types, right_type)?;
-                    Some(Self::Pair(left, right))
+                (Self::Pair(v), CompoundTypeDef::Pair(pair_ty)) => {
+                    let left_type = pair_ty.left_type();
+                    let right_type: Type = pair_ty.right_type();
+                    let left = v.left.coerce(engine, left_type)?;
+                    let right = v.right.coerce(engine, right_type)?;
+                    Some(Self::Pair(Pair::new(target, left, right)))
                 }
                 // Map[String, Y] -> Struct
-                (Self::Map(elements), CompoundTypeDef::Struct(target)) => {
-                    if elements.len() != target.members().len() {
+                (Self::Map(v), CompoundTypeDef::Struct(_)) => {
+                    if v.elements.len()
+                        != engine
+                            .types()
+                            .type_definition(compound_ty.definition())
+                            .as_struct()
+                            .expect("should be struct")
+                            .members()
+                            .len()
+                    {
                         return None;
                     }
 
-                    let mut members = IndexMap::new();
-                    for (name, ty) in target.members() {
-                        let v = elements.get(&Value::String(engine.interner().get(name)?))?;
-                        members.insert(name.clone(), v.coerce(engine, types, *ty)?);
-                    }
+                    let members = v
+                        .elements
+                        .iter()
+                        .map(|(k, v)| {
+                            let k = k.as_str(engine)?.to_string();
+                            let ty = *engine
+                                .types()
+                                .type_definition(compound_ty.definition())
+                                .as_struct()
+                                .expect("should be struct")
+                                .members()
+                                .get(&k)?;
+                            let v = v.coerce(engine, ty)?;
+                            Some((k, v))
+                        })
+                        .collect::<Option<_>>()?;
 
-                    Some(Self::Struct(id, Arc::new(members)))
+                    Some(Self::Struct(Struct::new(target, Arc::new(members))))
                 }
                 // Struct -> Map[String, Y]
                 // Object -> Map[String, Y]
-                (Self::Struct(_, elements), CompoundTypeDef::Map(target))
-                | (Self::Object(elements), CompoundTypeDef::Map(target)) => {
-                    if target.key_type().as_primitive() != Some(PrimitiveTypeKind::String.into()) {
+                (Self::Struct(Struct { members, .. }), CompoundTypeDef::Map(map_ty))
+                | (Self::Object(Object { members }), CompoundTypeDef::Map(map_ty)) => {
+                    if map_ty.key_type().as_primitive() != Some(PrimitiveTypeKind::String.into()) {
                         return None;
                     }
 
-                    let value_ty = target.value_type();
-                    Some(Self::Map(Arc::new(
-                        elements
-                            .iter()
-                            .map(|(n, v)| {
-                                let v = v.coerce(engine, types, value_ty)?;
-                                Some((engine.new_string(n), v))
-                            })
-                            .collect::<Option<_>>()?,
-                    )))
-                }
-                // Object -> Struct
-                (Self::Object(elements), CompoundTypeDef::Struct(target)) => {
-                    if elements.len() != target.members().len() {
-                        return None;
-                    }
-
-                    Some(Self::Struct(
-                        id,
-                        Arc::new(
-                            elements
-                                .iter()
-                                .map(|(k, v)| {
-                                    let ty = target.members().get(k)?;
-                                    let v = v.coerce(engine, types, *ty)?;
-                                    Some((k.clone(), v))
-                                })
-                                .collect::<Option<_>>()?,
-                        ),
-                    ))
-                }
-                // Struct -> Struct
-                (Self::Struct(_, members), CompoundTypeDef::Struct(target)) => {
-                    if members.len() != target.members().len() {
-                        return None;
-                    }
-
-                    Some(Self::Struct(
-                        id,
+                    let value_ty = map_ty.value_type();
+                    Some(Self::Map(Map::new(
+                        target,
                         Arc::new(
                             members
                                 .iter()
-                                .map(|(k, v)| {
-                                    let ty = target.members().get(k)?;
-                                    let v = v.coerce(engine, types, *ty)?;
-                                    Some((k.clone(), v))
+                                .map(|(n, v)| {
+                                    let v = v.coerce(engine, value_ty)?;
+                                    Some((engine.new_string(n), v))
                                 })
                                 .collect::<Option<_>>()?,
                         ),
-                    ))
+                    )))
+                }
+                // Object -> Struct
+                (Self::Object(v), CompoundTypeDef::Struct(_)) => {
+                    if v.members.len()
+                        != engine
+                            .types()
+                            .type_definition(compound_ty.definition())
+                            .as_struct()
+                            .expect("should be struct")
+                            .members()
+                            .len()
+                    {
+                        return None;
+                    }
+
+                    let members = Arc::new(
+                        v.members
+                            .iter()
+                            .map(|(k, v)| {
+                                let ty = engine
+                                    .types()
+                                    .type_definition(compound_ty.definition())
+                                    .as_struct()
+                                    .expect("should be struct")
+                                    .members()
+                                    .get(k)?;
+                                let v = v.coerce(engine, *ty)?;
+                                Some((k.clone(), v))
+                            })
+                            .collect::<Option<_>>()?,
+                    );
+
+                    Some(Self::Struct(Struct::new(target, members)))
+                }
+                // Struct -> Struct
+                (Self::Struct(v), CompoundTypeDef::Struct(_)) => {
+                    if v.members.len()
+                        != engine
+                            .types()
+                            .type_definition(compound_ty.definition())
+                            .as_struct()
+                            .expect("should be struct")
+                            .members()
+                            .len()
+                    {
+                        return None;
+                    }
+
+                    let members = Arc::new(
+                        v.members
+                            .iter()
+                            .map(|(k, v)| {
+                                let ty = engine
+                                    .types()
+                                    .type_definition(compound_ty.definition())
+                                    .as_struct()
+                                    .expect("should be struct")
+                                    .members()
+                                    .get(k)?;
+                                let v = v.coerce(engine, *ty)?;
+                                Some((k.clone(), v))
+                            })
+                            .collect::<Option<_>>()?,
+                    );
+
+                    Some(Self::Struct(Struct::new(target, members)))
                 }
                 _ => None,
             };
@@ -633,17 +1051,17 @@ impl Coercible for CompoundValue {
         if let Type::Object = target {
             return match self {
                 // Map[String, Y] -> Object
-                Self::Map(elements) => Some(Self::Object(Arc::new(
-                    elements
+                Self::Map(v) => Some(Self::Object(Object::new(Arc::new(
+                    v.elements
                         .iter()
                         .map(|(k, v)| {
                             let k = k.as_string(engine)?.to_string();
                             Some((k, *v))
                         })
                         .collect::<Option<_>>()?,
-                ))),
+                )))),
                 // Struct -> Object
-                Self::Struct(_, elements) => Some(Self::Object(elements.clone())),
+                Self::Struct(v) => Some(Self::Object(Object::new(v.members.clone()))),
                 _ => None,
             };
         }
@@ -668,16 +1086,15 @@ mod test {
     #[test]
     fn boolean_coercion() {
         let mut engine = Engine::default();
-        let types = Types::default();
 
         // Boolean -> Boolean
         assert_eq!(
-            Value::from(false).coerce(&mut engine, &types, PrimitiveTypeKind::Boolean.into()),
+            Value::from(false).coerce(&mut engine, PrimitiveTypeKind::Boolean.into()),
             Some(Value::from(false))
         );
         // Boolean -> String (invalid)
         assert_eq!(
-            Value::from(true).coerce(&mut engine, &types, PrimitiveTypeKind::String.into()),
+            Value::from(true).coerce(&mut engine, PrimitiveTypeKind::String.into()),
             None
         );
     }
@@ -685,36 +1102,28 @@ mod test {
     #[test]
     fn boolean_display() {
         let engine = Engine::default();
-        let types = Types::default();
 
-        assert_eq!(
-            Value::from(false).display(&engine, &types).to_string(),
-            "false"
-        );
-        assert_eq!(
-            Value::from(true).display(&engine, &types).to_string(),
-            "true"
-        );
+        assert_eq!(Value::from(false).display(&engine).to_string(), "false");
+        assert_eq!(Value::from(true).display(&engine).to_string(), "true");
     }
 
     #[test]
     fn integer_coercion() {
         let mut engine = Engine::default();
-        let types = Types::default();
 
         // Int -> Int
         assert_eq!(
-            Value::from(12345).coerce(&mut engine, &types, PrimitiveTypeKind::Integer.into()),
+            Value::from(12345).coerce(&mut engine, PrimitiveTypeKind::Integer.into()),
             Some(Value::from(12345))
         );
         // Int -> Float
         assert_eq!(
-            Value::from(12345).coerce(&mut engine, &types, PrimitiveTypeKind::Float.into()),
+            Value::from(12345).coerce(&mut engine, PrimitiveTypeKind::Float.into()),
             Some(Value::from(12345.0))
         );
         // Int -> Boolean (invalid)
         assert_eq!(
-            Value::from(12345).coerce(&mut engine, &types, PrimitiveTypeKind::Boolean.into()),
+            Value::from(12345).coerce(&mut engine, PrimitiveTypeKind::Boolean.into()),
             None
         );
     }
@@ -722,31 +1131,23 @@ mod test {
     #[test]
     fn integer_display() {
         let engine = Engine::default();
-        let types = Types::default();
 
-        assert_eq!(
-            Value::from(12345).display(&engine, &types).to_string(),
-            "12345"
-        );
-        assert_eq!(
-            Value::from(-12345).display(&engine, &types).to_string(),
-            "-12345"
-        );
+        assert_eq!(Value::from(12345).display(&engine).to_string(), "12345");
+        assert_eq!(Value::from(-12345).display(&engine).to_string(), "-12345");
     }
 
     #[test]
     fn float_coercion() {
         let mut engine = Engine::default();
-        let types = Types::default();
 
         // Float -> Float
         assert_eq!(
-            Value::from(12345.0).coerce(&mut engine, &types, PrimitiveTypeKind::Float.into()),
+            Value::from(12345.0).coerce(&mut engine, PrimitiveTypeKind::Float.into()),
             Some(Value::from(12345.0))
         );
         // Float -> Int (invalid)
         assert_eq!(
-            Value::from(12345.0).coerce(&mut engine, &types, PrimitiveTypeKind::Integer.into()),
+            Value::from(12345.0).coerce(&mut engine, PrimitiveTypeKind::Integer.into()),
             None
         );
     }
@@ -754,18 +1155,13 @@ mod test {
     #[test]
     fn float_display() {
         let engine = Engine::default();
-        let types = Types::default();
 
         assert_eq!(
-            Value::from(12345.12345)
-                .display(&engine, &types)
-                .to_string(),
+            Value::from(12345.12345).display(&engine).to_string(),
             "12345.12345"
         );
         assert_eq!(
-            Value::from(-12345.12345)
-                .display(&engine, &types)
-                .to_string(),
+            Value::from(-12345.12345).display(&engine).to_string(),
             "-12345.12345"
         );
     }
@@ -773,7 +1169,6 @@ mod test {
     #[test]
     fn string_coercion() {
         let mut engine = Engine::default();
-        let types = Types::default();
 
         let value = engine.new_string("foo");
         let sym = match value {
@@ -783,22 +1178,22 @@ mod test {
 
         // String -> String
         assert_eq!(
-            value.coerce(&mut engine, &types, PrimitiveTypeKind::String.into()),
+            value.coerce(&mut engine, PrimitiveTypeKind::String.into()),
             Some(value)
         );
         // String -> File
         assert_eq!(
-            value.coerce(&mut engine, &types, PrimitiveTypeKind::File.into()),
+            value.coerce(&mut engine, PrimitiveTypeKind::File.into()),
             Some(Value::File(sym))
         );
         // String -> Directory
         assert_eq!(
-            value.coerce(&mut engine, &types, PrimitiveTypeKind::Directory.into()),
+            value.coerce(&mut engine, PrimitiveTypeKind::Directory.into()),
             Some(Value::Directory(sym))
         );
         // String -> Boolean (invalid)
         assert_eq!(
-            value.coerce(&mut engine, &types, PrimitiveTypeKind::Boolean.into()),
+            value.coerce(&mut engine, PrimitiveTypeKind::Boolean.into()),
             None
         );
     }
@@ -806,19 +1201,14 @@ mod test {
     #[test]
     fn string_display() {
         let mut engine = Engine::default();
-        let types = Types::default();
 
         let value = engine.new_string("hello world!");
-        assert_eq!(
-            value.display(&engine, &types).to_string(),
-            "\"hello world!\""
-        );
+        assert_eq!(value.display(&engine).to_string(), "\"hello world!\"");
     }
 
     #[test]
     fn file_coercion() {
         let mut engine = Engine::default();
-        let types = Types::default();
 
         let value = engine.new_file("foo");
         let sym = match value {
@@ -828,17 +1218,17 @@ mod test {
 
         // File -> File
         assert_eq!(
-            value.coerce(&mut engine, &types, PrimitiveTypeKind::File.into()),
+            value.coerce(&mut engine, PrimitiveTypeKind::File.into()),
             Some(value)
         );
         // File -> String
         assert_eq!(
-            value.coerce(&mut engine, &types, PrimitiveTypeKind::String.into()),
+            value.coerce(&mut engine, PrimitiveTypeKind::String.into()),
             Some(Value::String(sym))
         );
         // File -> Directory (invalid)
         assert_eq!(
-            value.coerce(&mut engine, &types, PrimitiveTypeKind::Directory.into()),
+            value.coerce(&mut engine, PrimitiveTypeKind::Directory.into()),
             None
         );
     }
@@ -846,19 +1236,14 @@ mod test {
     #[test]
     fn file_display() {
         let mut engine = Engine::default();
-        let types = Types::default();
 
         let value = engine.new_file("/foo/bar/baz.txt");
-        assert_eq!(
-            value.display(&engine, &types).to_string(),
-            "\"/foo/bar/baz.txt\""
-        );
+        assert_eq!(value.display(&engine).to_string(), "\"/foo/bar/baz.txt\"");
     }
 
     #[test]
     fn directory_coercion() {
         let mut engine = Engine::default();
-        let types = Types::default();
 
         let value = engine.new_directory("foo");
         let sym = match value {
@@ -868,17 +1253,17 @@ mod test {
 
         // Directory -> Directory
         assert_eq!(
-            value.coerce(&mut engine, &types, PrimitiveTypeKind::Directory.into()),
+            value.coerce(&mut engine, PrimitiveTypeKind::Directory.into()),
             Some(value)
         );
         // Directory -> String
         assert_eq!(
-            value.coerce(&mut engine, &types, PrimitiveTypeKind::String.into()),
+            value.coerce(&mut engine, PrimitiveTypeKind::String.into()),
             Some(Value::String(sym))
         );
         // Directory -> File (invalid)
         assert_eq!(
-            value.coerce(&mut engine, &types, PrimitiveTypeKind::File.into()),
+            value.coerce(&mut engine, PrimitiveTypeKind::File.into()),
             None
         );
     }
@@ -886,25 +1271,19 @@ mod test {
     #[test]
     fn directory_display() {
         let mut engine = Engine::default();
-        let types = Types::default();
 
         let value = engine.new_file("/foo/bar/baz");
-        assert_eq!(
-            value.display(&engine, &types).to_string(),
-            "\"/foo/bar/baz\""
-        );
+        assert_eq!(value.display(&engine).to_string(), "\"/foo/bar/baz\"");
     }
 
     #[test]
     fn none_coercion() {
         let mut engine = Engine::default();
-        let types = Types::default();
 
         // None -> String?
         assert_eq!(
             Value::None.coerce(
                 &mut engine,
-                &types,
                 Type::from(PrimitiveTypeKind::String).optional()
             ),
             Some(Value::None)
@@ -912,7 +1291,7 @@ mod test {
 
         // None -> String (invalid)
         assert_eq!(
-            Value::None.coerce(&mut engine, &types, PrimitiveTypeKind::String.into()),
+            Value::None.coerce(&mut engine, PrimitiveTypeKind::String.into()),
             None
         );
     }
@@ -920,36 +1299,38 @@ mod test {
     #[test]
     fn none_display() {
         let engine = Engine::default();
-        let types = Types::default();
 
-        assert_eq!(Value::None.display(&engine, &types).to_string(), "None");
+        assert_eq!(Value::None.display(&engine).to_string(), "None");
     }
 
     #[test]
     fn array_coercion() {
         let mut engine = Engine::default();
-        let mut types = Types::default();
 
-        let src_ty = types.add_array(ArrayType::new(PrimitiveTypeKind::Integer));
-        let target_ty = types.add_array(ArrayType::new(PrimitiveTypeKind::Float));
+        let src_ty = engine
+            .types_mut()
+            .add_array(ArrayType::new(PrimitiveTypeKind::Integer));
+        let target_ty = engine
+            .types_mut()
+            .add_array(ArrayType::new(PrimitiveTypeKind::Float));
 
         // Array[Int] -> Array[Float]
         let src = engine
-            .new_array(&types, src_ty, [1, 2, 3])
+            .new_array(src_ty, [1, 2, 3])
             .expect("should create array value");
-        let target = src
-            .coerce(&mut engine, &types, target_ty)
-            .expect("should coerce");
-        assert_eq!(target.unwrap_array(&engine), &[
+        let target = src.coerce(&mut engine, target_ty).expect("should coerce");
+        assert_eq!(target.unwrap_array(&engine).elements(), &[
             1.0.into(),
             2.0.into(),
             3.0.into()
         ]);
 
         // Array[Int] -> Array[String] (invalid)
-        let target_ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
+        let target_ty = engine
+            .types_mut()
+            .add_array(ArrayType::new(PrimitiveTypeKind::String));
         assert!(
-            src.coerce(&mut engine, &types, target_ty).is_none(),
+            src.coerce(&mut engine, target_ty).is_none(),
             "should not coerce"
         );
     }
@@ -957,25 +1338,26 @@ mod test {
     #[test]
     fn non_empty_array_coercion() {
         let mut engine = Engine::default();
-        let mut types = Types::default();
 
-        let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::String));
-        let target_ty = types.add_array(ArrayType::non_empty(PrimitiveTypeKind::String));
+        let ty = engine
+            .types_mut()
+            .add_array(ArrayType::new(PrimitiveTypeKind::String));
+        let target_ty = engine
+            .types_mut()
+            .add_array(ArrayType::non_empty(PrimitiveTypeKind::String));
 
         // Array[String] (non-empty) -> Array[String]+
         let string = engine.new_string("foo");
-        let value = engine
-            .new_array(&types, ty, [string])
-            .expect("should create array");
+        let value = engine.new_array(ty, [string]).expect("should create array");
         assert!(
-            value.coerce(&mut engine, &types, target_ty).is_some(),
+            value.coerce(&mut engine, target_ty).is_some(),
             "should coerce"
         );
 
         // Array[String] (empty) -> Array[String]+ (invalid)
-        let value = engine.new_empty_array(&types, ty);
+        let value = engine.new_empty_array(ty);
         assert!(
-            value.coerce(&mut engine, &types, target_ty).is_none(),
+            value.coerce(&mut engine, target_ty).is_none(),
             "should not coerce"
         );
     }
@@ -983,84 +1365,80 @@ mod test {
     #[test]
     fn array_display() {
         let mut engine = Engine::default();
-        let mut types = Types::default();
 
-        let ty = types.add_array(ArrayType::new(PrimitiveTypeKind::Integer));
+        let ty = engine
+            .types_mut()
+            .add_array(ArrayType::new(PrimitiveTypeKind::Integer));
         let value = engine
-            .new_array(&types, ty, [1, 2, 3])
+            .new_array(ty, [1, 2, 3])
             .expect("should create array value");
 
-        assert_eq!(value.display(&engine, &types).to_string(), "[1, 2, 3]");
+        assert_eq!(value.display(&engine).to_string(), "[1, 2, 3]");
     }
 
     #[test]
     fn map_coerce() {
         let mut engine = Engine::default();
-        let mut types = Types::default();
 
         let key1 = engine.new_file("foo");
         let value1 = engine.new_string("bar");
         let key2 = engine.new_file("baz");
         let value2 = engine.new_string("qux");
 
-        let ty = types.add_map(MapType::new(
+        let ty = engine.types_mut().add_map(MapType::new(
             PrimitiveTypeKind::File,
             PrimitiveTypeKind::String,
         ));
         let value = engine
-            .new_map(&types, ty, [(key1, value1), (key2, value2)])
+            .new_map(ty, [(key1, value1), (key2, value2)])
             .expect("should create map value");
 
         // Map[File, String] -> Map[String, File]
-        let ty = types.add_map(MapType::new(
+        let ty = engine.types_mut().add_map(MapType::new(
             PrimitiveTypeKind::String,
             PrimitiveTypeKind::File,
         ));
-        let value = value
-            .coerce(&mut engine, &types, ty)
-            .expect("value should coerce");
+        let value = value.coerce(&mut engine, ty).expect("value should coerce");
         assert_eq!(
-            value.display(&engine, &types).to_string(),
+            value.display(&engine).to_string(),
             r#"{"foo": "bar", "baz": "qux"}"#
         );
 
         // Map[String, File] -> Map[Int, File] (invalid)
-        let ty = types.add_map(MapType::new(
+        let ty = engine.types_mut().add_map(MapType::new(
             PrimitiveTypeKind::Integer,
             PrimitiveTypeKind::File,
         ));
         assert!(
-            value.coerce(&mut engine, &types, ty).is_none(),
+            value.coerce(&mut engine, ty).is_none(),
             "value should not coerce"
         );
 
         // Map[String, File] -> Struct
-        let ty = types.add_struct(StructType::new("Foo", [
+        let ty = engine.types_mut().add_struct(StructType::new("Foo", [
             ("foo", PrimitiveTypeKind::File),
             ("baz", PrimitiveTypeKind::File),
         ]));
-        let struct_value = value
-            .coerce(&mut engine, &types, ty)
-            .expect("value should coerce");
+        let struct_value = value.coerce(&mut engine, ty).expect("value should coerce");
         assert_eq!(
-            struct_value.display(&engine, &types).to_string(),
+            struct_value.display(&engine).to_string(),
             r#"Foo {foo: "bar", baz: "qux"}"#
         );
 
         // Map[String, File] -> Struct (invalid)
-        let ty = types.add_struct(StructType::new("Foo", [
+        let ty = engine.types_mut().add_struct(StructType::new("Foo", [
             ("foo", PrimitiveTypeKind::File),
             ("baz", PrimitiveTypeKind::File),
             ("qux", PrimitiveTypeKind::File),
         ]));
-        assert!(value.coerce(&mut engine, &types, ty).is_none());
+        assert!(value.coerce(&mut engine, ty).is_none());
 
         // Map[String, File] -> Object
         let object_value = value
-            .coerce(&mut engine, &types, Type::Object)
+            .coerce(&mut engine, Type::Object)
             .expect("value should coerce");
         assert_eq!(
-            object_value.display(&engine, &types).to_string(),
+            object_value.display(&engine).to_string(),
             r#"object {foo: "bar", baz: "qux"}"#
         );
     }
@@ -1068,58 +1446,48 @@ mod test {
     #[test]
     fn map_display() {
         let mut engine = Engine::default();
-        let mut types = Types::default();
 
-        let ty = types.add_map(MapType::new(
+        let ty = engine.types_mut().add_map(MapType::new(
             PrimitiveTypeKind::Integer,
             PrimitiveTypeKind::Boolean,
         ));
 
         let value = engine
-            .new_map(&types, ty, [(1, true), (2, false)])
+            .new_map(ty, [(1, true), (2, false)])
             .expect("should create map value");
-        assert_eq!(
-            value.display(&engine, &types).to_string(),
-            "{1: true, 2: false}"
-        );
+        assert_eq!(value.display(&engine).to_string(), "{1: true, 2: false}");
     }
 
     #[test]
     fn pair_coercion() {
         let mut engine = Engine::default();
-        let mut types = Types::default();
 
         let left = engine.new_file("foo");
         let right = engine.new_string("bar");
 
-        let ty = types.add_pair(PairType::new(
+        let ty = engine.types_mut().add_pair(PairType::new(
             PrimitiveTypeKind::File,
             PrimitiveTypeKind::String,
         ));
         let value = engine
-            .new_pair(&types, ty, left, right)
+            .new_pair(ty, left, right)
             .expect("should create map value");
 
         // Pair[File, String] -> Pair[String, File]
-        let ty = types.add_pair(PairType::new(
+        let ty = engine.types_mut().add_pair(PairType::new(
             PrimitiveTypeKind::String,
             PrimitiveTypeKind::File,
         ));
-        let value = value
-            .coerce(&mut engine, &types, ty)
-            .expect("value should coerce");
-        assert_eq!(
-            value.display(&engine, &types).to_string(),
-            r#"("foo", "bar")"#
-        );
+        let value = value.coerce(&mut engine, ty).expect("value should coerce");
+        assert_eq!(value.display(&engine).to_string(), r#"("foo", "bar")"#);
 
         // Pair[String, File] -> Pair[Int, Int]
-        let ty = types.add_pair(PairType::new(
+        let ty = engine.types_mut().add_pair(PairType::new(
             PrimitiveTypeKind::Integer,
             PrimitiveTypeKind::Integer,
         ));
         assert!(
-            value.coerce(&mut engine, &types, ty).is_none(),
+            value.coerce(&mut engine, ty).is_none(),
             "value should not coerce"
         );
     }
@@ -1127,66 +1495,60 @@ mod test {
     #[test]
     fn pair_display() {
         let mut engine = Engine::default();
-        let mut types = Types::default();
 
-        let ty = types.add_pair(PairType::new(
+        let ty = engine.types_mut().add_pair(PairType::new(
             PrimitiveTypeKind::Integer,
             PrimitiveTypeKind::Boolean,
         ));
 
         let value = engine
-            .new_pair(&types, ty, 12345, false)
+            .new_pair(ty, 12345, false)
             .expect("should create pair value");
-        assert_eq!(value.display(&engine, &types).to_string(), "(12345, false)");
+        assert_eq!(value.display(&engine).to_string(), "(12345, false)");
     }
 
     #[test]
     fn struct_coercion() {
         let mut engine = Engine::default();
-        let mut types = Types::default();
 
-        let ty = types.add_struct(StructType::new("Foo", [
+        let ty = engine.types_mut().add_struct(StructType::new("Foo", [
             ("foo", PrimitiveTypeKind::Float),
             ("bar", PrimitiveTypeKind::Float),
             ("baz", PrimitiveTypeKind::Float),
         ]));
         let value = engine
-            .new_struct(&types, ty, [("foo", 1.0), ("bar", 2.0), ("baz", 3.0)])
+            .new_struct(ty, [("foo", 1.0), ("bar", 2.0), ("baz", 3.0)])
             .expect("should create map value");
 
         // Struct -> Map[String, Float]
-        let ty = types.add_map(MapType::new(
+        let ty = engine.types_mut().add_map(MapType::new(
             PrimitiveTypeKind::String,
             PrimitiveTypeKind::Float,
         ));
-        let map_value = value
-            .coerce(&mut engine, &types, ty)
-            .expect("value should coerce");
+        let map_value = value.coerce(&mut engine, ty).expect("value should coerce");
         assert_eq!(
-            map_value.display(&engine, &types).to_string(),
+            map_value.display(&engine).to_string(),
             r#"{"foo": 1.0, "bar": 2.0, "baz": 3.0}"#
         );
 
         // Struct -> Struct
-        let ty = types.add_struct(StructType::new("Bar", [
+        let ty = engine.types_mut().add_struct(StructType::new("Bar", [
             ("foo", PrimitiveTypeKind::Float),
             ("bar", PrimitiveTypeKind::Float),
             ("baz", PrimitiveTypeKind::Float),
         ]));
-        let struct_value = value
-            .coerce(&mut engine, &types, ty)
-            .expect("value should coerce");
+        let struct_value = value.coerce(&mut engine, ty).expect("value should coerce");
         assert_eq!(
-            struct_value.display(&engine, &types).to_string(),
+            struct_value.display(&engine).to_string(),
             r#"Bar {foo: 1.0, bar: 2.0, baz: 3.0}"#
         );
 
         // Struct -> Object
         let object_value = value
-            .coerce(&mut engine, &types, Type::Object)
+            .coerce(&mut engine, Type::Object)
             .expect("value should coerce");
         assert_eq!(
-            object_value.display(&engine, &types).to_string(),
+            object_value.display(&engine).to_string(),
             r#"object {foo: 1.0, bar: 2.0, baz: 3.0}"#
         );
     }
