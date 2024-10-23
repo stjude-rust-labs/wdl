@@ -89,7 +89,7 @@ impl Token for PostToken {
 
 impl PostToken {
     /// Gets the length of the [`PostToken`].
-    fn len(&self, config: &crate::Config) -> usize {
+    fn width(&self, config: &crate::Config) -> usize {
         match self {
             Self::Space => SPACE.len(),
             Self::Newline => 0,
@@ -101,8 +101,8 @@ impl PostToken {
 
 impl TokenStream<PostToken> {
     /// Gets the length of the [`TokenStream`].
-    fn len(&self, config: &Config) -> usize {
-        self.iter().map(|t| t.len(config)).sum()
+    fn width(&self, config: &Config) -> usize {
+        self.iter().map(|t| t.width(config)).sum()
     }
 }
 
@@ -294,7 +294,7 @@ impl Postprocessor {
         }
 
         if config.max_line_length().is_none()
-            || post_buffer.len(config) <= config.max_line_length().unwrap()
+            || post_buffer.width(config) <= config.max_line_length().unwrap()
         {
             dbg!("no line breaks needed");
             out_stream.extend(post_buffer);
@@ -347,7 +347,7 @@ impl Postprocessor {
                 .rev()
                 .take_while(|t| *t != &PostToken::Newline)
                 .for_each(|t| last_line.push(t.clone()));
-            if last_line.len(config) <= max_length {
+            if last_line.width(config) <= max_length {
                 break;
             }
         }
