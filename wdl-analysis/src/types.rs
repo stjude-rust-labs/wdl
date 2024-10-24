@@ -1,6 +1,7 @@
 //! Representation of the WDL type system.
 
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::fmt;
 use std::sync::Arc;
 
@@ -95,7 +96,7 @@ pub struct PrimitiveType {
 
 impl PrimitiveType {
     /// Constructs a new primitive type.
-    pub fn new(kind: PrimitiveTypeKind) -> Self {
+    pub const fn new(kind: PrimitiveTypeKind) -> Self {
         Self {
             kind,
             optional: false,
@@ -293,6 +294,35 @@ impl Type {
         }
 
         Display { types, ty: *self }
+    }
+
+    /// Calculates a common type between this type and the given type.
+    ///
+    /// Returns `None` if the types have no common type.
+    pub fn common_type(&self, types: &Types, other: Type) -> Option<Type> {
+        // Check for this type being coercible to the other type
+        if self.is_coercible_to(types, &other) {
+            return Some(other);
+        }
+
+        // Check for the other type being coercible to this type
+        if other.is_coercible_to(types, self) {
+            return Some(*self);
+        }
+
+        // Check for `None` for this type; the common type would be an optional other
+        // type
+        if *self == Type::None {
+            return Some(other.optional());
+        }
+
+        // Check for `None` for the other type; the common type would be an optional
+        // this type
+        if other == Type::None {
+            return Some(self.optional());
+        }
+
+        None
     }
 
     /// Asserts that the type is valid.
@@ -1053,6 +1083,8 @@ pub struct CallType {
     namespace: Option<Arc<String>>,
     /// The name of the task or workflow that was called.
     name: Arc<String>,
+    /// The set of specified inputs in the call.
+    specified: Arc<HashSet<String>>,
     /// The input types to the call.
     inputs: Arc<HashMap<String, Input>>,
     /// The output types from the call.
@@ -1064,6 +1096,7 @@ impl CallType {
     pub fn new(
         kind: CallKind,
         name: impl Into<String>,
+        specified: Arc<HashSet<String>>,
         inputs: Arc<HashMap<String, Input>>,
         outputs: Arc<HashMap<String, Output>>,
     ) -> Self {
@@ -1071,6 +1104,7 @@ impl CallType {
             kind,
             namespace: None,
             name: Arc::new(name.into()),
+            specified,
             inputs,
             outputs,
         }
@@ -1082,6 +1116,7 @@ impl CallType {
         kind: CallKind,
         namespace: impl Into<String>,
         name: impl Into<String>,
+        specified: Arc<HashSet<String>>,
         inputs: Arc<HashMap<String, Input>>,
         outputs: Arc<HashMap<String, Output>>,
     ) -> Self {
@@ -1089,6 +1124,7 @@ impl CallType {
             kind,
             namespace: Some(Arc::new(namespace.into())),
             name: Arc::new(name.into()),
+            specified,
             inputs,
             outputs,
         }
@@ -1111,12 +1147,17 @@ impl CallType {
         &self.name
     }
 
-    /// Gets the inputs of the call.
+    /// Gets the set of inputs specified in the call.
+    pub fn specified(&self) -> &HashSet<String> {
+        &self.specified
+    }
+
+    /// Gets the inputs of the called workflow or task.
     pub fn inputs(&self) -> &HashMap<String, Input> {
         &self.inputs
     }
 
-    /// Gets the outputs of the call.
+    /// Gets the outputs of the called workflow or task.
     pub fn outputs(&self) -> &HashMap<String, Output> {
         &self.outputs
     }

@@ -3,11 +3,16 @@
 use std::fmt;
 use std::sync::Arc;
 
+use anyhow::Context;
+use anyhow::Result;
+use anyhow::anyhow;
+use anyhow::bail;
 use id_arena::Id;
 use indexmap::IndexMap;
 use ordered_float::OrderedFloat;
+use serde_json::Value as JsonValue;
 use string_interner::symbol::SymbolU32;
-use wdl_analysis::types::Coercible as _;
+use wdl_analysis::types::ArrayType;
 use wdl_analysis::types::CompoundTypeDef;
 use wdl_analysis::types::Optional;
 use wdl_analysis::types::PrimitiveTypeKind;
@@ -25,7 +30,7 @@ pub trait Coercible: Sized {
     ///
     /// Panics if the provided target type is not from the given engine's type
     /// collection.
-    fn coerce(&self, engine: &mut Engine, target: Type) -> Option<Self>;
+    fn coerce(&self, engine: &mut Engine, target: Type) -> Result<Self>;
 }
 
 /// Represents a WDL runtime value.
@@ -50,6 +55,66 @@ pub enum Value {
 }
 
 impl Value {
+    /// Converts a JSON value into a WDL value.
+    ///
+    /// Returns an error if the JSON value cannot be represented as a WDL value.
+    pub fn from_json(engine: &mut Engine, value: JsonValue) -> Result<Self> {
+        match value {
+            JsonValue::Null => Ok(Value::None),
+            JsonValue::Bool(value) => Ok(value.into()),
+            JsonValue::Number(number) => {
+                if let Some(value) = number.as_i64() {
+                    Ok(value.into())
+                } else if let Some(value) = number.as_f64() {
+                    Ok(value.into())
+                } else {
+                    bail!("number `{number}` is out of range for a WDL value")
+                }
+            }
+            JsonValue::String(s) => Ok(engine.new_string(s)),
+            JsonValue::Array(elements) => {
+                let elements = elements
+                    .into_iter()
+                    .map(|v| Self::from_json(engine, v))
+                    .collect::<Result<Vec<_>>>()?;
+
+                let element_ty = elements
+                    .iter()
+                    .try_fold(None, |mut ty, element| {
+                        let element_ty = element.ty(engine);
+                        let ty = ty.get_or_insert(element_ty);
+                        ty.common_type(engine.types(), element_ty)
+                            .map(Some)
+                            .ok_or_else(|| {
+                                anyhow!(
+                                    "a common element type does not exist between `{ty}` and \
+                                     `{element_ty}`",
+                                    ty = ty.display(engine.types()),
+                                    element_ty = element_ty.display(engine.types())
+                                )
+                            })
+                    })
+                    .context("invalid WDL array value")?
+                    .unwrap_or(Type::Union);
+
+                let ty = engine.types_mut().add_array(ArrayType::new(element_ty));
+                engine.new_array(ty, elements).with_context(|| {
+                    format!(
+                        "cannot coerce value to `{ty}`",
+                        ty = ty.display(engine.types())
+                    )
+                })
+            }
+            JsonValue::Object(elements) => {
+                let elements = elements
+                    .into_iter()
+                    .map(|(k, v)| Ok((k, Self::from_json(engine, v)?)))
+                    .collect::<Result<Vec<_>>>()?;
+                Ok(engine.new_object(elements))
+            }
+        }
+    }
+
     /// Gets the type of the value.
     pub fn ty(&self, engine: &Engine) -> Type {
         match self {
@@ -135,7 +200,7 @@ impl Value {
     /// Returns `None` if the value is not a `String`.
     pub fn as_string(self, engine: &Engine) -> Option<&str> {
         match self {
-            Self::String(_) => self.as_str(engine),
+            Self::String(_) => Some(self.to_str(engine).expect("string should be interned")),
             _ => panic!("value is not a string"),
         }
     }
@@ -147,7 +212,7 @@ impl Value {
     /// Panics if the value is not a `String`.
     pub fn unwrap_string(self, engine: &Engine) -> &str {
         match self {
-            Self::String(_) => self.as_str(engine).expect("string should be interned"),
+            Self::String(_) => self.to_str(engine).expect("string should be interned"),
             _ => panic!("value is not a string"),
         }
     }
@@ -157,7 +222,7 @@ impl Value {
     /// Returns `None` if the value is not a `File`.
     pub fn as_file(self, engine: &Engine) -> Option<&str> {
         match self {
-            Self::File(_) => self.as_str(engine),
+            Self::File(_) => Some(self.to_str(engine).expect("string should be interned")),
             _ => None,
         }
     }
@@ -169,7 +234,7 @@ impl Value {
     /// Panics if the value is not a `File`.
     pub fn unwrap_file(self, engine: &Engine) -> &str {
         match self {
-            Self::File(_) => self.as_str(engine).expect("string should be interned"),
+            Self::File(_) => self.to_str(engine).expect("string should be interned"),
             _ => panic!("value is not a file"),
         }
     }
@@ -179,7 +244,7 @@ impl Value {
     /// Returns `None` if the value is not a `Directory`.
     pub fn as_directory(self, engine: &Engine) -> Option<&str> {
         match self {
-            Self::Directory(_) => self.as_str(engine),
+            Self::Directory(_) => Some(self.to_str(engine).expect("string should be interned")),
             _ => None,
         }
     }
@@ -191,7 +256,7 @@ impl Value {
     /// Panics if the value is not a `Directory`.
     pub fn unwrap_directory(self, engine: &Engine) -> &str {
         match self {
-            Self::Directory(_) => self.as_str(engine).expect("string should be interned"),
+            Self::Directory(_) => self.to_str(engine).expect("string should be interned"),
             _ => panic!("value is not a directory"),
         }
     }
@@ -340,7 +405,7 @@ impl Value {
     /// value.
     ///
     /// Returns `None` if the value is not a `String`, `File`, or `Directory`.
-    pub fn as_str<'a>(&self, engine: &'a Engine) -> Option<&'a str> {
+    pub fn to_str<'a>(&self, engine: &'a Engine) -> Option<&'a str> {
         match self {
             Self::String(sym) | Self::File(sym) | Self::Directory(sym) => {
                 engine.interner().resolve(*sym)
@@ -372,7 +437,7 @@ impl Value {
                             "\"{v}\"",
                             v = self
                                 .value
-                                .as_str(self.engine)
+                                .to_str(self.engine)
                                 .expect("string should be interned")
                         )
                     }
@@ -404,78 +469,121 @@ impl Value {
 }
 
 impl Coercible for Value {
-    fn coerce(&self, engine: &mut Engine, target: Type) -> Option<Self> {
+    fn coerce(&self, engine: &mut Engine, target: Type) -> Result<Self> {
         match self {
             Self::Boolean(v) => {
-                match target.as_primitive()?.kind() {
-                    // Boolean -> Boolean
-                    PrimitiveTypeKind::Boolean => Some(Self::Boolean(*v)),
-                    _ => None,
-                }
+                target
+                    .as_primitive()
+                    .and_then(|ty| match ty.kind() {
+                        // Boolean -> Boolean
+                        PrimitiveTypeKind::Boolean => Some(Self::Boolean(*v)),
+                        _ => None,
+                    })
+                    .ok_or_else(|| {
+                        anyhow!(
+                            "cannot coerce type `Boolean` to type `{target}`",
+                            target = target.display(engine.types())
+                        )
+                    })
             }
             Self::Integer(v) => {
-                match target.as_primitive()?.kind() {
-                    // Int -> Int
-                    PrimitiveTypeKind::Integer => Some(Self::Integer(*v)),
-                    // Int -> Float
-                    PrimitiveTypeKind::Float => Some(Self::Float((*v as f64).into())),
-                    _ => None,
-                }
+                target
+                    .as_primitive()
+                    .and_then(|ty| match ty.kind() {
+                        // Int -> Int
+                        PrimitiveTypeKind::Integer => Some(Self::Integer(*v)),
+                        // Int -> Float
+                        PrimitiveTypeKind::Float => Some(Self::Float((*v as f64).into())),
+                        _ => None,
+                    })
+                    .ok_or_else(|| {
+                        anyhow!(
+                            "cannot coerce type `Int` to type `{target}`",
+                            target = target.display(engine.types())
+                        )
+                    })
             }
             Self::Float(v) => {
-                match target.as_primitive()?.kind() {
-                    // Float -> Float
-                    PrimitiveTypeKind::Float => Some(Self::Float(*v)),
-                    _ => None,
-                }
+                target
+                    .as_primitive()
+                    .and_then(|ty| match ty.kind() {
+                        // Float -> Float
+                        PrimitiveTypeKind::Float => Some(Self::Float(*v)),
+                        _ => None,
+                    })
+                    .ok_or_else(|| {
+                        anyhow!(
+                            "cannot coerce type `Float` to type `{target}`",
+                            target = target.display(engine.types())
+                        )
+                    })
             }
             Self::String(sym) => {
-                match target.as_primitive()?.kind() {
-                    // String -> String
-                    PrimitiveTypeKind::String => Some(Self::String(*sym)),
-                    // String -> File
-                    PrimitiveTypeKind::File => Some(Self::File(*sym)),
-                    // String -> Directory
-                    PrimitiveTypeKind::Directory => Some(Self::Directory(*sym)),
-                    _ => None,
-                }
+                target
+                    .as_primitive()
+                    .and_then(|ty| match ty.kind() {
+                        // String -> String
+                        PrimitiveTypeKind::String => Some(Self::String(*sym)),
+                        // String -> File
+                        PrimitiveTypeKind::File => Some(Self::File(*sym)),
+                        // String -> Directory
+                        PrimitiveTypeKind::Directory => Some(Self::Directory(*sym)),
+                        _ => None,
+                    })
+                    .ok_or_else(|| {
+                        anyhow!(
+                            "cannot coerce type `String` to type `{target}`",
+                            target = target.display(engine.types())
+                        )
+                    })
             }
             Self::File(sym) => {
-                match target.as_primitive()?.kind() {
-                    // File -> File
-                    PrimitiveTypeKind::File => Some(Self::File(*sym)),
-                    // File -> String
-                    PrimitiveTypeKind::String => Some(Self::String(*sym)),
-                    _ => None,
-                }
+                target
+                    .as_primitive()
+                    .and_then(|ty| match ty.kind() {
+                        // File -> File
+                        PrimitiveTypeKind::File => Some(Self::File(*sym)),
+                        // File -> String
+                        PrimitiveTypeKind::String => Some(Self::String(*sym)),
+                        _ => None,
+                    })
+                    .ok_or_else(|| {
+                        anyhow!(
+                            "cannot coerce type `File` to type `{target}`",
+                            target = target.display(engine.types())
+                        )
+                    })
             }
             Self::Directory(sym) => {
-                match target.as_primitive()?.kind() {
-                    // Directory -> Directory
-                    PrimitiveTypeKind::Directory => Some(Self::Directory(*sym)),
-                    // Directory -> String
-                    PrimitiveTypeKind::String => Some(Self::String(*sym)),
-                    _ => None,
-                }
+                target
+                    .as_primitive()
+                    .and_then(|ty| match ty.kind() {
+                        // Directory -> Directory
+                        PrimitiveTypeKind::Directory => Some(Self::Directory(*sym)),
+                        // Directory -> String
+                        PrimitiveTypeKind::String => Some(Self::String(*sym)),
+                        _ => None,
+                    })
+                    .ok_or_else(|| {
+                        anyhow!(
+                            "cannot coerce type `Directory` to type `{target}`",
+                            target = target.display(engine.types())
+                        )
+                    })
             }
             Self::None => {
                 if target.is_optional() {
-                    Some(Self::None)
+                    Ok(Self::None)
                 } else {
-                    None
+                    bail!(
+                        "cannot coerce `None` to non-optional type `{target}`",
+                        target = target.display(engine.types())
+                    );
                 }
             }
             Self::Compound(id) => {
-                if engine
-                    .value(*id)
-                    .ty()
-                    .is_coercible_to(engine.types(), &target)
-                {
-                    let v = engine.value(*id).clone().coerce(engine, target)?;
-                    Some(Self::Compound(engine.alloc(v)))
-                } else {
-                    None
-                }
+                let value = engine.value(*id).clone().coerce(engine, target)?;
+                Ok(Self::Compound(engine.alloc(value)))
             }
         }
     }
@@ -808,6 +916,8 @@ impl Struct {
 }
 
 /// Represents a compound value.
+///
+/// Compound values may be trivially cloned.
 #[derive(Debug, Clone)]
 pub enum CompoundValue {
     /// The value is a `Pair` of values.
@@ -874,9 +984,9 @@ impl CompoundValue {
 }
 
 impl Coercible for CompoundValue {
-    fn coerce(&self, engine: &mut Engine, target: Type) -> Option<Self> {
+    fn coerce(&self, engine: &mut Engine, target: Type) -> Result<Self> {
         if let Type::Compound(compound_ty) = target {
-            return match (
+            match (
                 self,
                 engine.types().type_definition(compound_ty.definition()),
             ) {
@@ -884,112 +994,169 @@ impl Coercible for CompoundValue {
                 (Self::Array(v), CompoundTypeDef::Array(array_ty)) => {
                     // Don't allow coercion when the source is empty but the target has the
                     // non-empty qualifier
-                    if array_ty.is_non_empty() && v.elements.is_empty() {
-                        return None;
+                    if v.elements.is_empty() && array_ty.is_non_empty() {
+                        bail!(
+                            "cannot coerce empty array value to non-empty array type `{ty}`",
+                            ty = array_ty.display(engine.types())
+                        );
                     }
 
                     let element_type = array_ty.element_type();
-                    Some(Self::Array(Array::new(
+                    return Ok(Self::Array(Array::new(
                         target,
                         v.elements
                             .iter()
-                            .map(|e| e.coerce(engine, element_type))
-                            .collect::<Option<_>>()?,
-                    )))
+                            .enumerate()
+                            .map(|(i, e)| {
+                                e.coerce(engine, element_type).with_context(|| {
+                                    format!("failed to coerce array element at index {i}")
+                                })
+                            })
+                            .collect::<Result<_>>()?,
+                    )));
                 }
                 // Map[W, Y] -> Map[X, Z] where W -> X and Y -> Z
                 (Self::Map(v), CompoundTypeDef::Map(map_ty)) => {
                     let key_type = map_ty.key_type();
                     let value_type = map_ty.value_type();
-                    Some(Self::Map(Map::new(
+                    return Ok(Self::Map(Map::new(
                         target,
                         Arc::new(
                             v.elements
                                 .iter()
-                                .map(|(k, v)| {
-                                    let k = k.coerce(engine, key_type);
-                                    let v = v.coerce(engine, value_type);
-                                    Some((k?, v?))
+                                .enumerate()
+                                .map(|(i, (k, v))| {
+                                    let k = k.coerce(engine, key_type).with_context(|| {
+                                        format!("failed to coerce map key at index {i}")
+                                    })?;
+                                    let v = v.coerce(engine, value_type).with_context(|| {
+                                        format!("failed to coerce map value at index {i}")
+                                    })?;
+                                    Ok((k, v))
                                 })
-                                .collect::<Option<_>>()?,
+                                .collect::<Result<_>>()?,
                         ),
-                    )))
+                    )));
                 }
                 // Pair[W, Y] -> Pair[X, Z] where W -> X and Y -> Z
                 (Self::Pair(v), CompoundTypeDef::Pair(pair_ty)) => {
                     let left_type = pair_ty.left_type();
                     let right_type: Type = pair_ty.right_type();
-                    let left = v.left.coerce(engine, left_type)?;
-                    let right = v.right.coerce(engine, right_type)?;
-                    Some(Self::Pair(Pair::new(target, left, right)))
+                    let left = v
+                        .left
+                        .coerce(engine, left_type)
+                        .context("failed to coerce pair's left value")?;
+                    let right = v
+                        .right
+                        .coerce(engine, right_type)
+                        .context("failed to coerce pair's right value")?;
+                    return Ok(Self::Pair(Pair::new(target, left, right)));
                 }
                 // Map[String, Y] -> Struct
                 (Self::Map(v), CompoundTypeDef::Struct(_)) => {
-                    if v.elements.len()
-                        != engine
-                            .types()
-                            .type_definition(compound_ty.definition())
-                            .as_struct()
-                            .expect("should be struct")
-                            .members()
-                            .len()
-                    {
-                        return None;
+                    let len = v.elements.len();
+                    let expected_len = engine
+                        .types()
+                        .type_definition(compound_ty.definition())
+                        .as_struct()
+                        .expect("should be struct")
+                        .members()
+                        .len();
+
+                    if len != expected_len {
+                        bail!(
+                            "cannot coerce a map of {len} element{s1} to struct type `{ty}` as \
+                             the struct has {expected_len} member{s2}",
+                            s1 = if len == 1 { "" } else { "s" },
+                            ty = compound_ty.display(engine.types()),
+                            s2 = if expected_len == 1 { "" } else { "s" }
+                        );
                     }
 
                     let members = v
                         .elements
                         .iter()
                         .map(|(k, v)| {
-                            let k = k.as_str(engine)?.to_string();
+                            let k = k
+                                .as_string(engine)
+                                .ok_or_else(|| {
+                                    anyhow!(
+                                        "cannot coerce a map with a non-string key type to struct \
+                                         type `{ty}`",
+                                        ty = compound_ty.display(engine.types())
+                                    )
+                                })?
+                                .to_string();
                             let ty = *engine
                                 .types()
                                 .type_definition(compound_ty.definition())
                                 .as_struct()
                                 .expect("should be struct")
                                 .members()
-                                .get(&k)?;
-                            let v = v.coerce(engine, ty)?;
-                            Some((k, v))
+                                .get(&k)
+                                .ok_or_else(|| {
+                                    anyhow!(
+                                        "cannot coerce a map with key `{k}` to struct type `{ty}` \
+                                         as the struct does not contain a member with that name",
+                                        ty = compound_ty.display(engine.types())
+                                    )
+                                })?;
+                            let v = v.coerce(engine, ty).with_context(|| {
+                                format!("failed to coerce value of map key `{k}")
+                            })?;
+                            Ok((k, v))
                         })
-                        .collect::<Option<_>>()?;
+                        .collect::<Result<_>>()?;
 
-                    Some(Self::Struct(Struct::new(target, Arc::new(members))))
+                    return Ok(Self::Struct(Struct::new(target, Arc::new(members))));
                 }
                 // Struct -> Map[String, Y]
                 // Object -> Map[String, Y]
                 (Self::Struct(Struct { members, .. }), CompoundTypeDef::Map(map_ty))
                 | (Self::Object(Object { members }), CompoundTypeDef::Map(map_ty)) => {
                     if map_ty.key_type().as_primitive() != Some(PrimitiveTypeKind::String.into()) {
-                        return None;
+                        bail!(
+                            "cannot coerce a struct or object to type `{ty}` as it requires a \
+                             `String` key type",
+                            ty = compound_ty.display(engine.types())
+                        );
                     }
 
                     let value_ty = map_ty.value_type();
-                    Some(Self::Map(Map::new(
+                    return Ok(Self::Map(Map::new(
                         target,
                         Arc::new(
                             members
                                 .iter()
                                 .map(|(n, v)| {
-                                    let v = v.coerce(engine, value_ty)?;
-                                    Some((engine.new_string(n), v))
+                                    let v = v.coerce(engine, value_ty).with_context(|| {
+                                        format!("failed to coerce member `{n}`")
+                                    })?;
+                                    Ok((engine.new_string(n), v))
                                 })
-                                .collect::<Option<_>>()?,
+                                .collect::<Result<_>>()?,
                         ),
-                    )))
+                    )));
                 }
                 // Object -> Struct
                 (Self::Object(v), CompoundTypeDef::Struct(_)) => {
-                    if v.members.len()
-                        != engine
-                            .types()
-                            .type_definition(compound_ty.definition())
-                            .as_struct()
-                            .expect("should be struct")
-                            .members()
-                            .len()
-                    {
-                        return None;
+                    let len = v.members.len();
+                    let expected_len = engine
+                        .types()
+                        .type_definition(compound_ty.definition())
+                        .as_struct()
+                        .expect("should be struct")
+                        .members()
+                        .len();
+
+                    if len != expected_len {
+                        bail!(
+                            "cannot coerce an object of {len} members{s1} to struct type `{ty}` \
+                             as the target struct has {expected_len} member{s2}",
+                            s1 = if len == 1 { "" } else { "s" },
+                            ty = compound_ty.display(engine.types()),
+                            s2 = if expected_len == 1 { "" } else { "s" }
+                        );
                     }
 
                     let members = Arc::new(
@@ -1002,27 +1169,42 @@ impl Coercible for CompoundValue {
                                     .as_struct()
                                     .expect("should be struct")
                                     .members()
-                                    .get(k)?;
+                                    .get(k)
+                                    .ok_or_else(|| {
+                                        anyhow!(
+                                            "cannot coerce an object with member `{k}` to struct \
+                                             type `{ty}` as the struct does not contain a member \
+                                             with that name",
+                                            ty = compound_ty.display(engine.types())
+                                        )
+                                    })?;
                                 let v = v.coerce(engine, *ty)?;
-                                Some((k.clone(), v))
+                                Ok((k.clone(), v))
                             })
-                            .collect::<Option<_>>()?,
+                            .collect::<Result<_>>()?,
                     );
 
-                    Some(Self::Struct(Struct::new(target, members)))
+                    return Ok(Self::Struct(Struct::new(target, members)));
                 }
                 // Struct -> Struct
                 (Self::Struct(v), CompoundTypeDef::Struct(_)) => {
-                    if v.members.len()
-                        != engine
-                            .types()
-                            .type_definition(compound_ty.definition())
-                            .as_struct()
-                            .expect("should be struct")
-                            .members()
-                            .len()
-                    {
-                        return None;
+                    let len = v.members.len();
+                    let expected_len = engine
+                        .types()
+                        .type_definition(compound_ty.definition())
+                        .as_struct()
+                        .expect("should be struct")
+                        .members()
+                        .len();
+
+                    if len != expected_len {
+                        bail!(
+                            "cannot coerce a struct of {len} members{s1} to struct type `{ty}` as \
+                             the target struct has {expected_len} member{s2}",
+                            s1 = if len == 1 { "" } else { "s" },
+                            ty = compound_ty.display(engine.types()),
+                            s2 = if expected_len == 1 { "" } else { "s" }
+                        );
                     }
 
                     let members = Arc::new(
@@ -1035,38 +1217,62 @@ impl Coercible for CompoundValue {
                                     .as_struct()
                                     .expect("should be struct")
                                     .members()
-                                    .get(k)?;
-                                let v = v.coerce(engine, *ty)?;
-                                Some((k.clone(), v))
+                                    .get(k)
+                                    .ok_or_else(|| {
+                                        anyhow!(
+                                            "cannot coerce a struct with member `{k}` to struct \
+                                             type `{ty}` as the target struct does not contain a \
+                                             member with that name",
+                                            ty = compound_ty.display(engine.types())
+                                        )
+                                    })?;
+                                let v = v
+                                    .coerce(engine, *ty)
+                                    .with_context(|| format!("failed to coerce member `{k}`"))?;
+                                Ok((k.clone(), v))
                             })
-                            .collect::<Option<_>>()?,
+                            .collect::<Result<_>>()?,
                     );
 
-                    Some(Self::Struct(Struct::new(target, members)))
+                    return Ok(Self::Struct(Struct::new(target, members)));
                 }
-                _ => None,
+                _ => {}
             };
         }
 
         if let Type::Object = target {
-            return match self {
+            match self {
                 // Map[String, Y] -> Object
-                Self::Map(v) => Some(Self::Object(Object::new(Arc::new(
-                    v.elements
-                        .iter()
-                        .map(|(k, v)| {
-                            let k = k.as_string(engine)?.to_string();
-                            Some((k, *v))
-                        })
-                        .collect::<Option<_>>()?,
-                )))),
+                Self::Map(v) => {
+                    return Ok(Self::Object(Object::new(Arc::new(
+                        v.elements
+                            .iter()
+                            .map(|(k, v)| {
+                                let k = k
+                                    .as_string(engine)
+                                    .ok_or_else(|| {
+                                        anyhow!(
+                                            "cannot coerce a map with a non-string key type to \
+                                             type `Object`"
+                                        )
+                                    })?
+                                    .to_string();
+                                Ok((k, *v))
+                            })
+                            .collect::<Result<_>>()?,
+                    ))));
+                }
                 // Struct -> Object
-                Self::Struct(v) => Some(Self::Object(Object::new(v.members.clone()))),
-                _ => None,
+                Self::Struct(v) => return Ok(Self::Object(Object::new(v.members.clone()))),
+                _ => {}
             };
         }
 
-        None
+        bail!(
+            "cannot coerce a value of type `{ty}` to type `{expected}`",
+            ty = self.ty().display(engine.types()),
+            expected = target.display(engine.types())
+        );
     }
 }
 
@@ -1089,13 +1295,20 @@ mod test {
 
         // Boolean -> Boolean
         assert_eq!(
-            Value::from(false).coerce(&mut engine, PrimitiveTypeKind::Boolean.into()),
-            Some(Value::from(false))
+            Value::from(false)
+                .coerce(&mut engine, PrimitiveTypeKind::Boolean.into())
+                .expect("should coerce"),
+            Value::from(false)
         );
         // Boolean -> String (invalid)
         assert_eq!(
-            Value::from(true).coerce(&mut engine, PrimitiveTypeKind::String.into()),
-            None
+            format!(
+                "{e:?}",
+                e = Value::from(true)
+                    .coerce(&mut engine, PrimitiveTypeKind::String.into())
+                    .unwrap_err()
+            ),
+            "cannot coerce type `Boolean` to type `String`"
         );
     }
 
@@ -1113,18 +1326,27 @@ mod test {
 
         // Int -> Int
         assert_eq!(
-            Value::from(12345).coerce(&mut engine, PrimitiveTypeKind::Integer.into()),
-            Some(Value::from(12345))
+            Value::from(12345)
+                .coerce(&mut engine, PrimitiveTypeKind::Integer.into())
+                .expect("should coerce"),
+            Value::from(12345)
         );
         // Int -> Float
         assert_eq!(
-            Value::from(12345).coerce(&mut engine, PrimitiveTypeKind::Float.into()),
-            Some(Value::from(12345.0))
+            Value::from(12345)
+                .coerce(&mut engine, PrimitiveTypeKind::Float.into())
+                .expect("should coerce"),
+            Value::from(12345.0)
         );
         // Int -> Boolean (invalid)
         assert_eq!(
-            Value::from(12345).coerce(&mut engine, PrimitiveTypeKind::Boolean.into()),
-            None
+            format!(
+                "{e:?}",
+                e = Value::from(12345)
+                    .coerce(&mut engine, PrimitiveTypeKind::Boolean.into())
+                    .unwrap_err()
+            ),
+            "cannot coerce type `Int` to type `Boolean`"
         );
     }
 
@@ -1142,13 +1364,20 @@ mod test {
 
         // Float -> Float
         assert_eq!(
-            Value::from(12345.0).coerce(&mut engine, PrimitiveTypeKind::Float.into()),
-            Some(Value::from(12345.0))
+            Value::from(12345.0)
+                .coerce(&mut engine, PrimitiveTypeKind::Float.into())
+                .expect("should coerce"),
+            Value::from(12345.0)
         );
         // Float -> Int (invalid)
         assert_eq!(
-            Value::from(12345.0).coerce(&mut engine, PrimitiveTypeKind::Integer.into()),
-            None
+            format!(
+                "{e:?}",
+                e = Value::from(12345.0)
+                    .coerce(&mut engine, PrimitiveTypeKind::Integer.into())
+                    .unwrap_err()
+            ),
+            "cannot coerce type `Float` to type `Int`"
         );
     }
 
@@ -1178,23 +1407,34 @@ mod test {
 
         // String -> String
         assert_eq!(
-            value.coerce(&mut engine, PrimitiveTypeKind::String.into()),
-            Some(value)
+            value
+                .coerce(&mut engine, PrimitiveTypeKind::String.into())
+                .expect("should coerce"),
+            value
         );
         // String -> File
         assert_eq!(
-            value.coerce(&mut engine, PrimitiveTypeKind::File.into()),
-            Some(Value::File(sym))
+            value
+                .coerce(&mut engine, PrimitiveTypeKind::File.into())
+                .expect("should coerce"),
+            Value::File(sym)
         );
         // String -> Directory
         assert_eq!(
-            value.coerce(&mut engine, PrimitiveTypeKind::Directory.into()),
-            Some(Value::Directory(sym))
+            value
+                .coerce(&mut engine, PrimitiveTypeKind::Directory.into())
+                .expect("should coerce"),
+            Value::Directory(sym)
         );
         // String -> Boolean (invalid)
         assert_eq!(
-            value.coerce(&mut engine, PrimitiveTypeKind::Boolean.into()),
-            None
+            format!(
+                "{e:?}",
+                e = value
+                    .coerce(&mut engine, PrimitiveTypeKind::Boolean.into())
+                    .unwrap_err()
+            ),
+            "cannot coerce type `String` to type `Boolean`"
         );
     }
 
@@ -1218,18 +1458,27 @@ mod test {
 
         // File -> File
         assert_eq!(
-            value.coerce(&mut engine, PrimitiveTypeKind::File.into()),
-            Some(value)
+            value
+                .coerce(&mut engine, PrimitiveTypeKind::File.into())
+                .expect("should coerce"),
+            value
         );
         // File -> String
         assert_eq!(
-            value.coerce(&mut engine, PrimitiveTypeKind::String.into()),
-            Some(Value::String(sym))
+            value
+                .coerce(&mut engine, PrimitiveTypeKind::String.into())
+                .expect("should coerce"),
+            Value::String(sym)
         );
         // File -> Directory (invalid)
         assert_eq!(
-            value.coerce(&mut engine, PrimitiveTypeKind::Directory.into()),
-            None
+            format!(
+                "{e:?}",
+                e = value
+                    .coerce(&mut engine, PrimitiveTypeKind::Directory.into())
+                    .unwrap_err()
+            ),
+            "cannot coerce type `File` to type `Directory`"
         );
     }
 
@@ -1253,18 +1502,27 @@ mod test {
 
         // Directory -> Directory
         assert_eq!(
-            value.coerce(&mut engine, PrimitiveTypeKind::Directory.into()),
-            Some(value)
+            value
+                .coerce(&mut engine, PrimitiveTypeKind::Directory.into())
+                .expect("should coerce"),
+            value
         );
         // Directory -> String
         assert_eq!(
-            value.coerce(&mut engine, PrimitiveTypeKind::String.into()),
-            Some(Value::String(sym))
+            value
+                .coerce(&mut engine, PrimitiveTypeKind::String.into())
+                .expect("should coerce"),
+            Value::String(sym)
         );
         // Directory -> File (invalid)
         assert_eq!(
-            value.coerce(&mut engine, PrimitiveTypeKind::File.into()),
-            None
+            format!(
+                "{e:?}",
+                e = value
+                    .coerce(&mut engine, PrimitiveTypeKind::File.into())
+                    .unwrap_err()
+            ),
+            "cannot coerce type `Directory` to type `File`"
         );
     }
 
@@ -1282,17 +1540,24 @@ mod test {
 
         // None -> String?
         assert_eq!(
-            Value::None.coerce(
-                &mut engine,
-                Type::from(PrimitiveTypeKind::String).optional()
-            ),
-            Some(Value::None)
+            Value::None
+                .coerce(
+                    &mut engine,
+                    Type::from(PrimitiveTypeKind::String).optional()
+                )
+                .expect("should coerce"),
+            Value::None
         );
 
         // None -> String (invalid)
         assert_eq!(
-            Value::None.coerce(&mut engine, PrimitiveTypeKind::String.into()),
-            None
+            format!(
+                "{e:?}",
+                e = Value::None
+                    .coerce(&mut engine, PrimitiveTypeKind::String.into())
+                    .unwrap_err()
+            ),
+            "cannot coerce `None` to non-optional type `String`"
         );
     }
 
@@ -1329,9 +1594,12 @@ mod test {
         let target_ty = engine
             .types_mut()
             .add_array(ArrayType::new(PrimitiveTypeKind::String));
-        assert!(
-            src.coerce(&mut engine, target_ty).is_none(),
-            "should not coerce"
+        assert_eq!(
+            format!("{e:?}", e = src.coerce(&mut engine, target_ty).unwrap_err()),
+            r#"failed to coerce array element at index 0
+
+Caused by:
+    cannot coerce type `Int` to type `String`"#
         );
     }
 
@@ -1350,15 +1618,20 @@ mod test {
         let string = engine.new_string("foo");
         let value = engine.new_array(ty, [string]).expect("should create array");
         assert!(
-            value.coerce(&mut engine, target_ty).is_some(),
+            value.coerce(&mut engine, target_ty).is_ok(),
             "should coerce"
         );
 
         // Array[String] (empty) -> Array[String]+ (invalid)
-        let value = engine.new_empty_array(ty);
-        assert!(
-            value.coerce(&mut engine, target_ty).is_none(),
-            "should not coerce"
+        let value = engine
+            .new_array::<Value>(ty, [])
+            .expect("should create array");
+        assert_eq!(
+            format!(
+                "{e:?}",
+                e = value.coerce(&mut engine, target_ty).unwrap_err()
+            ),
+            "cannot coerce empty array value to non-empty array type `Array[String]+`"
         );
     }
 
@@ -1409,9 +1682,12 @@ mod test {
             PrimitiveTypeKind::Integer,
             PrimitiveTypeKind::File,
         ));
-        assert!(
-            value.coerce(&mut engine, ty).is_none(),
-            "value should not coerce"
+        assert_eq!(
+            format!("{e:?}", e = value.coerce(&mut engine, ty).unwrap_err()),
+            r#"failed to coerce map key at index 0
+
+Caused by:
+    cannot coerce type `String` to type `Int`"#
         );
 
         // Map[String, File] -> Struct
@@ -1431,7 +1707,10 @@ mod test {
             ("baz", PrimitiveTypeKind::File),
             ("qux", PrimitiveTypeKind::File),
         ]));
-        assert!(value.coerce(&mut engine, ty).is_none());
+        assert_eq!(
+            format!("{e:?}", e = value.coerce(&mut engine, ty).unwrap_err()),
+            "cannot coerce a map of 2 elements to struct type `Foo` as the struct has 3 members"
+        );
 
         // Map[String, File] -> Object
         let object_value = value
@@ -1486,9 +1765,12 @@ mod test {
             PrimitiveTypeKind::Integer,
             PrimitiveTypeKind::Integer,
         ));
-        assert!(
-            value.coerce(&mut engine, ty).is_none(),
-            "value should not coerce"
+        assert_eq!(
+            format!("{e:?}", e = value.coerce(&mut engine, ty).unwrap_err()),
+            r#"failed to coerce pair's left value
+
+Caused by:
+    cannot coerce type `String` to type `Int`"#
         );
     }
 

@@ -2,10 +2,14 @@
 
 use std::sync::Arc;
 
+use anyhow::Context;
+use anyhow::Result;
+use anyhow::anyhow;
 use id_arena::Arena;
 use id_arena::ArenaBehavior;
 use id_arena::DefaultArenaBehavior;
 use string_interner::DefaultStringInterner;
+use wdl_analysis::document::Document;
 use wdl_analysis::types::CompoundTypeDef;
 use wdl_analysis::types::Type;
 use wdl_analysis::types::Types;
@@ -16,9 +20,12 @@ use crate::CompoundValue;
 use crate::CompoundValueId;
 use crate::Map;
 use crate::Object;
+use crate::Outputs;
 use crate::Pair;
 use crate::Struct;
+use crate::TaskInputs;
 use crate::Value;
+use crate::WorkflowInputs;
 
 /// Represents a WDL evaluation engine.
 #[derive(Debug, Default)]
@@ -47,6 +54,47 @@ impl Engine {
         &mut self.types
     }
 
+    /// Evaluates a workflow.
+    ///
+    /// Returns the workflow outputs upon success.
+    pub async fn evaluate_workflow(
+        &mut self,
+        document: &Document,
+        inputs: &WorkflowInputs,
+    ) -> Result<Outputs> {
+        let workflow = document
+            .workflow()
+            .ok_or_else(|| anyhow!("document does not contain a workflow"))?;
+        inputs.validate(self, document, workflow).with_context(|| {
+            format!(
+                "failed to validate the inputs to workflow `{workflow}`",
+                workflow = workflow.name()
+            )
+        })?;
+        todo!("not yet implemented")
+    }
+
+    /// Evaluates a task with the given name.
+    ///
+    /// Returns the task outputs upon success.
+    pub async fn evaluate_task(
+        &mut self,
+        document: &Document,
+        name: &str,
+        inputs: &TaskInputs,
+    ) -> Result<Outputs> {
+        let task = document
+            .task_by_name(name)
+            .ok_or_else(|| anyhow!("document does not contain a task named `{name}`"))?;
+        inputs.validate(self, document, task).with_context(|| {
+            format!(
+                "failed to validate the inputs to task `{task}`",
+                task = task.name()
+            )
+        })?;
+        todo!("not yet implemented")
+    }
+
     /// Creates a new `String` value.
     pub fn new_string(&mut self, s: impl AsRef<str>) -> Value {
         Value::String(self.interner.get_or_intern(s))
@@ -64,7 +112,7 @@ impl Engine {
 
     /// Creates a new `Pair` value.
     ///
-    /// Returns `None` if either the `left` value or the `right` value did not
+    /// Returns an error if either the `left` value or the `right` value did not
     /// coerce to the pair's `left` type or `right`` type, respectively.
     ///
     /// # Panics
@@ -76,7 +124,7 @@ impl Engine {
         ty: Type,
         left: impl Into<Value>,
         right: impl Into<Value>,
-    ) -> Option<Value> {
+    ) -> Result<Value> {
         if let Type::Compound(compound_ty) = ty {
             if let CompoundTypeDef::Pair(pair_ty) =
                 self.types.type_definition(compound_ty.definition())
@@ -84,15 +132,21 @@ impl Engine {
                 let left_ty = pair_ty.left_type();
                 let right_ty = pair_ty.right_type();
 
-                let left = left.into().coerce(self, left_ty)?;
+                let left = left
+                    .into()
+                    .coerce(self, left_ty)
+                    .context("failed to coerce pair's left value")?;
                 left.assert_valid(self);
-                let right = right.into().coerce(self, right_ty)?;
+                let right = right
+                    .into()
+                    .coerce(self, right_ty)
+                    .context("failed to coerce pair's right value")?;
                 right.assert_valid(self);
 
                 let id = self
                     .values
                     .alloc(CompoundValue::Pair(Pair::new(ty, left, right)));
-                return Some(Value::Compound(id));
+                return Ok(Value::Compound(id));
             }
         }
 
@@ -104,13 +158,14 @@ impl Engine {
 
     /// Creates a new `Array` value for the given array type.
     ///
-    /// Returns `None` if an element did not coerce to the array's element type.
+    /// Returns an error if an element did not coerce to the array's element
+    /// type.
     ///
     /// # Panics
     ///
     /// Panics if the given type is not an array type from this engine's types
     /// collection or if any of the values are not from this engine.
-    pub fn new_array<V>(&mut self, ty: Type, elements: impl IntoIterator<Item = V>) -> Option<Value>
+    pub fn new_array<V>(&mut self, ty: Type, elements: impl IntoIterator<Item = V>) -> Result<Value>
     where
         V: Into<Value>,
     {
@@ -121,39 +176,18 @@ impl Engine {
                 let element_type = array_ty.element_type();
                 let elements = elements
                     .into_iter()
-                    .map(|v| {
+                    .enumerate()
+                    .map(|(i, v)| {
                         let v = v.into();
                         v.assert_valid(self);
                         v.coerce(self, element_type)
+                            .with_context(|| format!("failed to coerce array element at index {i}"))
                     })
-                    .collect::<Option<_>>()?;
+                    .collect::<Result<_>>()?;
                 let id = self
                     .values
                     .alloc(CompoundValue::Array(Array::new(ty, elements)));
-                return Some(Value::Compound(id));
-            }
-        }
-
-        panic!(
-            "type `{ty}` is not an array type",
-            ty = ty.display(&self.types)
-        );
-    }
-
-    /// Creates a new empty `Array` value for the given array type.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the given type is not an array type from this engine's types
-    /// collection.
-    pub fn new_empty_array(&mut self, ty: Type) -> Value {
-        if let Type::Compound(compound_ty) = ty {
-            if let CompoundTypeDef::Array(_) = self.types.type_definition(compound_ty.definition())
-            {
-                let id = self
-                    .values
-                    .alloc(CompoundValue::Array(Array::new(ty, Vec::new().into())));
-                return Value::Compound(id);
+                return Ok(Value::Compound(id));
             }
         }
 
@@ -165,7 +199,7 @@ impl Engine {
 
     /// Creates a new `Map` value.
     ///
-    /// Returns `None` if an key or value did not coerce to the map's key or
+    /// Returns an error if an key or value did not coerce to the map's key or
     /// value type, respectively.
     ///
     /// # Panics
@@ -176,7 +210,7 @@ impl Engine {
         &mut self,
         ty: Type,
         elements: impl IntoIterator<Item = (K, V)>,
-    ) -> Option<Value>
+    ) -> Result<Value>
     where
         K: Into<Value>,
         V: Into<Value>,
@@ -190,18 +224,26 @@ impl Engine {
 
                 let elements = elements
                     .into_iter()
-                    .map(|(k, v)| {
+                    .enumerate()
+                    .map(|(i, (k, v))| {
                         let k = k.into();
                         k.assert_valid(self);
                         let v = v.into();
                         v.assert_valid(self);
-                        Some((k.coerce(self, key_type)?, v.coerce(self, value_type)?))
+                        Ok((
+                            k.coerce(self, key_type).with_context(|| {
+                                format!("failed to coerce map key for element at index {i}")
+                            })?,
+                            v.coerce(self, value_type).with_context(|| {
+                                format!("failed to coerce map value for element at index {i}")
+                            })?,
+                        ))
                     })
-                    .collect::<Option<_>>()?;
+                    .collect::<Result<_>>()?;
                 let id = self
                     .values
                     .alloc(CompoundValue::Map(Map::new(ty, Arc::new(elements))));
-                return Some(Value::Compound(id));
+                return Ok(Value::Compound(id));
             }
         }
 
@@ -239,6 +281,9 @@ impl Engine {
 
     /// Creates a new struct value.
     ///
+    /// Returns an error if the struct type does not contain a member of a given
+    /// name or if a value does not coerce to the corresponding member's type.
+    ///
     /// # Panics
     ///
     /// Panics if the given type is not a struct type from this engine's types
@@ -247,7 +292,7 @@ impl Engine {
         &mut self,
         ty: Type,
         members: impl IntoIterator<Item = (S, V)>,
-    ) -> Option<Value>
+    ) -> Result<Value>
     where
         S: Into<String>,
         V: Into<Value>,
@@ -261,23 +306,28 @@ impl Engine {
                         let n = n.into();
                         let v = v.into();
                         v.assert_valid(self);
-                        let v = v.coerce(
-                            self,
-                            *self
-                                .types
-                                .type_definition(compound_ty.definition())
-                                .as_struct()
-                                .expect("should be a struct")
-                                .members()
-                                .get(&n)?,
-                        )?;
-                        Some((n, v))
+                        let v = v
+                            .coerce(
+                                self,
+                                *self
+                                    .types
+                                    .type_definition(compound_ty.definition())
+                                    .as_struct()
+                                    .expect("should be a struct")
+                                    .members()
+                                    .get(&n)
+                                    .ok_or_else(|| {
+                                        anyhow!("struct does not contain a member named `{n}`")
+                                    })?,
+                            )
+                            .with_context(|| format!("failed to coerce struct member `{n}`"))?;
+                        Ok((n, v))
                     })
-                    .collect::<Option<_>>()?;
+                    .collect::<Result<_>>()?;
                 let id = self
                     .values
                     .alloc(CompoundValue::Struct(Struct::new(ty, Arc::new(members))));
-                return Some(Value::Compound(id));
+                return Ok(Value::Compound(id));
             }
         }
 
