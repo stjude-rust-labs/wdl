@@ -69,8 +69,9 @@ use crate::diagnostics::too_few_arguments;
 use crate::diagnostics::too_many_arguments;
 use crate::diagnostics::type_mismatch;
 use crate::diagnostics::type_mismatch_custom;
+use crate::diagnostics::unknown_call_io;
 use crate::diagnostics::unknown_function;
-use crate::diagnostics::unknown_io_name;
+use crate::diagnostics::unknown_task_io;
 use crate::diagnostics::unsupported_function;
 use crate::document::ScopeRef;
 use crate::stdlib::FunctionBindError;
@@ -1162,10 +1163,9 @@ where
                 } {
                     Some(ty) => ty,
                     None => {
-                        self.diagnostics.push(unknown_io_name(
+                        self.diagnostics.push(unknown_task_io(
                             scope.task_name().expect("should have task name"),
                             &name,
-                            false,
                             input,
                         ));
                         break;
@@ -1707,14 +1707,13 @@ where
                 };
             }
 
-            // Check to see if it's a call output
-            if let CompoundTypeDef::CallOutput(ty) = definition {
+            // Check to see if it's a call
+            if let CompoundTypeDef::Call(ty) = definition {
                 if let Some(output) = ty.outputs().get(name.as_str()) {
                     return Some(output.ty());
                 }
 
-                self.diagnostics
-                    .push(unknown_io_name(ty.name(), &name, ty.is_workflow(), false));
+                self.diagnostics.push(unknown_call_io(ty, &name, false));
                 return None;
             }
         }
