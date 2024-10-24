@@ -724,6 +724,15 @@ impl AstNode for OutputSection {
     }
 }
 
+/// A command part stripped of leading whitespace.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum StrippedCommandPart {
+    /// A text part.
+    Text(String),
+    /// A placeholder part.
+    Placeholder(Placeholder),
+}
+
 /// Represents a command section in a task definition.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CommandSection(pub(crate) SyntaxNode);
@@ -753,6 +762,113 @@ impl CommandSection {
         }
 
         None
+    }
+
+    /// Strips leading whitespace from the command.
+    pub fn strip_whitespace(&self) -> Vec<StrippedCommandPart> {
+        let mut result = Vec::new();
+        let mut min_leading_spaces = usize::MAX;
+        let mut min_leading_tabs = usize::MAX;
+        let mut parsing_leading_whitespace = false; // init to false so that the first line is skipped
+
+        for part in self.parts() {
+            match part {
+                CommandPart::Text(text) => {
+                    let mut leading_spaces = 0;
+                    let mut leading_tabs = 0;
+
+                    for c in text.as_str().chars() {
+                        match c {
+                            ' ' if parsing_leading_whitespace => {
+                                leading_spaces += 1;
+                            }
+                            '\t' if parsing_leading_whitespace => {
+                                leading_tabs += 1;
+                            }
+                            '\n' => {
+                                parsing_leading_whitespace = true;
+                                leading_spaces = 0;
+                                leading_tabs = 0;
+                            }
+                            _ => {
+                                if parsing_leading_whitespace {
+                                    parsing_leading_whitespace = false;
+                                    if leading_spaces < min_leading_spaces {
+                                        min_leading_spaces = leading_spaces;
+                                    }
+                                    if leading_tabs < min_leading_tabs {
+                                        min_leading_tabs = leading_tabs;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // If the last line ends without a non-whitespace character, we need to check
+                    // the leading whitespace
+                    if leading_spaces < min_leading_spaces {
+                        min_leading_spaces = leading_spaces;
+                    }
+                    if leading_tabs < min_leading_tabs {
+                        min_leading_tabs = leading_tabs;
+                    }
+                }
+                CommandPart::Placeholder(_) => {
+                    parsing_leading_whitespace = false;
+                }
+            }
+        }
+
+        // Check for mixed indentation or no indentation
+        if (min_leading_spaces > 0 && min_leading_tabs > 0)
+            || (min_leading_spaces == 0 && min_leading_tabs == 0)
+        {
+            for part in self.parts() {
+                match part {
+                    CommandPart::Text(text) => {
+                        result.push(StrippedCommandPart::Text(text.as_str().to_owned()));
+                    }
+                    CommandPart::Placeholder(p) => {
+                        result.push(StrippedCommandPart::Placeholder(p.clone()));
+                    }
+                }
+            }
+            return result;
+        }
+
+        // Exactly one of the two will be equal to zero because it never appeared.
+        // The other will be the minimum number of leading spaces or tabs to strip.
+        let num_stripped_chars = if min_leading_spaces > min_leading_tabs {
+            min_leading_spaces
+        } else {
+            min_leading_tabs
+        };
+
+        for part in self.parts() {
+            match part {
+                CommandPart::Text(text) => {
+                    let mut stripped_text = Vec::new();
+                    for (i, line) in text.as_str().lines().enumerate() {
+                        if i == 0 {
+                            stripped_text.push(line);
+                            continue;
+                        }
+                        if line.len() >= num_stripped_chars {
+                            stripped_text.push(&line[num_stripped_chars..]);
+                        } else {
+                            stripped_text.push("");
+                        }
+                    }
+                    let stripped_text = stripped_text.join("\n");
+
+                    result.push(StrippedCommandPart::Text(stripped_text));
+                }
+                CommandPart::Placeholder(p) => {
+                    result.push(StrippedCommandPart::Placeholder(p.clone()));
+                }
+            }
+        }
+
+        result
     }
 
     /// Gets the parent of the command section.
@@ -1876,5 +1992,94 @@ task test {
         assert_eq!(visitor.param_metadata, 1);
         assert_eq!(visitor.unbound_decls, 1);
         assert_eq!(visitor.bound_decls, 2);
+    }
+
+    #[test]
+    fn whitespace_stripping_without_interpolation() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    command <<<
+        echo "hello"
+        echo "world"
+        echo \
+            "goodbye"
+    >>>
+}
+"#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+
+        let command = tasks[0].command().expect("should have a command section");
+
+        let stripped = command.strip_whitespace();
+        assert_eq!(stripped.len(), 1);
+        let text = match &stripped[0] {
+            StrippedCommandPart::Text(text) => text,
+            _ => panic!("expected text"),
+        };
+        assert_eq!(
+            text,
+            "\n    echo \"hello\"\n    echo \"world\"\n    echo \\\n        \"goodbye\"\n"
+        );
+    }
+
+    #[test]
+    fn whitespace_stripping_with_interpolation() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    input {
+        String name
+        Boolean flag
+    }
+
+    command <<<
+        echo "hello, ~{
+if flag
+then name
+               else "Jerry"
+    }!"
+    >>>
+}
+    "#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+
+        let command = tasks[0].command().expect("should have a command section");
+
+        let stripped = command.strip_whitespace();
+        assert_eq!(stripped.len(), 3);
+        let text = match &stripped[0] {
+            StrippedCommandPart::Text(text) => text,
+            _ => panic!("expected text"),
+        };
+        assert_eq!(text, "\n    echo \"hello, ");
+
+        let _placeholder = match &stripped[1] {
+            StrippedCommandPart::Placeholder(p) => p,
+            _ => panic!("expected placeholder"),
+        };
+        // not testing anything with the placeholder, just making sure it's there
+
+        let text = match &stripped[2] {
+            StrippedCommandPart::Text(text) => text,
+            _ => panic!("expected text"),
+        };
+        assert_eq!(text, "!\"\n");
     }
 }
