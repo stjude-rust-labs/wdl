@@ -145,6 +145,8 @@ impl Repository {
             .join(self.identifier.organization())
             .join(self.identifier.name());
 
+        std::fs::create_dir_all(&repo_root).expect("failed to create repository root directory");
+
         let git_repo = match git2::Repository::open(&repo_root) {
             Ok(repo) => {
                 info!("opening existing repository: {:?}", repo_root);
