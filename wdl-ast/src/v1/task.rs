@@ -803,14 +803,7 @@ impl CommandSection {
                             }
                         }
                     }
-                    // If the last line ends without a non-whitespace character, we need to check
-                    // the leading whitespace
-                    if leading_spaces < min_leading_spaces {
-                        min_leading_spaces = leading_spaces;
-                    }
-                    if leading_tabs < min_leading_tabs {
-                        min_leading_tabs = leading_tabs;
-                    }
+                    // The last line is intentionally skipped.
                 }
                 CommandPart::Placeholder(_) => {
                     parsing_leading_whitespace = false;
@@ -843,14 +836,20 @@ impl CommandSection {
             min_leading_tabs
         };
 
-        for part in self.parts() {
+        for (i, part) in self.parts().enumerate() {
             match part {
                 CommandPart::Text(text) => {
                     let mut stripped_text = Vec::new();
-                    for (i, line) in text.as_str().lines().enumerate() {
-                        if i == 0 {
+                    for (j, line) in text.as_str().lines().enumerate() {
+                        if i == 0 && j == 0 {
+                            let trimmed = line.trim_start();
+                            if trimmed.is_empty() {
+                                continue;
+                            }
+                            stripped_text.push(trimmed);
+                        }
+                        if j == 0 {
                             stripped_text.push(line);
-                            continue;
                         }
                         if line.len() >= num_stripped_chars {
                             stripped_text.push(&line[num_stripped_chars..]);
@@ -865,6 +864,18 @@ impl CommandSection {
                 CommandPart::Placeholder(p) => {
                     result.push(StrippedCommandPart::Placeholder(p.clone()));
                 }
+            }
+        }
+
+        if let Some(last) = result.pop() {
+            if let StrippedCommandPart::Text(text) = last {
+                if text.ends_with('\n') {
+                    result.push(StrippedCommandPart::Text(text.trim_end_matches('\n').to_owned()));
+                } else {
+                    result.push(StrippedCommandPart::Text(text));
+                }
+            } else {
+                result.push(last);
             }
         }
 
@@ -2027,7 +2038,7 @@ task test {
         };
         assert_eq!(
             text,
-            "\n    echo \"hello\"\n    echo \"world\"\n    echo \\\n        \"goodbye\"\n"
+            "echo \"hello\"\necho \"world\"\necho \\\n    \"goodbye\""
         );
     }
 
@@ -2068,7 +2079,7 @@ then name
             StrippedCommandPart::Text(text) => text,
             _ => panic!("expected text"),
         };
-        assert_eq!(text, "\n    echo \"hello, ");
+        assert_eq!(text, "echo \"hello, ");
 
         let _placeholder = match &stripped[1] {
             StrippedCommandPart::Placeholder(p) => p,
@@ -2080,6 +2091,6 @@ then name
             StrippedCommandPart::Text(text) => text,
             _ => panic!("expected text"),
         };
-        assert_eq!(text, "!\"\n");
+        assert_eq!(text, "!\"");
     }
 }
