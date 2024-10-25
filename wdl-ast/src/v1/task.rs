@@ -811,10 +811,54 @@ impl CommandSection {
             }
         }
 
-        // Check for mixed indentation or no indentation
-        if (min_leading_spaces > 0 && min_leading_tabs > 0)
-            || (min_leading_spaces == 0 && min_leading_tabs == 0)
+        // Check for no indentation or all whitespace, in which cases the first and last line must be trimmed.
+        if (min_leading_spaces == 0 && min_leading_tabs == 0)
+            || (min_leading_spaces == usize::MAX && min_leading_tabs == usize::MAX)
         {
+            for (i, part) in self.parts().enumerate() {
+                match part {
+                    CommandPart::Text(text) => {
+                        let mut stripped_text = Vec::new();
+                        for (j, line) in text.as_str().lines().enumerate() {
+                            if i == 0 && j == 0 {
+                                let trimmed = text.as_str().trim_start();
+                                if !trimmed.is_empty() {
+                                    stripped_text.push(trimmed);
+                                }
+                                continue;
+                            }
+                            stripped_text.push(line);
+                        }
+                        let stripped_text = stripped_text.join("\n");
+
+                        result.push(StrippedCommandPart::Text(stripped_text));
+                    }
+                    CommandPart::Placeholder(p) => {
+                        result.push(StrippedCommandPart::Placeholder(p.clone()));
+                    }
+                }
+            }
+
+            if let Some(mut last) = result.pop() {
+                if let StrippedCommandPart::Text(text) = &mut last {
+                    let trimmed = text.trim_end_matches(|c| matches!(c, ' ' | '\t'));
+                    if trimmed.ends_with('\n') {
+                        let mut trimmed = trimmed.to_owned();
+                        trimmed.pop();
+                        *text = trimmed;
+                    } else {
+                        *text = trimmed.to_owned();
+                    }
+                }
+
+                result.push(last);
+            }
+
+            return result;
+        }
+
+        // Check for mixed indentation
+        if min_leading_spaces > 0 && min_leading_tabs > 0 {
             for part in self.parts() {
                 match part {
                     CommandPart::Text(text) => {
@@ -843,13 +887,14 @@ impl CommandSection {
                     for (j, line) in text.as_str().lines().enumerate() {
                         if i == 0 && j == 0 {
                             let trimmed = line.trim_start();
-                            if trimmed.is_empty() {
-                                continue;
+                            if !trimmed.is_empty() {
+                                stripped_text.push(trimmed);
                             }
-                            stripped_text.push(trimmed);
+                            continue;
                         }
                         if j == 0 {
                             stripped_text.push(line);
+                            continue;
                         }
                         if line.len() >= num_stripped_chars {
                             stripped_text.push(&line[num_stripped_chars..]);
@@ -867,16 +912,14 @@ impl CommandSection {
             }
         }
 
-        if let Some(last) = result.pop() {
-            if let StrippedCommandPart::Text(text) = last {
+        if let Some(mut last) = result.pop() {
+            if let StrippedCommandPart::Text(text) = &mut last {
                 if text.ends_with('\n') {
-                    result.push(StrippedCommandPart::Text(text.trim_end_matches('\n').to_owned()));
-                } else {
-                    result.push(StrippedCommandPart::Text(text));
+                    text.pop();
                 }
-            } else {
-                result.push(last);
             }
+
+            result.push(last);
         }
 
         result
@@ -2092,5 +2135,150 @@ then name
             _ => panic!("expected text"),
         };
         assert_eq!(text, "!\"");
+    }
+
+    #[test]
+    fn whitespace_stripping_when_command_is_empty() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    command <<<>>>
+}
+    "#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+
+        let command = tasks[0].command().expect("should have a command section");
+
+        let stripped = command.strip_whitespace();
+        assert_eq!(stripped.len(), 0);
+    }
+
+    #[test]
+    fn whitespace_stripping_when_command_is_one_line_of_whitespace() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    command <<<     >>>
+}
+    "#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+
+        let command = tasks[0].command().expect("should have a command section");
+
+        let stripped = command.strip_whitespace();
+        assert_eq!(stripped.len(), 1);
+        let text = match &stripped[0] {
+            StrippedCommandPart::Text(text) => text,
+            _ => panic!("expected text"),
+        };
+        assert_eq!(text, "");
+    }
+
+    #[test]
+    fn whitespace_stripping_when_command_is_one_newline() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    command <<<
+    >>>
+}
+    "#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+
+        let command = tasks[0].command().expect("should have a command section");
+
+        let stripped = command.strip_whitespace();
+        assert_eq!(stripped.len(), 1);
+        let text = match &stripped[0] {
+            StrippedCommandPart::Text(text) => text,
+            _ => panic!("expected text"),
+        };
+        assert_eq!(text, "");
+    }
+
+    #[test]
+    fn whitespace_stripping_when_command_is_a_blank_line() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    command <<<
+
+    >>>
+}
+    "#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+
+        let command = tasks[0].command().expect("should have a command section");
+
+        let stripped = command.strip_whitespace();
+        assert_eq!(stripped.len(), 1);
+        let text = match &stripped[0] {
+            StrippedCommandPart::Text(text) => text,
+            _ => panic!("expected text"),
+        };
+        assert_eq!(text, "");
+    }
+
+    #[test]
+    fn whitespace_stripping_when_command_is_a_blank_line_with_spaces() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    command <<<
+    
+    >>>
+}
+    "#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+
+        let command = tasks[0].command().expect("should have a command section");
+
+        let stripped = command.strip_whitespace();
+        assert_eq!(stripped.len(), 1);
+        let text = match &stripped[0] {
+            StrippedCommandPart::Text(text) => text,
+            _ => panic!("expected text"),
+        };
+        assert_eq!(text, "    ");
     }
 }
