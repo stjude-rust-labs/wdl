@@ -828,7 +828,7 @@ impl CommandSection {
                         let mut stripped_text = Vec::new();
                         for (j, line) in text.as_str().lines().enumerate() {
                             if i == 0 && j == 0 {
-                                let trimmed = text.as_str().trim_start();
+                                let trimmed = line.trim_start();
                                 if !trimmed.is_empty() {
                                     stripped_text.push(trimmed);
                                 }
