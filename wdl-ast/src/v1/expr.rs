@@ -2075,6 +2075,44 @@ pub enum LiteralStringKind {
     Multiline,
 }
 
+/// Represents a multi-line string that's been stripped of leading whitespace
+/// and it's line continuations parsed.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum StrippedStringPart {
+    /// A textual part of the string.
+    Text(String),
+    /// A placeholder encountered in the string.
+    Placeholder(Placeholder),
+}
+
+/// Removes line continuations from a string.
+fn remove_line_continuations(s: &str) -> String {
+    let mut result = String::new();
+    let mut chars = s.chars();
+    while let Some(c) = chars.next() {
+        let mut push_c = true;
+        if c == '\\' {
+            if let Some(next) = chars.next() {
+                if next == '\n' {
+                    push_c = false;
+                    for ws in chars.by_ref() {
+                        if ws == ' ' || ws == '\t' {
+                            continue;
+                        } else {
+                            result.push(ws);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if push_c {
+            result.push(c);
+        }
+    }
+    result
+}
+
 /// Represents a literal string.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LiteralString(pub(super) SyntaxNode);
@@ -2124,6 +2162,97 @@ impl LiteralString {
         }
 
         None
+    }
+
+    /// For multiline strings, this method will strip leading whitespace
+    /// and parse line continuations. For single and double quoted strings,
+    /// this method will return None.
+    pub fn strip_whitespace(&self) -> Option<Vec<StrippedStringPart>> {
+        if self.kind() != LiteralStringKind::Multiline {
+            return None;
+        }
+
+        let mut result = Vec::new();
+
+        for (i, part) in self.parts().enumerate() {
+            match part {
+                StringPart::Text(text) => {
+                    let parsed = remove_line_continuations(text.as_str());
+                    let mut reconstructed = Vec::new();
+                    for (j, line) in parsed.lines().enumerate() {
+                        if i == 0 && j == 0 {
+                            let trimmed = line.trim_start();
+                            if !trimmed.is_empty() {
+                                reconstructed.push(trimmed.to_string());
+                            }
+                            continue;
+                        }
+                        reconstructed.push(line.to_string());
+                    }
+
+                    result.push(StrippedStringPart::Text(reconstructed.join("\n")));
+                }
+                StringPart::Placeholder(placeholder) => {
+                    result.push(StrippedStringPart::Placeholder(placeholder));
+                }
+            }
+        }
+
+        if let Some(mut last) = result.pop() {
+            if let StrippedStringPart::Text(text) = &mut last {
+                let trimmed = text.trim_end_matches([' ', '\t']);
+                if trimmed.ends_with('\n') {
+                    let mut trimmed = trimmed.to_owned();
+                    trimmed.pop();
+                    *text = trimmed;
+                } else {
+                    *text = trimmed.to_owned();
+                }
+            }
+
+            result.push(last);
+        }
+
+        // Now that the string has had line continuations parsed and the first and last
+        // lines removed, we can detect any leading whitespace and trim it.
+        let mut leading_whitespace = usize::MAX;
+        for part in &result {
+            match part {
+                StrippedStringPart::Text(text) => {
+                    for line in text.lines() {
+                        let mut ws_count = 0;
+                        for c in line.chars() {
+                            if c == ' ' || c == '\t' {
+                                ws_count += 1;
+                            } else {
+                                break;
+                            }
+                        }
+                        leading_whitespace = leading_whitespace.min(ws_count);
+                    }
+                }
+                StrippedStringPart::Placeholder(_) => {}
+            }
+        }
+
+        for part in &mut result {
+            match part {
+                StrippedStringPart::Text(text) => {
+                    let mut lines = Vec::new();
+                    for line in text.lines() {
+                        if line.len() < leading_whitespace {
+                            lines.push("");
+                        } else {
+                            lines.push(&line[leading_whitespace..]);
+                        }
+                    }
+                    *text = lines.join("\n");
+                }
+                StrippedStringPart::Placeholder(_) => {}
+            }
+        }
+
+        Some(result)
     }
 }
 
@@ -7361,5 +7490,120 @@ task test {
         let mut visitor = MyVisitor(0);
         document.visit(&mut (), &mut visitor);
         assert_eq!(visitor.0, 1);
+    }
+
+    #[test]
+    fn strip_whitespace_on_single_line_string() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.1
+
+task test {
+    String a = "  foo  "
+}"#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+
+        let decls: Vec<_> = tasks[0].declarations().collect();
+        assert_eq!(decls.len(), 1);
+
+        let expr = decls[0].expr().unwrap_literal().unwrap_string();
+        assert_eq!(expr.text().unwrap().as_str(), "  foo  ");
+
+        let stripped = expr.strip_whitespace();
+        assert!(stripped.is_none());
+    }
+
+    #[test]
+    fn strip_whitespace_on_multi_line_string() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    # all of these strings evaluate to "hello  world"
+    String hw1 = <<<hello  world>>>
+    String hw2 = <<<   hello  world   >>>
+    String hw3 = <<<   
+        hello  world>>>
+    String hw4 = <<<   
+        hello  world
+        >>>
+    String hw5 = <<<   
+        hello  world
+    >>>
+    # The line continuation causes the newline and all whitespace preceding 'world' to be 
+    # removed - to put two spaces between 'hello' and world' we need to put them before 
+    # the line continuation.
+    String hw6 = <<<
+        hello  \
+            world
+    >>>
+}"#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+
+        let decls: Vec<_> = tasks[0].declarations().collect();
+        assert_eq!(decls.len(), 6);
+
+        let expr = decls[0].expr().unwrap_literal().unwrap_string();
+        let stripped = expr.strip_whitespace().unwrap();
+        assert_eq!(stripped.len(), 1);
+        match &stripped[0] {
+            StrippedStringPart::Text(text) => assert_eq!(text.as_str(), "hello  world"),
+            _ => panic!("expected text part"),
+        }
+
+        let expr = decls[1].expr().unwrap_literal().unwrap_string();
+        let stripped = expr.strip_whitespace().unwrap();
+        assert_eq!(stripped.len(), 1);
+        match &stripped[0] {
+            StrippedStringPart::Text(text) => assert_eq!(text.as_str(), "hello  world"),
+            _ => panic!("expected text part"),
+        }
+
+        let expr = decls[2].expr().unwrap_literal().unwrap_string();
+        let stripped = expr.strip_whitespace().unwrap();
+        assert_eq!(stripped.len(), 1);
+        match &stripped[0] {
+            StrippedStringPart::Text(text) => assert_eq!(text.as_str(), "hello  world"),
+            _ => panic!("expected text part"),
+        }
+
+        let expr = decls[3].expr().unwrap_literal().unwrap_string();
+        let stripped = expr.strip_whitespace().unwrap();
+        assert_eq!(stripped.len(), 1);
+        match &stripped[0] {
+            StrippedStringPart::Text(text) => assert_eq!(text.as_str(), "hello  world"),
+            _ => panic!("expected text part"),
+        }
+
+        let expr = decls[4].expr().unwrap_literal().unwrap_string();
+        let stripped = expr.strip_whitespace().unwrap();
+        assert_eq!(stripped.len(), 1);
+        match &stripped[0] {
+            StrippedStringPart::Text(text) => assert_eq!(text.as_str(), "hello  world"),
+            _ => panic!("expected text part"),
+        }
+
+        let expr = decls[5].expr().unwrap_literal().unwrap_string();
+        let stripped = expr.strip_whitespace().unwrap();
+        assert_eq!(stripped.len(), 1);
+        match &stripped[0] {
+            StrippedStringPart::Text(text) => assert_eq!(text.as_str(), "hello  world"),
+            _ => panic!("expected text part"),
+        }
     }
 }
