@@ -246,6 +246,7 @@ pub fn format_command_section(element: &FormatElement, stream: &mut TokenStream<
                 }
             }
         }
+        stream.end_line();
     }
 }
 
