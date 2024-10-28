@@ -1,6 +1,7 @@
 //! Formatting for tasks.
 
 use wdl_ast::SyntaxKind;
+use wdl_ast::v1::StrippedCommandPart;
 
 use crate::PreToken;
 use crate::TokenStream;
@@ -164,36 +165,88 @@ pub fn format_command_section(element: &FormatElement, stream: &mut TokenStream<
             );
         }
     }
-    // Technically there's no trivia inside the command section,
-    // so we don't want to increment indent here.
-    // All the indentation should be handled by the command text itself.
-    // TODO: multi-line placeholders need better formatting
-    for child in children {
-        match child.element().kind() {
-            SyntaxKind::CloseBrace => {
-                stream.push_literal_in_place_of_token(
-                    child
-                        .element()
-                        .as_token()
-                        .expect("close brace should be token"),
-                    ">>>".to_string(),
-                );
+
+    let parts = element
+        .element()
+        .as_node()
+        .expect("command section node")
+        .as_command_section()
+        .expect("command section")
+        .strip_whitespace();
+    // If the command section has mixed indentation, we should not format it.
+    if parts.is_none() {
+        for child in children {
+            match child.element().kind() {
+                SyntaxKind::CloseBrace => {
+                    stream.push_literal_in_place_of_token(
+                        child
+                            .element()
+                            .as_token()
+                            .expect("close brace should be token"),
+                        ">>>".to_string(),
+                    );
+                }
+                SyntaxKind::CloseHeredoc => {
+                    (&child).write(stream);
+                }
+                SyntaxKind::LiteralCommandText | SyntaxKind::PlaceholderNode => {
+                    (&child).write(stream);
+                }
+                _ => {
+                    unreachable!(
+                        "unexpected child in command section: {:?}",
+                        child.element().kind()
+                    );
+                }
             }
-            SyntaxKind::CloseHeredoc => {
-                (&child).write(stream);
+        }
+        stream.end_line();
+    } else {
+        // Now we parse the stripped command section and format it.
+        // End the line after the open delimiter and increment indent.
+        stream.increment_indent();
+
+        for (part, child) in parts.unwrap().iter().zip(children.by_ref()) {
+            match part {
+                StrippedCommandPart::Text(text) => {
+                    for (i, line) in text.lines().enumerate() {
+                        if i > 0 {
+                            stream.end_line();
+                        }
+                        stream.push_literal(line.to_owned(), SyntaxKind::LiteralCommandText);
+                    }
+                }
+                StrippedCommandPart::Placeholder(_) => {
+                    (&child).write(stream);
+                }
             }
-            SyntaxKind::LiteralCommandText | SyntaxKind::PlaceholderNode => {
-                (&child).write(stream);
-            }
-            _ => {
-                unreachable!(
-                    "unexpected child in command section: {:?}",
-                    child.element().kind()
-                );
+        }
+
+        stream.decrement_indent();
+
+        for child in children {
+            match child.element().kind() {
+                SyntaxKind::CloseBrace => {
+                    stream.push_literal_in_place_of_token(
+                        child
+                            .element()
+                            .as_token()
+                            .expect("close brace should be token"),
+                        ">>>".to_string(),
+                    );
+                }
+                SyntaxKind::CloseHeredoc => {
+                    (&child).write(stream);
+                }
+                _ => {
+                    unreachable!(
+                        "unexpected child in command section: {:?}",
+                        child.element().kind()
+                    );
+                }
             }
         }
     }
-    stream.end_line();
 }
 
 /// Formats a [`RequirementsItem`](wdl_ast::v1::RequirementsItem).

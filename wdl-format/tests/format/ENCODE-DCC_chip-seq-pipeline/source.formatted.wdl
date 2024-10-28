@@ -2699,7 +2699,7 @@ task align {
 
     command <<<
         set -e
-
+        
         # check if pipeline dependencies can be found
         if [[ -z "$(which encode_task_merge_fastq.py 2> /dev/null || true)" ]]
         then
@@ -2709,12 +2709,12 @@ task align {
         python3 $(which encode_task_merge_fastq.py) \
             ~{write_tsv(tmp_fastqs)} \
             ~{(
-        if paired_end
-        then "--paired-end"
-        else ""
-    )} \
+            if paired_end
+            then "--paired-end"
+            else ""
+        )} \
             ~{"--nth " + cpu}
-
+        
         if [ -z '~{trim_bp}' ]; then
             SUFFIX=
         else
@@ -2737,76 +2737,76 @@ task align {
             python3 $(which encode_task_trimmomatic.py) \
                 --fastq1 R1$SUFFIX/*.fastq.gz \
                 ~{(
-        if paired_end
-        then "--fastq2 R2$SUFFIX/*.fastq.gz"
-        else ""
-    )} \
+            if paired_end
+            then "--fastq2 R2$SUFFIX/*.fastq.gz"
+            else ""
+        )} \
                 ~{(
-        if paired_end
-        then "--paired-end"
-        else ""
-    )} \
+            if paired_end
+            then "--paired-end"
+            else ""
+        )} \
                 --crop-length ~{crop_length} \
                 --crop-length-tol "~{crop_length_tol}" \
                 ~{"--phred-score-format " + trimmomatic_phred_score_format} \
                 --out-dir-R1 R1$NEW_SUFFIX \
                 ~{(
-        if paired_end
-        then "--out-dir-R2 R2$NEW_SUFFIX"
-        else ""
-    )} \
+            if paired_end
+            then "--out-dir-R2 R2$NEW_SUFFIX"
+            else ""
+        )} \
                 ~{"--trimmomatic-java-heap " + (
-        if defined(trimmomatic_java_heap)
-        then trimmomatic_java_heap
-        else (round(mem_gb * trimmomatic_java_heap_factor) + "G")
-    )} \
+            if defined(trimmomatic_java_heap)
+            then trimmomatic_java_heap
+            else (round(mem_gb * trimmomatic_java_heap_factor) + "G")
+        )} \
                 ~{"--nth " + cpu}
             SUFFIX=$NEW_SUFFIX
         fi
-
+        
         if [ '~{aligner}' == 'bwa' ]; then
             python3 $(which encode_task_bwa.py) \
                 ~{idx_tar} \
                 R1$SUFFIX/*.fastq.gz \
                 ~{(
-        if paired_end
-        then "R2$SUFFIX/*.fastq.gz"
-        else ""
-    )} \
+            if paired_end
+            then "R2$SUFFIX/*.fastq.gz"
+            else ""
+        )} \
                 ~{(
-        if paired_end
-        then "--paired-end"
-        else ""
-    )} \
+            if paired_end
+            then "--paired-end"
+            else ""
+        )} \
                 ~{(
-        if use_bwa_mem_for_pe
-        then "--use-bwa-mem-for-pe"
-        else ""
-    )} \
+            if use_bwa_mem_for_pe
+            then "--use-bwa-mem-for-pe"
+            else ""
+        )} \
                 ~{"--bwa-mem-read-len-limit " + bwa_mem_read_len_limit} \
                 ~{"--mem-gb " + samtools_mem_gb} \
                 ~{"--nth " + cpu}
-
+        
         elif [ '~{aligner}' == 'bowtie2' ]; then
             python3 $(which encode_task_bowtie2.py) \
                 ~{idx_tar} \
                 R1$SUFFIX/*.fastq.gz \
                 ~{(
-        if paired_end
-        then "R2$SUFFIX/*.fastq.gz"
-        else ""
-    )} \
+            if paired_end
+            then "R2$SUFFIX/*.fastq.gz"
+            else ""
+        )} \
                 ~{"--multimapping " + multimapping} \
                 ~{(
-        if paired_end
-        then "--paired-end"
-        else ""
-    )} \
+            if paired_end
+            then "--paired-end"
+            else ""
+        )} \
                 ~{(
-        if use_bowtie2_local_mode
-        then "--local"
-        else ""
-    )} \
+            if use_bowtie2_local_mode
+            then "--local"
+            else ""
+        )} \
                 ~{"--mem-gb " + samtools_mem_gb} \
                 ~{"--nth " + cpu}
         else
@@ -2814,19 +2814,19 @@ task align {
                 ~{idx_tar} \
                 R1$SUFFIX/*.fastq.gz \
                 ~{(
-        if paired_end
-        then "R2$SUFFIX/*.fastq.gz"
-        else ""
-    )} \
+            if paired_end
+            then "R2$SUFFIX/*.fastq.gz"
+            else ""
+        )} \
                 ~{(
-        if paired_end
-        then "--paired-end"
-        else ""
-    )} \
+            if paired_end
+            then "--paired-end"
+            else ""
+        )} \
                 ~{"--mem-gb " + samtools_mem_gb} \
                 ~{"--nth " + cpu}
         fi 
-
+        
         python3 $(which encode_task_post_align.py) \
             R1$SUFFIX/*.fastq.gz $(ls *.bam) \
             ~{"--mito-chr-name " + mito_chr_name} \
@@ -2886,29 +2886,29 @@ task filter {
         python3 $(which encode_task_filter.py) \
             ~{bam} \
             ~{(
-        if paired_end
-        then "--paired-end"
-        else ""
-    )} \
+            if paired_end
+            then "--paired-end"
+            else ""
+        )} \
             --multimapping 0 \
             ~{"--dup-marker " + dup_marker} \
             ~{"--mapq-thresh " + mapq_thresh} \
             --filter-chrs ~{sep=" " filter_chrs} \
             ~{"--chrsz " + chrsz} \
             ~{(
-        if no_dup_removal
-        then "--no-dup-removal"
-        else ""
-    )} \
+            if no_dup_removal
+            then "--no-dup-removal"
+            else ""
+        )} \
             ~{"--mito-chr-name " + mito_chr_name} \
             ~{"--mem-gb " + samtools_mem_gb} \
             ~{"--nth " + cpu} \
             ~{"--picard-java-heap " + (
-        if defined(picard_java_heap)
-        then picard_java_heap
-        else (round(mem_gb * picard_java_heap_factor) + "G")
-    )}
-
+            if defined(picard_java_heap)
+            then picard_java_heap
+            else (round(mem_gb * picard_java_heap_factor) + "G")
+        )}
+        
         if [ '~{redact_nodup_bam}' == 'true' ]; then
             python3 $(which encode_task_bam_to_pbam.py) \
                 $(ls *.bam) \
@@ -2961,10 +2961,10 @@ task bam2ta {
             ~{bam} \
             --disable-tn5-shift \
             ~{(
-        if paired_end
-        then "--paired-end"
-        else ""
-    )} \
+            if paired_end
+            then "--paired-end"
+            else ""
+        )} \
             ~{"--mito-chr-name " + mito_chr_name} \
             ~{"--subsample " + subsample} \
             ~{"--mem-gb " + samtools_mem_gb} \
@@ -3006,10 +3006,10 @@ task spr {
             ~{ta} \
             ~{"--pseudoreplication-random-seed " + pseudoreplication_random_seed} \
             ~{(
-        if paired_end
-        then "--paired-end"
-        else ""
-    )}
+            if paired_end
+            then "--paired-end"
+            else ""
+        )}
     >>>
 
     output {
@@ -3086,10 +3086,10 @@ task xcor {
         python3 $(which encode_task_xcor.py) \
             ~{ta} \
             ~{(
-        if paired_end
-        then "--paired-end"
-        else ""
-    )} \
+            if paired_end
+            then "--paired-end"
+            else ""
+        )} \
             ~{"--mito-chr-name " + mito_chr_name} \
             ~{"--subsample " + subsample} \
             ~{"--chip-seq-type " + chip_seq_type} \
@@ -3140,10 +3140,10 @@ task jsd {
         python3 $(which encode_task_jsd.py) \
             ~{sep=" " select_all(nodup_bams)} \
             ~{(
-        if length(ctl_bams) > 0
-        then "--ctl-bam " + select_first(ctl_bams)
-        else ""
-    )} \
+            if length(ctl_bams) > 0
+            then "--ctl-bam " + select_first(ctl_bams)
+            else ""
+        )} \
             ~{"--mapq-thresh " + mapq_thresh} \
             ~{"--blacklist " + blacklist} \
             ~{"--nth " + cpu}
@@ -3187,10 +3187,10 @@ task choose_ctl {
             ~{"--ta-pooled " + ta_pooled} \
             ~{"--ctl-ta-pooled " + ctl_ta_pooled} \
             ~{(
-        if always_use_pooled_ctl
-        then "--always-use-pooled-ctl"
-        else ""
-    )} \
+            if always_use_pooled_ctl
+            then "--always-use-pooled-ctl"
+            else ""
+        )} \
             ~{"--ctl-depth-ratio " + ctl_depth_ratio} \
             ~{"--ctl-depth-limit " + ctl_depth_limit} \
             ~{"--exp-ctl-depth-ratio-limit " + exp_ctl_depth_ratio_limit}
@@ -3268,10 +3268,10 @@ task subsample_ctl {
             ~{ta} \
             ~{"--subsample " + subsample} \
             ~{(
-        if paired_end
-        then "--paired-end"
-        else ""
-    )} \
+            if paired_end
+            then "--paired-end"
+            else ""
+        )} \
     >>>
 
     output {
@@ -3316,7 +3316,7 @@ task call_peak {
 
     command <<<
         set -e
-
+        
         if [ '~{peak_caller}' == 'macs2' ]; then
             python3 $(which encode_task_macs2_chip.py) \
                 ~{sep=" " select_all(tas)} \
@@ -3326,7 +3326,7 @@ task call_peak {
                 ~{"--cap-num-peak " + cap_num_peak} \
                 ~{"--pval-thresh " + pval_thresh} \
                 ~{"--mem-gb " + mem_gb}
-
+        
         elif [ '~{peak_caller}' == 'spp' ]; then
             python3 $(which encode_task_spp.py) \
                 ~{sep=" " select_all(tas)} \
@@ -3336,7 +3336,7 @@ task call_peak {
                 ~{"--fdr-thresh " + fdr_thresh} \
                 ~{"--nth " + cpu}
         fi
-
+        
         python3 $(which encode_task_post_call_peak_chip.py) \
             $(ls *Peak.gz) \
             ~{"--ta " + tas[0]} \
@@ -3442,12 +3442,11 @@ task idr {
     }
 
     command <<<
-        set -e
-        ~{(
-        if defined(ta)
-        then ""
-        else "touch null.frip.qc"
-    )}
+        set -e~{(
+            if defined(ta)
+            then ""
+            else "touch null.frip.qc"
+        )}
         touch null 
         python3 $(which encode_task_idr.py) \
             ~{peak1} ~{peak2} ~{peak_pooled} \
@@ -3507,12 +3506,11 @@ task overlap {
     }
 
     command <<<
-        set -e
-        ~{(
-        if defined(ta)
-        then ""
-        else "touch null.frip.qc"
-    )}
+        set -e~{(
+            if defined(ta)
+            then ""
+            else "touch null.frip.qc"
+        )}
         touch null 
         python3 $(which encode_task_overlap.py) \
             ~{peak1} ~{peak2} ~{peak_pooled} \
@@ -3624,10 +3622,10 @@ task gc_bias {
             ~{"--nodup-bam " + nodup_bam} \
             ~{"--ref-fa " + ref_fa} \
             ~{"--picard-java-heap " + (
-        if defined(picard_java_heap)
-        then picard_java_heap
-        else (round(mem_gb * picard_java_heap_factor) + "G")
-    )}
+            if defined(picard_java_heap)
+            then picard_java_heap
+            else (round(mem_gb * picard_java_heap_factor) + "G")
+        )}
     >>>
 
     output {
@@ -3724,10 +3722,10 @@ task qc_report {
             --pipeline-type ~{pipeline_type} \
             --aligner ~{aligner} \
             ~{(
-        if (no_dup_removal)
-        then "--no-dup-removal "
-        else ""
-    )} \
+            if (no_dup_removal)
+            then "--no-dup-removal "
+            else ""
+        )} \
             --peak-caller ~{peak_caller} \
             ~{"--cap-num-peak " + cap_num_peak} \
             --idr-thresh ~{idr_thresh} \
@@ -3809,7 +3807,7 @@ task read_genome_tsv {
         touch ref_fa bowtie2_idx_tar bwa_idx_tar chrsz gensz blacklist blacklist2
         touch mito_chr_name
         touch regex_bfilt_peak_chr_name
-
+        
         python <<CODE
         import os
         with open('~{genome_tsv}','r') as fp:
