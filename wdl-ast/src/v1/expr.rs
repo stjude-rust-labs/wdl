@@ -7665,8 +7665,7 @@ task test {
             _ => panic!("expected text part"),
         }
         match &stripped[1] {
-            StrippedStringPart::Placeholder(_) => {
-            }
+            StrippedStringPart::Placeholder(_) => {}
             _ => panic!("expected interpolated part"),
         }
         match &stripped[2] {
@@ -7682,8 +7681,7 @@ task test {
             _ => panic!("expected text part"),
         }
         match &stripped[1] {
-            StrippedStringPart::Placeholder(_) => {
-            }
+            StrippedStringPart::Placeholder(_) => {}
             _ => panic!("expected interpolated part"),
         }
         match &stripped[2] {
