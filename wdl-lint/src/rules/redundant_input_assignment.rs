@@ -20,7 +20,7 @@ const ID: &str = "RedundantInputAssignment";
 
 /// Create a "Redundant Input Assignment" diagnostic.
 fn redundant_input_assignment(span: Span) -> Diagnostic {
-    Diagnostic::warning("redundant input assignments can be shortened")
+    Diagnostic::note("redundant input assignments can be shortened")
         .with_rule(ID)
         .with_label("redundant input assignments can be shortened", span)
         .with_fix("remove the redundant input assignment")
