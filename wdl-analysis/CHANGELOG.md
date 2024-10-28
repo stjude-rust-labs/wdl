@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.5.0 - 10-22-2024
+
+### Changed
+
+* Refactored the `DocumentScope` API to simply `Document` and exposed more
+  information about tasks and workflows such as their inputs and outputs (#[232](https://github.com/stjude-rust-labs/wdl/pull/232)).
+* Switched to `rustls-tls` for TLS implementation rather than relying on
+  OpenSSL for Linux builds (#[228](https://github.com/stjude-rust-labs/wdl/pull/228)).
+
 ## 0.4.0 - 10-16-2024
 
 ### Added
