@@ -725,6 +725,8 @@ impl AstNode for OutputSection {
 }
 
 /// A command part stripped of leading whitespace.
+/// 
+/// Placeholders are not changed and are copied as is.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum StrippedCommandPart {
     /// A text part.
@@ -841,7 +843,7 @@ impl CommandSection {
                         result.push(StrippedCommandPart::Text(stripped_text));
                     }
                     CommandPart::Placeholder(p) => {
-                        result.push(StrippedCommandPart::Placeholder(p.clone()));
+                        result.push(StrippedCommandPart::Placeholder(p));
                     }
                 }
             }
@@ -906,7 +908,7 @@ impl CommandSection {
                     result.push(StrippedCommandPart::Text(stripped_text));
                 }
                 CommandPart::Placeholder(p) => {
-                    result.push(StrippedCommandPart::Placeholder(p.clone()));
+                    result.push(StrippedCommandPart::Placeholder(p));
                 }
             }
         }
