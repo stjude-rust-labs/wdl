@@ -109,6 +109,12 @@ pub struct Postprocessor {
 
     /// Whether blank lines are allowed in the current context.
     line_spacing_policy: LineSpacingPolicy,
+
+    /// Whether temporary indentation is needed.
+    temp_indent_needed: bool,
+
+    /// Temporary indentation to add while formatting command blocks.
+    temp_indent: String,
 }
 
 impl Postprocessor {
@@ -183,6 +189,14 @@ impl Postprocessor {
                 {
                     stream.0.pop();
                 }
+
+                if kind == SyntaxKind::LiteralCommandText {
+                    self.temp_indent = value
+                        .chars()
+                        .take_while(|c| matches!(c, ' ' | '\t'))
+                        .collect();
+                }
+
                 stream.push(PostToken::Literal(value));
                 self.position = LinePosition::MiddleOfLine;
             }
@@ -226,6 +240,12 @@ impl Postprocessor {
                     self.end_line(stream);
                 }
             },
+            PreToken::TempIndentStart => {
+                self.temp_indent_needed = true;
+            }
+            PreToken::TempIndentEnd => {
+                self.temp_indent_needed = false;
+            }
         }
     }
 
@@ -241,7 +261,10 @@ impl Postprocessor {
 
     /// Trims spaces and indents (and not newlines) from the end of the stream.
     fn trim_last_line(&mut self, stream: &mut TokenStream<PostToken>) {
-        stream.trim_while(|token| matches!(token, PostToken::Space | PostToken::Indent));
+        stream.trim_while(|token| {
+            matches!(token, PostToken::Space | PostToken::Indent)
+                || token == &PostToken::Literal(self.temp_indent.clone())
+        });
     }
 
     /// Ends the current line without resetting the interrupted flag.
@@ -272,6 +295,10 @@ impl Postprocessor {
 
         for _ in 0..level {
             stream.push(PostToken::Indent);
+        }
+
+        if self.temp_indent_needed {
+            stream.push(PostToken::Literal(self.temp_indent.clone()));
         }
     }
 

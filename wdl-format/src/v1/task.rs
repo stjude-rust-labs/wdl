@@ -217,7 +217,9 @@ pub fn format_command_section(element: &FormatElement, stream: &mut TokenStream<
                     }
                 }
                 StrippedCommandPart::Placeholder(_) => {
+                    stream.push(PreToken::TempIndentStart);
                     (&child).write(stream);
+                    stream.push(PreToken::TempIndentEnd);
                 }
             }
         }
