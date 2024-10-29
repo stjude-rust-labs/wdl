@@ -2093,7 +2093,7 @@ pub enum StrippedStringPart {
 /// spaces or tabs that follow the newline character.
 fn remove_line_continuations(s: &str) -> String {
     let mut result = String::new();
-    let mut chars = s.chars();
+    let mut chars = s.chars().peekable();
     let mut push_c;
     while let Some(c) = chars.next() {
         push_c = true;
@@ -2101,7 +2101,7 @@ fn remove_line_continuations(s: &str) -> String {
             if let Some(next) = chars.next() {
                 if next == '\n' {
                     push_c = false;
-                    let mut inner_chars = chars.by_ref().peekable();
+                    let inner_chars = chars.by_ref();
                     while let Some(&c) = inner_chars.peek() {
                         if c == ' ' || c == '\t' {
                             inner_chars.next();
