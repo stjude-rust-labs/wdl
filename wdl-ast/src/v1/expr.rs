@@ -2094,17 +2094,18 @@ pub enum StrippedStringPart {
 fn remove_line_continuations(s: &str) -> String {
     let mut result = String::new();
     let mut chars = s.chars();
+    let mut push_c;
     while let Some(c) = chars.next() {
-        let mut push_c = true;
+        push_c = true;
         if c == '\\' {
             if let Some(next) = chars.next() {
                 if next == '\n' {
                     push_c = false;
-                    for ws in chars.by_ref() {
-                        if ws == ' ' || ws == '\t' {
-                            continue;
+                    let mut inner_chars = chars.by_ref().peekable();
+                    while let Some(&c) = inner_chars.peek() {
+                        if c == ' ' || c == '\t' {
+                            inner_chars.next();
                         } else {
-                            result.push(ws);
                             break;
                         }
                     }
@@ -7696,6 +7697,43 @@ task test {
         }
         match &stripped[2] {
             StrippedStringPart::Text(text) => assert_eq!(text.as_str(), "\nmy name\nis Jerry!"),
+            _ => panic!("expected text part"),
+        }
+    }
+
+    #[test]
+    fn remove_multiple_line_continuations() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    String hw = <<<
+    hello world \
+    \
+    \
+    my name is Jeff.
+    >>>
+}"#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+
+        let decls: Vec<_> = tasks[0].declarations().collect();
+        assert_eq!(decls.len(), 1);
+
+        let expr = decls[0].expr().unwrap_literal().unwrap_string();
+        let stripped = expr.strip_whitespace().unwrap();
+        assert_eq!(stripped.len(), 1);
+        match &stripped[0] {
+            StrippedStringPart::Text(text) => {
+                assert_eq!(text.as_str(), "hello world my name is Jeff.")
+            }
             _ => panic!("expected text part"),
         }
     }
