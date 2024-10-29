@@ -167,7 +167,7 @@ impl Postprocessor {
             PreToken::Literal(value, kind) => {
                 assert!(kind != SyntaxKind::Comment && kind != SyntaxKind::Whitespace);
                 // Don't add empty literals.
-                if value == "" {
+                if value.is_empty() {
                     return;
                 }
 
