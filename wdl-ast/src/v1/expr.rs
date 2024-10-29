@@ -2076,7 +2076,8 @@ pub enum LiteralStringKind {
 }
 
 /// Represents a multi-line string that's been stripped of leading whitespace
-/// and it's line continuations parsed.
+/// and it's line continuations parsed. Placeholders are not changed and are
+/// copied as-is.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum StrippedStringPart {
     /// A textual part of the string.
@@ -2086,6 +2087,10 @@ pub enum StrippedStringPart {
 }
 
 /// Removes line continuations from a string.
+///
+/// A line continuation is a backslash immediately preceding a newline
+/// character. This function will remove the backslash and newline, and any
+/// spaces or tabs that follow the newline character.
 fn remove_line_continuations(s: &str) -> String {
     let mut result = String::new();
     let mut chars = s.chars();
@@ -2164,9 +2169,11 @@ impl LiteralString {
         None
     }
 
-    /// For multiline strings, this method will strip leading whitespace
-    /// and parse line continuations. For single and double quoted strings,
-    /// this method will return None.
+    /// Strips leading whitespace from a multi-line string.
+    ///
+    /// This function will remove leading whitespace from each line of a
+    /// multi-line string and parse line continuations. Single or double
+    /// quoted strings will return `None`.
     pub fn strip_whitespace(&self) -> Option<Vec<StrippedStringPart>> {
         if self.kind() != LiteralStringKind::Multiline {
             return None;
@@ -2174,6 +2181,9 @@ impl LiteralString {
 
         let mut result = Vec::new();
 
+        // Parse the string parts and remove line continuations.
+        // We also remove the first and last lines of the string.
+        // Placeholders are copied as-is.
         for (i, part) in self.parts().enumerate() {
             match part {
                 StringPart::Text(text) => {
