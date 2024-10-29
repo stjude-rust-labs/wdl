@@ -58,6 +58,7 @@ use crate::UNUSED_DECL_RULE_ID;
 use crate::UNUSED_IMPORT_RULE_ID;
 use crate::UNUSED_INPUT_RULE_ID;
 use crate::diagnostics::Context;
+use crate::diagnostics::Io;
 use crate::diagnostics::call_input_type_mismatch;
 use crate::diagnostics::duplicate_workflow;
 use crate::diagnostics::if_conditional_mismatch;
@@ -1196,7 +1197,7 @@ fn add_call_statement(
                 .copied()
                 .map(|i| i.ty)
                 .unwrap_or_else(|| {
-                    diagnostics.push(unknown_call_io(&ty, &input_name, true));
+                    diagnostics.push(unknown_call_io(&ty, &input_name, Io::Input));
                     Type::Union
                 });
 

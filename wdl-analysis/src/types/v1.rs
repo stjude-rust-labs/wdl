@@ -44,6 +44,7 @@ use super::StructType;
 use super::Type;
 use super::TypeEq;
 use super::Types;
+use crate::diagnostics::Io;
 use crate::diagnostics::ambiguous_argument;
 use crate::diagnostics::argument_type_mismatch;
 use crate::diagnostics::cannot_access;
@@ -1111,7 +1112,7 @@ where
 
         // Evaluate the items of the literal
         for item in expr.items() {
-            self.evaluate_literal_io_item(scope, item.names(), item.expr(), true);
+            self.evaluate_literal_io_item(scope, item.names(), item.expr(), Io::Input);
         }
 
         Some(Type::Input)
@@ -1130,7 +1131,7 @@ where
 
         // Evaluate the items of the literal
         for item in expr.items() {
-            self.evaluate_literal_io_item(scope, item.names(), item.expr(), false);
+            self.evaluate_literal_io_item(scope, item.names(), item.expr(), Io::Output);
         }
 
         Some(Type::Output)
@@ -1142,7 +1143,7 @@ where
         scope: &ScopeRef<'_>,
         names: impl Iterator<Item = Ident>,
         expr: Expr,
-        input: bool,
+        io: Io,
     ) {
         let mut names = names.enumerate().peekable();
         let expr_ty = self.evaluate_expr(scope, &expr).unwrap_or(Type::Union);
@@ -1156,7 +1157,7 @@ where
             let ty = if i == 0 {
                 span = Some(name.span());
 
-                match if input {
+                match if io == Io::Input {
                     scope.input(name.as_str()).unwrap().map(|i| i.ty())
                 } else {
                     scope.output(name.as_str()).unwrap().map(|o| o.ty())
@@ -1166,7 +1167,7 @@ where
                         self.diagnostics.push(unknown_task_io(
                             scope.task_name().expect("should have task name"),
                             &name,
-                            input,
+                            io,
                         ));
                         break;
                     }
@@ -1713,7 +1714,8 @@ where
                     return Some(output.ty());
                 }
 
-                self.diagnostics.push(unknown_call_io(ty, &name, false));
+                self.diagnostics
+                    .push(unknown_call_io(ty, &name, Io::Output));
                 return None;
             }
         }

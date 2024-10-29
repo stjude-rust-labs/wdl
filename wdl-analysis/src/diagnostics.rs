@@ -18,6 +18,24 @@ use crate::types::CallType;
 use crate::types::Type;
 use crate::types::Types;
 
+/// Utility type to represent an input or an output.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Io {
+    /// The I/O is an input.
+    Input,
+    /// The I/O is an output.
+    Output,
+}
+
+impl fmt::Display for Io {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Input => write!(f, "input"),
+            Self::Output => write!(f, "output"),
+        }
+    }
+}
+
 /// Represents the context for diagnostic reporting.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Context {
@@ -769,23 +787,21 @@ pub fn unknown_task_or_workflow(namespace: Option<Span>, name: &Ident) -> Diagno
 }
 
 /// Creates an "unknown call input/output" diagnostic.
-pub fn unknown_call_io(call: &CallType, name: &Ident, input: bool) -> Diagnostic {
+pub fn unknown_call_io(call: &CallType, name: &Ident, io: Io) -> Diagnostic {
     Diagnostic::error(format!(
-        "{kind} `{name}` does not have an {io} named `{input_name}`",
+        "{kind} `{call}` does not have an {io} named `{name}`",
         kind = call.kind(),
-        name = call.name(),
-        io = if input { "input" } else { "output" },
-        input_name = name.as_str(),
+        call = call.name(),
+        name = name.as_str(),
     ))
     .with_highlight(name.span())
 }
 
 /// Creates an "unknown task input/output name" diagnostic.
-pub fn unknown_task_io(task_name: &str, name: &Ident, input: bool) -> Diagnostic {
+pub fn unknown_task_io(task_name: &str, name: &Ident, io: Io) -> Diagnostic {
     Diagnostic::error(format!(
         "task `{task_name}` does not have an {io} named `{name}`",
         name = name.as_str(),
-        io = if input { "input" } else { "output" }
     ))
     .with_highlight(name.span())
 }
