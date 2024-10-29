@@ -725,7 +725,7 @@ impl AstNode for OutputSection {
 }
 
 /// A command part stripped of leading whitespace.
-/// 
+///
 /// Placeholders are not changed and are copied as is.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum StrippedCommandPart {
