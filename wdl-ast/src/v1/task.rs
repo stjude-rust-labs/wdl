@@ -851,7 +851,7 @@ impl CommandSection {
             if let Some(StrippedCommandPart::Text(text)) = result.last_mut() {
                 if let Some(index) = text.rfind(|c| !matches!(c, ' ' | '\t')) {
                     text.truncate(index + 1);
-                } else if text.chars().all(|c| matches!(c, ' ' | '\t')) {
+                } else {
                     text.clear();
                 }
                 if text.ends_with('\n') {
