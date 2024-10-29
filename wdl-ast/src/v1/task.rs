@@ -848,19 +848,15 @@ impl CommandSection {
                 }
             }
 
-            if let Some(mut last) = result.pop() {
-                if let StrippedCommandPart::Text(text) = &mut last {
-                    let trimmed = text.trim_end_matches([' ', '\t']);
-                    if trimmed.ends_with('\n') {
-                        let mut trimmed = trimmed.to_owned();
-                        trimmed.pop();
-                        *text = trimmed;
-                    } else {
-                        *text = trimmed.to_owned();
-                    }
+            if let Some(StrippedCommandPart::Text(text)) = result.last_mut() {
+                if let Some(index) = text.rfind(|c| !matches!(c, ' ' | '\t')) {
+                    text.truncate(index + 1);
+                } else if text.chars().all(|c| matches!(c, ' ' | '\t')) {
+                    text.clear();
                 }
-
-                result.push(last);
+                if text.ends_with('\n') {
+                    text.pop();
+                }
             }
 
             return Some(result);
@@ -913,14 +909,10 @@ impl CommandSection {
             }
         }
 
-        if let Some(mut last) = result.pop() {
-            if let StrippedCommandPart::Text(text) = &mut last {
-                if text.ends_with('\n') {
-                    text.pop();
-                }
+        if let Some(StrippedCommandPart::Text(text)) = result.last_mut() {
+            if text.ends_with('\n') {
+                text.pop();
             }
-
-            result.push(last);
         }
 
         Some(result)
