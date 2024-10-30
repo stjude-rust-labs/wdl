@@ -521,7 +521,7 @@ where
 pub enum Inputs {
     /// The inputs are to a task.
     Task(TaskInputs),
-    /// The inputs are
+    /// The inputs are to a workflow.
     Workflow(WorkflowInputs),
 }
 
