@@ -24,6 +24,5 @@ task mixed_leading_whitespace {
     command <<<
         echo "hello"
               echo "world"
-
     >>>
 }
