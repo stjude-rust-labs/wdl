@@ -219,6 +219,10 @@ pub fn format_command_section(element: &FormatElement, stream: &mut TokenStream<
                             }
                             stream.push_literal(line.to_owned(), SyntaxKind::LiteralCommandText);
                         }
+
+                        if text.ends_with('\n') {
+                            stream.end_line();
+                        }
                     }
                     StrippedCommandPart::Placeholder(_) => {
                         stream.push(PreToken::TempIndentStart);

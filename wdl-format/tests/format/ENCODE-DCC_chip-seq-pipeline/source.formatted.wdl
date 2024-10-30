@@ -3442,7 +3442,8 @@ task idr {
     }
 
     command <<<
-        set -e~{(
+        set -e
+        ~{(
             if defined(ta)
             then ""
             else "touch null.frip.qc"
@@ -3506,7 +3507,8 @@ task overlap {
     }
 
     command <<<
-        set -e~{(
+        set -e
+        ~{(
             if defined(ta)
             then ""
             else "touch null.frip.qc"
