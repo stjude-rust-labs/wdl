@@ -99,11 +99,14 @@ pub fn format_task_definition(element: &FormatElement, stream: &mut TokenStream<
     }
 
     stream.blank_lines_allowed();
+    let body_empty = body.is_empty();
     for child in body {
         (&child).write(stream);
     }
     stream.blank_lines_allowed_between_comments();
-    stream.blank_line();
+    if !body_empty {
+        stream.blank_line();
+    }
 
     if let Some(command) = command {
         (&command).write(stream);

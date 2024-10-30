@@ -3,28 +3,24 @@
 version 1.2
 
 task no_whitespace {
-
     command <<<
         echo "hello"
     >>>
 }
 
 task short_leading_whitespace {
-
     command <<<
         echo "hello"
     >>>
 }
 
 task long_leading_whitespace {
-
     command <<<
         echo "hello"
     >>>
 }
 
 task mixed_leading_whitespace {
-
     command <<<
         echo "hello"
               echo "world"
