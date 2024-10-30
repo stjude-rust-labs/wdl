@@ -17,6 +17,41 @@ use crate::stdlib::STDLIB;
 
 pub mod v1;
 
+/// Used to display a slice of types.
+pub fn display_types<'a>(types: &'a Types, slice: &'a [Type]) -> impl fmt::Display + use<'a> {
+    /// Used to display a slice of types.
+    struct Display<'a> {
+        /// The types collection.
+        types: &'a Types,
+        /// The slice of types being displayed.
+        slice: &'a [Type],
+    }
+
+    impl fmt::Display for Display<'_> {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            for (i, ty) in self.slice.iter().enumerate() {
+                if i > 0 {
+                    if self.slice.len() == 2 {
+                        write!(f, " ")?;
+                    } else {
+                        write!(f, ", ")?;
+                    }
+
+                    if i == self.slice.len() - 1 {
+                        write!(f, "or ")?;
+                    }
+                }
+
+                write!(f, "type `{ty}`", ty = ty.display(self.types))?;
+            }
+
+            Ok(())
+        }
+    }
+
+    Display { types, slice }
+}
+
 /// A trait implemented on types that may be optional.
 pub trait Optional: Copy {
     /// Determines if the type is optional.

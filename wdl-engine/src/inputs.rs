@@ -16,6 +16,7 @@ use wdl_analysis::document::Task;
 use wdl_analysis::document::Workflow;
 use wdl_analysis::types::CallKind;
 use wdl_analysis::types::Coercible;
+use wdl_analysis::types::display_types;
 use wdl_analysis::types::v1::task_hint_types;
 use wdl_analysis::types::v1::task_requirement_types;
 
@@ -100,13 +101,14 @@ impl TaskInputs {
         // Check the types of the specified requirements
         for (name, value) in &self.requirements {
             let ty = value.ty(engine);
-            if let Some((types, expected)) = task_requirement_types(version, name.as_str()) {
-                if !types
+            if let Some(expected) = task_requirement_types(version, name.as_str()) {
+                if !expected
                     .iter()
                     .any(|target| ty.is_coercible_to(engine.types(), target))
                 {
                     bail!(
                         "expected {expected} for requirement `{name}`, but found type `{ty}`",
+                        expected = display_types(engine.types(), expected),
                         ty = ty.display(engine.types())
                     );
                 }
@@ -120,13 +122,14 @@ impl TaskInputs {
         // Check the types of the specified hints
         for (name, value) in &self.hints {
             let ty = value.ty(engine);
-            if let Some((types, expected)) = task_hint_types(version, name.as_str(), false) {
-                if !types
+            if let Some(expected) = task_hint_types(version, name.as_str(), false) {
+                if !expected
                     .iter()
                     .any(|target| ty.is_coercible_to(engine.types(), target))
                 {
                     bail!(
                         "expected {expected} for hint `{name}`, but found type `{ty}`",
+                        expected = display_types(engine.types(), expected),
                         ty = ty.display(engine.types())
                     );
                 }
@@ -176,8 +179,8 @@ impl TaskInputs {
                     }
                 };
 
-                if let Some((requirement, (types, expected))) = matched {
-                    for ty in types {
+                if let Some((requirement, expected)) = matched {
+                    for ty in expected {
                         if value.ty(engine).is_coercible_to(engine.types(), ty) {
                             if requirement {
                                 self.requirements.insert(remainder.to_string(), value);
@@ -190,6 +193,7 @@ impl TaskInputs {
 
                     bail!(
                         "expected {expected} for {key} key `{remainder}`, but found type `{ty}`",
+                        expected = display_types(engine.types(), expected),
                         ty = value.ty(engine).display(engine.types())
                     );
                 } else if must_match {

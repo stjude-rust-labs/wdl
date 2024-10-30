@@ -100,169 +100,115 @@ pub fn task_member_type(name: &str) -> Option<Type> {
 
 /// Gets the types of a task requirement.
 ///
-/// Returns a slice of types and a string representation of the types or `None`
-/// if the given name is not a requirement.
-pub fn task_requirement_types(
-    version: SupportedVersion,
-    name: &str,
-) -> Option<(&'static [Type], &'static str)> {
+/// Returns a slice of types or `None` if the given name is not a requirement.
+pub fn task_requirement_types(version: SupportedVersion, name: &str) -> Option<&'static [Type]> {
     /// The types for the `container` requirement.
-    static CONTAINER_TYPES: LazyLock<(Box<[Type]>, &'static str)> = LazyLock::new(|| {
-        (
-            Box::new([PrimitiveTypeKind::String.into(), STDLIB.array_string]),
-            "type `String` or type `Array[String]`",
-        )
-    });
+    static CONTAINER_TYPES: LazyLock<Box<[Type]>> =
+        LazyLock::new(|| Box::new([PrimitiveTypeKind::String.into(), STDLIB.array_string]));
     /// The types for the `cpu` requirement.
-    const CPU_TYPES: (&[Type], &str) = (
-        &[
-            Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),
-            Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Float)),
-        ],
-        "type `Int` or type `Float`",
-    );
+    const CPU_TYPES: &[Type] = &[
+        Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),
+        Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Float)),
+    ];
     /// The types for the `memory` requirement.
-    const MEMORY_TYPES: (&[Type], &str) = (
-        &[
-            Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),
-            Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::String)),
-        ],
-        "type `Int` or type `String`",
-    );
+    const MEMORY_TYPES: &[Type] = &[
+        Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),
+        Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::String)),
+    ];
     /// The types for the `gpu` requirement.
-    const GPU_TYPES: (&[Type], &str) = (
-        &[Type::Primitive(PrimitiveType::new(
-            PrimitiveTypeKind::Boolean,
-        ))],
-        "type `Boolean`",
-    );
+    const GPU_TYPES: &[Type] = &[Type::Primitive(PrimitiveType::new(
+        PrimitiveTypeKind::Boolean,
+    ))];
     /// The types for the `fpga` requirement.
-    const FPGA_TYPES: (&[Type], &str) = (
-        &[Type::Primitive(PrimitiveType::new(
-            PrimitiveTypeKind::Boolean,
-        ))],
-        "type `Boolean`",
-    );
+    const FPGA_TYPES: &[Type] = &[Type::Primitive(PrimitiveType::new(
+        PrimitiveTypeKind::Boolean,
+    ))];
     /// The types for the `disks` requirement.
-    static DISKS_TYPES: LazyLock<(Box<[Type]>, &'static str)> = LazyLock::new(|| {
-        (
-            Box::new([
-                PrimitiveTypeKind::Integer.into(),
-                PrimitiveTypeKind::String.into(),
-                STDLIB.array_string,
-            ]),
-            "type `Int`, type `String`, or type `Array[String]`",
-        )
+    static DISKS_TYPES: LazyLock<Box<[Type]>> = LazyLock::new(|| {
+        Box::new([
+            PrimitiveTypeKind::Integer.into(),
+            PrimitiveTypeKind::String.into(),
+            STDLIB.array_string,
+        ])
     });
     /// The types for the `max_retries` requirement.
-    const MAX_RETRIES_TYPES: (&[Type], &str) = (
-        &[Type::Primitive(PrimitiveType::new(
-            PrimitiveTypeKind::Integer,
-        ))],
-        "type `Int`",
-    );
+    const MAX_RETRIES_TYPES: &[Type] = &[Type::Primitive(PrimitiveType::new(
+        PrimitiveTypeKind::Integer,
+    ))];
     /// The types for the `return_codes` requirement.
-    static RETURN_CODES_TYPES: LazyLock<(Box<[Type]>, &'static str)> = LazyLock::new(|| {
-        (
-            Box::new([
-                PrimitiveTypeKind::Integer.into(),
-                PrimitiveTypeKind::String.into(),
-                STDLIB.array_int,
-            ]),
-            "type `Int`, type `String`, or type `Array[Int]`",
-        )
+    static RETURN_CODES_TYPES: LazyLock<Box<[Type]>> = LazyLock::new(|| {
+        Box::new([
+            PrimitiveTypeKind::Integer.into(),
+            PrimitiveTypeKind::String.into(),
+            STDLIB.array_int,
+        ])
     });
 
     match name {
-        "container" | "docker" => Some((&CONTAINER_TYPES.0, CONTAINER_TYPES.1)),
+        "container" | "docker" => Some(&CONTAINER_TYPES),
         "cpu" => Some(CPU_TYPES),
-        "disks" => Some((&DISKS_TYPES.0, DISKS_TYPES.1)),
+        "disks" => Some(&DISKS_TYPES),
         "gpu" => Some(GPU_TYPES),
         "fpga" if version >= SupportedVersion::V1(V1::Two) => Some(FPGA_TYPES),
         "max_retries" if version >= SupportedVersion::V1(V1::Two) => Some(MAX_RETRIES_TYPES),
         "maxRetries" => Some(MAX_RETRIES_TYPES),
         "memory" => Some(MEMORY_TYPES),
-        "return_codes" if version >= SupportedVersion::V1(V1::Two) => {
-            Some((&RETURN_CODES_TYPES.0, RETURN_CODES_TYPES.1))
-        }
-        "returnCodes" => Some((&RETURN_CODES_TYPES.0, RETURN_CODES_TYPES.1)),
+        "return_codes" if version >= SupportedVersion::V1(V1::Two) => Some(&RETURN_CODES_TYPES),
+        "returnCodes" => Some(&RETURN_CODES_TYPES),
         _ => None,
     }
 }
 
 /// Gets the types of a task hint.
 ///
-/// Returns a slice of types and a string representation of the types or `None`
-/// if the given name is not a hint.
+/// Returns a slice of types or `None` if the given name is not a reserved hint.
 pub fn task_hint_types(
     version: SupportedVersion,
     name: &str,
     use_hidden_types: bool,
-) -> Option<(&'static [Type], &'static str)> {
+) -> Option<&'static [Type]> {
     /// The types for the `disks` hint.
-    static DISKS_TYPES: LazyLock<(Box<[Type]>, &'static str)> = LazyLock::new(|| {
-        (
-            Box::new([PrimitiveTypeKind::String.into(), STDLIB.map_string_string]),
-            "type `String` or type `Map[String, String]`",
-        )
-    });
+    static DISKS_TYPES: LazyLock<Box<[Type]>> =
+        LazyLock::new(|| Box::new([PrimitiveTypeKind::String.into(), STDLIB.map_string_string]));
     /// The types for the `fpga` hint.
-    const FPGA_TYPES: (&[Type], &str) = (
-        &[
-            Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),
-            Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::String)),
-        ],
-        "type `Int` or type `String`",
-    );
+    const FPGA_TYPES: &[Type] = &[
+        Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),
+        Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::String)),
+    ];
     /// The types for the `gpu` hint.
-    const GPU_TYPES: (&[Type], &str) = (
-        &[
-            Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),
-            Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::String)),
-        ],
-        "type `Int` or type `String`",
-    );
+    const GPU_TYPES: &[Type] = &[
+        Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),
+        Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::String)),
+    ];
     /// The types for the `inputs` hint.
-    const INPUTS_TYPES: (&[Type], &str) = (&[Type::Object], "type `Object`");
+    const INPUTS_TYPES: &[Type] = &[Type::Object];
     /// The types for the `inputs` hint (with hidden types).
-    const INPUTS_HIDDEN_TYPES: (&[Type], &str) = (&[Type::Input], "type `input`");
+    const INPUTS_HIDDEN_TYPES: &[Type] = &[Type::Input];
     /// The types for the `localization_optional` hint.
-    const LOCALIZATION_OPTIONAL_TYPES: (&[Type], &str) = (
-        &[Type::Primitive(PrimitiveType::new(
-            PrimitiveTypeKind::Boolean,
-        ))],
-        "type `Boolean`",
-    );
+    const LOCALIZATION_OPTIONAL_TYPES: &[Type] = &[Type::Primitive(PrimitiveType::new(
+        PrimitiveTypeKind::Boolean,
+    ))];
     /// The types for the `max_cpu` hint.
-    const MAX_CPU_TYPES: (&[Type], &str) = (
-        &[
-            Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),
-            Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Float)),
-        ],
-        "type `Int` or type `Float`",
-    );
+    const MAX_CPU_TYPES: &[Type] = &[
+        Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),
+        Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Float)),
+    ];
     /// The types for the `max_memory` hint.
-    const MAX_MEMORY_TYPES: (&[Type], &str) = (
-        &[
-            Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),
-            Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::String)),
-        ],
-        "type `Int` or type `String`",
-    );
+    const MAX_MEMORY_TYPES: &[Type] = &[
+        Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),
+        Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::String)),
+    ];
     /// The types for the `outputs` hint.
-    const OUTPUTS_TYPES: (&[Type], &str) = (&[Type::Object], "type `Object`");
+    const OUTPUTS_TYPES: &[Type] = &[Type::Object];
     /// The types for the `outputs` hint (with hidden types).
-    const OUTPUTS_HIDDEN_TYPES: (&[Type], &str) = (&[Type::Output], "type `output`");
+    const OUTPUTS_HIDDEN_TYPES: &[Type] = &[Type::Output];
     /// The types for the `short_task` hint.
-    const SHORT_TASK_TYPES: (&[Type], &str) = (
-        &[Type::Primitive(PrimitiveType::new(
-            PrimitiveTypeKind::Boolean,
-        ))],
-        "type `Boolean`",
-    );
+    const SHORT_TASK_TYPES: &[Type] = &[Type::Primitive(PrimitiveType::new(
+        PrimitiveTypeKind::Boolean,
+    ))];
 
     match name {
-        "disks" => Some((&DISKS_TYPES.0, DISKS_TYPES.1)),
+        "disks" => Some(&DISKS_TYPES),
         "fpga" if version >= SupportedVersion::V1(V1::Two) => Some(FPGA_TYPES),
         "gpu" => Some(GPU_TYPES),
         "inputs" if use_hidden_types && version >= SupportedVersion::V1(V1::Two) => {
@@ -962,8 +908,8 @@ where
         if !self.evaluate_requirement(name, expr, expr_ty) {
             // Always use object types for `runtime` section `inputs` and `outputs` keys as
             // only `hints` sections can use input/output hidden types
-            if let Some((types, expected)) = task_hint_types(self.version, name.as_str(), false) {
-                if !types
+            if let Some(expected) = task_hint_types(self.version, name.as_str(), false) {
+                if !expected
                     .iter()
                     .any(|target| expr_ty.is_coercible_to(self.types, target))
                 {
@@ -996,8 +942,8 @@ where
     /// Returns `true` if the name matched a requirement or `false` if it did
     /// not.
     fn evaluate_requirement(&mut self, name: &Ident, expr: &Expr, expr_ty: Type) -> bool {
-        if let Some((types, expected)) = task_requirement_types(self.version, name.as_str()) {
-            if !types
+        if let Some(expected) = task_requirement_types(self.version, name.as_str()) {
+            if !expected
                 .iter()
                 .any(|target| expr_ty.is_coercible_to(self.types, target))
             {
@@ -1037,8 +983,8 @@ where
     /// literal expression.
     pub(crate) fn evaluate_hints_item(&mut self, scope: &ScopeRef<'_>, name: &Ident, expr: &Expr) {
         let expr_ty = self.evaluate_expr(scope, expr).unwrap_or(Type::Union);
-        if let Some((types, expected)) = task_hint_types(self.version, name.as_str(), true) {
-            if !types
+        if let Some(expected) = task_hint_types(self.version, name.as_str(), true) {
+            if !expected
                 .iter()
                 .any(|target| expr_ty.is_coercible_to(self.types, target))
             {
