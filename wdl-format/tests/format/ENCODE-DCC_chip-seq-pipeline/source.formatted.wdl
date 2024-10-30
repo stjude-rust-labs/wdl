@@ -2699,6 +2699,7 @@ task align {
 
     command <<<
         set -e
+
         # check if pipeline dependencies can be found
         if [[ -z "$(which encode_task_merge_fastq.py 2> /dev/null || true)" ]]
         then
@@ -2713,6 +2714,7 @@ task align {
                 else ""
             )} \
             ~{"--nth " + cpu}
+
         if [ -z '~{trim_bp}' ]; then
             SUFFIX=
         else
@@ -2761,6 +2763,7 @@ task align {
                 ~{"--nth " + cpu}
             SUFFIX=$NEW_SUFFIX
         fi
+
         if [ '~{aligner}' == 'bwa' ]; then
             python3 $(which encode_task_bwa.py) \
                 ~{idx_tar} \
@@ -2783,6 +2786,7 @@ task align {
                 ~{"--bwa-mem-read-len-limit " + bwa_mem_read_len_limit} \
                 ~{"--mem-gb " + samtools_mem_gb} \
                 ~{"--nth " + cpu}
+
         elif [ '~{aligner}' == 'bowtie2' ]; then
             python3 $(which encode_task_bowtie2.py) \
                 ~{idx_tar} \
@@ -2822,6 +2826,7 @@ task align {
                 ~{"--mem-gb " + samtools_mem_gb} \
                 ~{"--nth " + cpu}
         fi 
+
         python3 $(which encode_task_post_align.py) \
             R1$SUFFIX/*.fastq.gz $(ls *.bam) \
             ~{"--mito-chr-name " + mito_chr_name} \
@@ -2903,6 +2908,7 @@ task filter {
                 then picard_java_heap
                 else (round(mem_gb * picard_java_heap_factor) + "G")
             )}
+
         if [ '~{redact_nodup_bam}' == 'true' ]; then
             python3 $(which encode_task_bam_to_pbam.py) \
                 $(ls *.bam) \
@@ -3310,6 +3316,7 @@ task call_peak {
 
     command <<<
         set -e
+
         if [ '~{peak_caller}' == 'macs2' ]; then
             python3 $(which encode_task_macs2_chip.py) \
                 ~{sep=" " select_all(tas)} \
@@ -3319,6 +3326,7 @@ task call_peak {
                 ~{"--cap-num-peak " + cap_num_peak} \
                 ~{"--pval-thresh " + pval_thresh} \
                 ~{"--mem-gb " + mem_gb}
+
         elif [ '~{peak_caller}' == 'spp' ]; then
             python3 $(which encode_task_spp.py) \
                 ~{sep=" " select_all(tas)} \
@@ -3328,6 +3336,7 @@ task call_peak {
                 ~{"--fdr-thresh " + fdr_thresh} \
                 ~{"--nth " + cpu}
         fi
+
         python3 $(which encode_task_post_call_peak_chip.py) \
             $(ls *Peak.gz) \
             ~{"--ta " + tas[0]} \
@@ -3798,6 +3807,7 @@ task read_genome_tsv {
         touch ref_fa bowtie2_idx_tar bwa_idx_tar chrsz gensz blacklist blacklist2
         touch mito_chr_name
         touch regex_bfilt_peak_chr_name
+
         python <<CODE
         import os
         with open('~{genome_tsv}','r') as fp:

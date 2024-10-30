@@ -172,8 +172,17 @@ impl Postprocessor {
             }
             PreToken::Literal(value, kind) => {
                 assert!(kind != SyntaxKind::Comment && kind != SyntaxKind::Whitespace);
-                // Don't add empty literals.
+
+                // This is special handling for inserting the empty string.
+                // We remove any indentation or spaces from the end of the
+                // stream and then add the empty string as a literal.
+                // Then we set the position to [`LinePosition::MiddleOfLine`]
+                // in order to trigger a newline being added before the next
+                // token.
                 if value.is_empty() {
+                    self.trim_last_line(stream);
+                    stream.push(PostToken::Literal(value));
+                    self.position = LinePosition::MiddleOfLine;
                     return;
                 }
 
