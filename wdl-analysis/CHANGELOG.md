@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+* Exposed information about workflow calls from an analyzed document (#[239](https://github.com/stjude-rust-labs/wdl/pull/239)).
+
+## 0.5.0 - 10-22-2024
+
 ### Changed
 
 * Refactored the `DocumentScope` API to simply `Document` and exposed more
