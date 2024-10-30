@@ -1,5 +1,4 @@
-## This is a test of an unknown task hint.
-## As an unknown hint are not an error, `error.txt` is expected to be empty.
+## This is a test of an invalid task hint type.
 
 version 1.2
 
