@@ -30,7 +30,7 @@ fn redundant_input_assignment(span: Span, name: &str) -> Diagnostic {
         .with_fix(format!("can be shortened to `{}`", name))
 }
 
-/// Detects a malformed lint directive.
+/// Detects a redundant input assignment.
 #[derive(Default, Debug, Clone, Copy)]
 pub struct RedundantInputAssignment(Option<SupportedVersion>);
 
