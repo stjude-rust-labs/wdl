@@ -50,7 +50,11 @@ impl Rule for RedundantInputAssignment {
     }
 
     fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
-        None
+        Some(&[
+            wdl_ast::SyntaxKind::VersionStatementNode,
+            wdl_ast::SyntaxKind::WorkflowDefinitionNode,
+            wdl_ast::SyntaxKind::CallStatementNode,
+        ])
     }
 }
 
