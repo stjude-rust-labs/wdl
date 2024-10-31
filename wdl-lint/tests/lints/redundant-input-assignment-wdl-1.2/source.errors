@@ -1,8 +1,8 @@
-note[RedundantInputAssignment]: redundant input assignment can be shortened
+note[RedundantInputAssignment]: redundant input assignment
    ┌─ tests/lints/redundant-input-assignment-wdl-1.2/source.wdl:18:10
    │
 18 │          c = c,  # should flag
    │          ^^^^^
    │
-   = fix: redundant input assignment can be shortened to `c`
+   = fix: can be shortened to `c`
 

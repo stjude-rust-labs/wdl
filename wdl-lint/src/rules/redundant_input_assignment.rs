@@ -24,13 +24,10 @@ const ID: &str = "RedundantInputAssignment";
 
 /// Create a "Redundant Input Assignment" diagnostic.
 fn redundant_input_assignment(span: Span, name: &str) -> Diagnostic {
-    Diagnostic::note("redundant input assignment can be shortened")
+    Diagnostic::note("redundant input assignment")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix(format!(
-            "can be shortened to `{}`",
-            name
-        ))
+        .with_fix(format!("can be shortened to `{}`", name))
 }
 
 /// Detects a malformed lint directive.
