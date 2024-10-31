@@ -217,7 +217,7 @@ impl Formatter {
         element.write(&mut stream);
 
         let mut postprocessor = Postprocessor::default();
-        postprocessor.run(stream)
+        postprocessor.run(stream, self.config())
     }
 }
 

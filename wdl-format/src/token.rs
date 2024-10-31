@@ -4,6 +4,7 @@ mod post;
 mod pre;
 
 use std::fmt::Display;
+use std::rc::Rc;
 
 pub use post::*;
 pub use pre::*;
@@ -52,6 +53,31 @@ impl<T: Token> TokenStream<T> {
             let _ = self.0.pop();
         }
     }
+
+    /// Returns whether the stream is empty.
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    /// Returns an iterator over the tokens in the stream.
+    pub fn iter(&self) -> std::slice::Iter<'_, T> {
+        self.0.iter()
+    }
+
+    /// Clears the stream.
+    pub fn clear(&mut self) {
+        self.0.clear();
+    }
+
+    /// Drains the stream.
+    pub fn drain(&mut self) -> std::vec::Drain<'_, T> {
+        self.0.drain(..)
+    }
+
+    /// Extends the stream with the tokens from another stream.
+    pub fn extend(&mut self, other: Self) {
+        self.0.extend(other.0);
+    }
 }
 
 impl<T: Token> IntoIterator for TokenStream<T> {
@@ -64,16 +90,16 @@ impl<T: Token> IntoIterator for TokenStream<T> {
 }
 
 /// The kind of comment.
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Comment {
     /// A comment on its own line.
-    Preceding(String),
+    Preceding(Rc<String>),
     /// A comment on the same line as the code preceding it.
-    Inline(String),
+    Inline(Rc<String>),
 }
 
 /// Trivia.
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Trivia {
     /// A blank line. This may be ignored by the postprocessor.
     BlankLine,

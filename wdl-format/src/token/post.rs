@@ -3,11 +3,14 @@
 //! Generally speaking, unless you are working with the internals of code
 //! formatting, you're not going to be working with these.
 
+use std::collections::HashSet;
 use std::fmt::Display;
+use std::rc::Rc;
 
 use wdl_ast::SyntaxKind;
 
 use crate::Comment;
+use crate::Config;
 use crate::LineSpacingPolicy;
 use crate::NEWLINE;
 use crate::PreToken;
@@ -18,7 +21,7 @@ use crate::Trivia;
 use crate::config::Indent;
 
 /// A postprocessed token.
-#[derive(Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq)]
 pub enum PostToken {
     /// A space.
     Space,
@@ -30,7 +33,7 @@ pub enum PostToken {
     Indent,
 
     /// A string literal.
-    Literal(String),
+    Literal(Rc<String>),
 }
 
 impl std::fmt::Debug for PostToken {
@@ -39,20 +42,20 @@ impl std::fmt::Debug for PostToken {
             Self::Space => write!(f, "<SPACE>"),
             Self::Newline => write!(f, "<NEWLINE>"),
             Self::Indent => write!(f, "<INDENT>"),
-            Self::Literal(value) => write!(f, "<LITERAL> {value}"),
+            Self::Literal(value) => write!(f, "<LITERAL@{value}>"),
         }
     }
 }
 
 impl Token for PostToken {
     /// Returns a displayable version of the token.
-    fn display<'a>(&'a self, config: &'a crate::Config) -> impl Display + 'a {
+    fn display<'a>(&'a self, config: &'a Config) -> impl Display + 'a {
         /// A displayable version of a [`PostToken`].
         struct Display<'a> {
             /// The token to display.
             token: &'a PostToken,
             /// The configuration to use.
-            config: &'a crate::Config,
+            config: &'a Config,
         }
 
         impl std::fmt::Display for Display<'_> {
@@ -63,10 +66,10 @@ impl Token for PostToken {
                     PostToken::Indent => {
                         let (c, n) = match self.config.indent() {
                             Indent::Spaces(n) => (' ', n),
-                            Indent::Tabs(n) => ('\t', n),
+                            Indent::Tabs => ('\t', 1),
                         };
 
-                        for _ in 0..n.get() {
+                        for _ in 0..n {
                             write!(f, "{c}")?;
                         }
 
@@ -81,6 +84,50 @@ impl Token for PostToken {
             token: self,
             config,
         }
+    }
+}
+
+impl PostToken {
+    /// Gets the width of the [`PostToken`].
+    fn width(&self, config: &crate::Config) -> usize {
+        match self {
+            Self::Space => SPACE.len(),
+            Self::Newline => 0,
+            Self::Indent => config.indent().num(),
+            Self::Literal(value) => value.len(),
+        }
+    }
+}
+
+impl TokenStream<PostToken> {
+    /// Gets the width of the [`TokenStream`].
+    ///
+    /// This only makes sense to call if the stream represents a single line.
+    fn width(&self, config: &Config) -> usize {
+        self.iter().map(|t| t.width(config)).sum()
+    }
+}
+
+/// A line break.
+enum LineBreak {
+    /// A line break that can be inserted before a token.
+    Before,
+    /// A line break that can be inserted after a token.
+    After,
+}
+
+/// Returns whether a token can be line broken.
+fn can_be_line_broken(kind: SyntaxKind) -> Option<LineBreak> {
+    match kind {
+        SyntaxKind::OpenBrace
+        | SyntaxKind::OpenBracket
+        | SyntaxKind::OpenParen
+        | SyntaxKind::OpenHeredoc => Some(LineBreak::After),
+        SyntaxKind::CloseBrace
+        | SyntaxKind::CloseBracket
+        | SyntaxKind::CloseParen
+        | SyntaxKind::CloseHeredoc => Some(LineBreak::Before),
+        _ => None,
     }
 }
 
@@ -113,16 +160,26 @@ pub struct Postprocessor {
 
 impl Postprocessor {
     /// Runs the postprocessor.
-    pub fn run(&mut self, input: TokenStream<PreToken>) -> TokenStream<PostToken> {
+    pub fn run(&mut self, input: TokenStream<PreToken>, config: &Config) -> TokenStream<PostToken> {
         let mut output = TokenStream::<PostToken>::default();
+        let mut buffer = TokenStream::<PreToken>::default();
 
-        let mut stream = input.into_iter().peekable();
-        while let Some(token) = stream.next() {
-            self.step(token, stream.peek(), &mut output);
+        for token in input {
+            match token {
+                PreToken::LineEnd => {
+                    self.flush(&buffer, &mut output, config);
+                    self.trim_whitespace(&mut output);
+                    output.push(PostToken::Newline);
+
+                    buffer.clear();
+                    buffer.push(token);
+                    self.position = LinePosition::StartOfLine;
+                }
+                _ => {
+                    buffer.push(token);
+                }
+            }
         }
-
-        self.trim_whitespace(&mut output);
-        output.push(PostToken::Newline);
 
         output
     }
@@ -206,7 +263,7 @@ impl Postprocessor {
                             self.position = LinePosition::MiddleOfLine;
                         }
                         Comment::Inline(value) => {
-                            assert!(self.position == LinePosition::MiddleOfLine);
+                            // assert!(self.position == LinePosition::MiddleOfLine);
                             if let Some(next) = next {
                                 if next != &PreToken::LineEnd {
                                     self.interrupted = true;
@@ -224,8 +281,84 @@ impl Postprocessor {
         }
     }
 
+    /// Flushes the `in_stream` buffer to the `out_stream`.
+    fn flush(
+        &mut self,
+        in_stream: &TokenStream<PreToken>,
+        out_stream: &mut TokenStream<PostToken>,
+        config: &Config,
+    ) {
+        let mut post_buffer = TokenStream::<PostToken>::default();
+        let mut pre_buffer = in_stream.iter().peekable();
+        while let Some(token) = pre_buffer.next() {
+            let next = pre_buffer.peek().copied();
+            self.step(token.clone(), next, &mut post_buffer);
+        }
+
+        if config.max_line_length().is_none()
+            || post_buffer.width(config) <= config.max_line_length().unwrap()
+        {
+            dbg!("no line breaks needed");
+            out_stream.extend(post_buffer);
+            return;
+        }
+        let max_length = config.max_line_length().unwrap();
+        dbg!("splitting line");
+        dbg!("in_stream ={:#?}", &in_stream);
+        dbg!("post_buffer ={:#?}", &post_buffer);
+
+        let mut line_breaks: Vec<usize> = Vec::new();
+        for (i, token) in in_stream.iter().enumerate() {
+            if let PreToken::Literal(_, kind) = token {
+                match can_be_line_broken(*kind) {
+                    Some(LineBreak::Before) => {
+                        line_breaks.push(i);
+                    }
+                    Some(LineBreak::After) => {
+                        line_breaks.push(i + 1);
+                    }
+                    None => {}
+                }
+            }
+        }
+        // Deduplicate the line breaks.
+        let line_breaks = line_breaks.into_iter().collect::<HashSet<usize>>();
+
+        let mut inserted_line_breaks;
+        for max_line_breaks in 1..=line_breaks.len() {
+            let mut pre_buffer = in_stream.iter().enumerate().peekable();
+            inserted_line_breaks = 0;
+            post_buffer.clear();
+
+            while let Some((i, token)) = pre_buffer.next() {
+                if inserted_line_breaks < max_line_breaks && line_breaks.contains(&i) {
+                    inserted_line_breaks += 1;
+                    self.step(PreToken::LineEnd, None, &mut post_buffer);
+                    // self.interrupted = true;
+                }
+                self.step(
+                    token.clone(),
+                    pre_buffer.peek().map(|(_, t)| t).copied(),
+                    &mut post_buffer,
+                );
+            }
+
+            let mut last_line = TokenStream::<PostToken>::default();
+            post_buffer
+                .iter()
+                .rev()
+                .take_while(|t| *t != &PostToken::Newline)
+                .for_each(|t| last_line.push(t.clone()));
+            if last_line.width(config) <= max_length {
+                break;
+            }
+        }
+
+        out_stream.extend(post_buffer);
+    }
+
     /// Trims any and all whitespace from the end of the stream.
-    fn trim_whitespace(&mut self, stream: &mut TokenStream<PostToken>) {
+    fn trim_whitespace(&self, stream: &mut TokenStream<PostToken>) {
         stream.trim_while(|token| {
             matches!(
                 token,
@@ -235,7 +368,7 @@ impl Postprocessor {
     }
 
     /// Trims spaces and indents (and not newlines) from the end of the stream.
-    fn trim_last_line(&mut self, stream: &mut TokenStream<PostToken>) {
+    fn trim_last_line(&self, stream: &mut TokenStream<PostToken>) {
         stream.trim_while(|token| matches!(token, PostToken::Space | PostToken::Indent));
     }
 
@@ -255,7 +388,7 @@ impl Postprocessor {
 
     /// Pushes the current indentation level to the stream.
     /// This should only be called when the state is
-    /// [`LinePosition::StartOfLine`].
+    /// [`LinePosition::StartOfLine`]. This does not change the state.
     fn indent(&self, stream: &mut TokenStream<PostToken>) {
         assert!(self.position == LinePosition::StartOfLine);
 
@@ -273,7 +406,9 @@ impl Postprocessor {
     /// Creates a blank line and then indents.
     fn blank_line(&mut self, stream: &mut TokenStream<PostToken>) {
         self.trim_whitespace(stream);
-        stream.push(PostToken::Newline);
+        if !stream.is_empty() {
+            stream.push(PostToken::Newline);
+        }
         stream.push(PostToken::Newline);
         self.position = LinePosition::StartOfLine;
         self.indent(stream);
