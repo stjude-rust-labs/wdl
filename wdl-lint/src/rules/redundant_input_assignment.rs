@@ -1,15 +1,17 @@
 //! A lint rule for flagging redundant input assignments
 
 use std::fmt::Debug;
-use wdl_ast::{AstToken, VersionStatement};
+
+use wdl_ast::Ast::V1;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Document;
+use wdl_ast::Node::NameRef;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
-use wdl_ast::v1::{Decl, InputSection};
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
+use wdl_ast::v1::InputSection;
 
 use crate::Rule;
 use crate::Tag;
@@ -42,7 +44,7 @@ impl Rule for RedundantInputAssignment {
 
     fn explanation(&self) -> &'static str {
         "Input assignments that are redundant can be shortened. For example, `{ input: a = a }` \
-        can be shortened to `{ input: a }`."
+         can be shortened to `{ input: a }`."
     }
 
     fn tags(&self) -> TagSet {
@@ -57,34 +59,44 @@ impl Rule for RedundantInputAssignment {
 impl Visitor for RedundantInputAssignment {
     type State = Diagnostics;
 
-    fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document, _: SupportedVersion) {
-        // This is intentionally empty, as this rule has no state.
-    }
-
-    fn version_statement(&mut self, state: &mut Self::State, reason: VisitReason, stmt: &VersionStatement) {
-        // this current takes into account for any possible patch versions, which might be unnecessary
-        let binding = stmt.version();
-        let split_versions = binding.as_str().split(".").collect::<Vec<_>>();
-        if split_versions[0] == "1" && split_versions[1] == "0" {
-            self.included_version = false;
-        } else {
-            self.included_version = true;
+    fn document(
+        &mut self,
+        _: &mut Self::State,
+        reason: VisitReason,
+        _: &Document,
+        version: SupportedVersion,
+    ) {
+        if reason == VisitReason::Exit {
+            return;
         }
+
+        // Reset the visitor upon document entry
+        *self = Self(Some(version));
     }
 
-    fn input_section(&mut self, state: &mut Self::State, reason: VisitReason, section: &InputSection) {
+    fn input_section(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        section: &InputSection,
+    ) {
         /// if the version statement is earlier than 1.1 return
-        if !self.included_version {
-            return
-        }
-
-        /// for each declaration in the input section,
-        section.declarations().for_each(|dcl| {
-            if let Some(expr) = dcl.expr() {
-                // if dcl.name().as_str() == expr {
-                //     state.add(redundant_input_assignment(Span::new(0, 12)));
-                // }
+        if let SupportedVersion::V1(minor_version) = self.0.expect("version should exist here") {
+            if minor_version < V1::One {
+                return;
             }
-        });
+
+            section
+                .declarations()
+                .for_each(|dcl| {
+                    if let Some(expr) = dcl.expr() {
+                        if let expr_name = NameRef(expr.clone()) {
+                            if (expr_name == dcl.name()) {
+                                state.push(redundant_input_assignment(expr_name.to_span()));
+                            }
+                        }
+                    }
+                });
+        }
     }
 }

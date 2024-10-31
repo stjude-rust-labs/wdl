@@ -1,28 +1,17 @@
 #@ except: DescriptionMissing, DisallowedInputName, MissingRequirements
 #@ except: RuntimeSectionKeys
 
-version 1.2
+version 1.1
 
-#@ except: SectionOrdering
-task bar {
-    meta {}
-
-    parameter_meta {
-        a: ""
-        b: 2
-        c: ""
-    }
-
+workflow test {
     input {
-        int b
-        String a = a
-        String c = c
+        Int b
+        String a
+        String c
     }
-
-    command <<<
-    >>>
-
-    runtime {}
-
-    output {}
+    call bar { input:
+         a,  # should not flag
+         b = b + 3,  # should not flag
+         c = c,  # should flag
+   }
 }
