@@ -12,5 +12,4 @@ import "fileB.wdl" as foo  # fileB
 import "fileC.wdl"  # fileC
 
 workflow test {
-
 }

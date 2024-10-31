@@ -88,7 +88,7 @@ impl Token for PostToken {
 }
 
 impl PostToken {
-    /// Gets the length of the [`PostToken`].
+    /// Gets the width of the [`PostToken`].
     fn width(&self, config: &crate::Config) -> usize {
         match self {
             Self::Space => SPACE.len(),
@@ -100,7 +100,9 @@ impl PostToken {
 }
 
 impl TokenStream<PostToken> {
-    /// Gets the length of the [`TokenStream`].
+    /// Gets the width of the [`TokenStream`].
+    ///
+    /// This only makes sense to call if the stream represents a single line.
     fn width(&self, config: &Config) -> usize {
         self.iter().map(|t| t.width(config)).sum()
     }

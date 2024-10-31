@@ -23,5 +23,4 @@ import "fileB.wdl" as foo
 import "fileC.wdl"
 
 workflow test {
-
 }
