@@ -82,3 +82,4 @@ pub use trailing_comma::*;
 pub use unknown_rule::*;
 pub use version_formatting::*;
 pub use whitespace::*;
+pub use redundant_input_assignment::*;
