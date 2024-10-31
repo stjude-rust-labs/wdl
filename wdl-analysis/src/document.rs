@@ -22,6 +22,7 @@ use crate::DiagnosticsConfig;
 use crate::diagnostics::unused_import;
 use crate::graph::DocumentGraph;
 use crate::graph::ParseState;
+use crate::types::CallType;
 use crate::types::Type;
 use crate::types::Types;
 
@@ -443,9 +444,9 @@ pub struct Task {
     /// The scopes will be in sorted order by span start.
     scopes: Vec<Scope>,
     /// The inputs of the task.
-    inputs: HashMap<String, Input>,
+    inputs: Arc<HashMap<String, Input>>,
     /// The outputs of the task.
-    outputs: HashMap<String, Output>,
+    outputs: Arc<HashMap<String, Output>>,
 }
 
 impl Task {
@@ -484,9 +485,13 @@ pub struct Workflow {
     /// The scopes will be in sorted order by span start.
     scopes: Vec<Scope>,
     /// The inputs of the workflow.
-    inputs: HashMap<String, Input>,
+    inputs: Arc<HashMap<String, Input>>,
     /// The outputs of the workflow.
-    outputs: HashMap<String, Output>,
+    outputs: Arc<HashMap<String, Output>>,
+    /// The calls made by the workflow.
+    calls: HashMap<String, CallType>,
+    /// Whether or not nested inputs are allowed for the workflow.
+    allows_nested_inputs: bool,
 }
 
 impl Workflow {
@@ -508,6 +513,16 @@ impl Workflow {
     /// Gets the outputs of the workflow.
     pub fn outputs(&self) -> &HashMap<String, Output> {
         &self.outputs
+    }
+
+    /// Gets the calls made by the workflow.
+    pub fn calls(&self) -> &HashMap<String, CallType> {
+        &self.calls
+    }
+
+    /// Determines if the workflow allows nested inputs.
+    pub fn allows_nested_inputs(&self) -> bool {
+        self.allows_nested_inputs
     }
 }
 
