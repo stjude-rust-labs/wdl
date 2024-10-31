@@ -2,11 +2,11 @@
 
 use std::fmt::Debug;
 
-use wdl_ast::Ast::V1;
+use wdl_ast::AstNodeExt;
+use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Document;
-use wdl_ast::Node::NameRef;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::VisitReason;
@@ -82,26 +82,23 @@ impl Visitor for RedundantInputAssignment {
         reason: VisitReason,
         stmt: &CallStatement,
     ) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+
         if let SupportedVersion::V1(minor_version) = self.0.expect("version should exist here") {
-            if minor_version < V1::One {
+            if minor_version < wdl_ast::version::V1::One {
                 return;
             }
-
-            stmt.sections()
-                .filter_map(|section| section.as_input())
-                .for_each(|section| {
-                    section
-                        .declarations()
-                        .for_each(|dcl| {
-                            if let Some(expr) = dcl.expr() {
-                                if let expr_name = NameRef(expr.clone()) {
-                                    if expr_name == dcl.name() {
-                                        state.push(redundant_input_assignment(expr_name.to_span()));
-                                    }
-                                }
-                            }
-                        });
-                });
+            stmt.inputs().for_each(|input| {
+                if let Some(expr) = input.expr() {
+                    if let Some(expr_name) = expr.as_name_ref() {
+                        if expr_name.name().as_str() == input.name().as_str() {
+                            state.add(redundant_input_assignment(input.span()));
+                        }
+                    }
+                }
+            });
         }
     }
 }
