@@ -28,7 +28,7 @@ fn redundant_input_assignment(span: Span, name: &str) -> Diagnostic {
         .with_rule(ID)
         .with_highlight(span)
         .with_fix(format!(
-            "redundant input assignment can be shortened to `{}`",
+            "can be shortened to `{}`",
             name
         ))
 }
