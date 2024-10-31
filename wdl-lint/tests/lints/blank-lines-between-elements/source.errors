@@ -127,11 +127,11 @@ note[Whitespace]: more than one blank line in a row
    │  
    = fix: remove the unnecessary blank lines
 
-note[RedundantInputAssignment]: redundant input assignments can be shortened
+note[RedundantInputAssignment]: redundant input assignment can be shortened
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:43:9
    │
 43 │         s = s
-   │         ^^^^^ redundant input assignments can be shortened
+   │         ^^^^^ redundant input assignment can be shortened to `s`
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:43:14
@@ -156,17 +156,17 @@ note[Whitespace]: more than one blank line in a row
    │  
    = fix: remove the unnecessary blank lines
 
-note[RedundantInputAssignment]: redundant input assignments can be shortened
+note[RedundantInputAssignment]: redundant input assignment can be shortened
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:49:9
    │
 49 │         s = s
-   │         ^^^^^ redundant input assignments can be shortened
+   │         ^^^^^ redundant input assignment can be shortened to `s`
 
-note[RedundantInputAssignment]: redundant input assignments can be shortened
+note[RedundantInputAssignment]: redundant input assignment can be shortened
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:52:9
    │
 52 │         s = s
-   │         ^^^^^ redundant input assignments can be shortened
+   │         ^^^^^ redundant input assignment can be shortened to `s`
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:55:13

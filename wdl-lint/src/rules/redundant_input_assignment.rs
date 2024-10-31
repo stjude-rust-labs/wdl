@@ -2,7 +2,7 @@
 
 use std::fmt::Debug;
 
-use wdl_ast::AstNodeExt;
+use wdl_ast::{AstNodeExt, Ident};
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -11,7 +11,7 @@ use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
-use wdl_ast::v1::CallStatement;
+use wdl_ast::v1::{CallStatement, NameRef};
 
 use crate::Rule;
 use crate::Tag;
@@ -21,10 +21,13 @@ use crate::TagSet;
 const ID: &str = "RedundantInputAssignment";
 
 /// Create a "Redundant Input Assignment" diagnostic.
-fn redundant_input_assignment(span: Span) -> Diagnostic {
-    Diagnostic::note("redundant input assignments can be shortened")
+fn redundant_input_assignment(span: Span, name: &str) -> Diagnostic {
+    Diagnostic::note("redundant input assignment can be shortened")
         .with_rule(ID)
-        .with_label("redundant input assignments can be shortened", span)
+        .with_label(
+            format!("redundant input assignment can be shortened to `{}`", name),
+            span
+        )
 }
 
 /// Detects a malformed lint directive.
@@ -94,7 +97,7 @@ impl Visitor for RedundantInputAssignment {
                 if let Some(expr) = input.expr() {
                     if let Some(expr_name) = expr.as_name_ref() {
                         if expr_name.name().as_str() == input.name().as_str() {
-                            state.add(redundant_input_assignment(input.span()));
+                            state.add(redundant_input_assignment(input.span(), input.name().as_str()));
                         }
                     }
                 }
