@@ -26,10 +26,11 @@ const ID: &str = "RedundantInputAssignment";
 fn redundant_input_assignment(span: Span, name: &str) -> Diagnostic {
     Diagnostic::note("redundant input assignment can be shortened")
         .with_rule(ID)
-        .with_label(
-            format!("redundant input assignment can be shortened to `{}`", name),
-            span,
-        )
+        .with_highlight(span)
+        .with_fix(format!(
+            "redundant input assignment can be shortened to `{}`",
+            name
+        ))
 }
 
 /// Detects a malformed lint directive.
@@ -51,7 +52,7 @@ impl Rule for RedundantInputAssignment {
     }
 
     fn tags(&self) -> TagSet {
-        TagSet::new(&[Tag::Clarity, Tag::Correctness])
+        TagSet::new(&[Tag::Style])
     }
 
     fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
