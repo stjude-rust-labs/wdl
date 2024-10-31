@@ -11,7 +11,7 @@ use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
-use wdl_ast::v1::InputSection;
+use wdl_ast::v1::CallStatement;
 
 use crate::Rule;
 use crate::Tag;
@@ -29,9 +29,7 @@ fn redundant_input_assignment(span: Span) -> Diagnostic {
 
 /// Detects a malformed lint directive.
 #[derive(Default, Debug, Clone, Copy)]
-pub struct RedundantInputAssignment {
-    included_version: bool,
-}
+pub struct RedundantInputAssignment(Option<SupportedVersion>);
 
 impl Rule for RedundantInputAssignment {
     fn id(&self) -> &'static str {
@@ -74,28 +72,31 @@ impl Visitor for RedundantInputAssignment {
         *self = Self(Some(version));
     }
 
-    fn input_section(
+    fn call_statement(
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        section: &InputSection,
+        stmt: &CallStatement,
     ) {
-        /// if the version statement is earlier than 1.1 return
         if let SupportedVersion::V1(minor_version) = self.0.expect("version should exist here") {
             if minor_version < V1::One {
                 return;
             }
 
-            section
-                .declarations()
-                .for_each(|dcl| {
-                    if let Some(expr) = dcl.expr() {
-                        if let expr_name = NameRef(expr.clone()) {
-                            if (expr_name == dcl.name()) {
-                                state.push(redundant_input_assignment(expr_name.to_span()));
+            stmt.sections()
+                .filter_map(|section| section.as_input())
+                .for_each(|section| {
+                    section
+                        .declarations()
+                        .for_each(|dcl| {
+                            if let Some(expr) = dcl.expr() {
+                                if let expr_name = NameRef(expr.clone()) {
+                                    if expr_name == dcl.name() {
+                                        state.push(redundant_input_assignment(expr_name.to_span()));
+                                    }
+                                }
                             }
-                        }
-                    }
+                        });
                 });
         }
     }
