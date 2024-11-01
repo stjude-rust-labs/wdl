@@ -103,7 +103,7 @@ async fn analyze<T: AsRef<dyn Rule>>(
         },
     );
 
-    analyzer.add_documents(vec![path]).await?;
+    analyzer.add_directory(path).await?;
     let results = analyzer
         .analyze(bar.clone())
         .await
