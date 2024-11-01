@@ -44,8 +44,7 @@ impl Rule for RedundantInputAssignment {
     }
 
     fn explanation(&self) -> &'static str {
-        "Input assignments that are redundant can be shortened. For example, `{ input: a = a }` \
-         can be shortened to `{ input: a }`."
+        "Redundant input assignments can be shortened in WDL versions >=v1.1. For example, `{ input: a = a }` can be shortened to `{ input: a }`."
     }
 
     fn tags(&self) -> TagSet {
@@ -57,6 +56,7 @@ impl Rule for RedundantInputAssignment {
             wdl_ast::SyntaxKind::VersionStatementNode,
             wdl_ast::SyntaxKind::WorkflowDefinitionNode,
             wdl_ast::SyntaxKind::CallStatementNode,
+            wdl_ast::SyntaxKind::CallInputItemNode,
         ])
     }
 }
