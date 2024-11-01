@@ -127,19 +127,11 @@ note[Whitespace]: more than one blank line in a row
    │  
    = fix: remove the unnecessary blank lines
 
-note[RedundantInputAssignment]: redundant input assignment
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:43:9
-   │
-43 │         s = s
-   │         ^^^^^
-   │
-   = fix: can be shortened to `s`
-
 note[BlankLinesBetweenElements]: extra blank line(s) found
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:43:14
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:43:10
    │  
-43 │           s = s
-   │ ╭─────────────^
+43 │           s
+   │ ╭─────────^
 44 │ │ 
 45 │ │     }  # following whitespace duplication is caught be Whitespace rule
    │ ╰────^
@@ -157,22 +149,6 @@ note[Whitespace]: more than one blank line in a row
    │ ╰────^
    │  
    = fix: remove the unnecessary blank lines
-
-note[RedundantInputAssignment]: redundant input assignment
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:49:9
-   │
-49 │         s = s
-   │         ^^^^^
-   │
-   = fix: can be shortened to `s`
-
-note[RedundantInputAssignment]: redundant input assignment
-   ┌─ tests/lints/blank-lines-between-elements/source.wdl:52:9
-   │
-52 │         s = s
-   │         ^^^^^
-   │
-   = fix: can be shortened to `s`
 
 note[BlankLinesBetweenElements]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:55:13

@@ -5,15 +5,15 @@ version 1.0
 
 workflow test {
     input {
-        String a
-        String c
-        Int b
+        String arm
+        String cam
+        Int bam
     }
 
     # This should not flag any notes, since version is 1.0
     call bar { input:
-         a.
-         b = b + 3,
-         c = c,
+        arm,
+        bam = bam + 3,
+        cam = cam,
    }
 }

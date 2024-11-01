@@ -44,7 +44,8 @@ impl Rule for RedundantInputAssignment {
     }
 
     fn explanation(&self) -> &'static str {
-        "Redundant input assignments can be shortened in WDL versions >=v1.1. For example, `{ input: a = a }` can be shortened to `{ input: a }`."
+        "Redundant input assignments can be shortened in WDL versions >=v1.1. For example, `{ \
+         input: a = a }` can be shortened to `{ input: a }`."
     }
 
     fn tags(&self) -> TagSet {
@@ -99,7 +100,7 @@ impl Visitor for RedundantInputAssignment {
                         if expr_name.name().as_str() == input.name().as_str() {
                             state.exceptable_add(
                                 redundant_input_assignment(input.span(), input.name().as_str()),
-                                SyntaxElement::from(stmt.syntax().clone()),
+                                SyntaxElement::from(input.syntax().clone()),
                                 &self.exceptable_nodes(),
                             );
                         }
