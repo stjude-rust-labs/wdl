@@ -793,6 +793,7 @@ impl CommandSection {
                                 leading_spaces = 0;
                                 leading_tabs = 0;
                             }
+                            '\r' => {}
                             _ => {
                                 if parsing_leading_whitespace {
                                     parsing_leading_whitespace = false;
