@@ -595,12 +595,7 @@ impl LanguageServer for Server {
             for folder in &params.event.added {
                 if let Err(e) = self
                     .analyzer
-                    .add_directory(
-                        folder
-                            .uri
-                            .to_file_path()
-                            .expect("should be a file path"),
-                    )
+                    .add_directory(folder.uri.to_file_path().expect("should be a file path"))
                     .await
                 {
                     error!("failed to add documents to analyzer: {e}");
