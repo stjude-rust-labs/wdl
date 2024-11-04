@@ -28,6 +28,7 @@ use colored::Colorize;
 use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
 use tracing_log::AsTrace;
+use url::Url;
 use wdl::ast::Diagnostic;
 use wdl::ast::Document;
 use wdl::ast::SyntaxNode;
@@ -36,6 +37,7 @@ use wdl::lint::LintVisitor;
 use wdl_analysis::AnalysisResult;
 use wdl_analysis::Analyzer;
 use wdl_analysis::Rule;
+use wdl_analysis::path_to_uri;
 use wdl_analysis::rules;
 use wdl_ast::Node;
 use wdl_ast::Severity;
@@ -76,7 +78,7 @@ fn emit_diagnostics(path: &str, source: &str, diagnostics: &[Diagnostic]) -> Res
 /// Analyzes a path.
 async fn analyze<T: AsRef<dyn Rule>>(
     rules: impl IntoIterator<Item = T>,
-    path: PathBuf,
+    file: String,
     lint: bool,
 ) -> Result<Vec<AnalysisResult>> {
     let bar = ProgressBar::new(0);
@@ -103,7 +105,16 @@ async fn analyze<T: AsRef<dyn Rule>>(
         },
     );
 
-    analyzer.add_directory(path).await?;
+    // Convert the file to a either a local URL or a remote URL
+    let file = if file.starts_with("http://") || file.starts_with("https://") {
+        Url::parse(&file).context("failed to parse URL")?
+    } else {
+        path_to_uri(&PathBuf::from(file.clone())).with_context(|| {
+            format!("failed to convert path `{file}` to URI", file = file)
+        })?
+    };
+
+    analyzer.add_document(file).await?;
     let results = analyzer
         .analyze(bar.clone())
         .await
@@ -253,9 +264,9 @@ impl AnalysisOptions {
 #[derive(Args)]
 #[clap(disable_version_flag = true)]
 pub struct CheckCommand {
-    /// The path to the source WDL file.
-    #[clap(value_name = "PATH")]
-    pub path: PathBuf,
+    /// The path or URL to the source WDL file.
+    #[clap(value_name = "PATH or URL")]
+    pub file: String,
 
     /// The analysis options.
     #[clap(flatten)]
@@ -266,7 +277,7 @@ impl CheckCommand {
     /// Executes the `check` subcommand.
     async fn exec(self) -> Result<()> {
         self.options.check_for_conflicts()?;
-        analyze(self.options.into_rules(), self.path, false).await?;
+        analyze(self.options.into_rules(), self.file, false).await?;
         Ok(())
     }
 }
@@ -315,9 +326,9 @@ impl LintCommand {
 #[derive(Args)]
 #[clap(disable_version_flag = true)]
 pub struct AnalyzeCommand {
-    /// The path to the source WDL file.
-    #[clap(value_name = "PATH")]
-    pub path: PathBuf,
+    /// The path or URL to the source WDL file.
+    #[clap(value_name = "PATH or URL")]
+    pub file: String,
 
     /// The analysis options.
     #[clap(flatten)]
@@ -332,7 +343,7 @@ impl AnalyzeCommand {
     /// Executes the `analyze` subcommand.
     async fn exec(self) -> Result<()> {
         self.options.check_for_conflicts()?;
-        let results = analyze(self.options.into_rules(), self.path, self.lint).await?;
+        let results = analyze(self.options.into_rules(), self.file, self.lint).await?;
         println!("{:#?}", results);
         Ok(())
     }
