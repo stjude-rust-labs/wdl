@@ -198,7 +198,7 @@ async fn main() {
         analyzer
             .add_directory(test.clone())
             .await
-            .expect("should add documents");
+            .expect("should add directory");
     }
     let results = analyzer
         .analyze(())
