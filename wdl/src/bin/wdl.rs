@@ -107,7 +107,7 @@ async fn analyze<T: AsRef<dyn Rule>>(
 
     let file = if let Ok(url) = Url::parse(&file) {
         url
-    } else if let Some(url) = path_to_uri(&PathBuf::from(file.clone())) {
+    } else if let Some(url) = path_to_uri(PathBuf::from(file.clone())) {
         url
     } else {
         bail!("failed to convert `{file}` to a URI", file = file)
