@@ -109,9 +109,8 @@ async fn analyze<T: AsRef<dyn Rule>>(
     let file = if file.starts_with("http://") || file.starts_with("https://") {
         Url::parse(&file).context("failed to parse URL")?
     } else {
-        path_to_uri(&PathBuf::from(file.clone())).with_context(|| {
-            format!("failed to convert path `{file}` to URI", file = file)
-        })?
+        path_to_uri(&PathBuf::from(file.clone()))
+            .with_context(|| format!("failed to convert path `{file}` to URI", file = file))?
     };
 
     analyzer.add_document(file).await?;
