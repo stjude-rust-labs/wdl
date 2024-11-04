@@ -173,7 +173,7 @@ async fn main() {
         analyzer
             .add_directory(test.clone())
             .await
-            .expect("should add documents");
+            .expect("should add directory");
     }
     let results = analyzer
         .analyze(())
@@ -226,7 +226,7 @@ async fn main() {
         analyzer
             .add_document(path_to_uri(&document).expect("should be valid URI"))
             .await
-            .expect("should add documents");
+            .expect("should add document");
         let results = analyzer
             .analyze_document((), uri)
             .await

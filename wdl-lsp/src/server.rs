@@ -598,7 +598,7 @@ impl LanguageServer for Server {
                     .add_directory(folder.uri.to_file_path().expect("should be a file path"))
                     .await
                 {
-                    error!("failed to add documents to analyzer: {e}");
+                    error!("failed to add documents from directory to analyzer: {e}");
                 }
             }
         }
