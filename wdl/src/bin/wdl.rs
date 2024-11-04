@@ -105,12 +105,12 @@ async fn analyze<T: AsRef<dyn Rule>>(
         },
     );
 
-    // Convert the file to a either a local URL or a remote URL
-    let file = if file.starts_with("http://") || file.starts_with("https://") {
-        Url::parse(&file).context("failed to parse URL")?
+    let file = if let Ok(url) = Url::parse(&file) {
+        url
+    } else if let Some(url) = path_to_uri(&PathBuf::from(file.clone())) {
+        url
     } else {
-        path_to_uri(&PathBuf::from(file.clone()))
-            .with_context(|| format!("failed to convert path `{file}` to URI", file = file))?
+        bail!("failed to convert `{file}` to a URI", file = file)
     };
 
     analyzer.add_document(file).await?;
