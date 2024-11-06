@@ -5,7 +5,7 @@ use std::fmt::Display;
 use html::content;
 use html::text_content;
 use wdl_ast::AstToken;
-use wdl_ast::v1::MetadataValue;
+// use wdl_ast::v1::MetadataValue;
 use wdl_ast::v1::StructDefinition;
 
 /// A struct in a WDL document.
@@ -13,14 +13,18 @@ use wdl_ast::v1::StructDefinition;
 pub struct Struct {
     /// The AST definition of the struct.
     def: StructDefinition,
-    /// Any meta entries associated with the struct.
-    meta: Vec<MetadataValue>,
+    // /// Any meta entries associated with the struct.
+    // meta: Vec<MetadataValue>,
 }
 
 impl Struct {
+    // /// Create a new struct.
+    // pub fn new(def: StructDefinition, meta: Vec<MetadataValue>) -> Self {
+    //     Self { def, meta }
+    // }
     /// Create a new struct.
-    pub fn new(def: StructDefinition, meta: Vec<MetadataValue>) -> Self {
-        Self { def, meta }
+    pub fn new(def: StructDefinition) -> Self {
+        Self { def }
     }
 
     /// Get the name of the struct.
@@ -37,10 +41,10 @@ impl Struct {
         })
     }
 
-    /// Get the meta entries associated with the struct.
-    pub fn meta(&self) -> &[MetadataValue] {
-        &self.meta
-    }
+    // /// Get the meta entries associated with the struct.
+    // pub fn meta(&self) -> &[MetadataValue] {
+    //     &self.meta
+    // }
 }
 
 impl Display for Struct {
