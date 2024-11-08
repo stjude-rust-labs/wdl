@@ -14,12 +14,12 @@ pub struct Parameter {
     /// The declaration of the parameter.
     def: Decl,
     /// Any meta entries associated with the parameter.
-    meta: Vec<MetadataValue>,
+    meta: Option<MetadataValue>,
 }
 
 impl Parameter {
     /// Create a new parameter.
-    pub fn new(def: Decl, meta: Vec<MetadataValue>) -> Self {
+    pub fn new(def: Decl, meta: Option<MetadataValue>) -> Self {
         Self { def, meta }
     }
 
@@ -39,8 +39,8 @@ impl Parameter {
     }
 
     /// Get the meta entries associated with the parameter.
-    pub fn meta(&self) -> &[MetadataValue] {
-        &self.meta
+    pub fn meta(&self) -> Option<&MetadataValue> {
+        self.meta.as_ref()
     }
 }
 
@@ -59,16 +59,6 @@ impl Display for Parameter {
                 .text("Expr: None")
                 .build()
         };
-
-        // let mut meta = text_content::UnorderedList::builder();
-        // for entry in self.meta() {
-        //     meta.push(
-        //         text_content::ListItem::builder()
-        //             .text(entry.to_string())
-        //             .build(),
-        //     );
-        // }
-        // let meta = meta.build();
 
         write!(f, "{}", parameter_name)?;
         write!(f, "{}", parameter_type)?;

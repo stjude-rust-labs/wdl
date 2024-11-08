@@ -10,7 +10,10 @@
 
 pub mod parameter;
 pub mod r#struct;
+pub mod task;
+pub mod workflow;
 
+use std::collections::HashMap;
 use std::fmt::Display;
 use std::path::PathBuf;
 
@@ -27,6 +30,8 @@ use wdl_ast::AstToken;
 use wdl_ast::Document as AstDocument;
 use wdl_ast::SyntaxTokenExt;
 use wdl_ast::Version;
+use wdl_ast::v1::DocumentItem;
+use wdl_ast::v1::MetadataValue;
 
 /// A WDL document.
 #[derive(Debug)]
@@ -39,23 +44,15 @@ pub struct Document {
     version: Version,
     /// The Markdown preamble comments.
     preamble: String,
-    /// The structs in the document.
-    structs: Vec<r#struct::Struct>,
 }
 
 impl Document {
     /// Create a new document.
-    pub fn new(
-        name: String,
-        version: Version,
-        preamble: String,
-        structs: Vec<r#struct::Struct>,
-    ) -> Self {
+    pub fn new(name: String, version: Version, preamble: String) -> Self {
         Self {
             name,
             version,
             preamble,
-            structs,
         }
     }
 
@@ -72,11 +69,6 @@ impl Document {
     /// Get the preamble comments of the document.
     pub fn preamble(&self) -> &str {
         &self.preamble
-    }
-
-    /// Get the structs in the document.
-    pub fn structs(&self) -> &[r#struct::Struct] {
-        &self.structs
     }
 }
 
@@ -161,23 +153,162 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
         let version = ast_doc.version_statement().unwrap().version();
         let preamble = fetch_preamble_comments(ast_doc.clone());
         let ast = ast_doc.ast().unwrap_v1();
-        let structs = ast.structs().map(r#struct::Struct::new).collect::<Vec<_>>();
 
-        let document = Document::new(name.to_owned(), version, preamble, structs);
+        let document = Document::new(name.to_owned(), version, preamble);
 
         let index = cur_dir.join("index.html");
         let mut index = tokio::fs::File::create(index).await?;
 
         index.write_all(document.to_string().as_bytes()).await?;
 
-        for r#struct in document.structs() {
-            let struct_name = r#struct.name();
-            let struct_file = cur_dir.join(format!("{}.html", struct_name));
-            let mut struct_file = tokio::fs::File::create(struct_file).await?;
+        for item in ast.items() {
+            match item {
+                DocumentItem::Struct(s) => {
+                    let struct_name = s.name().as_str().to_owned();
+                    let struct_file = cur_dir.join(format!("{}-struct.html", struct_name));
+                    let mut struct_file = tokio::fs::File::create(struct_file).await?;
 
-            struct_file
-                .write_all(r#struct.to_string().as_bytes())
-                .await?;
+                    let r#struct = r#struct::Struct::new(s.clone());
+                    struct_file
+                        .write_all(r#struct.to_string().as_bytes())
+                        .await?;
+                }
+                DocumentItem::Task(t) => {
+                    let task_name = t.name().as_str().to_owned();
+                    let task_file = cur_dir.join(format!("{}-task.html", task_name));
+                    let mut task_file = tokio::fs::File::create(task_file).await?;
+
+                    let parameter_meta: HashMap<String, MetadataValue> = t
+                        .parameter_metadata()
+                        .unwrap()
+                        .items()
+                        .map(|p| {
+                            let name = p.name().as_str().to_owned();
+                            let item = p.value();
+                            (name, item)
+                        })
+                        .collect();
+
+                    let meta: HashMap<String, MetadataValue> = t.metadata()
+                        .unwrap()
+                        .items()
+                        .map(|m| {
+                            let name = m.name().as_str().to_owned();
+                            let item = m.value();
+                            (name, item)
+                        })
+                        .collect();
+
+                    let output_meta: HashMap<String, MetadataValue> = meta
+                        .get("outputs")
+                        .unwrap()
+                        .clone()
+                        .unwrap_object()
+                        .items()
+                        .map(|m| {
+                            let name = m.name().as_str().to_owned();
+                            let item = m.value();
+                            (name, item)
+                        })
+                        .collect();
+
+                    let inputs = t
+                        .input()
+                        .unwrap()
+                        .declarations()
+                        .map(|decl| {
+                            let name = decl.name().as_str().to_owned();
+                            let meta = parameter_meta.get(&name);
+                            parameter::Parameter::new(decl.clone(), meta.cloned())
+                        })
+                        .collect();
+
+                    let outputs = t
+                        .output()
+                        .unwrap()
+                        .declarations()
+                        .map(|decl| {
+                            let name = decl.name().as_str().to_owned();
+                            let meta = output_meta.get(&name);
+                            parameter::Parameter::new(
+                                wdl_ast::v1::Decl::Bound(decl.clone()),
+                                meta.cloned(),
+                            )
+                        })
+                        .collect();
+                    let task = task::Task::new(task_name, t.metadata(), inputs, outputs);
+
+                    task_file.write_all(task.to_string().as_bytes()).await?;
+                }
+                DocumentItem::Workflow(w) => {
+                    let workflow_name = w.name().as_str().to_owned();
+                    let workflow_file = cur_dir.join(format!("{}-workflow.html", workflow_name));
+                    let mut workflow_file = tokio::fs::File::create(workflow_file).await?;
+
+                    let parameter_meta: HashMap<String, MetadataValue> = w
+                        .parameter_metadata()
+                        .unwrap()
+                        .items()
+                        .map(|p| {
+                            let name = p.name().as_str().to_owned();
+                            let item = p.value();
+                            (name, item)
+                        })
+                        .collect();
+
+                    let meta: HashMap<String, MetadataValue> = w.metadata()
+                        .unwrap()
+                        .items()
+                        .map(|m| {
+                            let name = m.name().as_str().to_owned();
+                            let item = m.value();
+                            (name, item)
+                        })
+                        .collect();
+
+                    let output_meta: HashMap<String, MetadataValue> = meta
+                        .get("outputs")
+                        .unwrap()
+                        .clone()
+                        .unwrap_object()
+                        .items()
+                        .map(|m| {
+                            let name = m.name().as_str().to_owned();
+                            let item = m.value();
+                            (name, item)
+                        })
+                        .collect();
+
+                    let inputs = w
+                        .input()
+                        .unwrap()
+                        .declarations()
+                        .map(|decl| {
+                            let name = decl.name().as_str().to_owned();
+                            let meta = parameter_meta.get(&name);
+                            parameter::Parameter::new(decl.clone(), meta.cloned())
+                        })
+                        .collect();
+
+                    let outputs = w
+                        .output()
+                        .unwrap()
+                        .declarations()
+                        .map(|decl| {
+                            let name = decl.name().as_str().to_owned();
+                            let meta = output_meta.get(&name);
+                            parameter::Parameter::new(
+                                wdl_ast::v1::Decl::Bound(decl.clone()),
+                                meta.cloned(),
+                            )
+                        })
+                        .collect();
+                    let workflow = workflow::Workflow::new(workflow_name, w.metadata(), inputs, outputs);
+
+                    workflow_file.write_all(workflow.to_string().as_bytes()).await?;
+                }
+                DocumentItem::Import(_) => {}
+            }
         }
     }
     anyhow::Ok(())
