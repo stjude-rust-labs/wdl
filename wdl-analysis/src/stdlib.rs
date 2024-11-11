@@ -41,7 +41,8 @@ const _: () = assert!(
     "the maximum number of type parameters cannot exceed the number of bits in usize"
 );
 
-/// The maximum number of parameters to any standard library function.
+/// The maximum (inclusive) number of parameters to any standard library
+/// function.
 ///
 /// A function cannot be defined with more than this number of parameters and
 /// accessing `STDLIB` will panic if a signature is defined that exceeds this
@@ -635,13 +636,14 @@ pub struct TypeParameters<'a> {
 }
 
 impl<'a> TypeParameters<'a> {
-    /// Constructs a new type parameters collection.
+    /// Constructs a new type parameters collection using `None` as the
+    /// calculated parameter types.
     ///
     /// # Panics
     ///
     /// Panics if the count of the given type parameters exceeds the maximum
     /// allowed.
-    fn new(parameters: &'a [TypeParameter]) -> Self {
+    pub fn new(parameters: &'a [TypeParameter]) -> Self {
         assert!(
             parameters.len() < MAX_TYPE_PARAMETERS,
             "no more than {MAX_TYPE_PARAMETERS} type parameters is supported"
@@ -1235,7 +1237,7 @@ impl FunctionSignatureBuilder {
     }
 }
 
-/// Represents a information relating to how a function binds to its arguments.
+/// Represents information relating to how a function binds to its arguments.
 #[derive(Debug, Clone, Copy)]
 pub struct Binding<'a> {
     /// The calculated return type from the function given the argument types.
@@ -1282,6 +1284,17 @@ impl Function {
         match self {
             Self::Monomorphic(f) => f.minimum_version(),
             Self::Polymorphic(f) => f.minimum_version(),
+        }
+    }
+
+    /// Gets the minimum and maximum number of parameters the function has for
+    /// the given WDL version.
+    ///
+    /// Returns `None` if the function is not supported for the given version.
+    pub fn param_min_max(&self, version: SupportedVersion) -> Option<(usize, usize)> {
+        match self {
+            Self::Monomorphic(f) => f.param_min_max(version),
+            Self::Polymorphic(f) => f.param_min_max(version),
         }
     }
 
@@ -1358,6 +1371,18 @@ impl MonomorphicFunction {
         self.signature.minimum_version()
     }
 
+    /// Gets the minimum and maximum number of parameters the function has for
+    /// the given WDL version.
+    ///
+    /// Returns `None` if the function is not supported for the given version.
+    pub fn param_min_max(&self, version: SupportedVersion) -> Option<(usize, usize)> {
+        if version < self.signature.minimum_version() {
+            return None;
+        }
+
+        Some((self.signature.required(), self.signature.parameters.len()))
+    }
+
     /// Gets the signature of the function.
     pub fn signature(&self) -> &FunctionSignature {
         &self.signature
@@ -1415,9 +1440,36 @@ impl PolymorphicFunction {
     pub fn minimum_version(&self) -> SupportedVersion {
         self.signatures
             .iter()
-            .fold(SupportedVersion::V1(V1::Zero), |v, s| {
-                v.min(s.minimum_version())
+            .fold(None, |v: Option<SupportedVersion>, s| {
+                Some(
+                    v.map(|v| v.min(s.minimum_version()))
+                        .unwrap_or_else(|| s.minimum_version()),
+                )
             })
+            .expect("there should be at least one signature")
+    }
+
+    /// Gets the minimum and maximum number of parameters the function has for
+    /// the given WDL version.
+    ///
+    /// Returns `None` if the function is not supported for the given version.
+    pub fn param_min_max(&self, version: SupportedVersion) -> Option<(usize, usize)> {
+        let mut min = usize::MAX;
+        let mut max = 0;
+        for sig in self
+            .signatures
+            .iter()
+            .filter(|s| s.minimum_version() <= version)
+        {
+            min = std::cmp::min(min, sig.required());
+            max = std::cmp::max(max, sig.parameters().len());
+        }
+
+        if min == usize::MAX {
+            return None;
+        }
+
+        Some((min, max))
     }
 
     /// Gets the signatures of the function.
@@ -1441,17 +1493,9 @@ impl PolymorphicFunction {
         }
 
         // Next check the min/max parameter counts
-        let mut min = usize::MAX;
-        let mut max = 0;
-        for sig in self
-            .signatures
-            .iter()
-            .filter(|s| s.minimum_version() >= min_version)
-        {
-            min = std::cmp::min(min, sig.required());
-            max = std::cmp::max(max, sig.parameters().len());
-        }
-
+        let (min, max) = self
+            .param_min_max(version)
+            .expect("should have at least one signature for the version");
         if arguments.len() < min {
             return Err(FunctionBindError::TooFewArguments(min));
         }
@@ -1475,7 +1519,7 @@ impl PolymorphicFunction {
             let mut coercion2 = None;
             for (index, signature) in self.signatures.iter().enumerate().filter(|(_, s)| {
                 s.is_generic() == generic
-                    && version >= s.minimum_version()
+                    && s.minimum_version() <= version
                     && !s.insufficient_arguments(arguments)
             }) {
                 match signature.bind(version, types, arguments) {
@@ -1570,6 +1614,8 @@ impl PolymorphicFunction {
             }
         }
 
+        assert!(!expected_types.is_empty());
+
         let mut expected = String::new();
         for (i, ty) in expected_types.iter().enumerate() {
             if i > 0 {
@@ -1627,7 +1673,7 @@ impl StandardLibrary {
     }
 
     /// Gets an iterator over all the functions in the standard library.
-    pub fn functions(&self) -> impl Iterator<Item = (&'static str, &Function)> {
+    pub fn functions(&self) -> impl ExactSizeIterator<Item = (&'static str, &Function)> {
         self.functions.iter().map(|(n, f)| (*n, f))
     }
 }
@@ -3137,7 +3183,7 @@ mod test {
     #[test]
     fn it_binds_concrete_overloads() {
         let f = STDLIB.function("max").expect("should have function");
-        assert_eq!(f.minimum_version(), SupportedVersion::V1(V1::Zero));
+        assert_eq!(f.minimum_version(), SupportedVersion::V1(V1::One));
 
         let mut types = Types::new();
         let e = f
