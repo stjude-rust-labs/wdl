@@ -1416,17 +1416,15 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     .map(|expr| self.evaluate_expr(&expr).unwrap_or(Type::Union))
                     .collect();
 
-                let minimum_version = f.minimum_version();
-                if minimum_version > self.context.version() {
-                    self.diagnostics.push(unsupported_function(
-                        minimum_version,
-                        target.as_str(),
-                        target.span(),
-                    ));
-                }
-
-                match f.bind(self.context.types_mut(), &arguments) {
-                    Ok(ty) => return Some(ty),
+                match f.bind(self.context.version(), self.context.types_mut(), &arguments) {
+                    Ok(binding) => return Some(binding.return_type()),
+                    Err(FunctionBindError::RequiresVersion(minimum)) => {
+                        self.diagnostics.push(unsupported_function(
+                            minimum,
+                            target.as_str(),
+                            target.span(),
+                        ));
+                    }
                     Err(FunctionBindError::TooFewArguments(minimum)) => {
                         self.diagnostics.push(too_few_arguments(
                             target.as_str(),
