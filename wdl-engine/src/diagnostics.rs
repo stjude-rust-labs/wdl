@@ -153,3 +153,18 @@ pub fn multiline_string_requirement(span: Span) -> Diagnostic {
 pub fn invalid_regex(error: &regex::Error, span: Span) -> Diagnostic {
     Diagnostic::error(error.to_string()).with_highlight(span)
 }
+
+/// Creates a "path not relative" diagnostic.
+pub fn path_not_relative(span: Span) -> Diagnostic {
+    Diagnostic::error("path is required to be a relative path, but an absolute path was provided")
+        .with_highlight(span)
+}
+
+/// Creates a "array path not relative" diagnostic.
+pub fn array_path_not_relative(index: usize, span: Span) -> Diagnostic {
+    Diagnostic::error(format!(
+        "index {index} of the array is required to be a relative path, but an absolute path was \
+         provided"
+    ))
+    .with_highlight(span)
+}

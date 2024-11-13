@@ -3,6 +3,8 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::path::Path;
+use std::path::PathBuf;
+use std::sync::Arc;
 use std::sync::LazyLock;
 
 use regex::Regex;
@@ -18,7 +20,9 @@ use wdl_ast::Span;
 use crate::Coercible;
 use crate::PrimitiveValue;
 use crate::Value;
+use crate::diagnostics::array_path_not_relative;
 use crate::diagnostics::invalid_regex;
+use crate::diagnostics::path_not_relative;
 
 /// Rounds a floating point number down to the next lower integer.
 ///
@@ -288,7 +292,7 @@ pub fn basename(
     arguments: &[(Value, Span)],
     return_type: Type,
 ) -> Result<Value, Diagnostic> {
-    assert!(arguments.len() >= 1 && arguments.len() < 3);
+    assert!(!arguments.is_empty() && arguments.len() < 3);
     debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::String.into()));
 
     let path = arguments[0]
@@ -318,6 +322,140 @@ pub fn basename(
         }
         None => Ok(PrimitiveValue::String(path).into()),
     }
+}
+
+/// Joins together two or more paths into an absolute path in the host
+/// filesystem.
+///
+/// `File join_paths(File, String)`: Joins together exactly two paths. The first
+/// path may be either absolute or relative and must specify a directory; the
+/// second path is relative to the first path and may specify a file or
+/// directory.
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-join_paths
+pub fn join_paths_simple(
+    types: &Types,
+    arguments: &[(Value, Span)],
+    return_type: Type,
+) -> Result<Value, Diagnostic> {
+    assert!(arguments.len() == 2);
+    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::File.into()));
+
+    let first = arguments[0]
+        .0
+        .coerce(types, PrimitiveTypeKind::File.into())
+        .expect("value should coerce to a file")
+        .unwrap_file();
+
+    let second = arguments[1]
+        .0
+        .coerce(types, PrimitiveTypeKind::String.into())
+        .expect("value should coerce to a string")
+        .unwrap_string();
+
+    let second = Path::new(second.as_str());
+    if !second.is_relative() {
+        return Err(path_not_relative(arguments[1].1));
+    }
+
+    let mut path = PathBuf::from(Arc::unwrap_or_clone(first));
+    path.push(second);
+
+    Ok(PrimitiveValue::new_file(
+        path.into_os_string()
+            .into_string()
+            .expect("should be UTF-8"),
+    )
+    .into())
+}
+
+/// Joins together two or more paths into an absolute path in the host
+/// filesystem.
+///
+/// `File join_paths(File, Array[String]+)`: Joins together any number of
+/// relative paths with a base path. The first argument may be either an
+/// absolute or a relative path and must specify a directory. The paths in the
+/// second array argument must all be relative. The last element may specify a
+/// file or directory; all other elements must specify a directory.
+///
+/// `File join_paths(Array[String]+)`: Joins together any number of paths. The
+/// array must not be empty. The first element of the array may be either
+/// absolute or relative; subsequent path(s) must be relative. The last element
+/// may specify a file or directory; all other elements must specify a
+/// directory.
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-join_paths
+pub fn join_paths(
+    types: &Types,
+    arguments: &[(Value, Span)],
+    return_type: Type,
+) -> Result<Value, Diagnostic> {
+    assert!(!arguments.is_empty() && arguments.len() < 3);
+    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::File.into()));
+
+    // Handle being provided one or two arguments
+    let (first, array, skip, array_span) = if arguments.len() == 1 {
+        let array = arguments[0]
+            .0
+            .coerce(
+                types,
+                wdl_analysis::stdlib::STDLIB.array_string_non_empty_type(),
+            )
+            .expect("value should coerce to Array[String]+")
+            .unwrap_array();
+
+        (
+            array.elements()[0].clone().unwrap_string(),
+            array,
+            true,
+            arguments[0].1,
+        )
+    } else {
+        let first = arguments[0]
+            .0
+            .coerce(types, PrimitiveTypeKind::File.into())
+            .expect("value should coerce to a file")
+            .unwrap_file();
+
+        let array = arguments[1]
+            .0
+            .coerce(
+                types,
+                wdl_analysis::stdlib::STDLIB.array_string_non_empty_type(),
+            )
+            .expect("value should coerce to a Array[String]+")
+            .unwrap_array();
+
+        (first, array, false, arguments[1].1)
+    };
+
+    let mut path = PathBuf::from(Arc::unwrap_or_clone(first));
+
+    for (i, second) in array
+        .elements()
+        .iter()
+        .enumerate()
+        .skip(if skip { 1 } else { 0 })
+    {
+        let second = second
+            .coerce(types, PrimitiveTypeKind::String.into())
+            .expect("value should coerce to a string")
+            .unwrap_string();
+
+        let second = Path::new(second.as_str());
+        if !second.is_relative() {
+            return Err(array_path_not_relative(i, array_span));
+        }
+
+        path.push(second);
+    }
+
+    Ok(PrimitiveValue::new_file(
+        path.into_os_string()
+            .into_string()
+            .expect("should be UTF-8"),
+    )
+    .into())
 }
 
 /// Represents a WDL function implementation callback.
@@ -482,6 +620,22 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                             Signature::new("(File, <String>) -> String", basename),
                             Signature::new("(String, <String>) -> String", basename),
                             Signature::new("(Directory, <String>) -> String", basename),
+                        ]
+                    }
+                )
+            )
+            .is_none()
+    );
+    assert!(
+        functions
+            .insert(
+                "join_paths",
+                Function::new(
+                    const {
+                        &[
+                            Signature::new("(File, String) -> File", join_paths_simple),
+                            Signature::new("(File, Array[String]+) -> File", join_paths),
+                            Signature::new("(Array[String]+) -> File", join_paths),
                         ]
                     }
                 )
@@ -902,5 +1056,125 @@ mod test {
         let value =
             eval_v1_expr(V1::Two, "basename('file.txt', '.txt')", &mut types, scope).unwrap();
         assert_eq!(value.unwrap_string().as_str(), "file");
+    }
+
+    #[test]
+    fn join_paths() {
+        let scopes = &[Scope::new(None)];
+        let scope = ScopeRef::new(scopes, 0);
+
+        let mut types = Types::default();
+        let value = eval_v1_expr(
+            V1::Two,
+            "join_paths('/usr', ['bin', 'echo'])",
+            &mut types,
+            scope,
+        )
+        .unwrap();
+        assert_eq!(value.unwrap_file().as_str(), "/usr/bin/echo");
+
+        let value = eval_v1_expr(
+            V1::Two,
+            "join_paths(['/usr', 'bin', 'echo'])",
+            &mut types,
+            scope,
+        )
+        .unwrap();
+        assert_eq!(value.unwrap_file().as_str(), "/usr/bin/echo");
+
+        let value = eval_v1_expr(
+            V1::Two,
+            "join_paths('mydir', 'mydata.txt')",
+            &mut types,
+            scope,
+        )
+        .unwrap();
+        assert_eq!(value.unwrap_file().as_str(), "mydir/mydata.txt");
+
+        let value =
+            eval_v1_expr(V1::Two, "join_paths('/usr', 'bin/echo')", &mut types, scope).unwrap();
+        assert_eq!(value.unwrap_file().as_str(), "/usr/bin/echo");
+
+        #[cfg(unix)]
+        {
+            let diagnostic = eval_v1_expr(
+                V1::Two,
+                "join_paths('/usr', '/bin/echo')",
+                &mut types,
+                scope,
+            )
+            .unwrap_err();
+            assert_eq!(
+                diagnostic.message(),
+                "path is required to be a relative path, but an absolute path was provided"
+            );
+
+            let diagnostic = eval_v1_expr(
+                V1::Two,
+                "join_paths('/usr', ['foo', '/bin/echo'])",
+                &mut types,
+                scope,
+            )
+            .unwrap_err();
+            assert_eq!(
+                diagnostic.message(),
+                "index 1 of the array is required to be a relative path, but an absolute path was \
+                 provided"
+            );
+
+            let diagnostic = eval_v1_expr(
+                V1::Two,
+                "join_paths(['/usr', 'foo', '/bin/echo'])",
+                &mut types,
+                scope,
+            )
+            .unwrap_err();
+            assert_eq!(
+                diagnostic.message(),
+                "index 2 of the array is required to be a relative path, but an absolute path was \
+                 provided"
+            );
+        }
+
+        #[cfg(windows)]
+        {
+            let diagnostic = eval_v1_expr(
+                V1::Two,
+                "join_paths('C:\\usr', 'C:\\bin\\echo')",
+                &mut types,
+                scope,
+            )
+            .unwrap_err();
+            assert_eq!(
+                diagnostic.message(),
+                "path is required to be a relative path, but an absolute path was provided"
+            );
+
+            let diagnostic = eval_v1_expr(
+                V1::Two,
+                "join_paths('C:\\usr', ['foo', 'C:\\bin\\echo'])",
+                &mut types,
+                scope,
+            )
+            .unwrap_err();
+            assert_eq!(
+                diagnostic.message(),
+                "index 1 of the array is required to be a relative path, but an absolute path was \
+                 provided"
+            );
+
+            let diagnostic = eval_v1_expr(
+                V1::Two,
+                "join_paths(['C:\\usr', 'foo', 'C:\\bin\\echo'])",
+                &mut types,
+                scope,
+            )
+            .unwrap_err();
+            assert_eq!(
+                diagnostic.message(),
+                "index 2 of the array is required to be a relative path, but an absolute path was \
+                 provided"
+            );
+        }
     }
 }

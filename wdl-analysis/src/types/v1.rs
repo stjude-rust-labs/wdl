@@ -93,8 +93,8 @@ pub fn task_member_type(name: &str) -> Option<Type> {
         "name" | "id" | "container" => Some(PrimitiveTypeKind::String.into()),
         "cpu" => Some(PrimitiveTypeKind::Float.into()),
         "memory" | "attempt" => Some(PrimitiveTypeKind::Integer.into()),
-        "gpu" | "fpga" => Some(STDLIB.array_string),
-        "disks" => Some(STDLIB.map_string_int),
+        "gpu" | "fpga" => Some(STDLIB.array_string_type()),
+        "disks" => Some(STDLIB.map_string_int_type()),
         "end_time" | "return_code" => Some(Type::from(PrimitiveTypeKind::Integer).optional()),
         "meta" | "parameter_meta" | "ext" => Some(Type::Object),
         _ => None,
@@ -107,7 +107,7 @@ pub fn task_member_type(name: &str) -> Option<Type> {
 pub fn task_requirement_types(version: SupportedVersion, name: &str) -> Option<&'static [Type]> {
     /// The types for the `container` requirement.
     static CONTAINER_TYPES: LazyLock<Box<[Type]>> =
-        LazyLock::new(|| Box::new([PrimitiveTypeKind::String.into(), STDLIB.array_string]));
+        LazyLock::new(|| Box::new([PrimitiveTypeKind::String.into(), STDLIB.array_string_type()]));
     /// The types for the `cpu` requirement.
     const CPU_TYPES: &[Type] = &[
         Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),
@@ -131,7 +131,7 @@ pub fn task_requirement_types(version: SupportedVersion, name: &str) -> Option<&
         Box::new([
             PrimitiveTypeKind::Integer.into(),
             PrimitiveTypeKind::String.into(),
-            STDLIB.array_string,
+            STDLIB.array_string_type(),
         ])
     });
     /// The types for the `max_retries` requirement.
@@ -143,7 +143,7 @@ pub fn task_requirement_types(version: SupportedVersion, name: &str) -> Option<&
         Box::new([
             PrimitiveTypeKind::Integer.into(),
             PrimitiveTypeKind::String.into(),
-            STDLIB.array_int,
+            STDLIB.array_int_type(),
         ])
     });
 
@@ -171,8 +171,12 @@ pub fn task_hint_types(
     use_hidden_types: bool,
 ) -> Option<&'static [Type]> {
     /// The types for the `disks` hint.
-    static DISKS_TYPES: LazyLock<Box<[Type]>> =
-        LazyLock::new(|| Box::new([PrimitiveTypeKind::String.into(), STDLIB.map_string_string]));
+    static DISKS_TYPES: LazyLock<Box<[Type]>> = LazyLock::new(|| {
+        Box::new([
+            PrimitiveTypeKind::String.into(),
+            STDLIB.map_string_string_type(),
+        ])
+    });
     /// The types for the `fpga` hint.
     const FPGA_TYPES: &[Type] = &[
         Type::Primitive(PrimitiveType::new(PrimitiveTypeKind::Integer)),

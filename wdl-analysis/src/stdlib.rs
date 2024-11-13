@@ -1651,14 +1651,22 @@ pub struct StandardLibrary {
     types: Types,
     /// A map of function name to function definition.
     functions: IndexMap<&'static str, Function>,
-    /// The type for `Array[String]`.
-    pub(crate) array_string: Type,
     /// The type for `Array[Int]`.
-    pub(crate) array_int: Type,
-    /// The type for `Map[String, Int]`.
-    pub(crate) map_string_int: Type,
+    array_int: Type,
+    /// The type for `Array[String]`.
+    array_string: Type,
+    /// The type for `Array[File]`.
+    array_file: Type,
+    /// The type for `Array[Object]`.
+    array_object: Type,
+    /// The type for `Array[String]+`.
+    array_string_non_empty: Type,
+    /// The type for `Array[Array[String]]`.
+    array_array_string: Type,
     /// The type for `Map[String, String]`.
-    pub(crate) map_string_string: Type,
+    map_string_string: Type,
+    /// The type for `Map[String, Int]`.
+    map_string_int: Type,
 }
 
 impl StandardLibrary {
@@ -1675,6 +1683,46 @@ impl StandardLibrary {
     /// Gets an iterator over all the functions in the standard library.
     pub fn functions(&self) -> impl ExactSizeIterator<Item = (&'static str, &Function)> {
         self.functions.iter().map(|(n, f)| (*n, f))
+    }
+
+    /// Gets the type for `Array[Int]`.
+    pub fn array_int_type(&self) -> Type {
+        self.array_int
+    }
+
+    /// Gets the type for `Array[String]`.
+    pub fn array_string_type(&self) -> Type {
+        self.array_string
+    }
+
+    /// Gets the type for `Array[File]`.
+    pub fn array_file_type(&self) -> Type {
+        self.array_file
+    }
+
+    /// Gets the type for `Array[Object]`.
+    pub fn array_object_type(&self) -> Type {
+        self.array_object
+    }
+
+    /// Gets the type for `Array[String]+`.
+    pub fn array_string_non_empty_type(&self) -> Type {
+        self.array_string_non_empty
+    }
+
+    /// Gets the type for `Array[Array[String]]`.
+    pub fn array_array_string_type(&self) -> Type {
+        self.array_array_string
+    }
+
+    /// Gets the type for `Map[String, String]`.
+    pub fn map_string_string_type(&self) -> Type {
+        self.map_string_string
+    }
+
+    /// Gets the type for `Map[String, Int]`.
+    pub fn map_string_int_type(&self) -> Type {
+        self.map_string_int
     }
 }
 
@@ -2853,10 +2901,14 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
     StandardLibrary {
         types,
         functions,
-        array_string,
         array_int,
-        map_string_int,
+        array_string,
+        array_file,
+        array_object,
+        array_string_non_empty,
+        array_array_string,
         map_string_string,
+        map_string_int,
     }
 });
 
