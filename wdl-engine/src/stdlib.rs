@@ -138,7 +138,7 @@ pub fn int_max(
     arguments: &[(Value, Span)],
     return_type: Type,
 ) -> Result<Value, Diagnostic> {
-    assert_eq!(arguments.len(), 2);
+    debug_assert_eq!(arguments.len(), 2);
     debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::Integer.into()));
 
     let first = arguments[0]
@@ -162,7 +162,7 @@ pub fn float_max(
     arguments: &[(Value, Span)],
     return_type: Type,
 ) -> Result<Value, Diagnostic> {
-    assert_eq!(arguments.len(), 2);
+    debug_assert_eq!(arguments.len(), 2);
     debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::Float.into()));
 
     let first = arguments[0]
@@ -188,7 +188,7 @@ pub fn find(
     arguments: &[(Value, Span)],
     return_type: Type,
 ) -> Result<Value, Diagnostic> {
-    assert_eq!(arguments.len(), 2);
+    debug_assert_eq!(arguments.len(), 2);
     debug_assert!(return_type.type_eq(types, &Type::from(PrimitiveTypeKind::String).optional()));
 
     let input = arguments[0]
@@ -219,7 +219,7 @@ pub fn matches(
     arguments: &[(Value, Span)],
     return_type: Type,
 ) -> Result<Value, Diagnostic> {
-    assert_eq!(arguments.len(), 2);
+    debug_assert_eq!(arguments.len(), 2);
     debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::Boolean.into()));
 
     let input = arguments[0]
@@ -247,7 +247,7 @@ pub fn sub(
     arguments: &[(Value, Span)],
     return_type: Type,
 ) -> Result<Value, Diagnostic> {
-    assert_eq!(arguments.len(), 3);
+    debug_assert_eq!(arguments.len(), 3);
     debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::String.into()));
 
     let input = arguments[0]
@@ -292,7 +292,7 @@ pub fn basename(
     arguments: &[(Value, Span)],
     return_type: Type,
 ) -> Result<Value, Diagnostic> {
-    assert!(!arguments.is_empty() && arguments.len() < 3);
+    debug_assert!(!arguments.is_empty() && arguments.len() < 3);
     debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::String.into()));
 
     let path = arguments[0]
@@ -338,7 +338,7 @@ pub fn join_paths_simple(
     arguments: &[(Value, Span)],
     return_type: Type,
 ) -> Result<Value, Diagnostic> {
-    assert!(arguments.len() == 2);
+    debug_assert!(arguments.len() == 2);
     debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::File.into()));
 
     let first = arguments[0]
@@ -390,7 +390,7 @@ pub fn join_paths(
     arguments: &[(Value, Span)],
     return_type: Type,
 ) -> Result<Value, Diagnostic> {
-    assert!(!arguments.is_empty() && arguments.len() < 3);
+    debug_assert!(!arguments.is_empty() && arguments.len() < 3);
     debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::File.into()));
 
     // Handle being provided one or two arguments
