@@ -2,6 +2,7 @@
 
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::path::Path;
 use std::sync::LazyLock;
 
 use regex::Regex;
@@ -274,6 +275,51 @@ pub fn sub(
     }
 }
 
+/// Returns the "basename" of a file or directory - the name after the last
+/// directory separator in the path.
+///
+/// The optional second parameter specifies a literal suffix to remove from the
+/// file name. If the file name does not end with the specified suffix then it
+/// is ignored.
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#basename
+pub fn basename(
+    types: &Types,
+    arguments: &[(Value, Span)],
+    return_type: Type,
+) -> Result<Value, Diagnostic> {
+    assert!(arguments.len() >= 1 && arguments.len() < 3);
+    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::String.into()));
+
+    let path = arguments[0]
+        .0
+        .coerce(types, PrimitiveTypeKind::String.into())
+        .expect("value should coerce to string")
+        .unwrap_string();
+
+    match Path::new(path.as_str()).file_name() {
+        Some(base) => {
+            let base = base.to_str().expect("should be UTF-8");
+            let base = if arguments.len() == 2 {
+                base.strip_suffix(
+                    arguments[1]
+                        .0
+                        .coerce(types, PrimitiveTypeKind::String.into())
+                        .expect("value should coerce to string")
+                        .unwrap_string()
+                        .as_str(),
+                )
+                .unwrap_or(base)
+            } else {
+                base
+            };
+
+            Ok(PrimitiveValue::new_string(base).into())
+        }
+        None => Ok(PrimitiveValue::String(path).into()),
+    }
+}
+
 /// Represents a WDL function implementation callback.
 type Callback = fn(&Types, &[(Value, Span)], Type) -> Result<Value, Diagnostic>;
 
@@ -421,7 +467,23 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             .insert(
                 "sub",
                 Function::new(
-                    const { &[Signature::new("(String, String, String) -> String", sub,)] }
+                    const { &[Signature::new("(String, String, String) -> String", sub)] }
+                )
+            )
+            .is_none()
+    );
+    assert!(
+        functions
+            .insert(
+                "basename",
+                Function::new(
+                    const {
+                        &[
+                            Signature::new("(File, <String>) -> String", basename),
+                            Signature::new("(String, <String>) -> String", basename),
+                            Signature::new("(Directory, <String>) -> String", basename),
+                        ]
+                    }
                 )
             )
             .is_none()
@@ -810,5 +872,35 @@ mod test {
         let value =
             eval_v1_expr(V1::Two, "sub('hello\tBob', '\\t', ' ')", &mut types, scope).unwrap();
         assert_eq!(value.unwrap_string().as_str(), "hello Bob");
+    }
+
+    #[test]
+    fn basename() {
+        let scopes = &[Scope::new(None)];
+        let scope = ScopeRef::new(scopes, 0);
+
+        let mut types = Types::default();
+        let value =
+            eval_v1_expr(V1::Two, "basename('/path/to/file.txt')", &mut types, scope).unwrap();
+        assert_eq!(value.unwrap_string().as_str(), "file.txt");
+
+        let value = eval_v1_expr(
+            V1::Two,
+            "basename('/path/to/file.txt', '.txt')",
+            &mut types,
+            scope,
+        )
+        .unwrap();
+        assert_eq!(value.unwrap_string().as_str(), "file");
+
+        let value = eval_v1_expr(V1::Two, "basename('/path/to/dir')", &mut types, scope).unwrap();
+        assert_eq!(value.unwrap_string().as_str(), "dir");
+
+        let value = eval_v1_expr(V1::Two, "basename('file.txt')", &mut types, scope).unwrap();
+        assert_eq!(value.unwrap_string().as_str(), "file.txt");
+
+        let value =
+            eval_v1_expr(V1::Two, "basename('file.txt', '.txt')", &mut types, scope).unwrap();
+        assert_eq!(value.unwrap_string().as_str(), "file");
     }
 }
