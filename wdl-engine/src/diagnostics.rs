@@ -1,5 +1,7 @@
 //! Module for evaluation diagnostics.
 
+use std::path::Path;
+
 use wdl_analysis::types::Type;
 use wdl_analysis::types::Types;
 use wdl_ast::AstToken;
@@ -160,11 +162,32 @@ pub fn path_not_relative(span: Span) -> Diagnostic {
         .with_highlight(span)
 }
 
-/// Creates a "array path not relative" diagnostic.
+/// Creates an "array path not relative" diagnostic.
 pub fn array_path_not_relative(index: usize, span: Span) -> Diagnostic {
     Diagnostic::error(format!(
         "index {index} of the array is required to be a relative path, but an absolute path was \
          provided"
+    ))
+    .with_highlight(span)
+}
+
+/// Creates an "invalid glob pattern" diagnostic.
+pub fn invalid_glob_pattern(e: &glob::PatternError, span: Span) -> Diagnostic {
+    Diagnostic::error(format!("invalid glob pattern specified: {e}", e = e.msg))
+        .with_highlight(span)
+}
+
+/// Creates a "glob error" diagnostic.
+pub fn glob_error(e: &glob::GlobError, span: Span) -> Diagnostic {
+    Diagnostic::error(format!("call to function `glob` failed: {e}")).with_highlight(span)
+}
+
+/// Creates a "path not UTF-8" diagnostic.
+pub fn path_not_utf8(context: &str, path: impl AsRef<Path>, span: Span) -> Diagnostic {
+    let path = path.as_ref();
+    Diagnostic::error(format!(
+        "{context}: path `{path}` cannot be represented as UTF-8",
+        path = path.display()
     ))
     .with_highlight(span)
 }

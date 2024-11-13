@@ -8,7 +8,6 @@ use std::sync::Arc;
 use std::sync::LazyLock;
 
 use regex::Regex;
-use wdl_analysis::stdlib::Binding;
 use wdl_analysis::types::Optional;
 use wdl_analysis::types::PrimitiveTypeKind;
 use wdl_analysis::types::Type;
@@ -17,28 +16,100 @@ use wdl_analysis::types::Types;
 use wdl_ast::Diagnostic;
 use wdl_ast::Span;
 
+use crate::Array;
 use crate::Coercible;
 use crate::PrimitiveValue;
 use crate::Value;
 use crate::diagnostics::array_path_not_relative;
+use crate::diagnostics::glob_error;
+use crate::diagnostics::invalid_glob_pattern;
 use crate::diagnostics::invalid_regex;
 use crate::diagnostics::path_not_relative;
+use crate::diagnostics::path_not_utf8;
+
+/// Represents a function call argument.
+pub struct CallArgument {
+    /// The value of the argument.
+    value: Value,
+    /// The span of the expression of the argument.
+    span: Span,
+}
+
+impl CallArgument {
+    /// Constructs a new call argument given its value and span.
+    pub const fn new(value: Value, span: Span) -> Self {
+        Self { value, span }
+    }
+
+    /// Constructs a `None` call argument.
+    pub const fn none() -> Self {
+        Self {
+            value: Value::None,
+            span: Span::new(0, 0),
+        }
+    }
+}
+
+/// Represents function call context.
+pub struct CallContext<'a> {
+    /// The types collection for any referenced types.
+    types: &'a Types,
+    /// The call site span.
+    call_site: Span,
+    /// The arguments to the call.
+    arguments: &'a [CallArgument],
+    /// The return type.
+    return_type: Type,
+    /// The current working directory.
+    cwd: &'a Path,
+}
+
+impl<'a> CallContext<'a> {
+    /// Constructs a new call context given the call arguments.
+    pub fn new(
+        types: &'a Types,
+        call_site: Span,
+        arguments: &'a [CallArgument],
+        return_type: Type,
+        cwd: &'a Path,
+    ) -> Self {
+        Self {
+            types,
+            call_site,
+            arguments,
+            return_type,
+            cwd,
+        }
+    }
+
+    /// Coerces an argument to the given type.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the given index is out of range or if the value fails to
+    /// coerce to the given type.
+    #[inline]
+    fn coerce_argument(&self, index: usize, ty: impl Into<Type>) -> Value {
+        self.arguments[index]
+            .value
+            .coerce(self.types, ty.into())
+            .expect("value should coerce")
+    }
+}
 
 /// Rounds a floating point number down to the next lower integer.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#floor
-pub fn floor(
-    types: &Types,
-    arguments: &[(Value, Span)],
-    return_type: Type,
-) -> Result<Value, Diagnostic> {
-    debug_assert_eq!(arguments.len(), 1);
-    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::Integer.into()));
+pub fn floor(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert_eq!(context.arguments.len(), 1);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::Integer.into())
+    );
 
-    let arg = arguments[0]
-        .0
-        .coerce(types, PrimitiveTypeKind::Float.into())
-        .expect("value should coerce to float")
+    let arg = context
+        .coerce_argument(0, PrimitiveTypeKind::Float)
         .unwrap_float();
     Ok((arg.floor() as i64).into())
 }
@@ -46,18 +117,16 @@ pub fn floor(
 /// Rounds a floating point number up to the next higher integer.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#ceil
-pub fn ceil(
-    types: &Types,
-    arguments: &[(Value, Span)],
-    return_type: Type,
-) -> Result<Value, Diagnostic> {
-    debug_assert_eq!(arguments.len(), 1);
-    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::Integer.into()));
+pub fn ceil(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert_eq!(context.arguments.len(), 1);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::Integer.into())
+    );
 
-    let arg = arguments[0]
-        .0
-        .coerce(types, PrimitiveTypeKind::Float.into())
-        .expect("value should coerce to float")
+    let arg = context
+        .coerce_argument(0, PrimitiveTypeKind::Float)
         .unwrap_float();
     Ok((arg.ceil() as i64).into())
 }
@@ -66,18 +135,16 @@ pub fn ceil(
 /// rounding rules ("round half up").
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#round
-pub fn round(
-    types: &Types,
-    arguments: &[(Value, Span)],
-    return_type: Type,
-) -> Result<Value, Diagnostic> {
-    debug_assert_eq!(arguments.len(), 1);
-    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::Integer.into()));
+pub fn round(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert_eq!(context.arguments.len(), 1);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::Integer.into())
+    );
 
-    let arg = arguments[0]
-        .0
-        .coerce(types, PrimitiveTypeKind::Float.into())
-        .expect("value should coerce to float")
+    let arg = context
+        .coerce_argument(0, PrimitiveTypeKind::Float)
         .unwrap_float();
     Ok((arg.round() as i64).into())
 }
@@ -85,23 +152,19 @@ pub fn round(
 /// Returns the smaller of two integer values.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#min
-pub fn int_min(
-    types: &Types,
-    arguments: &[(Value, Span)],
-    return_type: Type,
-) -> Result<Value, Diagnostic> {
-    debug_assert_eq!(arguments.len(), 2);
-    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::Integer.into()));
+pub fn int_min(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert_eq!(context.arguments.len(), 2);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::Integer.into())
+    );
 
-    let first = arguments[0]
-        .0
-        .coerce(types, PrimitiveTypeKind::Integer.into())
-        .expect("value should coerce to integer")
+    let first = context
+        .coerce_argument(0, PrimitiveTypeKind::Integer)
         .unwrap_integer();
-    let second = arguments[1]
-        .0
-        .coerce(types, PrimitiveTypeKind::Integer.into())
-        .expect("value should coerce to integer")
+    let second = context
+        .coerce_argument(1, PrimitiveTypeKind::Integer)
         .unwrap_integer();
     Ok(first.min(second).into())
 }
@@ -109,23 +172,19 @@ pub fn int_min(
 /// Returns the smaller of two float values.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#min
-pub fn float_min(
-    types: &Types,
-    arguments: &[(Value, Span)],
-    return_type: Type,
-) -> Result<Value, Diagnostic> {
-    debug_assert_eq!(arguments.len(), 2);
-    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::Float.into()));
+pub fn float_min(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert_eq!(context.arguments.len(), 2);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::Float.into())
+    );
 
-    let first = arguments[0]
-        .0
-        .coerce(types, PrimitiveTypeKind::Float.into())
-        .expect("value should coerce to float")
+    let first = context
+        .coerce_argument(0, PrimitiveTypeKind::Float)
         .unwrap_float();
-    let second = arguments[1]
-        .0
-        .coerce(types, PrimitiveTypeKind::Float.into())
-        .expect("value should coerce to float")
+    let second = context
+        .coerce_argument(1, PrimitiveTypeKind::Float)
         .unwrap_float();
     Ok(first.min(second).into())
 }
@@ -133,23 +192,19 @@ pub fn float_min(
 /// Returns the larger of two integer values.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#max
-pub fn int_max(
-    types: &Types,
-    arguments: &[(Value, Span)],
-    return_type: Type,
-) -> Result<Value, Diagnostic> {
-    debug_assert_eq!(arguments.len(), 2);
-    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::Integer.into()));
+pub fn int_max(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert_eq!(context.arguments.len(), 2);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::Integer.into())
+    );
 
-    let first = arguments[0]
-        .0
-        .coerce(types, PrimitiveTypeKind::Integer.into())
-        .expect("value should coerce to integer")
+    let first = context
+        .coerce_argument(0, PrimitiveTypeKind::Integer)
         .unwrap_integer();
-    let second = arguments[1]
-        .0
-        .coerce(types, PrimitiveTypeKind::Integer.into())
-        .expect("value should coerce to integer")
+    let second = context
+        .coerce_argument(1, PrimitiveTypeKind::Integer)
         .unwrap_integer();
     Ok(first.max(second).into())
 }
@@ -157,23 +212,19 @@ pub fn int_max(
 /// Returns the larger of two float values.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#max
-pub fn float_max(
-    types: &Types,
-    arguments: &[(Value, Span)],
-    return_type: Type,
-) -> Result<Value, Diagnostic> {
-    debug_assert_eq!(arguments.len(), 2);
-    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::Float.into()));
+pub fn float_max(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert_eq!(context.arguments.len(), 2);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::Float.into())
+    );
 
-    let first = arguments[0]
-        .0
-        .coerce(types, PrimitiveTypeKind::Float.into())
-        .expect("value should coerce to float")
+    let first = context
+        .coerce_argument(0, PrimitiveTypeKind::Float)
         .unwrap_float();
-    let second = arguments[1]
-        .0
-        .coerce(types, PrimitiveTypeKind::Float.into())
-        .expect("value should coerce to float")
+    let second = context
+        .coerce_argument(1, PrimitiveTypeKind::Float)
         .unwrap_float();
     Ok(first.max(second).into())
 }
@@ -183,26 +234,22 @@ pub fn float_max(
 /// if there are no matches.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-find
-pub fn find(
-    types: &Types,
-    arguments: &[(Value, Span)],
-    return_type: Type,
-) -> Result<Value, Diagnostic> {
-    debug_assert_eq!(arguments.len(), 2);
-    debug_assert!(return_type.type_eq(types, &Type::from(PrimitiveTypeKind::String).optional()));
+pub fn find(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert_eq!(context.arguments.len(), 2);
+    debug_assert!(context.return_type.type_eq(
+        context.types,
+        &Type::from(PrimitiveTypeKind::String).optional()
+    ));
 
-    let input = arguments[0]
-        .0
-        .coerce(types, PrimitiveTypeKind::String.into())
-        .expect("value should coerce to string")
+    let input = context
+        .coerce_argument(0, PrimitiveTypeKind::String)
         .unwrap_string();
-    let pattern = arguments[1]
-        .0
-        .coerce(types, PrimitiveTypeKind::String.into())
-        .expect("value should coerce to string")
+    let pattern = context
+        .coerce_argument(1, PrimitiveTypeKind::String)
         .unwrap_string();
 
-    let regex = Regex::new(pattern.as_str()).map_err(|e| invalid_regex(&e, arguments[1].1))?;
+    let regex =
+        Regex::new(pattern.as_str()).map_err(|e| invalid_regex(&e, context.arguments[1].span))?;
 
     match regex.find(input.as_str()) {
         Some(m) => Ok(PrimitiveValue::new_string(m.as_str()).into()),
@@ -214,26 +261,23 @@ pub fn find(
 /// matches `input` at least once.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-matches
-pub fn matches(
-    types: &Types,
-    arguments: &[(Value, Span)],
-    return_type: Type,
-) -> Result<Value, Diagnostic> {
-    debug_assert_eq!(arguments.len(), 2);
-    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::Boolean.into()));
+pub fn matches(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert_eq!(context.arguments.len(), 2);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::Boolean.into())
+    );
 
-    let input = arguments[0]
-        .0
-        .coerce(types, PrimitiveTypeKind::String.into())
-        .expect("value should coerce to string")
+    let input = context
+        .coerce_argument(0, PrimitiveTypeKind::String)
         .unwrap_string();
-    let pattern = arguments[1]
-        .0
-        .coerce(types, PrimitiveTypeKind::String.into())
-        .expect("value should coerce to string")
+    let pattern = context
+        .coerce_argument(1, PrimitiveTypeKind::String)
         .unwrap_string();
 
-    let regex = Regex::new(pattern.as_str()).map_err(|e| invalid_regex(&e, arguments[1].1))?;
+    let regex =
+        Regex::new(pattern.as_str()).map_err(|e| invalid_regex(&e, context.arguments[1].span))?;
     Ok(regex.is_match(input.as_str()).into())
 }
 
@@ -242,31 +286,26 @@ pub fn matches(
 /// with `replace`.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#sub
-pub fn sub(
-    types: &Types,
-    arguments: &[(Value, Span)],
-    return_type: Type,
-) -> Result<Value, Diagnostic> {
-    debug_assert_eq!(arguments.len(), 3);
-    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::String.into()));
+pub fn sub(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert_eq!(context.arguments.len(), 3);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::String.into())
+    );
 
-    let input = arguments[0]
-        .0
-        .coerce(types, PrimitiveTypeKind::String.into())
-        .expect("value should coerce to string")
+    let input = context
+        .coerce_argument(0, PrimitiveTypeKind::String)
         .unwrap_string();
-    let pattern = arguments[1]
-        .0
-        .coerce(types, PrimitiveTypeKind::String.into())
-        .expect("value should coerce to string")
+    let pattern = context
+        .coerce_argument(1, PrimitiveTypeKind::String)
         .unwrap_string();
-    let replacement = arguments[2]
-        .0
-        .coerce(types, PrimitiveTypeKind::String.into())
-        .expect("value should coerce to string")
+    let replacement = context
+        .coerce_argument(2, PrimitiveTypeKind::String)
         .unwrap_string();
 
-    let regex = Regex::new(pattern.as_str()).map_err(|e| invalid_regex(&e, arguments[1].1))?;
+    let regex =
+        Regex::new(pattern.as_str()).map_err(|e| invalid_regex(&e, context.arguments[1].span))?;
     match regex.replace(input.as_str(), replacement.as_str()) {
         Cow::Borrowed(_) => {
             // No replacements, just return the input
@@ -287,29 +326,25 @@ pub fn sub(
 /// is ignored.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#basename
-pub fn basename(
-    types: &Types,
-    arguments: &[(Value, Span)],
-    return_type: Type,
-) -> Result<Value, Diagnostic> {
-    debug_assert!(!arguments.is_empty() && arguments.len() < 3);
-    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::String.into()));
+pub fn basename(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(!context.arguments.is_empty() && context.arguments.len() < 3);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::String.into())
+    );
 
-    let path = arguments[0]
-        .0
-        .coerce(types, PrimitiveTypeKind::String.into())
-        .expect("value should coerce to string")
+    let path = context
+        .coerce_argument(0, PrimitiveTypeKind::String)
         .unwrap_string();
 
     match Path::new(path.as_str()).file_name() {
         Some(base) => {
             let base = base.to_str().expect("should be UTF-8");
-            let base = if arguments.len() == 2 {
+            let base = if context.arguments.len() == 2 {
                 base.strip_suffix(
-                    arguments[1]
-                        .0
-                        .coerce(types, PrimitiveTypeKind::String.into())
-                        .expect("value should coerce to string")
+                    context
+                        .coerce_argument(1, PrimitiveTypeKind::String)
                         .unwrap_string()
                         .as_str(),
                 )
@@ -333,29 +368,25 @@ pub fn basename(
 /// directory.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-join_paths
-pub fn join_paths_simple(
-    types: &Types,
-    arguments: &[(Value, Span)],
-    return_type: Type,
-) -> Result<Value, Diagnostic> {
-    debug_assert!(arguments.len() == 2);
-    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::File.into()));
+pub fn join_paths_simple(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(context.arguments.len() == 2);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::File.into())
+    );
 
-    let first = arguments[0]
-        .0
-        .coerce(types, PrimitiveTypeKind::File.into())
-        .expect("value should coerce to a file")
+    let first = context
+        .coerce_argument(0, PrimitiveTypeKind::File)
         .unwrap_file();
 
-    let second = arguments[1]
-        .0
-        .coerce(types, PrimitiveTypeKind::String.into())
-        .expect("value should coerce to a string")
+    let second = context
+        .coerce_argument(1, PrimitiveTypeKind::String)
         .unwrap_string();
 
     let second = Path::new(second.as_str());
     if !second.is_relative() {
-        return Err(path_not_relative(arguments[1].1));
+        return Err(path_not_relative(context.arguments[1].span));
     }
 
     let mut path = PathBuf::from(Arc::unwrap_or_clone(first));
@@ -385,61 +416,55 @@ pub fn join_paths_simple(
 /// directory.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-join_paths
-pub fn join_paths(
-    types: &Types,
-    arguments: &[(Value, Span)],
-    return_type: Type,
-) -> Result<Value, Diagnostic> {
-    debug_assert!(!arguments.is_empty() && arguments.len() < 3);
-    debug_assert!(return_type.type_eq(types, &PrimitiveTypeKind::File.into()));
+pub fn join_paths(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(!context.arguments.is_empty() && context.arguments.len() < 3);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::File.into())
+    );
 
     // Handle being provided one or two arguments
-    let (first, array, skip, array_span) = if arguments.len() == 1 {
-        let array = arguments[0]
-            .0
-            .coerce(
-                types,
+    let (first, array, skip, array_span) = if context.arguments.len() == 1 {
+        let array = context
+            .coerce_argument(
+                0,
                 wdl_analysis::stdlib::STDLIB.array_string_non_empty_type(),
             )
-            .expect("value should coerce to Array[String]+")
             .unwrap_array();
 
         (
             array.elements()[0].clone().unwrap_string(),
             array,
             true,
-            arguments[0].1,
+            context.arguments[0].span,
         )
     } else {
-        let first = arguments[0]
-            .0
-            .coerce(types, PrimitiveTypeKind::File.into())
-            .expect("value should coerce to a file")
+        let first = context
+            .coerce_argument(0, PrimitiveTypeKind::File)
             .unwrap_file();
 
-        let array = arguments[1]
-            .0
-            .coerce(
-                types,
+        let array = context
+            .coerce_argument(
+                1,
                 wdl_analysis::stdlib::STDLIB.array_string_non_empty_type(),
             )
-            .expect("value should coerce to a Array[String]+")
             .unwrap_array();
 
-        (first, array, false, arguments[1].1)
+        (first, array, false, context.arguments[1].span)
     };
 
     let mut path = PathBuf::from(Arc::unwrap_or_clone(first));
 
-    for (i, second) in array
+    for (i, element) in array
         .elements()
         .iter()
         .enumerate()
         .skip(if skip { 1 } else { 0 })
     {
-        let second = second
-            .coerce(types, PrimitiveTypeKind::String.into())
-            .expect("value should coerce to a string")
+        let second = element
+            .coerce(context.types, PrimitiveTypeKind::String.into())
+            .expect("element should coerce to a string")
             .unwrap_string();
 
         let second = Path::new(second.as_str());
@@ -458,8 +483,48 @@ pub fn join_paths(
     .into())
 }
 
+/// Returns the Bash expansion of the glob string relative to the task's
+/// execution directory, and in the same order.
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#glob
+pub fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(context.arguments.len() == 1);
+    debug_assert!(context.return_type.type_eq(
+        context.types,
+        &wdl_analysis::stdlib::STDLIB.array_file_type()
+    ));
+
+    let path = context
+        .coerce_argument(0, PrimitiveTypeKind::String)
+        .unwrap_string();
+
+    let mut elements: Vec<Value> = Vec::new();
+    for path in glob::glob(&context.cwd.join(path.as_str()).to_string_lossy())
+        .map_err(|e| invalid_glob_pattern(&e, context.arguments[0].span))?
+    {
+        let path = path.map_err(|e| glob_error(&e, context.call_site))?;
+
+        // Filter out directories (only files are returned from WDL's `glob` function)
+        if path.is_dir() {
+            continue;
+        }
+
+        // Strip the CWD prefix if there is one
+        let path = path.strip_prefix(context.cwd).unwrap_or(path.as_ref());
+
+        elements.push(
+            PrimitiveValue::new_file(path.to_str().ok_or_else(|| {
+                path_not_utf8("call to `glob` function failed", path, context.call_site)
+            })?)
+            .into(),
+        );
+    }
+
+    Ok(Array::new_unchecked(context.return_type, elements.into()).into())
+}
+
 /// Represents a WDL function implementation callback.
-type Callback = fn(&Types, &[(Value, Span)], Type) -> Result<Value, Diagnostic>;
+type Callback = fn(context: CallContext<'_>) -> Result<Value, Diagnostic>;
 
 /// Represents an implementation signature for a WDL standard library function.
 #[derive(Debug, Clone, Copy)]
@@ -493,15 +558,10 @@ impl Function {
         Self { signatures }
     }
 
-    /// Calls the function given the binding and the function's arguments.
+    /// Calls the function given the overload index and call context.
     #[inline]
-    pub fn call(
-        &self,
-        binding: Binding<'_>,
-        types: &Types,
-        arguments: &[(Value, Span)],
-    ) -> Result<Value, Diagnostic> {
-        (self.signatures[binding.index()].callback)(types, arguments, binding.return_type())
+    pub fn call(&self, index: usize, context: CallContext<'_>) -> Result<Value, Diagnostic> {
+        (self.signatures[index].callback)(context)
     }
 }
 
@@ -642,12 +702,22 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             )
             .is_none()
     );
+    assert!(
+        functions
+            .insert(
+                "glob",
+                Function::new(const { &[Signature::new("(String) -> Array[File]", glob)] })
+            )
+            .is_none()
+    );
 
     StandardLibrary { functions }
 });
 
 #[cfg(test)]
 mod test {
+    use std::fs;
+
     use pretty_assertions::assert_eq;
     use wdl_analysis::stdlib::TypeParameters;
     use wdl_ast::version::V1;
@@ -656,6 +726,7 @@ mod test {
     use crate::Scope;
     use crate::ScopeRef;
     use crate::v1::test::eval_v1_expr;
+    use crate::v1::test::eval_v1_expr_with_cwd;
 
     /// A test to verify that the STDLIB function types from `wdl-analysis`
     /// aligns with the STDLIB implementation from `wdl-engine`.
@@ -1176,5 +1247,84 @@ mod test {
                  provided"
             );
         }
+    }
+
+    #[test]
+    fn glob() {
+        let scopes = &[Scope::new(None)];
+        let scope = ScopeRef::new(scopes, 0);
+
+        let mut types = Types::default();
+        let diagnostic =
+            eval_v1_expr(V1::Two, "glob('invalid***')", &mut types, scope).unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "invalid glob pattern specified: wildcards are either regular `*` or recursive `**`"
+        );
+
+        let dir = tempfile::tempdir().expect("should create temp directory");
+
+        fs::write(dir.path().join("qux"), "qux").expect("should create temp file");
+        fs::write(dir.path().join("baz"), "baz").expect("should create temp file");
+        fs::write(dir.path().join("foo"), "foo").expect("should create temp file");
+        fs::write(dir.path().join("bar"), "bar").expect("should create temp file");
+        fs::create_dir_all(dir.path().join("nested")).expect("should create directory");
+        fs::write(dir.path().join("nested/bar"), "bar").expect("should create temp file");
+        fs::write(dir.path().join("nested/baz"), "bar").expect("should create temp file");
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "glob('jam')", &mut types, scope, dir.path()).unwrap();
+        let elements: Vec<_> = value
+            .as_array()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|v| v.as_file().unwrap().as_str())
+            .collect();
+        assert!(elements.is_empty());
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "glob('*')", &mut types, scope, dir.path()).unwrap();
+        let elements: Vec<_> = value
+            .as_array()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|v| v.as_file().unwrap().as_str())
+            .collect();
+        assert_eq!(elements, ["bar", "baz", "foo", "qux"]);
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "glob('ba?')", &mut types, scope, dir.path()).unwrap();
+        let elements: Vec<_> = value
+            .as_array()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|v| v.as_file().unwrap().as_str())
+            .collect();
+        assert_eq!(elements, ["bar", "baz"]);
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "glob('b*')", &mut types, scope, dir.path()).unwrap();
+        let elements: Vec<_> = value
+            .as_array()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|v| v.as_file().unwrap().as_str())
+            .collect();
+        assert_eq!(elements, ["bar", "baz"]);
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "glob('**/b*')", &mut types, scope, dir.path()).unwrap();
+        let elements: Vec<_> = value
+            .as_array()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|v| v.as_file().unwrap().as_str())
+            .collect();
+        assert_eq!(elements, ["bar", "baz", "nested/bar", "nested/baz"]);
     }
 }

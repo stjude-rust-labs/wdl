@@ -3,6 +3,7 @@
 use std::cmp::Ordering;
 use std::fmt::Write;
 use std::iter::once;
+use std::path::Path;
 use std::sync::Arc;
 
 use indexmap::IndexMap;
@@ -96,6 +97,8 @@ use crate::diagnostics::multiline_string_requirement;
 use crate::diagnostics::not_an_object_member;
 use crate::diagnostics::numeric_overflow;
 use crate::diagnostics::struct_member_coercion_failed;
+use crate::stdlib::CallArgument;
+use crate::stdlib::CallContext;
 use crate::stdlib::STDLIB;
 
 /// Represents context to an expression evaluator.
@@ -114,6 +117,9 @@ pub trait EvaluationContext {
 
     /// Resolves a type name to a type.
     fn resolve_type_name(&self, name: &Ident) -> Result<Type, Diagnostic>;
+
+    /// Gets the current working directory for the evaluation.
+    fn cwd(&self) -> &Path;
 
     /// Gets the value to return for a call to the `stdout` function.
     ///
@@ -1064,12 +1070,12 @@ impl<'a, C: EvaluationContext> ExprEvaluator<'a, C> {
                 // Evaluate the argument expressions
                 let mut count = 0;
                 let mut types = [Type::Union; MAX_PARAMETERS];
-                let mut arguments = [const { (Value::None, Span::new(0, 0)) }; MAX_PARAMETERS];
+                let mut arguments = [const { CallArgument::none() }; MAX_PARAMETERS];
                 for arg in expr.arguments() {
                     if count < MAX_PARAMETERS {
                         let v = self.evaluate_expr(&arg)?;
                         types[count] = v.ty();
-                        arguments[count] = (v, arg.span());
+                        arguments[count] = CallArgument::new(v, arg.span());
                     }
 
                     count += 1;
@@ -1083,7 +1089,16 @@ impl<'a, C: EvaluationContext> ExprEvaluator<'a, C> {
                         Ok(binding) => STDLIB
                             .get(target.as_str())
                             .expect("should have implementation")
-                            .call(binding, self.context.types(), arguments),
+                            .call(
+                                binding.index(),
+                                CallContext::new(
+                                    self.context.types(),
+                                    target.span(),
+                                    arguments,
+                                    binding.return_type(),
+                                    self.context.cwd(),
+                                ),
+                            ),
                         Err(FunctionBindError::RequiresVersion(minimum)) => Err(
                             unsupported_function(minimum, target.as_str(), target.span()),
                         ),
@@ -1266,6 +1281,8 @@ pub(crate) mod test {
         structs: HashMap<&'static str, Type>,
         /// The current evaluation scope.
         scope: ScopeRef<'a>,
+        /// The current working directory for evaluation.
+        cwd: &'a Path,
         /// The stdout value from a task's execution.
         stdout: Option<Value>,
         /// The stderr value from a task's execution.
@@ -1274,12 +1291,18 @@ pub(crate) mod test {
 
     impl<'a> TestEvaluationContext<'a> {
         /// Constructs a test evaluation context.
-        pub fn new(version: SupportedVersion, types: &'a mut Types, scope: ScopeRef<'a>) -> Self {
+        pub fn new(
+            version: SupportedVersion,
+            types: &'a mut Types,
+            scope: ScopeRef<'a>,
+            cwd: &'a Path,
+        ) -> Self {
             Self {
                 types,
                 version,
                 structs: HashMap::new(),
                 scope,
+                cwd,
                 stdout: None,
                 stderr: None,
             }
@@ -1313,6 +1336,10 @@ pub(crate) mod test {
                 .ok_or_else(|| unknown_type(name.as_str(), name.span()))
         }
 
+        fn cwd(&self) -> &Path {
+            self.cwd
+        }
+
         fn stdout(&self) -> Option<Value> {
             self.stdout.clone()
         }
@@ -1330,9 +1357,25 @@ pub(crate) mod test {
         types: &mut Types,
         scope: ScopeRef<'_>,
     ) -> Result<Value, Diagnostic> {
+        let cwd = std::env::current_dir().expect("failed to get current directory");
         eval_v1_expr_with_context(
             source,
-            &mut TestEvaluationContext::new(SupportedVersion::V1(version), types, scope),
+            &mut TestEvaluationContext::new(SupportedVersion::V1(version), types, scope, &cwd),
+        )
+    }
+
+    /// Evaluates a WDL v1 expression and returns the value or a
+    /// parse/evaluation diagnostic.
+    pub fn eval_v1_expr_with_cwd(
+        version: V1,
+        source: &str,
+        types: &mut Types,
+        scope: ScopeRef<'_>,
+        cwd: &Path,
+    ) -> Result<Value, Diagnostic> {
+        eval_v1_expr_with_context(
+            source,
+            &mut TestEvaluationContext::new(SupportedVersion::V1(version), types, scope, cwd),
         )
     }
 
@@ -1769,8 +1812,9 @@ pub(crate) mod test {
             ),
         ]));
 
+        let cwd = std::env::current_dir().expect("failed to get current directory");
         let mut context =
-            TestEvaluationContext::new(SupportedVersion::V1(V1::Two), &mut types, scope);
+            TestEvaluationContext::new(SupportedVersion::V1(V1::Two), &mut types, scope, &cwd);
         context.structs.insert("Foo", foo_ty);
         context.structs.insert("Bar", bar_ty);
 

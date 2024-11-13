@@ -980,6 +980,12 @@ impl Array {
         panic!("type `{ty}` is not an array type", ty = ty.display(types));
     }
 
+    /// Constructs a new array without checking the given elements conform to
+    /// the given type.
+    pub(crate) fn new_unchecked(ty: Type, elements: Arc<[Value]>) -> Self {
+        Self { ty, elements }
+    }
+
     /// Gets the type of the `Array` value.
     pub fn ty(&self) -> Type {
         self.ty
