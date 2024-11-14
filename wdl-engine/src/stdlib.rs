@@ -2,6 +2,7 @@
 
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -655,6 +656,35 @@ pub fn stderr(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     }
 }
 
+/// Reads an entire file as a String, with any trailing end-of-line characters
+/// (\r and \n) stripped off.
+///
+/// If the file is empty, an empty string is returned.
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_string
+pub fn read_string(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(context.arguments.len() == 1);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::String.into())
+    );
+
+    let path = context.cwd.join(
+        context
+            .coerce_argument(0, PrimitiveTypeKind::File)
+            .unwrap_file()
+            .as_str(),
+    );
+    let mut contents = fs::read_to_string(&path)
+        .with_context(|| format!("failed to read file `{path}`", path = path.display()))
+        .map_err(|e| function_call_failed("read_string", e, context.call_site))?;
+
+    let trimmed = contents.trim_end_matches(['\r', '\n']);
+    contents.truncate(trimmed.len());
+    Ok(PrimitiveValue::new_string(contents).into())
+}
+
 /// Represents a WDL function implementation callback.
 type Callback = fn(context: CallContext<'_>) -> Result<Value, Diagnostic>;
 
@@ -881,6 +911,14 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             .insert(
                 "stderr",
                 Function::new(const { &[Signature::new("() -> File", stderr)] })
+            )
+            .is_none()
+    );
+    assert!(
+        functions
+            .insert(
+                "read_string",
+                Function::new(const { &[Signature::new("(File) -> String", read_string)] })
             )
             .is_none()
     );
@@ -1699,5 +1737,39 @@ mod test {
 
         let value = eval_v1_expr_with_context("stderr()", &mut context).unwrap();
         assert_eq!(value.unwrap_file().as_str(), "stderr.txt");
+    }
+
+    #[test]
+    fn read_string() {
+        let dir = tempfile::tempdir().expect("should create temp directory");
+
+        fs::write(dir.path().join("foo"), "hello\nworld!\n\r\n").expect("should create temp file");
+
+        let mut scope = Scope::new(None);
+        scope.insert(
+            "file",
+            PrimitiveValue::new_file(dir.path().join("foo").to_str().expect("should be UTF-8")),
+        );
+        let scopes = &[scope];
+        let scope = ScopeRef::new(scopes, 0);
+
+        let mut types = Types::default();
+        let diagnostic =
+            eval_v1_expr(V1::Two, "read_string('does-not-exist')", &mut types, scope).unwrap_err();
+        assert!(
+            diagnostic
+                .message()
+                .starts_with("call to function `read_string` failed: failed to read file")
+        );
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "read_string('foo')", &mut types, scope, dir.path())
+                .unwrap();
+        assert_eq!(value.unwrap_string().as_str(), "hello\nworld!");
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "read_string(file)", &mut types, scope, dir.path())
+                .unwrap();
+        assert_eq!(value.unwrap_string().as_str(), "hello\nworld!");
     }
 }
