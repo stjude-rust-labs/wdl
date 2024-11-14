@@ -198,6 +198,6 @@ pub fn invalid_storage_unit(unit: &str, span: Span) -> Diagnostic {
 }
 
 /// Creates a "function call failed" diagnostic.
-pub fn function_call_failed(name: &str, e: &impl fmt::Display, span: Span) -> Diagnostic {
+pub fn function_call_failed(name: &str, e: impl fmt::Display, span: Span) -> Diagnostic {
     Diagnostic::error(format!("call to function `{name}` failed: {e}")).with_highlight(span)
 }

@@ -1086,19 +1086,28 @@ impl<'a, C: EvaluationContext> ExprEvaluator<'a, C> {
                 let arguments = &arguments[..count.min(MAX_PARAMETERS)];
                 if count <= MAX_PARAMETERS {
                     match f.bind(self.context.version(), self.context.types_mut(), types) {
-                        Ok(binding) => STDLIB
-                            .get(target.as_str())
-                            .expect("should have implementation")
-                            .call(
-                                binding.index(),
-                                CallContext::new(
-                                    self.context.types(),
-                                    target.span(),
-                                    arguments,
-                                    binding.return_type(),
-                                    self.context.cwd(),
-                                ),
-                            ),
+                        Ok(binding) => {
+                            let mut context = CallContext::new(
+                                self.context.types(),
+                                target.span(),
+                                arguments,
+                                binding.return_type(),
+                                self.context.cwd(),
+                            );
+
+                            if let Some(stdout) = self.context.stdout() {
+                                context = context.with_stdout(stdout);
+                            }
+
+                            if let Some(stderr) = self.context.stderr() {
+                                context = context.with_stderr(stderr);
+                            }
+
+                            STDLIB
+                                .get(target.as_str())
+                                .expect("should have implementation")
+                                .call(binding, context)
+                        }
                         Err(FunctionBindError::RequiresVersion(minimum)) => Err(
                             unsupported_function(minimum, target.as_str(), target.span()),
                         ),
@@ -1307,6 +1316,18 @@ pub(crate) mod test {
                 stderr: None,
             }
         }
+
+        /// Sets the stdout to use for the evaluation context.
+        pub fn with_stdout(mut self, stdout: impl Into<Value>) -> Self {
+            self.stdout = Some(stdout.into());
+            self
+        }
+
+        /// Sets the stderr to use for the evaluation context.
+        pub fn with_stderr(mut self, stderr: impl Into<Value>) -> Self {
+            self.stderr = Some(stderr.into());
+            self
+        }
     }
 
     impl EvaluationContext for TestEvaluationContext<'_> {
@@ -1381,7 +1402,7 @@ pub(crate) mod test {
 
     /// Evaluates a WDL v1 expression and returns the value or a
     /// parse/evaluation diagnostic.
-    fn eval_v1_expr_with_context(
+    pub fn eval_v1_expr_with_context(
         source: &str,
         context: &mut TestEvaluationContext<'_>,
     ) -> Result<Value, Diagnostic> {

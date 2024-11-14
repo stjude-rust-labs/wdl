@@ -9,6 +9,7 @@ use std::sync::LazyLock;
 
 use anyhow::Context;
 use regex::Regex;
+use wdl_analysis::stdlib::Binding;
 use wdl_analysis::types::Optional;
 use wdl_analysis::types::PrimitiveTypeKind;
 use wdl_analysis::types::Type;
@@ -67,6 +68,10 @@ pub struct CallContext<'a> {
     return_type: Type,
     /// The current working directory.
     cwd: &'a Path,
+    /// The current stdout file value.
+    stdout: Option<Value>,
+    /// The current stderr file value.
+    stderr: Option<Value>,
 }
 
 impl<'a> CallContext<'a> {
@@ -84,7 +89,21 @@ impl<'a> CallContext<'a> {
             arguments,
             return_type,
             cwd,
+            stdout: None,
+            stderr: None,
         }
+    }
+
+    /// Sets the current stdout file value.
+    pub fn with_stdout(mut self, stdout: impl Into<Value>) -> Self {
+        self.stdout = Some(stdout.into());
+        self
+    }
+
+    /// Sets the current stderr file value.
+    pub fn with_stderr(mut self, stderr: impl Into<Value>) -> Self {
+        self.stderr = Some(stderr.into());
+        self
     }
 
     /// Coerces an argument to the given type.
@@ -566,7 +585,7 @@ pub fn size(context: CallContext<'_>) -> Result<Value, Diagnostic> {
                     path = path.display()
                 )
             })
-            .map_err(|e| function_call_failed("size", &format!("{e:?}"), context.call_site))?;
+            .map_err(|e| function_call_failed("size", format!("{e:?}"), context.call_site))?;
         if metadata.is_dir() {
             PrimitiveValue::Directory(s.clone()).into()
         } else {
@@ -577,8 +596,63 @@ pub fn size(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     };
 
     util::calculate_disk_size(&value, unit, context.cwd)
-        .map_err(|e| function_call_failed("size", &format!("{e:?}"), context.call_site))
+        .map_err(|e| function_call_failed("size", format!("{e:?}"), context.call_site))
         .map(Into::into)
+}
+
+/// Returns the value of the executed command's standard output (stdout) as a
+/// File.
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#stdout
+pub fn stdout(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(context.arguments.is_empty());
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::File.into())
+    );
+    match context.stdout {
+        Some(stdout) => {
+            debug_assert!(
+                stdout.as_file().is_some(),
+                "expected the value to be a file"
+            );
+            Ok(stdout)
+        }
+        None => Err(function_call_failed(
+            "stdout",
+            "function may only be called in a task output section",
+            context.call_site,
+        )),
+    }
+}
+
+/// Returns the value of the executed command's standard error (stderr) as a
+/// File
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#stderr
+pub fn stderr(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(context.arguments.is_empty());
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::File.into())
+    );
+
+    match context.stderr {
+        Some(stderr) => {
+            debug_assert!(
+                stderr.as_file().is_some(),
+                "expected the value to be a file"
+            );
+            Ok(stderr)
+        }
+        None => Err(function_call_failed(
+            "stderr",
+            "function may only be called in a task output section",
+            context.call_site,
+        )),
+    }
 }
 
 /// Represents a WDL function implementation callback.
@@ -616,10 +690,14 @@ impl Function {
         Self { signatures }
     }
 
-    /// Calls the function given the overload index and call context.
+    /// Calls the function given the binding and call context.
     #[inline]
-    pub fn call(&self, index: usize, context: CallContext<'_>) -> Result<Value, Diagnostic> {
-        (self.signatures[index].callback)(context)
+    pub fn call(
+        &self,
+        binding: Binding<'_>,
+        context: CallContext<'_>,
+    ) -> Result<Value, Diagnostic> {
+        (self.signatures[binding.index()].callback)(context)
     }
 }
 
@@ -790,6 +868,22 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             )
             .is_none()
     );
+    assert!(
+        functions
+            .insert(
+                "stdout",
+                Function::new(const { &[Signature::new("() -> File", stdout)] })
+            )
+            .is_none()
+    );
+    assert!(
+        functions
+            .insert(
+                "stderr",
+                Function::new(const { &[Signature::new("() -> File", stderr)] })
+            )
+            .is_none()
+    );
 
     StandardLibrary { functions }
 });
@@ -800,12 +894,15 @@ mod test {
 
     use pretty_assertions::assert_eq;
     use wdl_analysis::stdlib::TypeParameters;
+    use wdl_ast::SupportedVersion;
     use wdl_ast::version::V1;
 
     use super::*;
     use crate::Scope;
     use crate::ScopeRef;
+    use crate::v1::test::TestEvaluationContext;
     use crate::v1::test::eval_v1_expr;
+    use crate::v1::test::eval_v1_expr_with_context;
     use crate::v1::test::eval_v1_expr_with_cwd;
 
     /// A test to verify that the STDLIB function types from `wdl-analysis`
@@ -1552,5 +1649,55 @@ mod test {
         )
         .unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 60.0);
+    }
+
+    #[test]
+    fn stdout() {
+        let scopes = &[Scope::new(None)];
+        let scope = ScopeRef::new(scopes, 0);
+
+        let mut types = Types::default();
+        let diagnostic = eval_v1_expr(V1::Two, "stdout()", &mut types, scope).unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "call to function `stdout` failed: function may only be called in a task output \
+             section"
+        );
+
+        let mut context = TestEvaluationContext::new(
+            SupportedVersion::V1(V1::Zero),
+            &mut types,
+            scope,
+            Path::new(""),
+        )
+        .with_stdout(PrimitiveValue::new_file("stdout.txt"));
+
+        let value = eval_v1_expr_with_context("stdout()", &mut context).unwrap();
+        assert_eq!(value.unwrap_file().as_str(), "stdout.txt");
+    }
+
+    #[test]
+    fn stderr() {
+        let scopes = &[Scope::new(None)];
+        let scope = ScopeRef::new(scopes, 0);
+
+        let mut types = Types::default();
+        let diagnostic = eval_v1_expr(V1::Two, "stderr()", &mut types, scope).unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "call to function `stderr` failed: function may only be called in a task output \
+             section"
+        );
+
+        let mut context = TestEvaluationContext::new(
+            SupportedVersion::V1(V1::Zero),
+            &mut types,
+            scope,
+            Path::new(""),
+        )
+        .with_stderr(PrimitiveValue::new_file("stderr.txt"));
+
+        let value = eval_v1_expr_with_context("stderr()", &mut context).unwrap();
+        assert_eq!(value.unwrap_file().as_str(), "stderr.txt");
     }
 }
