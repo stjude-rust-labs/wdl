@@ -685,6 +685,47 @@ pub fn read_string(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     Ok(PrimitiveValue::new_string(contents).into())
 }
 
+/// Reads a file that contains a single line containing only an integer and
+/// (optional) whitespace.
+///
+/// If the line contains a valid integer, that value is returned as an Int. If
+/// the file is empty or does not contain a single integer, an error is raised.
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_int
+pub fn read_int(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(context.arguments.len() == 1);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::Integer.into())
+    );
+
+    let path = context.cwd.join(
+        context
+            .coerce_argument(0, PrimitiveTypeKind::File)
+            .unwrap_file()
+            .as_str(),
+    );
+    let contents = fs::read_to_string(&path)
+        .with_context(|| format!("failed to read file `{path}`", path = path.display()))
+        .map_err(|e| function_call_failed("read_int", e, context.call_site))?;
+
+    Ok(contents
+        .trim()
+        .parse::<i64>()
+        .map_err(|_| {
+            function_call_failed(
+                "read_int",
+                format!(
+                    "file `{path}` does not contain a single integer value",
+                    path = path.display()
+                ),
+                context.call_site,
+            )
+        })?
+        .into())
+}
+
 /// Represents a WDL function implementation callback.
 type Callback = fn(context: CallContext<'_>) -> Result<Value, Diagnostic>;
 
@@ -919,6 +960,14 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             .insert(
                 "read_string",
                 Function::new(const { &[Signature::new("(File) -> String", read_string)] })
+            )
+            .is_none()
+    );
+    assert!(
+        functions
+            .insert(
+                "read_int",
+                Function::new(const { &[Signature::new("(File) -> Int", read_int)] })
             )
             .is_none()
     );
@@ -1771,5 +1820,45 @@ mod test {
             eval_v1_expr_with_cwd(V1::Two, "read_string(file)", &mut types, scope, dir.path())
                 .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "hello\nworld!");
+    }
+
+    #[test]
+    fn read_int() {
+        let dir = tempfile::tempdir().expect("should create temp directory");
+
+        fs::write(dir.path().join("foo"), "12345 hello world!").expect("should create temp file");
+        fs::write(dir.path().join("bar"), "\n\t\t12345   \n").expect("should create temp file");
+
+        let mut scope = Scope::new(None);
+        scope.insert("file", PrimitiveValue::new_file("bar"));
+        let scopes = &[scope];
+        let scope = ScopeRef::new(scopes, 0);
+
+        let mut types = Types::default();
+        let diagnostic =
+            eval_v1_expr(V1::Two, "read_int('does-not-exist')", &mut types, scope).unwrap_err();
+        assert!(
+            diagnostic
+                .message()
+                .starts_with("call to function `read_int` failed: failed to read file")
+        );
+
+        let diagnostic =
+            eval_v1_expr_with_cwd(V1::Two, "read_int('foo')", &mut types, scope, dir.path())
+                .unwrap_err();
+        assert!(
+            diagnostic
+                .message()
+                .contains(" does not contain a single integer value")
+        );
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "read_int('bar')", &mut types, scope, dir.path())
+                .unwrap();
+        assert_eq!(value.unwrap_integer(), 12345);
+
+        let value = eval_v1_expr_with_cwd(V1::Two, "read_int(file)", &mut types, scope, dir.path())
+            .unwrap();
+        assert_eq!(value.unwrap_integer(), 12345);
     }
 }
