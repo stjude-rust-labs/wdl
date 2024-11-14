@@ -2006,6 +2006,15 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             .insert(
                 "size",
                 PolymorphicFunction::new(vec![
+                    // This overload isn't explicitly in the spec, but it fixes an ambiguity in 1.2
+                    // when passed a literal `None` value.
+                    FunctionSignature::builder()
+                        .min_version(SupportedVersion::V1(V1::Two))
+                        .required(1)
+                        .parameter(Type::None)
+                        .parameter(PrimitiveTypeKind::String)
+                        .ret(PrimitiveTypeKind::Float)
+                        .build(),
                     FunctionSignature::builder()
                         .required(1)
                         .parameter(PrimitiveType::optional(PrimitiveTypeKind::File))
@@ -2017,6 +2026,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                     // `String` overload is required as `String` may coerce to either `File` or
                     // `Directory`, which is ambiguous.
                     FunctionSignature::builder()
+                        .min_version(SupportedVersion::V1(V1::Two))
                         .required(1)
                         .parameter(PrimitiveType::optional(PrimitiveTypeKind::String))
                         .parameter(PrimitiveTypeKind::String)
@@ -2964,6 +2974,7 @@ mod test {
             "join_paths(File, Array[String]+) -> File",
             "join_paths(Array[String]+) -> File",
             "glob(String) -> Array[File]",
+            "size(None, <String>) -> Float",
             "size(File?, <String>) -> Float",
             "size(String?, <String>) -> Float",
             "size(Directory?, <String>) -> Float",

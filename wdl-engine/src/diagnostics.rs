@@ -1,5 +1,6 @@
 //! Module for evaluation diagnostics.
 
+use std::fmt;
 use std::path::Path;
 
 use wdl_analysis::types::Type;
@@ -177,11 +178,6 @@ pub fn invalid_glob_pattern(e: &glob::PatternError, span: Span) -> Diagnostic {
         .with_highlight(span)
 }
 
-/// Creates a "glob error" diagnostic.
-pub fn glob_error(e: &glob::GlobError, span: Span) -> Diagnostic {
-    Diagnostic::error(format!("call to function `glob` failed: {e}")).with_highlight(span)
-}
-
 /// Creates a "path not UTF-8" diagnostic.
 pub fn path_not_utf8(context: &str, path: impl AsRef<Path>, span: Span) -> Diagnostic {
     let path = path.as_ref();
@@ -190,4 +186,18 @@ pub fn path_not_utf8(context: &str, path: impl AsRef<Path>, span: Span) -> Diagn
         path = path.display()
     ))
     .with_highlight(span)
+}
+
+/// Creates an "invalid storage unit" diagnostic.
+pub fn invalid_storage_unit(unit: &str, span: Span) -> Diagnostic {
+    Diagnostic::error(format!(
+        "invalid storage unit `{unit}`; supported units are `B`, `KB`, `K`, `MB`, `M`, `GB`, `G`, \
+         `TB`, `T`, `KiB`, `Ki`, `MiB`, `Mi`, `GiB`, `Gi`, `TiB`, and `Ti`",
+    ))
+    .with_highlight(span)
+}
+
+/// Creates a "function call failed" diagnostic.
+pub fn function_call_failed(name: &str, e: &impl fmt::Display, span: Span) -> Diagnostic {
+    Diagnostic::error(format!("call to function `{name}` failed: {e}")).with_highlight(span)
 }

@@ -7,6 +7,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::LazyLock;
 
+use anyhow::Context;
 use regex::Regex;
 use wdl_analysis::types::Optional;
 use wdl_analysis::types::PrimitiveTypeKind;
@@ -19,13 +20,17 @@ use wdl_ast::Span;
 use crate::Array;
 use crate::Coercible;
 use crate::PrimitiveValue;
+use crate::StorageUnit;
 use crate::Value;
 use crate::diagnostics::array_path_not_relative;
-use crate::diagnostics::glob_error;
+use crate::diagnostics::function_call_failed;
 use crate::diagnostics::invalid_glob_pattern;
 use crate::diagnostics::invalid_regex;
+use crate::diagnostics::invalid_storage_unit;
 use crate::diagnostics::path_not_relative;
 use crate::diagnostics::path_not_utf8;
+
+mod util;
 
 /// Represents a function call argument.
 pub struct CallArgument {
@@ -502,7 +507,7 @@ pub fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     for path in glob::glob(&context.cwd.join(path.as_str()).to_string_lossy())
         .map_err(|e| invalid_glob_pattern(&e, context.arguments[0].span))?
     {
-        let path = path.map_err(|e| glob_error(&e, context.call_site))?;
+        let path = path.map_err(|e| function_call_failed("glob", &e, context.call_site))?;
 
         // Filter out directories (only files are returned from WDL's `glob` function)
         if path.is_dir() {
@@ -521,6 +526,59 @@ pub fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     }
 
     Ok(Array::new_unchecked(context.return_type, elements.into()).into())
+}
+
+/// Determines the size of a file, directory, or the sum total sizes of the
+/// files/directories contained within a compound value. The files may be
+/// optional values; None values have a size of 0.0. By default, the size is
+/// returned in bytes unless the optional second argument is specified with a
+/// unit.
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#glob
+pub fn size(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(!context.arguments.is_empty() && context.arguments.len() < 3);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::Float.into())
+    );
+
+    let unit = if context.arguments.len() == 2 {
+        let unit = context
+            .coerce_argument(1, PrimitiveTypeKind::String)
+            .unwrap_string();
+
+        unit.parse()
+            .map_err(|_| invalid_storage_unit(&unit, context.arguments[1].span))?
+    } else {
+        StorageUnit::default()
+    };
+
+    // If the first argument is a string, we need to check if it's a file or
+    // directory and treat it as such.
+    let value = if let Some(s) = context.arguments[0].value.as_string() {
+        let path = context.cwd.join(s.as_str());
+        let metadata = path
+            .metadata()
+            .with_context(|| {
+                format!(
+                    "failed to read metadata for file `{path}`",
+                    path = path.display()
+                )
+            })
+            .map_err(|e| function_call_failed("size", &format!("{e:?}"), context.call_site))?;
+        if metadata.is_dir() {
+            PrimitiveValue::Directory(s.clone()).into()
+        } else {
+            PrimitiveValue::File(s.clone()).into()
+        }
+    } else {
+        context.arguments[0].value.clone()
+    };
+
+    util::calculate_disk_size(&value, unit, context.cwd)
+        .map_err(|e| function_call_failed("size", &format!("{e:?}"), context.call_site))
+        .map(Into::into)
 }
 
 /// Represents a WDL function implementation callback.
@@ -710,6 +768,28 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             )
             .is_none()
     );
+    assert!(
+        functions
+            .insert(
+                "size",
+                Function::new(
+                    const {
+                        &[
+                            Signature::new("(None, <String>) -> Float", size),
+                            Signature::new("(File?, <String>) -> Float", size),
+                            Signature::new("(String?, <String>) -> Float", size),
+                            Signature::new("(Directory?, <String>) -> Float", size),
+                            Signature::new(
+                                "(X, <String>) -> Float where `X`: any compound type that \
+                                 recursively contains a `File` or `Directory`",
+                                size,
+                            ),
+                        ]
+                    }
+                )
+            )
+            .is_none()
+    );
 
     StandardLibrary { functions }
 });
@@ -739,7 +819,7 @@ mod test {
                         assert_eq!(
                             imp.signatures.len(),
                             1,
-                            "signature mismatch for function `{name}`"
+                            "signature count mismatch for function `{name}`"
                         );
                         assert_eq!(
                             f.signature()
@@ -753,7 +833,11 @@ mod test {
                         );
                     }
                     wdl_analysis::stdlib::Function::Polymorphic(f) => {
-                        assert_eq!(imp.signatures.len(), f.signatures().len());
+                        assert_eq!(
+                            imp.signatures.len(),
+                            f.signatures().len(),
+                            "signature count mismatch for function `{name}`"
+                        );
                         for (i, sig) in f.signatures().iter().enumerate() {
                             assert_eq!(
                                 sig.display(
@@ -1326,5 +1410,147 @@ mod test {
             .map(|v| v.as_file().unwrap().as_str())
             .collect();
         assert_eq!(elements, ["bar", "baz", "nested/bar", "nested/baz"]);
+    }
+
+    #[test]
+    fn size() {
+        let dir = tempfile::tempdir().expect("should create temp directory");
+
+        // 10 byte file
+        fs::write(dir.path().join("foo"), "0123456789").expect("should create temp file");
+        // 20 byte file
+        fs::write(dir.path().join("bar"), "01234567890123456789").expect("should create temp file");
+        // 30 byte file
+        fs::write(dir.path().join("baz"), "012345678901234567890123456789")
+            .expect("should create temp file");
+
+        let mut scope = Scope::new(None);
+        scope.insert(
+            "file",
+            PrimitiveValue::new_file(dir.path().join("bar").to_str().expect("should be UTF-8")),
+        );
+        scope.insert(
+            "dir",
+            PrimitiveValue::new_directory(dir.path().to_str().expect("should be UTF-8")),
+        );
+        let scopes = &[scope];
+        let scope = ScopeRef::new(scopes, 0);
+
+        let mut types = Types::default();
+        let diagnostic =
+            eval_v1_expr(V1::Two, "size('foo', 'invalid')", &mut types, scope).unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "invalid storage unit `invalid`; supported units are `B`, `KB`, `K`, `MB`, `M`, `GB`, \
+             `G`, `TB`, `T`, `KiB`, `Ki`, `MiB`, `Mi`, `GiB`, `Gi`, `TiB`, and `Ti`"
+        );
+
+        let diagnostic = eval_v1_expr_with_cwd(
+            V1::Two,
+            "size('does-not-exist', 'B')",
+            &mut types,
+            scope,
+            dir.path(),
+        )
+        .unwrap_err();
+        assert!(
+            diagnostic
+                .message()
+                .starts_with("call to function `size` failed: failed to read metadata for file")
+        );
+
+        let value = eval_v1_expr_with_cwd(
+            V1::Two,
+            &format!("size('{path}', 'B')", path = dir.path().display()),
+            &mut types,
+            scope,
+            dir.path(),
+        )
+        .unwrap();
+        approx::assert_relative_eq!(value.unwrap_float(), 60.0);
+
+        for (expected, unit) in [
+            (10.0, "B"),
+            (0.01, "K"),
+            (0.01, "KB"),
+            (0.00001, "M"),
+            (0.00001, "MB"),
+            (0.00000001, "G"),
+            (0.00000001, "GB"),
+            (0.00000000001, "T"),
+            (0.00000000001, "TB"),
+            (0.009765625, "Ki"),
+            (0.009765625, "KiB"),
+            (0.0000095367431640625, "Mi"),
+            (0.0000095367431640625, "MiB"),
+            (0.000000009313225746154785, "Gi"),
+            (0.000000009313225746154785, "GiB"),
+            (0.000000000009094947017729282, "Ti"),
+            (0.000000000009094947017729282, "TiB"),
+        ] {
+            let value = eval_v1_expr_with_cwd(
+                V1::Two,
+                &format!("size('foo', '{unit}')"),
+                &mut types,
+                scope,
+                dir.path(),
+            )
+            .unwrap();
+            approx::assert_relative_eq!(value.unwrap_float(), expected);
+        }
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "size(None, 'B')", &mut types, scope, dir.path())
+                .unwrap();
+        approx::assert_relative_eq!(value.unwrap_float(), 0.0);
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "size(file, 'B')", &mut types, scope, dir.path())
+                .unwrap();
+        approx::assert_relative_eq!(value.unwrap_float(), 20.0);
+
+        let value = eval_v1_expr_with_cwd(V1::Two, "size(dir, 'B')", &mut types, scope, dir.path())
+            .unwrap();
+        approx::assert_relative_eq!(value.unwrap_float(), 60.0);
+
+        let value = eval_v1_expr_with_cwd(
+            V1::Two,
+            "size((dir, dir), 'B')",
+            &mut types,
+            scope,
+            dir.path(),
+        )
+        .unwrap();
+        approx::assert_relative_eq!(value.unwrap_float(), 120.0);
+
+        let value = eval_v1_expr_with_cwd(
+            V1::Two,
+            "size([file, file, file], 'B')",
+            &mut types,
+            scope,
+            dir.path(),
+        )
+        .unwrap();
+        approx::assert_relative_eq!(value.unwrap_float(), 60.0);
+
+        let value = eval_v1_expr_with_cwd(
+            V1::Two,
+            "size({ 'a': file, 'b': file, 'c': file }, 'B')",
+            &mut types,
+            scope,
+            dir.path(),
+        )
+        .unwrap();
+        approx::assert_relative_eq!(value.unwrap_float(), 60.0);
+
+        let value = eval_v1_expr_with_cwd(
+            V1::Two,
+            "size(object { a: file, b: file, c: file }, 'B')",
+            &mut types,
+            scope,
+            dir.path(),
+        )
+        .unwrap();
+        approx::assert_relative_eq!(value.unwrap_float(), 60.0);
     }
 }

@@ -189,7 +189,7 @@ impl Value {
     pub fn as_string(&self) -> Option<&Arc<String>> {
         match self {
             Self::Primitive(PrimitiveValue::String(s)) => Some(s),
-            _ => panic!("value is not a string"),
+            _ => None,
         }
     }
 
@@ -588,7 +588,7 @@ impl PrimitiveValue {
     pub fn as_string(&self) -> Option<&Arc<String>> {
         match self {
             Self::String(s) => Some(s),
-            _ => panic!("value is not a string"),
+            _ => None,
         }
     }
 
