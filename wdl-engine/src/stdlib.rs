@@ -767,6 +767,50 @@ pub fn read_float(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .into())
 }
 
+/// Reads a file that contains a single line containing only a boolean value and
+/// (optional) whitespace.
+///
+/// If the non-whitespace content of the line is "true" or "false", that value
+/// is returned as a Boolean. If the file is empty or does not contain a single
+/// boolean, an error is raised. The comparison is case-insensitive.
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_boolean
+pub fn read_boolean(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(context.arguments.len() == 1);
+    debug_assert!(
+        context
+            .return_type
+            .type_eq(context.types, &PrimitiveTypeKind::Boolean.into())
+    );
+
+    let path = context.cwd.join(
+        context
+            .coerce_argument(0, PrimitiveTypeKind::File)
+            .unwrap_file()
+            .as_str(),
+    );
+    let mut contents = fs::read_to_string(&path)
+        .with_context(|| format!("failed to read file `{path}`", path = path.display()))
+        .map_err(|e| function_call_failed("read_boolean", e, context.call_site))?;
+
+    contents.make_ascii_lowercase();
+
+    Ok(contents
+        .trim()
+        .parse::<bool>()
+        .map_err(|_| {
+            function_call_failed(
+                "read_boolean",
+                format!(
+                    "file `{path}` does not contain a single boolean value",
+                    path = path.display()
+                ),
+                context.call_site,
+            )
+        })?
+        .into())
+}
+
 /// Represents a WDL function implementation callback.
 type Callback = fn(context: CallContext<'_>) -> Result<Value, Diagnostic>;
 
@@ -1017,6 +1061,14 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             .insert(
                 "read_float",
                 Function::new(const { &[Signature::new("(File) -> Float", read_float)] })
+            )
+            .is_none()
+    );
+    assert!(
+        functions
+            .insert(
+                "read_boolean",
+                Function::new(const { &[Signature::new("(File) -> Boolean", read_boolean)] })
             )
             .is_none()
     );
@@ -1952,5 +2004,74 @@ mod test {
             eval_v1_expr_with_cwd(V1::Two, "read_float(file)", &mut types, scope, dir.path())
                 .unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 12345.6789);
+    }
+
+    #[test]
+    fn read_boolean() {
+        let dir = tempfile::tempdir().expect("should create temp directory");
+
+        fs::write(dir.path().join("foo"), "true false hello world!")
+            .expect("should create temp file");
+        fs::write(dir.path().join("bar"), "\n\t\tTrUe   \n").expect("should create temp file");
+        fs::write(dir.path().join("baz"), "\n\t\tfalse   \n").expect("should create temp file");
+
+        let mut scope = Scope::new(None);
+        scope.insert("t", PrimitiveValue::new_file("bar"));
+        scope.insert("f", PrimitiveValue::new_file("baz"));
+        let scopes = &[scope];
+        let scope = ScopeRef::new(scopes, 0);
+
+        let mut types = Types::default();
+        let diagnostic =
+            eval_v1_expr(V1::Two, "read_boolean('does-not-exist')", &mut types, scope).unwrap_err();
+        assert!(
+            diagnostic
+                .message()
+                .starts_with("call to function `read_boolean` failed: failed to read file")
+        );
+
+        let diagnostic = eval_v1_expr_with_cwd(
+            V1::Two,
+            "read_boolean('foo')",
+            &mut types,
+            scope,
+            dir.path(),
+        )
+        .unwrap_err();
+        assert!(
+            diagnostic
+                .message()
+                .contains("does not contain a single boolean value")
+        );
+
+        let value = eval_v1_expr_with_cwd(
+            V1::Two,
+            "read_boolean('bar')",
+            &mut types,
+            scope,
+            dir.path(),
+        )
+        .unwrap();
+        assert!(value.unwrap_boolean());
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "read_boolean(t)", &mut types, scope, dir.path())
+                .unwrap();
+        assert!(value.unwrap_boolean());
+
+        let value = eval_v1_expr_with_cwd(
+            V1::Two,
+            "read_boolean('baz')",
+            &mut types,
+            scope,
+            dir.path(),
+        )
+        .unwrap();
+        assert!(!value.unwrap_boolean());
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "read_boolean(f)", &mut types, scope, dir.path())
+                .unwrap();
+        assert!(!value.unwrap_boolean());
     }
 }
