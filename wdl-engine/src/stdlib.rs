@@ -3,6 +3,8 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fs;
+use std::io::BufRead;
+use std::io::BufReader;
 use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -545,7 +547,7 @@ pub fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         );
     }
 
-    Ok(Array::new_unchecked(context.return_type, elements.into()).into())
+    Ok(Array::new_unchecked(context.return_type, Arc::new(elements.into_boxed_slice())).into())
 }
 
 /// Determines the size of a file, directory, or the sum total sizes of the
@@ -811,6 +813,51 @@ pub fn read_boolean(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .into())
 }
 
+/// Reads each line of a file as a String, and returns all lines in the file as
+/// an Array[String].
+///
+/// Trailing end-of-line characters (\r and \n) are removed from each line.
+///
+/// The order of the lines in the returned Array[String] is the order in which
+/// the lines appear in the file.
+///
+/// If the file is empty, an empty array is returned.
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_lines
+pub fn read_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(context.arguments.len() == 1);
+    debug_assert!(context.return_type.type_eq(
+        context.types,
+        &wdl_analysis::stdlib::STDLIB.array_string_type()
+    ));
+
+    let path = context.cwd.join(
+        context
+            .coerce_argument(0, PrimitiveTypeKind::File)
+            .unwrap_file()
+            .as_str(),
+    );
+
+    let file = fs::File::open(&path)
+        .with_context(|| format!("failed to open file `{path}`", path = path.display()))
+        .map_err(|e| function_call_failed("read_lines", e, context.call_site))?;
+
+    let elements = BufReader::new(file)
+        .lines()
+        .map(|line| {
+            let mut line = line
+                .with_context(|| format!("failed to read file `{path}`", path = path.display()))
+                .map_err(|e| function_call_failed("read_lines", e, context.call_site))?;
+
+            let trimmed = line.trim_end_matches(['\r', '\n']);
+            line.truncate(trimmed.len());
+            Ok(PrimitiveValue::new_string(line).into())
+        })
+        .collect::<Result<Vec<Value>, _>>()?;
+
+    Ok(Array::new_unchecked(context.return_type, Arc::new(elements.into_boxed_slice())).into())
+}
+
 /// Represents a WDL function implementation callback.
 type Callback = fn(context: CallContext<'_>) -> Result<Value, Diagnostic>;
 
@@ -1069,6 +1116,14 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             .insert(
                 "read_boolean",
                 Function::new(const { &[Signature::new("(File) -> Boolean", read_boolean)] })
+            )
+            .is_none()
+    );
+    assert!(
+        functions
+            .insert(
+                "read_lines",
+                Function::new(const { &[Signature::new("(File) -> Array[String]", read_lines)] })
             )
             .is_none()
     );
@@ -2073,5 +2128,68 @@ mod test {
             eval_v1_expr_with_cwd(V1::Two, "read_boolean(f)", &mut types, scope, dir.path())
                 .unwrap();
         assert!(!value.unwrap_boolean());
+    }
+
+    #[test]
+    fn read_lines() {
+        let dir = tempfile::tempdir().expect("should create temp directory");
+
+        fs::write(
+            dir.path().join("foo"),
+            "\nhello!\nworld!\n\r\nhi!\r\nthere!",
+        )
+        .expect("should create temp file");
+        fs::write(dir.path().join("empty"), "").expect("should create temp file");
+
+        let mut scope = Scope::new(None);
+        scope.insert(
+            "file",
+            PrimitiveValue::new_file(dir.path().join("foo").to_str().expect("should be UTF-8")),
+        );
+        let scopes = &[scope];
+        let scope = ScopeRef::new(scopes, 0);
+
+        let mut types = Types::default();
+        let diagnostic =
+            eval_v1_expr(V1::Two, "read_lines('does-not-exist')", &mut types, scope).unwrap_err();
+        assert!(
+            diagnostic
+                .message()
+                .starts_with("call to function `read_lines` failed: failed to open file")
+        );
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "read_lines('foo')", &mut types, scope, dir.path())
+                .unwrap();
+        let elements: Vec<_> = value
+            .as_array()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|v| v.as_string().unwrap().as_str())
+            .collect();
+        assert_eq!(elements, ["", "hello!", "world!", "", "hi!", "there!"]);
+
+        let value =
+            eval_v1_expr_with_cwd(V1::Two, "read_lines(file)", &mut types, scope, dir.path())
+                .unwrap();
+        let elements: Vec<_> = value
+            .as_array()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|v| v.as_string().unwrap().as_str())
+            .collect();
+        assert_eq!(elements, ["", "hello!", "world!", "", "hi!", "there!"]);
+
+        let value = eval_v1_expr_with_cwd(
+            V1::Two,
+            "read_lines('empty')",
+            &mut types,
+            scope,
+            dir.path(),
+        )
+        .unwrap();
+        assert!(value.unwrap_array().elements().is_empty());
     }
 }

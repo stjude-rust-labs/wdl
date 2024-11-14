@@ -940,7 +940,10 @@ pub struct Array {
     /// The type of the array.
     ty: Type,
     /// The array's elements.
-    elements: Arc<[Value]>,
+    ///
+    /// This is an `Arc<Box<[Value]>>` and not `Arc<[Value]>` so that we can
+    /// reuse allocations from places where we construct a `Vec<Value>`.
+    elements: Arc<Box<[Value]>>,
 }
 
 impl Array {
@@ -963,16 +966,19 @@ impl Array {
                 let element_type = array_ty.element_type();
                 return Ok(Self {
                     ty,
-                    elements: elements
-                        .into_iter()
-                        .enumerate()
-                        .map(|(i, v)| {
-                            let v = v.into();
-                            v.coerce(types, element_type).with_context(|| {
-                                format!("failed to coerce array element at index {i}")
+                    elements: Arc::new(
+                        elements
+                            .into_iter()
+                            .enumerate()
+                            .map(|(i, v)| {
+                                let v = v.into();
+                                v.coerce(types, element_type).with_context(|| {
+                                    format!("failed to coerce array element at index {i}")
+                                })
                             })
-                        })
-                        .collect::<Result<_>>()?,
+                            .collect::<Result<Vec<_>>>()?
+                            .into_boxed_slice(),
+                    ),
                 });
             }
         }
@@ -982,7 +988,7 @@ impl Array {
 
     /// Constructs a new array without checking the given elements conform to
     /// the given type.
-    pub(crate) fn new_unchecked(ty: Type, elements: Arc<[Value]>) -> Self {
+    pub(crate) fn new_unchecked(ty: Type, elements: Arc<Box<[Value]>>) -> Self {
         Self { ty, elements }
     }
 
