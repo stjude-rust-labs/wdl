@@ -144,7 +144,13 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
     for result in results {
         let cur_path = PathBuf::from(result.uri().path());
-        let cur_dir = docs_dir.join(cur_path.strip_prefix(&abs_path).unwrap().with_extension(""));
+        let relative_path = match cur_path.strip_prefix(&abs_path) {
+            Ok(path) => path,
+            Err(_) => {
+                &PathBuf::from("external").join(cur_path.strip_prefix("/").unwrap())
+            }
+        };
+        let cur_dir = docs_dir.join(relative_path.with_extension(""));
         if !cur_dir.exists() {
             std::fs::create_dir_all(&cur_dir)?;
         }
@@ -180,8 +186,8 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
                     let parameter_meta: HashMap<String, MetadataValue> = t
                         .parameter_metadata()
-                        .unwrap()
-                        .items()
+                        .into_iter()
+                        .flat_map(|p| p.items())
                         .map(|p| {
                             let name = p.name().as_str().to_owned();
                             let item = p.value();
@@ -189,9 +195,10 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
                         })
                         .collect();
 
-                    let meta: HashMap<String, MetadataValue> = t.metadata()
-                        .unwrap()
-                        .items()
+                    let meta: HashMap<String, MetadataValue> = t
+                        .metadata()
+                        .into_iter()
+                        .flat_map(|m| m.items())
                         .map(|m| {
                             let name = m.name().as_str().to_owned();
                             let item = m.value();
@@ -201,10 +208,9 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
                     let output_meta: HashMap<String, MetadataValue> = meta
                         .get("outputs")
-                        .unwrap()
-                        .clone()
-                        .unwrap_object()
-                        .items()
+                        .cloned()
+                        .into_iter()
+                        .flat_map(|v| v.unwrap_object().items())
                         .map(|m| {
                             let name = m.name().as_str().to_owned();
                             let item = m.value();
@@ -214,8 +220,8 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
                     let inputs = t
                         .input()
-                        .unwrap()
-                        .declarations()
+                        .into_iter()
+                        .flat_map(|i| i.declarations())
                         .map(|decl| {
                             let name = decl.name().as_str().to_owned();
                             let meta = parameter_meta.get(&name);
@@ -225,8 +231,8 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
                     let outputs = t
                         .output()
-                        .unwrap()
-                        .declarations()
+                        .into_iter()
+                        .flat_map(|o| o.declarations())
                         .map(|decl| {
                             let name = decl.name().as_str().to_owned();
                             let meta = output_meta.get(&name);
@@ -236,6 +242,7 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
                             )
                         })
                         .collect();
+
                     let task = task::Task::new(task_name, t.metadata(), inputs, outputs);
 
                     task_file.write_all(task.to_string().as_bytes()).await?;
@@ -247,8 +254,8 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
                     let parameter_meta: HashMap<String, MetadataValue> = w
                         .parameter_metadata()
-                        .unwrap()
-                        .items()
+                        .into_iter()
+                        .flat_map(|p| p.items())
                         .map(|p| {
                             let name = p.name().as_str().to_owned();
                             let item = p.value();
@@ -256,9 +263,10 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
                         })
                         .collect();
 
-                    let meta: HashMap<String, MetadataValue> = w.metadata()
-                        .unwrap()
-                        .items()
+                    let meta: HashMap<String, MetadataValue> = w
+                        .metadata()
+                        .into_iter()
+                        .flat_map(|m| m.items())
                         .map(|m| {
                             let name = m.name().as_str().to_owned();
                             let item = m.value();
@@ -268,10 +276,9 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
                     let output_meta: HashMap<String, MetadataValue> = meta
                         .get("outputs")
-                        .unwrap()
-                        .clone()
-                        .unwrap_object()
-                        .items()
+                        .cloned()
+                        .into_iter()
+                        .flat_map(|v| v.unwrap_object().items())
                         .map(|m| {
                             let name = m.name().as_str().to_owned();
                             let item = m.value();
@@ -281,8 +288,8 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
                     let inputs = w
                         .input()
-                        .unwrap()
-                        .declarations()
+                        .into_iter()
+                        .flat_map(|i| i.declarations())
                         .map(|decl| {
                             let name = decl.name().as_str().to_owned();
                             let meta = parameter_meta.get(&name);
@@ -292,8 +299,8 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
                     let outputs = w
                         .output()
-                        .unwrap()
-                        .declarations()
+                        .into_iter()
+                        .flat_map(|o| o.declarations())
                         .map(|decl| {
                             let name = decl.name().as_str().to_owned();
                             let meta = output_meta.get(&name);
@@ -303,9 +310,13 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
                             )
                         })
                         .collect();
-                    let workflow = workflow::Workflow::new(workflow_name, w.metadata(), inputs, outputs);
 
-                    workflow_file.write_all(workflow.to_string().as_bytes()).await?;
+                    let workflow =
+                        workflow::Workflow::new(workflow_name, w.metadata(), inputs, outputs);
+
+                    workflow_file
+                        .write_all(workflow.to_string().as_bytes())
+                        .await?;
                 }
                 DocumentItem::Import(_) => {}
             }
