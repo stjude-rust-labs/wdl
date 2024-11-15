@@ -7,7 +7,11 @@ use std::path::Path;
 use anyhow::Context;
 use anyhow::Result;
 use anyhow::bail;
+use itertools::Either;
+use wdl_grammar::lexer::Lexer;
+use wdl_grammar::lexer::v1::Token;
 
+use crate::Array;
 use crate::CompoundValue;
 use crate::PrimitiveValue;
 use crate::StorageUnit;
@@ -118,4 +122,44 @@ fn calculate_directory_size(path: &Path, unit: StorageUnit) -> Result<f64> {
     }
 
     Ok(size)
+}
+
+/// Determines if the given string is a valid WDL identifier.
+pub fn is_ident(s: &str) -> bool {
+    let mut lexer = Lexer::new(s);
+    if !lexer
+        .next()
+        .map(|r| matches!(r, (Ok(Token::Ident), _)))
+        .unwrap_or(false)
+    {
+        return false;
+    }
+
+    lexer.next().is_none()
+}
+
+/// Represents a header in a TSV (tab-separated value) file.
+pub enum TsvHeader {
+    /// The header was explicitly specified as an `Array[String]`.
+    Specified(Array),
+    /// The header was read from the file.
+    File(String),
+}
+
+impl TsvHeader {
+    /// Gets the column names in the header.
+    ///
+    /// # Panics
+    ///
+    /// Panics if a specified header contains a value that is not a string.
+    pub fn columns(&self) -> impl Iterator<Item = &str> {
+        match self {
+            Self::Specified(array) => Either::Left(array.elements().iter().map(|v| {
+                v.as_string()
+                    .expect("header value must be a string")
+                    .as_str()
+            })),
+            Self::File(s) => Either::Right(s.split('\t')),
+        }
+    }
 }

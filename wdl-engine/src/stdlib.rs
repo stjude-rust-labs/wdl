@@ -13,18 +13,24 @@ use std::sync::Arc;
 use std::sync::LazyLock;
 
 use anyhow::Context;
+use indexmap::IndexMap;
+use itertools::EitherOrBoth;
+use itertools::Itertools;
 use regex::Regex;
+use util::TsvHeader;
+use util::is_ident;
 use wdl_analysis::stdlib::Binding;
+use wdl_analysis::stdlib::STDLIB as ANALYSIS_STDLIB;
 use wdl_analysis::types::Optional;
 use wdl_analysis::types::PrimitiveTypeKind;
 use wdl_analysis::types::Type;
 use wdl_analysis::types::TypeEq;
-use wdl_analysis::types::Types;
 use wdl_ast::Diagnostic;
 use wdl_ast::Span;
 
 use crate::Array;
 use crate::Coercible;
+use crate::CompoundValue;
 use crate::EvaluationContext;
 use crate::PrimitiveValue;
 use crate::StorageUnit;
@@ -87,11 +93,6 @@ impl<'a> CallContext<'a> {
             arguments,
             return_type,
         }
-    }
-
-    /// Gets the types collection for the call.
-    pub fn types(&self) -> &Types {
-        self.context.types()
     }
 
     /// Gets the current working directory for the call.
@@ -416,10 +417,7 @@ pub fn join_paths(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     // Handle being provided one or two arguments
     let (first, array, skip, array_span) = if context.arguments.len() == 1 {
         let array = context
-            .coerce_argument(
-                0,
-                wdl_analysis::stdlib::STDLIB.array_string_non_empty_type(),
-            )
+            .coerce_argument(0, ANALYSIS_STDLIB.array_string_non_empty_type())
             .unwrap_array();
 
         (
@@ -434,10 +432,7 @@ pub fn join_paths(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             .unwrap_file();
 
         let array = context
-            .coerce_argument(
-                1,
-                wdl_analysis::stdlib::STDLIB.array_string_non_empty_type(),
-            )
+            .coerce_argument(1, ANALYSIS_STDLIB.array_string_non_empty_type())
             .unwrap_array();
 
         (first, array, false, context.arguments[1].span)
@@ -451,17 +446,14 @@ pub fn join_paths(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .enumerate()
         .skip(if skip { 1 } else { 0 })
     {
-        let second = element
-            .coerce(context.types(), PrimitiveTypeKind::String.into())
-            .expect("element should coerce to a string")
-            .unwrap_string();
+        let next = element.as_string().expect("element should be string");
 
-        let second = Path::new(second.as_str());
-        if !second.is_relative() {
+        let next = Path::new(next.as_str());
+        if !next.is_relative() {
             return Err(array_path_not_relative(i, array_span));
         }
 
-        path.push(second);
+        path.push(next);
     }
 
     Ok(PrimitiveValue::new_file(
@@ -478,7 +470,7 @@ pub fn join_paths(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#glob
 pub fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(context.arguments.len() == 1);
-    debug_assert!(context.return_type_eq(wdl_analysis::stdlib::STDLIB.array_file_type()));
+    debug_assert!(context.return_type_eq(ANALYSIS_STDLIB.array_file_type()));
 
     let path = context
         .coerce_argument(0, PrimitiveTypeKind::String)
@@ -782,7 +774,7 @@ pub fn read_boolean(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_lines
 pub fn read_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(context.arguments.len() == 1);
-    debug_assert!(context.return_type_eq(wdl_analysis::stdlib::STDLIB.array_string_type()));
+    debug_assert!(context.return_type_eq(ANALYSIS_STDLIB.array_string_type()));
 
     let path = context.cwd().join(
         context
@@ -835,7 +827,7 @@ pub fn write_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     };
 
     let lines = context
-        .coerce_argument(0, wdl_analysis::stdlib::STDLIB.array_string_type())
+        .coerce_argument(0, ANALYSIS_STDLIB.array_string_type())
         .unwrap_array();
 
     // Create a temporary file that will be persisted after writing the lines
@@ -882,6 +874,168 @@ pub fn write_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         })?)
         .into(),
     )
+}
+
+/// Reads a tab-separated value (TSV) file as an Array[Array[String]]
+/// representing a table of values.
+///
+/// Trailing end-of-line characters (\r and \n) are removed from each line.
+///
+/// `Array[Array[String]] read_tsv(File, [false])``: Returns each row of the
+/// table as an Array[String]. There is no requirement that the rows of the
+/// table are all the same length.
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_tsv
+pub fn read_tsv_simple(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(context.arguments.len() == 1);
+    debug_assert!(context.return_type_eq(ANALYSIS_STDLIB.array_array_string_type()));
+
+    let path = context.cwd().join(
+        context
+            .coerce_argument(0, PrimitiveTypeKind::File)
+            .unwrap_file()
+            .as_str(),
+    );
+
+    let file = fs::File::open(&path)
+        .with_context(|| format!("failed to open file `{path}`", path = path.display()))
+        .map_err(|e| function_call_failed("read_tsv", format!("{e:?}"), context.call_site))?;
+
+    let mut rows: Vec<Value> = Vec::new();
+    for line in BufReader::new(file).lines() {
+        let line = line
+            .with_context(|| format!("failed to read file `{path}`", path = path.display()))
+            .map_err(|e| function_call_failed("read_tsv", format!("{e:?}"), context.call_site))?;
+        let values = line
+            .trim_end_matches(['\r', '\n'])
+            .split('\t')
+            .map(|s| PrimitiveValue::new_string(s).into())
+            .collect::<Vec<Value>>()
+            .into_boxed_slice();
+        rows.push(
+            Array::new_unchecked(ANALYSIS_STDLIB.array_string_type(), Arc::new(values)).into(),
+        );
+    }
+
+    Ok(Array::new_unchecked(
+        ANALYSIS_STDLIB.array_array_string_type(),
+        Arc::new(rows.into_boxed_slice()),
+    )
+    .into())
+}
+
+/// Reads a tab-separated value (TSV) file as an Array[Array[String]]
+/// representing a table of values.
+///
+/// Trailing end-of-line characters (\r and \n) are removed from each line.
+///
+/// `Array[Object] read_tsv(File, true)``: The second parameter must be true and
+/// specifies that the TSV file contains a header line. Each row is returned as
+/// an Object with its keys determined by the header (the first line in the
+/// file) and its values as Strings. All rows in the file must be the same
+/// length and the field names in the header row must be valid Object field
+/// names, or an error is raised.
+///
+/// `Array[Object] read_tsv(File, Boolean, Array[String])``: The second
+/// parameter specifies whether the TSV file contains a header line, and the
+/// third parameter is an array of field names that is used to specify the field
+/// names to use for the returned Objects. If the second parameter is true, the
+/// specified field names override those in the file's header (i.e., the header
+/// line is ignored).
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_tsv
+pub fn read_tsv(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(context.arguments.len() >= 2 && context.arguments.len() <= 3);
+    debug_assert!(context.return_type_eq(ANALYSIS_STDLIB.array_object_type()));
+
+    let path = context.cwd().join(
+        context
+            .coerce_argument(0, PrimitiveTypeKind::File)
+            .unwrap_file()
+            .as_str(),
+    );
+
+    let file = fs::File::open(&path)
+        .with_context(|| format!("failed to open file `{path}`", path = path.display()))
+        .map_err(|e| function_call_failed("read_tsv", format!("{e:?}"), context.call_site))?;
+
+    let mut lines = BufReader::new(file).lines();
+
+    // Read the file header if there is one; ignore it if the header was directly
+    // specified.
+    let file_has_header = context
+        .coerce_argument(1, PrimitiveTypeKind::Boolean)
+        .unwrap_boolean();
+    let header = if context.arguments.len() == 3 {
+        if file_has_header {
+            lines.next();
+        }
+
+        TsvHeader::Specified(
+            context
+                .coerce_argument(2, ANALYSIS_STDLIB.array_string_type())
+                .unwrap_array(),
+        )
+    } else if !file_has_header {
+        return Err(function_call_failed(
+            "read_tsv",
+            "argument specifying presence of a file header must be `true`",
+            context.arguments[1].span,
+        ));
+    } else {
+        TsvHeader::File(
+            lines
+                .next()
+                .unwrap_or_else(|| Ok(String::default()))
+                .with_context(|| format!("failed to read file `{path}`", path = path.display()))
+                .map_err(|e| {
+                    function_call_failed("read_tsv", format!("{e:?}"), context.call_site)
+                })?,
+        )
+    };
+
+    if let Some(invalid) = header.columns().find(|c| !is_ident(c)) {
+        return Err(function_call_failed(
+            "read_tsv",
+            format!("column name `{invalid}` is not a valid WDL object field name"),
+            context.call_site,
+        ));
+    }
+
+    let mut rows: Vec<Value> = Vec::new();
+    for (index, line) in lines.enumerate() {
+        let line = line
+            .with_context(|| format!("failed to read file `{path}`", path = path.display()))
+            .map_err(|e| function_call_failed("read_tsv", format!("{e:?}"), context.call_site))?;
+
+        let members = header
+            .columns()
+            .zip_longest(line.trim_end_matches(['\r', '\n']).split('\t'))
+            .map(|e| match e {
+                EitherOrBoth::Both(c, v) => {
+                    Ok((c.to_string(), PrimitiveValue::new_string(v).into()))
+                }
+                _ => Err(function_call_failed(
+                    "read_tsv",
+                    format!(
+                        "line {index} in file `{path}` does not have the expected number of \
+                         columns",
+                        index = index + 1 + if file_has_header { 1 } else { 0 },
+                        path = path.display()
+                    ),
+                    context.call_site,
+                )),
+            })
+            .collect::<Result<IndexMap<_, _>, _>>()?;
+
+        rows.push(CompoundValue::Object(members.into()).into());
+    }
+
+    Ok(Array::new_unchecked(
+        ANALYSIS_STDLIB.array_object_type(),
+        Arc::new(rows.into_boxed_slice()),
+    )
+    .into())
 }
 
 /// Represents a WDL function implementation callback.
@@ -950,7 +1104,7 @@ impl StandardLibrary {
 /// Represents the mapping between function name and overload index to the
 /// implementation callback.
 pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
-    let mut functions = HashMap::with_capacity(wdl_analysis::stdlib::STDLIB.functions().len());
+    let mut functions = HashMap::with_capacity(ANALYSIS_STDLIB.functions().len());
     assert!(
         functions
             .insert(
@@ -1161,6 +1315,25 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             )
             .is_none()
     );
+    assert!(
+        functions
+            .insert(
+                "read_tsv",
+                Function::new(
+                    const {
+                        &[
+                            Signature::new("(File) -> Array[Array[String]]", read_tsv_simple),
+                            Signature::new("(File, Boolean) -> Array[Object]", read_tsv),
+                            Signature::new(
+                                "(File, Boolean, Array[String]) -> Array[Object]",
+                                read_tsv,
+                            ),
+                        ]
+                    }
+                )
+            )
+            .is_none()
+    );
 
     StandardLibrary { functions }
 });
@@ -1182,7 +1355,7 @@ mod test {
     /// aligns with the STDLIB implementation from `wdl-engine`.
     #[test]
     fn verify_stdlib() {
-        for (name, func) in wdl_analysis::stdlib::STDLIB.functions() {
+        for (name, func) in ANALYSIS_STDLIB.functions() {
             match STDLIB.functions.get(name) {
                 Some(imp) => match func {
                     wdl_analysis::stdlib::Function::Monomorphic(f) => {
@@ -1194,7 +1367,7 @@ mod test {
                         assert_eq!(
                             f.signature()
                                 .display(
-                                    wdl_analysis::stdlib::STDLIB.types(),
+                                    ANALYSIS_STDLIB.types(),
                                     &TypeParameters::new(f.signature().type_parameters())
                                 )
                                 .to_string(),
@@ -1211,7 +1384,7 @@ mod test {
                         for (i, sig) in f.signatures().iter().enumerate() {
                             assert_eq!(
                                 sig.display(
-                                    wdl_analysis::stdlib::STDLIB.types(),
+                                    ANALYSIS_STDLIB.types(),
                                     &TypeParameters::new(sig.type_parameters())
                                 )
                                 .to_string(),
@@ -2001,6 +2174,198 @@ mod test {
         assert_eq!(
             fs::read_to_string(value.unwrap_file().as_str()).expect("failed to read file"),
             "hello\nworld\n!\n\n!\n"
+        );
+    }
+
+    #[test]
+    fn read_tsv() {
+        let mut env = TestEnv::default();
+        env.write_file(
+            "foo.tsv",
+            "row1_1\trow1_2\trow1_3\nrow2_1\trow2_2\trow2_3\trow2_4\nrow3_1\trow3_2\n",
+        );
+        env.write_file(
+            "bar.tsv",
+            "foo\tbar\tbaz\nrow1_1\trow1_2\trow1_3\nrow2_1\trow2_2\trow2_3\nrow3_1\trow3_2\trow3_3",
+        );
+        env.write_file(
+            "bar_invalid.tsv",
+            "foo\tbar\tbaz\nnrow1_1\trow1_2\trow1_3\nrow2_1\trow2_3\nrow3_1\trow3_2\trow3_3",
+        );
+        env.write_file(
+            "baz.tsv",
+            "row1_1\trow1_2\trow1_3\nrow2_1\trow2_2\trow2_3\nrow3_1\trow3_2\trow3_3",
+        );
+        env.write_file("empty.tsv", "");
+        env.write_file("invalid_name.tsv", "invalid-name\nfoo");
+
+        let diagnostic = eval_v1_expr(&mut env, V1::Two, "read_tsv('unknown.tsv')").unwrap_err();
+        assert!(
+            diagnostic
+                .message()
+                .contains("call to function `read_tsv` failed: failed to open file")
+        );
+
+        let value = eval_v1_expr(&mut env, V1::Two, "read_tsv('empty.tsv')").unwrap();
+        assert!(value.unwrap_array().elements().is_empty());
+
+        let diagnostic = eval_v1_expr(&mut env, V1::Two, "read_tsv('foo.tsv', false)").unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "call to function `read_tsv` failed: argument specifying presence of a file header \
+             must be `true`"
+        );
+
+        let value = eval_v1_expr(&mut env, V1::Two, "read_tsv('foo.tsv')").unwrap();
+        let elements = value
+            .as_array()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|v| {
+                v.as_array()
+                    .unwrap()
+                    .elements()
+                    .iter()
+                    .map(|v| v.as_string().unwrap().as_str())
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(elements, [
+            Vec::from_iter(["row1_1", "row1_2", "row1_3"]),
+            Vec::from_iter(["row2_1", "row2_2", "row2_3", "row2_4"]),
+            Vec::from_iter(["row3_1", "row3_2"])
+        ]);
+
+        let value = eval_v1_expr(&mut env, V1::Two, "read_tsv('bar.tsv', true)").unwrap();
+        let elements = value
+            .as_array()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|v| {
+                v.as_object()
+                    .unwrap()
+                    .members()
+                    .iter()
+                    .map(|(k, v)| (k.as_str(), v.as_string().unwrap().as_str()))
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(elements, [
+            Vec::from_iter([("foo", "row1_1"), ("bar", "row1_2"), ("baz", "row1_3")]),
+            Vec::from_iter([("foo", "row2_1"), ("bar", "row2_2"), ("baz", "row2_3")]),
+            Vec::from_iter([("foo", "row3_1"), ("bar", "row3_2"), ("baz", "row3_3")]),
+        ]);
+
+        let value = eval_v1_expr(
+            &mut env,
+            V1::Two,
+            "read_tsv('bar.tsv', true, ['qux', 'jam', 'cakes'])",
+        )
+        .unwrap();
+        let elements = value
+            .as_array()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|v| {
+                v.as_object()
+                    .unwrap()
+                    .members()
+                    .iter()
+                    .map(|(k, v)| (k.as_str(), v.as_string().unwrap().as_str()))
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(elements, [
+            Vec::from_iter([("qux", "row1_1"), ("jam", "row1_2"), ("cakes", "row1_3")]),
+            Vec::from_iter([("qux", "row2_1"), ("jam", "row2_2"), ("cakes", "row2_3")]),
+            Vec::from_iter([("qux", "row3_1"), ("jam", "row3_2"), ("cakes", "row3_3")]),
+        ]);
+
+        let diagnostic =
+            eval_v1_expr(&mut env, V1::Two, "read_tsv('bar.tsv', true, ['nope'])").unwrap_err();
+        assert!(
+            diagnostic
+                .message()
+                .contains("call to function `read_tsv` failed: line 2 in file")
+        );
+        assert!(
+            diagnostic
+                .message()
+                .contains("does not have the expected number of column")
+        );
+
+        let diagnostic =
+            eval_v1_expr(&mut env, V1::Two, "read_tsv('bar_invalid.tsv', true)").unwrap_err();
+        assert!(
+            diagnostic
+                .message()
+                .contains("call to function `read_tsv` failed: line 3 in file")
+        );
+        assert!(
+            diagnostic
+                .message()
+                .contains("does not have the expected number of column")
+        );
+
+        let value = eval_v1_expr(
+            &mut env,
+            V1::Two,
+            "read_tsv('baz.tsv', false, ['foo', 'bar', 'baz'])",
+        )
+        .unwrap();
+        let elements = value
+            .as_array()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|v| {
+                v.as_object()
+                    .unwrap()
+                    .members()
+                    .iter()
+                    .map(|(k, v)| (k.as_str(), v.as_string().unwrap().as_str()))
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(elements, [
+            Vec::from_iter([("foo", "row1_1"), ("bar", "row1_2"), ("baz", "row1_3")]),
+            Vec::from_iter([("foo", "row2_1"), ("bar", "row2_2"), ("baz", "row2_3")]),
+            Vec::from_iter([("foo", "row3_1"), ("bar", "row3_2"), ("baz", "row3_3")]),
+        ]);
+
+        let diagnostic = eval_v1_expr(
+            &mut env,
+            V1::Two,
+            "read_tsv('bar_invalid.tsv', true, ['not-valid'])",
+        )
+        .unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "call to function `read_tsv` failed: column name `not-valid` is not a valid WDL \
+             object field name"
+        );
+
+        let diagnostic = eval_v1_expr(
+            &mut env,
+            V1::Two,
+            "read_tsv('bar_invalid.tsv', true, ['not-valid'])",
+        )
+        .unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "call to function `read_tsv` failed: column name `not-valid` is not a valid WDL \
+             object field name"
+        );
+
+        let diagnostic =
+            eval_v1_expr(&mut env, V1::Two, "read_tsv('invalid_name.tsv', true)").unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "call to function `read_tsv` failed: column name `invalid-name` is not a valid WDL \
+             object field name"
         );
     }
 }
