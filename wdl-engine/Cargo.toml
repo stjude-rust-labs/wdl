@@ -19,6 +19,7 @@ indexmap = { workspace = true }
 serde_json = { workspace = true }
 regex = { workspace = true }
 glob = { workspace = true }
+tempfile = { workspace = true }
 
 [dev-dependencies]
 wdl-grammar = { version = "0.10.0", path = "../wdl-grammar" }
@@ -27,7 +28,6 @@ pretty_assertions = { workspace = true }
 codespan-reporting = { workspace = true }
 path-clean = { workspace = true }
 colored = { workspace = true }
-tempfile = { workspace = true }
 approx = { workspace = true }
 
 [lints]

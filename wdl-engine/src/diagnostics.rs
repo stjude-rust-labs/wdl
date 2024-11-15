@@ -1,7 +1,6 @@
 //! Module for evaluation diagnostics.
 
 use std::fmt;
-use std::path::Path;
 
 use wdl_analysis::types::Type;
 use wdl_analysis::types::Types;
@@ -173,17 +172,10 @@ pub fn array_path_not_relative(index: usize, span: Span) -> Diagnostic {
 }
 
 /// Creates an "invalid glob pattern" diagnostic.
-pub fn invalid_glob_pattern(e: &glob::PatternError, span: Span) -> Diagnostic {
-    Diagnostic::error(format!("invalid glob pattern specified: {e}", e = e.msg))
-        .with_highlight(span)
-}
-
-/// Creates a "path not UTF-8" diagnostic.
-pub fn path_not_utf8(context: &str, path: impl AsRef<Path>, span: Span) -> Diagnostic {
-    let path = path.as_ref();
+pub fn invalid_glob_pattern(error: &glob::PatternError, span: Span) -> Diagnostic {
     Diagnostic::error(format!(
-        "{context}: path `{path}` cannot be represented as UTF-8",
-        path = path.display()
+        "invalid glob pattern specified: {error}",
+        error = error.msg
     ))
     .with_highlight(span)
 }
@@ -198,6 +190,6 @@ pub fn invalid_storage_unit(unit: &str, span: Span) -> Diagnostic {
 }
 
 /// Creates a "function call failed" diagnostic.
-pub fn function_call_failed(name: &str, e: impl fmt::Display, span: Span) -> Diagnostic {
-    Diagnostic::error(format!("call to function `{name}` failed: {e}")).with_highlight(span)
+pub fn function_call_failed(name: &str, error: impl fmt::Display, span: Span) -> Diagnostic {
+    Diagnostic::error(format!("call to function `{name}` failed: {error}")).with_highlight(span)
 }

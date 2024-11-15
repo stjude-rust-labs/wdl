@@ -5,6 +5,8 @@ use std::collections::HashMap;
 use std::fs;
 use std::io::BufRead;
 use std::io::BufReader;
+use std::io::BufWriter;
+use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -23,6 +25,7 @@ use wdl_ast::Span;
 
 use crate::Array;
 use crate::Coercible;
+use crate::EvaluationContext;
 use crate::PrimitiveValue;
 use crate::StorageUnit;
 use crate::Value;
@@ -32,7 +35,6 @@ use crate::diagnostics::invalid_glob_pattern;
 use crate::diagnostics::invalid_regex;
 use crate::diagnostics::invalid_storage_unit;
 use crate::diagnostics::path_not_relative;
-use crate::diagnostics::path_not_utf8;
 
 mod util;
 
@@ -61,52 +63,55 @@ impl CallArgument {
 
 /// Represents function call context.
 pub struct CallContext<'a> {
-    /// The types collection for any referenced types.
-    types: &'a Types,
+    /// The evaluation context for the call.
+    context: &'a dyn EvaluationContext,
     /// The call site span.
     call_site: Span,
     /// The arguments to the call.
     arguments: &'a [CallArgument],
     /// The return type.
     return_type: Type,
-    /// The current working directory.
-    cwd: &'a Path,
-    /// The current stdout file value.
-    stdout: Option<Value>,
-    /// The current stderr file value.
-    stderr: Option<Value>,
 }
 
 impl<'a> CallContext<'a> {
     /// Constructs a new call context given the call arguments.
     pub fn new(
-        types: &'a Types,
+        context: &'a dyn EvaluationContext,
         call_site: Span,
         arguments: &'a [CallArgument],
         return_type: Type,
-        cwd: &'a Path,
     ) -> Self {
         Self {
-            types,
+            context,
             call_site,
             arguments,
             return_type,
-            cwd,
-            stdout: None,
-            stderr: None,
         }
     }
 
-    /// Sets the current stdout file value.
-    pub fn with_stdout(mut self, stdout: impl Into<Value>) -> Self {
-        self.stdout = Some(stdout.into());
-        self
+    /// Gets the types collection for the call.
+    pub fn types(&self) -> &Types {
+        self.context.types()
     }
 
-    /// Sets the current stderr file value.
-    pub fn with_stderr(mut self, stderr: impl Into<Value>) -> Self {
-        self.stderr = Some(stderr.into());
-        self
+    /// Gets the current working directory for the call.
+    pub fn cwd(&self) -> &Path {
+        self.context.cwd()
+    }
+
+    /// Gets the temp directory for the call.
+    pub fn tmp(&self) -> &Path {
+        self.context.tmp()
+    }
+
+    /// Gets the stdout value for the call.
+    pub fn stdout(&self) -> Option<Value> {
+        self.context.stdout()
+    }
+
+    /// Gets the stderr value for the call.
+    pub fn stderr(&self) -> Option<Value> {
+        self.context.stderr()
     }
 
     /// Coerces an argument to the given type.
@@ -119,8 +124,16 @@ impl<'a> CallContext<'a> {
     fn coerce_argument(&self, index: usize, ty: impl Into<Type>) -> Value {
         self.arguments[index]
             .value
-            .coerce(self.types, ty.into())
+            .coerce(self.context.types(), ty.into())
             .expect("value should coerce")
+    }
+
+    /// Checks to see if the calculated return type equals the given type.
+    ///
+    /// This is only used in assertions made by the function implementations.
+    #[cfg(debug_assertions)]
+    fn return_type_eq(&self, ty: impl Into<Type>) -> bool {
+        self.return_type.type_eq(self.context.types(), &ty.into())
     }
 }
 
@@ -129,11 +142,7 @@ impl<'a> CallContext<'a> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#floor
 pub fn floor(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert_eq!(context.arguments.len(), 1);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::Integer.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::Integer));
 
     let arg = context
         .coerce_argument(0, PrimitiveTypeKind::Float)
@@ -146,11 +155,7 @@ pub fn floor(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#ceil
 pub fn ceil(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert_eq!(context.arguments.len(), 1);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::Integer.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::Integer));
 
     let arg = context
         .coerce_argument(0, PrimitiveTypeKind::Float)
@@ -164,11 +169,7 @@ pub fn ceil(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#round
 pub fn round(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert_eq!(context.arguments.len(), 1);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::Integer.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::Integer));
 
     let arg = context
         .coerce_argument(0, PrimitiveTypeKind::Float)
@@ -181,11 +182,7 @@ pub fn round(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#min
 pub fn int_min(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert_eq!(context.arguments.len(), 2);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::Integer.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::Integer));
 
     let first = context
         .coerce_argument(0, PrimitiveTypeKind::Integer)
@@ -201,11 +198,7 @@ pub fn int_min(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#min
 pub fn float_min(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert_eq!(context.arguments.len(), 2);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::Float.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::Float));
 
     let first = context
         .coerce_argument(0, PrimitiveTypeKind::Float)
@@ -221,11 +214,7 @@ pub fn float_min(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#max
 pub fn int_max(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert_eq!(context.arguments.len(), 2);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::Integer.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::Integer));
 
     let first = context
         .coerce_argument(0, PrimitiveTypeKind::Integer)
@@ -241,11 +230,7 @@ pub fn int_max(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#max
 pub fn float_max(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert_eq!(context.arguments.len(), 2);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::Float.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::Float));
 
     let first = context
         .coerce_argument(0, PrimitiveTypeKind::Float)
@@ -263,10 +248,7 @@ pub fn float_max(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-find
 pub fn find(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert_eq!(context.arguments.len(), 2);
-    debug_assert!(context.return_type.type_eq(
-        context.types,
-        &Type::from(PrimitiveTypeKind::String).optional()
-    ));
+    debug_assert!(context.return_type_eq(Type::from(PrimitiveTypeKind::String).optional()));
 
     let input = context
         .coerce_argument(0, PrimitiveTypeKind::String)
@@ -290,11 +272,7 @@ pub fn find(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-matches
 pub fn matches(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert_eq!(context.arguments.len(), 2);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::Boolean.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::Boolean));
 
     let input = context
         .coerce_argument(0, PrimitiveTypeKind::String)
@@ -315,11 +293,7 @@ pub fn matches(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#sub
 pub fn sub(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert_eq!(context.arguments.len(), 3);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::String.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::String));
 
     let input = context
         .coerce_argument(0, PrimitiveTypeKind::String)
@@ -355,11 +329,7 @@ pub fn sub(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#basename
 pub fn basename(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(!context.arguments.is_empty() && context.arguments.len() < 3);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::String.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::String));
 
     let path = context
         .coerce_argument(0, PrimitiveTypeKind::String)
@@ -397,11 +367,7 @@ pub fn basename(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-join_paths
 pub fn join_paths_simple(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(context.arguments.len() == 2);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::File.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::File));
 
     let first = context
         .coerce_argument(0, PrimitiveTypeKind::File)
@@ -445,11 +411,7 @@ pub fn join_paths_simple(context: CallContext<'_>) -> Result<Value, Diagnostic> 
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#-join_paths
 pub fn join_paths(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(!context.arguments.is_empty() && context.arguments.len() < 3);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::File.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::File));
 
     // Handle being provided one or two arguments
     let (first, array, skip, array_span) = if context.arguments.len() == 1 {
@@ -490,7 +452,7 @@ pub fn join_paths(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .skip(if skip { 1 } else { 0 })
     {
         let second = element
-            .coerce(context.types, PrimitiveTypeKind::String.into())
+            .coerce(context.types(), PrimitiveTypeKind::String.into())
             .expect("element should coerce to a string")
             .unwrap_string();
 
@@ -516,17 +478,14 @@ pub fn join_paths(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#glob
 pub fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(context.arguments.len() == 1);
-    debug_assert!(context.return_type.type_eq(
-        context.types,
-        &wdl_analysis::stdlib::STDLIB.array_file_type()
-    ));
+    debug_assert!(context.return_type_eq(wdl_analysis::stdlib::STDLIB.array_file_type()));
 
     let path = context
         .coerce_argument(0, PrimitiveTypeKind::String)
         .unwrap_string();
 
     let mut elements: Vec<Value> = Vec::new();
-    for path in glob::glob(&context.cwd.join(path.as_str()).to_string_lossy())
+    for path in glob::glob(&context.cwd().join(path.as_str()).to_string_lossy())
         .map_err(|e| invalid_glob_pattern(&e, context.arguments[0].span))?
     {
         let path = path.map_err(|e| function_call_failed("glob", &e, context.call_site))?;
@@ -537,14 +496,38 @@ pub fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         }
 
         // Strip the CWD prefix if there is one
-        let path = path.strip_prefix(context.cwd).unwrap_or(path.as_ref());
+        let path = match path.strip_prefix(context.cwd()) {
+            Ok(path) => {
+                // Create a string from the stripped path
+                path.to_str()
+                    .ok_or_else(|| {
+                        function_call_failed(
+                            "glob",
+                            format!(
+                                "path `{path}` cannot be represented as UTF-8",
+                                path = path.display()
+                            ),
+                            context.call_site,
+                        )
+                    })?
+                    .to_string()
+            }
+            Err(_) => {
+                // Convert the path directly to a string
+                path.into_os_string().into_string().map_err(|path| {
+                    function_call_failed(
+                        "glob",
+                        format!(
+                            "path `{path}` cannot be represented as UTF-8",
+                            path = Path::new(&path).display()
+                        ),
+                        context.call_site,
+                    )
+                })?
+            }
+        };
 
-        elements.push(
-            PrimitiveValue::new_file(path.to_str().ok_or_else(|| {
-                path_not_utf8("call to `glob` function failed", path, context.call_site)
-            })?)
-            .into(),
-        );
+        elements.push(PrimitiveValue::new_file(path).into());
     }
 
     Ok(Array::new_unchecked(context.return_type, Arc::new(elements.into_boxed_slice())).into())
@@ -559,11 +542,7 @@ pub fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#glob
 pub fn size(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(!context.arguments.is_empty() && context.arguments.len() < 3);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::Float.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::Float));
 
     let unit = if context.arguments.len() == 2 {
         let unit = context
@@ -579,7 +558,7 @@ pub fn size(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     // If the first argument is a string, we need to check if it's a file or
     // directory and treat it as such.
     let value = if let Some(s) = context.arguments[0].value.as_string() {
-        let path = context.cwd.join(s.as_str());
+        let path = context.cwd().join(s.as_str());
         let metadata = path
             .metadata()
             .with_context(|| {
@@ -598,7 +577,7 @@ pub fn size(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         context.arguments[0].value.clone()
     };
 
-    util::calculate_disk_size(&value, unit, context.cwd)
+    util::calculate_disk_size(&value, unit, context.cwd())
         .map_err(|e| function_call_failed("size", format!("{e:?}"), context.call_site))
         .map(Into::into)
 }
@@ -609,12 +588,9 @@ pub fn size(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#stdout
 pub fn stdout(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(context.arguments.is_empty());
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::File.into())
-    );
-    match context.stdout {
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::File));
+
+    match context.stdout() {
         Some(stdout) => {
             debug_assert!(
                 stdout.as_file().is_some(),
@@ -636,13 +612,9 @@ pub fn stdout(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#stderr
 pub fn stderr(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(context.arguments.is_empty());
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::File.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::File));
 
-    match context.stderr {
+    match context.stderr() {
         Some(stderr) => {
             debug_assert!(
                 stderr.as_file().is_some(),
@@ -666,13 +638,9 @@ pub fn stderr(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_string
 pub fn read_string(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(context.arguments.len() == 1);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::String.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::String));
 
-    let path = context.cwd.join(
+    let path = context.cwd().join(
         context
             .coerce_argument(0, PrimitiveTypeKind::File)
             .unwrap_file()
@@ -680,7 +648,7 @@ pub fn read_string(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     );
     let mut contents = fs::read_to_string(&path)
         .with_context(|| format!("failed to read file `{path}`", path = path.display()))
-        .map_err(|e| function_call_failed("read_string", e, context.call_site))?;
+        .map_err(|e| function_call_failed("read_string", format!("{e:?}"), context.call_site))?;
 
     let trimmed = contents.trim_end_matches(['\r', '\n']);
     contents.truncate(trimmed.len());
@@ -696,13 +664,9 @@ pub fn read_string(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_int
 pub fn read_int(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(context.arguments.len() == 1);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::Integer.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::Integer));
 
-    let path = context.cwd.join(
+    let path = context.cwd().join(
         context
             .coerce_argument(0, PrimitiveTypeKind::File)
             .unwrap_file()
@@ -710,7 +674,7 @@ pub fn read_int(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     );
     let contents = fs::read_to_string(&path)
         .with_context(|| format!("failed to read file `{path}`", path = path.display()))
-        .map_err(|e| function_call_failed("read_int", e, context.call_site))?;
+        .map_err(|e| function_call_failed("read_int", format!("{e:?}"), context.call_site))?;
 
     Ok(contents
         .trim()
@@ -737,13 +701,9 @@ pub fn read_int(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_float
 pub fn read_float(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(context.arguments.len() == 1);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::Float.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::Float));
 
-    let path = context.cwd.join(
+    let path = context.cwd().join(
         context
             .coerce_argument(0, PrimitiveTypeKind::File)
             .unwrap_file()
@@ -751,7 +711,7 @@ pub fn read_float(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     );
     let contents = fs::read_to_string(&path)
         .with_context(|| format!("failed to read file `{path}`", path = path.display()))
-        .map_err(|e| function_call_failed("read_float", e, context.call_site))?;
+        .map_err(|e| function_call_failed("read_float", format!("{e:?}"), context.call_site))?;
 
     Ok(contents
         .trim()
@@ -779,13 +739,9 @@ pub fn read_float(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_boolean
 pub fn read_boolean(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(context.arguments.len() == 1);
-    debug_assert!(
-        context
-            .return_type
-            .type_eq(context.types, &PrimitiveTypeKind::Boolean.into())
-    );
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::Boolean));
 
-    let path = context.cwd.join(
+    let path = context.cwd().join(
         context
             .coerce_argument(0, PrimitiveTypeKind::File)
             .unwrap_file()
@@ -793,7 +749,7 @@ pub fn read_boolean(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     );
     let mut contents = fs::read_to_string(&path)
         .with_context(|| format!("failed to read file `{path}`", path = path.display()))
-        .map_err(|e| function_call_failed("read_boolean", e, context.call_site))?;
+        .map_err(|e| function_call_failed("read_boolean", format!("{e:?}"), context.call_site))?;
 
     contents.make_ascii_lowercase();
 
@@ -826,12 +782,9 @@ pub fn read_boolean(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_lines
 pub fn read_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(context.arguments.len() == 1);
-    debug_assert!(context.return_type.type_eq(
-        context.types,
-        &wdl_analysis::stdlib::STDLIB.array_string_type()
-    ));
+    debug_assert!(context.return_type_eq(wdl_analysis::stdlib::STDLIB.array_string_type()));
 
-    let path = context.cwd.join(
+    let path = context.cwd().join(
         context
             .coerce_argument(0, PrimitiveTypeKind::File)
             .unwrap_file()
@@ -840,14 +793,16 @@ pub fn read_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
     let file = fs::File::open(&path)
         .with_context(|| format!("failed to open file `{path}`", path = path.display()))
-        .map_err(|e| function_call_failed("read_lines", e, context.call_site))?;
+        .map_err(|e| function_call_failed("read_lines", format!("{e:?}"), context.call_site))?;
 
     let elements = BufReader::new(file)
         .lines()
         .map(|line| {
             let mut line = line
                 .with_context(|| format!("failed to read file `{path}`", path = path.display()))
-                .map_err(|e| function_call_failed("read_lines", e, context.call_site))?;
+                .map_err(|e| {
+                    function_call_failed("read_lines", format!("{e:?}"), context.call_site)
+                })?;
 
             let trimmed = line.trim_end_matches(['\r', '\n']);
             line.truncate(trimmed.len());
@@ -856,6 +811,77 @@ pub fn read_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .collect::<Result<Vec<Value>, _>>()?;
 
     Ok(Array::new_unchecked(context.return_type, Arc::new(elements.into_boxed_slice())).into())
+}
+
+/// Writes a file with one line for each element in a Array[String].
+///
+/// All lines are terminated by the newline (\n) character (following the POSIX
+/// standard).
+///
+/// If the Array is empty, an empty file is written.
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#write_lines
+pub fn write_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+    debug_assert!(context.arguments.len() == 1);
+    debug_assert!(context.return_type_eq(PrimitiveTypeKind::File));
+
+    // Helper for handling errors while writing to the file.
+    let write_error = |e: std::io::Error| {
+        function_call_failed(
+            "write_lines",
+            format!("failed to write to temporary file: {e}"),
+            context.call_site,
+        )
+    };
+
+    let lines = context
+        .coerce_argument(0, wdl_analysis::stdlib::STDLIB.array_string_type())
+        .unwrap_array();
+
+    // Create a temporary file that will be persisted after writing the lines
+    let mut file = tempfile::NamedTempFile::new_in(context.tmp()).map_err(|e| {
+        function_call_failed(
+            "write_lines",
+            format!("failed to create temporary file: {e}"),
+            context.call_site,
+        )
+    })?;
+
+    // Write the lines
+    let mut writer = BufWriter::new(file.as_file_mut());
+    for line in lines.elements() {
+        writer
+            .write(line.as_string().unwrap().as_str().as_bytes())
+            .map_err(write_error)?;
+        writer.write(b"\n").map_err(write_error)?;
+    }
+
+    // Consume the writer, flushing the buffer to disk.
+    writer
+        .into_inner()
+        .map_err(|e| write_error(e.into_error()))?;
+
+    let (_, path) = file.keep().map_err(|e| {
+        function_call_failed(
+            "write_lines",
+            format!("failed to keep temporary file: {e}"),
+            context.call_site,
+        )
+    })?;
+
+    Ok(
+        PrimitiveValue::new_file(path.into_os_string().into_string().map_err(|path| {
+            function_call_failed(
+                "write_lines",
+                format!(
+                    "path `{path}` cannot be represented as UTF-8",
+                    path = Path::new(&path).display()
+                ),
+                context.call_site,
+            )
+        })?)
+        .into(),
+    )
 }
 
 /// Represents a WDL function implementation callback.
@@ -1127,6 +1153,14 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             )
             .is_none()
     );
+    assert!(
+        functions
+            .insert(
+                "write_lines",
+                Function::new(const { &[Signature::new("(Array[String]) -> File", write_lines)] })
+            )
+            .is_none()
+    );
 
     StandardLibrary { functions }
 });
@@ -1137,16 +1171,12 @@ mod test {
 
     use pretty_assertions::assert_eq;
     use wdl_analysis::stdlib::TypeParameters;
-    use wdl_ast::SupportedVersion;
     use wdl_ast::version::V1;
 
     use super::*;
-    use crate::Scope;
-    use crate::ScopeRef;
-    use crate::v1::test::TestEvaluationContext;
+    use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
-    use crate::v1::test::eval_v1_expr_with_context;
-    use crate::v1::test::eval_v1_expr_with_cwd;
+    use crate::v1::test::eval_v1_expr_with_stdio;
 
     /// A test to verify that the STDLIB function types from `wdl-analysis`
     /// aligns with the STDLIB implementation from `wdl-engine`.
@@ -1201,150 +1231,137 @@ mod test {
 
     #[test]
     fn floor() {
-        let scopes = &[Scope::new(None)];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
-        let value = eval_v1_expr(V1::Zero, "floor(10.5)", &mut types, scope).unwrap();
+        let mut env = TestEnv::default();
+        let value = eval_v1_expr(&mut env, V1::Zero, "floor(10.5)").unwrap();
         assert_eq!(value.unwrap_integer(), 10);
 
-        let value = eval_v1_expr(V1::Zero, "floor(10)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "floor(10)").unwrap();
         assert_eq!(value.unwrap_integer(), 10);
 
-        let value = eval_v1_expr(V1::Zero, "floor(9.9999)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "floor(9.9999)").unwrap();
         assert_eq!(value.unwrap_integer(), 9);
 
-        let value = eval_v1_expr(V1::Zero, "floor(0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "floor(0)").unwrap();
         assert_eq!(value.unwrap_integer(), 0);
 
-        let value = eval_v1_expr(V1::Zero, "floor(-5.1)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "floor(-5.1)").unwrap();
         assert_eq!(value.unwrap_integer(), -6);
     }
 
     #[test]
     fn ceil() {
-        let scopes = &[Scope::new(None)];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
-        let value = eval_v1_expr(V1::Zero, "ceil(10.5)", &mut types, scope).unwrap();
+        let mut env = TestEnv::default();
+        let value = eval_v1_expr(&mut env, V1::Zero, "ceil(10.5)").unwrap();
         assert_eq!(value.unwrap_integer(), 11);
 
-        let value = eval_v1_expr(V1::Zero, "ceil(10)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "ceil(10)").unwrap();
         assert_eq!(value.unwrap_integer(), 10);
 
-        let value = eval_v1_expr(V1::Zero, "ceil(9.9999)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "ceil(9.9999)").unwrap();
         assert_eq!(value.unwrap_integer(), 10);
 
-        let value = eval_v1_expr(V1::Zero, "ceil(0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "ceil(0)").unwrap();
         assert_eq!(value.unwrap_integer(), 0);
 
-        let value = eval_v1_expr(V1::Zero, "ceil(-5.1)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "ceil(-5.1)").unwrap();
         assert_eq!(value.unwrap_integer(), -5);
     }
 
     #[test]
     fn round() {
-        let scopes = &[Scope::new(None)];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
-        let value = eval_v1_expr(V1::Zero, "round(10.5)", &mut types, scope).unwrap();
+        let mut env = TestEnv::default();
+        let value = eval_v1_expr(&mut env, V1::Zero, "round(10.5)").unwrap();
         assert_eq!(value.unwrap_integer(), 11);
 
-        let value = eval_v1_expr(V1::Zero, "round(10.3)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "round(10.3)").unwrap();
         assert_eq!(value.unwrap_integer(), 10);
 
-        let value = eval_v1_expr(V1::Zero, "round(10)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "round(10)").unwrap();
         assert_eq!(value.unwrap_integer(), 10);
 
-        let value = eval_v1_expr(V1::Zero, "round(9.9999)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "round(9.9999)").unwrap();
         assert_eq!(value.unwrap_integer(), 10);
 
-        let value = eval_v1_expr(V1::Zero, "round(9.12345)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "round(9.12345)").unwrap();
         assert_eq!(value.unwrap_integer(), 9);
 
-        let value = eval_v1_expr(V1::Zero, "round(0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "round(0)").unwrap();
         assert_eq!(value.unwrap_integer(), 0);
 
-        let value = eval_v1_expr(V1::Zero, "round(-5.1)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "round(-5.1)").unwrap();
         assert_eq!(value.unwrap_integer(), -5);
 
-        let value = eval_v1_expr(V1::Zero, "round(-5.5)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Zero, "round(-5.5)").unwrap();
         assert_eq!(value.unwrap_integer(), -6);
     }
 
     #[test]
     fn min() {
-        let scopes = &[Scope::new(None)];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
-        let value = eval_v1_expr(V1::One, "min(7, 42)", &mut types, scope).unwrap();
+        let mut env = TestEnv::default();
+        let value = eval_v1_expr(&mut env, V1::One, "min(7, 42)").unwrap();
         assert_eq!(value.unwrap_integer(), 7);
 
-        let value = eval_v1_expr(V1::One, "min(42, 7)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(42, 7)").unwrap();
         assert_eq!(value.unwrap_integer(), 7);
 
-        let value = eval_v1_expr(V1::One, "min(-42, 7)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(-42, 7)").unwrap();
         assert_eq!(value.unwrap_integer(), -42);
 
-        let value = eval_v1_expr(V1::One, "min(0, -42)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(0, -42)").unwrap();
         assert_eq!(value.unwrap_integer(), -42);
 
-        let value = eval_v1_expr(V1::One, "min(0, 42)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(0, 42)").unwrap();
         assert_eq!(value.unwrap_integer(), 0);
 
-        let value = eval_v1_expr(V1::One, "min(7.0, 42)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(7.0, 42)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(V1::One, "min(42.0, 7)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(42.0, 7)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(V1::One, "min(-42.0, 7)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(-42.0, 7)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -42.0);
 
-        let value = eval_v1_expr(V1::One, "min(0.0, -42)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(0.0, -42)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -42.0);
 
-        let value = eval_v1_expr(V1::One, "min(0.0, 42)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(0.0, 42)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -0.0);
 
-        let value = eval_v1_expr(V1::One, "min(7, 42.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(7, 42.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(V1::One, "min(42, 7.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(42, 7.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(V1::One, "min(-42, 7.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(-42, 7.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -42.0);
 
-        let value = eval_v1_expr(V1::One, "min(0, -42.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(0, -42.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -42.0);
 
-        let value = eval_v1_expr(V1::One, "min(0, 42.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(0, 42.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -0.0);
 
-        let value = eval_v1_expr(V1::One, "min(7.0, 42.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(7.0, 42.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(V1::One, "min(42.0, 7.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(42.0, 7.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(V1::One, "min(-42.0, 7.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(-42.0, 7.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -42.0);
 
-        let value = eval_v1_expr(V1::One, "min(0.0, -42.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(0.0, -42.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -42.0);
 
-        let value = eval_v1_expr(V1::One, "min(0.0, 42.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "min(0.0, 42.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -0.0);
 
         let value = eval_v1_expr(
+            &mut env,
             V1::One,
             "min(12345, min(-100, min(54321, 1234.5678)))",
-            &mut types,
-            scope,
         )
         .unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -100.0);
@@ -1352,75 +1369,71 @@ mod test {
 
     #[test]
     fn max() {
-        let scopes = &[Scope::new(None)];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
-        let value = eval_v1_expr(V1::One, "max(7, 42)", &mut types, scope).unwrap();
+        let mut env = TestEnv::default();
+        let value = eval_v1_expr(&mut env, V1::One, "max(7, 42)").unwrap();
         assert_eq!(value.unwrap_integer(), 42);
 
-        let value = eval_v1_expr(V1::One, "max(42, 7)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(42, 7)").unwrap();
         assert_eq!(value.unwrap_integer(), 42);
 
-        let value = eval_v1_expr(V1::One, "max(-42, 7)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(-42, 7)").unwrap();
         assert_eq!(value.unwrap_integer(), 7);
 
-        let value = eval_v1_expr(V1::One, "max(0, -42)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(0, -42)").unwrap();
         assert_eq!(value.unwrap_integer(), 0);
 
-        let value = eval_v1_expr(V1::One, "max(0, 42)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(0, 42)").unwrap();
         assert_eq!(value.unwrap_integer(), 42);
 
-        let value = eval_v1_expr(V1::One, "max(7.0, 42)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(7.0, 42)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 42.0);
 
-        let value = eval_v1_expr(V1::One, "max(42.0, 7)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(42.0, 7)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 42.0);
 
-        let value = eval_v1_expr(V1::One, "max(-42.0, 7)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(-42.0, 7)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(V1::One, "max(0.0, -42)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(0.0, -42)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 0.0);
 
-        let value = eval_v1_expr(V1::One, "max(0.0, 42)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(0.0, 42)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 42.0);
 
-        let value = eval_v1_expr(V1::One, "max(7, 42.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(7, 42.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 42.0);
 
-        let value = eval_v1_expr(V1::One, "max(42, 7.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(42, 7.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 42.0);
 
-        let value = eval_v1_expr(V1::One, "max(-42, 7.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(-42, 7.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(V1::One, "max(0, -42.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(0, -42.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 0.0);
 
-        let value = eval_v1_expr(V1::One, "max(0, 42.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(0, 42.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 42.0);
 
-        let value = eval_v1_expr(V1::One, "max(7.0, 42.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(7.0, 42.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 42.0);
 
-        let value = eval_v1_expr(V1::One, "max(42.0, 7.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(42.0, 7.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 42.0);
 
-        let value = eval_v1_expr(V1::One, "max(-42.0, 7.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(-42.0, 7.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(V1::One, "max(0.0, -42.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(0.0, -42.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 0.0);
 
-        let value = eval_v1_expr(V1::One, "max(0.0, 42.0)", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "max(0.0, 42.0)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 42.0);
 
         let value = eval_v1_expr(
+            &mut env,
             V1::One,
             "max(12345, max(-100, max(54321, 1234.5678)))",
-            &mut types,
-            scope,
         )
         .unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 54321.0);
@@ -1428,187 +1441,113 @@ mod test {
 
     #[test]
     fn find() {
-        let scopes = &[Scope::new(None)];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
-        let diagnostic =
-            eval_v1_expr(V1::Two, "find('foo bar baz', '?')", &mut types, scope).unwrap_err();
+        let mut env = TestEnv::default();
+        let diagnostic = eval_v1_expr(&mut env, V1::Two, "find('foo bar baz', '?')").unwrap_err();
         assert_eq!(
             diagnostic.message(),
             "regex parse error:\n    ?\n    ^\nerror: repetition operator missing expression"
         );
 
-        let value =
-            eval_v1_expr(V1::Two, "find('hello world', 'e..o')", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "find('hello world', 'e..o')").unwrap();
         assert_eq!(value.unwrap_string().as_str(), "ello");
 
-        let value =
-            eval_v1_expr(V1::Two, "find('hello world', 'goodbye')", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "find('hello world', 'goodbye')").unwrap();
         assert!(value.is_none());
 
-        let value = eval_v1_expr(V1::Two, "find('hello\tBob', '\\t')", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "find('hello\tBob', '\\t')").unwrap();
         assert_eq!(value.unwrap_string().as_str(), "\t");
     }
 
     #[test]
     fn matches() {
-        let scopes = &[Scope::new(None)];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
+        let mut env = TestEnv::default();
         let diagnostic =
-            eval_v1_expr(V1::Two, "matches('foo bar baz', '?')", &mut types, scope).unwrap_err();
+            eval_v1_expr(&mut env, V1::Two, "matches('foo bar baz', '?')").unwrap_err();
         assert_eq!(
             diagnostic.message(),
             "regex parse error:\n    ?\n    ^\nerror: repetition operator missing expression"
         );
 
-        let value =
-            eval_v1_expr(V1::Two, "matches('hello world', 'e..o')", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "matches('hello world', 'e..o')").unwrap();
         assert!(value.unwrap_boolean());
 
-        let value = eval_v1_expr(
-            V1::Two,
-            "matches('hello world', 'goodbye')",
-            &mut types,
-            scope,
-        )
-        .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "matches('hello world', 'goodbye')").unwrap();
         assert!(!value.unwrap_boolean());
 
-        let value =
-            eval_v1_expr(V1::Two, "matches('hello\tBob', '\\t')", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "matches('hello\tBob', '\\t')").unwrap();
         assert!(value.unwrap_boolean());
     }
 
     #[test]
     fn sub() {
-        let scopes = &[Scope::new(None)];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
-        let diagnostic = eval_v1_expr(
-            V1::Two,
-            "sub('foo bar baz', '?', 'nope')",
-            &mut types,
-            scope,
-        )
-        .unwrap_err();
+        let mut env = TestEnv::default();
+        let diagnostic =
+            eval_v1_expr(&mut env, V1::Two, "sub('foo bar baz', '?', 'nope')").unwrap_err();
         assert_eq!(
             diagnostic.message(),
             "regex parse error:\n    ?\n    ^\nerror: repetition operator missing expression"
         );
 
-        let value = eval_v1_expr(
-            V1::Two,
-            "sub('hello world', 'e..o', 'ey there')",
-            &mut types,
-            scope,
-        )
-        .unwrap();
+        let value =
+            eval_v1_expr(&mut env, V1::Two, "sub('hello world', 'e..o', 'ey there')").unwrap();
         assert_eq!(value.unwrap_string().as_str(), "hey there world");
 
-        let value = eval_v1_expr(
-            V1::Two,
-            "sub('hello world', 'goodbye', 'nope')",
-            &mut types,
-            scope,
-        )
-        .unwrap();
+        let value =
+            eval_v1_expr(&mut env, V1::Two, "sub('hello world', 'goodbye', 'nope')").unwrap();
         assert_eq!(value.unwrap_string().as_str(), "hello world");
 
-        let value =
-            eval_v1_expr(V1::Two, "sub('hello\tBob', '\\t', ' ')", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "sub('hello\tBob', '\\t', ' ')").unwrap();
         assert_eq!(value.unwrap_string().as_str(), "hello Bob");
     }
 
     #[test]
     fn basename() {
-        let scopes = &[Scope::new(None)];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
-        let value =
-            eval_v1_expr(V1::Two, "basename('/path/to/file.txt')", &mut types, scope).unwrap();
+        let mut env = TestEnv::default();
+        let value = eval_v1_expr(&mut env, V1::Two, "basename('/path/to/file.txt')").unwrap();
         assert_eq!(value.unwrap_string().as_str(), "file.txt");
 
-        let value = eval_v1_expr(
-            V1::Two,
-            "basename('/path/to/file.txt', '.txt')",
-            &mut types,
-            scope,
-        )
-        .unwrap();
+        let value =
+            eval_v1_expr(&mut env, V1::Two, "basename('/path/to/file.txt', '.txt')").unwrap();
         assert_eq!(value.unwrap_string().as_str(), "file");
 
-        let value = eval_v1_expr(V1::Two, "basename('/path/to/dir')", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "basename('/path/to/dir')").unwrap();
         assert_eq!(value.unwrap_string().as_str(), "dir");
 
-        let value = eval_v1_expr(V1::Two, "basename('file.txt')", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "basename('file.txt')").unwrap();
         assert_eq!(value.unwrap_string().as_str(), "file.txt");
 
-        let value =
-            eval_v1_expr(V1::Two, "basename('file.txt', '.txt')", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "basename('file.txt', '.txt')").unwrap();
         assert_eq!(value.unwrap_string().as_str(), "file");
     }
 
     #[test]
     fn join_paths() {
-        let scopes = &[Scope::new(None)];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
-        let value = eval_v1_expr(
-            V1::Two,
-            "join_paths('/usr', ['bin', 'echo'])",
-            &mut types,
-            scope,
-        )
-        .unwrap();
+        let mut env = TestEnv::default();
+        let value = eval_v1_expr(&mut env, V1::Two, "join_paths('/usr', ['bin', 'echo'])").unwrap();
         assert_eq!(value.unwrap_file().as_str(), "/usr/bin/echo");
 
-        let value = eval_v1_expr(
-            V1::Two,
-            "join_paths(['/usr', 'bin', 'echo'])",
-            &mut types,
-            scope,
-        )
-        .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "join_paths(['/usr', 'bin', 'echo'])").unwrap();
         assert_eq!(value.unwrap_file().as_str(), "/usr/bin/echo");
 
-        let value = eval_v1_expr(
-            V1::Two,
-            "join_paths('mydir', 'mydata.txt')",
-            &mut types,
-            scope,
-        )
-        .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "join_paths('mydir', 'mydata.txt')").unwrap();
         assert_eq!(value.unwrap_file().as_str(), "mydir/mydata.txt");
 
-        let value =
-            eval_v1_expr(V1::Two, "join_paths('/usr', 'bin/echo')", &mut types, scope).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "join_paths('/usr', 'bin/echo')").unwrap();
         assert_eq!(value.unwrap_file().as_str(), "/usr/bin/echo");
 
         #[cfg(unix)]
         {
-            let diagnostic = eval_v1_expr(
-                V1::Two,
-                "join_paths('/usr', '/bin/echo')",
-                &mut types,
-                scope,
-            )
-            .unwrap_err();
+            let diagnostic =
+                eval_v1_expr(&mut env, V1::Two, "join_paths('/usr', '/bin/echo')").unwrap_err();
             assert_eq!(
                 diagnostic.message(),
                 "path is required to be a relative path, but an absolute path was provided"
             );
 
             let diagnostic = eval_v1_expr(
+                &mut env,
                 V1::Two,
                 "join_paths('/usr', ['foo', '/bin/echo'])",
-                &mut types,
-                scope,
             )
             .unwrap_err();
             assert_eq!(
@@ -1618,10 +1557,9 @@ mod test {
             );
 
             let diagnostic = eval_v1_expr(
+                &mut env,
                 V1::Two,
                 "join_paths(['/usr', 'foo', '/bin/echo'])",
-                &mut types,
-                scope,
             )
             .unwrap_err();
             assert_eq!(
@@ -1633,23 +1571,18 @@ mod test {
 
         #[cfg(windows)]
         {
-            let diagnostic = eval_v1_expr(
-                V1::Two,
-                "join_paths('C:\\usr', 'C:\\bin\\echo')",
-                &mut types,
-                scope,
-            )
-            .unwrap_err();
+            let diagnostic =
+                eval_v1_expr(&mut env, V1::Two, "join_paths('C:\\usr', 'C:\\bin\\echo')")
+                    .unwrap_err();
             assert_eq!(
                 diagnostic.message(),
                 "path is required to be a relative path, but an absolute path was provided"
             );
 
             let diagnostic = eval_v1_expr(
+                &mut env,
                 V1::Two,
                 "join_paths('C:\\usr', ['foo', 'C:\\bin\\echo'])",
-                &mut types,
-                scope,
             )
             .unwrap_err();
             assert_eq!(
@@ -1659,10 +1592,9 @@ mod test {
             );
 
             let diagnostic = eval_v1_expr(
+                &mut env,
                 V1::Two,
                 "join_paths(['C:\\usr', 'foo', 'C:\\bin\\echo'])",
-                &mut types,
-                scope,
             )
             .unwrap_err();
             assert_eq!(
@@ -1675,29 +1607,22 @@ mod test {
 
     #[test]
     fn glob() {
-        let scopes = &[Scope::new(None)];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
-        let diagnostic =
-            eval_v1_expr(V1::Two, "glob('invalid***')", &mut types, scope).unwrap_err();
+        let mut env = TestEnv::default();
+        let diagnostic = eval_v1_expr(&mut env, V1::Two, "glob('invalid***')").unwrap_err();
         assert_eq!(
             diagnostic.message(),
             "invalid glob pattern specified: wildcards are either regular `*` or recursive `**`"
         );
 
-        let dir = tempfile::tempdir().expect("should create temp directory");
+        env.write_file("qux", "qux");
+        env.write_file("baz", "baz");
+        env.write_file("foo", "foo");
+        env.write_file("bar", "bar");
+        fs::create_dir_all(env.cwd().join("nested")).expect("failed to create directory");
+        env.write_file("nested/bar", "bar");
+        env.write_file("nested/baz", "baz");
 
-        fs::write(dir.path().join("qux"), "qux").expect("should create temp file");
-        fs::write(dir.path().join("baz"), "baz").expect("should create temp file");
-        fs::write(dir.path().join("foo"), "foo").expect("should create temp file");
-        fs::write(dir.path().join("bar"), "bar").expect("should create temp file");
-        fs::create_dir_all(dir.path().join("nested")).expect("should create directory");
-        fs::write(dir.path().join("nested/bar"), "bar").expect("should create temp file");
-        fs::write(dir.path().join("nested/baz"), "bar").expect("should create temp file");
-
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "glob('jam')", &mut types, scope, dir.path()).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "glob('jam')").unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -1707,8 +1632,7 @@ mod test {
             .collect();
         assert!(elements.is_empty());
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "glob('*')", &mut types, scope, dir.path()).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "glob('*')").unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -1718,8 +1642,7 @@ mod test {
             .collect();
         assert_eq!(elements, ["bar", "baz", "foo", "qux"]);
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "glob('ba?')", &mut types, scope, dir.path()).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "glob('ba?')").unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -1729,8 +1652,7 @@ mod test {
             .collect();
         assert_eq!(elements, ["bar", "baz"]);
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "glob('b*')", &mut types, scope, dir.path()).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "glob('b*')").unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -1740,8 +1662,7 @@ mod test {
             .collect();
         assert_eq!(elements, ["bar", "baz"]);
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "glob('**/b*')", &mut types, scope, dir.path()).unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "glob('**/b*')").unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -1754,59 +1675,41 @@ mod test {
 
     #[test]
     fn size() {
-        let dir = tempfile::tempdir().expect("should create temp directory");
+        let mut env = TestEnv::default();
 
         // 10 byte file
-        fs::write(dir.path().join("foo"), "0123456789").expect("should create temp file");
+        env.write_file("foo", "0123456789");
         // 20 byte file
-        fs::write(dir.path().join("bar"), "01234567890123456789").expect("should create temp file");
+        env.write_file("bar", "01234567890123456789");
         // 30 byte file
-        fs::write(dir.path().join("baz"), "012345678901234567890123456789")
-            .expect("should create temp file");
+        env.write_file("baz", "012345678901234567890123456789");
 
-        let mut scope = Scope::new(None);
-        scope.insert(
+        env.insert_name(
             "file",
-            PrimitiveValue::new_file(dir.path().join("bar").to_str().expect("should be UTF-8")),
+            PrimitiveValue::new_file(env.cwd().join("bar").to_str().expect("should be UTF-8")),
         );
-        scope.insert(
+        env.insert_name(
             "dir",
-            PrimitiveValue::new_directory(dir.path().to_str().expect("should be UTF-8")),
+            PrimitiveValue::new_directory(env.cwd().to_str().expect("should be UTF-8")),
         );
-        let scopes = &[scope];
-        let scope = ScopeRef::new(scopes, 0);
 
-        let mut types = Types::default();
-        let diagnostic =
-            eval_v1_expr(V1::Two, "size('foo', 'invalid')", &mut types, scope).unwrap_err();
+        let diagnostic = eval_v1_expr(&mut env, V1::Two, "size('foo', 'invalid')").unwrap_err();
         assert_eq!(
             diagnostic.message(),
             "invalid storage unit `invalid`; supported units are `B`, `KB`, `K`, `MB`, `M`, `GB`, \
              `G`, `TB`, `T`, `KiB`, `Ki`, `MiB`, `Mi`, `GiB`, `Gi`, `TiB`, and `Ti`"
         );
 
-        let diagnostic = eval_v1_expr_with_cwd(
-            V1::Two,
-            "size('does-not-exist', 'B')",
-            &mut types,
-            scope,
-            dir.path(),
-        )
-        .unwrap_err();
+        let diagnostic =
+            eval_v1_expr(&mut env, V1::Two, "size('does-not-exist', 'B')").unwrap_err();
         assert!(
             diagnostic
                 .message()
                 .starts_with("call to function `size` failed: failed to read metadata for file")
         );
 
-        let value = eval_v1_expr_with_cwd(
-            V1::Two,
-            &format!("size('{path}', 'B')", path = dir.path().display()),
-            &mut types,
-            scope,
-            dir.path(),
-        )
-        .unwrap();
+        let source = format!("size('{path}', 'B')", path = env.cwd().display());
+        let value = eval_v1_expr(&mut env, V1::Two, &source).unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 60.0);
 
         for (expected, unit) in [
@@ -1828,67 +1731,37 @@ mod test {
             (0.000000000009094947017729282, "Ti"),
             (0.000000000009094947017729282, "TiB"),
         ] {
-            let value = eval_v1_expr_with_cwd(
-                V1::Two,
-                &format!("size('foo', '{unit}')"),
-                &mut types,
-                scope,
-                dir.path(),
-            )
-            .unwrap();
+            let value = eval_v1_expr(&mut env, V1::Two, &format!("size('foo', '{unit}')")).unwrap();
             approx::assert_relative_eq!(value.unwrap_float(), expected);
         }
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "size(None, 'B')", &mut types, scope, dir.path())
-                .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "size(None, 'B')").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 0.0);
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "size(file, 'B')", &mut types, scope, dir.path())
-                .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "size(file, 'B')").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 20.0);
 
-        let value = eval_v1_expr_with_cwd(V1::Two, "size(dir, 'B')", &mut types, scope, dir.path())
-            .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "size(dir, 'B')").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 60.0);
 
-        let value = eval_v1_expr_with_cwd(
-            V1::Two,
-            "size((dir, dir), 'B')",
-            &mut types,
-            scope,
-            dir.path(),
-        )
-        .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "size((dir, dir), 'B')").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 120.0);
 
-        let value = eval_v1_expr_with_cwd(
-            V1::Two,
-            "size([file, file, file], 'B')",
-            &mut types,
-            scope,
-            dir.path(),
-        )
-        .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "size([file, file, file], 'B')").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 60.0);
 
-        let value = eval_v1_expr_with_cwd(
+        let value = eval_v1_expr(
+            &mut env,
             V1::Two,
             "size({ 'a': file, 'b': file, 'c': file }, 'B')",
-            &mut types,
-            scope,
-            dir.path(),
         )
         .unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 60.0);
 
-        let value = eval_v1_expr_with_cwd(
+        let value = eval_v1_expr(
+            &mut env,
             V1::Two,
             "size(object { a: file, b: file, c: file }, 'B')",
-            &mut types,
-            scope,
-            dir.path(),
         )
         .unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 60.0);
@@ -1896,271 +1769,180 @@ mod test {
 
     #[test]
     fn stdout() {
-        let scopes = &[Scope::new(None)];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
-        let diagnostic = eval_v1_expr(V1::Two, "stdout()", &mut types, scope).unwrap_err();
+        let mut env = TestEnv::default();
+        let diagnostic = eval_v1_expr(&mut env, V1::Two, "stdout()").unwrap_err();
         assert_eq!(
             diagnostic.message(),
             "call to function `stdout` failed: function may only be called in a task output \
              section"
         );
 
-        let mut context = TestEvaluationContext::new(
-            SupportedVersion::V1(V1::Zero),
-            &mut types,
-            scope,
-            Path::new(""),
+        let value = eval_v1_expr_with_stdio(
+            &mut env,
+            V1::Zero,
+            "stdout()",
+            PrimitiveValue::new_file("stdout.txt"),
+            PrimitiveValue::new_file("stderr.txt"),
         )
-        .with_stdout(PrimitiveValue::new_file("stdout.txt"));
-
-        let value = eval_v1_expr_with_context("stdout()", &mut context).unwrap();
+        .unwrap();
         assert_eq!(value.unwrap_file().as_str(), "stdout.txt");
     }
 
     #[test]
     fn stderr() {
-        let scopes = &[Scope::new(None)];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
-        let diagnostic = eval_v1_expr(V1::Two, "stderr()", &mut types, scope).unwrap_err();
+        let mut env = TestEnv::default();
+        let diagnostic = eval_v1_expr(&mut env, V1::Two, "stderr()").unwrap_err();
         assert_eq!(
             diagnostic.message(),
             "call to function `stderr` failed: function may only be called in a task output \
              section"
         );
 
-        let mut context = TestEvaluationContext::new(
-            SupportedVersion::V1(V1::Zero),
-            &mut types,
-            scope,
-            Path::new(""),
+        let value = eval_v1_expr_with_stdio(
+            &mut env,
+            V1::Zero,
+            "stderr()",
+            PrimitiveValue::new_file("stdout.txt"),
+            PrimitiveValue::new_file("stderr.txt"),
         )
-        .with_stderr(PrimitiveValue::new_file("stderr.txt"));
-
-        let value = eval_v1_expr_with_context("stderr()", &mut context).unwrap();
+        .unwrap();
         assert_eq!(value.unwrap_file().as_str(), "stderr.txt");
     }
 
     #[test]
     fn read_string() {
-        let dir = tempfile::tempdir().expect("should create temp directory");
-
-        fs::write(dir.path().join("foo"), "hello\nworld!\n\r\n").expect("should create temp file");
-
-        let mut scope = Scope::new(None);
-        scope.insert(
+        let mut env = TestEnv::default();
+        env.write_file("foo", "hello\nworld!\n\r\n");
+        env.insert_name(
             "file",
-            PrimitiveValue::new_file(dir.path().join("foo").to_str().expect("should be UTF-8")),
+            PrimitiveValue::new_file(env.cwd().join("foo").to_str().expect("should be UTF-8")),
         );
-        let scopes = &[scope];
-        let scope = ScopeRef::new(scopes, 0);
 
-        let mut types = Types::default();
         let diagnostic =
-            eval_v1_expr(V1::Two, "read_string('does-not-exist')", &mut types, scope).unwrap_err();
+            eval_v1_expr(&mut env, V1::Two, "read_string('does-not-exist')").unwrap_err();
         assert!(
             diagnostic
                 .message()
                 .starts_with("call to function `read_string` failed: failed to read file")
         );
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "read_string('foo')", &mut types, scope, dir.path())
-                .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "read_string('foo')").unwrap();
         assert_eq!(value.unwrap_string().as_str(), "hello\nworld!");
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "read_string(file)", &mut types, scope, dir.path())
-                .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "read_string(file)").unwrap();
         assert_eq!(value.unwrap_string().as_str(), "hello\nworld!");
     }
 
     #[test]
     fn read_int() {
-        let dir = tempfile::tempdir().expect("should create temp directory");
+        let mut env = TestEnv::default();
+        env.write_file("foo", "12345 hello world!");
+        env.write_file("bar", "\n\t\t12345   \n");
+        env.insert_name("file", PrimitiveValue::new_file("bar"));
 
-        fs::write(dir.path().join("foo"), "12345 hello world!").expect("should create temp file");
-        fs::write(dir.path().join("bar"), "\n\t\t12345   \n").expect("should create temp file");
-
-        let mut scope = Scope::new(None);
-        scope.insert("file", PrimitiveValue::new_file("bar"));
-        let scopes = &[scope];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
-        let diagnostic =
-            eval_v1_expr(V1::Two, "read_int('does-not-exist')", &mut types, scope).unwrap_err();
+        let diagnostic = eval_v1_expr(&mut env, V1::Two, "read_int('does-not-exist')").unwrap_err();
         assert!(
             diagnostic
                 .message()
                 .starts_with("call to function `read_int` failed: failed to read file")
         );
 
-        let diagnostic =
-            eval_v1_expr_with_cwd(V1::Two, "read_int('foo')", &mut types, scope, dir.path())
-                .unwrap_err();
+        let diagnostic = eval_v1_expr(&mut env, V1::Two, "read_int('foo')").unwrap_err();
         assert!(
             diagnostic
                 .message()
                 .contains("does not contain a single integer value")
         );
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "read_int('bar')", &mut types, scope, dir.path())
-                .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "read_int('bar')").unwrap();
         assert_eq!(value.unwrap_integer(), 12345);
 
-        let value = eval_v1_expr_with_cwd(V1::Two, "read_int(file)", &mut types, scope, dir.path())
-            .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "read_int(file)").unwrap();
         assert_eq!(value.unwrap_integer(), 12345);
     }
 
     #[test]
     fn read_float() {
-        let dir = tempfile::tempdir().expect("should create temp directory");
+        let mut env = TestEnv::default();
+        env.write_file("foo", "12345.6789 hello world!");
+        env.write_file("bar", "\n\t\t12345.6789   \n");
+        env.insert_name("file", PrimitiveValue::new_file("bar"));
 
-        fs::write(dir.path().join("foo"), "12345.6789 hello world!")
-            .expect("should create temp file");
-        fs::write(dir.path().join("bar"), "\n\t\t12345.6789   \n")
-            .expect("should create temp file");
-
-        let mut scope = Scope::new(None);
-        scope.insert("file", PrimitiveValue::new_file("bar"));
-        let scopes = &[scope];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
         let diagnostic =
-            eval_v1_expr(V1::Two, "read_float('does-not-exist')", &mut types, scope).unwrap_err();
+            eval_v1_expr(&mut env, V1::Two, "read_float('does-not-exist')").unwrap_err();
         assert!(
             diagnostic
                 .message()
                 .starts_with("call to function `read_float` failed: failed to read file")
         );
 
-        let diagnostic =
-            eval_v1_expr_with_cwd(V1::Two, "read_float('foo')", &mut types, scope, dir.path())
-                .unwrap_err();
+        let diagnostic = eval_v1_expr(&mut env, V1::Two, "read_float('foo')").unwrap_err();
         assert!(
             diagnostic
                 .message()
                 .contains("does not contain a single float value")
         );
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "read_float('bar')", &mut types, scope, dir.path())
-                .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "read_float('bar')").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 12345.6789);
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "read_float(file)", &mut types, scope, dir.path())
-                .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "read_float(file)").unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 12345.6789);
     }
 
     #[test]
     fn read_boolean() {
-        let dir = tempfile::tempdir().expect("should create temp directory");
+        let mut env = TestEnv::default();
+        env.write_file("foo", "true false hello world!");
+        env.write_file("bar", "\n\t\tTrUe   \n");
+        env.write_file("baz", "\n\t\tfalse   \n");
+        env.insert_name("t", PrimitiveValue::new_file("bar"));
+        env.insert_name("f", PrimitiveValue::new_file("baz"));
 
-        fs::write(dir.path().join("foo"), "true false hello world!")
-            .expect("should create temp file");
-        fs::write(dir.path().join("bar"), "\n\t\tTrUe   \n").expect("should create temp file");
-        fs::write(dir.path().join("baz"), "\n\t\tfalse   \n").expect("should create temp file");
-
-        let mut scope = Scope::new(None);
-        scope.insert("t", PrimitiveValue::new_file("bar"));
-        scope.insert("f", PrimitiveValue::new_file("baz"));
-        let scopes = &[scope];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
         let diagnostic =
-            eval_v1_expr(V1::Two, "read_boolean('does-not-exist')", &mut types, scope).unwrap_err();
+            eval_v1_expr(&mut env, V1::Two, "read_boolean('does-not-exist')").unwrap_err();
         assert!(
             diagnostic
                 .message()
                 .starts_with("call to function `read_boolean` failed: failed to read file")
         );
 
-        let diagnostic = eval_v1_expr_with_cwd(
-            V1::Two,
-            "read_boolean('foo')",
-            &mut types,
-            scope,
-            dir.path(),
-        )
-        .unwrap_err();
+        let diagnostic = eval_v1_expr(&mut env, V1::Two, "read_boolean('foo')").unwrap_err();
         assert!(
             diagnostic
                 .message()
                 .contains("does not contain a single boolean value")
         );
 
-        let value = eval_v1_expr_with_cwd(
-            V1::Two,
-            "read_boolean('bar')",
-            &mut types,
-            scope,
-            dir.path(),
-        )
-        .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "read_boolean('bar')").unwrap();
         assert!(value.unwrap_boolean());
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "read_boolean(t)", &mut types, scope, dir.path())
-                .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "read_boolean(t)").unwrap();
         assert!(value.unwrap_boolean());
 
-        let value = eval_v1_expr_with_cwd(
-            V1::Two,
-            "read_boolean('baz')",
-            &mut types,
-            scope,
-            dir.path(),
-        )
-        .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "read_boolean('baz')").unwrap();
         assert!(!value.unwrap_boolean());
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "read_boolean(f)", &mut types, scope, dir.path())
-                .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "read_boolean(f)").unwrap();
         assert!(!value.unwrap_boolean());
     }
 
     #[test]
     fn read_lines() {
-        let dir = tempfile::tempdir().expect("should create temp directory");
+        let mut env = TestEnv::default();
+        env.write_file("foo", "\nhello!\nworld!\n\r\nhi!\r\nthere!");
+        env.write_file("empty", "");
+        env.insert_name("file", PrimitiveValue::new_file("foo"));
 
-        fs::write(
-            dir.path().join("foo"),
-            "\nhello!\nworld!\n\r\nhi!\r\nthere!",
-        )
-        .expect("should create temp file");
-        fs::write(dir.path().join("empty"), "").expect("should create temp file");
-
-        let mut scope = Scope::new(None);
-        scope.insert(
-            "file",
-            PrimitiveValue::new_file(dir.path().join("foo").to_str().expect("should be UTF-8")),
-        );
-        let scopes = &[scope];
-        let scope = ScopeRef::new(scopes, 0);
-
-        let mut types = Types::default();
         let diagnostic =
-            eval_v1_expr(V1::Two, "read_lines('does-not-exist')", &mut types, scope).unwrap_err();
+            eval_v1_expr(&mut env, V1::Two, "read_lines('does-not-exist')").unwrap_err();
         assert!(
             diagnostic
                 .message()
                 .starts_with("call to function `read_lines` failed: failed to open file")
         );
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "read_lines('foo')", &mut types, scope, dir.path())
-                .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "read_lines('foo')").unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -2170,9 +1952,7 @@ mod test {
             .collect();
         assert_eq!(elements, ["", "hello!", "world!", "", "hi!", "there!"]);
 
-        let value =
-            eval_v1_expr_with_cwd(V1::Two, "read_lines(file)", &mut types, scope, dir.path())
-                .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "read_lines(file)").unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -2182,14 +1962,45 @@ mod test {
             .collect();
         assert_eq!(elements, ["", "hello!", "world!", "", "hi!", "there!"]);
 
-        let value = eval_v1_expr_with_cwd(
+        let value = eval_v1_expr(&mut env, V1::Two, "read_lines('empty')").unwrap();
+        assert!(value.unwrap_array().elements().is_empty());
+    }
+
+    #[test]
+    fn write_lines() {
+        let mut env = TestEnv::default();
+
+        let value = eval_v1_expr(&mut env, V1::Two, "write_lines([])").unwrap();
+        assert!(
+            value
+                .as_file()
+                .expect("should be file")
+                .as_str()
+                .starts_with(env.tmp().to_str().expect("should be UTF-8")),
+            "file should be in temp directory"
+        );
+        assert_eq!(
+            fs::read_to_string(value.unwrap_file().as_str()).expect("failed to read file"),
+            "",
+        );
+
+        let value = eval_v1_expr(
+            &mut env,
             V1::Two,
-            "read_lines('empty')",
-            &mut types,
-            scope,
-            dir.path(),
+            "write_lines(['hello', 'world', '!\n', '!'])",
         )
         .unwrap();
-        assert!(value.unwrap_array().elements().is_empty());
+        assert!(
+            value
+                .as_file()
+                .expect("should be file")
+                .as_str()
+                .starts_with(env.tmp().to_str().expect("should be UTF-8")),
+            "file should be in temp directory"
+        );
+        assert_eq!(
+            fs::read_to_string(value.unwrap_file().as_str()).expect("failed to read file"),
+            "hello\nworld\n!\n\n!\n"
+        );
     }
 }
