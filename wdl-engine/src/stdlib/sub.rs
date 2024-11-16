@@ -53,6 +53,7 @@ pub const fn descriptor() -> Function {
 
 #[cfg(test)]
 mod test {
+    use pretty_assertions::assert_eq;
     use wdl_ast::version::V1;
 
     use crate::v1::test::TestEnv;

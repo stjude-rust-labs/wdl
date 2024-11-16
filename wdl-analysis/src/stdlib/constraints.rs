@@ -114,6 +114,27 @@ impl Constraint for StructConstraint {
     }
 }
 
+/// Represents a constraint that ensures the type is any structure that contains
+/// only primitive types.
+#[derive(Debug, Copy, Clone)]
+pub struct PrimitiveStructConstraint;
+
+impl Constraint for PrimitiveStructConstraint {
+    fn description(&self) -> &'static str {
+        "any structure containing only primitive types"
+    }
+
+    fn satisfied(&self, types: &Types, ty: Type) -> bool {
+        if let Type::Compound(ty) = ty {
+            if let CompoundTypeDef::Struct(s) = types.type_definition(ty.definition()) {
+                return s.members().values().all(|ty| ty.as_primitive().is_some());
+            }
+        }
+
+        false
+    }
+}
+
 /// Represents a constraint that ensures the type is JSON serializable.
 #[derive(Debug, Copy, Clone)]
 pub struct JsonSerializableConstraint;

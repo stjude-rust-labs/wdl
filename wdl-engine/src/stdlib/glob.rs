@@ -86,6 +86,7 @@ pub const fn descriptor() -> Function {
 mod test {
     use std::fs;
 
+    use pretty_assertions::assert_eq;
     use wdl_ast::version::V1;
 
     use crate::v1::test::TestEnv;

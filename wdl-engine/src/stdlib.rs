@@ -8,6 +8,7 @@ use wdl_analysis::stdlib::Binding;
 use wdl_analysis::stdlib::STDLIB as ANALYSIS_STDLIB;
 use wdl_analysis::types::Type;
 use wdl_analysis::types::TypeEq;
+use wdl_analysis::types::Types;
 use wdl_ast::Diagnostic;
 use wdl_ast::Span;
 
@@ -36,6 +37,7 @@ mod stderr;
 mod stdout;
 mod sub;
 mod write_lines;
+mod write_tsv;
 
 /// Represents a function call argument.
 pub struct CallArgument {
@@ -86,6 +88,11 @@ impl<'a> CallContext<'a> {
             arguments,
             return_type,
         }
+    }
+
+    /// Gets the types collection associated with the call.
+    pub fn types(&self) -> &Types {
+        self.context.types()
     }
 
     /// Gets the current working directory for the call.
@@ -253,6 +260,11 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
     assert!(
         functions
             .insert("read_tsv", read_tsv::descriptor())
+            .is_none()
+    );
+    assert!(
+        functions
+            .insert("write_tsv", write_tsv::descriptor())
             .is_none()
     );
 

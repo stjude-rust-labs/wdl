@@ -2189,11 +2189,13 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .ret(array_array_string)
                         .build(),
                     FunctionSignature::builder()
+                        .min_version(SupportedVersion::V1(V1::Two))
                         .parameter(PrimitiveTypeKind::File)
                         .parameter(PrimitiveTypeKind::Boolean)
                         .ret(array_object)
                         .build(),
                     FunctionSignature::builder()
+                        .min_version(SupportedVersion::V1(V1::Two))
                         .parameter(PrimitiveTypeKind::File)
                         .parameter(PrimitiveTypeKind::Boolean)
                         .parameter(array_string)
@@ -2216,18 +2218,16 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .ret(PrimitiveTypeKind::File)
                         .build(),
                     FunctionSignature::builder()
-                        .type_parameter("S", StructConstraint)
-                        .parameter(GenericArrayType::new(GenericType::Parameter("S")))
-                        .ret(PrimitiveTypeKind::File)
-                        .build(),
-                    FunctionSignature::builder()
+                        .min_version(SupportedVersion::V1(V1::Two))
                         .parameter(array_array_string)
                         .parameter(PrimitiveTypeKind::Boolean)
                         .parameter(array_string)
                         .ret(PrimitiveTypeKind::File)
                         .build(),
                     FunctionSignature::builder()
-                        .type_parameter("S", StructConstraint)
+                        .min_version(SupportedVersion::V1(V1::Two))
+                        .type_parameter("S", PrimitiveStructConstraint)
+                        .required(1)
                         .parameter(GenericArrayType::new(GenericType::Parameter("S")))
                         .parameter(PrimitiveTypeKind::Boolean)
                         .parameter(array_string)
@@ -2347,7 +2347,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .ret(PrimitiveTypeKind::File)
                         .build(),
                     FunctionSignature::builder()
-                        .type_parameter("S", StructConstraint)
+                        .type_parameter("S", PrimitiveStructConstraint)
                         .parameter(GenericType::Parameter("S"))
                         .ret(PrimitiveTypeKind::File)
                         .build(),
@@ -2368,7 +2368,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .ret(PrimitiveTypeKind::File)
                         .build(),
                     FunctionSignature::builder()
-                        .type_parameter("S", StructConstraint)
+                        .type_parameter("S", PrimitiveStructConstraint)
                         .parameter(GenericArrayType::new(GenericType::Parameter("S")))
                         .ret(PrimitiveTypeKind::File)
                         .build(),
@@ -2992,9 +2992,9 @@ mod test {
             "read_tsv(File, Boolean) -> Array[Object]",
             "read_tsv(File, Boolean, Array[String]) -> Array[Object]",
             "write_tsv(Array[Array[String]]) -> File",
-            "write_tsv(Array[S]) -> File where `S`: any structure",
             "write_tsv(Array[Array[String]], Boolean, Array[String]) -> File",
-            "write_tsv(Array[S], Boolean, Array[String]) -> File where `S`: any structure",
+            "write_tsv(Array[S], <Boolean>, <Array[String]>) -> File where `S`: any structure \
+             containing only primitive types",
             "read_map(File) -> Map[String, String]",
             "write_map(Map[String, String]) -> File",
             "read_json(File) -> Union",
@@ -3002,9 +3002,10 @@ mod test {
             "read_object(File) -> Object",
             "read_objects(File) -> Array[Object]",
             "write_object(Object) -> File",
-            "write_object(S) -> File where `S`: any structure",
+            "write_object(S) -> File where `S`: any structure containing only primitive types",
             "write_objects(Array[Object]) -> File",
-            "write_objects(Array[S]) -> File where `S`: any structure",
+            "write_objects(Array[S]) -> File where `S`: any structure containing only primitive \
+             types",
             "prefix(String, Array[P]) -> Array[String] where `P`: any required primitive type",
             "suffix(String, Array[P]) -> Array[String] where `P`: any required primitive type",
             "quote(Array[P]) -> Array[String] where `P`: any required primitive type",

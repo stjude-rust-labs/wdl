@@ -4,6 +4,7 @@ use std::io::BufWriter;
 use std::io::Write;
 use std::path::Path;
 
+use tempfile::NamedTempFile;
 use wdl_analysis::stdlib::STDLIB as ANALYSIS_STDLIB;
 use wdl_analysis::types::PrimitiveTypeKind;
 use wdl_ast::Diagnostic;
@@ -41,7 +42,7 @@ fn write_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .unwrap_array();
 
     // Create a temporary file that will be persisted after writing the lines
-    let mut file = tempfile::NamedTempFile::new_in(context.tmp()).map_err(|e| {
+    let mut file = NamedTempFile::new_in(context.tmp()).map_err(|e| {
         function_call_failed(
             "write_lines",
             format!("failed to create temporary file: {e}"),
@@ -53,7 +54,7 @@ fn write_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     let mut writer = BufWriter::new(file.as_file_mut());
     for line in lines.elements() {
         writer
-            .write(line.as_string().unwrap().as_str().as_bytes())
+            .write(line.as_string().unwrap().as_bytes())
             .map_err(write_error)?;
         writer.write(b"\n").map_err(write_error)?;
     }
@@ -95,6 +96,7 @@ pub const fn descriptor() -> Function {
 mod test {
     use std::fs;
 
+    use pretty_assertions::assert_eq;
     use wdl_ast::version::V1;
 
     use crate::v1::test::TestEnv;
