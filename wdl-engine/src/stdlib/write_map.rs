@@ -1,4 +1,4 @@
-//! Implements the `write_lines` function from the WDL standard library.
+//! Implements the `write_map` function from the WDL standard library.
 
 use std::io::BufWriter;
 use std::io::Write;
@@ -16,32 +16,35 @@ use crate::PrimitiveValue;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
 
-/// Writes a file with one line for each element in a Array[String].
+/// Writes a tab-separated value (TSV) file with one line for each element in a
+/// Map[String, String].
 ///
-/// All lines are terminated by the newline (\n) character (following the POSIX
-/// standard).
+/// Each element is concatenated into a single tab-delimited string of the
+/// format ~{key}\t~{value}.
 ///
-/// If the Array is empty, an empty file is written.
+/// Each line is terminated by the newline (\n) character.
 ///
-/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#write_lines
-fn write_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+/// If the Map is empty, an empty file is written.
+///
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#write_map
+fn write_map(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert!(context.arguments.len() == 1);
     debug_assert!(context.return_type_eq(PrimitiveTypeKind::File));
 
     // Helper for handling errors while writing to the file.
     let write_error = |e: std::io::Error| {
         function_call_failed(
-            "write_lines",
+            "write_map",
             format!("failed to write to temporary file: {e}"),
             context.call_site,
         )
     };
 
-    let lines = context
-        .coerce_argument(0, ANALYSIS_STDLIB.array_string_type())
-        .unwrap_array();
+    let map = context
+        .coerce_argument(0, ANALYSIS_STDLIB.map_string_string_type())
+        .unwrap_map();
 
-    // Create a temporary file that will be persisted after writing the lines
+    // Create a temporary file that will be persisted after writing the map
     let mut file = NamedTempFile::new_in(context.tmp()).map_err(|e| {
         function_call_failed(
             "write_lines",
@@ -52,11 +55,14 @@ fn write_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
     // Write the lines
     let mut writer = BufWriter::new(file.as_file_mut());
-    for line in lines.elements() {
-        writer
-            .write(line.as_string().unwrap().as_bytes())
-            .map_err(write_error)?;
-        writeln!(&mut writer).map_err(write_error)?;
+    for (key, value) in map.elements() {
+        writeln!(
+            &mut writer,
+            "{key}\t{value}",
+            key = key.as_string().unwrap(),
+            value = value.as_string().unwrap()
+        )
+        .map_err(write_error)?;
     }
 
     // Consume the writer, flushing the buffer to disk.
@@ -87,9 +93,9 @@ fn write_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     )
 }
 
-/// Gets the function describing `write_lines`.
+/// Gets the function describing `write_map`.
 pub const fn descriptor() -> Function {
-    Function::new(const { &[Signature::new("(Array[String]) -> File", write_lines)] })
+    Function::new(const { &[Signature::new("(Map[String, String]) -> File", write_map)] })
 }
 
 #[cfg(test)]
@@ -103,10 +109,10 @@ mod test {
     use crate::v1::test::eval_v1_expr;
 
     #[test]
-    fn write_lines() {
+    fn write_map() {
         let mut env = TestEnv::default();
 
-        let value = eval_v1_expr(&mut env, V1::Two, "write_lines([])").unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "write_map({})").unwrap();
         assert!(
             value
                 .as_file()
@@ -120,12 +126,7 @@ mod test {
             "",
         );
 
-        let value = eval_v1_expr(
-            &mut env,
-            V1::Two,
-            "write_lines(['hello', 'world', '!\n', '!'])",
-        )
-        .unwrap();
+        let value = eval_v1_expr(&mut env, V1::Two, "write_map({ 'foo': 'bar', 'bar': 'baz', 'qux': 'jam' })").unwrap();
         assert!(
             value
                 .as_file()
@@ -136,7 +137,7 @@ mod test {
         );
         assert_eq!(
             fs::read_to_string(value.unwrap_file().as_str()).expect("failed to read file"),
-            "hello\nworld\n!\n\n!\n"
+            "foo\tbar\nbar\tbaz\nqux\tjam\n",
         );
     }
 }

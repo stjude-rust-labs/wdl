@@ -38,6 +38,7 @@ mod stderr;
 mod stdout;
 mod sub;
 mod write_lines;
+mod write_map;
 mod write_tsv;
 
 /// Represents a function call argument.
@@ -271,6 +272,11 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
     assert!(
         functions
             .insert("read_map", read_map::descriptor())
+            .is_none()
+    );
+    assert!(
+        functions
+            .insert("write_map", write_map::descriptor())
             .is_none()
     );
 

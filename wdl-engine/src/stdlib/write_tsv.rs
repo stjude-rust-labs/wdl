@@ -58,8 +58,7 @@ fn write_array_tsv_file(
                 .map_err(write_error)?;
         }
 
-        writer.write(b"\n").map_err(write_error)?;
-
+        writeln!(&mut writer).map_err(write_error)?;
         Some(header.elements().len())
     } else {
         None
@@ -93,7 +92,7 @@ fn write_array_tsv_file(
                 .map_err(write_error)?;
         }
 
-        writer.write(b"\n").map_err(write_error)?;
+        writeln!(&mut writer).map_err(write_error)?;
     }
 
     // Consume the writer, flushing the buffer to disk.
@@ -282,7 +281,7 @@ fn write_tsv_struct(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             }
         }
 
-        writer.write(b"\n").map_err(write_error)?;
+        writeln!(&mut writer).map_err(write_error)?;
     }
 
     // Write the rows
@@ -312,7 +311,7 @@ fn write_tsv_struct(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             }
         }
 
-        writer.write(b"\n").map_err(write_error)?;
+        writeln!(&mut writer).map_err(write_error)?;
     }
 
     // Consume the writer, flushing the buffer to disk.
