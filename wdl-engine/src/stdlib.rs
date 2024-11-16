@@ -29,6 +29,7 @@ mod read_boolean;
 mod read_float;
 mod read_int;
 mod read_lines;
+mod read_map;
 mod read_string;
 mod read_tsv;
 mod round;
@@ -265,6 +266,11 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
     assert!(
         functions
             .insert("write_tsv", write_tsv::descriptor())
+            .is_none()
+    );
+    assert!(
+        functions
+            .insert("read_map", read_map::descriptor())
             .is_none()
     );
 

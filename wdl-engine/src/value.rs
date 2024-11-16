@@ -1081,6 +1081,12 @@ impl Map {
         panic!("type `{ty}` is not a map type", ty = ty.display(types));
     }
 
+    /// Constructs a new map without checking the given elements conform to the
+    /// given type.
+    pub(crate) fn new_unchecked(ty: Type, elements: Arc<IndexMap<PrimitiveValue, Value>>) -> Self {
+        Self { ty, elements }
+    }
+
     /// Gets the type of the `Map` value.
     pub fn ty(&self) -> Type {
         self.ty
