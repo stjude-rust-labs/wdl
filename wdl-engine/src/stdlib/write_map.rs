@@ -126,7 +126,12 @@ mod test {
             "",
         );
 
-        let value = eval_v1_expr(&mut env, V1::Two, "write_map({ 'foo': 'bar', 'bar': 'baz', 'qux': 'jam' })").unwrap();
+        let value = eval_v1_expr(
+            &mut env,
+            V1::Two,
+            "write_map({ 'foo': 'bar', 'bar': 'baz', 'qux': 'jam' })",
+        )
+        .unwrap();
         assert!(
             value
                 .as_file()

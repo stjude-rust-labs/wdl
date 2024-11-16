@@ -13,8 +13,7 @@ use itertools::Itertools;
 use wdl_analysis::stdlib::STDLIB as ANALYSIS_STDLIB;
 use wdl_analysis::types::PrimitiveTypeKind;
 use wdl_ast::Diagnostic;
-use wdl_grammar::lexer::Lexer;
-use wdl_grammar::lexer::v1::Token;
+use wdl_grammar::lexer::v1::is_ident;
 
 use super::CallContext;
 use super::Function;
@@ -24,20 +23,6 @@ use crate::CompoundValue;
 use crate::PrimitiveValue;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
-
-/// Determines if the given string is a valid WDL identifier.
-fn is_ident(s: &str) -> bool {
-    let mut lexer = Lexer::new(s);
-    if !lexer
-        .next()
-        .map(|r| matches!(r, (Ok(Token::Ident), _)))
-        .unwrap_or(false)
-    {
-        return false;
-    }
-
-    lexer.next().is_none()
-}
 
 /// Represents a header in a TSV (tab-separated value) file.
 enum TsvHeader {

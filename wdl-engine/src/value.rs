@@ -20,6 +20,7 @@ use wdl_analysis::types::PrimitiveTypeKind;
 use wdl_analysis::types::Type;
 use wdl_analysis::types::TypeEq;
 use wdl_analysis::types::Types;
+use wdl_grammar::lexer::v1::is_ident;
 
 /// Implemented on coercible values.
 pub trait Coercible: Sized {
@@ -96,7 +97,13 @@ impl Value {
             JsonValue::Object(elements) => Ok(Object::new(
                 elements
                     .into_iter()
-                    .map(|(k, v)| Ok((k, Self::from_json(types, v)?)))
+                    .map(|(k, v)| {
+                        if !is_ident(&k) {
+                            bail!("object key `{k}` is not a valid WDL identifier");
+                        }
+
+                        Ok((k, Self::from_json(types, v)?))
+                    })
                     .collect::<Result<Vec<_>>>()?,
             )
             .into()),

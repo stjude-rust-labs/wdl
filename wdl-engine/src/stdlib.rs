@@ -28,6 +28,7 @@ mod min;
 mod read_boolean;
 mod read_float;
 mod read_int;
+mod read_json;
 mod read_lines;
 mod read_map;
 mod read_string;
@@ -67,7 +68,7 @@ impl CallArgument {
 /// Represents function call context.
 pub struct CallContext<'a> {
     /// The evaluation context for the call.
-    context: &'a dyn EvaluationContext,
+    context: &'a mut dyn EvaluationContext,
     /// The call site span.
     call_site: Span,
     /// The arguments to the call.
@@ -79,7 +80,7 @@ pub struct CallContext<'a> {
 impl<'a> CallContext<'a> {
     /// Constructs a new call context given the call arguments.
     pub fn new(
-        context: &'a dyn EvaluationContext,
+        context: &'a mut dyn EvaluationContext,
         call_site: Span,
         arguments: &'a [CallArgument],
         return_type: Type,
@@ -95,6 +96,11 @@ impl<'a> CallContext<'a> {
     /// Gets the types collection associated with the call.
     pub fn types(&self) -> &Types {
         self.context.types()
+    }
+
+    /// Gets the mutable types collection associated with the call.
+    pub fn types_mut(&mut self) -> &mut Types {
+        self.context.types_mut()
     }
 
     /// Gets the current working directory for the call.
@@ -277,6 +283,11 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
     assert!(
         functions
             .insert("write_map", write_map::descriptor())
+            .is_none()
+    );
+    assert!(
+        functions
+            .insert("read_json", read_json::descriptor())
             .is_none()
     );
 
