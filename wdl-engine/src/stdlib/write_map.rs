@@ -47,7 +47,7 @@ fn write_map(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     // Create a temporary file that will be persisted after writing the map
     let mut file = NamedTempFile::new_in(context.tmp()).map_err(|e| {
         function_call_failed(
-            "write_lines",
+            "write_map",
             format!("failed to create temporary file: {e}"),
             context.call_site,
         )
@@ -72,7 +72,7 @@ fn write_map(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
     let (_, path) = file.keep().map_err(|e| {
         function_call_failed(
-            "write_lines",
+            "write_map",
             format!("failed to keep temporary file: {e}"),
             context.call_site,
         )
@@ -81,7 +81,7 @@ fn write_map(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     Ok(
         PrimitiveValue::new_file(path.into_os_string().into_string().map_err(|path| {
             function_call_failed(
-                "write_lines",
+                "write_map",
                 format!(
                     "path `{path}` cannot be represented as UTF-8",
                     path = Path::new(&path).display()

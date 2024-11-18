@@ -49,13 +49,20 @@ fn write_array_tsv_file(
     // Start by writing the header, if one was provided
     let column_count = if let Some(header) = header {
         for (i, name) in header.elements().iter().enumerate() {
+            let name = name.as_string().unwrap();
+            if name.contains('\t') {
+                return Err(function_call_failed(
+                    "write_tsv",
+                    format!("specified column name at index {i} contains a tab character"),
+                    call_site,
+                ));
+            }
+
             if i > 0 {
                 writer.write(b"\t").map_err(write_error)?;
             }
 
-            writer
-                .write(name.as_string().unwrap().as_bytes())
-                .map_err(write_error)?;
+            writer.write(name.as_bytes()).map_err(write_error)?;
         }
 
         writeln!(&mut writer).map_err(write_error)?;
@@ -83,13 +90,20 @@ fn write_array_tsv_file(
         }
 
         for (i, column) in row.elements().iter().enumerate() {
+            let column = column.as_string().unwrap();
+            if column.contains('\t') {
+                return Err(function_call_failed(
+                    "write_tsv",
+                    format!("element of array at index {index} contains a tab character"),
+                    call_site,
+                ));
+            }
+
             if i > 0 {
                 writer.write(b"\t").map_err(write_error)?;
             }
 
-            writer
-                .write(column.as_string().unwrap().as_bytes())
-                .map_err(write_error)?;
+            writer.write(column.as_bytes()).map_err(write_error)?;
         }
 
         writeln!(&mut writer).map_err(write_error)?;
@@ -262,13 +276,20 @@ fn write_tsv_struct(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
             // Header was explicitly specified, write out the values
             for (i, name) in header.elements().iter().enumerate() {
+                let name = name.as_string().unwrap();
+                if name.contains('\t') {
+                    return Err(function_call_failed(
+                        "write_tsv",
+                        format!("specified column name at index {i} contains a tab character"),
+                        context.call_site,
+                    ));
+                }
+
                 if i > 0 {
                     writer.write(b"\t").map_err(write_error)?;
                 }
 
-                writer
-                    .write(name.as_string().unwrap().as_bytes())
-                    .map_err(write_error)?;
+                writer.write(name.as_bytes()).map_err(write_error)?;
             }
         } else {
             // Write out the names of each struct member
@@ -287,7 +308,7 @@ fn write_tsv_struct(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     // Write the rows
     for row in rows.elements() {
         let row = row.as_struct().unwrap();
-        for (i, column) in row.members().values().enumerate() {
+        for (i, (name, column)) in row.members().iter().enumerate() {
             if i > 0 {
                 writer.write(b"\t").map_err(write_error)?;
             }
@@ -305,6 +326,14 @@ fn write_tsv_struct(context: CallContext<'_>) -> Result<Value, Diagnostic> {
                 Value::Primitive(PrimitiveValue::String(v))
                 | Value::Primitive(PrimitiveValue::File(v))
                 | Value::Primitive(PrimitiveValue::Directory(v)) => {
+                    if v.contains('\t') {
+                        return Err(function_call_failed(
+                            "write_tsv",
+                            format!("member `{name}` contains a tab character"),
+                            context.call_site,
+                        ));
+                    }
+
                     write!(&mut writer, "{v}").map_err(write_error)?
                 }
                 _ => panic!("value is expected to be primitive"),
@@ -562,6 +591,34 @@ mod test {
             diagnostic.message(),
             "call to function `write_tsv` failed: expected 3 headers as the struct has 3 members, \
              but only given 1 header"
+        );
+
+        let diagnostic = eval_v1_expr(&mut env, V1::Two, "write_tsv([['\tfoo']])").unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "call to function `write_tsv` failed: element of array at index 0 contains a tab \
+             character"
+        );
+
+        let diagnostic =
+            eval_v1_expr(&mut env, V1::Two, "write_tsv([['foo']], true, ['\tfoo'])").unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "call to function `write_tsv` failed: specified column name at index 0 contains a tab \
+             character"
+        );
+
+        let diagnostic = eval_v1_expr(
+            &mut env,
+            V1::Two,
+            "write_tsv([Foo { foo: 1, bar: 'hi', baz: true }, Foo { foo: 1234, bar: 'there', baz: \
+             false }], true, ['foo', '\tbar', 'baz'])",
+        )
+        .unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "call to function `write_tsv` failed: specified column name at index 1 contains a tab \
+             character"
         );
     }
 }

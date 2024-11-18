@@ -2347,6 +2347,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .ret(PrimitiveTypeKind::File)
                         .build(),
                     FunctionSignature::builder()
+                        .min_version(SupportedVersion::V1(V1::One))
                         .type_parameter("S", PrimitiveStructConstraint)
                         .parameter(GenericType::Parameter("S"))
                         .ret(PrimitiveTypeKind::File)
@@ -2368,6 +2369,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .ret(PrimitiveTypeKind::File)
                         .build(),
                     FunctionSignature::builder()
+                        .min_version(SupportedVersion::V1(V1::One))
                         .type_parameter("S", PrimitiveStructConstraint)
                         .parameter(GenericArrayType::new(GenericType::Parameter("S")))
                         .ret(PrimitiveTypeKind::File)
