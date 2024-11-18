@@ -32,13 +32,17 @@ fn read_json(mut context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .with_context(|| format!("failed to open file `{path}`", path = path.display()))
         .map_err(|e| function_call_failed("read_json", format!("{e:?}"), context.call_site))?;
 
-    let value = serde_json::from_reader(BufReader::new(file))
-        .with_context(|| format!("failed to deserialize file `{path}", path = path.display()))
-        .map_err(|e| function_call_failed("read_json", format!("{e:?}"), context.call_site))?;
-
-    Value::from_json(context.types_mut(), value)
-        .with_context(|| format!("failed to deserialize file `{path}`", path = path.display()))
-        .map_err(|e| function_call_failed("read_json", format!("{e:?}"), context.call_site))
+    let mut deserializer = serde_json::Deserializer::from_reader(BufReader::new(file));
+    Value::deserialize(context.types_mut(), &mut deserializer).map_err(|e| {
+        function_call_failed(
+            "read_json",
+            format!(
+                "failed to deserialize file `{path}`: {e}",
+                path = path.display()
+            ),
+            context.call_site,
+        )
+    })
 }
 
 /// Gets the function describing `read_json`.
