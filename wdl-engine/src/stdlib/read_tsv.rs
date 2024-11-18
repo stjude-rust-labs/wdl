@@ -175,7 +175,14 @@ fn read_tsv(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     }) {
         return Err(function_call_failed(
             "read_tsv",
-            format!("column name `{invalid}` is not a valid WDL object field name"),
+            if context.arguments.len() == 2 {
+                format!(
+                    "column name `{invalid}` in file `{path}` is not a valid WDL object field name",
+                    path = path.display()
+                )
+            } else {
+                format!("specified name `{invalid}` is not a valid WDL object field name")
+            },
             context.call_site,
         ));
     }
@@ -429,7 +436,7 @@ mod test {
         .unwrap_err();
         assert_eq!(
             diagnostic.message(),
-            "call to function `read_tsv` failed: column name `not-valid` is not a valid WDL \
+            "call to function `read_tsv` failed: specified name `not-valid` is not a valid WDL \
              object field name"
         );
 
@@ -441,16 +448,21 @@ mod test {
         .unwrap_err();
         assert_eq!(
             diagnostic.message(),
-            "call to function `read_tsv` failed: column name `not-valid` is not a valid WDL \
+            "call to function `read_tsv` failed: specified name `not-valid` is not a valid WDL \
              object field name"
         );
 
         let diagnostic =
             eval_v1_expr(&mut env, V1::Two, "read_tsv('invalid_name.tsv', true)").unwrap_err();
-        assert_eq!(
-            diagnostic.message(),
-            "call to function `read_tsv` failed: column name `invalid-name` is not a valid WDL \
-             object field name"
+        assert!(
+            diagnostic
+                .message()
+                .contains("call to function `read_tsv` failed: column name `invalid-name`")
+        );
+        assert!(
+            diagnostic
+                .message()
+                .contains("is not a valid WDL object field name")
         );
 
         let diagnostic = eval_v1_expr(

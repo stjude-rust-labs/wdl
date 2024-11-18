@@ -5,7 +5,6 @@ use std::path::Path;
 use std::sync::LazyLock;
 
 use wdl_analysis::stdlib::Binding;
-use wdl_analysis::stdlib::STDLIB as ANALYSIS_STDLIB;
 use wdl_analysis::types::Type;
 use wdl_analysis::types::TypeEq;
 use wdl_analysis::types::Types;
@@ -31,6 +30,7 @@ mod read_int;
 mod read_json;
 mod read_lines;
 mod read_map;
+mod read_object;
 mod read_string;
 mod read_tsv;
 mod round;
@@ -213,96 +213,50 @@ impl StandardLibrary {
 /// Represents the mapping between function name and overload index to the
 /// implementation callback.
 pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
-    let mut functions = HashMap::with_capacity(ANALYSIS_STDLIB.functions().len());
-    assert!(functions.insert("floor", floor::descriptor()).is_none());
-    assert!(functions.insert("ceil", ceil::descriptor()).is_none());
-    assert!(functions.insert("round", round::descriptor()).is_none());
-    assert!(functions.insert("min", min::descriptor()).is_none());
-    assert!(functions.insert("max", max::descriptor()).is_none());
-    assert!(functions.insert("find", find::descriptor()).is_none());
-    assert!(functions.insert("matches", matches::descriptor()).is_none());
-    assert!(functions.insert("sub", sub::descriptor()).is_none());
-    assert!(
-        functions
-            .insert("basename", basename::descriptor())
-            .is_none()
-    );
-    assert!(
-        functions
-            .insert("join_paths", join_paths::descriptor())
-            .is_none()
-    );
-    assert!(functions.insert("glob", glob::descriptor()).is_none());
-    assert!(functions.insert("size", size::descriptor()).is_none());
-    assert!(functions.insert("stdout", stdout::descriptor()).is_none());
-    assert!(functions.insert("stderr", stderr::descriptor()).is_none());
-    assert!(
-        functions
-            .insert("read_string", read_string::descriptor())
-            .is_none()
-    );
-    assert!(
-        functions
-            .insert("read_int", read_int::descriptor())
-            .is_none()
-    );
-    assert!(
-        functions
-            .insert("read_float", read_float::descriptor())
-            .is_none()
-    );
-    assert!(
-        functions
-            .insert("read_boolean", read_boolean::descriptor())
-            .is_none()
-    );
-    assert!(
-        functions
-            .insert("read_lines", read_lines::descriptor())
-            .is_none()
-    );
-    assert!(
-        functions
-            .insert("write_lines", write_lines::descriptor())
-            .is_none()
-    );
-    assert!(
-        functions
-            .insert("read_tsv", read_tsv::descriptor())
-            .is_none()
-    );
-    assert!(
-        functions
-            .insert("write_tsv", write_tsv::descriptor())
-            .is_none()
-    );
-    assert!(
-        functions
-            .insert("read_map", read_map::descriptor())
-            .is_none()
-    );
-    assert!(
-        functions
-            .insert("write_map", write_map::descriptor())
-            .is_none()
-    );
-    assert!(
-        functions
-            .insert("read_json", read_json::descriptor())
-            .is_none()
-    );
-    assert!(
-        functions
-            .insert("write_json", write_json::descriptor())
-            .is_none()
-    );
+    /// Helper macro for mapping a function name to its descriptor
+    macro_rules! func {
+        ($name:ident) => {
+            (stringify!($name), $name::descriptor())
+        };
+    }
 
-    StandardLibrary { functions }
+    StandardLibrary {
+        functions: HashMap::from_iter([
+            func!(floor),
+            func!(ceil),
+            func!(round),
+            func!(min),
+            func!(max),
+            func!(find),
+            func!(matches),
+            func!(sub),
+            func!(basename),
+            func!(join_paths),
+            func!(glob),
+            func!(size),
+            func!(stdout),
+            func!(stderr),
+            func!(read_string),
+            func!(read_int),
+            func!(read_float),
+            func!(read_boolean),
+            func!(read_lines),
+            func!(write_lines),
+            func!(read_tsv),
+            func!(write_tsv),
+            func!(read_map),
+            func!(write_map),
+            func!(read_json),
+            func!(write_json),
+            func!(read_object),
+        ]),
+    }
 });
 
 #[cfg(test)]
 mod test {
     use pretty_assertions::assert_eq;
+    use wdl_analysis::stdlib::STDLIB as ANALYSIS_STDLIB;
     use wdl_analysis::stdlib::TypeParameters;
 
     use super::*;
