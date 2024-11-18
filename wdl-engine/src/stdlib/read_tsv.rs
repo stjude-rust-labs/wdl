@@ -84,18 +84,13 @@ fn read_tsv_simple(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             .trim_end_matches(['\r', '\n'])
             .split('\t')
             .map(|s| PrimitiveValue::new_string(s).into())
-            .collect::<Vec<Value>>()
-            .into_boxed_slice();
+            .collect::<Vec<Value>>();
         rows.push(
             Array::new_unchecked(ANALYSIS_STDLIB.array_string_type(), Arc::new(values)).into(),
         );
     }
 
-    Ok(Array::new_unchecked(
-        ANALYSIS_STDLIB.array_array_string_type(),
-        Arc::new(rows.into_boxed_slice()),
-    )
-    .into())
+    Ok(Array::new_unchecked(ANALYSIS_STDLIB.array_array_string_type(), Arc::new(rows)).into())
 }
 
 /// Reads a tab-separated value (TSV) file as an Array[Array[String]]
@@ -237,11 +232,7 @@ fn read_tsv(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         rows.push(CompoundValue::Object(members.into()).into());
     }
 
-    Ok(Array::new_unchecked(
-        ANALYSIS_STDLIB.array_object_type(),
-        Arc::new(rows.into_boxed_slice()),
-    )
-    .into())
+    Ok(Array::new_unchecked(ANALYSIS_STDLIB.array_object_type(), Arc::new(rows)).into())
 }
 
 /// Gets the function describing `read_tsv`.

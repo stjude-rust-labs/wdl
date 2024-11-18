@@ -31,6 +31,7 @@ mod read_json;
 mod read_lines;
 mod read_map;
 mod read_object;
+mod read_objects;
 mod read_string;
 mod read_tsv;
 mod round;
@@ -249,6 +250,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(read_json),
             func!(write_json),
             func!(read_object),
+            func!(read_objects),
         ]),
     }
 });

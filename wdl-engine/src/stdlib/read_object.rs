@@ -91,8 +91,8 @@ fn read_object(context: CallContext<'_>) -> Result<Value, Diagnostic> {
                     return Err(function_call_failed(
                         "read_object",
                         format!(
-                            "column name `{name}` in file `{path}` is not a valid WDL object \
-                             field name",
+                            "column name `{name}` in line 1 of file `{path}` is not a valid WDL \
+                             object field name",
                             path = path.display()
                         ),
                         context.call_site,
@@ -211,11 +211,9 @@ mod test {
 
         let diagnostic =
             eval_v1_expr(&mut env, V1::Two, "read_object('invalid-name.tsv')").unwrap_err();
-        assert!(
-            diagnostic
-                .message()
-                .contains("call to function `read_object` failed: column name `bar-wrong` in file")
-        );
+        assert!(diagnostic.message().contains(
+            "call to function `read_object` failed: column name `bar-wrong` in line 1 of file"
+        ));
         assert!(
             diagnostic
                 .message()

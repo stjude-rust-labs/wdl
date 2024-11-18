@@ -59,7 +59,7 @@ fn read_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         })
         .collect::<Result<Vec<Value>, _>>()?;
 
-    Ok(Array::new_unchecked(context.return_type, Arc::new(elements.into_boxed_slice())).into())
+    Ok(Array::new_unchecked(context.return_type, Arc::new(elements)).into())
 }
 
 /// Gets the function describing `read_lines`.
