@@ -23,6 +23,7 @@ use wdl_ast::v1::LiteralHints;
 use wdl_ast::v1::LiteralInput;
 use wdl_ast::v1::LiteralMap;
 use wdl_ast::v1::LiteralMapItem;
+use wdl_ast::v1::LiteralObject;
 use wdl_ast::v1::LiteralOutput;
 use wdl_ast::v1::LiteralPair;
 use wdl_ast::v1::LiteralStruct;
@@ -601,7 +602,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
             LiteralExpr::Array(expr) => Some(self.evaluate_literal_array(expr)),
             LiteralExpr::Pair(expr) => Some(self.evaluate_literal_pair(expr)),
             LiteralExpr::Map(expr) => Some(self.evaluate_literal_map(expr)),
-            LiteralExpr::Object(_) => Some(Type::Object),
+            LiteralExpr::Object(expr) => Some(self.evaluate_literal_object(expr)),
             LiteralExpr::Struct(expr) => self.evaluate_literal_struct(expr),
             LiteralExpr::None(_) => Some(Type::None),
             LiteralExpr::Hints(expr) => self.evaluate_literal_hints(expr),
@@ -788,6 +789,17 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 .types_mut()
                 .add_map(MapType::new(Type::Union, Type::Union)),
         }
+    }
+
+    /// Evaluates the type of a literal object expression.
+    fn evaluate_literal_object(&mut self, expr: &LiteralObject) -> Type {
+        // Validate the member expressions
+        for item in expr.items() {
+            let (_, v) = item.name_value();
+            self.evaluate_expr(&v);
+        }
+
+        Type::Object
     }
 
     /// Evaluates the type of a literal struct expression.

@@ -38,6 +38,7 @@ mod size;
 mod stderr;
 mod stdout;
 mod sub;
+mod write_json;
 mod write_lines;
 mod write_map;
 mod write_tsv;
@@ -288,6 +289,11 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
     assert!(
         functions
             .insert("read_json", read_json::descriptor())
+            .is_none()
+    );
+    assert!(
+        functions
+            .insert("write_json", write_json::descriptor())
             .is_none()
     );
 

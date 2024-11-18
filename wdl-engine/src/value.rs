@@ -12,8 +12,11 @@ use anyhow::anyhow;
 use anyhow::bail;
 use indexmap::IndexMap;
 use ordered_float::OrderedFloat;
+use serde::ser::SerializeMap;
+use serde::ser::SerializeSeq;
 use serde_json::Value as JsonValue;
 use wdl_analysis::types::ArrayType;
+use wdl_analysis::types::Coercible as _;
 use wdl_analysis::types::CompoundTypeDef;
 use wdl_analysis::types::Optional;
 use wdl_analysis::types::PrimitiveTypeKind;
@@ -381,6 +384,20 @@ impl Value {
                 CompoundValue::equals(types, left, right)
             }
             _ => None,
+        }
+    }
+
+    /// Serializes the value to the given serializer.
+    pub fn serialize<S>(&self, types: &Types, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::Serialize;
+
+        match self {
+            Self::None => serializer.serialize_none(),
+            Self::Primitive(v) => v.serialize(serializer),
+            Self::Compound(v) => v.serialize(types, serializer),
         }
     }
 }
@@ -864,6 +881,20 @@ impl Coercible for PrimitiveValue {
                         )
                     })
             }
+        }
+    }
+}
+
+impl serde::Serialize for PrimitiveValue {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            Self::Boolean(v) => v.serialize(serializer),
+            Self::Integer(v) => v.serialize(serializer),
+            Self::Float(v) => v.serialize(serializer),
+            Self::String(s) | Self::File(s) | Self::Directory(s) => s.serialize(serializer),
         }
     }
 }
@@ -1483,6 +1514,76 @@ impl CompoundValue {
                     }),
             ),
             _ => None,
+        }
+    }
+
+    /// Serializes the value to the given serializer.
+    pub fn serialize<S>(&self, types: &Types, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::Error;
+
+        /// Helper `Serialize` implementation for serializing element values.
+        struct Serialize<'a> {
+            /// The types collection.
+            types: &'a Types,
+            /// The value being serialized.
+            value: &'a Value,
+        }
+
+        impl serde::Serialize for Serialize<'_> {
+            fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+            where
+                S: serde::Serializer,
+            {
+                self.value.serialize(self.types, serializer)
+            }
+        }
+
+        match self {
+            Self::Pair(_) => Err(S::Error::custom("a pair cannot be serialized")),
+            Self::Array(v) => {
+                let mut s = serializer.serialize_seq(Some(v.elements.len()))?;
+                for e in v.elements.iter() {
+                    s.serialize_element(&Serialize { types, value: e })?;
+                }
+
+                s.end()
+            }
+            Self::Map(v) => {
+                if !types
+                    .type_definition(
+                        v.ty()
+                            .as_compound()
+                            .expect("type should be compound")
+                            .definition(),
+                    )
+                    .as_map()
+                    .expect("type should be a map")
+                    .key_type()
+                    .is_coercible_to(types, &PrimitiveTypeKind::String.into())
+                {
+                    return Err(S::Error::custom(
+                        "only maps with `String` key types may be serialized",
+                    ));
+                }
+
+                let mut s = serializer.serialize_map(Some(v.elements.len()))?;
+                for (k, v) in v.elements.iter() {
+                    s.serialize_entry(k, &Serialize { types, value: v })?;
+                }
+
+                s.end()
+            }
+            Self::Object(Object { members, .. }) | Self::Struct(Struct { members, .. }) => {
+                let mut s = serializer.serialize_map(Some(members.len()))?;
+                for (k, v) in members.iter() {
+                    s.serialize_entry(k, &Serialize { types, value: v })?;
+                }
+
+                s.end()
+            }
         }
     }
 }

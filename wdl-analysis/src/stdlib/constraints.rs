@@ -2,6 +2,7 @@
 
 use std::fmt;
 
+use crate::types::Coercible;
 use crate::types::CompoundType;
 use crate::types::CompoundTypeDef;
 use crate::types::Optional;
@@ -151,8 +152,8 @@ impl Constraint for JsonSerializableConstraint {
                 CompoundTypeDef::Array(ty) => type_is_serializable(types, ty.element_type()),
                 CompoundTypeDef::Pair(_) => false,
                 CompoundTypeDef::Map(ty) => {
-                    !ty.key_type().is_optional()
-                        && matches!(ty.key_type(), Type::Primitive(ty) if ty.kind() == PrimitiveTypeKind::String)
+                    ty.key_type()
+                        .is_coercible_to(types, &PrimitiveTypeKind::String.into())
                         && type_is_serializable(types, ty.value_type())
                 }
                 CompoundTypeDef::Struct(s) => s
