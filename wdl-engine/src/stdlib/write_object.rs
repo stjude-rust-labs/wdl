@@ -15,6 +15,7 @@ use super::Signature;
 use crate::PrimitiveValue;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
+use crate::stdlib::write_tsv::write_tsv_value;
 
 /// Writes a tab-separated value (TSV) file with the contents of a Object or
 /// Struct.
@@ -71,27 +72,15 @@ fn write_object(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             }
 
             match value {
-                Value::Primitive(v) => match v {
-                    PrimitiveValue::Boolean(v) => {
-                        write!(&mut writer, "{v}").map_err(write_error)?
+                Value::Primitive(v) => {
+                    if !write_tsv_value(&mut writer, v).map_err(write_error)? {
+                        return Err(function_call_failed(
+                            "write_object",
+                            format!("member `{key}` contains a tab character"),
+                            context.call_site,
+                        ));
                     }
-                    PrimitiveValue::Integer(v) => {
-                        write!(&mut writer, "{v}").map_err(write_error)?
-                    }
-                    PrimitiveValue::Float(v) => write!(&mut writer, "{v}").map_err(write_error)?,
-                    PrimitiveValue::String(v)
-                    | PrimitiveValue::File(v)
-                    | PrimitiveValue::Directory(v) => {
-                        if v.contains('\t') {
-                            return Err(function_call_failed(
-                                "write_object",
-                                format!("member `{key}` contains a tab character"),
-                                context.call_site,
-                            ));
-                        }
-                        write!(&mut writer, "{v}").map_err(write_error)?
-                    }
-                },
+                }
                 _ => {
                     return Err(function_call_failed(
                         "write_object",

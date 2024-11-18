@@ -19,6 +19,39 @@ use crate::PrimitiveValue;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
 
+/// Writes a primitive value as a TSV value.
+///
+/// Returns `Ok(true)` if the value was written.
+///
+/// Returns `Ok(false)` if the value contains a tab character.
+///
+/// Returns `Err(_)` if there was an I/O error.
+pub(crate) fn write_tsv_value<W: Write>(
+    mut writer: &mut W,
+    value: &PrimitiveValue,
+) -> Result<bool, std::io::Error> {
+    match value {
+        PrimitiveValue::Boolean(v) => {
+            write!(&mut writer, "{v}")?;
+        }
+        PrimitiveValue::Integer(v) => {
+            write!(&mut writer, "{v}")?;
+        }
+        PrimitiveValue::Float(v) => {
+            write!(&mut writer, "{v}")?;
+        }
+        PrimitiveValue::String(v) | PrimitiveValue::File(v) | PrimitiveValue::Directory(v) => {
+            if v.contains('\t') {
+                return Ok(false);
+            }
+
+            write!(&mut writer, "{v}")?;
+        }
+    }
+
+    Ok(true)
+}
+
 /// Helper for writing a `Array[Array[String]]` to a TSV file.
 fn write_array_tsv_file(
     tmp: &Path,
@@ -314,27 +347,14 @@ fn write_tsv_struct(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             }
 
             match column {
-                Value::Primitive(PrimitiveValue::Boolean(v)) => {
-                    write!(&mut writer, "{v}").map_err(write_error)?
-                }
-                Value::Primitive(PrimitiveValue::Integer(v)) => {
-                    write!(&mut writer, "{v}").map_err(write_error)?
-                }
-                Value::Primitive(PrimitiveValue::Float(v)) => {
-                    write!(&mut writer, "{v}").map_err(write_error)?
-                }
-                Value::Primitive(PrimitiveValue::String(v))
-                | Value::Primitive(PrimitiveValue::File(v))
-                | Value::Primitive(PrimitiveValue::Directory(v)) => {
-                    if v.contains('\t') {
+                Value::Primitive(v) => {
+                    if !write_tsv_value(&mut writer, v).map_err(write_error)? {
                         return Err(function_call_failed(
                             "write_tsv",
                             format!("member `{name}` contains a tab character"),
                             context.call_site,
                         ));
                     }
-
-                    write!(&mut writer, "{v}").map_err(write_error)?
                 }
                 _ => panic!("value is expected to be primitive"),
             }

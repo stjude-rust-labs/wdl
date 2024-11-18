@@ -1251,7 +1251,7 @@ impl fmt::Display for Map {
 #[derive(Debug, Clone)]
 pub struct Object {
     /// The members of the object.
-    members: Arc<IndexMap<String, Value>>,
+    pub(crate) members: Arc<IndexMap<String, Value>>,
 }
 
 impl Object {
@@ -1318,7 +1318,7 @@ pub struct Struct {
     /// The name of the struct.
     name: Arc<String>,
     /// The members of the struct value.
-    members: Arc<IndexMap<String, Value>>,
+    pub(crate) members: Arc<IndexMap<String, Value>>,
 }
 
 impl Struct {

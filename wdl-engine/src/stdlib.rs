@@ -43,6 +43,7 @@ mod write_json;
 mod write_lines;
 mod write_map;
 mod write_object;
+mod write_objects;
 mod write_tsv;
 
 /// Represents a function call argument.
@@ -253,6 +254,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(read_object),
             func!(read_objects),
             func!(write_object),
+            func!(write_objects),
         ]),
     }
 });
