@@ -148,16 +148,28 @@ mod test {
     fn join_paths() {
         let mut env = TestEnv::default();
         let value = eval_v1_expr(&mut env, V1::Two, "join_paths('/usr', ['bin', 'echo'])").unwrap();
-        assert_eq!(value.unwrap_file().as_str(), "/usr/bin/echo");
+        assert_eq!(
+            value.unwrap_file().as_str().replace('\\', "/"),
+            "/usr/bin/echo"
+        );
 
         let value = eval_v1_expr(&mut env, V1::Two, "join_paths(['/usr', 'bin', 'echo'])").unwrap();
-        assert_eq!(value.unwrap_file().as_str(), "/usr/bin/echo");
+        assert_eq!(
+            value.unwrap_file().as_str().replace('\\', "/"),
+            "/usr/bin/echo"
+        );
 
         let value = eval_v1_expr(&mut env, V1::Two, "join_paths('mydir', 'mydata.txt')").unwrap();
-        assert_eq!(value.unwrap_file().as_str(), "mydir/mydata.txt");
+        assert_eq!(
+            value.unwrap_file().as_str().replace('\\', "/"),
+            "mydir/mydata.txt"
+        );
 
         let value = eval_v1_expr(&mut env, V1::Two, "join_paths('/usr', 'bin/echo')").unwrap();
-        assert_eq!(value.unwrap_file().as_str(), "/usr/bin/echo");
+        assert_eq!(
+            value.unwrap_file().as_str().replace('\\', "/"),
+            "/usr/bin/echo"
+        );
 
         #[cfg(unix)]
         {

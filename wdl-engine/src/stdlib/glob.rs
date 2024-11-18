@@ -155,7 +155,7 @@ mod test {
             .unwrap()
             .elements()
             .iter()
-            .map(|v| v.as_file().unwrap().as_str())
+            .map(|v| v.as_file().unwrap().as_str().replace('\\', "/"))
             .collect();
         assert_eq!(elements, ["bar", "baz", "nested/bar", "nested/baz"]);
     }
