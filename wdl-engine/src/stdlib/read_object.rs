@@ -91,8 +91,8 @@ fn read_object(context: CallContext<'_>) -> Result<Value, Diagnostic> {
                     return Err(function_call_failed(
                         "read_object",
                         format!(
-                            "column name `{name}` in line 1 of file `{path}` is not a valid WDL \
-                             object field name",
+                            "invalid column name `{name}` at {path}:1: column name must be a \
+                             valid WDL identifier",
                             path = path.display()
                         ),
                         context.call_site,
@@ -106,7 +106,7 @@ fn read_object(context: CallContext<'_>) -> Result<Value, Diagnostic> {
                     return Err(function_call_failed(
                         "read_object",
                         format!(
-                            "duplicate column name `{name}` in line 1 of file `{path}`",
+                            "duplicate column name `{name}` at {path}:1",
                             path = path.display()
                         ),
                         context.call_site,
@@ -205,19 +205,18 @@ mod test {
 
         let diagnostic =
             eval_v1_expr(&mut env, V1::Two, "read_object('duplicate.tsv')").unwrap_err();
-        assert!(diagnostic.message().contains(
-            "call to function `read_object` failed: duplicate column name `foo` in line 1 of file"
-        ));
-
-        let diagnostic =
-            eval_v1_expr(&mut env, V1::Two, "read_object('invalid-name.tsv')").unwrap_err();
-        assert!(diagnostic.message().contains(
-            "call to function `read_object` failed: column name `bar-wrong` in line 1 of file"
-        ));
         assert!(
             diagnostic
                 .message()
-                .contains("is not a valid WDL object field name")
+                .starts_with("call to function `read_object` failed: duplicate column name `foo`")
+        );
+
+        let diagnostic =
+            eval_v1_expr(&mut env, V1::Two, "read_object('invalid-name.tsv')").unwrap_err();
+        assert!(
+            diagnostic.message().starts_with(
+                "call to function `read_object` failed: invalid column name `bar-wrong`"
+            )
         );
 
         let value = eval_v1_expr(&mut env, V1::Two, "read_object('object.tsv')").unwrap();
