@@ -37,7 +37,7 @@ fn read_json(mut context: CallContext<'_>) -> Result<Value, Diagnostic> {
         function_call_failed(
             "read_json",
             format!(
-                "failed to deserialize file `{path}`: {e}",
+                "failed to read JSON file `{path}`: {e}",
                 path = path.display()
             ),
             context.call_site,
@@ -85,7 +85,7 @@ mod test {
         assert!(
             diagnostic
                 .message()
-                .contains("call to function `read_json` failed: failed to deserialize file")
+                .contains("call to function `read_json` failed: failed to read JSON file")
         );
         assert!(
             diagnostic
@@ -97,7 +97,7 @@ mod test {
         assert!(
             diagnostic
                 .message()
-                .contains("call to function `read_json` failed: failed to deserialize file")
+                .contains("call to function `read_json` failed: failed to read JSON file")
         );
         assert!(
             diagnostic
@@ -137,7 +137,7 @@ mod test {
         assert!(
             diagnostic
                 .message()
-                .contains("call to function `read_json` failed: failed to deserialize file")
+                .contains("call to function `read_json` failed: failed to read JSON file")
         );
         assert!(
             diagnostic
@@ -167,7 +167,7 @@ mod test {
         assert!(
             diagnostic
                 .message()
-                .contains("call to function `read_json` failed: failed to deserialize file")
+                .contains("call to function `read_json` failed: failed to read JSON file")
         );
         assert!(
             diagnostic

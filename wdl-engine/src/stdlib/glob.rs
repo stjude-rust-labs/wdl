@@ -17,7 +17,7 @@ use crate::diagnostics::function_call_failed;
 use crate::diagnostics::invalid_glob_pattern;
 
 /// Returns the Bash expansion of the glob string relative to the task's
-/// execution directory, and in the same order.
+/// execution directory, and in the same order (i.e. lexicographical).
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#glob
 fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {

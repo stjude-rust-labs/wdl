@@ -1,8 +1,9 @@
 //! Implements the `read_boolean` function from the WDL standard library.
 
 use std::fs;
+use std::io::BufRead;
+use std::io::BufReader;
 
-use anyhow::Context;
 use wdl_analysis::types::PrimitiveTypeKind;
 use wdl_ast::Diagnostic;
 
@@ -30,25 +31,41 @@ fn read_boolean(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             .unwrap_file()
             .as_str(),
     );
-    let mut contents = fs::read_to_string(&path)
-        .with_context(|| format!("failed to read file `{path}`", path = path.display()))
-        .map_err(|e| function_call_failed("read_boolean", format!("{e:?}"), context.call_site))?;
 
-    contents.make_ascii_lowercase();
+    let read_error = |e: std::io::Error| {
+        function_call_failed(
+            "read_boolean",
+            format!("failed to read file `{path}`: {e}", path = path.display()),
+            context.call_site,
+        )
+    };
 
-    Ok(contents
+    let invalid_contents = || {
+        function_call_failed(
+            "read_boolean",
+            format!(
+                "file `{path}` does not contain a boolean value on a single line",
+                path = path.display()
+            ),
+            context.call_site,
+        )
+    };
+
+    let mut lines = BufReader::new(fs::File::open(&path).map_err(read_error)?).lines();
+    let mut line = lines
+        .next()
+        .ok_or_else(invalid_contents)?
+        .map_err(read_error)?;
+
+    if lines.next().is_some() {
+        return Err(invalid_contents());
+    }
+
+    line.make_ascii_lowercase();
+    Ok(line
         .trim()
         .parse::<bool>()
-        .map_err(|_| {
-            function_call_failed(
-                "read_boolean",
-                format!(
-                    "file `{path}` does not contain a single boolean value",
-                    path = path.display()
-                ),
-                context.call_site,
-            )
-        })?
+        .map_err(|_| invalid_contents())?
         .into())
 }
 
@@ -69,8 +86,8 @@ mod test {
     fn read_boolean() {
         let mut env = TestEnv::default();
         env.write_file("foo", "true false hello world!");
-        env.write_file("bar", "\n\t\tTrUe   \n");
-        env.write_file("baz", "\n\t\tfalse   \n");
+        env.write_file("bar", "\t\tTrUe   \n");
+        env.write_file("baz", "\t\tfalse   \n");
         env.insert_name("t", PrimitiveValue::new_file("bar"));
         env.insert_name("f", PrimitiveValue::new_file("baz"));
 
@@ -86,7 +103,7 @@ mod test {
         assert!(
             diagnostic
                 .message()
-                .contains("does not contain a single boolean value")
+                .contains("does not contain a boolean value on a single line")
         );
 
         let value = eval_v1_expr(&mut env, V1::Two, "read_boolean('bar')").unwrap();

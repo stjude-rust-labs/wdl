@@ -1,8 +1,9 @@
 //! Implements the `read_int` function from the WDL standard library.
 
 use std::fs;
+use std::io::BufRead;
+use std::io::BufReader;
 
-use anyhow::Context;
 use wdl_analysis::types::PrimitiveTypeKind;
 use wdl_ast::Diagnostic;
 
@@ -29,23 +30,40 @@ fn read_int(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             .unwrap_file()
             .as_str(),
     );
-    let contents = fs::read_to_string(&path)
-        .with_context(|| format!("failed to read file `{path}`", path = path.display()))
-        .map_err(|e| function_call_failed("read_int", format!("{e:?}"), context.call_site))?;
 
-    Ok(contents
+    let read_error = |e: std::io::Error| {
+        function_call_failed(
+            "read_int",
+            format!("failed to read file `{path}`: {e}", path = path.display()),
+            context.call_site,
+        )
+    };
+
+    let invalid_contents = || {
+        function_call_failed(
+            "read_int",
+            format!(
+                "file `{path}` does not contain an integer value on a single line",
+                path = path.display()
+            ),
+            context.call_site,
+        )
+    };
+
+    let mut lines = BufReader::new(fs::File::open(&path).map_err(read_error)?).lines();
+    let line = lines
+        .next()
+        .ok_or_else(invalid_contents)?
+        .map_err(read_error)?;
+
+    if lines.next().is_some() {
+        return Err(invalid_contents());
+    }
+
+    Ok(line
         .trim()
         .parse::<i64>()
-        .map_err(|_| {
-            function_call_failed(
-                "read_int",
-                format!(
-                    "file `{path}` does not contain a single integer value",
-                    path = path.display()
-                ),
-                context.call_site,
-            )
-        })?
+        .map_err(|_| invalid_contents())?
         .into())
 }
 
@@ -67,7 +85,7 @@ mod test {
     fn read_int() {
         let mut env = TestEnv::default();
         env.write_file("foo", "12345 hello world!");
-        env.write_file("bar", "\n\t\t12345   \n");
+        env.write_file("bar", "     \t   \t12345   \n");
         env.insert_name("file", PrimitiveValue::new_file("bar"));
 
         let diagnostic = eval_v1_expr(&mut env, V1::Two, "read_int('does-not-exist')").unwrap_err();
@@ -81,7 +99,7 @@ mod test {
         assert!(
             diagnostic
                 .message()
-                .contains("does not contain a single integer value")
+                .contains("does not contain an integer value on a single line")
         );
 
         let value = eval_v1_expr(&mut env, V1::Two, "read_int('bar')").unwrap();
