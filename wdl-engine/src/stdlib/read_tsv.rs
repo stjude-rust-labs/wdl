@@ -55,7 +55,7 @@ impl TsvHeader {
 ///
 /// Trailing end-of-line characters (\r and \n) are removed from each line.
 ///
-/// `Array[Array[String]] read_tsv(File, [false])``: Returns each row of the
+/// `Array[Array[String]] read_tsv(File, [false])`: Returns each row of the
 /// table as an Array[String]. There is no requirement that the rows of the
 /// table are all the same length.
 ///
@@ -92,19 +92,19 @@ fn read_tsv_simple(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     Ok(Array::new_unchecked(ANALYSIS_STDLIB.array_array_string_type(), Arc::new(rows)).into())
 }
 
-/// Reads a tab-separated value (TSV) file as an Array[Array[String]]
-/// representing a table of values.
+/// Reads a tab-separated value (TSV) file as an Array[Object] representing a
+/// table of values.
 ///
 /// Trailing end-of-line characters (\r and \n) are removed from each line.
 ///
-/// `Array[Object] read_tsv(File, true)``: The second parameter must be true and
+/// `Array[Object] read_tsv(File, true)`: The second parameter must be true and
 /// specifies that the TSV file contains a header line. Each row is returned as
 /// an Object with its keys determined by the header (the first line in the
 /// file) and its values as Strings. All rows in the file must be the same
 /// length and the field names in the header row must be valid Object field
 /// names, or an error is raised.
 ///
-/// `Array[Object] read_tsv(File, Boolean, Array[String])``: The second
+/// `Array[Object] read_tsv(File, Boolean, Array[String])`: The second
 /// parameter specifies whether the TSV file contains a header line, and the
 /// third parameter is an array of field names that is used to specify the field
 /// names to use for the returned Objects. If the second parameter is true, the
