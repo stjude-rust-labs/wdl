@@ -47,15 +47,15 @@ fn read_lines(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     let elements = BufReader::new(file)
         .lines()
         .map(|line| {
-            let mut line = line
-                .with_context(|| format!("failed to read file `{path}`", path = path.display()))
+            Ok(PrimitiveValue::new_string(
+                line.with_context(|| {
+                    format!("failed to read file `{path}`", path = path.display())
+                })
                 .map_err(|e| {
                     function_call_failed("read_lines", format!("{e:?}"), context.call_site)
-                })?;
-
-            let trimmed = line.trim_end_matches(['\r', '\n']);
-            line.truncate(trimmed.len());
-            Ok(PrimitiveValue::new_string(line).into())
+                })?,
+            )
+            .into())
         })
         .collect::<Result<Vec<Value>, _>>()?;
 

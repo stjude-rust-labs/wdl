@@ -53,7 +53,7 @@ fn read_map(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             .with_context(|| format!("failed to read file `{path}`", path = path.display()))
             .map_err(|e| function_call_failed("read_map", format!("{e:?}"), context.call_site))?;
 
-        let (key, value) = match line.trim_end_matches(['\r', '\n']).split_once('\t') {
+        let (key, value) = match line.split_once('\t') {
             Some((key, value)) if !value.contains('\t') => (key, value),
             _ => {
                 return Err(function_call_failed(

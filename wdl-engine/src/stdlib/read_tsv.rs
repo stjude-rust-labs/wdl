@@ -81,7 +81,6 @@ fn read_tsv_simple(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             .with_context(|| format!("failed to read file `{path}`", path = path.display()))
             .map_err(|e| function_call_failed("read_tsv", format!("{e:?}"), context.call_site))?;
         let values = line
-            .trim_end_matches(['\r', '\n'])
             .split('\t')
             .map(|s| PrimitiveValue::new_string(s).into())
             .collect::<Vec<Value>>();
@@ -190,10 +189,7 @@ fn read_tsv(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
         let mut members: IndexMap<String, Value> = IndexMap::with_capacity(column_count);
 
-        for e in header
-            .columns()
-            .zip_longest(line.trim_end_matches(['\r', '\n']).split('\t'))
-        {
+        for e in header.columns().zip_longest(line.split('\t')) {
             match e {
                 EitherOrBoth::Both(c, v) => {
                     if members

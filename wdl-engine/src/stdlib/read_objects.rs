@@ -72,7 +72,6 @@ fn read_objects(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         }
     };
 
-    let names = names.trim_end_matches(['\r', '\n']);
     for name in names.split('\t') {
         if !is_ident(name) {
             return Err(function_call_failed(
@@ -96,10 +95,7 @@ fn read_objects(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             })?;
 
         let mut members = IndexMap::new();
-        for e in names
-            .split('\t')
-            .zip_longest(line.trim_end_matches(['\r', '\n']).split('\t'))
-        {
+        for e in names.split('\t').zip_longest(line.split('\t')) {
             match e {
                 EitherOrBoth::Both(name, value) => {
                     if members

@@ -80,11 +80,7 @@ fn read_object(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     }
 
     let mut members = IndexMap::new();
-    for e in names
-        .trim_end_matches(['\r', '\n'])
-        .split('\t')
-        .zip_longest(values.trim_end_matches(['\r', '\n']).split('\t'))
-    {
+    for e in names.split('\t').zip_longest(values.split('\t')) {
         match e {
             EitherOrBoth::Both(name, value) => {
                 if !is_ident(name) {
