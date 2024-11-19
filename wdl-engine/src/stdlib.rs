@@ -40,6 +40,7 @@ mod size;
 mod stderr;
 mod stdout;
 mod sub;
+mod suffix;
 mod write_json;
 mod write_lines;
 mod write_map;
@@ -257,6 +258,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(write_object),
             func!(write_objects),
             func!(prefix),
+            func!(suffix),
         ]),
     }
 });
