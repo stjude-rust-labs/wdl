@@ -24,6 +24,7 @@ mod join_paths;
 mod matches;
 mod max;
 mod min;
+mod prefix;
 mod read_boolean;
 mod read_float;
 mod read_int;
@@ -255,6 +256,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(read_objects),
             func!(write_object),
             func!(write_objects),
+            func!(prefix),
         ]),
     }
 });
