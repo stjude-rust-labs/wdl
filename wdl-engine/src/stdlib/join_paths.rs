@@ -16,7 +16,7 @@ use crate::Value;
 use crate::diagnostics::array_path_not_relative;
 use crate::diagnostics::path_not_relative;
 
-/// Joins together two or more paths into an absolute path in the host
+/// Joins together two paths into an absolute path in the host
 /// filesystem.
 ///
 /// `File join_paths(File, String)`: Joins together exactly two paths. The first
