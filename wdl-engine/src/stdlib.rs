@@ -15,6 +15,7 @@ use crate::Coercible;
 use crate::EvaluationContext;
 use crate::Value;
 
+mod as_pairs;
 mod basename;
 mod ceil;
 mod chunk;
@@ -285,6 +286,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(flatten),
             func!(select_first),
             func!(select_all),
+            func!(as_pairs),
         ]),
     }
 });
