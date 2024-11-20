@@ -21,6 +21,7 @@ mod chunk;
 mod contains;
 mod cross;
 mod find;
+mod flatten;
 mod floor;
 mod glob;
 mod join_paths;
@@ -279,6 +280,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(unzip),
             func!(contains),
             func!(chunk),
+            func!(flatten),
         ]),
     }
 });
