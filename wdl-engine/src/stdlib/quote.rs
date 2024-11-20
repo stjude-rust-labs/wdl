@@ -93,5 +93,8 @@ mod test {
             .map(|v| v.as_string().unwrap().as_str())
             .collect();
         assert_eq!(elements, [r#""bar""#, r#""baz""#, r#""qux""#]);
+
+        let value = eval_v1_expr(&mut env, V1::One, "quote([])").unwrap();
+        assert!(value.unwrap_array().elements().is_empty());
     }
 }
