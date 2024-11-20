@@ -59,7 +59,7 @@ mod test {
     fn range() {
         let mut env = TestEnv::default();
         let value = eval_v1_expr(&mut env, V1::One, "range(0)").unwrap();
-        assert_eq!(value.unwrap_array().elements().len(), 0);
+        assert_eq!(value.unwrap_array().len(), 0);
 
         let value = eval_v1_expr(&mut env, V1::One, "range(10)").unwrap();
         assert_eq!(

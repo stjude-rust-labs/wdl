@@ -1,8 +1,7 @@
-//! Implements the `cross` function from the WDL standard library.
+//! Implements the `zip` function from the WDL standard library.
 
 use std::sync::Arc;
 
-use itertools::Itertools;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
@@ -11,19 +10,18 @@ use super::Signature;
 use crate::Array;
 use crate::Pair;
 use crate::Value;
+use crate::diagnostics::function_call_failed;
 
-/// Creates an array of Pairs containing the cross product of two input arrays,
-/// i.e., each element in the first array is paired with each element in the
-/// second array.
+/// Creates an array of Pairs containing the dot product of two input arrays,
+/// i.e., the elements at the same indices in each array X[i] and Y[i] are
+/// combined together into (X[i], Y[i]) for each i in range(length(X)).
 ///
-/// Given Array[X] of length M, and Array[Y] of length N, the cross product is
-/// Array[Pair[X, Y]] of length M*N with the following elements: [(X0, Y0), (X0,
-/// Y1), ..., (X0, Yn-1), (X1, Y0), ..., (X1, Yn-1), ..., (Xm-1, Yn-1)].
+/// The input arrays must have the same lengths or an error is raised.
 ///
-/// If either of the input arrays is empty, an empty array is returned.
+/// If the input arrays are empty, an empty array is returned.
 ///
-/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#cross
-fn cross(context: CallContext<'_>) -> Result<Value, Diagnostic> {
+/// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#zip
+fn zip(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert_eq!(context.arguments.len(), 2);
     debug_assert!(
         context
@@ -50,6 +48,18 @@ fn cross(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .as_array()
         .expect("argument should be an array");
 
+    if left.len() != right.len() {
+        return Err(function_call_failed(
+            "zip",
+            format!(
+                "expected an array of length {left}, but this is an array of length {right}",
+                left = left.len(),
+                right = right.len()
+            ),
+            context.arguments[1].span,
+        ));
+    }
+
     let element_ty = context
         .types()
         .type_definition(
@@ -66,21 +76,22 @@ fn cross(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     let elements = left
         .elements()
         .iter()
-        .cartesian_product(right.elements().iter())
+        .zip(right.elements().iter())
         .map(|(l, r)| {
             Pair::new_unchecked(element_ty, Arc::new(l.clone()), Arc::new(r.clone())).into()
         })
         .collect();
+
     Ok(Array::new_unchecked(context.return_type, Arc::new(elements)).into())
 }
 
-/// Gets the function describing `cross`.
+/// Gets the function describing `zip`.
 pub const fn descriptor() -> Function {
     Function::new(
         const {
             &[Signature::new(
                 "(Array[X], Array[Y]) -> Array[Pair[X, Y]]",
-                cross,
+                zip,
             )]
         },
     )
@@ -95,19 +106,13 @@ mod test {
     use crate::v1::test::eval_v1_expr;
 
     #[test]
-    fn cross() {
+    fn zip() {
         let mut env = TestEnv::default();
 
-        let value = eval_v1_expr(&mut env, V1::One, "cross([], [])").unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "zip([], [])").unwrap();
         assert_eq!(value.as_array().unwrap().len(), 0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "cross([1], [])").unwrap();
-        assert_eq!(value.as_array().unwrap().len(), 0);
-
-        let value = eval_v1_expr(&mut env, V1::One, "cross([], [1])").unwrap();
-        assert_eq!(value.as_array().unwrap().len(), 0);
-
-        let value = eval_v1_expr(&mut env, V1::One, "cross([1, 2, 3], ['a', 'b'])").unwrap();
+        let value = eval_v1_expr(&mut env, V1::One, "zip([1, 2, 3], ['a', 'b', 'c'])").unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -121,13 +126,13 @@ mod test {
                 )
             })
             .collect();
-        assert_eq!(elements, [
-            (1, "a"),
-            (1, "b"),
-            (2, "a"),
-            (2, "b"),
-            (3, "a"),
-            (3, "b")
-        ]);
+        assert_eq!(elements, [(1, "a"), (2, "b"), (3, "c"),]);
+
+        let diagnostic = eval_v1_expr(&mut env, V1::One, "zip([1, 2, 3], ['a'])").unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "call to function `zip` failed: expected an array of length 3, but this is an array \
+             of length 1"
+        );
     }
 }

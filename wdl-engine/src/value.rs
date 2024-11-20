@@ -1160,6 +1160,16 @@ impl Array {
     pub fn elements(&self) -> &[Value] {
         &self.elements
     }
+
+    /// Returns the number of elements in the array.
+    pub fn len(&self) -> usize {
+        self.elements.len()
+    }
+
+    /// Returns `true` if the array has no elements.
+    pub fn is_empty(&self) -> bool {
+        self.elements.is_empty()
+    }
 }
 
 impl fmt::Display for Array {

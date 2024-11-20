@@ -44,7 +44,7 @@ fn transpose(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .as_array()
         .expect("argument should be an array");
 
-    let rows = outer.elements().len();
+    let rows = outer.len();
     let (columns, ty) = outer
         .elements()
         .first()
@@ -66,7 +66,7 @@ fn transpose(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             let inner = outer.elements()[j]
                 .as_array()
                 .expect("element should be an array");
-            if inner.elements().len() != columns {
+            if inner.len() != columns {
                 return Err(function_call_failed(
                     "transpose",
                     format!("expected array at index {j} to have a length of {columns}"),
@@ -108,10 +108,10 @@ mod test {
         let mut env = TestEnv::default();
 
         let value = eval_v1_expr(&mut env, V1::One, "transpose([])").unwrap();
-        assert_eq!(value.as_array().unwrap().elements().len(), 0);
+        assert_eq!(value.as_array().unwrap().len(), 0);
 
         let value = eval_v1_expr(&mut env, V1::One, "transpose([[], [], []])").unwrap();
-        assert_eq!(value.as_array().unwrap().elements().len(), 0);
+        assert_eq!(value.as_array().unwrap().len(), 0);
 
         let value = eval_v1_expr(&mut env, V1::One, "transpose([[0, 1, 2], [3, 4, 5]])").unwrap();
         let elements: Vec<_> = value

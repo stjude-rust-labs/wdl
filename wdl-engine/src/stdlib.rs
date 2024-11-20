@@ -53,6 +53,7 @@ mod write_map;
 mod write_object;
 mod write_objects;
 mod write_tsv;
+mod zip;
 
 /// Represents a function call argument.
 pub struct CallArgument {
@@ -271,6 +272,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(range),
             func!(transpose),
             func!(cross),
+            func!(zip),
         ]),
     }
 });
