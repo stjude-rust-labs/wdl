@@ -23,20 +23,6 @@ use crate::diagnostics::function_call_failed;
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#zip
 fn zip(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     debug_assert_eq!(context.arguments.len(), 2);
-    debug_assert!(
-        context
-            .types()
-            .type_definition(
-                context
-                    .return_type
-                    .as_compound()
-                    .expect("type should be compound")
-                    .definition()
-            )
-            .as_array()
-            .is_some(),
-        "type should be an array"
-    );
 
     let left = context.arguments[0]
         .value
@@ -70,8 +56,22 @@ fn zip(context: CallContext<'_>) -> Result<Value, Diagnostic> {
                 .definition(),
         )
         .as_array()
-        .unwrap()
+        .expect("type should be an array")
         .element_type();
+
+    debug_assert!(
+        context
+            .types()
+            .type_definition(
+                element_ty
+                    .as_compound()
+                    .expect("type should be compound")
+                    .definition(),
+            )
+            .as_pair()
+            .is_some(),
+        "element type should be a pair"
+    );
 
     let elements = left
         .elements()
@@ -126,7 +126,7 @@ mod test {
                 )
             })
             .collect();
-        assert_eq!(elements, [(1, "a"), (2, "b"), (3, "c"),]);
+        assert_eq!(elements, [(1, "a"), (2, "b"), (3, "c")]);
 
         let diagnostic = eval_v1_expr(&mut env, V1::One, "zip([1, 2, 3], ['a'])").unwrap_err();
         assert_eq!(
