@@ -42,6 +42,7 @@ mod read_objects;
 mod read_string;
 mod read_tsv;
 mod round;
+mod select_all;
 mod select_first;
 mod sep;
 mod size;
@@ -283,6 +284,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(chunk),
             func!(flatten),
             func!(select_first),
+            func!(select_all),
         ]),
     }
 });
