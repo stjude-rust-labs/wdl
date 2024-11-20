@@ -26,6 +26,7 @@ mod max;
 mod min;
 mod prefix;
 mod quote;
+mod range;
 mod read_boolean;
 mod read_float;
 mod read_int;
@@ -265,6 +266,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(quote),
             func!(squote),
             func!(sep),
+            func!(range),
         ]),
     }
 });
