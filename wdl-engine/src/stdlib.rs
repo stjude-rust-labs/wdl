@@ -37,6 +37,7 @@ mod read_objects;
 mod read_string;
 mod read_tsv;
 mod round;
+mod sep;
 mod size;
 mod squote;
 mod stderr;
@@ -263,6 +264,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(suffix),
             func!(quote),
             func!(squote),
+            func!(sep),
         ]),
     }
 });
