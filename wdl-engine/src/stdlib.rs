@@ -17,6 +17,7 @@ use crate::Value;
 
 mod basename;
 mod ceil;
+mod cross;
 mod find;
 mod floor;
 mod glob;
@@ -269,6 +270,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(sep),
             func!(range),
             func!(transpose),
+            func!(cross),
         ]),
     }
 });

@@ -1069,6 +1069,12 @@ impl Pair {
         panic!("type `{ty}` is not a pair type", ty = ty.display(types));
     }
 
+    /// Constructs a new pair without checking the given left and right conform
+    /// to the given type.
+    pub(crate) fn new_unchecked(ty: Type, left: Arc<Value>, right: Arc<Value>) -> Self {
+        Self { ty, left, right }
+    }
+
     /// Gets the type of the `Pair`.
     pub fn ty(&self) -> Type {
         self.ty
