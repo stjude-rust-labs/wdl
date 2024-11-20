@@ -17,6 +17,7 @@ use crate::Value;
 
 mod basename;
 mod ceil;
+mod chunk;
 mod contains;
 mod cross;
 mod find;
@@ -277,6 +278,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(zip),
             func!(unzip),
             func!(contains),
+            func!(chunk),
         ]),
     }
 });
