@@ -45,6 +45,7 @@ mod stderr;
 mod stdout;
 mod sub;
 mod suffix;
+mod transpose;
 mod write_json;
 mod write_lines;
 mod write_map;
@@ -267,6 +268,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(squote),
             func!(sep),
             func!(range),
+            func!(transpose),
         ]),
     }
 });
