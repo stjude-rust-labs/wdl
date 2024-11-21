@@ -54,7 +54,7 @@ pub const fn descriptor() -> Function {
     Function::new(
         const {
             &[Signature::new(
-                "(Map[K, V]) -> Array[Pair[K, V]] where `K`: any required primitive type",
+                "(Map[K, V]) -> Array[Pair[K, V]] where `K`: any primitive type",
                 as_pairs,
             )]
         },
@@ -66,6 +66,8 @@ mod test {
     use pretty_assertions::assert_eq;
     use wdl_ast::version::V1;
 
+    use crate::PrimitiveValue;
+    use crate::Value;
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
@@ -112,5 +114,25 @@ mod test {
             })
             .collect();
         assert_eq!(elements, [("a", 1), ("c", 3), ("b", 2)]);
+
+        let value = eval_v1_expr(&mut env, V1::One, "as_pairs({'a': 1, None: 3, 'b': 2})").unwrap();
+        let elements: Vec<_> = value
+            .as_array()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|v| {
+                let pair = v.as_pair().unwrap();
+                (
+                    match pair.left() {
+                        Value::None => None,
+                        Value::Primitive(PrimitiveValue::String(s)) => Some(s.as_str()),
+                        _ => panic!("expected a String?"),
+                    },
+                    pair.right().as_integer().unwrap(),
+                )
+            })
+            .collect();
+        assert_eq!(elements, [(Some("a"), 1), (None, 3), (Some("b"), 2)]);
     }
 }

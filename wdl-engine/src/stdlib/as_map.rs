@@ -1,5 +1,6 @@
 //! Implements the `as_map` function from the WDL standard library.
 
+use std::fmt;
 use std::sync::Arc;
 
 use indexmap::IndexMap;
@@ -9,8 +10,25 @@ use super::CallContext;
 use super::Function;
 use super::Signature;
 use crate::Map;
+use crate::PrimitiveValue;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
+
+/// Used for displaying duplicate key errors.
+struct DuplicateKeyError(Option<PrimitiveValue>);
+
+impl fmt::Display for DuplicateKeyError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self.0 {
+            Some(v) => write!(
+                f,
+                "array contains a duplicate entry for map key `{v}`",
+                v = v.raw()
+            ),
+            None => write!(f, "array contains a duplicate entry for map key `None`"),
+        }
+    }
+}
 
 /// Converts an Array of Pairs into a Map in which the left elements of the
 /// Pairs are the keys and the right elements the values.
@@ -47,17 +65,15 @@ fn as_map(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     for e in array.elements() {
         let pair = e.as_pair().expect("element should be a pair");
         let key = match pair.left() {
-            Value::Primitive(v) => v.clone(),
+            Value::None => None,
+            Value::Primitive(v) => Some(v.clone()),
             _ => unreachable!("expected a primitive type for the left value"),
         };
 
         if elements.insert(key.clone(), pair.right().clone()).is_some() {
             return Err(function_call_failed(
                 "as_map",
-                format!(
-                    "array contains a duplicate entry for map key `{key}`",
-                    key = key.raw()
-                ),
+                DuplicateKeyError(key),
                 context.arguments[0].span,
             ));
         }
@@ -71,7 +87,7 @@ pub const fn descriptor() -> Function {
     Function::new(
         const {
             &[Signature::new(
-                "(Array[Pair[K, V]]) -> Map[K, V] where `K`: any required primitive type",
+                "(Array[Pair[K, V]]) -> Map[K, V] where `K`: any primitive type",
                 as_map,
             )]
         },
@@ -106,7 +122,7 @@ mod test {
             .iter()
             .map(|(k, v)| {
                 (
-                    k.as_string().unwrap().as_str(),
+                    k.as_ref().and_then(|k| k.as_string()).unwrap().as_str(),
                     v.as_string().unwrap().as_str(),
                 )
             })
@@ -120,9 +136,30 @@ mod test {
             .unwrap()
             .elements()
             .iter()
-            .map(|(k, v)| (k.as_string().unwrap().as_str(), v.as_integer().unwrap()))
+            .map(|(k, v)| {
+                (
+                    k.as_ref().and_then(|k| k.as_string()).unwrap().as_str(),
+                    v.as_integer().unwrap(),
+                )
+            })
             .collect();
         assert_eq!(elements, [("a", 1), ("c", 3), ("b", 2)]);
+
+        let value =
+            eval_v1_expr(&mut env, V1::One, "as_map([('a', 1), (None, 3), ('b', 2)])").unwrap();
+        let elements: Vec<_> = value
+            .as_map()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|(k, v)| {
+                (
+                    k.as_ref().map(|k| k.as_string().unwrap().as_str()),
+                    v.as_integer().unwrap(),
+                )
+            })
+            .collect();
+        assert_eq!(elements, [(Some("a"), 1), (None, 3), (Some("b"), 2)]);
 
         let value = eval_v1_expr(
             &mut env,
@@ -135,7 +172,12 @@ mod test {
             .unwrap()
             .elements()
             .iter()
-            .map(|(k, v)| (k.as_string().unwrap().as_str(), v.as_integer().unwrap()))
+            .map(|(k, v)| {
+                (
+                    k.as_ref().and_then(|k| k.as_string()).unwrap().as_str(),
+                    v.as_integer().unwrap(),
+                )
+            })
             .collect();
         assert_eq!(elements, [("a", 1), ("c", 3), ("b", 2)]);
 
@@ -144,6 +186,17 @@ mod test {
         assert_eq!(
             diagnostic.message(),
             "call to function `as_map` failed: array contains a duplicate entry for map key `a`"
+        );
+
+        let diagnostic = eval_v1_expr(
+            &mut env,
+            V1::One,
+            "as_map([(None, 1), ('c', 3), (None, 2)])",
+        )
+        .unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "call to function `as_map` failed: array contains a duplicate entry for map key `None`"
         );
     }
 }

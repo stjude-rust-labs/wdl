@@ -64,7 +64,7 @@ pub const fn descriptor() -> Function {
         const {
             &[
                 Signature::new(
-                    "(Map[K, V]) -> Array[K] where `K`: any required primitive type",
+                    "(Map[K, V]) -> Array[K] where `K`: any primitive type",
                     keys,
                 ),
                 Signature::new("(S) -> Array[String] where `S`: any structure", keys),
@@ -81,6 +81,7 @@ mod test {
     use wdl_analysis::types::StructType;
     use wdl_ast::version::V1;
 
+    use crate::Value;
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
@@ -109,6 +110,20 @@ mod test {
             .map(|v| v.as_string().unwrap().as_str())
             .collect();
         assert_eq!(elements, ["foo", "bar", "baz"]);
+
+        let value = eval_v1_expr(&mut env, V1::One, "keys({'foo': 1, None: 2, 'baz': 3})").unwrap();
+        let elements: Vec<_> = value
+            .as_array()
+            .unwrap()
+            .elements()
+            .iter()
+            .map(|v| match v {
+                Value::None => "None",
+                Value::Primitive(v) => v.as_string().unwrap().as_str(),
+                _ => unreachable!("expected an optional primitive value"),
+            })
+            .collect();
+        assert_eq!(elements, ["foo", "None", "baz"]);
 
         let value =
             eval_v1_expr(&mut env, V1::Two, "keys(object { foo: 1, bar: 2, baz: 3})").unwrap();
