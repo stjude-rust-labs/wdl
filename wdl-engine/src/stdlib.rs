@@ -27,6 +27,7 @@ mod flatten;
 mod floor;
 mod glob;
 mod join_paths;
+mod keys;
 mod matches;
 mod max;
 mod min;
@@ -289,6 +290,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(select_all),
             func!(as_pairs),
             func!(as_map),
+            func!(keys),
         ]),
     }
 });

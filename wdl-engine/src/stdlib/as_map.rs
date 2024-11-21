@@ -2,6 +2,7 @@
 
 use std::sync::Arc;
 
+use indexmap::IndexMap;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
@@ -9,6 +10,7 @@ use super::Function;
 use super::Signature;
 use crate::Map;
 use crate::Value;
+use crate::diagnostics::function_call_failed;
 
 /// Converts an Array of Pairs into a Map in which the left elements of the
 /// Pairs are the keys and the right elements the values.
@@ -33,7 +35,7 @@ fn as_map(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             )
             .as_map()
             .is_some(),
-        "type should be an map"
+        "return type should be a map"
     );
 
     let array = context.arguments[0]
@@ -41,18 +43,25 @@ fn as_map(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .as_array()
         .expect("argument should be an array");
 
-    let elements = array
-        .elements()
-        .iter()
-        .map(|e| {
-            let pair = e.as_pair().expect("element should be a pair");
-            let key = match pair.left() {
-                Value::Primitive(v) => v.clone(),
-                _ => unreachable!("expected a primitive type for the left value"),
-            };
-            (key, pair.right().clone())
-        })
-        .collect();
+    let mut elements = IndexMap::with_capacity(array.len());
+    for e in array.elements() {
+        let pair = e.as_pair().expect("element should be a pair");
+        let key = match pair.left() {
+            Value::Primitive(v) => v.clone(),
+            _ => unreachable!("expected a primitive type for the left value"),
+        };
+
+        if elements.insert(key.clone(), pair.right().clone()).is_some() {
+            return Err(function_call_failed(
+                "as_map",
+                format!(
+                    "array contains a duplicate entry for map key `{key}`",
+                    key = key.raw()
+                ),
+                context.arguments[0].span,
+            ));
+        }
+    }
 
     Ok(Map::new_unchecked(context.return_type, Arc::new(elements)).into())
 }
@@ -129,5 +138,12 @@ mod test {
             .map(|(k, v)| (k.as_string().unwrap().as_str(), v.as_integer().unwrap()))
             .collect();
         assert_eq!(elements, [("a", 1), ("c", 3), ("b", 2)]);
+
+        let diagnostic =
+            eval_v1_expr(&mut env, V1::One, "as_map([('a', 1), ('c', 3), ('a', 2)])").unwrap_err();
+        assert_eq!(
+            diagnostic.message(),
+            "call to function `as_map` failed: array contains a duplicate entry for map key `a`"
+        );
     }
 }

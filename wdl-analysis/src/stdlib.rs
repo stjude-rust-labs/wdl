@@ -2744,13 +2744,13 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                         .ret(GenericArrayType::new(GenericType::Parameter("K")))
                         .build(),
                     FunctionSignature::builder()
-                        .min_version(SupportedVersion::V1(V1::One))
+                        .min_version(SupportedVersion::V1(V1::Two))
                         .type_parameter("S", StructConstraint)
                         .parameter(GenericType::Parameter("S"))
                         .ret(array_string)
                         .build(),
                     FunctionSignature::builder()
-                        .min_version(SupportedVersion::V1(V1::One))
+                        .min_version(SupportedVersion::V1(V1::Two))
                         .parameter(Type::Object)
                         .ret(array_string)
                         .build(),
