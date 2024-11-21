@@ -118,12 +118,12 @@ mod test {
             .elements()
             .iter()
             .map(|v| match v {
-                Value::None => "None",
-                Value::Primitive(v) => v.as_string().unwrap().as_str(),
+                Value::None => None,
+                Value::Primitive(v) => Some(v.as_string().unwrap().as_str()),
                 _ => unreachable!("expected an optional primitive value"),
             })
             .collect();
-        assert_eq!(elements, ["foo", "None", "baz"]);
+        assert_eq!(elements, [Some("foo"), None, Some("baz")]);
 
         let value =
             eval_v1_expr(&mut env, V1::Two, "keys(object { foo: 1, bar: 2, baz: 3})").unwrap();

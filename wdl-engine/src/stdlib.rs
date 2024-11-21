@@ -57,6 +57,7 @@ mod sub;
 mod suffix;
 mod transpose;
 mod unzip;
+mod values;
 mod write_json;
 mod write_lines;
 mod write_map;
@@ -293,6 +294,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(as_map),
             func!(keys),
             func!(contains_key),
+            func!(values),
         ]),
     }
 });
