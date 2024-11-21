@@ -20,6 +20,7 @@ mod as_pairs;
 mod basename;
 mod ceil;
 mod chunk;
+mod collect_by_key;
 mod contains;
 mod contains_key;
 mod cross;
@@ -295,6 +296,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
             func!(keys),
             func!(contains_key),
             func!(values),
+            func!(collect_by_key),
         ]),
     }
 });
