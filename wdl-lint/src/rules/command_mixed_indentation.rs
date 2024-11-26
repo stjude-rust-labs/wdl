@@ -72,7 +72,6 @@ fn mixed_indentation(command: Span, span: Span, kind: IndentationKind) -> Diagno
             "this command section uses both tabs and spaces in leading whitespace",
             command,
         )
-        .with_fix("use the same whitespace character for indentation")
 }
 
 /// Detects mixed indentation in a command section.

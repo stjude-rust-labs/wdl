@@ -23,8 +23,6 @@ note[Whitespace]: line contains only whitespace
    │
 10 │     
    │ ^^^^
-   │
-   = fix: remove the whitespace from this line
 
 note[Whitespace]: more than one blank line in a row
    ┌─ tests/lints/only-whitespace/source.wdl:11:45
@@ -37,54 +35,40 @@ note[Whitespace]: more than one blank line in a row
 15 │ │ 
 16 │ │ workflow test {    
    │ ╰^
-   │  
-   = fix: remove the unnecessary blank lines
 
 note[Whitespace]: line contains only whitespace
    ┌─ tests/lints/only-whitespace/source.wdl:13:1
    │
 13 │           
    │ ^^^^^^^^^^
-   │
-   = fix: remove the whitespace from this line
 
 note[Whitespace]: line contains trailing whitespace
    ┌─ tests/lints/only-whitespace/source.wdl:16:16
    │
 16 │ workflow test {    
    │                ^^^^
-   │
-   = fix: remove this trailing whitespace
 
 note[Whitespace]: line contains trailing whitespace
    ┌─ tests/lints/only-whitespace/source.wdl:18:34
    │
 18 │     #@ except: DescriptionMissing        
    │                                  ^^^^^^^^
-   │
-   = fix: remove this trailing whitespace
 
 note[Whitespace]: line contains only whitespace
    ┌─ tests/lints/only-whitespace/source.wdl:20:1
    │
 20 │     
    │ ^^^^
-   │
-   = fix: remove the whitespace from this line
 
 note[Whitespace]: line contains trailing whitespace
    ┌─ tests/lints/only-whitespace/source.wdl:23:18
    │
 23 │     String x = ""           
    │                  ^^^^^^^^^^^
-   │
-   = fix: remove this trailing whitespace
 
 note[Whitespace]: line contains only whitespace
    ┌─ tests/lints/only-whitespace/source.wdl:27:1
    │
 27 │      
    │ ^^^^^
-   │
-   = fix: remove the whitespace from this line
 

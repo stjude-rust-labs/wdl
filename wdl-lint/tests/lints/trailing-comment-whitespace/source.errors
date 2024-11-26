@@ -3,30 +3,22 @@ note[Whitespace]: line contains trailing whitespace
   │
 1 │ #@ except: BlankLinesBetweenElements       
   │                                     ^^^^^^^
-  │
-  = fix: remove this trailing whitespace
 
 note[Whitespace]: line contains trailing whitespace
   ┌─ tests/lints/trailing-comment-whitespace/source.wdl:4:55
   │
 4 │ ## This is a preamble comment with whitespace trailing 
   │                                                       ^
-  │
-  = fix: remove this trailing whitespace
 
 note[Whitespace]: line contains trailing whitespace
   ┌─ tests/lints/trailing-comment-whitespace/source.wdl:8:54
   │
 8 │ # This is a workflow comment with trailing whitespace 
   │                                                      ^
-  │
-  = fix: remove this trailing whitespace
 
 note[Whitespace]: line contains trailing whitespace
    ┌─ tests/lints/trailing-comment-whitespace/source.wdl:11:34
    │
 11 │     #@ except: DescriptionMissing       
    │                                  ^^^^^^^
-   │
-   = fix: remove this trailing whitespace
 

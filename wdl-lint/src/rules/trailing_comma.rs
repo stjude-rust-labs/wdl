@@ -28,7 +28,6 @@ fn missing_trailing_comma(span: Span) -> Diagnostic {
     Diagnostic::note("item missing trailing comma")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("add a comma after this element")
 }
 
 /// Diagnostic message for extraneous content before trailing comma.
@@ -36,7 +35,6 @@ fn extraneous_content(span: Span) -> Diagnostic {
     Diagnostic::note("extraneous whitespace and/or comments before trailing comma")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("remove this extraneous content")
 }
 
 /// Detects missing trailing commas.

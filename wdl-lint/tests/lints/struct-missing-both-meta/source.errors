@@ -3,6 +3,4 @@ note[MissingMetas]: struct `Test` is missing both meta and parameter_meta sectio
   │
 5 │ struct Test {
   │        ^^^^ this struct is missing both meta and parameter_meta sections
-  │
-  = fix: add meta and parameter_meta sections to the struct
 

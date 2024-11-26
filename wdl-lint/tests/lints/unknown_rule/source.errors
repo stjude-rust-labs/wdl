@@ -3,6 +3,4 @@ note[UnknownRule]: unknown lint rule `ThisIsNotARealRule`
   │
 3 │ #@ except: ThisIsNotARealRule, MissingMetas
   │            ^^^^^^^^^^^^^^^^^^ cannot make an exception for this rule
-  │
-  = fix: remove the rule from the exception list
 

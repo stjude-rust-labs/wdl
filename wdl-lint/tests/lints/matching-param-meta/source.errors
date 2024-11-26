@@ -3,8 +3,6 @@ note[MatchingParameterMeta]: task `t` has an extraneous parameter metadata key n
    │
 20 │         extra: "this should not be here"
    │         ^^^^^ this key does not correspond to any input declaration
-   │
-   = fix: remove the extraneous parameter metadata entry
 
 warning[MatchingParameterMeta]: task `t` is missing a parameter metadata key for input `does_not_exist`
    ┌─ tests/lints/matching-param-meta/source.wdl:25:16
@@ -19,8 +17,6 @@ note[MatchingParameterMeta]: workflow `w` has an extraneous parameter metadata k
    │
 47 │         extra: "this should not be here"
    │         ^^^^^ this key does not correspond to any input declaration
-   │
-   = fix: remove the extraneous parameter metadata entry
 
 warning[MatchingParameterMeta]: workflow `w` is missing a parameter metadata key for input `does_not_exist`
    ┌─ tests/lints/matching-param-meta/source.wdl:52:16

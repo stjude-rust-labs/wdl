@@ -23,10 +23,9 @@ const ID: &str = "DoubleQuotes";
 
 /// Creates a "use double quotes" diagnostic.
 fn use_double_quotes(span: Span) -> Diagnostic {
-    Diagnostic::note("string defined with single quotes")
+    Diagnostic::note("string defined with single quotes instead of double quotes")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("change the single quotes to double quotes")
 }
 
 /// Detects strings that are not defined with double quotes.

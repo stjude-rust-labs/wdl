@@ -5,6 +5,4 @@ note[InconsistentNewlines]: inconsistent newlines detected
   │ ╭───────────^
 6 │ │ 
   │ ╰^ the first occurrence of a mismatched newline is here
-  │  
-  = fix: use either "/n" or "/r/n" consistently in the file
 

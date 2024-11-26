@@ -67,7 +67,6 @@ fn extra_param_meta(parent: &SectionParent, extra: &str, span: Span) -> Diagnost
         "this key does not correspond to any input declaration",
         span,
     )
-    .with_fix("remove the extraneous parameter metadata entry")
 }
 
 /// Detects missing or extraneous entries in a `parameter_meta` section.

@@ -15,6 +15,4 @@ note[BlankLinesBetweenElements]: missing blank line
  9 │ │     output {}
 10 │ │ }
    │ ╰─^
-   │  
-   = fix: add a blank line before this element
 

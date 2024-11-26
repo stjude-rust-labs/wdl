@@ -31,7 +31,6 @@ fn inline_lint_directive(span: Span) -> Diagnostic {
     Diagnostic::warning("lint directive must be on its own line")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("move the lint directive to its own line")
 }
 
 /// Creates an "Invalid Lint Directive" diagnostic.

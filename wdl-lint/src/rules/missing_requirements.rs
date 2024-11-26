@@ -37,7 +37,6 @@ fn missing_requirements_section(task: &str, span: Span) -> Diagnostic {
     Diagnostic::warning(format!("task `{task}` is missing a `requirements` section"))
         .with_rule(ID)
         .with_label("this task is missing a `requirements` section", span)
-        .with_fix("add a `requirements` section to the task")
 }
 
 /// Detects missing `requirements` section for tasks.

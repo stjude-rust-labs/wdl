@@ -27,7 +27,6 @@ fn blank_between_imports(span: Span) -> Diagnostic {
     Diagnostic::note("blank lines are not allowed between imports")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("remove any blank lines between imports")
 }
 
 /// Creates a diagnostic for where there is improper
@@ -36,7 +35,6 @@ fn improper_whitespace_within_import(span: Span) -> Diagnostic {
     Diagnostic::note("improper whitespace in import statement")
         .with_rule(ID)
         .with_label("this should be a singular space (` `)", span)
-        .with_fix("use minimal whitespace within import statements")
 }
 
 /// Creates a diagnostic for where there is improper
@@ -44,8 +42,7 @@ fn improper_whitespace_within_import(span: Span) -> Diagnostic {
 fn improper_whitespace_before_import(span: Span) -> Diagnostic {
     Diagnostic::note("improper whitespace before import statement")
         .with_rule(ID)
-        .with_label("extraneous whitespace should not be there", span)
-        .with_fix("use minimal whitespace before import statements")
+        .with_label("extraneous whitespace should not be here", span)
 }
 
 /// Detects whitespace between imports.

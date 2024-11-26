@@ -23,8 +23,6 @@ warning[MalformedLintDirective]: lint directive must be on its own line
    │
 33 │ struct Baz {  #@ except: this should be flagged for being inlined
    │               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │
-   = fix: move the lint directive to its own line
 
 warning[MalformedLintDirective]: expected exactly one space before lint directive
    ┌─ tests/lints/malformed-lint-directive/source.wdl:48:7

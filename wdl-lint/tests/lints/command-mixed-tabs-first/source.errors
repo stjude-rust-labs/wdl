@@ -6,8 +6,6 @@ warning[CommandSectionMixedIndentation]: mixed indentation within a command
 13 │         this line is prefixed with ~{"tabs"}
 14 │         this line is prefixed with spaces
    │ ^ indented with tabs until this space
-   │
-   = fix: use the same whitespace character for indentation
 
 warning[CommandSectionMixedIndentation]: mixed indentation within a command
    ┌─ tests/lints/command-mixed-tabs-first/source.wdl:30:1
@@ -17,6 +15,4 @@ warning[CommandSectionMixedIndentation]: mixed indentation within a command
 29 │         this line is prefixed with ~{"tabs"}
 30 │         this line is prefixed with spaces
    │ ^ indented with tabs until this space
-   │
-   = fix: use the same whitespace character for indentation
 

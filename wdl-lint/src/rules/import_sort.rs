@@ -25,7 +25,6 @@ fn import_not_sorted(span: Span) -> Diagnostic {
     Diagnostic::note("imports are not sorted lexicographically")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("sort the imports lexicographically")
 }
 
 /// Creates an improper comment diagnostic.
@@ -33,7 +32,6 @@ fn improper_comment(span: Span) -> Diagnostic {
     Diagnostic::note("comments are not allowed within an import statement")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("remove the comment from the import statement")
 }
 
 /// Detects imports that are not sorted lexicographically.

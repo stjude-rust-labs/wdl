@@ -3,6 +3,4 @@ note[MissingMetas]: task `test` is missing a `meta` section
   │
 3 │ task test {
   │      ^^^^ this task is missing a `meta` section
-  │
-  = fix: add a `meta` section to the task
 
