@@ -90,17 +90,17 @@ note[KeyValuePairs]: incorrect indentation
    │
    = fix: add 4 spaces to indentation
 
-note[TrailingComma]: item missing trailing comma
-   ┌─ tests/lints/key-value-pairs/source.wdl:34:13
-   │
-34 │             choices: ["yes", "reverse", "no",]
-   │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 note[KeyValuePairs]: all items in an array or object should be on separate lines
    ┌─ tests/lints/key-value-pairs/source.wdl:34:22
    │
 34 │             choices: ["yes", "reverse", "no",]
    │                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+note[TrailingComma]: item missing trailing comma
+   ┌─ tests/lints/key-value-pairs/source.wdl:34:46
+   │
+34 │             choices: ["yes", "reverse", "no",]
+   │                                              ^
 
 note[KeyValuePairs]: all items in an array or object should be on separate lines
    ┌─ tests/lints/key-value-pairs/source.wdl:36:19

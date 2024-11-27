@@ -130,7 +130,14 @@ impl Visitor for TrailingCommaRule {
                 } else {
                     // No comma found, report missing
                     state.exceptable_add(
-                        missing_trailing_comma(last_child.syntax().text_range().to_span()),
+                        missing_trailing_comma(
+                            last_child
+                                .syntax()
+                                .last_token()
+                                .unwrap()
+                                .text_range()
+                                .to_span(),
+                        ),
                         SyntaxElement::from(item.syntax().clone()),
                         &self.exceptable_nodes(),
                     );
@@ -171,7 +178,14 @@ impl Visitor for TrailingCommaRule {
                 } else {
                     // No comma found, report missing
                     state.exceptable_add(
-                        missing_trailing_comma(last_child.syntax().text_range().to_span()),
+                        missing_trailing_comma(
+                            last_child
+                                .syntax()
+                                .last_token()
+                                .unwrap()
+                                .text_range()
+                                .to_span(),
+                        ),
                         SyntaxElement::from(item.syntax().clone()),
                         &self.exceptable_nodes(),
                     );
@@ -212,7 +226,9 @@ impl Visitor for TrailingCommaRule {
                 }
             } else {
                 state.exceptable_add(
-                    missing_trailing_comma(input.syntax().text_range().to_span()),
+                    missing_trailing_comma(
+                        input.syntax().last_token().unwrap().text_range().to_span(),
+                    ),
                     SyntaxElement::from(call.syntax().clone()),
                     &self.exceptable_nodes(),
                 );
@@ -254,7 +270,9 @@ impl Visitor for TrailingCommaRule {
                             } else {
                                 // No comma found, report missing
                                 state.exceptable_add(
-                                    missing_trailing_comma(last_child.text_range().to_span()),
+                                    missing_trailing_comma(
+                                        last_child.last_token().unwrap().text_range().to_span(),
+                                    ),
                                     SyntaxElement::from(l.syntax().clone()),
                                     &self.exceptable_nodes(),
                                 );
