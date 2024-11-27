@@ -272,7 +272,6 @@ impl Visitor for InputNotSortedRule {
                 }
             });
         if errors > 0 {
-            // Span should jsut be the input keyword
             let span = input.syntax().first_token().unwrap().text_range().to_span();
             state.exceptable_add(
                 input_not_sorted(span, input_string),
