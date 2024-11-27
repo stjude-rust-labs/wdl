@@ -551,6 +551,16 @@ fn check_prior_spacing(
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
     if let Some(prior) = syntax.prev_sibling_or_token() {
+        let span = match prior {
+            NodeOrToken::Token(ref t) => Span::new(
+                t.text_range().start().into(),
+                (syntax.text_range().start() - t.text_range().start()).into(),
+            ),
+            NodeOrToken::Node(ref n) => Span::new(
+                n.last_token().unwrap().text_range().start().into(),
+                (syntax.text_range().start() - n.last_token().unwrap().text_range().start()).into(),
+            ),
+        };
         match prior.kind() {
             SyntaxKind::Whitespace => {
                 let count = prior
@@ -577,7 +587,7 @@ fn check_prior_spacing(
                     }
                 } else if count < 2 && element_spacing_required {
                     state.exceptable_add(
-                        missing_blank_line(syntax.text_range().to_span()),
+                        missing_blank_line(span),
                         SyntaxElement::from(syntax.clone()),
                         exceptable_nodes,
                     );
@@ -589,7 +599,7 @@ fn check_prior_spacing(
                 // we're missing a blank line.
                 if element_spacing_required && !first {
                     state.exceptable_add(
-                        missing_blank_line(syntax.text_range().to_span()),
+                        missing_blank_line(span),
                         SyntaxElement::from(syntax.clone()),
                         exceptable_nodes,
                     );
