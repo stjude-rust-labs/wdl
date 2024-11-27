@@ -21,6 +21,10 @@ use tracing_subscriber::EnvFilter;
 async fn inner() -> Result<(), Box<dyn std::error::Error>> {
     let args = gauntlet::Args::parse();
 
+    if args.bless && args.update {
+        return Err("cannot use both --bless and --update".into());
+    }
+
     let level = if args.trace {
         LevelFilter::TRACE
     } else if args.debug {
