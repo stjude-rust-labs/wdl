@@ -9,7 +9,6 @@ use std::collections::HashSet;
 use std::sync::OnceLock;
 
 use wdl_ast::AstNode;
-use wdl_ast::AstNodeExt;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -18,6 +17,7 @@ use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
+use wdl_ast::ToSpan;
 use wdl_ast::TokenStrHash;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -447,7 +447,14 @@ impl Visitor for RuntimeSectionKeysRule {
                     // `runtime` section is entered before a previous `runtime`
                     // section is exited.
                     Some(_) => unreachable!(),
-                    None => Some(section.span()),
+                    None => Some(
+                        section
+                            .syntax()
+                            .first_token()
+                            .unwrap()
+                            .text_range()
+                            .to_span(),
+                    ),
                 };
             }
             VisitReason::Exit => {

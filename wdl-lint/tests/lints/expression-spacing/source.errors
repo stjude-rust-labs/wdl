@@ -120,7 +120,7 @@ note[CommentWhitespace]: comment not sufficiently indented
     ┌─ tests/lints/expression-spacing/source.wdl:104:13
     │
 104 │             # This comment will flag, because the  `] == [` expression is incorrect.
-    │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    │             ^
     │
     = fix: this comment has 3 levels of indentation. It should have 4 levels of indentation.
 
@@ -128,7 +128,7 @@ note[CommentWhitespace]: comment not sufficiently indented
     ┌─ tests/lints/expression-spacing/source.wdl:138:13
     │
 138 │             # This comment will flag, because the  `} == {` expression is incorrect.
-    │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    │             ^
     │
     = fix: this comment has 3 levels of indentation. It should have 4 levels of indentation.
 

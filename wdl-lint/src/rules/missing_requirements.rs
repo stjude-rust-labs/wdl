@@ -1,7 +1,6 @@
 //! A lint rule for missing `requirements` sections.
 
 use wdl_ast::AstNode;
-use wdl_ast::AstNodeExt;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -10,6 +9,7 @@ use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
+use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::v1::TaskDefinition;
@@ -106,7 +106,15 @@ impl Visitor for MissingRequirementsRule {
                 if let Some(runtime) = task.runtime() {
                     let name = task.name();
                     state.exceptable_add(
-                        deprecated_runtime_section(name.as_str(), runtime.span()),
+                        deprecated_runtime_section(
+                            name.as_str(),
+                            runtime
+                                .syntax()
+                                .first_token()
+                                .expect("runtime section should have tokens")
+                                .text_range()
+                                .to_span(),
+                        ),
                         SyntaxElement::from(runtime.syntax().clone()),
                         &self.exceptable_nodes(),
                     );

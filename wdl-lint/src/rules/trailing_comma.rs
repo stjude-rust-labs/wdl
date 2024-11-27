@@ -118,11 +118,10 @@ impl Visitor for TrailingCommaRule {
                         // Comma found, but not next, extraneous trivia
                         state.exceptable_add(
                             extraneous_content(Span::new(
-                                usize::from(last_child.syntax().text_range().end()),
-                                usize::from(
-                                    comma.text_range().start()
-                                        - last_child.syntax().text_range().end(),
-                                ),
+                                last_child.syntax().text_range().end().into(),
+                                (comma.text_range().start()
+                                    - last_child.syntax().text_range().end())
+                                .into(),
                             )),
                             SyntaxElement::from(item.syntax().clone()),
                             &self.exceptable_nodes(),
@@ -160,11 +159,10 @@ impl Visitor for TrailingCommaRule {
                         // Comma found, but not next, extraneous trivia
                         state.exceptable_add(
                             extraneous_content(Span::new(
-                                usize::from(last_child.syntax().text_range().end()),
-                                usize::from(
-                                    comma.text_range().start()
-                                        - last_child.syntax().text_range().end(),
-                                ),
+                                last_child.syntax().text_range().end().into(),
+                                (comma.text_range().start()
+                                    - last_child.syntax().text_range().end())
+                                .into(),
                             )),
                             SyntaxElement::from(item.syntax().clone()),
                             &self.exceptable_nodes(),
@@ -205,10 +203,8 @@ impl Visitor for TrailingCommaRule {
                 if !comma_is_next {
                     state.exceptable_add(
                         extraneous_content(Span::new(
-                            usize::from(input.syntax().text_range().end()),
-                            usize::from(
-                                nc.text_range().start() - input.syntax().text_range().end(),
-                            ),
+                            input.syntax().text_range().end().into(),
+                            (nc.text_range().start() - input.syntax().text_range().end()).into(),
                         )),
                         SyntaxElement::from(call.syntax().clone()),
                         &self.exceptable_nodes(),
@@ -246,11 +242,10 @@ impl Visitor for TrailingCommaRule {
                                     // Comma found, but not next, extraneous trivia
                                     state.exceptable_add(
                                         extraneous_content(Span::new(
-                                            usize::from(last_child.text_range().end()),
-                                            usize::from(
-                                                comma.text_range().start()
-                                                    - last_child.text_range().end(),
-                                            ),
+                                            last_child.text_range().end().into(),
+                                            (comma.text_range().start()
+                                                - last_child.text_range().end())
+                                            .into(),
                                         )),
                                         SyntaxElement::from(l.syntax().clone()),
                                         &self.exceptable_nodes(),

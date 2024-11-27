@@ -137,8 +137,9 @@ impl Visitor for CommentWhitespaceRule {
                     || prior.as_token().expect("should be a token").text() != "  "
                 {
                     // Report a diagnostic if there are not two spaces before the comment delimiter
+                    let span = Span::new(comment.span().start(), 1);
                     state.exceptable_add(
-                        inline_preceding_whitespace(comment.span()),
+                        inline_preceding_whitespace(span),
                         SyntaxElement::from(comment.syntax().clone()),
                         &self.exceptable_nodes(),
                     );
@@ -165,10 +166,11 @@ impl Visitor for CommentWhitespaceRule {
                     .expect("should have prior whitespace");
                 if this_indentation != expected_indentation {
                     // Report a diagnostic if the comment is not indented properly
+                    let span = Span::new(comment.span().start(), 1);
                     match this_indentation.len().cmp(&expected_indentation.len()) {
                         Ordering::Greater => state.exceptable_add(
                             excess_indentation(
-                                comment.span(),
+                                span,
                                 expected_indentation.len() / INDENT.len(),
                                 this_indentation.len() / INDENT.len(),
                             ),
@@ -177,7 +179,7 @@ impl Visitor for CommentWhitespaceRule {
                         ),
                         Ordering::Less => state.exceptable_add(
                             insufficient_indentation(
-                                comment.span(),
+                                span,
                                 expected_indentation.len() / INDENT.len(),
                                 this_indentation.len() / INDENT.len(),
                             ),

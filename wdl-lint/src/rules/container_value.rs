@@ -56,7 +56,7 @@ fn mutable_tag(span: Span) -> Diagnostic {
 
 /// Creates an "empty array" diagnostic.
 fn empty_array(span: Span) -> Diagnostic {
-    Diagnostic::note(String::from(
+    Diagnostic::warning(String::from(
         "empty arrays are ambiguous and should contain at least one entry",
     ))
     .with_rule(ID)
@@ -78,7 +78,7 @@ fn array_to_string_literal(span: Span) -> Diagnostic {
 /// Creates a diagnostic indicating that an array contains one or more 'any'
 /// URIs.
 fn array_containing_anys(spans: impl Iterator<Item = Span>) -> Diagnostic {
-    let mut diagnostic = Diagnostic::note(String::from("arrays containing any are ambiguous"))
+    let mut diagnostic = Diagnostic::warning(String::from("arrays containing any are ambiguous"))
         .with_rule(ID)
         .with_fix(format!(
             "remove these entries or change the array to a string literal with the value of \
