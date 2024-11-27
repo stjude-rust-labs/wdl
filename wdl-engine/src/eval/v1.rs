@@ -636,26 +636,32 @@ impl<'a, C: EvaluationContext> ExprEvaluator<'a, C> {
     fn evaluate_if_expr(&mut self, expr: &IfExpr) -> Result<Value, Diagnostic> {
         /// Used to translate an expression evaluation context to an expression
         /// type evaluation context.
-        struct TypeContext<'a, C: EvaluationContext>(&'a mut C);
+        struct TypeContext<'a, C: EvaluationContext> {
+            /// The expression evaluation context.
+            context: &'a mut C,
+            /// The diagnostics from evaluating the type of an expression.
+            diagnostics: Vec<Diagnostic>,
+        }
+
         impl<C: EvaluationContext> wdl_analysis::types::v1::EvaluationContext for TypeContext<'_, C> {
             fn version(&self) -> SupportedVersion {
-                self.0.version()
+                self.context.version()
             }
 
             fn types(&self) -> &wdl_analysis::types::Types {
-                self.0.types()
+                self.context.types()
             }
 
             fn types_mut(&mut self) -> &mut wdl_analysis::types::Types {
-                self.0.types_mut()
+                self.context.types_mut()
             }
 
             fn resolve_name(&self, name: &wdl_ast::Ident) -> Option<Type> {
-                self.0.resolve_name(name).map(|v| v.ty()).ok()
+                self.context.resolve_name(name).map(|v| v.ty()).ok()
             }
 
             fn resolve_type_name(&mut self, name: &wdl_ast::Ident) -> Result<Type, Diagnostic> {
-                self.0.resolve_type_name(name)
+                self.context.resolve_type_name(name)
             }
 
             fn input(&self, _name: &str) -> Option<wdl_analysis::document::Input> {
@@ -685,13 +691,16 @@ impl<'a, C: EvaluationContext> ExprEvaluator<'a, C> {
             fn diagnostics_config(&self) -> DiagnosticsConfig {
                 DiagnosticsConfig::except_all()
             }
+
+            fn add_diagnostic(&mut self, diagnostic: Diagnostic) {
+                self.diagnostics.push(diagnostic);
+            }
         }
 
         let (cond_expr, true_expr, false_expr) = expr.exprs();
 
         // Evaluate the conditional expression and the true expression or the false
         // expression, depending on the result of the conditional expression
-        let mut diagnostics = Vec::new();
         let cond = self.evaluate_expr(&cond_expr)?;
         let (value, true_ty, false_ty) = if cond
             .coerce(self.context.types(), PrimitiveTypeKind::Boolean.into())
@@ -703,25 +712,38 @@ impl<'a, C: EvaluationContext> ExprEvaluator<'a, C> {
             // Evaluate the `true` expression and calculate the type of the `false`
             // expression
             let value = self.evaluate_expr(&true_expr)?;
-            let true_ty = value.ty();
-            let false_ty = ExprTypeEvaluator::new(&mut TypeContext(self.context), &mut diagnostics)
+            let mut context = TypeContext {
+                context: self.context,
+                diagnostics: Vec::new(),
+            };
+            let false_ty = ExprTypeEvaluator::new(&mut context)
                 .evaluate_expr(&false_expr)
                 .unwrap_or(Type::Union);
+
+            if let Some(diagnostic) = context.diagnostics.pop() {
+                return Err(diagnostic);
+            }
+
+            let true_ty = value.ty();
             (value, true_ty, false_ty)
         } else {
             // Evaluate the `false` expression and calculate the type of the `true`
             // expression
             let value = self.evaluate_expr(&false_expr)?;
-            let true_ty = ExprTypeEvaluator::new(&mut TypeContext(self.context), &mut diagnostics)
+            let mut context = TypeContext {
+                context: self.context,
+                diagnostics: Vec::new(),
+            };
+            let true_ty = ExprTypeEvaluator::new(&mut context)
                 .evaluate_expr(&true_expr)
                 .unwrap_or(Type::Union);
+            if let Some(diagnostic) = context.diagnostics.pop() {
+                return Err(diagnostic);
+            }
+
             let false_ty = value.ty();
             (value, true_ty, false_ty)
         };
-
-        if let Some(diagnostic) = diagnostics.pop() {
-            return Err(diagnostic);
-        }
 
         // Determine the common type of the true and false expressions
         // The value must be coerced to that type

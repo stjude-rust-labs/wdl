@@ -117,22 +117,22 @@ fn compare_results(test: &Path, results: Vec<AnalysisResult>) -> Result<()> {
     let cwd = std::env::current_dir().expect("must have a CWD");
     for result in results {
         // Attempt to strip the CWD from the result path
-        let path = result.uri().to_file_path();
+        let path = result.document().uri().to_file_path();
         let path: Cow<'_, str> = match &path {
             // Strip the CWD from the path
             Ok(path) => path.strip_prefix(&cwd).unwrap_or(path).to_string_lossy(),
             // Use the id itself if there is no path
-            Err(_) => result.uri().as_str().into(),
+            Err(_) => result.document().uri().as_str().into(),
         };
 
-        let diagnostics: Cow<'_, [Diagnostic]> = match result.parse_result().error() {
+        let diagnostics: Cow<'_, [Diagnostic]> = match result.error() {
             Some(e) => vec![Diagnostic::error(format!("failed to read `{path}`: {e:#}"))].into(),
-            None => result.diagnostics().into(),
+            None => result.document().diagnostics().into(),
         };
 
         if !diagnostics.is_empty() {
             let source = result
-                .parse_result()
+                .document()
                 .root()
                 .map(|n| SyntaxNode::new_root(n.clone()).text().to_string())
                 .unwrap_or(String::new());
@@ -197,7 +197,8 @@ async fn main() {
         let results = results
             .iter()
             .filter_map(|r| {
-                r.uri()
+                r.document()
+                    .uri()
                     .to_file_path()
                     .ok()?
                     .starts_with(&base)
