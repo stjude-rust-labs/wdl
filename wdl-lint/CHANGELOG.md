@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Added a `RedundantInputAssignment` rule ([#244](https://github.com/stjude-rust-labs/wdl/pull/244))
 
+## Fixed
+
+* Shortened many reported spans and removed unhelpful `fix` messages ([#260](https://github.com/stjude-rust-labs/wdl/pull/260))
+
 ## 0.8.0 - 10-22-2024
 
 ### Fixed
