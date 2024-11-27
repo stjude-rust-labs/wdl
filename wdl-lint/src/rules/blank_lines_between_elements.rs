@@ -490,14 +490,21 @@ impl Visitor for BlankLinesBetweenElementsRule {
 /// Check if the given syntax node is the first element in the block.
 fn is_first_element(syntax: &SyntaxNode) -> bool {
     let mut prev = syntax.prev_sibling_or_token();
+    let mut comment_seen = false;
     while let Some(ref cur) = prev {
         match cur {
             NodeOrToken::Token(t) => {
                 if t.kind() == SyntaxKind::OpenBrace {
                     return true;
                 }
+                if t.kind() == SyntaxKind::Comment {
+                    comment_seen = true;
+                }
             }
-            NodeOrToken::Node(_) => {
+            NodeOrToken::Node(n) => {
+                if n.kind() == SyntaxKind::VersionStatementNode {
+                    return !comment_seen;
+                }
                 return false;
             }
         }
