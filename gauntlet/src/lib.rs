@@ -42,7 +42,6 @@ pub use repository::Repository;
 use wdl::analysis::Analyzer;
 use wdl::analysis::rules;
 use wdl::ast::Diagnostic;
-use wdl::ast::SyntaxNode;
 use wdl::lint::LintVisitor;
 use wdl::lint::ast::Validator;
 
@@ -220,11 +219,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
 
             let mut actual = IndexSet::new();
             if !diagnostics.is_empty() {
-                let source = result
-                    .document()
-                    .root()
-                    .map(|n| SyntaxNode::new_root(n.clone()).text().to_string())
-                    .unwrap_or(String::new());
+                let source = result.document().node().syntax().text().to_string();
 
                 let file: SimpleFile<_, _> = SimpleFile::new(
                     Path::new(document_identifier.path())

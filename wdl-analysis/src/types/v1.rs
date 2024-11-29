@@ -49,6 +49,7 @@ use super::PrimitiveTypeKind;
 use super::StructType;
 use super::Type;
 use super::TypeEq;
+use super::TypeNameResolver;
 use super::Types;
 use crate::DiagnosticsConfig;
 use crate::UNNECESSARY_FUNCTION_CALL;
@@ -66,6 +67,7 @@ use crate::diagnostics::logical_not_mismatch;
 use crate::diagnostics::logical_or_mismatch;
 use crate::diagnostics::map_key_not_primitive;
 use crate::diagnostics::missing_struct_members;
+use crate::diagnostics::multiple_type_mismatch;
 use crate::diagnostics::negation_mismatch;
 use crate::diagnostics::no_common_type;
 use crate::diagnostics::not_a_pair_accessor;
@@ -77,14 +79,12 @@ use crate::diagnostics::string_concat_mismatch;
 use crate::diagnostics::too_few_arguments;
 use crate::diagnostics::too_many_arguments;
 use crate::diagnostics::type_mismatch;
-use crate::diagnostics::type_mismatch_custom;
 use crate::diagnostics::unknown_call_io;
 use crate::diagnostics::unknown_function;
 use crate::diagnostics::unknown_task_io;
 use crate::diagnostics::unnecessary_function_call;
 use crate::diagnostics::unsupported_function;
-use crate::document::Input;
-use crate::document::Output;
+use crate::document::Task;
 use crate::stdlib::FunctionBindError;
 use crate::stdlib::MAX_PARAMETERS;
 use crate::stdlib::STDLIB;
@@ -309,22 +309,15 @@ impl fmt::Display for NumericOperator {
 
 /// Used to convert AST types into diagnostic types.
 #[derive(Debug)]
-pub struct AstTypeConverter<'a, L> {
-    /// The types collection to use for the conversion.
-    types: &'a mut Types,
-    /// A lookup function for looking up type names.
-    lookup: L,
-}
+pub struct AstTypeConverter<R>(R);
 
-impl<'a, L> AstTypeConverter<'a, L>
+impl<R> AstTypeConverter<R>
 where
-    L: FnMut(&str, Span) -> Result<Type, Diagnostic>,
+    R: TypeNameResolver,
 {
     /// Constructs a new AST type converter.
-    ///
-    /// The provided callback is used to look up type name references.
-    pub fn new(types: &'a mut Types, lookup: L) -> Self {
-        Self { types, lookup }
+    pub fn new(resolver: R) -> Self {
+        Self(resolver)
     }
 
     /// Converts a V1 AST type into an analysis type.
@@ -337,21 +330,18 @@ where
         let ty = match ty {
             v1::Type::Map(ty) => {
                 let ty = self.convert_map_type(ty)?;
-                self.types.add_map(ty)
+                self.0.types_mut().add_map(ty)
             }
             v1::Type::Array(ty) => {
                 let ty = self.convert_array_type(ty)?;
-                self.types.add_array(ty)
+                self.0.types_mut().add_array(ty)
             }
             v1::Type::Pair(ty) => {
                 let ty = self.convert_pair_type(ty)?;
-                self.types.add_pair(ty)
+                self.0.types_mut().add_pair(ty)
             }
             v1::Type::Object(_) => Type::Object,
-            v1::Type::Ref(r) => {
-                let name = r.name();
-                (self.lookup)(name.as_str(), name.span())?
-            }
+            v1::Type::Ref(r) => self.0.resolve_type_name(&r.name())?,
             v1::Type::Primitive(ty) => Type::Primitive(ty.into()),
         };
 
@@ -454,31 +444,10 @@ pub trait EvaluationContext {
     /// Resolves a type name to a type.
     fn resolve_type_name(&mut self, name: &Ident) -> Result<Type, Diagnostic>;
 
-    /// Gets an input for the given name.
+    /// Gets the task associated with the evaluation context.
     ///
-    /// Returns `None` if `input` hidden types are not supported or if the
-    /// specified input isn't known.
-    fn input(&self, name: &str) -> Option<Input>;
-
-    /// Gets an output for the given name.
-    ///
-    /// Returns `None` if `output` hidden types are not supported or if the
-    /// specified output isn't known.
-    fn output(&self, name: &str) -> Option<Output>;
-
-    /// The task name associated with the evaluation.
-    ///
-    /// Returns `None` if no task is visible in this context.
-    fn task_name(&self) -> Option<&str>;
-
-    /// Whether or not `hints` hidden types are supported for the evaluation.
-    fn supports_hints_type(&self) -> bool;
-
-    /// Whether or not `input` hidden types are supported for the evaluation.
-    fn supports_input_type(&self) -> bool;
-
-    /// Whether or not `output` hidden types are supported for the evaluation.
-    fn supports_output_type(&self) -> bool;
+    /// This is only `Some` when evaluating a task `hints` section.
+    fn task(&self) -> Option<&Task>;
 
     /// Gets the diagnostics configuration for the evaluation.
     fn diagnostics_config(&self) -> DiagnosticsConfig;
@@ -928,7 +897,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     .iter()
                     .any(|target| expr_ty.is_coercible_to(self.context.types(), target))
                 {
-                    self.context.add_diagnostic(type_mismatch_custom(
+                    self.context.add_diagnostic(multiple_type_mismatch(
                         self.context.types(),
                         expected,
                         name.span(),
@@ -957,7 +926,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 .iter()
                 .any(|target| expr_ty.is_coercible_to(self.context.types(), target))
             {
-                self.context.add_diagnostic(type_mismatch_custom(
+                self.context.add_diagnostic(multiple_type_mismatch(
                     self.context.types(),
                     expected,
                     name.span(),
@@ -974,9 +943,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
 
     /// Evaluates the type of a literal hints expression.
     fn evaluate_literal_hints(&mut self, expr: &LiteralHints) -> Option<Type> {
-        if !self.context.supports_hints_type() {
-            return None;
-        }
+        self.context.task()?;
 
         for item in expr.items() {
             self.evaluate_hints_item(&item.name(), &item.expr())
@@ -994,7 +961,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 .iter()
                 .any(|target| expr_ty.is_coercible_to(self.context.types(), target))
             {
-                self.context.add_diagnostic(type_mismatch_custom(
+                self.context.add_diagnostic(multiple_type_mismatch(
                     self.context.types(),
                     expected,
                     name.span(),
@@ -1008,9 +975,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
     /// Evaluates the type of a literal input expression.
     fn evaluate_literal_input(&mut self, expr: &LiteralInput) -> Option<Type> {
         // Check to see if inputs literals are supported in the evaluation scope
-        if !self.context.supports_input_type() {
-            return None;
-        }
+        self.context.task()?;
 
         // Evaluate the items of the literal
         for item in expr.items() {
@@ -1023,9 +988,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
     /// Evaluates the type of a literal output expression.
     fn evaluate_literal_output(&mut self, expr: &LiteralOutput) -> Option<Type> {
         // Check to see if output literals are supported in the evaluation scope
-        if !self.context.supports_output_type() {
-            return None;
-        }
+        self.context.task()?;
 
         // Evaluate the items of the literal
         for item in expr.items() {
@@ -1050,14 +1013,24 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 span = Some(name.span());
 
                 match if io == Io::Input {
-                    self.context.input(name.as_str()).map(|i| i.ty())
+                    self.context
+                        .task()
+                        .expect("should have task")
+                        .inputs()
+                        .get(name.as_str())
+                        .map(|i| i.ty())
                 } else {
-                    self.context.output(name.as_str()).map(|o| o.ty())
+                    self.context
+                        .task()
+                        .expect("should have task")
+                        .outputs()
+                        .get(name.as_str())
+                        .map(|o| o.ty())
                 } {
                     Some(ty) => ty,
                     None => {
                         self.context.add_diagnostic(unknown_task_io(
-                            self.context.task_name().expect("should have task name"),
+                            self.context.task().expect("should have task").name(),
                             &name,
                             io,
                         ));

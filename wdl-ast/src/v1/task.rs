@@ -28,6 +28,32 @@ pub mod common;
 pub mod requirements;
 pub mod runtime;
 
+/// Unescapes command text.
+fn unescape_command_text(s: &str, heredoc: bool, buffer: &mut String) {
+    let mut chars = s.chars().peekable();
+    while let Some(c) = chars.next() {
+        match c {
+            '\\' => match chars.peek() {
+                Some('\\') | Some('~') => {
+                    buffer.push(chars.next().unwrap());
+                }
+                Some('>') if heredoc => {
+                    buffer.push(chars.next().unwrap());
+                }
+                Some('$') | Some('}') if !heredoc => {
+                    buffer.push(chars.next().unwrap());
+                }
+                _ => {
+                    buffer.push('\\');
+                }
+            },
+            _ => {
+                buffer.push(c);
+            }
+        }
+    }
+}
+
 /// Represents a task definition.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TaskDefinition(pub(crate) SyntaxNode);
@@ -766,10 +792,10 @@ impl CommandSection {
         None
     }
 
-    /// Strips leading whitespace from the command. If the command has mixed
-    /// indentation, this will return `None`.
+    /// Strips leading whitespace from the command.
+    ///
+    /// If the command has mixed indentation, this will return `None`.
     pub fn strip_whitespace(&self) -> Option<Vec<StrippedCommandPart>> {
-        let mut result = Vec::new();
         let mut min_leading_spaces = usize::MAX;
         let mut min_leading_tabs = usize::MAX;
         let mut parsing_leading_whitespace = false; // init to false so that the first line is skipped
@@ -820,46 +846,46 @@ impl CommandSection {
             }
         }
 
-        // Check for no indentation or all whitespace, in which cases the first and last
-        // line must be trimmed.
+        let mut result = Vec::new();
+        let heredoc = self.is_heredoc();
+        for part in self.parts() {
+            match part {
+                CommandPart::Text(text) => {
+                    let mut s = String::new();
+                    unescape_command_text(text.as_str(), heredoc, &mut s);
+                    result.push(StrippedCommandPart::Text(s));
+                }
+                CommandPart::Placeholder(p) => {
+                    result.push(StrippedCommandPart::Placeholder(p));
+                }
+            }
+        }
+
+        // Trim the first line
+        if let Some(StrippedCommandPart::Text(text)) = result.first_mut() {
+            let end = text.find('\n').map(|p| p + 1).unwrap_or(text.len());
+            let line = &text[..end];
+            let len = line.len() - line.trim_start().len();
+            text.replace_range(..len, "");
+        }
+
+        // Trim the last line
+        if let Some(StrippedCommandPart::Text(text)) = result.last_mut() {
+            if let Some(index) = text.rfind(|c| !matches!(c, ' ' | '\t')) {
+                text.truncate(index + 1);
+            } else {
+                text.clear();
+            }
+
+            if text.ends_with('\n') {
+                text.pop();
+            }
+        }
+
+        // Check for no indentation or all whitespace, in which case we're done
         if (min_leading_spaces == 0 && min_leading_tabs == 0)
             || (min_leading_spaces == usize::MAX && min_leading_tabs == usize::MAX)
         {
-            for (i, part) in self.parts().enumerate() {
-                match part {
-                    CommandPart::Text(text) => {
-                        let mut stripped_text = Vec::new();
-                        for (j, line) in text.as_str().lines().enumerate() {
-                            if i == 0 && j == 0 {
-                                let trimmed = line.trim_start();
-                                if !trimmed.is_empty() {
-                                    stripped_text.push(trimmed);
-                                }
-                                continue;
-                            }
-                            stripped_text.push(line);
-                        }
-                        let stripped_text = stripped_text.join("\n");
-
-                        result.push(StrippedCommandPart::Text(stripped_text));
-                    }
-                    CommandPart::Placeholder(p) => {
-                        result.push(StrippedCommandPart::Placeholder(p));
-                    }
-                }
-            }
-
-            if let Some(StrippedCommandPart::Text(text)) = result.last_mut() {
-                if let Some(index) = text.rfind(|c| !matches!(c, ' ' | '\t')) {
-                    text.truncate(index + 1);
-                } else {
-                    text.clear();
-                }
-                if text.ends_with('\n') {
-                    text.pop();
-                }
-            }
-
             return Some(result);
         }
 
@@ -878,49 +904,42 @@ impl CommandSection {
             min_leading_tabs
         };
 
-        for (i, part) in self.parts().enumerate() {
+        // Finally, strip the leading whitespace on each line
+        // This is done in place using the `replace_range` method; the method will
+        // internally do moves without allocations
+        let mut strip_leading_whitespace = true;
+        for part in &mut result {
             match part {
-                CommandPart::Text(text) => {
-                    let mut stripped_text = Vec::new();
-                    for (j, line) in text.as_str().lines().enumerate() {
-                        if i == 0 && j == 0 {
-                            let trimmed = line.trim_start();
-                            if !trimmed.is_empty() {
-                                stripped_text.push(trimmed);
-                            }
+                StrippedCommandPart::Text(text) => {
+                    let mut offset = 0;
+                    while let Some(next) = text[offset..].find('\n') {
+                        let next = next + offset;
+                        if offset > 0 {
+                            strip_leading_whitespace = true;
+                        }
+
+                        if !strip_leading_whitespace {
+                            offset = next + 1;
                             continue;
                         }
-                        if j == 0 {
-                            stripped_text.push(line);
-                            continue;
-                        }
-                        if line.len() >= num_stripped_chars {
-                            stripped_text.push(&line[num_stripped_chars..]);
-                        } else {
-                            stripped_text.push("");
-                        }
-                    }
-                    let stripped_text = stripped_text.join("\n");
 
-                    result.push(StrippedCommandPart::Text(stripped_text));
-                }
-                CommandPart::Placeholder(p) => {
-                    result.push(StrippedCommandPart::Placeholder(p));
-                }
-            }
-        }
-
-        if let Some(StrippedCommandPart::Text(text)) = result.last_mut() {
-            if text.ends_with('\n') {
-                text.pop();
-            }
-            if text.lines().last().map_or(false, |l| l.trim().is_empty()) {
-                while let Some(last) = text.lines().last() {
-                    if last.trim().is_empty() {
-                        text.pop();
-                    } else {
-                        break;
+                        let line = &text[offset..next];
+                        let line = line.strip_suffix('\r').unwrap_or(line);
+                        let len = line.len().min(num_stripped_chars);
+                        text.replace_range(offset..offset + len, "");
+                        offset = next + 1 - len;
                     }
+
+                    // Replace any remaining text
+                    if strip_leading_whitespace || offset > 0 {
+                        let line = &text[offset..];
+                        let line = line.strip_suffix('\r').unwrap_or(line);
+                        let len = line.len().min(num_stripped_chars);
+                        text.replace_range(offset..offset + len, "");
+                    }
+                }
+                StrippedCommandPart::Placeholder(_) => {
+                    strip_leading_whitespace = false;
                 }
             }
         }
@@ -963,6 +982,17 @@ impl AstNode for CommandSection {
 /// Represents a textual part of a command.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CommandText(pub(crate) SyntaxToken);
+
+impl CommandText {
+    /// Unescapes the command text to the given buffer.
+    ///
+    /// When `heredoc` is true, only heredoc escape sequences are allowed.
+    ///
+    /// Otherwise, brace command sequences are accepted.
+    pub fn unescape_to(&self, heredoc: bool, buffer: &mut String) {
+        unescape_command_text(self.0.text(), heredoc, buffer);
+    }
+}
 
 impl AstToken for CommandText {
     fn can_cast(kind: SyntaxKind) -> bool
@@ -1688,6 +1718,8 @@ impl AstNode for ParameterMetadataSection {
 
 #[cfg(test)]
 mod test {
+    use pretty_assertions::assert_eq;
+
     use super::*;
     use crate::Document;
     use crate::SupportedVersion;
@@ -2346,7 +2378,7 @@ task test {
         };
         assert_eq!(
             text,
-            "echo \"hello\"\n    echo \"world\"\necho \\\n        \"goodbye\"\n"
+            "echo \"hello\"\n    echo \"world\"\necho \\\n        \"goodbye\""
         );
     }
 }

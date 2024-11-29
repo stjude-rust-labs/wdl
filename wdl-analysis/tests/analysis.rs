@@ -36,7 +36,6 @@ use wdl_analysis::Analyzer;
 use wdl_analysis::path_to_uri;
 use wdl_analysis::rules;
 use wdl_ast::Diagnostic;
-use wdl_ast::SyntaxNode;
 
 /// Finds tests to run as part of the analysis test suite.
 fn find_tests() -> Vec<PathBuf> {
@@ -103,8 +102,9 @@ fn compare_result(path: &Path, result: &str, is_error: bool) -> Result<()> {
 
     if expected != result {
         bail!(
-            "result is not as expected:\n{}",
-            StrComparison::new(&expected, &result),
+            "result from `{path}` is not as expected:\n{diff}",
+            path = path.display(),
+            diff = StrComparison::new(&expected, &result),
         );
     }
 
@@ -131,11 +131,7 @@ fn compare_results(test: &Path, results: Vec<AnalysisResult>) -> Result<()> {
         };
 
         if !diagnostics.is_empty() {
-            let source = result
-                .document()
-                .root()
-                .map(|n| SyntaxNode::new_root(n.clone()).text().to_string())
-                .unwrap_or(String::new());
+            let source = result.document().node().syntax().text().to_string();
             let file = SimpleFile::new(path, &source);
             for diagnostic in diagnostics.as_ref() {
                 term::emit(
