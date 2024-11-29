@@ -99,6 +99,7 @@ use crate::types::Optional;
 use crate::types::PrimitiveTypeKind;
 use crate::types::PromotionKind;
 use crate::types::Type;
+use crate::types::TypeNameResolver;
 use crate::types::Types;
 use crate::types::v1::AstTypeConverter;
 use crate::types::v1::ExprTypeEvaluator;
@@ -325,23 +326,26 @@ fn add_namespace(
             .unwrap_or_else(|| (span, name, false));
         match document.structs.get(aliased_name) {
             Some(prev) => {
-                // Import conflicts with a struct defined in this document
-                if prev.namespace.is_none() {
-                    document.diagnostics.push(struct_conflicts_with_import(
-                        aliased_name,
-                        prev.span,
-                        span,
-                    ));
-                    continue;
-                }
-
-                if !are_structs_equal(prev, s) {
-                    document.diagnostics.push(imported_struct_conflict(
-                        aliased_name,
-                        span,
-                        prev.span,
-                        !aliased,
-                    ));
+                let a = StructDefinition::cast(SyntaxNode::new_root(prev.node.clone()))
+                    .expect("node should cast");
+                let b = StructDefinition::cast(SyntaxNode::new_root(s.node.clone()))
+                    .expect("node should cast");
+                if !are_structs_equal(&a, &b) {
+                    // Import conflicts with a struct defined in this document
+                    if prev.namespace.is_none() {
+                        document.diagnostics.push(struct_conflicts_with_import(
+                            aliased_name,
+                            prev.span,
+                            span,
+                        ));
+                    } else {
+                        document.diagnostics.push(imported_struct_conflict(
+                            aliased_name,
+                            span,
+                            prev.span,
+                            !aliased,
+                        ));
+                    }
                     continue;
                 }
             }
@@ -361,9 +365,7 @@ fn add_namespace(
 }
 
 /// Compares two structs for structural equality.
-fn are_structs_equal(a: &Struct, b: &Struct) -> bool {
-    let a = StructDefinition::cast(SyntaxNode::new_root(a.node.clone())).expect("node should cast");
-    let b = StructDefinition::cast(SyntaxNode::new_root(b.node.clone())).expect("node should cast");
+fn are_structs_equal(a: &StructDefinition, b: &StructDefinition) -> bool {
     for (a, b) in a.members().zip(b.members()) {
         if a.name().as_str() != b.name().as_str() {
             return false;
@@ -382,11 +384,15 @@ fn add_struct(document: &mut Document, definition: &StructDefinition) {
     let name = definition.name();
     if let Some(prev) = document.structs.get(name.as_str()) {
         if prev.namespace.is_some() {
-            document.diagnostics.push(struct_conflicts_with_import(
-                name.as_str(),
-                name.span(),
-                prev.span,
-            ))
+            let prev_def = StructDefinition::cast(SyntaxNode::new_root(prev.node.clone()))
+                .expect("node should cast");
+            if !are_structs_equal(definition, &prev_def) {
+                document.diagnostics.push(struct_conflicts_with_import(
+                    name.as_str(),
+                    name.span(),
+                    prev.span,
+                ))
+            }
         } else {
             document.diagnostics.push(name_conflict(
                 name.as_str(),
@@ -423,21 +429,31 @@ fn add_struct(document: &mut Document, definition: &StructDefinition) {
 
 /// Converts an AST type to an analysis type.
 fn convert_ast_type(document: &mut Document, ty: &wdl_ast::v1::Type) -> Type {
-    let mut converter = AstTypeConverter::new(&mut document.types, |name, span| {
-        document
-            .structs
-            .get(name)
-            .map(|s| {
-                // Mark the struct's namespace as used
-                if let Some(ns) = &s.namespace {
-                    document.namespaces[ns].used = true;
-                }
+    /// Used to resolve a type name from a document.
+    struct Resolver<'a>(&'a mut Document);
 
-                s.ty().expect("struct should have type")
-            })
-            .ok_or_else(|| unknown_type(name, span))
-    });
+    impl TypeNameResolver for Resolver<'_> {
+        fn types_mut(&mut self) -> &mut Types {
+            &mut self.0.types
+        }
 
+        fn resolve_type_name(&mut self, name: &Ident) -> Result<Type, Diagnostic> {
+            self.0
+                .structs
+                .get(name.as_str())
+                .map(|s| {
+                    // Mark the struct's namespace as used
+                    if let Some(ns) = &s.namespace {
+                        self.0.namespaces[ns].used = true;
+                    }
+
+                    s.ty().expect("struct should have type")
+                })
+                .ok_or_else(|| unknown_type(name.as_str(), name.span()))
+        }
+    }
+
+    let mut converter = AstTypeConverter::new(Resolver(document));
     match converter.convert_type(ty) {
         Ok(ty) => ty,
         Err(diagnostic) => {
@@ -451,8 +467,8 @@ fn convert_ast_type(document: &mut Document, ty: &wdl_ast::v1::Type) -> Type {
 fn create_input_type_map(
     document: &mut Document,
     declarations: impl Iterator<Item = Decl>,
-) -> Arc<HashMap<String, Input>> {
-    let mut map = HashMap::new();
+) -> Arc<IndexMap<String, Input>> {
+    let mut map = IndexMap::new();
     for decl in declarations {
         let name = decl.name();
         if map.contains_key(name.as_str()) {
@@ -474,8 +490,8 @@ fn create_input_type_map(
 fn create_output_type_map(
     document: &mut Document,
     declarations: impl Iterator<Item = Decl>,
-) -> Arc<HashMap<String, Output>> {
-    let mut map = HashMap::new();
+) -> Arc<IndexMap<String, Output>> {
+    let mut map = IndexMap::new();
     for decl in declarations {
         let name = decl.name();
         if map.contains_key(name.as_str()) {
@@ -491,7 +507,7 @@ fn create_output_type_map(
 }
 
 /// Adds a task to the document.
-fn add_task(config: DiagnosticsConfig, document: &mut Document, task: &TaskDefinition) {
+fn add_task(config: DiagnosticsConfig, document: &mut Document, definition: &TaskDefinition) {
     /// Helper function for creating a scope for a task section.
     fn create_section_scope(
         version: Option<SupportedVersion>,
@@ -510,7 +526,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, task: &TaskDefin
     }
 
     // Check for a name conflict with another task or workflow
-    let name = task.name();
+    let name = definition.name();
     if let Some(s) = document.tasks.get(name.as_str()) {
         document.diagnostics.push(name_conflict(
             name.as_str(),
@@ -532,11 +548,15 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, task: &TaskDefin
     // Populate type maps for the task's inputs and outputs
     let inputs = create_input_type_map(
         document,
-        task.input().into_iter().flat_map(|s| s.declarations()),
+        definition
+            .input()
+            .into_iter()
+            .flat_map(|s| s.declarations()),
     );
     let outputs = create_output_type_map(
         document,
-        task.output()
+        definition
+            .output()
             .into_iter()
             .flat_map(|s| s.declarations().map(Decl::Bound)),
     );
@@ -544,10 +564,18 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, task: &TaskDefin
     // Process the task in evaluation order
     let graph = TaskGraphBuilder::default().build(
         document.version.unwrap(),
-        task,
+        definition,
         &mut document.diagnostics,
     );
-    let mut scopes = vec![Scope::new(None, braced_scope_span(task))];
+
+    let mut task = Task {
+        name_span: name.span(),
+        name: name.as_str().to_string(),
+        scopes: vec![Scope::new(None, braced_scope_span(definition))],
+        inputs,
+        outputs,
+    };
+
     let mut output_scope = None;
     let mut command_scope = None;
 
@@ -557,9 +585,9 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, task: &TaskDefin
                 if !add_decl(
                     config,
                     document,
-                    ScopeRefMut::new(&mut scopes, ScopeIndex(0)),
+                    ScopeRefMut::new(&mut task.scopes, ScopeIndex(0)),
                     &decl,
-                    |_, n, _| inputs[n].ty,
+                    |_, n, _| task.inputs[n].ty,
                 ) {
                     continue;
                 }
@@ -573,7 +601,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, task: &TaskDefin
                         .is_none()
                     {
                         // Determine if the input is really used based on its name and type
-                        if is_input_used(document, name.as_str(), inputs[name.as_str()].ty) {
+                        if is_input_used(document, name.as_str(), task.inputs[name.as_str()].ty) {
                             continue;
                         }
 
@@ -589,7 +617,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, task: &TaskDefin
                 if !add_decl(
                     config,
                     document,
-                    ScopeRefMut::new(&mut scopes, ScopeIndex(0)),
+                    ScopeRefMut::new(&mut task.scopes, ScopeIndex(0)),
                     &decl,
                     |doc, _, decl| convert_ast_type(doc, &decl.ty()),
                 ) {
@@ -615,17 +643,19 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, task: &TaskDefin
                 let scope_index = *output_scope.get_or_insert_with(|| {
                     create_section_scope(
                         document.version(),
-                        &mut scopes,
+                        &mut task.scopes,
                         &name,
-                        braced_scope_span(&task.output().expect("should have output section")),
+                        braced_scope_span(
+                            &definition.output().expect("should have output section"),
+                        ),
                     )
                 });
                 add_decl(
                     config,
                     document,
-                    ScopeRefMut::new(&mut scopes, scope_index),
+                    ScopeRefMut::new(&mut task.scopes, scope_index),
                     &decl,
-                    |_, n, _| outputs[n].ty,
+                    |_, n, _| task.outputs[n].ty,
                 );
             }
             TaskGraphNode::Command(section) => {
@@ -636,11 +666,14 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, task: &TaskDefin
                         braced_scope_span(&section)
                     };
 
-                    create_section_scope(document.version(), &mut scopes, &name, span)
+                    create_section_scope(document.version(), &mut task.scopes, &name, span)
                 });
 
-                let mut context =
-                    EvaluationContext::new(document, ScopeRef::new(&scopes, scope_index), config);
+                let mut context = EvaluationContext::new(
+                    document,
+                    ScopeRef::new(&task.scopes, scope_index),
+                    config,
+                );
                 let mut evaluator = ExprTypeEvaluator::new(&mut context);
                 for part in section.parts() {
                     if let CommandPart::Placeholder(p) = part {
@@ -650,8 +683,11 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, task: &TaskDefin
             }
             TaskGraphNode::Runtime(section) => {
                 // Perform type checking on the runtime section's expressions
-                let mut context =
-                    EvaluationContext::new(document, ScopeRef::new(&scopes, ScopeIndex(0)), config);
+                let mut context = EvaluationContext::new(
+                    document,
+                    ScopeRef::new(&task.scopes, ScopeIndex(0)),
+                    config,
+                );
                 let mut evaluator = ExprTypeEvaluator::new(&mut context);
                 for item in section.items() {
                     evaluator.evaluate_runtime_item(&item.name(), &item.expr());
@@ -659,8 +695,11 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, task: &TaskDefin
             }
             TaskGraphNode::Requirements(section) => {
                 // Perform type checking on the requirements section's expressions
-                let mut context =
-                    EvaluationContext::new(document, ScopeRef::new(&scopes, ScopeIndex(0)), config);
+                let mut context = EvaluationContext::new(
+                    document,
+                    ScopeRef::new(&task.scopes, ScopeIndex(0)),
+                    config,
+                );
                 let mut evaluator = ExprTypeEvaluator::new(&mut context);
                 for item in section.items() {
                     evaluator.evaluate_requirements_item(&item.name(), &item.expr());
@@ -670,9 +709,9 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, task: &TaskDefin
                 // Perform type checking on the hints section's expressions
                 let mut context = EvaluationContext::new_for_task(
                     document,
-                    ScopeRef::new(&scopes, ScopeIndex(0)),
+                    ScopeRef::new(&task.scopes, ScopeIndex(0)),
                     config,
-                    TaskEvaluationContext::new(name.as_str(), &inputs, &outputs),
+                    &task,
                 );
                 let mut evaluator = ExprTypeEvaluator::new(&mut context);
                 for item in section.items() {
@@ -683,15 +722,8 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, task: &TaskDefin
     }
 
     // Sort the scopes
-    sort_scopes(&mut scopes);
-
-    document.tasks.insert(name.as_str().to_string(), Task {
-        name_span: name.span(),
-        name: name.as_str().to_string(),
-        scopes,
-        inputs,
-        outputs,
-    });
+    sort_scopes(&mut task.scopes);
+    document.tasks.insert(name.as_str().to_string(), task);
 }
 
 /// Adds a declaration to a scope.
@@ -1357,6 +1389,38 @@ fn resolve_import(
 
 /// Sets the struct types in the document.
 fn set_struct_types(document: &mut Document) {
+    /// Used to resolve a type name from a document.
+    struct Resolver<'a> {
+        /// The document to resolve the type name from.
+        document: &'a mut Document,
+        /// The offset to use to adjust the start of diagnostics.
+        offset: usize,
+    }
+
+    impl TypeNameResolver for Resolver<'_> {
+        fn types_mut(&mut self) -> &mut Types {
+            &mut self.document.types
+        }
+
+        fn resolve_type_name(&mut self, name: &Ident) -> Result<Type, Diagnostic> {
+            if let Some(s) = self.document.structs.get(name.as_str()) {
+                // Mark the struct's namespace as used
+                if let Some(ns) = &s.namespace {
+                    self.document.namespaces[ns].used = true;
+                }
+
+                Ok(s.ty().unwrap_or(Type::Union))
+            } else {
+                let span = name.span();
+                self.document.diagnostics.push(unknown_type(
+                    name.as_str(),
+                    Span::new(span.start() + self.offset, span.len()),
+                ));
+                Ok(Type::Union)
+            }
+        }
+    }
+
     if document.structs.is_empty() {
         return;
     }
@@ -1408,23 +1472,8 @@ fn set_struct_types(document: &mut Document) {
             StructDefinition::cast(SyntaxNode::new_root(document.structs[index].node.clone()))
                 .expect("node should cast");
 
-        let mut converter = AstTypeConverter::new(&mut document.types, |name, span| {
-            if let Some(s) = document.structs.get(name) {
-                // Mark the struct's namespace as used
-                if let Some(ns) = &s.namespace {
-                    document.namespaces[ns].used = true;
-                }
-
-                Ok(s.ty().unwrap_or(Type::Union))
-            } else {
-                document.diagnostics.push(unknown_type(
-                    name,
-                    Span::new(span.start() + document.structs[index].offset, span.len()),
-                ));
-                Ok(Type::Union)
-            }
-        });
-
+        let offset = document.structs[index].offset;
+        let mut converter = AstTypeConverter::new(Resolver { document, offset });
         let ty = converter
             .convert_struct_type(&definition)
             .expect("struct type conversion should not fail");
@@ -1432,34 +1481,6 @@ fn set_struct_types(document: &mut Document) {
         let s = &mut document.structs[index];
         assert!(s.ty.is_none(), "type should not already be present");
         s.ty = Some(document.types.add_struct(ty));
-    }
-}
-
-/// Represents context of a task being evaluated for an expression type
-/// evaluator.
-#[derive(Clone, Copy, Debug)]
-struct TaskEvaluationContext<'a> {
-    /// The name of the task.
-    name: &'a str,
-    /// The inputs of the task.
-    inputs: &'a HashMap<String, Input>,
-    /// The outputs of the task.
-    outputs: &'a HashMap<String, Output>,
-}
-
-impl<'a> TaskEvaluationContext<'a> {
-    /// Constructs a new task evaluation context given the task name, inputs,
-    /// and outputs.
-    fn new(
-        name: &'a str,
-        inputs: &'a HashMap<String, Input>,
-        outputs: &'a HashMap<String, Output>,
-    ) -> Self {
-        Self {
-            name,
-            inputs,
-            outputs,
-        }
     }
 }
 
@@ -1475,7 +1496,7 @@ struct EvaluationContext<'a> {
     /// The context of the task being evaluated.
     ///
     /// This is only `Some` when evaluating a task's `hints` section.`
-    task: Option<TaskEvaluationContext<'a>>,
+    task: Option<&'a Task>,
 }
 
 impl<'a> EvaluationContext<'a> {
@@ -1489,8 +1510,7 @@ impl<'a> EvaluationContext<'a> {
         }
     }
 
-    /// Constructs a new expression type evaluation context with the given task
-    /// context.
+    /// Constructs a new expression type evaluation context with the given task.
     ///
     /// This is used to evaluated the type of expressions inside of a task's
     /// `hints` section.
@@ -1498,7 +1518,7 @@ impl<'a> EvaluationContext<'a> {
         document: &'a mut Document,
         scope: ScopeRef<'a>,
         config: DiagnosticsConfig,
-        task: TaskEvaluationContext<'a>,
+        task: &'a Task,
     ) -> Self {
         Self {
             document,
@@ -1543,28 +1563,8 @@ impl crate::types::v1::EvaluationContext for EvaluationContext<'_> {
             .ok_or_else(|| unknown_type(name.as_str(), name.span()))
     }
 
-    fn input(&self, name: &str) -> Option<Input> {
-        self.task.and_then(|task| task.inputs.get(name).copied())
-    }
-
-    fn output(&self, name: &str) -> Option<Output> {
-        self.task.and_then(|task| task.outputs.get(name).copied())
-    }
-
-    fn task_name(&self) -> Option<&str> {
-        self.task.map(|task| task.name)
-    }
-
-    fn supports_hints_type(&self) -> bool {
-        self.task.is_some()
-    }
-
-    fn supports_input_type(&self) -> bool {
-        self.task.is_some()
-    }
-
-    fn supports_output_type(&self) -> bool {
-        self.task.is_some()
+    fn task(&self) -> Option<&Task> {
+        self.task
     }
 
     fn diagnostics_config(&self) -> DiagnosticsConfig {

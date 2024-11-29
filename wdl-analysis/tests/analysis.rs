@@ -103,8 +103,9 @@ fn compare_result(path: &Path, result: &str, is_error: bool) -> Result<()> {
 
     if expected != result {
         bail!(
-            "result is not as expected:\n{}",
-            StrComparison::new(&expected, &result),
+            "result from `{path}` is not as expected:\n{diff}",
+            path = path.display(),
+            diff = StrComparison::new(&expected, &result),
         );
     }
 

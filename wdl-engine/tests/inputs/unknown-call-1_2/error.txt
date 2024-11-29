@@ -1,4 +1,4 @@
-failed to parse input file `tests/inputs/unknown-call-1.2/inputs.json`
+failed to parse input file `tests/inputs/unknown-call-1_2/inputs.json`
 
 Caused by:
     0: invalid input key `test.foo.bar`
