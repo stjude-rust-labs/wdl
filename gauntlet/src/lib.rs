@@ -104,13 +104,13 @@ pub struct Args {
     /// Overwrites the configuration file with new expected diagnostics.
     ///
     /// Mutually exclusive with `--update`.
-    #[arg(long)]
+    #[arg(long, group = "action")]
     pub bless: bool,
 
     /// Updates the commit hashes for all repositories.
     ///
     /// Mutually exclusive with `--bless`.
-    #[arg(long)]
+    #[arg(long, group = "action")]
     pub update: bool,
 
     /// Displays warnings as part of the report output.
