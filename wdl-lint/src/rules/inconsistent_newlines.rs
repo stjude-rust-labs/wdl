@@ -22,6 +22,7 @@ fn inconsistent_newlines(span: Span) -> Diagnostic {
     Diagnostic::note("inconsistent newlines detected")
         .with_rule(ID)
         .with_label("the first occurrence of a mismatched newline is here", span)
+        .with_fix("ensure that all newlines are consistent")
 }
 
 /// Detects imports that are not sorted lexicographically.

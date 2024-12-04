@@ -37,6 +37,8 @@ note[CallInputSpacing]: call inputs must be separated by newline
    │
 20 │         a="something", b="somethingelse",
    │                        ^^^^^^^^^^^^^^^^^
+   │
+   = fix: add a newline after each input
 
 note[CallInputSpacing]: call inputs assignments must be surrounded with whitespace
    ┌─ tests/lints/input-spacing/source.wdl:20:25

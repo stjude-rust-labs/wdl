@@ -27,6 +27,7 @@ fn decl_identifier_too_short(span: Span) -> Diagnostic {
     Diagnostic::note("declaration identifier must be at least 3 characters")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("rename the identifier to be at least 3 characters long")
 }
 
 /// Diagnostic for input names that start with [oO]ut[A-Z_]
@@ -34,6 +35,7 @@ fn decl_identifier_starts_with_out(span: Span) -> Diagnostic {
     Diagnostic::note("declaration identifier starts with 'out'")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("rename the identifier to not start with 'out'")
 }
 
 /// Diagnostic for input names that start with "output"
@@ -41,6 +43,7 @@ fn decl_identifier_starts_with_output(span: Span) -> Diagnostic {
     Diagnostic::note("declaration identifier starts with 'output'")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("rename the identifier to not start with 'output'")
 }
 
 /// A lint rule for disallowed output names.

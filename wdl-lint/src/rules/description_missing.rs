@@ -37,6 +37,7 @@ fn description_missing(span: Span, parent: SectionParent) -> Diagnostic {
     ))
     .with_rule(ID)
     .with_highlight(span)
+    .with_fix("add a description key to the meta section")
 }
 
 /// Detects unsorted input declarations.

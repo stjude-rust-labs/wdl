@@ -26,6 +26,7 @@ fn only_whitespace(span: Span) -> Diagnostic {
     Diagnostic::note("line contains only whitespace")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("remove the whitespace")
 }
 
 /// Creates a "trailing whitespace" diagnostic.
@@ -33,6 +34,7 @@ fn trailing_whitespace(span: Span) -> Diagnostic {
     Diagnostic::note("line contains trailing whitespace")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("remove the trailing whitespace")
 }
 
 /// Creates a "more than one blank line" diagnostic.
@@ -40,6 +42,7 @@ fn more_than_one_blank_line(span: Span) -> Diagnostic {
     Diagnostic::note("more than one blank line in a row")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("remove the extra blank lines")
 }
 
 /// Detects undesired whitespace.

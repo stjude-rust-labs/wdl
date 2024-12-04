@@ -31,6 +31,7 @@ fn inline_preceding_whitespace(span: Span) -> Diagnostic {
     Diagnostic::note("in-line comments should be preceded by two spaces")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("add two spaces before the comment delimiter")
 }
 
 /// Creates a diagnostic when the comment token is not followed by a single
@@ -39,6 +40,7 @@ fn following_whitespace(span: Span) -> Diagnostic {
     Diagnostic::note("comment delimiter should be followed by a single space")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("add a single space after the comment delimiter")
 }
 
 /// Creates a diagnostic when non-inline comment has insufficient indentation.

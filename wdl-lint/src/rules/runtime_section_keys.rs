@@ -151,6 +151,10 @@ fn deprecated_runtime_key(key: &Ident, replacement: &str) -> Diagnostic {
     ))
     .with_rule(ID)
     .with_highlight(key.span())
+    .with_fix(format!(
+        "replace the `{key}` key with `{replacement}`",
+        key = key.as_str()
+    ))
 }
 
 /// Creates an "non-reserved runtime key" diagnostic.

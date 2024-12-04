@@ -44,6 +44,7 @@ fn excess_blank_line(span: Span) -> Diagnostic {
     Diagnostic::note("extra blank line(s) found")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("remove extra blank line(s)")
 }
 
 /// Creates a missing blank line diagnostic.
@@ -51,6 +52,7 @@ fn missing_blank_line(span: Span) -> Diagnostic {
     Diagnostic::note("missing blank line")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("add blank line")
 }
 
 /// Track the position within a document

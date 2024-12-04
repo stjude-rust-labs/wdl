@@ -3,4 +3,6 @@ note[MissingMetas]: workflow `test` is missing both meta and parameter_meta sect
   │
 5 │ workflow test {
   │          ^^^^ this workflow is missing both meta and parameter_meta sections
+  │
+  = fix: add both the meta and parameter_meta sections
 

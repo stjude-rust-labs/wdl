@@ -5,4 +5,6 @@ note[EndingNewline]: multiple empty lines at the end of file
    │ ╭─^
 11 │ │ 
    │ ╰^ duplicate newline here
+   │  
+   = fix: remove the extra newlines at the end of the file
 

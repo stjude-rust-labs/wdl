@@ -3,6 +3,8 @@ note[CommentWhitespace]: comment delimiter should be followed by a single space
   │
 5 │ #a bad comment
   │ ^
+  │
+  = fix: add a single space after the comment delimiter
 
 note[CommentWhitespace]: comment has too much indentation
   ┌─ tests/lints/comment-whitespace/source.wdl:6:5
@@ -17,24 +19,32 @@ note[Whitespace]: line contains trailing whitespace
   │
 9 │ # a comment with trailing whitespace          
   │                                     ^^^^^^^^^^
+  │
+  = fix: remove the trailing whitespace
 
 note[CommentWhitespace]: in-line comments should be preceded by two spaces
    ┌─ tests/lints/comment-whitespace/source.wdl:12:15
    │
 12 │ workflow foo {# test in-line comment without preceding whitespace
    │               ^
+   │
+   = fix: add two spaces before the comment delimiter
 
 note[CommentWhitespace]: in-line comments should be preceded by two spaces
    ┌─ tests/lints/comment-whitespace/source.wdl:14:11
    │
 14 │     meta {# this is a problematic comment
    │           ^
+   │
+   = fix: add two spaces before the comment delimiter
 
 note[CommentWhitespace]: in-line comments should be preceded by two spaces
    ┌─ tests/lints/comment-whitespace/source.wdl:17:13
    │
 17 │     input { # a bad comment
    │             ^
+   │
+   = fix: add two spaces before the comment delimiter
 
 note[CommentWhitespace]: comment not sufficiently indented
    ┌─ tests/lints/comment-whitespace/source.wdl:19:5
@@ -57,6 +67,8 @@ note[CommentWhitespace]: in-line comments should be preceded by two spaces
    │
 21 │         String foo = "bar"       # too much space for an inline comment
    │                                  ^
+   │
+   = fix: add two spaces before the comment delimiter
 
 note[CommentWhitespace]: comment has too much indentation
    ┌─ tests/lints/comment-whitespace/source.wdl:26:15

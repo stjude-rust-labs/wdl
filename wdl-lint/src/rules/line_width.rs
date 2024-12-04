@@ -24,6 +24,7 @@ fn line_too_long(span: Span, max_width: usize) -> Diagnostic {
     Diagnostic::note(format!("line exceeds maximum width of {}", max_width))
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("split the line into multiple lines")
 }
 
 /// Detects lines that exceed a certain width.

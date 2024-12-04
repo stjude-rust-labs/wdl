@@ -357,12 +357,12 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:133:15: note[DoubleQuotes]: string defined with single quotes instead of double quotes"
+message = "ww-star-deseq2.wdl:133:15: note[DoubleQuotes]: string defined with single quotes"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697c3f707f073177ddde7013/ww-star-deseq2.wdl/#L133"
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:134:15: note[DoubleQuotes]: string defined with single quotes instead of double quotes"
+message = "ww-star-deseq2.wdl:134:15: note[DoubleQuotes]: string defined with single quotes"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/6d81ede0ad963115697c3f707f073177ddde7013/ww-star-deseq2.wdl/#L134"
 
 [[diagnostics]]

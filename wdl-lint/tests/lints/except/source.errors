@@ -3,12 +3,16 @@ note[UnknownRule]: unknown lint rule `Unknown`
   │
 1 │ #@ except: CommentWhitespace, Whitespace, EndingNewline, Unknown
   │                                                          ^^^^^^^ cannot make an exception for this rule
+  │
+  = fix: remove this rule from the exception list
 
 note[UnknownRule]: unknown lint rule `AlsoUnknown`
    ┌─ tests/lints/except/source.wdl:22:26
    │
 22 │     #@ except: SnakeCase,AlsoUnknown
    │                          ^^^^^^^^^^^ cannot make an exception for this rule
+   │
+   = fix: remove this rule from the exception list
 
 warning[SnakeCase]: struct member name `NotOk` is not snake_case
    ┌─ tests/lints/except/source.wdl:24:9
@@ -18,9 +22,11 @@ warning[SnakeCase]: struct member name `NotOk` is not snake_case
    │
    = fix: replace `NotOk` with `not_ok`
 
-note[DoubleQuotes]: string defined with single quotes instead of double quotes
+note[DoubleQuotes]: string defined with single quotes
    ┌─ tests/lints/except/source.wdl:29:18
    │
 29 │     String bad = 'bad string'   # NOT OK
    │                  ^^^^^^^^^^^^
+   │
+   = fix: change the string to use double quotes
 

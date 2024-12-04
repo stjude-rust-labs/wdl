@@ -5,4 +5,6 @@ note[InconsistentNewlines]: inconsistent newlines detected
   │ ╭───────────^
 6 │ │ 
   │ ╰^ the first occurrence of a mismatched newline is here
+  │  
+  = fix: ensure that all newlines are consistent
 
