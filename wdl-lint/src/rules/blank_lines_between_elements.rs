@@ -559,8 +559,17 @@ fn check_prior_spacing(
                 (syntax.text_range().start() - t.text_range().start()).into(),
             ),
             NodeOrToken::Node(ref n) => Span::new(
-                n.last_token().unwrap().text_range().start().into(),
-                (syntax.text_range().start() - n.last_token().unwrap().text_range().start()).into(),
+                n.last_token()
+                    .expect("node should have tokens")
+                    .text_range()
+                    .start()
+                    .into(),
+                (syntax.text_range().start()
+                    - n.last_token()
+                        .expect("node should have tokens")
+                        .text_range()
+                        .start())
+                .into(),
             ),
         };
         match prior.kind() {

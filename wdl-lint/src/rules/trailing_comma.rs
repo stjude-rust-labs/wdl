@@ -136,7 +136,7 @@ impl Visitor for TrailingCommaRule {
                             last_child
                                 .syntax()
                                 .last_token()
-                                .unwrap()
+                                .expect("object should have tokens")
                                 .text_range()
                                 .to_span(),
                         ),
@@ -184,7 +184,7 @@ impl Visitor for TrailingCommaRule {
                             last_child
                                 .syntax()
                                 .last_token()
-                                .unwrap()
+                                .expect("array should have tokens")
                                 .text_range()
                                 .to_span(),
                         ),
@@ -229,7 +229,12 @@ impl Visitor for TrailingCommaRule {
             } else {
                 state.exceptable_add(
                     missing_trailing_comma(
-                        input.syntax().last_token().unwrap().text_range().to_span(),
+                        input
+                            .syntax()
+                            .last_token()
+                            .expect("input should have tokens")
+                            .text_range()
+                            .to_span(),
                     ),
                     SyntaxElement::from(call.syntax().clone()),
                     &self.exceptable_nodes(),
@@ -273,7 +278,11 @@ impl Visitor for TrailingCommaRule {
                                 // No comma found, report missing
                                 state.exceptable_add(
                                     missing_trailing_comma(
-                                        last_child.last_token().unwrap().text_range().to_span(),
+                                        last_child
+                                            .last_token()
+                                            .expect("item should have tokens")
+                                            .text_range()
+                                            .to_span(),
                                     ),
                                     SyntaxElement::from(l.syntax().clone()),
                                     &self.exceptable_nodes(),
