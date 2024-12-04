@@ -272,7 +272,12 @@ impl Visitor for InputNotSortedRule {
                 }
             });
         if errors > 0 {
-            let span = input.syntax().first_token().expect("input section should have tokens").text_range().to_span();
+            let span = input
+                .syntax()
+                .first_token()
+                .expect("input section should have tokens")
+                .text_range()
+                .to_span();
             state.exceptable_add(
                 input_not_sorted(span, input_string),
                 SyntaxElement::from(input.syntax().clone()),
