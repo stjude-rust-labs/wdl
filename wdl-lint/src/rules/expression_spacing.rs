@@ -59,7 +59,7 @@ fn disallowed_space(span: Span) -> Diagnostic {
     Diagnostic::note("this space is not allowed")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("remove this space")
+        .with_fix("remove the space")
 }
 
 /// Reports missing preceding whitespace around assignments
@@ -128,7 +128,7 @@ fn multiline_literal_open_newline(span: Span) -> Diagnostic {
     )
     .with_rule(ID)
     .with_highlight(span)
-    .with_fix("add a newline after the opening brace/bracket/paren")
+    .with_fix("add a newline after the opening brace/bracket/parenthesis")
 }
 
 /// Reports missing newline before close brace/bracket/paren for multiline
@@ -139,7 +139,7 @@ fn multiline_literal_close_newline(span: Span) -> Diagnostic {
     )
     .with_rule(ID)
     .with_highlight(span)
-    .with_fix("add a newline before the closing brace/bracket/paren")
+    .with_fix("add a newline before the closing brace/bracket/parenthesis")
 }
 
 /// Detects improperly spaced expressions.

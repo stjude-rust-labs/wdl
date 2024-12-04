@@ -27,7 +27,7 @@ fn blank_between_imports(span: Span) -> Diagnostic {
     Diagnostic::note("blank lines are not allowed between imports")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("remove the blank line between imports")
+        .with_fix("remove blank lines between imports")
 }
 
 /// Creates a diagnostic for where there is improper

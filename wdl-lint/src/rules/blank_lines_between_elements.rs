@@ -52,7 +52,7 @@ fn missing_blank_line(span: Span) -> Diagnostic {
     Diagnostic::note("missing blank line")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("add blank line")
+        .with_fix("add a blank line")
 }
 
 /// Track the position within a document

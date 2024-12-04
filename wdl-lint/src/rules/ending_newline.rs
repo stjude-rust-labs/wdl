@@ -38,7 +38,7 @@ fn multiple_ending_newline(span: Span, count: usize) -> Diagnostic {
             },
             span,
         )
-        .with_fix("remove the extra newlines at the end of the file")
+        .with_fix("remove all but one empty line at the end of the file")
 }
 
 /// Detects missing newline at the end of the document.
