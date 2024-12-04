@@ -36,7 +36,7 @@ fn extraneous_content(span: Span) -> Diagnostic {
     Diagnostic::note("extraneous whitespace and/or comments before trailing comma")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("remove extraneous content before trailing comma")
+        .with_fix("remove the extraneous content before the trailing comma")
 }
 
 /// Detects missing trailing commas.

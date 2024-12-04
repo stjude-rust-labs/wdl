@@ -31,8 +31,8 @@ fn invalid_preamble_comment(span: Span) -> Diagnostic {
     .with_rule(ID)
     .with_highlight(span)
     .with_fix(
-        "either move this comment out of the preamble or \"upgrade\" it to a preamble comment \
-         (starting with `## `)",
+        "either move this comment out of the preamble or change it to a preamble comment \
+         (i.e. a comment that starts with `##`)",
     )
 }
 

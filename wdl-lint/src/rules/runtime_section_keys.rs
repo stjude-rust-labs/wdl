@@ -455,7 +455,7 @@ impl Visitor for RuntimeSectionKeysRule {
                         section
                             .syntax()
                             .first_token()
-                            .unwrap()
+                            .expect("runtime section should have tokens")
                             .text_range()
                             .to_span(),
                     ),

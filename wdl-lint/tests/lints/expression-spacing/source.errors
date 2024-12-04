@@ -36,7 +36,7 @@ note[ExpressionSpacing]: this space is not allowed
 21 │         Int complex_value = w -x +( y* ( z /(f %b) ))
    │                                    ^
    │
-   = fix: remove this space
+   = fix: remove the space
 
 note[ExpressionSpacing]: operators must be preceded by whitespace
    ┌─ tests/lints/expression-spacing/source.wdl:21:38
@@ -52,7 +52,7 @@ note[ExpressionSpacing]: this space is not allowed
 21 │         Int complex_value = w -x +( y* ( z /(f %b) ))
    │                                         ^
    │
-   = fix: remove this space
+   = fix: remove the space
 
 note[ExpressionSpacing]: operators must be followed by whitespace
    ┌─ tests/lints/expression-spacing/source.wdl:21:44
@@ -76,7 +76,7 @@ note[ExpressionSpacing]: this space is not allowed
 21 │         Int complex_value = w -x +( y* ( z /(f %b) ))
    │                                                   ^
    │
-   = fix: remove this space
+   = fix: remove the space
 
 note[ExpressionSpacing]: operators must be followed by whitespace
    ┌─ tests/lints/expression-spacing/source.wdl:43:29
@@ -132,7 +132,7 @@ note[ExpressionSpacing]: multi-line array/map/object literals must have a newlin
 81 │         Boolean i = [1
    │                     ^
    │
-   = fix: add a newline after the opening brace/bracket/paren
+   = fix: add a newline after the opening brace/bracket/parenthesis
 
 note[ExpressionSpacing]: multi-line array/map/object literals must have a newline preceding the closing token
    ┌─ tests/lints/expression-spacing/source.wdl:83:18
@@ -140,7 +140,7 @@ note[ExpressionSpacing]: multi-line array/map/object literals must have a newlin
 83 │             ,2,3,] == [1,2,4]
    │                  ^
    │
-   = fix: add a newline before the closing brace/bracket/paren
+   = fix: add a newline before the closing brace/bracket/parenthesis
 
 note[CommentWhitespace]: comment not sufficiently indented
     ┌─ tests/lints/expression-spacing/source.wdl:104:13
@@ -164,7 +164,7 @@ note[ExpressionSpacing]: multi-line array/map/object literals must have a newlin
 149 │         Array[Int] p = [1,
     │                        ^
     │
-    = fix: add a newline after the opening brace/bracket/paren
+    = fix: add a newline after the opening brace/bracket/parenthesis
 
 note[ExpressionSpacing]: multi-line array/map/object literals must have a newline preceding the closing token
     ┌─ tests/lints/expression-spacing/source.wdl:150:13
@@ -172,7 +172,7 @@ note[ExpressionSpacing]: multi-line array/map/object literals must have a newlin
 150 │         2,3,]
     │             ^
     │
-    = fix: add a newline before the closing brace/bracket/paren
+    = fix: add a newline before the closing brace/bracket/parenthesis
 
 note[ExpressionSpacing]: prefix operators may not contain whitespace
     ┌─ tests/lints/expression-spacing/source.wdl:157:21

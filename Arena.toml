@@ -887,7 +887,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:17:10: note[MissingMetas]: workflow `ww_vc_trio` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:17:10: note[MissingMetas]: workflow `ww_vc_trio` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L17"
 
 [[diagnostics]]
@@ -1097,7 +1097,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:262:6: note[MissingMetas]: task `annovar` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:262:6: note[MissingMetas]: task `annovar` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L262"
 
 [[diagnostics]]
@@ -1132,7 +1132,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:298:6: note[MissingMetas]: task `ApplyBaseRecalibrator` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:298:6: note[MissingMetas]: task `ApplyBaseRecalibrator` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L298"
 
 [[diagnostics]]
@@ -1192,7 +1192,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:353:6: note[MissingMetas]: task `bcftoolsMpileup` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:353:6: note[MissingMetas]: task `bcftoolsMpileup` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L353"
 
 [[diagnostics]]
@@ -1237,7 +1237,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:392:6: note[MissingMetas]: task `bedToolsQC` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:392:6: note[MissingMetas]: task `bedToolsQC` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L392"
 
 [[diagnostics]]
@@ -1267,7 +1267,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:420:6: note[MissingMetas]: task `BwaMem` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:420:6: note[MissingMetas]: task `BwaMem` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L420"
 
 [[diagnostics]]
@@ -1297,7 +1297,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:456:6: note[MissingMetas]: task `CollectHsMetrics` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:456:6: note[MissingMetas]: task `CollectHsMetrics` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L456"
 
 [[diagnostics]]
@@ -1347,7 +1347,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:492:6: note[MissingMetas]: task `consensusProcessingR` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:492:6: note[MissingMetas]: task `consensusProcessingR` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L492"
 
 [[diagnostics]]
@@ -1402,7 +1402,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:518:6: note[MissingMetas]: task `HaplotypeCaller` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:518:6: note[MissingMetas]: task `HaplotypeCaller` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L518"
 
 [[diagnostics]]
@@ -1462,7 +1462,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:558:6: note[MissingMetas]: task `MergeBamAlignment` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:558:6: note[MissingMetas]: task `MergeBamAlignment` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L558"
 
 [[diagnostics]]
@@ -1497,7 +1497,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:596:6: note[MissingMetas]: task `Mutect2TumorOnly` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:596:6: note[MissingMetas]: task `Mutect2TumorOnly` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L596"
 
 [[diagnostics]]
@@ -1547,7 +1547,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:643:6: note[MissingMetas]: task `SamToFastq` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:643:6: note[MissingMetas]: task `SamToFastq` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L643"
 
 [[diagnostics]]
@@ -1592,7 +1592,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:680:6: note[MissingMetas]: task `SortBed` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:680:6: note[MissingMetas]: task `SortBed` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L680"
 
 [[diagnostics]]
@@ -1602,7 +1602,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:709:6: note[MissingMetas]: task `MarkDuplicates` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:709:6: note[MissingMetas]: task `MarkDuplicates` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L709"
 
 [[diagnostics]]
@@ -1672,7 +1672,7 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:745:6: note[MissingMetas]: task `SortSam` is missing both meta and parameter_meta sections"
+message = "ww-vc-trio.wdl:745:6: note[MissingMetas]: task `SortSam` is missing both `meta` and `parameter_meta` sections"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L745"
 
 [[diagnostics]]

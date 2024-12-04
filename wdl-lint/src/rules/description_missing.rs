@@ -132,7 +132,7 @@ impl Visitor for DescriptionMissingRule {
                     section
                         .syntax()
                         .first_token()
-                        .unwrap()
+                        .expect("metadata section should have tokens")
                         .text_range()
                         .to_span(),
                     section.parent(),

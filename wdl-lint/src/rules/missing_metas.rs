@@ -78,15 +78,15 @@ fn missing_section(name: Ident, section: Section, context: Context) -> Diagnosti
 /// Creates a "missing sections" diagnostic.
 fn missing_sections(name: Ident, context: Context) -> Diagnostic {
     Diagnostic::note(format!(
-        "{context} `{name}` is missing both meta and parameter_meta sections",
+        "{context} `{name}` is missing both `meta` and `parameter_meta` sections",
         name = name.as_str(),
     ))
     .with_rule(ID)
     .with_label(
-        format!("this {context} is missing both meta and parameter_meta sections"),
+        format!("this {context} is missing both `meta` and `parameter_meta` sections"),
         name.span(),
     )
-    .with_fix("add both the meta and parameter_meta sections")
+    .with_fix("add both the `meta` and `parameter_meta` sections")
 }
 
 /// A lint rule for missing meta and parameter_meta sections.

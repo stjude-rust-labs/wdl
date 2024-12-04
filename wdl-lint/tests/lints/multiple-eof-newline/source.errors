@@ -11,5 +11,5 @@ note[EndingNewline]: multiple empty lines at the end of file
 18 │ │ 
    │ ╰^ duplicate newlines here
    │  
-   = fix: remove the extra newlines at the end of the file
+   = fix: remove all but one empty line at the end of the file
 

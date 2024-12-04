@@ -305,7 +305,7 @@ impl Visitor for NonmatchingOutputRule<'_> {
                     section
                         .syntax()
                         .first_token()
-                        .unwrap()
+                        .expect("metadata section should have tokens")
                         .text_range()
                         .to_span(),
                 );
@@ -329,7 +329,7 @@ impl Visitor for NonmatchingOutputRule<'_> {
                     section
                         .syntax()
                         .first_token()
-                        .unwrap()
+                        .expect("output section should have tokens")
                         .text_range()
                         .to_span(),
                 );
