@@ -143,7 +143,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
     let mut work_dir = WorkDir::default();
 
     if args.update {
-        info!("refreshing repository commit hashes.");
+        info!("updating repository commit hashes.");
         config.inner_mut().update_repositories(work_dir.root());
     }
 
