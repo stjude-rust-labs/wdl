@@ -1101,13 +1101,11 @@ impl<'a, C: EvaluationContext> ExprEvaluator<'a, C> {
                                 expr.arguments().skip(max).map(|e| e.span()),
                             ))
                         }
-                        None => {
-                            Err(unsupported_function(
-                                f.minimum_version(),
-                                target.as_str(),
-                                target.span(),
-                            ))
-                        }
+                        None => Err(unsupported_function(
+                            f.minimum_version(),
+                            target.as_str(),
+                            target.span(),
+                        )),
                     }
                 }
             }
@@ -1349,7 +1347,8 @@ pub(crate) mod test {
         fn resolve_name(&self, name: &Ident) -> Result<Value, Diagnostic> {
             self.env
                 .scope()
-                .lookup(name.as_str()).cloned()
+                .lookup(name.as_str())
+                .cloned()
                 .ok_or_else(|| unknown_name(name.as_str(), name.span()))
         }
 
