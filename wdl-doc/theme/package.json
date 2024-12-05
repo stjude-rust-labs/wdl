@@ -1,0 +1,21 @@
+{
+  "name": "wdl-docs-theme",
+  "author": "The Rust WDL project developers",
+  "private": true,
+  "scripts": {
+    "prod": "NODE_ENV=production pnpm postcss src/index.css -o dist/styles.css",
+    "dev": "concurrently --kill-others \"pnpm postcss src/index.css -o dist/styles.css -w\" \"pnpm http-server\" --names POSTCSS,SERVER",
+    "serve": "pnpm http-server"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.0",
+    "cssnano": "^7.0.6",
+    "http-server": "^14.1.1",
+    "postcss": "^8.4.49",
+    "postcss-cli": "^11.0.0",
+    "postcss-import": "^16.1.0",
+    "postcss-url": "^10.1.3",
+    "tailwindcss": "^3.4.16"
+  }
+}
