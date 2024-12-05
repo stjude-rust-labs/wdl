@@ -38,7 +38,7 @@ note[ContainerValue]: an array with a single value should be a string literal
     │
     = fix: change the array to a string literal representing the first value
 
-warning[ContainerValue]: arrays containing any are ambiguous
+warning[ContainerValue]: container arrays containing `*` are ambiguous
     ┌─ tests/lints/container-value/source.wdl:159:21
     │
 159 │         container: ["*", "foo", "*", "*"]
