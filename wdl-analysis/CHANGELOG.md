@@ -13,6 +13,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Exposed information about workflow calls from an analyzed document ([#239](https://github.com/stjude-rust-labs/wdl/pull/239)).
 * Added formatting to the analyzer ([#247](https://github.com/stjude-rust-labs/wdl/pull/247)).
 
+### Changed
+
+* Removed the "optional type" constraint for the `select_first`, `select_all`,
+  and `defined` functions; instead, these functions now accepted non-optional
+  types and analysis emits a warning when the functions are called with
+  non-optional types ([#258](https://github.com/stjude-rust-labs/wdl/pull/258)).
+* The "required primitive type" constraint has been removed as every place the
+  constraint was used should allow for optional primitive types as well;
+  consequently, the AnyPrimitiveTypeConstraint was renamed to simply
+  `PrimitiveTypeConstraint` ([#257](https://github.com/stjude-rust-labs/wdl/pull/257)).
+* The common type calculation now favors the "left-hand side" of the
+  calculation rather than the right, making it more intuitive to use. For
+  example, a calculation of `File | String` is now `File` rather than
+  `String` ([#257](https://github.com/stjude-rust-labs/wdl/pull/257)).
+* Refactored function call binding information to aid with call evaluation in
+  `wdl-engine` ([#251](https://github.com/stjude-rust-labs/wdl/pull/251)).
+* Made diagnostic creation functions public ([#249](https://github.com/stjude-rust-labs/wdl/pull/249)).
+* Refactored expression type evaluator to provide context via a trait ([#249](https://github.com/stjude-rust-labs/wdl/pull/249)).
+* Removed `PartialEq`, `Eq`, and `Hash` from WDL-type-related types ([#249](https://github.com/stjude-rust-labs/wdl/pull/249)).
+
+### Fixed
+
+* Common type calculation now supports discovering common types between the
+  compound types containing Union and None as inner types, e.g.
+  `Array[String] | Array[None] -> Array[String?]` ([#257](https://github.com/stjude-rust-labs/wdl/pull/257)).
+* Static analysis of expressions within object literal members now takes place ([#254](https://github.com/stjude-rust-labs/wdl/pull/254)).
+* Certain standard library functions with an existing constraint on generic
+  parameters that take structs are further constrained to take structs
+  containing only primitive members ([#254](https://github.com/stjude-rust-labs/wdl/pull/254)).
+* Fixed signatures and minimum required versions for certain standard library
+  functions ([#254](https://github.com/stjude-rust-labs/wdl/pull/254)).
+
 ## 0.5.0 - 10-22-2024
 
 ### Changed

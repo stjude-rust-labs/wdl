@@ -230,7 +230,7 @@ pub enum PromotionKind {
 }
 
 /// Represents a WDL type.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy)]
 pub enum Type {
     /// The type is a primitive type.
     Primitive(PrimitiveType),
@@ -269,6 +269,16 @@ impl Type {
     pub fn as_primitive(&self) -> Option<PrimitiveType> {
         match self {
             Self::Primitive(ty) => Some(*ty),
+            _ => None,
+        }
+    }
+
+    /// Casts the type to a compound type.
+    ///
+    /// Returns `None` if the type is not a compound type.
+    pub fn as_compound(&self) -> Option<CompoundType> {
+        match self {
+            Self::Compound(ty) => Some(*ty),
             _ => None,
         }
     }
@@ -334,10 +344,26 @@ impl Type {
     /// Calculates a common type between this type and the given type.
     ///
     /// Returns `None` if the types have no common type.
-    pub fn common_type(&self, types: &Types, other: Type) -> Option<Type> {
-        // Check for this type being coercible to the other type
-        if self.is_coercible_to(types, &other) {
+    pub fn common_type(&self, types: &mut Types, other: Type) -> Option<Type> {
+        // If the other type is union, then the common type would be this type
+        if other.is_union() {
+            return Some(*self);
+        }
+
+        // If this type is union, then the common type would be the other type
+        if self.is_union() {
             return Some(other);
+        }
+
+        // If the other type is `None`, then the common type would be an optional this
+        // type
+        if other.is_none() {
+            return Some(self.optional());
+        }
+
+        // If this type is `None`, then the common type would be an optional other type
+        if self.is_none() {
+            return Some(other.optional());
         }
 
         // Check for the other type being coercible to this type
@@ -345,16 +371,16 @@ impl Type {
             return Some(*self);
         }
 
-        // Check for `None` for this type; the common type would be an optional other
-        // type
-        if *self == Type::None {
-            return Some(other.optional());
+        // Check for this type being coercible to the other type
+        if self.is_coercible_to(types, &other) {
+            return Some(other);
         }
 
-        // Check for `None` for the other type; the common type would be an optional
-        // this type
-        if other == Type::None {
-            return Some(self.optional());
+        // Check for a compound type that might have a common type within it
+        if let (Some(this), Some(other)) = (self.as_compound(), other.as_compound()) {
+            if let Some(ty) = this.common_type(types, other) {
+                return Some(ty);
+            }
         }
 
         None
@@ -424,7 +450,7 @@ impl Optional for Type {
 
 impl Coercible for Type {
     fn is_coercible_to(&self, types: &Types, target: &Self) -> bool {
-        if self == target {
+        if self.type_eq(types, target) {
             return true;
         }
 
@@ -440,7 +466,7 @@ impl Coercible for Type {
             // Map[String, X] -> Object, Map[String, X] -> Object?, Map[String, X]? -> Object?
             // Struct -> Object, Struct -> Object?, Struct? -> Object?
             (Self::Compound(src), Self::Object) | (Self::Compound(src), Self::OptionalObject) => {
-                if src.is_optional() && *target == Self::Object {
+                if src.is_optional() && matches!(target, Type::Object) {
                     return false;
                 }
 
@@ -464,7 +490,7 @@ impl Coercible for Type {
             // member names and object values must be coercible to struct member types)
             (Self::Object, Self::Compound(target))
             | (Self::OptionalObject, Self::Compound(target)) => {
-                if *self == Self::OptionalObject && !target.is_optional() {
+                if matches!(self, Type::OptionalObject) && !target.is_optional() {
                     return false;
                 }
 
@@ -486,8 +512,8 @@ impl Coercible for Type {
                 }
             }
 
-            // Union is always coercible to the target
-            (Self::Union, _) => true,
+            // Union is always coercible to the target (and vice versa)
+            (Self::Union, _) | (_, Self::Union) => true,
 
             // None is coercible to an optional type
             (Self::None, ty) if ty.is_optional() => true,
@@ -500,13 +526,17 @@ impl Coercible for Type {
 
 impl TypeEq for Type {
     fn type_eq(&self, types: &Types, other: &Self) -> bool {
-        if self == other {
-            return true;
-        }
-
         match (self, other) {
             (Self::Primitive(a), Self::Primitive(b)) => a.type_eq(types, b),
             (Self::Compound(a), Self::Compound(b)) => a.type_eq(types, b),
+            (Self::Object, Self::Object) => true,
+            (Self::OptionalObject, Self::OptionalObject) => true,
+            (Self::Union, Self::Union) => true,
+            (Self::None, Self::None) => true,
+            (Self::Task, Self::Task) => true,
+            (Self::Hints, Self::Hints) => true,
+            (Self::Input, Self::Input) => true,
+            (Self::Output, Self::Output) => true,
             _ => false,
         }
     }
@@ -570,6 +600,41 @@ impl CompoundType {
             types,
             ty: types.type_definition(self.definition),
             optional: self.optional,
+        }
+    }
+
+    /// Calculates a common type between two compound types.
+    ///
+    /// This method does not attempt coercion; it only attempts to find common
+    /// inner types for the same outer type.
+    fn common_type(&self, types: &mut Types, other: Self) -> Option<Type> {
+        // Check to see if the types are both `Array`, `Pair`, or `Map`; if so, attempt
+        // to find a common type for their inner types
+        match (
+            types.type_definition(self.definition),
+            types.type_definition(other.definition),
+        ) {
+            (CompoundTypeDef::Array(this), CompoundTypeDef::Array(other)) => {
+                let this = *this;
+                let other = *other;
+                let element_type = this.element_type.common_type(types, other.element_type)?;
+                Some(types.add_array(ArrayType::new(element_type)))
+            }
+            (CompoundTypeDef::Pair(this), CompoundTypeDef::Pair(other)) => {
+                let this = *this;
+                let other = *other;
+                let left_type = this.left_type.common_type(types, other.left_type)?;
+                let right_type = this.right_type.common_type(types, other.right_type)?;
+                Some(types.add_pair(PairType::new(left_type, right_type)))
+            }
+            (CompoundTypeDef::Map(this), CompoundTypeDef::Map(other)) => {
+                let this = *this;
+                let other = *other;
+                let key_type = this.key_type.common_type(types, other.key_type)?;
+                let value_type = this.value_type.common_type(types, other.value_type)?;
+                Some(types.add_map(MapType::new(key_type, value_type)))
+            }
+            _ => None,
         }
     }
 
@@ -805,7 +870,7 @@ impl From<StructType> for CompoundTypeDef {
 }
 
 /// Represents the type of an `Array`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy)]
 pub struct ArrayType {
     /// The element type of the array.
     element_type: Type,
@@ -888,7 +953,7 @@ impl TypeEq for ArrayType {
 }
 
 /// Represents the type of a `Pair`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy)]
 pub struct PairType {
     /// The type of the left element of the pair.
     left_type: Type,
@@ -958,7 +1023,7 @@ impl TypeEq for PairType {
 }
 
 /// Represents the type of a `Map`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy)]
 pub struct MapType {
     /// The key type of the map.
     key_type: Type,
@@ -1030,9 +1095,9 @@ impl TypeEq for MapType {
 #[derive(Debug)]
 pub struct StructType {
     /// The name of the struct.
-    pub(crate) name: String,
+    name: Arc<String>,
     /// The members of the struct.
-    pub(crate) members: IndexMap<String, Type>,
+    members: IndexMap<String, Type>,
 }
 
 impl StructType {
@@ -1043,7 +1108,7 @@ impl StructType {
         T: Into<Type>,
     {
         Self {
-            name: name.into(),
+            name: Arc::new(name.into()),
             members: members
                 .into_iter()
                 .map(|(n, ty)| (n.into(), ty.into()))
@@ -1052,7 +1117,7 @@ impl StructType {
     }
 
     /// Gets the name of the struct.
-    pub fn name(&self) -> &str {
+    pub fn name(&self) -> &Arc<String> {
         &self.name
     }
 
@@ -1325,15 +1390,17 @@ impl Types {
 
     /// Gets a struct type from the type collection.
     ///
-    /// Returns `None` if the type is not a struct.
-    pub fn struct_type(&self, ty: Type) -> Option<&StructType> {
+    /// # Panics
+    ///
+    /// Panics if the given type is not a struct type.
+    pub fn struct_type(&self, ty: Type) -> &StructType {
         if let Type::Compound(ty) = ty {
             if let CompoundTypeDef::Struct(s) = &self.0[ty.definition()] {
-                return Some(s);
+                return s;
             }
         }
 
-        None
+        panic!("type `{ty}` is not a struct type", ty = ty.display(self))
     }
 
     /// Imports a type from a foreign type collection.
@@ -2179,7 +2246,7 @@ mod test {
         ] {
             assert!(Type::Union.is_coercible_to(&types, &kind.into()));
             assert!(Type::Union.is_coercible_to(&types, &PrimitiveType::optional(kind).into()));
-            assert!(!Type::from(kind).is_coercible_to(&types, &Type::Union));
+            assert!(Type::from(kind).is_coercible_to(&types, &Type::Union));
         }
 
         for optional in [true, false] {

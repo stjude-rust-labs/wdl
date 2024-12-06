@@ -9,6 +9,7 @@ use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::Version;
 
+use crate::UNNECESSARY_FUNCTION_CALL;
 use crate::UNUSED_CALL_RULE_ID;
 use crate::UNUSED_DECL_RULE_ID;
 use crate::UNUSED_IMPORT_RULE_ID;
@@ -18,6 +19,8 @@ use crate::types::CallType;
 use crate::types::Type;
 use crate::types::Types;
 use crate::types::display_types;
+use crate::types::v1::ComparisonOperator;
+use crate::types::v1::NumericOperator;
 
 /// Utility type to represent an input or an output.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -506,17 +509,12 @@ pub fn missing_struct_members(name: &Ident, count: usize, members: &str) -> Diag
 }
 
 /// Creates a "map key not primitive" diagnostic.
-pub fn map_key_not_primitive(
-    types: &Types,
-    span: Span,
-    actual: Type,
-    actual_span: Span,
-) -> Diagnostic {
+pub fn map_key_not_primitive(types: &Types, span: Span, actual: Type) -> Diagnostic {
     Diagnostic::error("expected map literal to use primitive type keys")
         .with_highlight(span)
         .with_label(
             format!("this is type `{actual}`", actual = actual.display(types)),
-            actual_span,
+            span,
         )
 }
 
@@ -588,7 +586,7 @@ pub fn logical_and_mismatch(types: &Types, actual: Type, actual_span: Span) -> D
 /// Creates a "comparison mismatch" diagnostic.
 pub fn comparison_mismatch(
     types: &Types,
-    op: &impl fmt::Display,
+    op: ComparisonOperator,
     span: Span,
     lhs: Type,
     lhs_span: Span,
@@ -614,7 +612,7 @@ pub fn comparison_mismatch(
 /// Creates a "numeric mismatch" diagnostic.
 pub fn numeric_mismatch(
     types: &Types,
-    op: &impl fmt::Display,
+    op: NumericOperator,
     span: Span,
     lhs: Type,
     lhs_span: Span,
@@ -660,7 +658,7 @@ pub fn unknown_function(name: &str, span: Span) -> Diagnostic {
 /// Creates an "unsupported function" diagnostic.
 pub fn unsupported_function(minimum: SupportedVersion, name: &str, span: Span) -> Diagnostic {
     Diagnostic::error(format!(
-        "function `{name}` requires a minimum WDL version of {minimum}"
+        "this use of function `{name}` requires a minimum WDL version of {minimum}"
     ))
     .with_highlight(span)
 }
@@ -858,4 +856,17 @@ pub fn unused_call(name: &str, span: Span) -> Diagnostic {
     Diagnostic::warning(format!("unused call `{name}`"))
         .with_rule(UNUSED_CALL_RULE_ID)
         .with_highlight(span)
+}
+
+/// Creates an "unnecessary function call" diagnostic.
+pub fn unnecessary_function_call(
+    name: &str,
+    span: Span,
+    label: &str,
+    label_span: Span,
+) -> Diagnostic {
+    Diagnostic::warning(format!("unnecessary call to function `{name}`"))
+        .with_rule(UNNECESSARY_FUNCTION_CALL)
+        .with_highlight(span)
+        .with_label(label.to_string(), label_span)
 }

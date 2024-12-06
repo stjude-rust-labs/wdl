@@ -132,7 +132,7 @@ fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
             .parse_result()
             .root()
             .map(|n| SyntaxNode::new_root(n.clone()).text().to_string())
-            .unwrap_or(String::new());
+            .unwrap_or_default();
         let file = SimpleFile::new(&path, &source);
 
         term::emit(
@@ -149,12 +149,12 @@ fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
 
     let mut engine = Engine::default();
     let document = result.document();
-    let result = match InputsFile::parse(&mut engine, document, test.join("inputs.json")) {
+    let result = match InputsFile::parse(engine.types_mut(), document, test.join("inputs.json")) {
         Ok(inputs) => {
             if let Some((task, inputs)) = inputs.as_task_inputs() {
                 match inputs
                     .validate(
-                        &mut engine,
+                        engine.types_mut(),
                         document,
                         document.task_by_name(task).expect("task should be present"),
                     )
@@ -166,7 +166,7 @@ fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
             } else if let Some(inputs) = inputs.as_workflow_inputs() {
                 let workflow = document.workflow().expect("workflow should be present");
                 match inputs
-                    .validate(&mut engine, document, workflow)
+                    .validate(engine.types_mut(), document, workflow)
                     .with_context(|| {
                         format!(
                             "failed to validate the inputs to workflow `{workflow}`",
@@ -221,7 +221,7 @@ async fn main() {
         });
 
         let result = results.next().expect("should have a result");
-        if !results.next().is_none() {
+        if results.next().is_some() {
             println!("test {test_name} ... {failed}", failed = "failed".red());
             errors.push((
                 test_name,
