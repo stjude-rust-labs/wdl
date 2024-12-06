@@ -146,9 +146,7 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
         let cur_path = PathBuf::from(result.uri().path());
         let relative_path = match cur_path.strip_prefix(&abs_path) {
             Ok(path) => path,
-            Err(_) => {
-                &PathBuf::from("external").join(cur_path.strip_prefix("/").unwrap())
-            }
+            Err(_) => &PathBuf::from("external").join(cur_path.strip_prefix("/").unwrap()),
         };
         let cur_dir = docs_dir.join(relative_path.with_extension(""));
         if !cur_dir.exists() {
