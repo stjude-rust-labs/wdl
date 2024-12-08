@@ -3,6 +3,7 @@
 mod blank_lines_between_elements;
 mod call_input_spacing;
 mod command_mixed_indentation;
+mod command_shellcheck;
 mod comment_whitespace;
 mod container_value;
 mod deprecated_object;
@@ -45,6 +46,7 @@ mod whitespace;
 pub use blank_lines_between_elements::*;
 pub use call_input_spacing::*;
 pub use command_mixed_indentation::*;
+pub use command_shellcheck::*;
 pub use comment_whitespace::*;
 pub use container_value::*;
 pub use deprecated_object::*;

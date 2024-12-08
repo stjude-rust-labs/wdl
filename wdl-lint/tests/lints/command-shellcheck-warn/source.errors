@@ -1,0 +1,16 @@
+note[CommandSectionShellCheck]: shellcheck violations within a command
+   ┌─ tests/lints/command-shellcheck-warn/source.wdl:15:10
+   │
+15 │     echo $foo
+   │          ^^^^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │
+   = fix: address ShellCheck violations
+
+note[CommandSectionShellCheck]: shellcheck violations within a command
+   ┌─ tests/lints/command-shellcheck-warn/source.wdl:32:12
+   │
+32 │       echo $foo
+   │            ^^^^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │
+   = fix: address ShellCheck violations
+

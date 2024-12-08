@@ -1,0 +1,49 @@
+note[SectionOrdering]: sections are not in order for task `test1`
+   ┌─ tests/lints/command-shellcheck-ok/source.wdl:7:6
+   │
+ 7 │ task test1 {
+   │      ^^^^^ this task contains sections that are out of order
+   ·
+13 │     meta {}
+   │     ---- this section is out of order
+   │
+   = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `requirements`/`runtime`
+
+note[BlankLinesBetweenElements]: extra blank line(s) found
+  ┌─ tests/lints/command-shellcheck-ok/source.wdl:7:13
+  │  
+7 │   task test1 {
+  │ ╭────────────^
+8 │ │ 
+9 │ │     input {
+  │ ╰────^
+  │  
+  = fix: remove extra blank line(s)
+
+warning[MatchingParameterMeta]: task `test1` is missing a parameter metadata key for input `foo`
+   ┌─ tests/lints/command-shellcheck-ok/source.wdl:10:14
+   │
+10 │       String foo = "hello"
+   │              ^^^ this input does not have an entry in the parameter metadata section
+   │
+   = fix: add a `foo` key to the `parameter_meta` section with a detailed description of the input.
+
+note[SectionOrdering]: sections are not in order for task `test2`
+   ┌─ tests/lints/command-shellcheck-ok/source.wdl:30:6
+   │
+30 │ task test2 {
+   │      ^^^^^ this task contains sections that are out of order
+   ·
+35 │     meta {}
+   │     ---- this section is out of order
+   │
+   = fix: order as `meta`, `parameter_meta`, `input`, private declarations, `command`, `output`, `requirements`/`runtime`
+
+warning[MatchingParameterMeta]: task `test2` is missing a parameter metadata key for input `foo`
+   ┌─ tests/lints/command-shellcheck-ok/source.wdl:32:14
+   │
+32 │       String foo = "hello"
+   │              ^^^ this input does not have an entry in the parameter metadata section
+   │
+   = fix: add a `foo` key to the `parameter_meta` section with a detailed description of the input.
+
