@@ -49,6 +49,9 @@ const SHELLCHECK_SUPPRESS: &[&str] = &[
     "2193", // The arguments to this comparison can never be equal
 ];
 
+/// ShellCheck: var is referenced by not assigned.
+const SHELLCHECK_REFERENCED_UNASSIGNED: usize = 2154;
+
 /// The identifier for the command section ShellCheck rule.
 const ID: &str = "CommandSectionShellCheck";
 
@@ -121,7 +124,7 @@ fn run_shellcheck(command: &str) -> Result<Vec<ShellCheckComment>> {
 #[derive(Default, Debug, Clone, Copy)]
 pub struct ShellCheckRule;
 
-impl Rule for CommandSectionShellCheck {
+impl Rule for ShellCheckRule {
     fn id(&self) -> &'static str {
         ID
     }
@@ -197,7 +200,7 @@ fn shellcheck_lint(comment: &ShellCheckComment, span: Span) -> Diagnostic {
     )
 }
 
-impl Visitor for CommandSectionShellCheck {
+impl Visitor for ShellCheckRule {
     type State = Diagnostics;
 
     fn document(
@@ -231,7 +234,7 @@ impl Visitor for CommandSectionShellCheck {
 
         // Collect declarations so we can ignore placeholder variables
         let parent_task = section.parent().into_task().expect("parent is a task");
-        let mut decls = task_declarations(&parent_task);
+        let mut decls = gather_task_declarations(&parent_task);
 
         // Replace all placeholders in the command with
         // dummy bash variables
@@ -252,12 +255,13 @@ impl Visitor for CommandSectionShellCheck {
                 }
             });
         } else {
-            // TODO add a diagnostic explaining why this is being skipped?
+            // This is the case where the command section contains
+            // mixed indentation. We silently return and allow
+            // the mixed indentation lint to report this.
             return;
         }
 
         // get leading whitespace so we can add it to each span
-        // TODO there may be a more elegant way to do this
         let leading_whitespace = {
             if let Some(first_part) = section.parts().next() {
                 match first_part {
@@ -311,7 +315,7 @@ impl Visitor for CommandSectionShellCheck {
             Ok(comments) => {
                 for comment in comments {
                     // Skip declarations that shellcheck is unaware of.
-                    if comment.code == 2154
+                    if comment.code == SHELLCHECK_REFERENCED_UNASSIGNED
                         && decls.contains(comment.message.split_whitespace().next().unwrap_or(""))
                     {
                         continue;
@@ -347,7 +351,7 @@ impl Visitor for CommandSectionShellCheck {
                     Diagnostic::error("running `shellcheck` on command block")
                         .with_label(e.to_string(), command_keyword.text_range().to_span())
                         .with_rule(ID)
-                        .with_fix("ensure shellcheck is installed or disable this lint"),
+                        .with_fix("address reported error."),
                     SyntaxElement::from(section.syntax().clone()),
                     &self.exceptable_nodes(),
                 );
