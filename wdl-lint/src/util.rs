@@ -1,8 +1,19 @@
 //! A module for utility functions for the lint rules.
 
+use std::process::Command;
+use std::process::Stdio;
+
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::SyntaxKind;
+
+/// Count amount of leading whitespace in a str
+pub fn count_leading_whitespace(input: &str) -> usize {
+    input
+        .chars()
+        .take_while(|ch| ch.is_whitespace() && *ch != '\n')
+        .count()
+}
 
 /// Detect if a comment is in-line or not by looking for `\n` in the prior
 /// whitespace.
@@ -58,6 +69,17 @@ pub fn lines_with_offset(s: &str) -> impl Iterator<Item = (&str, usize, usize)> 
             }
         }
     })
+}
+
+/// check if a program exists via `which`
+pub fn program_exists(exec: &str) -> bool {
+    Command::new("which")
+        .arg(exec)
+        .stdout(Stdio::null())
+        .stdin(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .is_ok_and(|r| r.success())
 }
 
 /// Strips a single newline from the end of a string.

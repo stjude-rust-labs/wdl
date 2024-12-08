@@ -84,6 +84,7 @@ pub trait Rule: Visitor<State = Diagnostics> {
 /// Gets the default rule set.
 pub fn rules() -> Vec<Box<dyn Rule>> {
     let rules: Vec<Box<dyn Rule>> = vec![
+        Box::<rules::CommandSectionShellCheck>::default(),
         Box::<rules::DoubleQuotesRule>::default(),
         Box::<rules::NoCurlyCommandsRule>::default(),
         Box::<rules::SnakeCaseRule>::default(),
