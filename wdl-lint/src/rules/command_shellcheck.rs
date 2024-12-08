@@ -52,7 +52,7 @@ const SHELLCHECK_SUPPRESS: &[&str] = &[
 /// The identifier for the command section ShellCheck rule.
 const ID: &str = "CommandSectionShellCheck";
 
-/// A ShellCheck comment
+/// A ShellCheck comment.
 ///
 /// The file and fix fields are ommitted as we have no use for them.
 #[derive(Clone, Debug, Deserialize)]
@@ -93,33 +93,33 @@ fn run_shellcheck(command: &str) -> Result<Vec<ShellCheckComment>> {
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
-        .context("error calling shellcheck")?;
+        .context("spawning the `shellcheck` process")?;
     {
         let mut proc_stdin = sc_proc
             .stdin
             .take()
-            .context("error obtaining stdin of shellcheck")?;
+            .context("obtaining the STDIN handle of the `shellcheck` process")?;
         proc_stdin.write_all(command.as_bytes())?;
     }
 
     let output = sc_proc
         .wait_with_output()
-        .context("error calling shellcheck")?;
+        .context("waiting for the `shellcheck` process to complete")?;
 
     // shellcheck returns exit code 1 if
     // any checked files result in comments
     // so cannot check with status.success()
     match output.status.code() {
         Some(0) | Some(1) => serde_json::from_slice::<Vec<ShellCheckComment>>(&output.stdout)
-            .context("failed to parse shellcheck output"),
-        Some(code) => bail!("error calling shellcheck: exit code {}", code),
-        None => bail!("error calling check: process interrupted"),
+            .context("deserializing STDOUT from `shellcheck` process"),
+        Some(code) => bail!("unexpected `shellcheck` exit code: {}", code),
+        None => bail!("the `shellcheck` process appears to have been interrupted"),
     }
 }
 
 /// Runs ShellCheck on a command section and reports violations
 #[derive(Default, Debug, Clone, Copy)]
-pub struct CommandSectionShellCheck;
+pub struct ShellCheckRule;
 
 impl Rule for CommandSectionShellCheck {
     fn id(&self) -> &'static str {
@@ -150,7 +150,7 @@ impl Rule for CommandSectionShellCheck {
     }
 }
 
-/// Convert a WDL placeholder to a bash variable
+/// Convert a WDL placeholder to a bash variable.
 fn to_bash_var(placeholder: &Placeholder) -> String {
     let placeholder_text = placeholder.syntax().text().to_string();
     let mut bash_var = String::from("_WL");
@@ -169,8 +169,8 @@ fn to_bash_var(placeholder: &Placeholder) -> String {
     bash_var
 }
 
-/// retrieve all input and private declations for a task
-fn task_declarations(task: &TaskDefinition) -> HashSet<String> {
+/// Retrieve all input and private declarations for a task.
+fn gather_task_declarations(task: &TaskDefinition) -> HashSet<String> {
     let mut decls = HashSet::new();
     if let Some(input) = task.input() {
         for decl in input.declarations() {
@@ -187,13 +187,13 @@ fn task_declarations(task: &TaskDefinition) -> HashSet<String> {
 /// Creates a "ShellCheck lint" diagnostic from a ShellCheckComment
 fn shellcheck_lint(comment: &ShellCheckComment, span: Span) -> Diagnostic {
     dbg!(
-        Diagnostic::note("shellcheck violations within a command")
+        Diagnostic::note("`shellcheck` reported the following diagnostic")
             .with_rule(ID)
             .with_label(
                 format!("SC{}[{}]: {}", comment.code, comment.level, comment.message),
                 span,
             )
-            .with_fix("address ShellCheck violations")
+            .with_fix("address the diagnostics as recommended in the message")
     )
 }
 
@@ -229,11 +229,11 @@ impl Visitor for CommandSectionShellCheck {
             return;
         }
 
-        // collect declarations so we can ignore placeholder variables
+        // Collect declarations so we can ignore placeholder variables
         let parent_task = section.parent().into_task().expect("parent is a task");
         let mut decls = task_declarations(&parent_task);
 
-        // replace all placeholders in the command with
+        // Replace all placeholders in the command with
         // dummy bash variables
         let mut sanitized_command = String::new();
         if let Some(cmd_parts) = section.strip_whitespace() {
@@ -281,7 +281,7 @@ impl Visitor for CommandSectionShellCheck {
         };
 
         // Map each actual line of the command to its corresponding
-        // CommandPart and start position
+        // `CommandPart` and start position.
         let mut line_map = HashMap::new();
         let mut on_same_line = false;
         let mut line_num = 0usize;
@@ -310,7 +310,7 @@ impl Visitor for CommandSectionShellCheck {
         match run_shellcheck(&sanitized_command) {
             Ok(comments) => {
                 for comment in comments {
-                    // skip declarations that shellcheck is unaware of
+                    // Skip declarations that shellcheck is unaware of.
                     if comment.code == 2154
                         && decls.contains(comment.message.split_whitespace().next().unwrap_or(""))
                     {
@@ -344,7 +344,7 @@ impl Visitor for CommandSectionShellCheck {
                 let command_keyword = support::token(section.syntax(), SyntaxKind::CommandKeyword)
                     .expect("should have a command keyword token");
                 state.exceptable_add(
-                    Diagnostic::error("failed to run shellcheck on command block")
+                    Diagnostic::error("running `shellcheck` on command block")
                         .with_label(e.to_string(), command_keyword.text_range().to_span())
                         .with_rule(ID)
                         .with_fix("ensure shellcheck is installed or disable this lint"),

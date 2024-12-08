@@ -7,7 +7,7 @@ use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::SyntaxKind;
 
-/// Count amount of leading whitespace in a str
+/// Counts the amount of leading whitespace in a string slice.
 pub fn count_leading_whitespace(input: &str) -> usize {
     input
         .chars()
@@ -71,7 +71,7 @@ pub fn lines_with_offset(s: &str) -> impl Iterator<Item = (&str, usize, usize)> 
     })
 }
 
-/// check if a program exists via `which`
+/// Check whether or not a program exists via `which`.
 pub fn program_exists(exec: &str) -> bool {
     Command::new("which")
         .arg(exec)
