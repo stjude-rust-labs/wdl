@@ -71,8 +71,13 @@ async fn main() {
     for entry in fs::read_dir(docs_dir).unwrap() {
         let entry = entry.unwrap();
         let path = entry.path();
-        let relative_path = path.strip_prefix(docs_dir).unwrap();
-        let expected_path = test_dir.join("docs").join(relative_path);
+        // Normalize the path to be relative to the `docs` directory
+        // regardless of OS path separator.
+        let expected_path = test_dir
+            .join("docs")
+            .join(path.strip_prefix(docs_dir).unwrap())
+            .canonicalize()
+            .unwrap();
         if !expected_path.exists() {
             eprintln!("Expected path does not exist: {}", expected_path.display());
             success = false;
