@@ -4,6 +4,7 @@ use std::collections::HashSet;
 use std::io::Write;
 use std::process;
 use std::process::Stdio;
+use std::sync::OnceLock;
 
 use anyhow::Context;
 use anyhow::Result;
@@ -51,6 +52,9 @@ const SHELLCHECK_SUPPRESS: &[&str] = &[
 
 /// ShellCheck: var is referenced by not assigned.
 const SHELLCHECK_REFERENCED_UNASSIGNED: usize = 2154;
+
+/// Whether or not shellcheck exists on the system
+static SHELLCHECK_EXISTS: OnceLock<bool> = OnceLock::new();
 
 /// The identifier for the command section ShellCheck rule.
 const ID: &str = "CommandSectionShellCheck";
@@ -228,7 +232,25 @@ impl Visitor for ShellCheckRule {
             return;
         }
 
-        if !program_exists(SHELLCHECK_BIN) {
+        if !SHELLCHECK_EXISTS.get_or_init(|| {
+            if !program_exists(SHELLCHECK_BIN) {
+                let command_keyword = support::token(section.syntax(), SyntaxKind::CommandKeyword)
+                    .expect("should have a command keyword token");
+                state.exceptable_add(
+                    Diagnostic::error("running `shellcheck` on command section")
+                        .with_label(
+                            "could not find `shellcheck` executable.",
+                            command_keyword.text_range().to_span(),
+                        )
+                        .with_rule(ID)
+                        .with_fix("install shellcheck or disable this lint."),
+                    SyntaxElement::from(section.syntax().clone()),
+                    &self.exceptable_nodes(),
+                );
+                return false;
+            }
+            true
+        }) {
             return;
         }
 
