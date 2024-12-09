@@ -32,8 +32,15 @@ fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> 
 
 #[tokio::main]
 async fn main() {
+    #[cfg(not(windows))]
     let test_dir = Path::new("tests/codebase");
+    #[cfg(not(windows))]
     let docs_dir = Path::new("tests/output_docs");
+
+    #[cfg(windows)]
+    let test_dir = Path::new("tests\\codebase");
+    #[cfg(windows)]
+    let docs_dir = Path::new("tests\\output_docs");
 
     // If `tests/codebase/docs` exists, delete it
     if test_dir.join("docs").exists() {
@@ -75,9 +82,7 @@ async fn main() {
         // regardless of OS path separator.
         let expected_path = test_dir
             .join("docs")
-            .join(path.strip_prefix(docs_dir).unwrap())
-            .canonicalize()
-            .unwrap();
+            .join(path.strip_prefix(docs_dir).unwrap());
         if !expected_path.exists() {
             eprintln!("Expected path does not exist: {}", expected_path.display());
             success = false;
