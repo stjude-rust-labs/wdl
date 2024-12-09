@@ -33,6 +33,8 @@ use wdl_ast::Version;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::MetadataValue;
 
+const DOCS_DIR: &str = "docs";
+
 /// A WDL document.
 #[derive(Debug)]
 pub struct Document {
@@ -131,7 +133,7 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
     let abs_path = std::path::absolute(&path)?;
 
-    let docs_dir = abs_path.clone().join("docs");
+    let docs_dir = abs_path.clone().join(DOCS_DIR);
     if !docs_dir.exists() {
         std::fs::create_dir(&docs_dir)?;
     }
