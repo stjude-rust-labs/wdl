@@ -127,7 +127,7 @@ pub fn fetch_preamble_comments(document: AstDocument) -> String {
 
 /// Generate HTML documentation for a workspace.
 pub async fn document_workspace(path: PathBuf) -> Result<()> {
-    if !path.exists() || !path.is_dir() {
+    if !path.is_dir() {
         return Err(anyhow!("The path is not a directory"));
     }
 
@@ -152,13 +152,22 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
         if !cur_dir.exists() {
             std::fs::create_dir_all(&cur_dir)?;
         }
-        let name = cur_dir.file_name().unwrap().to_str().unwrap();
-        let ast_doc = result.parse_result().document().unwrap();
-        let version = ast_doc.version_statement().unwrap().version();
+        let name = cur_dir
+            .file_name()
+            .expect("current directory should have a filen name")
+            .to_string_lossy();
+        let ast_doc = result
+            .parse_result()
+            .document()
+            .expect("document should be parsable");
+        let version = ast_doc
+            .version_statement()
+            .expect("document should have a version statement")
+            .version();
         let preamble = fetch_preamble_comments(ast_doc.clone());
         let ast = ast_doc.ast().unwrap_v1();
 
-        let document = Document::new(name.to_owned(), version, preamble);
+        let document = Document::new(name.to_string(), version, preamble);
 
         let index = cur_dir.join("index.html");
         let mut index = tokio::fs::File::create(index).await?;
