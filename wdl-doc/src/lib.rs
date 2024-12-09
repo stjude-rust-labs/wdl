@@ -322,3 +322,32 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
     }
     anyhow::Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_fetch_preamble_comments() {
+        let source = r#"
+        ## This is a comment
+        ## This is also a comment
+        version 1.0
+        workflow test {
+            input {
+                String name
+            }
+            output {
+                String greeting = "Hello, ${name}!"
+            }
+            call say_hello as say_hello {
+                input:
+                    name = name
+            }
+        }
+        "#;
+        let (document, _) = AstDocument::parse(source);
+        let preamble = fetch_preamble_comments(document);
+        assert_eq!(preamble, "This is a comment\nThis is also a comment");
+    }
+}

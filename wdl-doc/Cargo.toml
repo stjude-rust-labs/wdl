@@ -19,3 +19,7 @@ wdl-ast = { path = "../wdl-ast", version = "0.9.0" }
 
 [lints]
 workspace = true
+
+[[test]]
+name = "doc"
+harness = false
