@@ -103,12 +103,10 @@ pub fn fetch_preamble_comments(document: AstDocument) -> String {
                 .syntax()
                 .preceding_trivia()
                 .map(|t| match t.kind() {
-                    wdl_ast::SyntaxKind::Comment => {
-                        match t.to_string().strip_prefix("## ") {
-                            Some(comment) => comment.to_string(),
-                            None => "".to_string(),
-                        }
-                    }
+                    wdl_ast::SyntaxKind::Comment => match t.to_string().strip_prefix("## ") {
+                        Some(comment) => comment.to_string(),
+                        None => "".to_string(),
+                    },
                     wdl_ast::SyntaxKind::Whitespace => "".to_string(),
                     _ => {
                         panic!("Unexpected token kind: {:?}", t.kind())
@@ -131,7 +129,7 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
         return Err(anyhow!("The path is not a directory"));
     }
 
-    let abs_path = std::fs::canonicalize(&path)?;
+    let abs_path = std::path::absolute(&path)?;
 
     let docs_dir = abs_path.clone().join("docs");
     if !docs_dir.exists() {
@@ -143,7 +141,10 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
     let results = analyzer.analyze(()).await?;
 
     for result in results {
-        let cur_path = PathBuf::from(result.uri().path());
+        let cur_path = result
+            .uri()
+            .to_file_path()
+            .expect("URI should have a file path");
         let relative_path = match cur_path.strip_prefix(&abs_path) {
             Ok(path) => path,
             Err(_) => &PathBuf::from("external").join(cur_path.strip_prefix("/").unwrap()),
