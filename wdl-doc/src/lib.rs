@@ -154,7 +154,7 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
         }
         let name = cur_dir
             .file_name()
-            .expect("current directory should have a filen name")
+            .expect("current directory should have a file name")
             .to_string_lossy();
         let ast_doc = result
             .parse_result()
