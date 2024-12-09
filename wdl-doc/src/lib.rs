@@ -104,7 +104,7 @@ pub fn fetch_preamble_comments(document: AstDocument) -> String {
                 .preceding_trivia()
                 .map(|t| match t.kind() {
                     wdl_ast::SyntaxKind::Comment => {
-                        match t.to_string().strip_prefix('#').unwrap().strip_prefix("# ") {
+                        match t.to_string().strip_prefix("## ") {
                             Some(comment) => comment.to_string(),
                             None => "".to_string(),
                         }
