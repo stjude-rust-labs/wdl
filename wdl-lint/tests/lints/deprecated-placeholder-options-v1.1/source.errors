@@ -46,3 +46,11 @@ note[DeprecatedPlaceholderOption]: use of the deprecated `default` placeholder o
    │
    = fix: replace the `default` placeholder option with a call to the `select_first()` standard library function
 
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:33:27
+   │
+33 │         python script.py ~{sep(" ", numbers)}
+   │                           ^ SC1037[error]: Braces are required for positionals over 9, e.g. ${10}.
+   │
+   = fix: address the diagnostics as recommended in the message
+

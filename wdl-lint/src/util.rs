@@ -170,4 +170,27 @@ task foo {  # an in-line comment
             ("and even a \r that should not be a newline", 53, 95),
         ]);
     }
+
+    #[test]
+    fn test_count_leading_whitespace() {
+        let s = "    this string has four leading spaces";
+        assert_eq!(count_leading_whitespace(s), 4);
+        let s = "\t\t\t\tthis string has four leading tabs";
+        assert_eq!(count_leading_whitespace(s), 4);
+        let s = "\r\r\r\rthis has four leading carriage returns";
+        assert_eq!(count_leading_whitespace(s), 4);
+        let s = "\n starts with a newline";
+        assert_eq!(count_leading_whitespace(s), 2);
+        let s = "I have no leading whitespace";
+        assert_eq!(count_leading_whitespace(s), 0);
+    }
+
+    #[test]
+    fn test_program_exists() {
+        if cfg!(windows) {
+            assert!(program_exists("where.exe"));
+        } else {
+            assert!(program_exists("which"));
+        }
+    }
 }
