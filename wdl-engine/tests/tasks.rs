@@ -26,6 +26,7 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
 use std::process::exit;
+use std::sync::LazyLock;
 use std::thread::available_parallelism;
 
 use anyhow::Context;
@@ -41,6 +42,7 @@ use futures::StreamExt;
 use futures::stream;
 use path_clean::clean;
 use pretty_assertions::StrComparison;
+use regex::Regex;
 use tempfile::TempDir;
 use walkdir::WalkDir;
 use wdl_analysis::AnalysisResult;
@@ -55,6 +57,11 @@ use wdl_engine::EvaluationError;
 use wdl_engine::Inputs;
 use wdl_engine::local::LocalTaskExecutionBackend;
 use wdl_engine::v1::TaskEvaluator;
+
+/// Regex used to replace temporary file names in task command files with
+/// consistent names for test baselines.
+static TEMP_FILENAME_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new("tmp[[:alnum:]]{6}").expect("invalid regex"));
 
 /// Finds tests to run as part of the analysis test suite.
 fn find_tests() -> Vec<PathBuf> {
@@ -84,30 +91,42 @@ fn find_tests() -> Vec<PathBuf> {
     tests
 }
 
-/// Normalizes a result.
-fn normalize(root: &Path, s: &str) -> String {
-    // Normalize paths separation characters first
-    let s = s
-        .replace("\\", "/")
-        .replace("//", "/")
-        .replace("\r\n", "\n");
-
-    // Strip any paths that start with the root directory
-    if let Some(root) = root.to_str().map(str::to_string) {
-        let mut root = root.replace('\\', "/");
-        if !root.ends_with('/') {
-            root.push('/');
+/// Strips paths from the given string.
+fn strip_paths(root: &Path, s: &str) -> String {
+    #[cfg(windows)]
+    {
+        // First try it with a single slash
+        let mut pattern = root.to_str().expect("path is not UTF-8").to_string();
+        if !pattern.ends_with('\\') {
+            pattern.push('\\');
         }
 
-        s.replace(&root, "")
-    } else {
-        s
+        // Next try with double slashes in case there were escaped backslashes
+        let s = s.replace(&pattern, "");
+        let pattern = pattern.replace('\\', "\\\\");
+        s.replace(&pattern, "")
+    }
+
+    #[cfg(unix)]
+    {
+        let mut pattern = root.to_str().expect("path is not UTF-8").to_string();
+        if !pattern.ends_with('/') {
+            pattern.push('/');
+        }
+
+        s.replace(&pattern, "")
     }
 }
 
+/// Normalizes a result.
+fn normalize(s: &str) -> String {
+    // Normalize paths separation characters first
+    s.replace("\\", "/").replace("\r\n", "\n")
+}
+
 /// Compares a single result.
-fn compare_result(root: &Path, path: &Path, result: &str) -> Result<()> {
-    let result = normalize(root, result);
+fn compare_result(path: &Path, result: &str) -> Result<()> {
+    let result = normalize(result);
     if env::var_os("BLESS").is_some() {
         fs::write(path, &result).with_context(|| {
             format!(
@@ -151,7 +170,7 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
     };
 
     if let Some(diagnostic) = diagnostics.iter().find(|d| d.severity() == Severity::Error) {
-        bail!(diagnostic_to_string(result.document(), &path, &diagnostic));
+        bail!(diagnostic_to_string(result.document(), &path, diagnostic));
     }
 
     let mut engine = Engine::new(LocalTaskExecutionBackend::new());
@@ -179,17 +198,14 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
         }
     };
 
+    let test_dir = absolute(test).expect("failed to get absolute directory");
+
     // Make any paths specified in the inputs file relative to the test directory
     let task = result
         .document()
         .task_by_name(&name)
         .ok_or_else(|| anyhow!("document does not contain a task named `{name}`"))?;
-    inputs.join_paths(
-        engine.types_mut(),
-        result.document(),
-        task,
-        &absolute(test).expect("failed to get absolute directory"),
-    );
+    inputs.join_paths(engine.types_mut(), result.document(), task, &test_dir);
 
     let dir = TempDir::new().context("failed to create temporary directory")?;
     let mut evaluator = TaskEvaluator::new(&mut engine);
@@ -198,7 +214,7 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
         .await
     {
         Ok(evaluated) => {
-            compare_evaluation_results(test, dir.path(), &evaluated)?;
+            compare_evaluation_results(&test_dir, dir.path(), &evaluated)?;
 
             match evaluated.into_result() {
                 Ok(outputs) => {
@@ -207,8 +223,8 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
                     let mut serializer = serde_json::Serializer::pretty(&mut buffer);
                     outputs.serialize(engine.types(), &mut serializer)?;
                     let outputs = String::from_utf8(buffer).expect("output should be UTF-8");
-                    let outputs_path = test.join("outputs.json");
-                    compare_result(dir.path(), &outputs_path, &outputs)?;
+                    let outputs = strip_paths(dir.path(), &outputs);
+                    compare_result(&test.join("outputs.json"), &outputs)?;
                 }
                 Err(e) => {
                     let error = match e {
@@ -217,9 +233,8 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
                         }
                         EvaluationError::Other(e) => format!("{e:?}"),
                     };
-
-                    let error_path = test.join("error.txt");
-                    compare_result(dir.path(), &error_path, &error)?;
+                    let error = strip_paths(dir.path(), &error);
+                    compare_result(&test.join("error.txt"), &error)?;
                 }
             }
         }
@@ -230,16 +245,26 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
                 }
                 EvaluationError::Other(e) => format!("{e:?}"),
             };
-
-            let error_path = test.join("error.txt");
-            compare_result(dir.path(), &error_path, &error)?;
+            let error = strip_paths(dir.path(), &error);
+            compare_result(&test.join("error.txt"), &error)?;
         }
     }
 
     Ok(())
 }
 
-fn compare_evaluation_results(test: &Path, dir: &Path, evaluated: &EvaluatedTask) -> Result<()> {
+/// Compares the evaluation output files against the baselines.
+fn compare_evaluation_results(
+    test_dir: &Path,
+    temp_dir: &Path,
+    evaluated: &EvaluatedTask,
+) -> Result<()> {
+    let command = fs::read_to_string(evaluated.command()).with_context(|| {
+        format!(
+            "failed to read task command file `{path}`",
+            path = evaluated.command().display()
+        )
+    })?;
     let stdout =
         fs::read_to_string(evaluated.stdout().as_file().unwrap().as_str()).with_context(|| {
             format!(
@@ -255,15 +280,31 @@ fn compare_evaluation_results(test: &Path, dir: &Path, evaluated: &EvaluatedTask
             )
         })?;
 
-    let stdout_path = test.join("stdout");
-    compare_result(dir, &stdout_path, &stdout)?;
+    // Strip both temp paths and test dir (input file) paths from the outputs
+    let command = strip_paths(temp_dir, &command);
+    let mut command = strip_paths(test_dir, &command);
 
-    let stderr_path = test.join("stderr");
-    compare_result(dir, &stderr_path, &stderr)?;
+    // Replace any temporary file names in the command
+    for i in 0..usize::MAX {
+        match TEMP_FILENAME_REGEX.replace(&command, format!("tmp{i}")) {
+            Cow::Borrowed(_) => break,
+            Cow::Owned(s) => command = s,
+        }
+    }
+
+    compare_result(&test_dir.join("command"), &command)?;
+
+    let stdout = strip_paths(temp_dir, &stdout);
+    let stdout = strip_paths(test_dir, &stdout);
+    compare_result(&test_dir.join("stdout"), &stdout)?;
+
+    let stderr = strip_paths(temp_dir, &stderr);
+    let stderr = strip_paths(test_dir, &stderr);
+    compare_result(&test_dir.join("stderr"), &stderr)?;
 
     // Compare expected output files
     let mut had_files = false;
-    let files_dir = test.join("files");
+    let files_dir = test_dir.join("files");
     for entry in WalkDir::new(evaluated.work_dir()) {
         let entry = entry.with_context(|| {
             format!(
@@ -301,7 +342,7 @@ fn compare_evaluation_results(test: &Path, dir: &Path, evaluated: &EvaluatedTask
                 .expect("should have parent directory"),
         )
         .context("failed to create output file directory")?;
-        compare_result(dir, &expected_path, &contents)?;
+        compare_result(&expected_path, &contents)?;
     }
 
     // Look for missing output files

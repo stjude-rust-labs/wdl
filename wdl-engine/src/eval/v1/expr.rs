@@ -1563,7 +1563,7 @@ pub(crate) mod test {
             self.env
                 .scope()
                 .lookup(name.as_str())
-                .map(|v| v.clone())
+                .cloned()
                 .ok_or_else(|| unknown_name(name.as_str(), name.span()))
         }
 
@@ -1638,7 +1638,7 @@ pub(crate) mod test {
                 );
                 let output = parser.finish();
                 assert_eq!(
-                    output.diagnostics.iter().next(),
+                    output.diagnostics.first(),
                     None,
                     "the provided WDL source failed to parse"
                 );
@@ -1717,10 +1717,10 @@ pub(crate) mod test {
         approx::assert_relative_eq!(value.unwrap_float(), -12345.6789);
 
         let value = eval_v1_expr(&mut env, V1::Two, "1.7976931348623157E+308").unwrap();
-        approx::assert_relative_eq!(value.unwrap_float(), 1.7976931348623157E+308);
+        approx::assert_relative_eq!(value.unwrap_float(), 1.797_693_134_862_315_7E308);
 
         let value = eval_v1_expr(&mut env, V1::Two, "-1.7976931348623157E+308").unwrap();
-        approx::assert_relative_eq!(value.unwrap_float(), -1.7976931348623157E+308);
+        approx::assert_relative_eq!(value.unwrap_float(), -1.797_693_134_862_315_7E308);
 
         let diagnostic =
             eval_v1_expr(&mut env, V1::Two, "2.7976931348623157E+308").expect_err("should fail");
