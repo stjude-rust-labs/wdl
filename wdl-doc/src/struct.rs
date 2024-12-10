@@ -18,10 +18,6 @@ pub struct Struct {
 }
 
 impl Struct {
-    // /// Create a new struct.
-    // pub fn new(def: StructDefinition, meta: Vec<MetadataValue>) -> Self {
-    //     Self { def, meta }
-    // }
     /// Create a new struct.
     pub fn new(def: StructDefinition) -> Self {
         Self { def }
@@ -41,10 +37,6 @@ impl Struct {
         })
     }
 
-    // /// Get the meta entries associated with the struct.
-    // pub fn meta(&self) -> &[MetadataValue] {
-    //     &self.meta
-    // }
 }
 
 impl Display for Struct {
