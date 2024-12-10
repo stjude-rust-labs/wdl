@@ -44,12 +44,8 @@ const SHELLCHECK_BIN: &str = "shellcheck";
 /// shellcheck lints that we want to suppress
 const SHELLCHECK_SUPPRESS: &[&str] = &[
     "1009", // the mentioned parser error was in...
-    "1072", // Unexpected..
+    "1072", // Unexpected
     "1083", // this {/} is literal
-    "2043", // this loop will only ever run once for constant value
-    "2050", // This expression is constant
-    "2157", // Argument to -n is always true due to literal strings
-    "2193", // The arguments to this comparison can never be equal
 ];
 
 /// ShellCheck: var is referenced by not assigned.
@@ -97,6 +93,8 @@ fn run_shellcheck(command: &str) -> Result<Vec<ShellCheckDiagnostic>> {
             "json",
             "-e",
             &SHELLCHECK_SUPPRESS.join(","),
+            "-S",
+            "style",
             "-",
         ])
         .stdin(Stdio::piped())
