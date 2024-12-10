@@ -9,6 +9,8 @@ use std::sync::OnceLock;
 use anyhow::Context;
 use anyhow::Result;
 use anyhow::bail;
+use rand::distributions::Alphanumeric;
+use rand::distributions::DistString;
 use serde::Deserialize;
 use serde_json;
 
@@ -157,23 +159,13 @@ impl Rule for ShellCheckRule {
     }
 }
 
-/// Convert a WDL placeholder to a bash variable.
+/// Convert a WDL `Placeholder` to a bash variable declaration.
+///
+/// returns a random string three characters shorter than the Placeholder's length
+/// to account for '~{}'.
 fn to_bash_var(placeholder: &Placeholder) -> String {
-    let placeholder_text = placeholder.syntax().text().to_string();
-    let mut bash_var = String::from("_WL");
-    bash_var.push_str(
-        &placeholder_text
-            .chars()
-            .map(|c| {
-                if c.is_ascii_alphanumeric() || c == '_' {
-                    c
-                } else {
-                    '_'
-                }
-            })
-            .collect::<String>(),
-    );
-    bash_var
+    let placeholder_len: usize = placeholder.syntax().text_range().len().into();
+    Alphanumeric.sample_string(&mut rand::thread_rng(), placeholder_len - 3)
 }
 
 /// Retrieve all input and private declarations for a task.
