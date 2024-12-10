@@ -1,0 +1,32 @@
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-style/source.wdl:17:7
+   │
+17 │       [[ ]]
+   │       ^^^ SC2212[style]: Use 'false' instead of empty [/[[ conditionals.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-style/source.wdl:18:9
+   │
+18 │       [ true ]
+   │         ^^^^ SC2160[style]: Instead of '[ true ]', just use 'true'.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-style/source.wdl:36:7
+   │
+36 │       [[ ]]
+   │       ^^^ SC2212[style]: Use 'false' instead of empty [/[[ conditionals.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-style/source.wdl:37:9
+   │
+37 │       [ true ]
+   │         ^^^^ SC2160[style]: Instead of '[ true ]', just use 'true'.
+   │
+   = fix: address the diagnostics as recommended in the message
+

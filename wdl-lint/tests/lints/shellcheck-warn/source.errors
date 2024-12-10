@@ -1,0 +1,176 @@
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:17:22
+   │
+17 │       somecommand.py $line17 ~{placeholder}
+   │                      ^^^^^^^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:17:22
+   │
+17 │       somecommand.py $line17 ~{placeholder}
+   │                      ^^^^^^^ SC2154[warning]: line17 is referenced but not assigned.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:18:37
+   │
+18 │       somecommand.py ~{placeholder} $line18
+   │                                     ^^^^^^^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:18:37
+   │
+18 │       somecommand.py ~{placeholder} $line18
+   │                                     ^^^^^^^ SC2154[warning]: line18 is referenced but not assigned.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:19:36
+   │
+19 │       somecommand.py ~{placeholder}$line19
+   │                                    ^^^^^^^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:19:36
+   │
+19 │       somecommand.py ~{placeholder}$line19
+   │                                    ^^^^^^^ SC2154[warning]: line19 is referenced but not assigned.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:30:22
+   │
+30 │       somecommand.py $line30~{placeholder}
+   │                      ^^^^^^^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:30:22
+   │
+30 │       somecommand.py $line30~{placeholder}
+   │                      ^^^^^^^ SC2154[warning]: line30 is referenced but not assigned.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:31:27
+   │
+31 │       somecommand.py [ -f $line31 ] ~{placeholder}
+   │                           ^^^^^^^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:31:27
+   │
+31 │       somecommand.py [ -f $line31 ] ~{placeholder}
+   │                           ^^^^^^^ SC2154[warning]: line31 is referenced but not assigned.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:49:22
+   │
+49 │       somecommand.py $line49 ~{placeholder}
+   │                      ^^^^^^^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:49:22
+   │
+49 │       somecommand.py $line49 ~{placeholder}
+   │                      ^^^^^^^ SC2154[warning]: line49 is referenced but not assigned.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:50:37
+   │
+50 │       somecommand.py ~{placeholder} $line50
+   │                                     ^^^^^^^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:50:37
+   │
+50 │       somecommand.py ~{placeholder} $line50
+   │                                     ^^^^^^^ SC2154[warning]: line50 is referenced but not assigned.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:51:36
+   │
+51 │       somecommand.py ~{placeholder}$line51
+   │                                    ^^^^^^^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:51:36
+   │
+51 │       somecommand.py ~{placeholder}$line51
+   │                                    ^^^^^^^ SC2154[warning]: line51 is referenced but not assigned.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:52:22
+   │
+52 │       somecommand.py $line52~{placeholder}
+   │                      ^^^^^^^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:52:22
+   │
+52 │       somecommand.py $line52~{placeholder}
+   │                      ^^^^^^^ SC2154[warning]: line52 is referenced but not assigned.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:53:27
+   │
+53 │       somecommand.py [ -f $bad_test ] ~{placeholder}
+   │                           ^^^^^^^^^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:53:27
+   │
+53 │       somecommand.py [ -f $bad_test ] ~{placeholder}
+   │                           ^^^^^^^^^ SC2154[warning]: bad_test is referenced but not assigned.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:54:27
+   │
+54 │       somecommand.py [ -f $trailing_space ] ~{placeholder}  
+   │                           ^^^^^^^^^^^^^^^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │
+   = fix: address the diagnostics as recommended in the message
+
+note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+   ┌─ tests/lints/shellcheck-warn/source.wdl:54:27
+   │
+54 │       somecommand.py [ -f $trailing_space ] ~{placeholder}  
+   │                           ^^^^^^^^^^^^^^^ SC2154[warning]: trailing_space is referenced but not assigned.
+   │
+   = fix: address the diagnostics as recommended in the message
+
