@@ -70,9 +70,13 @@ pub fn lines_with_offset(s: &str) -> impl Iterator<Item = (&str, usize, usize)> 
     })
 }
 
-/// Check whether or not a program exists via `which`.
+/// Check whether or not a program exists.
+///
+/// On unix-like OSes, uses `which`.
+/// On Windows, uses `where.exe`.
 pub fn program_exists(exec: &str) -> bool {
-    Command::new("which")
+    let finder = if cfg!(windows) { "where.exe" } else { "which" };
+    Command::new(finder)
         .arg(exec)
         .stdout(Stdio::null())
         .stdin(Stdio::null())
