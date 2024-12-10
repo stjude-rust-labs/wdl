@@ -139,7 +139,7 @@ The `wdl` CLI tool currently supports the following subcommands:
   code of `1`.
 - `format` - Parses, validates, and then formats a single WDL document, printing
   the result to STDOUT.
-- `document` - Builds documentation for a WDL workspace.
+- `doc` - Builds documentation for a WDL workspace.
 
 Each of the subcommands supports passing `-` as the file path to denote reading
 from STDIN instead of a file on disk.
