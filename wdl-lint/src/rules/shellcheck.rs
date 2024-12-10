@@ -159,11 +159,16 @@ impl Rule for ShellCheckRule {
 
 /// Convert a WDL `Placeholder` to a bash variable declaration.
 ///
-/// returns a random string three characters shorter than the Placeholder's length
-/// to account for '~{}'.
+/// returns "WDL" + <placeholder length - 6> random alphnumeric characters.
+/// 'WDL' + '~{}' = 6.
 fn to_bash_var(placeholder: &Placeholder) -> String {
     let placeholder_len: usize = placeholder.syntax().text_range().len().into();
-    Alphanumeric.sample_string(&mut rand::thread_rng(), placeholder_len - 3)
+    // don't start variable with numbers
+    let mut bash_var = String::from("WDL");
+    bash_var.push_str(
+        &Alphanumeric.sample_string(&mut rand::thread_rng(), placeholder_len.saturating_sub(6)),
+    );
+    bash_var
 }
 
 /// Retrieve all input and private declarations for a task.
