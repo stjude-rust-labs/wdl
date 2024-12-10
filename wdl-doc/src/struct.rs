@@ -5,7 +5,6 @@ use std::fmt::Display;
 use html::content;
 use html::text_content;
 use wdl_ast::AstToken;
-// use wdl_ast::v1::MetadataValue;
 use wdl_ast::v1::StructDefinition;
 
 /// A struct in a WDL document.
