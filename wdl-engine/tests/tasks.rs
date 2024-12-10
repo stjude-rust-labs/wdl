@@ -212,7 +212,7 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
     let dir = TempDir::new().context("failed to create temporary directory")?;
     let mut evaluator = TaskEvaluator::new(&mut engine);
     match evaluator
-        .evaluate(result.document(), task, &inputs, dir.path())
+        .evaluate(result.document(), task, &inputs, dir.path(), &name)
         .await
     {
         Ok(evaluated) => {

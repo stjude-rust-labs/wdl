@@ -207,6 +207,7 @@ impl<'a> TaskEvaluator<'a> {
         task: &Task,
         inputs: &TaskInputs,
         root: &Path,
+        id: &str,
     ) -> EvaluationResult<EvaluatedTask> {
         // Return the first error analysis diagnostic if there was one
         // With this check, we can assume certain correctness properties of the document
@@ -316,7 +317,7 @@ impl<'a> TaskEvaluator<'a> {
                             // section and the outputs section
                             if version >= SupportedVersion::V1(V1::Two) {
                                 let task =
-                                    TaskValue::new_v1(task.name(), "bar", &definition, constraints);
+                                    TaskValue::new_v1(task.name(), id, &definition, constraints);
                                 scopes[TASK_SCOPE_INDEX].insert(TASK_VAR_NAME, Value::Task(task));
                             }
 
@@ -763,7 +764,7 @@ impl<'a> TaskEvaluator<'a> {
             document,
             execution.work_dir(),
             execution.temp_dir(),
-            ScopeRef::new(scopes, OUTPUT_SCOPE_INDEX),
+            ScopeRef::new(scopes, TASK_SCOPE_INDEX),
         ));
 
         let mut command = String::new();

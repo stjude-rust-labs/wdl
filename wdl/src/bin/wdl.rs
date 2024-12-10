@@ -547,7 +547,7 @@ impl RunCommand {
 
                 let mut evaluator = TaskEvaluator::new(&mut engine);
                 match evaluator
-                    .evaluate(document, task, &inputs, &output_dir)
+                    .evaluate(document, task, &inputs, &output_dir, &name)
                     .await
                 {
                     Ok(evaluated) => {
