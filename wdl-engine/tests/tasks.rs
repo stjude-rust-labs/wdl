@@ -121,7 +121,9 @@ fn strip_paths(root: &Path, s: &str) -> String {
 /// Normalizes a result.
 fn normalize(s: &str) -> String {
     // Normalize paths separation characters first
-    s.replace("\\", "/").replace("\r\n", "\n")
+    s.replace("\\\\", "/")
+        .replace("\\", "/")
+        .replace("\r\n", "\n")
 }
 
 /// Compares a single result.
