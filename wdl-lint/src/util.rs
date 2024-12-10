@@ -1,8 +1,18 @@
 //! A module for utility functions for the lint rules.
 
+use std::process::Command;
+use std::process::Stdio;
+
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::SyntaxKind;
+
+/// Counts the amount of leading whitespace in a string slice.
+///
+/// Returns when the first non-whitespace character is encountered.
+pub fn count_leading_whitespace(input: &str) -> usize {
+    input.chars().take_while(|ch| ch.is_whitespace()).count()
+}
 
 /// Detect if a comment is in-line or not by looking for `\n` in the prior
 /// whitespace.
@@ -58,6 +68,21 @@ pub fn lines_with_offset(s: &str) -> impl Iterator<Item = (&str, usize, usize)> 
             }
         }
     })
+}
+
+/// Check whether or not a program exists.
+///
+/// On unix-like OSes, uses `which`.
+/// On Windows, uses `where.exe`.
+pub fn program_exists(exec: &str) -> bool {
+    let finder = if cfg!(windows) { "where.exe" } else { "which" };
+    Command::new(finder)
+        .arg(exec)
+        .stdout(Stdio::null())
+        .stdin(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .is_ok_and(|r| r.success())
 }
 
 /// Strips a single newline from the end of a string.
@@ -144,5 +169,28 @@ task foo {  # an in-line comment
             ("", 51, 53),
             ("and even a \r that should not be a newline", 53, 95),
         ]);
+    }
+
+    #[test]
+    fn test_count_leading_whitespace() {
+        let s = "    this string has four leading spaces";
+        assert_eq!(count_leading_whitespace(s), 4);
+        let s = "\t\t\t\tthis string has four leading tabs";
+        assert_eq!(count_leading_whitespace(s), 4);
+        let s = "\r\r\r\rthis has four leading carriage returns";
+        assert_eq!(count_leading_whitespace(s), 4);
+        let s = "\n starts with a newline";
+        assert_eq!(count_leading_whitespace(s), 2);
+        let s = "I have no leading whitespace";
+        assert_eq!(count_leading_whitespace(s), 0);
+    }
+
+    #[test]
+    fn test_program_exists() {
+        if cfg!(windows) {
+            assert!(program_exists("where.exe"));
+        } else {
+            assert!(program_exists("which"));
+        }
     }
 }
