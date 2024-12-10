@@ -1,4 +1,4 @@
-//! A lint rule for checking mixed indentation in command text.
+//! A lint rule for running shellcheck against command sections.
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::io::Write;
@@ -63,7 +63,7 @@ const ID: &str = "CommandSectionShellCheck";
 ///
 /// The file and fix fields are ommitted as we have no use for them.
 #[derive(Clone, Debug, Deserialize)]
-struct ShellCheckComment {
+struct ShellCheckDiagnostic {
     /// line number comment starts on
     pub line: usize,
     /// line number comment ends on
@@ -82,11 +82,11 @@ struct ShellCheckComment {
     pub message: String,
 }
 
-/// Run shellcheck
+/// Run shellcheck on a command.
 ///
 /// writes command text to stdin of shellcheck process
-/// and returns parsed ShellCheckComments
-fn run_shellcheck(command: &str) -> Result<Vec<ShellCheckComment>> {
+/// and returns parsed `ShellCheckDiagnostic`s
+fn run_shellcheck(command: &str) -> Result<Vec<ShellCheckDiagnostic>> {
     let mut sc_proc = process::Command::new(SHELLCHECK_BIN)
         .args([
             "-s",
@@ -117,7 +117,7 @@ fn run_shellcheck(command: &str) -> Result<Vec<ShellCheckComment>> {
     // any checked files result in comments
     // so cannot check with status.success()
     match output.status.code() {
-        Some(0) | Some(1) => serde_json::from_slice::<Vec<ShellCheckComment>>(&output.stdout)
+        Some(0) | Some(1) => serde_json::from_slice::<Vec<ShellCheckDiagnostic>>(&output.stdout)
             .context("deserializing STDOUT from `shellcheck` process"),
         Some(code) => bail!("unexpected `shellcheck` exit code: {}", code),
         None => bail!("the `shellcheck` process appears to have been interrupted"),
@@ -138,10 +138,10 @@ impl Rule for ShellCheckRule {
     }
 
     fn explanation(&self) -> &'static str {
-        "ShellCheck is a static analysis tool and linter for sh / bash. \
+        "ShellCheck (https://shellcheck.net) is a static analysis tool and linter for sh / bash. \
         The lints provided by ShellCheck help prevent common errors and \
         pitfalls in your scripts. Following its recommendations will increase \
-        the robustness of your command blocks."
+        the robustness of your command sections."
     }
 
     fn tags(&self) -> TagSet {
@@ -370,7 +370,7 @@ impl Visitor for ShellCheckRule {
                 let command_keyword = support::token(section.syntax(), SyntaxKind::CommandKeyword)
                     .expect("should have a command keyword token");
                 state.exceptable_add(
-                    Diagnostic::error("running `shellcheck` on command block")
+                    Diagnostic::error("running `shellcheck` on command section")
                         .with_label(e.to_string(), command_keyword.text_range().to_span())
                         .with_rule(ID)
                         .with_fix("address reported error."),
