@@ -36,7 +36,6 @@ impl Struct {
             (name, ty)
         })
     }
-
 }
 
 impl Display for Struct {
