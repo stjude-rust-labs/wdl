@@ -295,74 +295,40 @@ impl Visitor for ShellCheckRule {
         let parent_task = section.parent().into_task().expect("parent is a task");
         let mut decls = gather_task_declarations(&parent_task);
 
-        // Replace all placeholders in the command with
-        // dummy bash variables
-        let mut sanitized_command = String::new();
-        if let Some(cmd_parts) = section.strip_whitespace() {
-            cmd_parts.iter().for_each(|part| match part {
-                StrippedCommandPart::Text(text) => {
-                    sanitized_command.push_str(text);
-                }
-                StrippedCommandPart::Placeholder(placeholder) => {
-                    let bash_var = to_bash_var(placeholder);
-                    // we need to save the var so we can suppress later
-                    decls.insert(bash_var.clone());
-                    let mut expansion = String::from("\"$");
-                    expansion.push_str(&bash_var);
-                    expansion.push('"');
-                    sanitized_command.push_str(&expansion);
-                }
-            });
-        } else {
+        // Replace all placeholders in the command with dummy bash variables
+        let Some((sanitized_command, cmd_decls)) = sanitize_command(section) else {
             // This is the case where the command section contains
             // mixed indentation. We silently return and allow
             // the mixed indentation lint to report this.
             return;
-        }
-
-        // get leading whitespace so we can add it to each span
-        let leading_whitespace = {
-            if let Some(first_part) = section.parts().next() {
-                match first_part {
-                    CommandPart::Text(text) => {
-                        let text_str = text
-                            .as_str()
-                            .strip_prefix("\n")
-                            .unwrap_or_else(|| text.as_str());
-                        count_leading_whitespace(text_str)
-                    }
-                    CommandPart::Placeholder(pholder) => {
-                        let pholder_str = &pholder.syntax().text().to_string();
-                        count_leading_whitespace(
-                            pholder_str.strip_prefix("\n").unwrap_or(pholder_str),
-                        )
-                    }
-                }
-            } else {
-                0
-            }
         };
+        decls.extend(cmd_decls);
+
+        // Get leading whitespace so we can add it to each span
+        let leading_whitespace = count_command_whitespace(section);
 
         // Map each actual line of the command to its corresponding
         // `CommandPart` and start position.
         let mut line_map = HashMap::new();
+        let mut line_num = 1;
         let mut on_same_line = false;
-        let mut line_num = 0usize;
         for part in section.parts() {
             match part {
                 CommandPart::Text(ref text) => {
-                    let mut last_line = 0usize;
-                    for (_, start, _) in lines_with_offset(text.as_str()) {
-                        // Check to see if we are still on the previous line
-                        // This happens after we encounter a placeholder
+                    for (line, start, _) in lines_with_offset(text.as_str()) {
+                        if line_num == 1 && line.trim().is_empty() {
+                            continue;
+                        }
                         if on_same_line {
                             on_same_line = false;
-                            last_line = last_line.saturating_sub(1);
+                            continue;
                         }
-                        line_map.insert(line_num + last_line, (part.clone(), start));
-                        last_line += 1;
+                        line_map.insert(
+                            line_num,
+                            text.span().start() + start + leading_whitespace - 1,
+                        );
+                        line_num += 1;
                     }
-                    line_num += last_line;
                 }
                 CommandPart::Placeholder(_) => {
                     on_same_line = true;
@@ -371,34 +337,30 @@ impl Visitor for ShellCheckRule {
         }
 
         match run_shellcheck(&sanitized_command) {
-            Ok(comments) => {
-                for comment in comments {
+            Ok(diagnostics) => {
+                for diagnostic in diagnostics {
                     // Skip declarations that shellcheck is unaware of.
-                    if comment.code == SHELLCHECK_REFERENCED_UNASSIGNED
-                        && decls.contains(comment.message.split_whitespace().next().unwrap_or(""))
+                    // ShellCheck's message always starts with the variable name
+                    // that is unassigned.
+                    let target_variable =
+                        diagnostic.message.split_whitespace().next().unwrap_or("");
+                    if diagnostic.code == SHELLCHECK_REFERENCED_UNASSIGNED
+                        && decls.contains(target_variable)
                     {
                         continue;
                     }
-                    let (rel_part, start) = line_map
-                        .get(&comment.line)
+                    let start = line_map
+                        .get(&diagnostic.line)
                         .expect("shellcheck line corresponds to command line");
-                    let rel_token = match rel_part {
-                        CommandPart::Text(text) => text.syntax(),
-                        CommandPart::Placeholder(phold) => {
-                            &support::token(phold.syntax(), SyntaxKind::PlaceholderNode)
-                                .expect("should have a placeholder node token")
-                        }
-                    };
                     let inner_span = {
-                        let outer_span = rel_token.text_range().to_span();
                         Span::new(
-                            outer_span.start() + leading_whitespace + start + comment.column - 1,
-                            comment.end_column - comment.column,
+                            start + diagnostic.column,
+                            diagnostic.end_column - diagnostic.column,
                         )
                     };
                     state.exceptable_add(
-                        shellcheck_lint(&comment, inner_span),
-                        SyntaxElement::from(rel_token.clone()),
+                        shellcheck_lint(&diagnostic, inner_span),
+                        SyntaxElement::from(section.syntax().clone()),
                         &self.exceptable_nodes(),
                     )
                 }

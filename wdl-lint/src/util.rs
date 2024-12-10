@@ -8,11 +8,10 @@ use wdl_ast::Comment;
 use wdl_ast::SyntaxKind;
 
 /// Counts the amount of leading whitespace in a string slice.
+///
+/// Returns when the first non-whitespace character is encountered.
 pub fn count_leading_whitespace(input: &str) -> usize {
-    input
-        .chars()
-        .take_while(|ch| ch.is_whitespace() && *ch != '\n')
-        .count()
+    input.chars().take_while(|ch| ch.is_whitespace()).count()
 }
 
 /// Detect if a comment is in-line or not by looking for `\n` in the prior
