@@ -33,6 +33,9 @@ use wdl_ast::Version;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::MetadataValue;
 
+/// The directory where the generated documentation will be stored.
+///
+/// This directory will be created in the workspace directory.
 const DOCS_DIR: &str = "docs";
 
 /// A WDL document.
