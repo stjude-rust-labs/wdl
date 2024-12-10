@@ -8,7 +8,7 @@
 //!   contain no static analysis errors, but may fail at evaluation time.
 //! * `error.txt` - the expected evaluation error, if any.
 //! * `inputs.json` - the inputs to the task.
-//! * `outputs.json` - the expected outputs from the task, if the task run
+//! * `outputs.json` - the expected outputs from the task, if the task runs
 //!   successfully.
 //! * `stdout` - the expected stdout from the task.
 //! * `stderr` - the expected stderr from the task.
@@ -152,7 +152,7 @@ fn compare_result(path: &Path, result: &str) -> Result<()> {
     Ok(())
 }
 
-/// Runts the test given the provided analysis result.
+/// Runs the test given the provided analysis result.
 async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
     let cwd = std::env::current_dir().expect("must have a CWD");
     // Attempt to strip the CWD from the result path

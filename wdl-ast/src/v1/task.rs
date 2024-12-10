@@ -28,6 +28,86 @@ pub mod common;
 pub mod requirements;
 pub mod runtime;
 
+/// The name of the `name` task variable field.
+pub const TASK_FIELD_NAME: &str = "name";
+/// The name of the `id` task variable field.
+pub const TASK_FIELD_ID: &str = "id";
+/// The name of the `container` task variable field.
+pub const TASK_FIELD_CONTAINER: &str = "container";
+/// The name of the `cpu` task variable field.
+pub const TASK_FIELD_CPU: &str = "cpu";
+/// The name of the `memory` task variable field.
+pub const TASK_FIELD_MEMORY: &str = "memory";
+/// The name of the `attempt` task variable field.
+pub const TASK_FIELD_ATTEMPT: &str = "attempt";
+/// The name of the `gpu` task variable field.
+pub const TASK_FIELD_GPU: &str = "gpu";
+/// The name of the `fpga` task variable field.
+pub const TASK_FIELD_FPGA: &str = "fpga";
+/// The name of the `disks` task variable field.
+pub const TASK_FIELD_DISKS: &str = "disks";
+/// The name of the `end_time` task variable field.
+pub const TASK_FIELD_END_TIME: &str = "end_time";
+/// The name of the `return_code` task variable field.
+pub const TASK_FIELD_RETURN_CODE: &str = "return_code";
+/// The name of the `meta` task variable field.
+pub const TASK_FIELD_META: &str = "meta";
+/// The name of the `parameter_meta` task variable field.
+pub const TASK_FIELD_PARAMETER_META: &str = "parameter_meta";
+/// The name of the `ext` task variable field.
+pub const TASK_FIELD_EXT: &str = "ext";
+
+/// The name of the `container` task requirement.
+pub const TASK_REQUIREMENT_CONTAINER: &str = "container";
+/// The alias of the `container` task requirement (i.e. `docker`).
+pub const TASK_REQUIREMENT_CONTAINER_ALIAS: &str = "docker";
+/// The name of the `cpu` task requirement.
+pub const TASK_REQUIREMENT_CPU: &str = "cpu";
+/// The name of the `disks` task requirement.
+pub const TASK_REQUIREMENT_DISKS: &str = "disks";
+/// The name of the `gpu` task requirement.
+pub const TASK_REQUIREMENT_GPU: &str = "gpu";
+/// The name of the `fpga` task requirement.
+pub const TASK_REQUIREMENT_FPGA: &str = "fpga";
+/// The name of the `max_retries` task requirement.
+pub const TASK_REQUIREMENT_MAX_RETRIES: &str = "max_retries";
+/// The alias of the `max_retries` task requirement (i.e. `maxRetries``).
+pub const TASK_REQUIREMENT_MAX_RETRIES_ALIAS: &str = "maxRetries";
+/// The name of the `memory` task requirement.
+pub const TASK_REQUIREMENT_MEMORY: &str = "memory";
+/// The name of the `return_codes` task requirement.
+pub const TASK_REQUIREMENT_RETURN_CODES: &str = "return_codes";
+/// The alias of the `return_codes` task requirement (i.e. `returnCodes`).
+pub const TASK_REQUIREMENT_RETURN_CODES_ALIAS: &str = "returnCodes";
+
+/// The name of the `disks` task hint.
+pub const TASK_HINT_DISKS: &str = "disks";
+/// The name of the `gpu` task hint.
+pub const TASK_HINT_GPU: &str = "gpu";
+/// The name of the `fpga` task hint.
+pub const TASK_HINT_FPGA: &str = "fpga";
+/// The name of the `inputs` task hint.
+pub const TASK_HINT_INPUTS: &str = "inputs";
+/// The name of the `localization_optional` task hint.
+pub const TASK_HINT_LOCALIZATION_OPTIONAL: &str = "localization_optional";
+/// The alias of the `localization_optional` task hint (i.e.
+/// `localizationOptional`).
+pub const TASK_HINT_LOCALIZATION_OPTIONAL_ALIAS: &str = "localizationOptional";
+/// The name of the `max_cpu` task hint.
+pub const TASK_HINT_MAX_CPU: &str = "max_cpu";
+/// The alias of the `max_cpu` task hint (i.e. `maxCpu`).
+pub const TASK_HINT_MAX_CPU_ALIAS: &str = "maxCpu";
+/// The name of the `max_memory` task hint.
+pub const TASK_HINT_MAX_MEMORY: &str = "max_memory";
+/// The alias of the `max_memory` task hin (e.g. `maxMemory`).
+pub const TASK_HINT_MAX_MEMORY_ALIAS: &str = "maxMemory";
+/// The name of the `outputs` task hint.
+pub const TASK_HINT_OUTPUTS: &str = "outputs";
+/// The name of the `short_task` task hint.
+pub const TASK_HINT_SHORT_TASK: &str = "short_task";
+/// The alias of the `short_task` task hint (e.g. `shortTask`).
+pub const TASK_HINT_SHORT_TASK_ALIAS: &str = "shortTask";
+
 /// Unescapes command text.
 fn unescape_command_text(s: &str, heredoc: bool, buffer: &mut String) {
     let mut chars = s.chars().peekable();
@@ -1833,7 +1913,7 @@ task test {
         assert_eq!(requirements.parent().name().as_str(), "test");
         let items: Vec<_> = requirements.items().collect();
         assert_eq!(items.len(), 1);
-        assert_eq!(items[0].name().as_str(), "container");
+        assert_eq!(items[0].name().as_str(), TASK_REQUIREMENT_CONTAINER);
         assert_eq!(
             items[0]
                 .expr()
@@ -1867,7 +1947,7 @@ task test {
         assert_eq!(runtime.parent().name().as_str(), "test");
         let items: Vec<_> = runtime.items().collect();
         assert_eq!(items.len(), 1);
-        assert_eq!(items[0].name().as_str(), "container");
+        assert_eq!(items[0].name().as_str(), TASK_REQUIREMENT_CONTAINER);
         assert_eq!(
             items[0]
                 .expr()

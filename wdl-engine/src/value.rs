@@ -27,6 +27,20 @@ use wdl_analysis::types::TypeEq;
 use wdl_analysis::types::Types;
 use wdl_ast::AstToken;
 use wdl_ast::v1;
+use wdl_ast::v1::TASK_FIELD_ATTEMPT;
+use wdl_ast::v1::TASK_FIELD_CONTAINER;
+use wdl_ast::v1::TASK_FIELD_CPU;
+use wdl_ast::v1::TASK_FIELD_DISKS;
+use wdl_ast::v1::TASK_FIELD_END_TIME;
+use wdl_ast::v1::TASK_FIELD_EXT;
+use wdl_ast::v1::TASK_FIELD_FPGA;
+use wdl_ast::v1::TASK_FIELD_GPU;
+use wdl_ast::v1::TASK_FIELD_ID;
+use wdl_ast::v1::TASK_FIELD_MEMORY;
+use wdl_ast::v1::TASK_FIELD_META;
+use wdl_ast::v1::TASK_FIELD_NAME;
+use wdl_ast::v1::TASK_FIELD_PARAMETER_META;
+use wdl_ast::v1::TASK_FIELD_RETURN_CODE;
 use wdl_grammar::lexer::v1::is_ident;
 
 use crate::TaskExecutionConstraints;
@@ -2794,25 +2808,29 @@ impl TaskValue {
     /// Returns `None` if the name is not a known field name.
     pub fn field(&self, name: &str) -> Option<Value> {
         match name {
-            "name" => Some(PrimitiveValue::String(self.name.clone()).into()),
-            "id" => Some(PrimitiveValue::String(self.id.clone()).into()),
-            "container" => Some(
+            n if n == TASK_FIELD_NAME => Some(PrimitiveValue::String(self.name.clone()).into()),
+            n if n == TASK_FIELD_ID => Some(PrimitiveValue::String(self.id.clone()).into()),
+            n if n == TASK_FIELD_CONTAINER => Some(
                 self.container
                     .clone()
                     .map(|c| PrimitiveValue::String(c).into())
                     .unwrap_or(Value::None),
             ),
-            "cpu" => Some(self.cpu.into()),
-            "memory" => Some(self.memory.into()),
-            "gpu" => Some(self.gpu.clone().into()),
-            "fpga" => Some(self.fpga.clone().into()),
-            "disks" => Some(self.disks.clone().into()),
-            "attempt" => Some(self.attempt.into()),
-            "end_time" => Some(self.end_time.map(Into::into).unwrap_or(Value::None)),
-            "return_code" => Some(self.return_code.map(Into::into).unwrap_or(Value::None)),
-            "meta" => Some(self.meta.clone().into()),
-            "parameter_meta" => Some(self.parameter_meta.clone().into()),
-            "ext" => Some(self.ext.clone().into()),
+            n if n == TASK_FIELD_CPU => Some(self.cpu.into()),
+            n if n == TASK_FIELD_MEMORY => Some(self.memory.into()),
+            n if n == TASK_FIELD_GPU => Some(self.gpu.clone().into()),
+            n if n == TASK_FIELD_FPGA => Some(self.fpga.clone().into()),
+            n if n == TASK_FIELD_DISKS => Some(self.disks.clone().into()),
+            n if n == TASK_FIELD_ATTEMPT => Some(self.attempt.into()),
+            n if n == TASK_FIELD_END_TIME => {
+                Some(self.end_time.map(Into::into).unwrap_or(Value::None))
+            }
+            n if n == TASK_FIELD_RETURN_CODE => {
+                Some(self.return_code.map(Into::into).unwrap_or(Value::None))
+            }
+            n if n == TASK_FIELD_META => Some(self.meta.clone().into()),
+            n if n == TASK_FIELD_PARAMETER_META => Some(self.parameter_meta.clone().into()),
+            n if n == TASK_FIELD_EXT => Some(self.ext.clone().into()),
             _ => None,
         }
     }

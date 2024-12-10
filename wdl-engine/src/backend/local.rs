@@ -16,6 +16,8 @@ use futures::future::BoxFuture;
 use tokio::process::Command;
 use tracing::info;
 use wdl_analysis::types::PrimitiveTypeKind;
+use wdl_ast::v1::TASK_REQUIREMENT_CPU;
+use wdl_ast::v1::TASK_REQUIREMENT_MEMORY;
 
 use super::TaskExecution;
 use super::TaskExecutionBackend;
@@ -114,7 +116,7 @@ impl TaskExecution for LocalTaskExecution {
     ) -> Result<TaskExecutionConstraints> {
         let num_cpus: f64 = engine.system().cpus().len() as f64;
         let min_cpu = requirements
-            .get("cpu")
+            .get(TASK_REQUIREMENT_CPU)
             .map(|v| {
                 v.coerce(engine.types(), PrimitiveTypeKind::Float.into())
                     .expect("type should coerce")
@@ -123,10 +125,9 @@ impl TaskExecution for LocalTaskExecution {
             .unwrap_or(1.0);
         if num_cpus < min_cpu {
             bail!(
-                "task requires at least {min_cpu} CPU{s}, but only {num_cpus} CPU{s2} are \
+                "task requires at least {min_cpu} CPU{s}, but the host only has {num_cpus} \
                  available",
                 s = if min_cpu == 1.0 { "" } else { "s" },
-                s2 = if num_cpus == 1.0 { "" } else { "s" }
             );
         }
 
@@ -135,8 +136,10 @@ impl TaskExecution for LocalTaskExecution {
             .total_memory()
             .try_into()
             .context("system has too much memory to describe as a WDL value")?;
+
+        // The default value for `memory` is 2 GiB
         let min_memory = requirements
-            .get("memory")
+            .get(TASK_REQUIREMENT_MEMORY)
             .map(|v| {
                 if let Some(v) = v.as_integer() {
                     return Ok(v);
@@ -153,13 +156,16 @@ impl TaskExecution for LocalTaskExecution {
                 unreachable!("value should be an integer or string");
             })
             .transpose()?
-            .unwrap_or(1);
+            .unwrap_or(2 * 1024 * 1024 * 1024); // 2GiB is the default for `memory`
+
         if memory < min_memory {
+            // Display the error in GiB, as it is the most common unit for memory
+            let memory = memory as f64 / (1024.0 * 1024.0 * 1024.0);
+            let min_memory = min_memory as f64 / (1024.0 * 1024.0 * 1024.0);
+
             bail!(
-                "task requires at least {min_memory} byte{s} of memory, but only {memory} \
-                 byte{s2} are available",
-                s = if min_memory == 1 { "" } else { "s" },
-                s2 = if memory == 1 { "" } else { "s" }
+                "task requires at least {min_memory} GiB of memory, but the host only has \
+                 {memory} GiB available",
             );
         }
 

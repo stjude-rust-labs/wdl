@@ -13,6 +13,8 @@ use wdl_analysis::types::Types;
 use wdl_ast::Diagnostic;
 use wdl_ast::Ident;
 use wdl_ast::SupportedVersion;
+use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES;
+use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES_ALIAS;
 
 use crate::CompoundValue;
 use crate::Outputs;
@@ -313,8 +315,8 @@ impl EvaluatedTask {
     fn handle_exit(&self, requirements: &HashMap<String, Value>) -> anyhow::Result<()> {
         let mut error = true;
         if let Some(return_codes) = requirements
-            .get("return_codes")
-            .or_else(|| requirements.get("returnCodes"))
+            .get(TASK_REQUIREMENT_RETURN_CODES)
+            .or_else(|| requirements.get(TASK_REQUIREMENT_RETURN_CODES_ALIAS))
         {
             match return_codes {
                 Value::Primitive(PrimitiveValue::String(s)) if s.as_ref() == "*" => {

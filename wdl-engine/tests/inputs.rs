@@ -111,7 +111,7 @@ fn compare_result(path: &Path, result: &str) -> Result<()> {
     Ok(())
 }
 
-/// Runts the test given the provided analysis result.
+/// Runs the test given the provided analysis result.
 fn run_test(test: &Path, result: AnalysisResult, ntests: &AtomicUsize) -> Result<()> {
     let cwd = std::env::current_dir().expect("must have a CWD");
     let mut buffer = Buffer::no_color();
