@@ -13,8 +13,6 @@ use wdl_ast::v1::StructDefinition;
 pub struct Struct {
     /// The AST definition of the struct.
     def: StructDefinition,
-    // /// Any meta entries associated with the struct.
-    // meta: Vec<MetadataValue>,
 }
 
 impl Struct {

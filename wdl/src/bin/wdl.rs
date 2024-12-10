@@ -395,13 +395,13 @@ impl FormatCommand {
 /// Document a workspace.
 #[derive(Args)]
 #[clap(disable_version_flag = true)]
-pub struct DocumentCommand {
+pub struct DocCommand {
     /// The path to the workspace.
     #[clap(value_name = "PATH")]
     pub path: PathBuf,
 }
 
-impl DocumentCommand {
+impl DocCommand {
     /// Executes the `document` subcommand.
     async fn exec(self) -> Result<()> {
         document_workspace(self.path).await
@@ -452,7 +452,7 @@ enum Command {
     Format(FormatCommand),
 
     /// Documents a workspace.
-    Document(DocumentCommand),
+    Doc(DocCommand),
 }
 
 #[tokio::main]
@@ -472,7 +472,7 @@ async fn main() -> Result<()> {
         Command::Lint(cmd) => cmd.exec().await,
         Command::Analyze(cmd) => cmd.exec().await,
         Command::Format(cmd) => cmd.exec().await,
-        Command::Document(cmd) => cmd.exec().await,
+        Command::Doc(cmd) => cmd.exec().await,
     } {
         eprintln!(
             "{error}: {e:?}",
