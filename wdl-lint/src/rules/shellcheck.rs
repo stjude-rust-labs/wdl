@@ -181,17 +181,64 @@ fn gather_task_declarations(task: &TaskDefinition) -> HashSet<String> {
     decls
 }
 
-/// Creates a "ShellCheck lint" diagnostic from a ShellCheckComment
-fn shellcheck_lint(comment: &ShellCheckComment, span: Span) -> Diagnostic {
-    dbg!(
-        Diagnostic::note("`shellcheck` reported the following diagnostic")
-            .with_rule(ID)
-            .with_label(
-                format!("SC{}[{}]: {}", comment.code, comment.level, comment.message),
-                span,
-            )
-            .with_fix("address the diagnostics as recommended in the message")
-    )
+/// Creates a "ShellCheck lint" diagnostic from a ShellCheckDiagnostic
+fn shellcheck_lint(comment: &ShellCheckDiagnostic, span: Span) -> Diagnostic {
+    Diagnostic::note("`shellcheck` reported the following diagnostic")
+        .with_rule(ID)
+        .with_label(
+            format!("SC{}[{}]: {}", comment.code, comment.level, comment.message),
+            span,
+        )
+        .with_fix("address the diagnostics as recommended in the message")
+}
+
+/// Sanitize a `CommandSection`.
+///
+/// Removes all trailing whitespace, replaces placeholders
+/// with dummy bash variables, and records declarations.
+///
+/// If the section contains mixed indentation, returns None
+fn sanitize_command(section: &CommandSection) -> Option<(String, HashSet<String>)> {
+    let mut sanitized_command = String::new();
+    let mut decls = HashSet::new();
+    if let Some(cmd_parts) = section.strip_whitespace() {
+        cmd_parts.iter().for_each(|part| match part {
+            StrippedCommandPart::Text(text) => {
+                sanitized_command.push_str(text);
+            }
+            StrippedCommandPart::Placeholder(placeholder) => {
+                let bash_var = to_bash_var(placeholder);
+                // we need to save the var so we can suppress later
+                decls.insert(bash_var.clone());
+                let mut expansion = String::from("\"$");
+                expansion.push_str(&bash_var);
+                expansion.push('"');
+                sanitized_command.push_str(&expansion);
+            }
+        });
+        Some((sanitized_command, decls))
+    } else {
+        None
+    }
+}
+
+/// Returns the amount of leading whitespace characters in a `CommandSection`.
+///
+/// Only checks the first `CommandPart::Text`.
+fn count_command_whitespace(section: &CommandSection) -> usize {
+    if let Some(first_text) = section.parts().find(|p| matches!(p, CommandPart::Text(..))) {
+        match first_text {
+            CommandPart::Text(text) => {
+                let text_str = text
+                    .as_str()
+                    .strip_prefix("\n")
+                    .unwrap_or_else(|| text.as_str());
+                return count_leading_whitespace(text_str);
+            }
+            CommandPart::Placeholder(_) => unreachable!(),
+        }
+    }
+    0
 }
 
 impl Visitor for ShellCheckRule {
