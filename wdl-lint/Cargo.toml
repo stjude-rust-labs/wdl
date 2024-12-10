@@ -13,12 +13,13 @@ readme = "../README.md"
 
 [dependencies]
 wdl-ast = { path = "../wdl-ast", version = "0.9.0" }
+anyhow = { workspace = true }
 convert_case = { workspace = true }
 indexmap = { workspace = true }
+rand = { workspace = true }
 rowan = { workspace = true }
-serde_json = { workspace = true }
-anyhow = { workspace = true }
 serde = { workspace = true }
+serde_json = { workspace = true }
 
 [dev-dependencies]
 codespan-reporting = { workspace = true }
