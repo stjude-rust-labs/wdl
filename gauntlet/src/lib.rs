@@ -198,7 +198,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
         total_time += elapsed;
 
         for result in &results {
-            let path = result.uri().to_file_path().ok();
+            let path = result.document().uri().to_file_path().ok();
             let path = match &path {
                 Some(path) => path
                     .strip_prefix(&repo_root)
@@ -211,17 +211,17 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             let document_identifier =
                 document::Identifier::new(repository_identifier.clone(), &path);
 
-            let diagnostics: Cow<'_, [Diagnostic]> = match result.parse_result().error() {
+            let diagnostics: Cow<'_, [Diagnostic]> = match result.error() {
                 Some(e) => {
                     vec![Diagnostic::error(format!("failed to read `{path}`: {e:#}"))].into()
                 }
-                None => result.diagnostics().into(),
+                None => result.document().diagnostics().into(),
             };
 
             let mut actual = IndexSet::new();
             if !diagnostics.is_empty() {
                 let source = result
-                    .parse_result()
+                    .document()
                     .root()
                     .map(|n| SyntaxNode::new_root(n.clone()).text().to_string())
                     .unwrap_or(String::new());

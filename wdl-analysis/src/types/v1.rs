@@ -49,6 +49,7 @@ use super::PrimitiveTypeKind;
 use super::StructType;
 use super::Type;
 use super::TypeEq;
+use super::TypeNameResolver;
 use super::Types;
 use crate::DiagnosticsConfig;
 use crate::UNNECESSARY_FUNCTION_CALL;
@@ -66,6 +67,7 @@ use crate::diagnostics::logical_not_mismatch;
 use crate::diagnostics::logical_or_mismatch;
 use crate::diagnostics::map_key_not_primitive;
 use crate::diagnostics::missing_struct_members;
+use crate::diagnostics::multiple_type_mismatch;
 use crate::diagnostics::negation_mismatch;
 use crate::diagnostics::no_common_type;
 use crate::diagnostics::not_a_pair_accessor;
@@ -77,14 +79,12 @@ use crate::diagnostics::string_concat_mismatch;
 use crate::diagnostics::too_few_arguments;
 use crate::diagnostics::too_many_arguments;
 use crate::diagnostics::type_mismatch;
-use crate::diagnostics::type_mismatch_custom;
 use crate::diagnostics::unknown_call_io;
 use crate::diagnostics::unknown_function;
 use crate::diagnostics::unknown_task_io;
 use crate::diagnostics::unnecessary_function_call;
 use crate::diagnostics::unsupported_function;
-use crate::document::Input;
-use crate::document::Output;
+use crate::document::Task;
 use crate::stdlib::FunctionBindError;
 use crate::stdlib::MAX_PARAMETERS;
 use crate::stdlib::STDLIB;
@@ -309,22 +309,15 @@ impl fmt::Display for NumericOperator {
 
 /// Used to convert AST types into diagnostic types.
 #[derive(Debug)]
-pub struct AstTypeConverter<'a, L> {
-    /// The types collection to use for the conversion.
-    types: &'a mut Types,
-    /// A lookup function for looking up type names.
-    lookup: L,
-}
+pub struct AstTypeConverter<R>(R);
 
-impl<'a, L> AstTypeConverter<'a, L>
+impl<R> AstTypeConverter<R>
 where
-    L: FnMut(&str, Span) -> Result<Type, Diagnostic>,
+    R: TypeNameResolver,
 {
     /// Constructs a new AST type converter.
-    ///
-    /// The provided callback is used to look up type name references.
-    pub fn new(types: &'a mut Types, lookup: L) -> Self {
-        Self { types, lookup }
+    pub fn new(resolver: R) -> Self {
+        Self(resolver)
     }
 
     /// Converts a V1 AST type into an analysis type.
@@ -337,21 +330,18 @@ where
         let ty = match ty {
             v1::Type::Map(ty) => {
                 let ty = self.convert_map_type(ty)?;
-                self.types.add_map(ty)
+                self.0.types_mut().add_map(ty)
             }
             v1::Type::Array(ty) => {
                 let ty = self.convert_array_type(ty)?;
-                self.types.add_array(ty)
+                self.0.types_mut().add_array(ty)
             }
             v1::Type::Pair(ty) => {
                 let ty = self.convert_pair_type(ty)?;
-                self.types.add_pair(ty)
+                self.0.types_mut().add_pair(ty)
             }
             v1::Type::Object(_) => Type::Object,
-            v1::Type::Ref(r) => {
-                let name = r.name();
-                (self.lookup)(name.as_str(), name.span())?
-            }
+            v1::Type::Ref(r) => self.0.resolve_type_name(&r.name())?,
             v1::Type::Primitive(ty) => Type::Primitive(ty.into()),
         };
 
@@ -454,34 +444,16 @@ pub trait EvaluationContext {
     /// Resolves a type name to a type.
     fn resolve_type_name(&mut self, name: &Ident) -> Result<Type, Diagnostic>;
 
-    /// Gets an input for the given name.
+    /// Gets the task associated with the evaluation context.
     ///
-    /// Returns `None` if `input` hidden types are not supported or if the
-    /// specified input isn't known.
-    fn input(&self, name: &str) -> Option<Input>;
-
-    /// Gets an output for the given name.
-    ///
-    /// Returns `None` if `output` hidden types are not supported or if the
-    /// specified output isn't known.
-    fn output(&self, name: &str) -> Option<Output>;
-
-    /// The task name associated with the evaluation.
-    ///
-    /// Returns `None` if no task is visible in this context.
-    fn task_name(&self) -> Option<&str>;
-
-    /// Whether or not `hints` hidden types are supported for the evaluation.
-    fn supports_hints_type(&self) -> bool;
-
-    /// Whether or not `input` hidden types are supported for the evaluation.
-    fn supports_input_type(&self) -> bool;
-
-    /// Whether or not `output` hidden types are supported for the evaluation.
-    fn supports_output_type(&self) -> bool;
+    /// This is only `Some` when evaluating a task `hints` section.
+    fn task(&self) -> Option<&Task>;
 
     /// Gets the diagnostics configuration for the evaluation.
     fn diagnostics_config(&self) -> DiagnosticsConfig;
+
+    /// Adds a diagnostic.
+    fn add_diagnostic(&mut self, diagnostic: Diagnostic);
 }
 
 /// Represents an evaluator of expression types.
@@ -489,8 +461,6 @@ pub trait EvaluationContext {
 pub struct ExprTypeEvaluator<'a, C> {
     /// The context for the evaluator.
     context: &'a mut C,
-    /// The diagnostics collection for adding evaluation diagnostics.
-    diagnostics: &'a mut Vec<Diagnostic>,
     /// The nested count of placeholder evaluation.
     ///
     /// This is incremented immediately before a placeholder expression is
@@ -503,10 +473,9 @@ pub struct ExprTypeEvaluator<'a, C> {
 
 impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
     /// Constructs a new expression type evaluator.
-    pub fn new(context: &'a mut C, diagnostics: &'a mut Vec<Diagnostic>) -> Self {
+    pub fn new(context: &'a mut C) -> Self {
         Self {
             context,
-            diagnostics,
             placeholders: 0,
         }
     }
@@ -652,7 +621,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     }
 
                     if !coercible {
-                        self.diagnostics.push(cannot_coerce_to_string(
+                        self.context.add_diagnostic(cannot_coerce_to_string(
                             self.context.types(),
                             ty,
                             expr.span(),
@@ -682,7 +651,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                             expected = ty;
                             expected_span = expr.span();
                         } else {
-                            self.diagnostics.push(no_common_type(
+                            self.context.add_diagnostic(no_common_type(
                                 self.context.types(),
                                 expected,
                                 expected_span,
@@ -725,7 +694,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     // OK
                 }
                 _ => {
-                    self.diagnostics.push(map_key_not_primitive(
+                    self.context.add_diagnostic(map_key_not_primitive(
                         self.context.types(),
                         key.span(),
                         expected_key,
@@ -761,7 +730,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                                 expected_key = ty;
                                 expected_key_span = key.span();
                             } else {
-                                self.diagnostics.push(no_common_type(
+                                self.context.add_diagnostic(no_common_type(
                                     self.context.types(),
                                     expected_key,
                                     expected_key_span,
@@ -776,7 +745,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                                 expected_value = ty;
                                 expected_value_span = value.span();
                             } else {
-                                self.diagnostics.push(no_common_type(
+                                self.context.add_diagnostic(no_common_type(
                                     self.context.types(),
                                     expected_value,
                                     expected_value_span,
@@ -849,7 +818,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                         present[index] = true;
                         if let Some(actual) = self.evaluate_expr(&v) {
                             if !actual.is_coercible_to(self.context.types(), &expected) {
-                                self.diagnostics.push(type_mismatch(
+                                self.context.add_diagnostic(type_mismatch(
                                     self.context.types(),
                                     expected,
                                     n.span(),
@@ -860,8 +829,8 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                         }
                     } else {
                         // Not a struct member
-                        self.diagnostics
-                            .push(not_a_struct_member(name.as_str(), &n));
+                        self.context
+                            .add_diagnostic(not_a_struct_member(name.as_str(), &n));
                     }
                 }
 
@@ -904,14 +873,14 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                         count += 1;
                     }
 
-                    self.diagnostics
-                        .push(missing_struct_members(&name, count, &members));
+                    self.context
+                        .add_diagnostic(missing_struct_members(&name, count, &members));
                 }
 
                 Some(ty)
             }
             Err(diagnostic) => {
-                self.diagnostics.push(diagnostic);
+                self.context.add_diagnostic(diagnostic);
                 None
             }
         }
@@ -928,7 +897,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     .iter()
                     .any(|target| expr_ty.is_coercible_to(self.context.types(), target))
                 {
-                    self.diagnostics.push(type_mismatch_custom(
+                    self.context.add_diagnostic(multiple_type_mismatch(
                         self.context.types(),
                         expected,
                         name.span(),
@@ -957,7 +926,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 .iter()
                 .any(|target| expr_ty.is_coercible_to(self.context.types(), target))
             {
-                self.diagnostics.push(type_mismatch_custom(
+                self.context.add_diagnostic(multiple_type_mismatch(
                     self.context.types(),
                     expected,
                     name.span(),
@@ -974,9 +943,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
 
     /// Evaluates the type of a literal hints expression.
     fn evaluate_literal_hints(&mut self, expr: &LiteralHints) -> Option<Type> {
-        if !self.context.supports_hints_type() {
-            return None;
-        }
+        self.context.task()?;
 
         for item in expr.items() {
             self.evaluate_hints_item(&item.name(), &item.expr())
@@ -994,7 +961,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 .iter()
                 .any(|target| expr_ty.is_coercible_to(self.context.types(), target))
             {
-                self.diagnostics.push(type_mismatch_custom(
+                self.context.add_diagnostic(multiple_type_mismatch(
                     self.context.types(),
                     expected,
                     name.span(),
@@ -1008,9 +975,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
     /// Evaluates the type of a literal input expression.
     fn evaluate_literal_input(&mut self, expr: &LiteralInput) -> Option<Type> {
         // Check to see if inputs literals are supported in the evaluation scope
-        if !self.context.supports_input_type() {
-            return None;
-        }
+        self.context.task()?;
 
         // Evaluate the items of the literal
         for item in expr.items() {
@@ -1023,9 +988,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
     /// Evaluates the type of a literal output expression.
     fn evaluate_literal_output(&mut self, expr: &LiteralOutput) -> Option<Type> {
         // Check to see if output literals are supported in the evaluation scope
-        if !self.context.supports_output_type() {
-            return None;
-        }
+        self.context.task()?;
 
         // Evaluate the items of the literal
         for item in expr.items() {
@@ -1050,14 +1013,24 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 span = Some(name.span());
 
                 match if io == Io::Input {
-                    self.context.input(name.as_str()).map(|i| i.ty())
+                    self.context
+                        .task()
+                        .expect("should have task")
+                        .inputs()
+                        .get(name.as_str())
+                        .map(|i| i.ty())
                 } else {
-                    self.context.output(name.as_str()).map(|o| o.ty())
+                    self.context
+                        .task()
+                        .expect("should have task")
+                        .outputs()
+                        .get(name.as_str())
+                        .map(|o| o.ty())
                 } {
                     Some(ty) => ty,
                     None => {
-                        self.diagnostics.push(unknown_task_io(
-                            self.context.task_name().expect("should have task name"),
+                        self.context.add_diagnostic(unknown_task_io(
+                            self.context.task().expect("should have task").name(),
                             &name,
                             io,
                         ));
@@ -1072,7 +1045,8 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 match s.members.get(name.as_str()) {
                     Some(ty) => *ty,
                     None => {
-                        self.diagnostics.push(not_a_struct_member(&s.name, &name));
+                        self.context
+                            .add_diagnostic(not_a_struct_member(&s.name, &name));
                         break;
                     }
                 }
@@ -1094,7 +1068,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     );
                 }
                 _ if names.peek().is_some() => {
-                    self.diagnostics.push(not_a_struct(&name, i == 0));
+                    self.context.add_diagnostic(not_a_struct(&name, i == 0));
                     break;
                 }
                 _ => {
@@ -1111,7 +1085,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
 
         // The type of every item should be `hints`
         if !expr_ty.is_coercible_to(self.context.types(), &Type::Hints) {
-            self.diagnostics.push(type_mismatch(
+            self.context.add_diagnostic(type_mismatch(
                 self.context.types(),
                 Type::Hints,
                 span.expect("should have span"),
@@ -1128,7 +1102,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         // The conditional should be a boolean
         let cond_ty = self.evaluate_expr(&cond_expr).unwrap_or(Type::Union);
         if !cond_ty.is_coercible_to(self.context.types(), &PrimitiveTypeKind::Boolean.into()) {
-            self.diagnostics.push(if_conditional_mismatch(
+            self.context.add_diagnostic(if_conditional_mismatch(
                 self.context.types(),
                 cond_ty,
                 cond_expr.span(),
@@ -1147,7 +1121,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 if let Some(ty) = true_ty.common_type(self.context.types_mut(), false_ty) {
                     Some(ty)
                 } else {
-                    self.diagnostics.push(type_mismatch(
+                    self.context.add_diagnostic(type_mismatch(
                         self.context.types(),
                         true_ty,
                         true_expr.span(),
@@ -1167,7 +1141,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         let operand = expr.operand();
         let ty = self.evaluate_expr(&operand).unwrap_or(Type::Union);
         if !ty.is_coercible_to(self.context.types(), &PrimitiveTypeKind::Boolean.into()) {
-            self.diagnostics.push(logical_not_mismatch(
+            self.context.add_diagnostic(logical_not_mismatch(
                 self.context.types(),
                 ty,
                 operand.span(),
@@ -1190,8 +1164,11 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         }
 
         if !ty.is_coercible_to(self.context.types(), &PrimitiveTypeKind::Float.into()) {
-            self.diagnostics
-                .push(negation_mismatch(self.context.types(), ty, operand.span()));
+            self.context.add_diagnostic(negation_mismatch(
+                self.context.types(),
+                ty,
+                operand.span(),
+            ));
             // Type is indeterminate as the expression may evaluate to more than one type
             return None;
         }
@@ -1206,14 +1183,14 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
 
         let ty = self.evaluate_expr(&lhs).unwrap_or(Type::Union);
         if !ty.is_coercible_to(self.context.types(), &PrimitiveTypeKind::Boolean.into()) {
-            self.diagnostics
-                .push(logical_or_mismatch(self.context.types(), ty, lhs.span()));
+            self.context
+                .add_diagnostic(logical_or_mismatch(self.context.types(), ty, lhs.span()));
         }
 
         let ty = self.evaluate_expr(&rhs).unwrap_or(Type::Union);
         if !ty.is_coercible_to(self.context.types(), &PrimitiveTypeKind::Boolean.into()) {
-            self.diagnostics
-                .push(logical_or_mismatch(self.context.types(), ty, rhs.span()));
+            self.context
+                .add_diagnostic(logical_or_mismatch(self.context.types(), ty, rhs.span()));
         }
 
         Some(PrimitiveTypeKind::Boolean.into())
@@ -1226,14 +1203,14 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
 
         let ty = self.evaluate_expr(&lhs).unwrap_or(Type::Union);
         if !ty.is_coercible_to(self.context.types(), &PrimitiveTypeKind::Boolean.into()) {
-            self.diagnostics
-                .push(logical_and_mismatch(self.context.types(), ty, lhs.span()));
+            self.context
+                .add_diagnostic(logical_and_mismatch(self.context.types(), ty, lhs.span()));
         }
 
         let ty = self.evaluate_expr(&rhs).unwrap_or(Type::Union);
         if !ty.is_coercible_to(self.context.types(), &PrimitiveTypeKind::Boolean.into()) {
-            self.diagnostics
-                .push(logical_and_mismatch(self.context.types(), ty, rhs.span()));
+            self.context
+                .add_diagnostic(logical_and_mismatch(self.context.types(), ty, rhs.span()));
         }
 
         Some(PrimitiveTypeKind::Boolean.into())
@@ -1334,7 +1311,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         }
 
         // A type mismatch at this point
-        self.diagnostics.push(comparison_mismatch(
+        self.context.add_diagnostic(comparison_mismatch(
             self.context.types(),
             op,
             span,
@@ -1411,14 +1388,17 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     return Some(ty);
                 }
 
-                self.diagnostics
-                    .push(string_concat_mismatch(self.context.types(), other, span));
+                self.context.add_diagnostic(string_concat_mismatch(
+                    self.context.types(),
+                    other,
+                    span,
+                ));
                 return None;
             }
         }
 
         if !lhs_ty.is_union() && !rhs_ty.is_union() {
-            self.diagnostics.push(numeric_mismatch(
+            self.context.add_diagnostic(numeric_mismatch(
                 self.context.types(),
                 op,
                 span,
@@ -1467,14 +1447,14 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                             return Some(binding.return_type());
                         }
                         Err(FunctionBindError::RequiresVersion(minimum)) => {
-                            self.diagnostics.push(unsupported_function(
+                            self.context.add_diagnostic(unsupported_function(
                                 minimum,
                                 target.as_str(),
                                 target.span(),
                             ));
                         }
                         Err(FunctionBindError::TooFewArguments(minimum)) => {
-                            self.diagnostics.push(too_few_arguments(
+                            self.context.add_diagnostic(too_few_arguments(
                                 target.as_str(),
                                 target.span(),
                                 minimum,
@@ -1482,7 +1462,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                             ));
                         }
                         Err(FunctionBindError::TooManyArguments(maximum)) => {
-                            self.diagnostics.push(too_many_arguments(
+                            self.context.add_diagnostic(too_many_arguments(
                                 target.as_str(),
                                 target.span(),
                                 maximum,
@@ -1491,7 +1471,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                             ));
                         }
                         Err(FunctionBindError::ArgumentTypeMismatch { index, expected }) => {
-                            self.diagnostics.push(argument_type_mismatch(
+                            self.context.add_diagnostic(argument_type_mismatch(
                                 self.context.types(),
                                 target.as_str(),
                                 &expected,
@@ -1503,7 +1483,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                             ));
                         }
                         Err(FunctionBindError::Ambiguous { first, second }) => {
-                            self.diagnostics.push(ambiguous_argument(
+                            self.context.add_diagnostic(ambiguous_argument(
                                 target.as_str(),
                                 target.span(),
                                 &first,
@@ -1516,7 +1496,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     match f.param_min_max(self.context.version()) {
                         Some((_, max)) => {
                             assert!(max <= MAX_PARAMETERS);
-                            self.diagnostics.push(too_many_arguments(
+                            self.context.add_diagnostic(too_many_arguments(
                                 target.as_str(),
                                 target.span(),
                                 max,
@@ -1525,7 +1505,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                             ));
                         }
                         None => {
-                            self.diagnostics.push(unsupported_function(
+                            self.context.add_diagnostic(unsupported_function(
                                 f.minimum_version(),
                                 target.as_str(),
                                 target.span(),
@@ -1537,8 +1517,8 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 Some(f.realize_unconstrained_return_type(self.context.types_mut(), arguments))
             }
             None => {
-                self.diagnostics
-                    .push(unknown_function(target.as_str(), target.span()));
+                self.context
+                    .add_diagnostic(unknown_function(target.as_str(), target.span()));
                 None
             }
         }
@@ -1566,7 +1546,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         if let Some(expected_index_ty) = expected_index_ty {
             let index_ty = self.evaluate_expr(&index).unwrap_or(Type::Union);
             if !index_ty.is_coercible_to(self.context.types(), &expected_index_ty) {
-                self.diagnostics.push(index_type_mismatch(
+                self.context.add_diagnostic(index_type_mismatch(
                     self.context.types(),
                     expected_index_ty,
                     index_ty,
@@ -1578,8 +1558,11 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         match result_ty {
             Some(ty) => Some(ty),
             None => {
-                self.diagnostics
-                    .push(cannot_index(self.context.types(), target_ty, target.span()));
+                self.context.add_diagnostic(cannot_index(
+                    self.context.types(),
+                    target_ty,
+                    target.span(),
+                ));
                 None
             }
         }
@@ -1594,7 +1577,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
             return match task_member_type(name.as_str()) {
                 Some(ty) => Some(ty),
                 None => {
-                    self.diagnostics.push(not_a_task_member(&name));
+                    self.context.add_diagnostic(not_a_task_member(&name));
                     return None;
                 }
             };
@@ -1609,7 +1592,8 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     return Some(*ty);
                 }
 
-                self.diagnostics.push(not_a_struct_member(ty.name(), &name));
+                self.context
+                    .add_diagnostic(not_a_struct_member(ty.name(), &name));
                 return None;
             }
 
@@ -1620,7 +1604,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     "left" => Some(ty.left_type),
                     "right" => Some(ty.right_type),
                     _ => {
-                        self.diagnostics.push(not_a_pair_accessor(&name));
+                        self.context.add_diagnostic(not_a_pair_accessor(&name));
                         None
                     }
                 };
@@ -1632,8 +1616,8 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     return Some(output.ty());
                 }
 
-                self.diagnostics
-                    .push(unknown_call_io(ty, &name, Io::Output));
+                self.context
+                    .add_diagnostic(unknown_call_io(ty, &name, Io::Output));
                 return None;
             }
         }
@@ -1644,8 +1628,8 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
             return Some(Type::Union);
         }
 
-        self.diagnostics
-            .push(cannot_access(self.context.types(), ty, target.span()));
+        self.context
+            .add_diagnostic(cannot_access(self.context.types(), ty, target.span()));
         None
     }
 
@@ -1727,7 +1711,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
             _ => return,
         };
 
-        self.diagnostics.push(
+        self.context.add_diagnostic(
             unnecessary_function_call(target.as_str(), target.span(), &label, span)
                 .with_severity(severity)
                 .with_fix(fix),
