@@ -9,7 +9,7 @@ task private_declaration {
   Int num_lines_clamped = if num_lines > 3 then 3 else num_lines
 
   command <<<
-  head -~{num_lines_clamped} ~{write_lines(lines)}
+  head -~{num_lines_clamped} '~{write_lines(lines)}'
   >>>
 
   output {

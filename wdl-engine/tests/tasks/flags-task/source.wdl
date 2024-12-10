@@ -15,7 +15,7 @@ task flags {
 
     # Instead, make both the flag and the value conditional on `max_matches`
     # being defined.
-    grep ~{"-m " + max_matches} ~{pattern} ~{infile} | wc -l | sed 's/^ *//'
+    grep ~{"-m " + max_matches} ~{pattern} '~{infile}' | wc -l | sed 's/^ *//'
   >>>
 
   output {
