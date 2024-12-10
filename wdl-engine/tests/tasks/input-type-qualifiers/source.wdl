@@ -13,13 +13,13 @@ task input_type_quantifiers {
   }
 
   command <<<
-    cat ~{write_lines(a)} >> result
-    cat ~{write_lines(b)} >> result
+    cat '~{write_lines(a)}' >> result
+    cat '~{write_lines(b)}' >> result
     ~{if defined(c) then 
-    "cat ~{write_lines(select_first([c]))} >> result"
+    "cat '~{write_lines(select_first([c]))}' >> result"
     else ""}
     ~{if defined(e) then 
-    "cat ~{write_lines(select_first([e]))} >> result"
+    "cat '~{write_lines(select_first([e]))}' >> result"
     else ""}
   >>>
 

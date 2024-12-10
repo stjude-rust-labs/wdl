@@ -22,7 +22,6 @@ use std::collections::HashSet;
 use std::env;
 use std::ffi::OsStr;
 use std::fs;
-use std::path::MAIN_SEPARATOR;
 use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
@@ -87,19 +86,23 @@ fn find_tests() -> Vec<PathBuf> {
 
 /// Normalizes a result.
 fn normalize(root: &Path, s: &str) -> String {
+    // Normalize paths separation characters first
+    let s = s
+        .replace("\\", "/")
+        .replace("//", "/")
+        .replace("\r\n", "\n");
+
     // Strip any paths that start with the root directory
-    let s: Cow<'_, str> = if let Some(mut root) = root.to_str().map(str::to_string) {
-        if !root.ends_with(MAIN_SEPARATOR) {
-            root.push(MAIN_SEPARATOR);
+    if let Some(root) = root.to_str().map(str::to_string) {
+        let mut root = root.replace('\\', "/");
+        if !root.ends_with('/') {
+            root.push('/');
         }
 
-        s.replace(&root, "").into()
+        s.replace(&root, "")
     } else {
-        s.into()
-    };
-
-    // Normalize paths separation characters
-    s.replace('\\', "/").replace("\r\n", "\n")
+        s
+    }
 }
 
 /// Compares a single result.
