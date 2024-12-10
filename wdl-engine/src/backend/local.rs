@@ -55,16 +55,8 @@ impl LocalTaskExecution {
             )
         })?;
 
-        // Recreate the temp directory as it may be needed for task evaluation
+        // Create the temp directory now as it may be needed for task evaluation
         let temp_dir = root.join("tmp");
-        if temp_dir.exists() {
-            fs::remove_dir_all(&temp_dir).with_context(|| {
-                format!(
-                    "failed to remove directory `{path}`",
-                    path = temp_dir.display()
-                )
-            })?;
-        }
         fs::create_dir_all(&temp_dir).with_context(|| {
             format!(
                 "failed to create directory `{path}`",

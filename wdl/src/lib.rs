@@ -78,10 +78,6 @@ pub use wdl_analysis as analysis;
 #[cfg(feature = "ast")]
 #[doc(inline)]
 pub use wdl_ast as ast;
-// TODO: uncomment this when wdl-engine is ready for release.
-// #[cfg(feature = "engine")]
-// #[doc(inline)]
-// pub use wdl_engine as engine;
 #[cfg(feature = "doc")]
 #[doc(inline)]
 pub use wdl_doc as doc;

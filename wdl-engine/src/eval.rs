@@ -1,6 +1,7 @@
 //! Module for evaluation.
 
 use std::collections::HashMap;
+use std::path::MAIN_SEPARATOR;
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -323,7 +324,10 @@ impl EvaluatedTask {
                     error = false;
                 }
                 Value::Primitive(PrimitiveValue::String(s)) => {
-                    bail!("invalid return code value `{s}`; only `*` is accepted");
+                    bail!(
+                        "invalid return code value `{s}`: only `*` is accepted when the return \
+                         code is specified as a string"
+                    );
                 }
                 Value::Primitive(PrimitiveValue::Integer(ok)) => {
                     if self.status_code == i32::try_from(*ok).unwrap_or_default() {
@@ -345,10 +349,14 @@ impl EvaluatedTask {
 
         if error {
             bail!(
-                "task process has terminated with status code {code}; see standard error output \
-                 `{stderr}`",
+                "task process has terminated with status code {code}; see the `stdout` and \
+                 `stderr` files in execution directory `{dir}{MAIN_SEPARATOR}` for task command \
+                 output",
                 code = self.status_code,
-                stderr = self.stderr.as_file().unwrap().as_str(),
+                dir = Path::new(self.stderr.as_file().unwrap().as_str())
+                    .parent()
+                    .expect("parent should exist")
+                    .display(),
             );
         }
 

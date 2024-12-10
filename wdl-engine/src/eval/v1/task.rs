@@ -253,8 +253,14 @@ impl<'a> TaskEvaluator<'a> {
                     uri = document.uri()
                 );
 
-                // Tasks only have a root scope (0), an output scope (1), and a `task` variable
-                // scope (2)
+                // Tasks have a root scope (index 0), an output scope (index 1), and a `task`
+                // variable scope (index 2). The output scope inherits from the root scope and
+                // the task scope inherits from the output scope. Inputs and private
+                // declarations are evaluated into the root scope. Outputs are evaluated into
+                // the output scope. The task scope is used for evaluating expressions in both
+                // the command and output sections. Only the `task` variable in WDL 1.2 is
+                // introduced into the task scope; in previous WDL versions, the task scope will
+                // not have any local names.
                 let mut scopes = [
                     Scope::new(None),
                     Scope::new(Some(ROOT_SCOPE_INDEX.into())),

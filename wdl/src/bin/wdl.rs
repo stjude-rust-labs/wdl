@@ -431,6 +431,10 @@ pub struct RunCommand {
     #[clap(short, long, value_name = "OUTPUT_DIR")]
     pub output: Option<PathBuf>,
 
+    /// Overwrites the task execution output directory if it exists.
+    #[clap(long)]
+    pub overwrite: bool,
+
     /// The analysis options.
     #[clap(flatten)]
     pub options: AnalysisOptions,
@@ -508,6 +512,25 @@ impl RunCommand {
         let output_dir = self
             .output
             .unwrap_or_else(|| Path::new(&name).to_path_buf());
+
+        // Check to see if the output directory already exists and if it should be
+        // removed
+        if output_dir.exists() {
+            if !self.overwrite {
+                bail!(
+                    "output directory `{dir}` exists; use the `--overwrite` option to overwrite \
+                     its contents",
+                    dir = output_dir.display()
+                );
+            }
+
+            fs::remove_dir_all(&output_dir).with_context(|| {
+                format!(
+                    "failed to remove output directory `{dir}`",
+                    dir = output_dir.display()
+                )
+            })?;
+        }
 
         match inputs {
             Inputs::Task(mut inputs) => {

@@ -39,7 +39,7 @@ anyhow = { workspace = true }
 codespan-reporting = { workspace = true }
 
 [features]
-default = ["ast", "grammar", "lint", "format"]
+default = ["ast", "grammar", "lint", "format", "engine"]
 analysis = ["dep:wdl-analysis"]
 ast = ["dep:wdl-ast"]
 engine = ["dep:wdl-engine"]
