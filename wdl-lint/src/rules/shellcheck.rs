@@ -51,13 +51,16 @@ const SHELLCHECK_SUPPRESS: &[&str] = &[
 /// ShellCheck: var is referenced by not assigned.
 const SHELLCHECK_REFERENCED_UNASSIGNED: usize = 2154;
 
+/// ShellCheck wiki base url.
+const SHELLCHECK_WIKI: &str = "https://www.shellcheck.net/wiki";
+
 /// Whether or not shellcheck exists on the system
 static SHELLCHECK_EXISTS: OnceLock<bool> = OnceLock::new();
 
 /// The identifier for the command section ShellCheck rule.
-const ID: &str = "CommandSectionShellCheck";
+const ID: &str = "ShellCheck";
 
-/// A ShellCheck comment.
+/// A ShellCheck diagnostic.
 ///
 /// The file and fix fields are ommitted as we have no use for them.
 #[derive(Clone, Debug, Deserialize)]
@@ -87,15 +90,15 @@ struct ShellCheckDiagnostic {
 fn run_shellcheck(command: &str) -> Result<Vec<ShellCheckDiagnostic>> {
     let mut sc_proc = process::Command::new(SHELLCHECK_BIN)
         .args([
-            "-s",
+            "-s", // bash shell
             "bash",
-            "-f",
+            "-f", // output JSON
             "json",
-            "-e",
+            "-e", // errors to suppress
             &SHELLCHECK_SUPPRESS.join(","),
-            "-S",
+            "-S", // set minimum lint level to style
             "style",
-            "-",
+            "-", // input is piped to STDIN
         ])
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -145,7 +148,7 @@ impl Rule for ShellCheckRule {
     }
 
     fn tags(&self) -> TagSet {
-        TagSet::new(&[Tag::Correctness, Tag::Style, Tag::Portability])
+        TagSet::new(&[Tag::Correctness, Tag::Portability])
     }
 
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
@@ -186,15 +189,22 @@ fn gather_task_declarations(task: &TaskDefinition) -> HashSet<String> {
     decls
 }
 
-/// Creates a "ShellCheck lint" diagnostic from a ShellCheckDiagnostic
-fn shellcheck_lint(comment: &ShellCheckDiagnostic, span: Span) -> Diagnostic {
+/// Creates a "ShellCheck lint" diagnostic from a `ShellCheckDiagnostic`
+fn shellcheck_lint(diagnostic: &ShellCheckDiagnostic, span: Span) -> Diagnostic {
     Diagnostic::note("`shellcheck` reported the following diagnostic")
         .with_rule(ID)
         .with_label(
-            format!("SC{}[{}]: {}", comment.code, comment.level, comment.message),
+            format!(
+                "SC{}[{}]: {}",
+                diagnostic.code, diagnostic.level, diagnostic.message
+            ),
             span,
         )
-        .with_fix("address the diagnostics as recommended in the message")
+        .with_label(
+            format!("more info: {}/SC{}", &SHELLCHECK_WIKI, diagnostic.code),
+            span,
+        )
+        .with_fix("address the diagnostic as recommended in the message")
 }
 
 /// Sanitize a `CommandSection`.
