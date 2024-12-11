@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Refactored the `AnalysisResult` and `Document` types to move properties of
   the former into the latter; this will assist in evaluation of documents in
-  that the `Document` along can be passed into evaluation ([#265](https://github.com/stjude-rust-labs/wdl/pull/265)).
+  that the `Document` alone can be passed into evaluation ([#265](https://github.com/stjude-rust-labs/wdl/pull/265)).
 * Removed the "optional type" constraint for the `select_first`, `select_all`,
   and `defined` functions; instead, these functions now accepted non-optional
   types and analysis emits a warning when the functions are called with
