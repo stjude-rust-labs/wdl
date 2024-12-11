@@ -1,48 +1,66 @@
-note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: `shellcheck` reported the following diagnostic
    ┌─ tests/lints/shellcheck-error/source.wdl:18:10
    │
 18 │       if [ -f "$broken"]
-   │          ^ SC1073[error]: Couldn't parse this test expression. Fix to allow more checks.
+   │          ^
+   │          │
+   │          SC1073[error]: Couldn't parse this test expression. Fix to allow more checks.
+   │          more info: https://www.shellcheck.net/wiki/SC1073
    │
-   = fix: address the diagnostics as recommended in the message
+   = fix: address the diagnostic as recommended in the message
 
-note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: `shellcheck` reported the following diagnostic
    ┌─ tests/lints/shellcheck-error/source.wdl:18:15
    │
 18 │       if [ -f "$broken"]
-   │               ^ SC1019[error]: Expected this to be an argument to the unary condition.
+   │               ^
+   │               │
+   │               SC1019[error]: Expected this to be an argument to the unary condition.
+   │               more info: https://www.shellcheck.net/wiki/SC1019
    │
-   = fix: address the diagnostics as recommended in the message
+   = fix: address the diagnostic as recommended in the message
 
-note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: `shellcheck` reported the following diagnostic
    ┌─ tests/lints/shellcheck-error/source.wdl:18:25
    │
 18 │       if [ -f "$broken"]
-   │                         ^ SC1020[error]: You need a space before the ].
+   │                         ^
+   │                         
+   │                         SC1020[error]: You need a space before the ].
+   │                         more info: https://www.shellcheck.net/wiki/SC1020
    │
-   = fix: address the diagnostics as recommended in the message
+   = fix: address the diagnostic as recommended in the message
 
-note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: `shellcheck` reported the following diagnostic
    ┌─ tests/lints/shellcheck-error/source.wdl:37:10
    │
 37 │       if [ -f "$broken"]
-   │          ^ SC1073[error]: Couldn't parse this test expression. Fix to allow more checks.
+   │          ^
+   │          │
+   │          SC1073[error]: Couldn't parse this test expression. Fix to allow more checks.
+   │          more info: https://www.shellcheck.net/wiki/SC1073
    │
-   = fix: address the diagnostics as recommended in the message
+   = fix: address the diagnostic as recommended in the message
 
-note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: `shellcheck` reported the following diagnostic
    ┌─ tests/lints/shellcheck-error/source.wdl:37:15
    │
 37 │       if [ -f "$broken"]
-   │               ^ SC1019[error]: Expected this to be an argument to the unary condition.
+   │               ^
+   │               │
+   │               SC1019[error]: Expected this to be an argument to the unary condition.
+   │               more info: https://www.shellcheck.net/wiki/SC1019
    │
-   = fix: address the diagnostics as recommended in the message
+   = fix: address the diagnostic as recommended in the message
 
-note[CommandSectionShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: `shellcheck` reported the following diagnostic
    ┌─ tests/lints/shellcheck-error/source.wdl:37:25
    │
 37 │       if [ -f "$broken"]
-   │                         ^ SC1020[error]: You need a space before the ].
+   │                         ^
+   │                         
+   │                         SC1020[error]: You need a space before the ].
+   │                         more info: https://www.shellcheck.net/wiki/SC1020
    │
-   = fix: address the diagnostics as recommended in the message
+   = fix: address the diagnostic as recommended in the message
 

@@ -237,23 +237,38 @@ fn sanitize_command(section: &CommandSection) -> Option<(String, HashSet<String>
     }
 }
 
-/// Returns the amount of leading whitespace characters in a `CommandSection`.
-///
-/// Only checks the first `CommandPart::Text`.
-fn count_command_whitespace(section: &CommandSection) -> usize {
-    if let Some(first_text) = section.parts().find(|p| matches!(p, CommandPart::Text(..))) {
-        match first_text {
-            CommandPart::Text(text) => {
-                let text_str = text
-                    .as_str()
-                    .strip_prefix("\n")
-                    .unwrap_or_else(|| text.as_str());
-                return count_leading_whitespace(text_str);
+/// Maps each line as shellcheck sees it to its corresponding start position in the source.
+fn map_shellcheck_lines(section: &CommandSection) -> HashMap<usize, usize> {
+    let mut line_map = HashMap::new();
+    let mut line_num = 1;
+    let mut skip_next_line = false;
+    for part in section.parts() {
+        match part {
+            CommandPart::Text(ref text) => {
+                for (line, line_start, _) in lines_with_offset(text.as_str()) {
+                    // Add back leading whitespace that is stripped from the sanitized command.
+                    // The first line is removed entirely, UNLESS there is content on it.
+                    let leading_ws = if line_num > 1 || ! line.trim().is_empty() {
+                        count_leading_whitespace(line)
+                    } else {
+                        continue;
+                    };
+                    // this occurs after encountering a placeholder
+                    if skip_next_line {
+                        skip_next_line = false;
+                        continue;
+                    }
+                    let adjusted_start = text.span().start() + line_start + leading_ws;
+                    line_map.insert(line_num, adjusted_start);
+                    line_num += 1;
+                }
             }
-            CommandPart::Placeholder(_) => unreachable!(),
+            CommandPart::Placeholder(_) => {
+                skip_next_line = true;
+            }
         }
     }
-    0
+    line_map
 }
 
 impl Visitor for ShellCheckRule {
@@ -318,38 +333,7 @@ impl Visitor for ShellCheckRule {
             return;
         };
         decls.extend(cmd_decls);
-
-        // Get leading whitespace so we can add it to each span
-        let leading_whitespace = count_command_whitespace(section);
-
-        // Map each actual line of the command to its corresponding
-        // `CommandPart` and start position.
-        let mut line_map = HashMap::new();
-        let mut line_num = 1;
-        let mut on_same_line = false;
-        for part in section.parts() {
-            match part {
-                CommandPart::Text(ref text) => {
-                    for (line, start, _) in lines_with_offset(text.as_str()) {
-                        if line_num == 1 && line.trim().is_empty() {
-                            continue;
-                        }
-                        if on_same_line {
-                            on_same_line = false;
-                            continue;
-                        }
-                        line_map.insert(
-                            line_num,
-                            text.span().start() + start + leading_whitespace - 1,
-                        );
-                        line_num += 1;
-                    }
-                }
-                CommandPart::Placeholder(_) => {
-                    on_same_line = true;
-                }
-            }
-        }
+        let line_map = map_shellcheck_lines(section);
 
         match run_shellcheck(&sanitized_command) {
             Ok(diagnostics) => {
@@ -367,12 +351,18 @@ impl Visitor for ShellCheckRule {
                     let start = line_map
                         .get(&diagnostic.line)
                         .expect("shellcheck line corresponds to command line");
-                    let inner_span = {
-                        Span::new(
-                            start + diagnostic.column,
-                            diagnostic.end_column - diagnostic.column,
-                        )
+                    let len = if diagnostic.end_line > diagnostic.line {
+                        // this is a multiline diagnostic
+                        let end_line_start = line_map
+                            .get(&diagnostic.end_line)
+                            .expect("shellcheck line corresponds to command line");
+                        end_line_start + diagnostic.end_column
+                    } else {
+                        // single line diagnostic
+                        (diagnostic.end_column).saturating_sub(diagnostic.column)
                     };
+                    // shellcheck 1-indexes columns, so subtract 1.
+                    let inner_span = { Span::new(start + diagnostic.column - 1, len) };
                     state.exceptable_add(
                         shellcheck_lint(&diagnostic, inner_span),
                         SyntaxElement::from(section.syntax().clone()),
