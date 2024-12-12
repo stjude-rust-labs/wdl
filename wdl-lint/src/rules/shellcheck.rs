@@ -13,6 +13,7 @@ use rand::distributions::Alphanumeric;
 use rand::distributions::DistString;
 use serde::Deserialize;
 use serde_json;
+use tracing::debug;
 
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
@@ -104,6 +105,7 @@ fn run_shellcheck(command: &str) -> Result<Vec<ShellCheckDiagnostic>> {
         .stdout(Stdio::piped())
         .spawn()
         .context("spawning the `shellcheck` process")?;
+    debug!("`shellcheck` process id: {}", sc_proc.id());
     {
         let mut proc_stdin = sc_proc
             .stdin
