@@ -157,7 +157,6 @@ impl Rule for ShellCheckRule {
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
         Some(&[
             SyntaxKind::VersionStatementNode,
-            SyntaxKind::TaskDefinitionNode,
             SyntaxKind::CommandSectionNode,
         ])
     }
