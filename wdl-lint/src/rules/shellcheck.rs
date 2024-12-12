@@ -334,13 +334,13 @@ impl Visitor for ShellCheckRule {
                 // let command_keyword = support::token(section.syntax(), SyntaxKind::CommandKeyword)
                 //     .expect("should have a command keyword token");
                 // state.exceptable_add(
-                //     Diagnostic::error("running `shellcheck` on command section")
+                //     Diagnostic::note("running `shellcheck` on command section")
                 //         .with_label(
                 //             "could not find `shellcheck` executable.",
                 //             command_keyword.text_range().to_span(),
                 //         )
                 //         .with_rule(ID)
-                //         .with_fix("install shellcheck or disable this lint."),
+                //         .with_fix("install shellcheck (https://www.shellcheck.net) or disable this lint."),
                 //     SyntaxElement::from(section.syntax().clone()),
                 //     &self.exceptable_nodes(),
                 // );
