@@ -301,19 +301,23 @@ impl Visitor for ShellCheckRule {
 
         if !SHELLCHECK_EXISTS.get_or_init(|| {
             if !program_exists(SHELLCHECK_BIN) {
-                let command_keyword = support::token(section.syntax(), SyntaxKind::CommandKeyword)
-                    .expect("should have a command keyword token");
-                state.exceptable_add(
-                    Diagnostic::error("running `shellcheck` on command section")
-                        .with_label(
-                            "could not find `shellcheck` executable.",
-                            command_keyword.text_range().to_span(),
-                        )
-                        .with_rule(ID)
-                        .with_fix("install shellcheck or disable this lint."),
-                    SyntaxElement::from(section.syntax().clone()),
-                    &self.exceptable_nodes(),
-                );
+                // TODO this diagnostic is currently disabled.
+                // When support for opt-in lints is added, this diagnostic
+                // should be enabled.
+                //
+                // let command_keyword = support::token(section.syntax(), SyntaxKind::CommandKeyword)
+                //     .expect("should have a command keyword token");
+                // state.exceptable_add(
+                //     Diagnostic::error("running `shellcheck` on command section")
+                //         .with_label(
+                //             "could not find `shellcheck` executable.",
+                //             command_keyword.text_range().to_span(),
+                //         )
+                //         .with_rule(ID)
+                //         .with_fix("install shellcheck or disable this lint."),
+                //     SyntaxElement::from(section.syntax().clone()),
+                //     &self.exceptable_nodes(),
+                // );
                 return false;
             }
             true
