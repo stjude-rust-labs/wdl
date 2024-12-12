@@ -43,10 +43,11 @@ use crate::util::{count_leading_whitespace, lines_with_offset, program_exists};
 const SHELLCHECK_BIN: &str = "shellcheck";
 
 /// shellcheck lints that we want to suppress
+/// these two lints always co-occur with a more
+/// informative message.
 const SHELLCHECK_SUPPRESS: &[&str] = &[
-    "1009", // the mentioned parser error was in...
-    "1072", // Unexpected
-    "1083", // this {/} is literal
+    "1009", // the mentioned parser error was in... (unhelpful commentary)
+    "1072", // Unexpected eof (unhelpful commentary)
 ];
 
 /// ShellCheck: var is referenced by not assigned.
