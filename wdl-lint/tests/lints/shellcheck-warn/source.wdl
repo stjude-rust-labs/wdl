@@ -130,6 +130,18 @@ task test5 {
           placeholder
         }
       $occurs_after_multiline
+
+      $(echo This is a 
+        very long string that should be quoted)
+      
+      $(echo This is an
+        even longer very long string that should really 
+        be quoted)
+      
+      $(echo This is an
+        even longer very long string that should really
+        really really really 
+        ought to be quoted)
     >>>
 
     output {}

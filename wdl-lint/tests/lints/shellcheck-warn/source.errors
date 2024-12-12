@@ -669,3 +669,36 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
+note[ShellCheck]: `shellcheck` reported the following diagnostic
+    ┌─ tests/lints/shellcheck-warn/source.wdl:134:7
+    │    
+134 │ ╭ ╭       $(echo This is a 
+135 │ │ │         very long string that should be quoted)
+    │ ╰─│───────────────────────────────────────────────^ SC2091[warning]: Remove surrounding $() to avoid executing output (or use eval if intentional).
+    │   ╰───────────────────────────────────────────────' more info: https://www.shellcheck.net/wiki/SC2091
+    │    
+    = fix: address the diagnostic as recommended in the message
+
+note[ShellCheck]: `shellcheck` reported the following diagnostic
+    ┌─ tests/lints/shellcheck-warn/source.wdl:137:7
+    │    
+137 │ ╭ ╭       $(echo This is an
+138 │ │ │         even longer very long string that should really 
+139 │ │ │         be quoted)
+    │ ╰─│──────────────────^ SC2091[warning]: Remove surrounding $() to avoid executing output (or use eval if intentional).
+    │   ╰──────────────────' more info: https://www.shellcheck.net/wiki/SC2091
+    │    
+    = fix: address the diagnostic as recommended in the message
+
+note[ShellCheck]: `shellcheck` reported the following diagnostic
+    ┌─ tests/lints/shellcheck-warn/source.wdl:141:7
+    │    
+141 │ ╭ ╭       $(echo This is an
+142 │ │ │         even longer very long string that should really
+143 │ │ │         really really really 
+144 │ │ │         ought to be quoted)
+    │ ╰─│───────────────────────────^ SC2091[warning]: Remove surrounding $() to avoid executing output (or use eval if intentional).
+    │   ╰───────────────────────────' more info: https://www.shellcheck.net/wiki/SC2091
+    │    
+    = fix: address the diagnostic as recommended in the message
+

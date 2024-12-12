@@ -250,7 +250,7 @@ fn map_shellcheck_lines(section: &CommandSection) -> HashMap<usize, usize> {
                 for (line, line_start, _) in lines_with_offset(text.as_str()) {
                     // Add back leading whitespace that is stripped from the sanitized command.
                     // The first line is removed entirely, UNLESS there is content on it.
-                    let leading_ws = if line_num > 1 || ! line.trim().is_empty() {
+                    let leading_ws = if line_num > 1 || !line.trim().is_empty() {
                         count_leading_whitespace(line)
                     } else {
                         continue;
@@ -271,6 +271,30 @@ fn map_shellcheck_lines(section: &CommandSection) -> HashMap<usize, usize> {
         }
     }
     line_map
+}
+
+/// Calculates the correct `Span` for a `ShellCheckDiagnostic` relative to the source.
+fn calculate_span(diagnostic: &ShellCheckDiagnostic, line_map: &HashMap<usize, usize>) -> Span {
+    // shellcheck 1-indexes columns, so subtract 1.
+    let start = line_map
+        .get(&diagnostic.line)
+        .expect("shellcheck line corresponds to command line")
+        + diagnostic.column
+        - 1;
+    let len = if diagnostic.end_line > diagnostic.line {
+        // this is a multiline diagnostic
+        let end_line_end = line_map
+            .get(&diagnostic.end_line)
+            .expect("shellcheck line corresponds to command line")
+            + diagnostic.end_column
+            - 1;
+        // - 2 to discount first and last newlines
+        end_line_end.saturating_sub(start) - 2
+    } else {
+        // single line diagnostic
+        (diagnostic.end_column).saturating_sub(diagnostic.column)
+    };
+    Span::new(start, len)
 }
 
 impl Visitor for ShellCheckRule {
@@ -354,23 +378,9 @@ impl Visitor for ShellCheckRule {
                     {
                         continue;
                     }
-                    let start = line_map
-                        .get(&diagnostic.line)
-                        .expect("shellcheck line corresponds to command line");
-                    let len = if diagnostic.end_line > diagnostic.line {
-                        // this is a multiline diagnostic
-                        let end_line_start = line_map
-                            .get(&diagnostic.end_line)
-                            .expect("shellcheck line corresponds to command line");
-                        end_line_start + diagnostic.end_column
-                    } else {
-                        // single line diagnostic
-                        (diagnostic.end_column).saturating_sub(diagnostic.column)
-                    };
-                    // shellcheck 1-indexes columns, so subtract 1.
-                    let inner_span = { Span::new(start + diagnostic.column - 1, len) };
+                    let span = calculate_span(&diagnostic, &line_map);
                     state.exceptable_add(
-                        shellcheck_lint(&diagnostic, inner_span),
+                        shellcheck_lint(&diagnostic, span),
                         SyntaxElement::from(section.syntax().clone()),
                         &self.exceptable_nodes(),
                     )
