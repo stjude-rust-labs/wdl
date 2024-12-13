@@ -194,15 +194,13 @@ fn gather_task_declarations(task: &TaskDefinition) -> HashSet<String> {
 
 /// Creates a "ShellCheck lint" diagnostic from a `ShellCheckDiagnostic`
 fn shellcheck_lint(diagnostic: &ShellCheckDiagnostic, span: Span) -> Diagnostic {
-    Diagnostic::note("`shellcheck` reported the following diagnostic")
+    let label = format!(
+        "SC{}[{}]: {}",
+        diagnostic.code, diagnostic.level, diagnostic.message
+    );
+    Diagnostic::note(&diagnostic.message)
         .with_rule(ID)
-        .with_label(
-            format!(
-                "SC{}[{}]: {}",
-                diagnostic.code, diagnostic.level, diagnostic.message
-            ),
-            span,
-        )
+        .with_label(label, span)
         .with_label(
             format!("more info: {}/SC{}", &SHELLCHECK_WIKI, diagnostic.code),
             span,
