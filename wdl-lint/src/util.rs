@@ -34,6 +34,22 @@ pub fn is_inline_comment(token: &Comment) -> bool {
     false
 }
 
+/// Determines if a string containing embedded quotes is properly quoted.
+pub fn is_properly_quoted(s: &str, quote_char: char) -> bool {
+    let mut closed = true;
+    let mut escaped = false;
+    s.chars().for_each(|c| {
+        if c == '\\' {
+            escaped = true;
+        } else if !escaped && c == quote_char {
+            closed = !closed;
+        } else {
+            escaped = false;
+        }
+    });
+    closed
+}
+
 /// Iterates over the lines of a string and returns the line, starting offset,
 /// and next possible starting offset.
 pub fn lines_with_offset(s: &str) -> impl Iterator<Item = (&str, usize, usize)> {
@@ -192,5 +208,23 @@ task foo {  # an in-line comment
         } else {
             assert!(program_exists("which"));
         }
+    }
+
+    #[test]
+    fn test_is_properly_quoted() {
+        let s = "\"this string is quoted properly.\"";
+        assert!(is_properly_quoted(s, '"'));
+        let s = "\"this string has an escaped \\\" quote.\"";
+        assert!(is_properly_quoted(s, '"'));
+        let s = "\"this string is missing an end quote";
+        assert_eq!(is_properly_quoted(s, '"'), false);
+        let s = "this string is missing an open quote\"";
+        assert_eq!(is_properly_quoted(s, '"'), false);
+        let s = "\"this string has an irrelevant escape \\ \"";
+        assert!(is_properly_quoted(s, '"'));
+        let s = "'this string has single quotes'";
+        assert!(is_properly_quoted(s, '\''));
+        let s = "this string has unclosed single quotes'";
+        assert_eq!(is_properly_quoted(s, '\''), false);
     }
 }

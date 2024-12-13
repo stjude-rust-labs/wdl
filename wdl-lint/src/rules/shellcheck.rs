@@ -219,18 +219,31 @@ fn shellcheck_lint(diagnostic: &ShellCheckDiagnostic, span: Span) -> Diagnostic 
 fn sanitize_command(section: &CommandSection) -> Option<(String, HashSet<String>)> {
     let mut sanitized_command = String::new();
     let mut decls = HashSet::new();
+    let mut needs_quotes = true;
     if let Some(cmd_parts) = section.strip_whitespace() {
         cmd_parts.iter().for_each(|part| match part {
             StrippedCommandPart::Text(text) => {
                 sanitized_command.push_str(text);
+                // if this text section is not properly is not properly quoted
+                // then the next placeholder does *not* need double quotes
+                // because it will end up enclosed.
+                needs_quotes ^= !is_properly_quoted(text, '"');
             }
             StrippedCommandPart::Placeholder(placeholder) => {
                 let bash_var = to_bash_var(placeholder);
                 // we need to save the var so we can suppress later
                 decls.insert(bash_var.clone());
-                let mut expansion = String::from("\"$");
+                let mut expansion = String::from("$");
                 expansion.push_str(&bash_var);
-                expansion.push('"');
+                if needs_quotes {
+                    // surround with quotes
+                    expansion.insert(0, '"');
+                    expansion.push('"');
+                } else {
+                    // surround with {}
+                    expansion.insert(1, '{');
+                    expansion.push('}');
+                }
                 sanitized_command.push_str(&expansion);
             }
         });
