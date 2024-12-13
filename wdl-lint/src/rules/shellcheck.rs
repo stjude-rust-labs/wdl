@@ -14,7 +14,6 @@ use rand::distributions::DistString;
 use serde::Deserialize;
 use serde_json;
 use tracing::debug;
-
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -37,7 +36,10 @@ use wdl_ast::v1::TaskDefinition;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
-use crate::util::{count_leading_whitespace, lines_with_offset, program_exists};
+use crate::util::count_leading_whitespace;
+use crate::util::is_properly_quoted;
+use crate::util::lines_with_offset;
+use crate::util::program_exists;
 
 /// The shellcheck executable
 const SHELLCHECK_BIN: &str = "shellcheck";
@@ -145,9 +147,8 @@ impl Rule for ShellCheckRule {
 
     fn explanation(&self) -> &'static str {
         "ShellCheck (https://shellcheck.net) is a static analysis tool and linter for sh / bash. \
-        The lints provided by ShellCheck help prevent common errors and \
-        pitfalls in your scripts. Following its recommendations will increase \
-        the robustness of your command sections."
+         The lints provided by ShellCheck help prevent common errors and pitfalls in your scripts. \
+         Following its recommendations will increase the robustness of your command sections."
     }
 
     fn tags(&self) -> TagSet {
@@ -239,7 +240,8 @@ fn sanitize_command(section: &CommandSection) -> Option<(String, HashSet<String>
     }
 }
 
-/// Maps each line as shellcheck sees it to its corresponding start position in the source.
+/// Maps each line as shellcheck sees it to its corresponding start position in
+/// the source.
 fn map_shellcheck_lines(section: &CommandSection) -> HashMap<usize, usize> {
     let mut line_map = HashMap::new();
     let mut line_num = 1;
@@ -248,6 +250,11 @@ fn map_shellcheck_lines(section: &CommandSection) -> HashMap<usize, usize> {
         match part {
             CommandPart::Text(ref text) => {
                 for (line, line_start, _) in lines_with_offset(text.as_str()) {
+                    // this occurs after encountering a placeholder
+                    if skip_next_line {
+                        skip_next_line = false;
+                        continue;
+                    }
                     // Add back leading whitespace that is stripped from the sanitized command.
                     // The first line is removed entirely, UNLESS there is content on it.
                     let leading_ws = if line_num > 1 || !line.trim().is_empty() {
@@ -255,11 +262,6 @@ fn map_shellcheck_lines(section: &CommandSection) -> HashMap<usize, usize> {
                     } else {
                         continue;
                     };
-                    // this occurs after encountering a placeholder
-                    if skip_next_line {
-                        skip_next_line = false;
-                        continue;
-                    }
                     let adjusted_start = text.span().start() + line_start + leading_ws;
                     line_map.insert(line_num, adjusted_start);
                     line_num += 1;
@@ -273,7 +275,8 @@ fn map_shellcheck_lines(section: &CommandSection) -> HashMap<usize, usize> {
     line_map
 }
 
-/// Calculates the correct `Span` for a `ShellCheckDiagnostic` relative to the source.
+/// Calculates the correct `Span` for a `ShellCheckDiagnostic` relative to the
+/// source.
 fn calculate_span(diagnostic: &ShellCheckDiagnostic, line_map: &HashMap<usize, usize>) -> Span {
     // shellcheck 1-indexes columns, so subtract 1.
     let start = line_map
@@ -331,9 +334,9 @@ impl Visitor for ShellCheckRule {
                 // When support for opt-in lints is added, this diagnostic
                 // should be enabled.
                 //
-                // let command_keyword = support::token(section.syntax(), SyntaxKind::CommandKeyword)
-                //     .expect("should have a command keyword token");
-                // state.exceptable_add(
+                // let command_keyword = support::token(section.syntax(),
+                // SyntaxKind::CommandKeyword)     .expect("should have a
+                // command keyword token"); state.exceptable_add(
                 //     Diagnostic::note("running `shellcheck` on command section")
                 //         .with_label(
                 //             "could not find `shellcheck` executable.",
