@@ -1,4 +1,4 @@
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:17:22
    │
 17 │       somecommand.py $line17 ~{placeholder}
@@ -9,7 +9,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line17 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:17:22
    │
 17 │       somecommand.py $line17 ~{placeholder}
@@ -20,7 +20,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:18:37
    │
 18 │       somecommand.py ~{placeholder} $line18
@@ -31,7 +31,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line18 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:18:37
    │
 18 │       somecommand.py ~{placeholder} $line18
@@ -42,7 +42,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:19:36
    │
 19 │       somecommand.py ~{placeholder}$line19
@@ -53,7 +53,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line19 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:19:36
    │
 19 │       somecommand.py ~{placeholder}$line19
@@ -64,7 +64,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:30:22
    │
 30 │       somecommand.py $line30~{placeholder}
@@ -75,7 +75,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line30 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:30:22
    │
 30 │       somecommand.py $line30~{placeholder}
@@ -86,7 +86,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:31:27
    │
 31 │       somecommand.py [ -f $line31 ] ~{placeholder}
@@ -97,7 +97,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line31 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:31:27
    │
 31 │       somecommand.py [ -f $line31 ] ~{placeholder}
@@ -108,7 +108,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:49:22
    │
 49 │       somecommand.py $line49 ~{placeholder}
@@ -119,7 +119,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line49 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:49:22
    │
 49 │       somecommand.py $line49 ~{placeholder}
@@ -130,7 +130,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:50:37
    │
 50 │       somecommand.py ~{placeholder} $line50
@@ -141,7 +141,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line50 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:50:37
    │
 50 │       somecommand.py ~{placeholder} $line50
@@ -152,7 +152,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:51:36
    │
 51 │       somecommand.py ~{placeholder}$line51
@@ -163,7 +163,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line51 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:51:36
    │
 51 │       somecommand.py ~{placeholder}$line51
@@ -174,7 +174,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:52:22
    │
 52 │       somecommand.py $line52~{placeholder}
@@ -185,7 +185,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line52 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:52:22
    │
 52 │       somecommand.py $line52~{placeholder}
@@ -196,7 +196,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:53:27
    │
 53 │       somecommand.py [ -f $bad_test ] ~{placeholder}
@@ -207,7 +207,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: bad_test is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:53:27
    │
 53 │       somecommand.py [ -f $bad_test ] ~{placeholder}
@@ -218,7 +218,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:54:27
    │
 54 │       somecommand.py [ -f $trailing_space ] ~{placeholder}  
@@ -229,7 +229,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: trailing_space is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:54:27
    │
 54 │       somecommand.py [ -f $trailing_space ] ~{placeholder}  
@@ -240,7 +240,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:72:22
    │
 72 │       somecommand.py $line72 ~{placeholder}
@@ -251,7 +251,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line72 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:72:22
    │
 72 │       somecommand.py $line72 ~{placeholder}
@@ -262,7 +262,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:73:37
    │
 73 │       somecommand.py ~{placeholder} $line73
@@ -273,7 +273,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line73 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:73:37
    │
 73 │       somecommand.py ~{placeholder} $line73
@@ -284,7 +284,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:74:36
    │
 74 │       somecommand.py ~{placeholder}$line74
@@ -295,7 +295,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line74 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:74:36
    │
 74 │       somecommand.py ~{placeholder}$line74
@@ -306,7 +306,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:75:22
    │
 75 │       somecommand.py $line75~{placeholder}
@@ -317,7 +317,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line75 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:75:22
    │
 75 │       somecommand.py $line75~{placeholder}
@@ -328,7 +328,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:76:22
    │
 76 │       ~{placeholder} $line76_trailing_pholder ~{placeholder}
@@ -339,7 +339,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line76_trailing_pholder is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:76:22
    │
 76 │       ~{placeholder} $line76_trailing_pholder ~{placeholder}
@@ -350,7 +350,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:77:37
    │
 77 │       ~{placeholder} somecommand.py $leading_pholder
@@ -361,7 +361,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: leading_pholder is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:77:37
    │
 77 │       ~{placeholder} somecommand.py $leading_pholder
@@ -372,7 +372,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:96:22
    │
 96 │       somecommand.py $line96 ~{placeholder}
@@ -383,7 +383,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line96 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:96:22
    │
 96 │       somecommand.py $line96 ~{placeholder}
@@ -394,7 +394,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:97:37
    │
 97 │       somecommand.py ~{placeholder} $line97
@@ -405,7 +405,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line97 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:97:37
    │
 97 │       somecommand.py ~{placeholder} $line97
@@ -416,7 +416,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:98:36
    │
 98 │       somecommand.py ~{placeholder}$line98
@@ -427,7 +427,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line98 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:98:36
    │
 98 │       somecommand.py ~{placeholder}$line98
@@ -438,7 +438,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:99:22
    │
 99 │       somecommand.py $line99~{placeholder}
@@ -449,7 +449,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line99 is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:99:22
    │
 99 │       somecommand.py $line99~{placeholder}
@@ -460,7 +460,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
    │
    = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
     ┌─ tests/lints/shellcheck-warn/source.wdl:100:22
     │
 100 │       ~{placeholder} $line100_trailing_pholder ~{placeholder}
@@ -471,7 +471,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line100_trailing_pholder is referenced but not assigned.
     ┌─ tests/lints/shellcheck-warn/source.wdl:100:22
     │
 100 │       ~{placeholder} $line100_trailing_pholder ~{placeholder}
@@ -482,7 +482,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
     ┌─ tests/lints/shellcheck-warn/source.wdl:101:37
     │
 101 │       ~{placeholder} somecommand.py $leading_pholder
@@ -493,7 +493,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: leading_pholder is referenced but not assigned.
     ┌─ tests/lints/shellcheck-warn/source.wdl:101:37
     │
 101 │       ~{placeholder} somecommand.py $leading_pholder
@@ -504,29 +504,29 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
-    ┌─ tests/lints/shellcheck-warn/source.wdl:118:34
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
+    ┌─ tests/lints/shellcheck-warn/source.wdl:118:28
     │
 118 │     command <<<      weird stuff $firstlinelint
-    │                                  ^^^^^^^^^^^^^^
-    │                                  │
-    │                                  SC2086[info]: Double quote to prevent globbing and word splitting.
-    │                                  more info: https://www.shellcheck.net/wiki/SC2086
+    │                            ^^^^^^^^^^^^^^
+    │                            │
+    │                            SC2086[info]: Double quote to prevent globbing and word splitting.
+    │                            more info: https://www.shellcheck.net/wiki/SC2086
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
-    ┌─ tests/lints/shellcheck-warn/source.wdl:118:34
+note[ShellCheck]: firstlinelint is referenced but not assigned.
+    ┌─ tests/lints/shellcheck-warn/source.wdl:118:28
     │
 118 │     command <<<      weird stuff $firstlinelint
-    │                                  ^^^^^^^^^^^^^^
-    │                                  │
-    │                                  SC2154[warning]: firstlinelint is referenced but not assigned.
-    │                                  more info: https://www.shellcheck.net/wiki/SC2154
+    │                            ^^^^^^^^^^^^^^
+    │                            │
+    │                            SC2154[warning]: firstlinelint is referenced but not assigned.
+    │                            more info: https://www.shellcheck.net/wiki/SC2154
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
     ┌─ tests/lints/shellcheck-warn/source.wdl:120:22
     │
 120 │       somecommand.py $line120 ~{placeholder}
@@ -537,7 +537,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line120 is referenced but not assigned.
     ┌─ tests/lints/shellcheck-warn/source.wdl:120:22
     │
 120 │       somecommand.py $line120 ~{placeholder}
@@ -548,7 +548,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
     ┌─ tests/lints/shellcheck-warn/source.wdl:121:37
     │
 121 │       somecommand.py ~{placeholder} $line121
@@ -559,7 +559,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line121 is referenced but not assigned.
     ┌─ tests/lints/shellcheck-warn/source.wdl:121:37
     │
 121 │       somecommand.py ~{placeholder} $line121
@@ -570,7 +570,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
     ┌─ tests/lints/shellcheck-warn/source.wdl:122:36
     │
 122 │       somecommand.py ~{placeholder}$line122
@@ -581,7 +581,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line122 is referenced but not assigned.
     ┌─ tests/lints/shellcheck-warn/source.wdl:122:36
     │
 122 │       somecommand.py ~{placeholder}$line122
@@ -592,7 +592,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
     ┌─ tests/lints/shellcheck-warn/source.wdl:123:22
     │
 123 │       somecommand.py $line123~{placeholder}
@@ -603,7 +603,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line123 is referenced but not assigned.
     ┌─ tests/lints/shellcheck-warn/source.wdl:123:22
     │
 123 │       somecommand.py $line123~{placeholder}
@@ -614,7 +614,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
     ┌─ tests/lints/shellcheck-warn/source.wdl:124:22
     │
 124 │       ~{placeholder} $line124_trailing_pholder ~{placeholder}
@@ -625,7 +625,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: line124_trailing_pholder is referenced but not assigned.
     ┌─ tests/lints/shellcheck-warn/source.wdl:124:22
     │
 124 │       ~{placeholder} $line124_trailing_pholder ~{placeholder}
@@ -636,7 +636,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
     ┌─ tests/lints/shellcheck-warn/source.wdl:126:37
     │
 126 │       ~{placeholder} somecommand.py $leading_pholder
@@ -647,7 +647,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: leading_pholder is referenced but not assigned.
     ┌─ tests/lints/shellcheck-warn/source.wdl:126:37
     │
 126 │       ~{placeholder} somecommand.py $leading_pholder
@@ -658,7 +658,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: occurs_after_multiline is referenced but not assigned.
     ┌─ tests/lints/shellcheck-warn/source.wdl:132:7
     │
 132 │       $occurs_after_multiline
@@ -669,7 +669,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Remove surrounding $() to avoid executing output (or use eval if intentional).
     ┌─ tests/lints/shellcheck-warn/source.wdl:134:7
     │    
 134 │ ╭ ╭       $(echo This is a 
@@ -679,7 +679,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │    
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Remove surrounding $() to avoid executing output (or use eval if intentional).
     ┌─ tests/lints/shellcheck-warn/source.wdl:137:7
     │    
 137 │ ╭ ╭       $(echo This is an
@@ -690,7 +690,7 @@ note[ShellCheck]: `shellcheck` reported the following diagnostic
     │    
     = fix: address the diagnostic as recommended in the message
 
-note[ShellCheck]: `shellcheck` reported the following diagnostic
+note[ShellCheck]: Remove surrounding $() to avoid executing output (or use eval if intentional).
     ┌─ tests/lints/shellcheck-warn/source.wdl:141:7
     │    
 141 │ ╭ ╭       $(echo This is an
