@@ -1,0 +1,21 @@
+name: Install ShellCheck
+description: "Installs ShellCheck. Supports Ubuntu, macOS, and Windows."
+runs:
+  using: "composite"
+  steps:
+    - uses: awalsh128/cache-apt-pkgs-action@latest
+      if: runner.os == 'Linux'
+      with:
+          packages: shellcheck
+          version: 1.0
+    - name: install shellcheck -- macOS
+      shell: bash
+      if: runner.os == 'macOS'
+      run: brew install shellcheck
+    - name: install shellcheck -- Windows
+      if: runner.os == 'Windows'
+      shell: powershell
+      run: |
+        gh release download -R koalaman/shellcheck -p 'shellcheck-v*.zip' -O shellcheck-latest.zip
+        7z x shellcheck-latest.zip
+        echo $(Get-Location).Path >> "$GITHUB_PATH"
