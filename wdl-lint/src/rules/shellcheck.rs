@@ -166,7 +166,10 @@ impl Rule for ShellCheckRule {
 /// Convert a WDL `Placeholder` to a bash variable declaration.
 ///
 /// returns "WDL" + <placeholder length - 6> random alphnumeric characters.
-/// 'WDL' + '~{}' = 6.
+/// The returned value is shorter than the placeholder by 3 characters so
+/// that the caller may pad with $, {}, or other characters as necessary
+/// depending on whether or not the variable needs to be treated as a
+/// declaration or literal.
 fn to_bash_var(placeholder: &Placeholder) -> String {
     let placeholder_len: usize = placeholder.syntax().text_range().len().into();
     // don't start variable with numbers
@@ -218,12 +221,16 @@ fn sanitize_command(section: &CommandSection) -> Option<(String, HashSet<String>
     let mut sanitized_command = String::new();
     let mut decls = HashSet::new();
     let mut needs_quotes = true;
+    let mut is_literal = false;
     if let Some(cmd_parts) = section.strip_whitespace() {
         cmd_parts.iter().for_each(|part| match part {
             StrippedCommandPart::Text(text) => {
                 sanitized_command.push_str(text);
-                // if this text section is not properly is not properly quoted
-                // then the next placeholder does *not* need double quotes
+                // if this placeholder is in a single-quoted segment
+                // don't treat as an expansion but rather a literal.
+                is_literal ^= !is_properly_quoted(text, '\'');
+                // if this text section is not properly quoted then the
+                // next placeholder does *not* need double quotes
                 // because it will end up enclosed.
                 needs_quotes ^= !is_properly_quoted(text, '"');
             }
@@ -231,18 +238,18 @@ fn sanitize_command(section: &CommandSection) -> Option<(String, HashSet<String>
                 let bash_var = to_bash_var(placeholder);
                 // we need to save the var so we can suppress later
                 decls.insert(bash_var.clone());
-                let mut expansion = String::from("$");
-                expansion.push_str(&bash_var);
-                if needs_quotes {
-                    // surround with quotes
-                    expansion.insert(0, '"');
-                    expansion.push('"');
+
+                if is_literal {
+                    // pad literal with three underscores to account for ~{}
+                    sanitized_command.push_str(&format!("___{bash_var}"));
+                } else if needs_quotes {
+                    // surround with quotes for proper form
+                    sanitized_command.push_str(&format!("\"${bash_var}\""));
                 } else {
-                    // surround with {}
-                    expansion.insert(1, '{');
-                    expansion.push('}');
+                    // surround with curly braces because already
+                    // inside of a quoted segment.
+                    sanitized_command.push_str(&format!("${{{bash_var}}}"));
                 }
-                sanitized_command.push_str(&expansion);
             }
         });
         Some((sanitized_command, decls))
