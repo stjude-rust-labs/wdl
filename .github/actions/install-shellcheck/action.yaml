@@ -18,4 +18,4 @@ runs:
       run: |
         gh release download -R koalaman/shellcheck -p 'shellcheck-v*.zip' -O shellcheck-latest.zip
         7z x shellcheck-latest.zip
-        echo $(Get-Location).Path >> "$GITHUB_PATH"
+        Add-Content $env:GITHUB_PATH "$(Get-Location).Path"
