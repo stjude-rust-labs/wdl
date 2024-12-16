@@ -10,3 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * `wdl-doc` crate for documenting WDL codebases ([#258](https://github.com/stjude-rust-labs/wdl/pull/248)).
+
+### Changed
+
+* Pretty print HTML ([#270](https://github.com/stjude-rust-labs/wdl/pull/270)).
