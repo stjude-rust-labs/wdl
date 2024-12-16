@@ -1,5 +1,6 @@
 //! Create HTML documentation for WDL tasks.
 
+use std::fmt::Debug;
 use std::fmt::Display;
 
 use html::content;
@@ -103,7 +104,7 @@ impl Display for Workflow {
                 .build(),
         );
 
-        write!(f, "{}", task_name)?;
-        write!(f, "{}", content.build())
+        write!(f, "{:?}", task_name)?;
+        write!(f, "{:?}", content.build())
     }
 }
