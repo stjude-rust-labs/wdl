@@ -13,4 +13,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* Pretty print HTML ([#270](https://github.com/stjude-rust-labs/wdl/pull/270)).
+* Updates HTML generation to be pretty printed ([#270](https://github.com/stjude-rust-labs/wdl/pull/270)).
