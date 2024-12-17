@@ -9,6 +9,7 @@ use std::fs;
 use std::io::IsTerminal;
 use std::io::Read;
 use std::io::stderr;
+use std::iter;
 use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
@@ -50,6 +51,7 @@ use wdl_engine::local::LocalTaskExecutionBackend;
 use wdl_engine::v1::TaskEvaluator;
 use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt as _;
+use wdl_lint::rules::ShellCheckRule;
 
 /// Emits the given diagnostics to the output stream.
 ///
@@ -295,6 +297,9 @@ pub struct LintCommand {
     /// The path to the source WDL file.
     #[clap(value_name = "PATH")]
     pub path: PathBuf,
+    /// Enable shellcheck lints.
+    #[clap(long, action)]
+    pub shellcheck: bool,
 }
 
 impl LintCommand {
@@ -314,6 +319,9 @@ impl LintCommand {
 
         let mut validator = Validator::default();
         validator.add_visitor(LintVisitor::default());
+        if self.shellcheck {
+            validator.add_visitor(ShellCheckRule);
+        }
         if let Err(diagnostics) = validator.validate(&document) {
             emit_diagnostics(&self.path.to_string_lossy(), &source, &diagnostics)?;
 
