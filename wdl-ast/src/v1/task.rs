@@ -2493,7 +2493,10 @@ task test {
             StrippedCommandPart::Text(text) => text,
             _ => panic!("expected text"),
         };
-        assert_eq!(text, "weird stuff $firstlinelint\n      # other weird whitespace\nsomecommand.py $line120 ");
+        assert_eq!(
+            text,
+            "weird stuff $firstlinelint\n      # other weird whitespace\nsomecommand.py $line120 "
+        );
 
         let _placeholder = match &stripped[1] {
             StrippedCommandPart::Placeholder(p) => p,
