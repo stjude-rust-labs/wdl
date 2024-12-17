@@ -49,7 +49,7 @@ impl Display for Struct {
         }
         let members = members.build();
 
-        write!(f, "{:?}\n", struct_name)?;
-        write!(f, "{:?}\n", members)
+        writeln!(f, "{:?}", struct_name)?;
+        writeln!(f, "{:?}", members)
     }
 }

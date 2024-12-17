@@ -104,7 +104,7 @@ impl Display for Workflow {
                 .build(),
         );
 
-        write!(f, "{:?}\n", task_name)?;
-        write!(f, "{:?}\n", content.build())
+        writeln!(f, "{:?}", task_name)?;
+        writeln!(f, "{:?}", content.build())
     }
 }

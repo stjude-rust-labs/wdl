@@ -93,8 +93,8 @@ impl Display for Document {
         let mut preamble = String::new();
         pulldown_cmark::html::push_html(&mut preamble, parser);
 
-        write!(f, "{:?}\n", document_name)?;
-        write!(f, "{:?}\n", version)?;
+        writeln!(f, "{:?}", document_name)?;
+        writeln!(f, "{:?}", version)?;
         write!(f, "{}", preamble)
     }
 }
