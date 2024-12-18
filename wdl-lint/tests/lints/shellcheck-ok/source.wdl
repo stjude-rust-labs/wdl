@@ -52,3 +52,28 @@ task test2 {
 
     runtime {}
 }
+
+task test3 {
+    meta {}
+
+    parameter_meta {}
+
+    input {
+      Int placeholder
+    }
+
+    #@ except: ShellCheck
+    command {
+      set -eo pipefail
+
+      echo "$placeholder"
+
+      if [[ $I_really_want_this_unquoted ]]; then
+        echo "all is not well"
+      fi
+    }
+
+    output {}
+
+    runtime {}
+}

@@ -29,6 +29,8 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
+use std::collections::HashSet;
+
 use wdl_ast::Diagnostics;
 use wdl_ast::SyntaxKind;
 use wdl_ast::Visitor;
@@ -149,4 +151,33 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
     }
 
     rules
+}
+
+/// Gets the optional rule set.
+pub fn optional_rules() -> Vec<Box<dyn Rule>> {
+    let opt_rules: Vec<Box<dyn Rule>> = vec![Box::<rules::ShellCheckRule>::default()];
+
+    // Ensure all the rule ids are unique and pascal case
+    #[cfg(debug_assertions)]
+    {
+        use crate::rules;
+        use convert_case::Case;
+        use convert_case::Casing;
+        let mut set: HashSet<&str> = HashSet::from_iter(rules().iter().map(|r| r.id()));
+        for r in opt_rules.iter() {
+            if r.id().to_case(Case::Pascal) != r.id() {
+                panic!("lint rule id `{id}` is not pascal case", id = r.id());
+            }
+
+            if !set.insert(r.id()) {
+                panic!("duplicate rule id `{id}`", id = r.id());
+            }
+
+            if RESERVED_RULE_IDS.contains(&r.id()) {
+                panic!("rule id `{id}` is reserved", id = r.id());
+            }
+        }
+    }
+
+    opt_rules
 }
