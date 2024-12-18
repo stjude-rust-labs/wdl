@@ -160,9 +160,10 @@ pub fn optional_rules() -> Vec<Box<dyn Rule>> {
     // Ensure all the rule ids are unique and pascal case
     #[cfg(debug_assertions)]
     {
-        use crate::rules;
         use convert_case::Case;
         use convert_case::Casing;
+
+        use crate::rules;
         let mut set: HashSet<&str> = HashSet::from_iter(rules().iter().map(|r| r.id()));
         for r in opt_rules.iter() {
             if r.id().to_case(Case::Pascal) != r.id() {
