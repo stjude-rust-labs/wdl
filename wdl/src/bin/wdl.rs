@@ -9,7 +9,6 @@ use std::fs;
 use std::io::IsTerminal;
 use std::io::Read;
 use std::io::stderr;
-use std::iter;
 use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
