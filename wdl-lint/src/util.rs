@@ -34,7 +34,8 @@ pub fn is_inline_comment(token: &Comment) -> bool {
     false
 }
 
-/// Determines whether or not a string containing embedded quotes is properly quoted.
+/// Determines whether or not a string containing embedded quotes is properly
+/// quoted.
 pub fn is_properly_quoted(s: &str, quote_char: char) -> bool {
     let mut closed = true;
     let mut escaped = false;
