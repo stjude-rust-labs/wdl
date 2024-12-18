@@ -17,9 +17,11 @@ use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
+use super::ShellCheckRule;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
+use crate::optional_rules;
 use crate::rules;
 
 /// The identifier for the unknown rule rule.
@@ -58,6 +60,10 @@ pub static RULE_MAP: LazyLock<HashMap<&'static str, Option<&'static [SyntaxKind]
     LazyLock::new(|| {
         let mut map = HashMap::new();
         for rule in rules() {
+            map.insert(rule.id(), rule.exceptable_nodes());
+        }
+        // insert optional rules as well
+        for rule in optional_rules() {
             map.insert(rule.id(), rule.exceptable_nodes());
         }
         map
