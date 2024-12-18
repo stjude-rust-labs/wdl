@@ -60,8 +60,8 @@ impl Display for Parameter {
                 .build()
         };
 
-        write!(f, "{}", parameter_name)?;
-        write!(f, "{}", parameter_type)?;
-        write!(f, "{}", parameter_expr)
+        writeln!(f, "{:?}", parameter_name)?;
+        writeln!(f, "{:?}", parameter_type)?;
+        writeln!(f, "{:?}", parameter_expr)
     }
 }
