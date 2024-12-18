@@ -5,13 +5,20 @@ runs:
   steps:
     - uses: awalsh128/cache-apt-pkgs-action@latest
       if: runner.os == 'Linux'
-      with:
-          packages: shellcheck
-          version: 1.0
+      run:
+        gh release download -R koalaman/shellcheck -p 'shellcheck-v*.linux.x86_64.tar.xz' -O shellcheck-latest.tar.xz
+        tar -xvf shellcheck-latest.tar.xz
+        chmod +x ./shellcheck
+        echo ${{github.workspace}} >> "$GITHUB_PATH"
+        export PATH="$PATH":"$(pwd)"
     - name: install shellcheck -- macOS
       shell: bash
       if: runner.os == 'macOS'
-      run: brew install shellcheck
+      run: |
+        gh release download -R koalaman/shellcheck -p 'shellcheck-v*.darwin.aarch64.tar.xz' -O shellcheck-latest.tar.xz
+        tar -xvf shellcheck-latest.tar.xz
+        chmod +x ./shellcheck
+        echo ${{github.workspace}} >> "$GITHUB_PATH"
     - name: install shellcheck -- Windows
       if: runner.os == 'Windows'
       shell: powershell
