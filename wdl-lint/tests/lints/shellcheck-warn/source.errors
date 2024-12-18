@@ -221,7 +221,7 @@ note[ShellCheck]: bad_test is referenced but not assigned.
 note[ShellCheck]: Double quote to prevent globbing and word splitting.
    ┌─ tests/lints/shellcheck-warn/source.wdl:54:27
    │
-54 │       somecommand.py [ -f $trailing_space ] ~{placeholder}  
+54 │       somecommand.py [ -f $trailing_space ] ~{placeholder}
    │                           ^^^^^^^^^^^^^^^
    │                           │
    │                           SC2086[info]: Double quote to prevent globbing and word splitting.
@@ -232,7 +232,7 @@ note[ShellCheck]: Double quote to prevent globbing and word splitting.
 note[ShellCheck]: trailing_space is referenced but not assigned.
    ┌─ tests/lints/shellcheck-warn/source.wdl:54:27
    │
-54 │       somecommand.py [ -f $trailing_space ] ~{placeholder}  
+54 │       somecommand.py [ -f $trailing_space ] ~{placeholder}
    │                           ^^^^^^^^^^^^^^^
    │                           │
    │                           SC2154[warning]: trailing_space is referenced but not assigned.
@@ -505,24 +505,24 @@ note[ShellCheck]: leading_pholder is referenced but not assigned.
     = fix: address the diagnostic as recommended in the message
 
 note[ShellCheck]: Double quote to prevent globbing and word splitting.
-    ┌─ tests/lints/shellcheck-warn/source.wdl:118:28
+    ┌─ tests/lints/shellcheck-warn/source.wdl:118:34
     │
 118 │     command <<<      weird stuff $firstlinelint
-    │                            ^^^^^^^^^^^^^^
-    │                            │
-    │                            SC2086[info]: Double quote to prevent globbing and word splitting.
-    │                            more info: https://www.shellcheck.net/wiki/SC2086
+    │                                  ^^^^^^^^^^^^^^
+    │                                  │
+    │                                  SC2086[info]: Double quote to prevent globbing and word splitting.
+    │                                  more info: https://www.shellcheck.net/wiki/SC2086
     │
     = fix: address the diagnostic as recommended in the message
 
 note[ShellCheck]: firstlinelint is referenced but not assigned.
-    ┌─ tests/lints/shellcheck-warn/source.wdl:118:28
+    ┌─ tests/lints/shellcheck-warn/source.wdl:118:34
     │
 118 │     command <<<      weird stuff $firstlinelint
-    │                            ^^^^^^^^^^^^^^
-    │                            │
-    │                            SC2154[warning]: firstlinelint is referenced but not assigned.
-    │                            more info: https://www.shellcheck.net/wiki/SC2154
+    │                                  ^^^^^^^^^^^^^^
+    │                                  │
+    │                                  SC2154[warning]: firstlinelint is referenced but not assigned.
+    │                                  more info: https://www.shellcheck.net/wiki/SC2154
     │
     = fix: address the diagnostic as recommended in the message
 
@@ -700,5 +700,49 @@ note[ShellCheck]: Remove surrounding $() to avoid executing output (or use eval 
     │ ╰─│───────────────────────────^ SC2091[warning]: Remove surrounding $() to avoid executing output (or use eval if intentional).
     │   ╰───────────────────────────' more info: https://www.shellcheck.net/wiki/SC2091
     │    
+    = fix: address the diagnostic as recommended in the message
+
+note[ShellCheck]: Remove surrounding $() to avoid executing output (or use eval if intentional).
+    ┌─ tests/lints/shellcheck-warn/source.wdl:146:7
+    │    
+146 │ ╭ ╭       $(echo this is a $lint146 that occurs in a /
+147 │ │ │         multiline command /
+148 │ │ │         with line breaks)
+    │ ╰─│─────────────────────────^ SC2091[warning]: Remove surrounding $() to avoid executing output (or use eval if intentional).
+    │   ╰─────────────────────────' more info: https://www.shellcheck.net/wiki/SC2091
+    │    
+    = fix: address the diagnostic as recommended in the message
+
+note[ShellCheck]: Useless echo? Instead of 'cmd $(echo foo)', just use 'cmd foo'.
+    ┌─ tests/lints/shellcheck-warn/source.wdl:146:7
+    │    
+146 │ ╭ ╭       $(echo this is a $lint146 that occurs in a /
+147 │ │ │         multiline command /
+148 │ │ │         with line breaks)
+    │ ╰─│─────────────────────────^ SC2116[style]: Useless echo? Instead of 'cmd $(echo foo)', just use 'cmd foo'.
+    │   ╰─────────────────────────' more info: https://www.shellcheck.net/wiki/SC2116
+    │    
+    = fix: address the diagnostic as recommended in the message
+
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
+    ┌─ tests/lints/shellcheck-warn/source.wdl:146:24
+    │
+146 │       $(echo this is a $lint146 that occurs in a /
+    │                        ^^^^^^^^
+    │                        │
+    │                        SC2086[info]: Double quote to prevent globbing and word splitting.
+    │                        more info: https://www.shellcheck.net/wiki/SC2086
+    │
+    = fix: address the diagnostic as recommended in the message
+
+note[ShellCheck]: lint146 is referenced but not assigned.
+    ┌─ tests/lints/shellcheck-warn/source.wdl:146:24
+    │
+146 │       $(echo this is a $lint146 that occurs in a /
+    │                        ^^^^^^^^
+    │                        │
+    │                        SC2154[warning]: lint146 is referenced but not assigned.
+    │                        more info: https://www.shellcheck.net/wiki/SC2154
+    │
     = fix: address the diagnostic as recommended in the message
 

@@ -51,7 +51,7 @@ task test2 {
       somecommand.py ~{placeholder}$line51
       somecommand.py $line52~{placeholder}
       somecommand.py [ -f $bad_test ] ~{placeholder}
-      somecommand.py [ -f $trailing_space ] ~{placeholder}  
+      somecommand.py [ -f $trailing_space ] ~{placeholder}
     }
 
     output {}
@@ -142,6 +142,10 @@ task test5 {
         even longer very long string that should really
         really really really 
         ought to be quoted)
+
+      $(echo this is a $lint146 that occurs in a \
+        multiline command \
+        with line breaks)
     >>>
 
     output {}

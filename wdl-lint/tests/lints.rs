@@ -31,6 +31,7 @@ use rayon::prelude::*;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
 use wdl_ast::Validator;
+use wdl_lint::rules::ShellCheckRule;
 use wdl_lint::LintVisitor;
 
 /// Finds tests for this package.
@@ -141,6 +142,7 @@ fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), String> {
     } else {
         let mut validator = Validator::default();
         validator.add_visitor(LintVisitor::default());
+        validator.add_visitor(ShellCheckRule::default());
         let errors = match validator.validate(&document) {
             Ok(()) => String::new(),
             Err(diagnostics) => format_diagnostics(&diagnostics, &path, &source),
