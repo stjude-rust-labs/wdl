@@ -44,15 +44,15 @@ use crate::util::program_exists;
 /// The shellcheck executable
 const SHELLCHECK_BIN: &str = "shellcheck";
 
-/// shellcheck lints that we want to suppress
-/// these two lints always co-occur with a more
+/// Shellcheck lints that we want to suppresks.
+/// These two lints always co-occur with a more
 /// informative message.
 const SHELLCHECK_SUPPRESS: &[&str] = &[
     "1009", // the mentioned parser error was in... (unhelpful commentary)
     "1072", // Unexpected eof (unhelpful commentary)
 ];
 
-/// ShellCheck: var is referenced by not assigned.
+/// ShellCheck: var is referenced but not assigned.
 const SHELLCHECK_REFERENCED_UNASSIGNED: usize = 2154;
 
 /// ShellCheck wiki base url.
@@ -66,7 +66,7 @@ const ID: &str = "ShellCheck";
 
 /// A ShellCheck diagnostic.
 ///
-/// The file and fix fields are ommitted as we have no use for them.
+/// The `file` and `fix` fields are ommitted as we have no use for them.
 #[derive(Clone, Debug, Deserialize)]
 struct ShellCheckDiagnostic {
     /// line number comment starts on
@@ -132,7 +132,7 @@ fn run_shellcheck(command: &str) -> Result<Vec<ShellCheckDiagnostic>> {
     }
 }
 
-/// Runs ShellCheck on a command section and reports violations
+/// Runs ShellCheck on a command section and reports diagnostics.
 #[derive(Default, Debug, Clone, Copy)]
 pub struct ShellCheckRule;
 
@@ -165,11 +165,11 @@ impl Rule for ShellCheckRule {
 
 /// Convert a WDL `Placeholder` to a bash variable declaration.
 ///
-/// returns "WDL" + <placeholder length - 6> random alphnumeric characters.
+/// Returns "WDL" + <placeholder length - 6> random alphnumeric characters.
 /// The returned value is shorter than the placeholder by 3 characters so
-/// that the caller may pad with $, {}, or other characters as necessary
+/// that the caller may pad with other characters as necessary
 /// depending on whether or not the variable needs to be treated as a
-/// declaration or literal.
+/// declaration, expansion, or literal.
 fn to_bash_var(placeholder: &Placeholder) -> String {
     let placeholder_len: usize = placeholder.syntax().text_range().len().into();
     // don't start variable with numbers
@@ -214,9 +214,9 @@ fn shellcheck_lint(diagnostic: &ShellCheckDiagnostic, span: Span) -> Diagnostic 
 /// Sanitize a `CommandSection`.
 ///
 /// Removes all trailing whitespace, replaces placeholders
-/// with dummy bash variables, and records declarations.
+/// with dummy bash variables or literals, and records declarations.
 ///
-/// If the section contains mixed indentation, returns None
+/// If the section contains mixed indentation, returns None.
 fn sanitize_command(section: &CommandSection) -> Option<(String, HashSet<String>)> {
     let mut sanitized_command = String::new();
     let mut decls = HashSet::new();
