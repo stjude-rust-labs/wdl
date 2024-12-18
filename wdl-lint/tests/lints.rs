@@ -31,8 +31,8 @@ use rayon::prelude::*;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
 use wdl_ast::Validator;
-use wdl_lint::rules::ShellCheckRule;
 use wdl_lint::LintVisitor;
+use wdl_lint::rules::ShellCheckRule;
 
 /// Finds tests for this package.
 fn find_tests() -> Vec<PathBuf> {
