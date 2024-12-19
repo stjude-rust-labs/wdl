@@ -3,11 +3,12 @@ description: "Installs ShellCheck. Supports Ubuntu, macOS, and Windows."
 runs:
   using: "composite"
   steps:
-    - uses: awalsh128/cache-apt-pkgs-action@latest
+    - name: install shellcheck -- Ubuntu
       if: runner.os == 'Linux'
-      run:
+      shell: bash
+      run: |
         gh release download -R koalaman/shellcheck -p 'shellcheck-v*.linux.x86_64.tar.xz' -O shellcheck-latest.tar.xz
-        tar -xvf shellcheck-latest.tar.xz
+        tar -xvf shellcheck-latest.tar.xz --strip-components 1
         chmod +x ./shellcheck
         echo ${{github.workspace}} >> "$GITHUB_PATH"
         export PATH="$PATH":"$(pwd)"
@@ -16,7 +17,7 @@ runs:
       if: runner.os == 'macOS'
       run: |
         gh release download -R koalaman/shellcheck -p 'shellcheck-v*.darwin.aarch64.tar.xz' -O shellcheck-latest.tar.xz
-        tar -xvf shellcheck-latest.tar.xz
+        tar -xvf shellcheck-latest.tar.xz --strip-components 1
         chmod +x ./shellcheck
         echo ${{github.workspace}} >> "$GITHUB_PATH"
     - name: install shellcheck -- Windows
@@ -25,4 +26,6 @@ runs:
       run: |
         gh release download -R koalaman/shellcheck -p 'shellcheck-v*.zip' -O shellcheck-latest.zip
         7z x shellcheck-latest.zip
-        Add-Content $env:GITHUB_PATH "$(Get-Location).Path"
+        New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.local\bin"
+        Move-Item -Force "shellcheck.exe" "$env:USERPROFILE\.local\bin"
+        Add-Content $env:GITHUB_PATH "$env:USERPROFILE\.local\bin"
