@@ -17,7 +17,6 @@ use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
-use super::ShellCheckRule;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
