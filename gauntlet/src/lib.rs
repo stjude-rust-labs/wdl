@@ -127,7 +127,7 @@ pub struct Args {
     pub verbose: bool,
 
     /// Enable shellcheck lints.
-    #[arg(long, action)]
+    #[arg(long, action, requires = "arena")]
     pub shellcheck: bool,
 }
 
@@ -189,9 +189,9 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                 };
                 if args.arena {
                     validator.add_visitor(LintVisitor::default());
-                }
-                if args.shellcheck {
-                    validator.add_visitor(ShellCheckRule);
+                    if args.shellcheck {
+                        validator.add_visitor(ShellCheckRule);
+                    }
                 }
 
                 validator
