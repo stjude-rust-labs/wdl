@@ -29,8 +29,6 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
-use std::collections::HashSet;
-
 use wdl_ast::Diagnostics;
 use wdl_ast::SyntaxKind;
 use wdl_ast::Visitor;
@@ -164,7 +162,8 @@ pub fn optional_rules() -> Vec<Box<dyn Rule>> {
         use convert_case::Casing;
 
         use crate::rules;
-        let mut set: HashSet<&str> = HashSet::from_iter(rules().iter().map(|r| r.id()));
+        let mut set: std::collections::HashSet<&str> =
+            std::collections::HashSet::from_iter(rules().iter().map(|r| r.id()));
         for r in opt_rules.iter() {
             if r.id().to_case(Case::Pascal) != r.id() {
                 panic!("lint rule id `{id}` is not pascal case", id = r.id());
