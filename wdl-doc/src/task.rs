@@ -103,7 +103,7 @@ impl Display for Task {
                 .build(),
         );
 
-        write!(f, "{}", task_name)?;
-        write!(f, "{}", content.build())
+        writeln!(f, "{:?}", task_name)?;
+        writeln!(f, "{:?}", content.build())
     }
 }
