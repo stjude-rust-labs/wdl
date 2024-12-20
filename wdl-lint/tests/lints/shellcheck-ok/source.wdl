@@ -77,3 +77,25 @@ task test3 {
 
     runtime {}
 }
+
+task test4 {
+    meta {}
+
+    parameter_meta {}
+
+    input {
+      Int placeholder
+    }
+
+    command {
+      set -eo pipefail
+      
+      unquoted_var="foo bar baz"
+      # shellcheck disable=SC2086
+      echo $unquoted_var
+    }
+
+    output {}
+
+    runtime {}
+}
