@@ -1254,10 +1254,8 @@ impl serde::Serialize for PrimitiveValue {
 pub struct Pair {
     /// The type of the pair.
     ty: Type,
-    /// The left value of the pair.
-    left: Arc<Value>,
-    /// The right value of the pair.
-    right: Arc<Value>,
+    /// The left and right values of the pair.
+    values: Arc<(Value, Value)>,
 }
 
 impl Pair {
@@ -1299,8 +1297,7 @@ impl Pair {
     pub(crate) fn new_unchecked(ty: Type, left: Value, right: Value) -> Self {
         Self {
             ty,
-            left: left.into(),
-            right: right.into(),
+            values: Arc::new((left, right)),
         }
     }
 
@@ -1311,18 +1308,23 @@ impl Pair {
 
     /// Gets the left value of the `Pair`.
     pub fn left(&self) -> &Value {
-        &self.left
+        &self.values.0
     }
 
     /// Gets the right value of the `Pair`.
     pub fn right(&self) -> &Value {
-        &self.right
+        &self.values.1
     }
 }
 
 impl fmt::Display for Pair {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({left}, {right})", left = self.left, right = self.right)
+        write!(
+            f,
+            "({left}, {right})",
+            left = self.values.0,
+            right = self.values.1
+        )
     }
 }
 
@@ -1996,8 +1998,8 @@ impl CompoundValue {
 
         match (left, right) {
             (Self::Pair(left), Self::Pair(right)) => Some(
-                Value::equals(&left.left, &right.left)?
-                    && Value::equals(&left.right, &right.right)?,
+                Value::equals(left.left(), right.left())?
+                    && Value::equals(left.right(), right.right())?,
             ),
             (CompoundValue::Array(left), CompoundValue::Array(right)) => Some(
                 left.len() == right.len()
@@ -2087,8 +2089,9 @@ impl CompoundValue {
                 let ty = pair.ty.as_pair().expect("should be a pair type");
                 let (left_optional, right_optional) =
                     (ty.left_type().is_optional(), ty.right_type().is_optional());
-                Arc::make_mut(&mut pair.left).join_paths(path, check_existence, left_optional)?;
-                Arc::make_mut(&mut pair.right).join_paths(path, check_existence, right_optional)?;
+                let values = Arc::make_mut(&mut pair.values);
+                values.0.join_paths(path, check_existence, left_optional)?;
+                values.1.join_paths(path, check_existence, right_optional)?;
             }
             Self::Array(array) => {
                 let ty = array.ty.as_array().expect("should be an array type");
@@ -2161,8 +2164,7 @@ impl CompoundValue {
         match self {
             Self::Pair(v) => Self::Pair(Pair {
                 ty: v.ty.require(),
-                left: v.left.clone(),
-                right: v.right.clone(),
+                values: v.values.clone(),
             }),
             Self::Array(v) => Self::Array(Array {
                 ty: v.ty.require(),
@@ -2228,8 +2230,8 @@ impl Coercible for CompoundValue {
                 (Self::Pair(v), CompoundType::Pair(_)) => {
                     return Ok(Self::Pair(Pair::new(
                         target.clone(),
-                        v.left.as_ref().clone(),
-                        v.right.as_ref().clone(),
+                        v.values.0.clone(),
+                        v.values.1.clone(),
                     )?));
                 }
                 // Map[String, Y] -> Struct
@@ -2497,11 +2499,9 @@ impl serde::Serialize for CompoundValue {
     }
 }
 
-/// Represents a value for `task` variables in WDL 1.2.
-///
-/// Task values are cheap to clone.
-#[derive(Debug, Clone)]
-pub struct TaskValue {
+/// Immutable data for task values.
+#[derive(Debug)]
+struct TaskData {
     /// The name of the task.
     name: Arc<String>,
     /// The id of the task.
@@ -2529,25 +2529,34 @@ pub struct TaskValue {
     /// The key is the mount point and the value is the initial amount of disk
     /// space allocated, in bytes.
     disks: Map,
-    /// The current task attempt count.
-    ///
-    /// The value must be 0 the first time the task is executed and incremented
-    /// by 1 each time the task is retried (if any).
-    attempt: i64,
     /// The time by which the task must be completed, as a Unix time stamp.
     ///
     /// A value of `None` indicates there is no deadline.
     end_time: Option<i64>,
-    /// The task's return code.
-    ///
-    /// Initially set to `None`, but set after task execution completes.
-    return_code: Option<i64>,
     /// The task's `meta` section as an object.
     meta: Object,
     /// The tasks's `parameter_meta` section as an object.
     parameter_meta: Object,
     /// The task's extension metadata.
     ext: Object,
+}
+
+/// Represents a value for `task` variables in WDL 1.2.
+///
+/// Task values are cheap to clone.
+#[derive(Debug, Clone)]
+pub struct TaskValue {
+    /// The immutable data for task values.
+    data: Arc<TaskData>,
+    /// The current task attempt count.
+    ///
+    /// The value must be 0 the first time the task is executed and incremented
+    /// by 1 each time the task is retried (if any).
+    attempt: i64,
+    /// The task's return code.
+    ///
+    /// Initially set to `None`, but set after task execution completes.
+    return_code: Option<i64>,
 }
 
 impl TaskValue {
@@ -2559,73 +2568,75 @@ impl TaskValue {
         constraints: TaskExecutionConstraints,
     ) -> Self {
         Self {
-            name: Arc::new(name.into()),
-            id: Arc::new(id.into()),
-            container: constraints.container.map(Into::into),
-            cpu: constraints.cpu,
-            memory: constraints.memory,
-            gpu: Array::new_unchecked(
-                ANALYSIS_STDLIB.array_string_type().clone(),
-                constraints
-                    .gpu
-                    .into_iter()
-                    .map(|v| PrimitiveValue::new_string(v).into())
-                    .collect(),
-            ),
-            fpga: Array::new_unchecked(
-                ANALYSIS_STDLIB.array_string_type().clone(),
-                constraints
-                    .fpga
-                    .into_iter()
-                    .map(|v| PrimitiveValue::new_string(v).into())
-                    .collect(),
-            ),
-            disks: Map::new_unchecked(
-                ANALYSIS_STDLIB.map_string_int_type().clone(),
-                constraints
-                    .disks
-                    .into_iter()
-                    .map(|(k, v)| (Some(PrimitiveValue::new_string(k)), v.into()))
-                    .collect(),
-            ),
+            data: Arc::new(TaskData {
+                name: Arc::new(name.into()),
+                id: Arc::new(id.into()),
+                container: constraints.container.map(Into::into),
+                cpu: constraints.cpu,
+                memory: constraints.memory,
+                gpu: Array::new_unchecked(
+                    ANALYSIS_STDLIB.array_string_type().clone(),
+                    constraints
+                        .gpu
+                        .into_iter()
+                        .map(|v| PrimitiveValue::new_string(v).into())
+                        .collect(),
+                ),
+                fpga: Array::new_unchecked(
+                    ANALYSIS_STDLIB.array_string_type().clone(),
+                    constraints
+                        .fpga
+                        .into_iter()
+                        .map(|v| PrimitiveValue::new_string(v).into())
+                        .collect(),
+                ),
+                disks: Map::new_unchecked(
+                    ANALYSIS_STDLIB.map_string_int_type().clone(),
+                    constraints
+                        .disks
+                        .into_iter()
+                        .map(|(k, v)| (Some(PrimitiveValue::new_string(k)), v.into()))
+                        .collect(),
+                ),
+                end_time: None,
+                meta: definition
+                    .metadata()
+                    .map(|s| Object::from_v1_metadata(s.items()))
+                    .unwrap_or_else(Object::empty),
+                parameter_meta: definition
+                    .parameter_metadata()
+                    .map(|s| Object::from_v1_metadata(s.items()))
+                    .unwrap_or_else(Object::empty),
+                ext: Object::empty(),
+            }),
             attempt: 1,
-            end_time: None,
             return_code: None,
-            meta: definition
-                .metadata()
-                .map(|s| Object::from_v1_metadata(s.items()))
-                .unwrap_or_else(Object::empty),
-            parameter_meta: definition
-                .parameter_metadata()
-                .map(|s| Object::from_v1_metadata(s.items()))
-                .unwrap_or_else(Object::empty),
-            ext: Object::empty(),
         }
     }
 
     /// Gets the task name.
     pub fn name(&self) -> &Arc<String> {
-        &self.name
+        &self.data.name
     }
 
     /// Gets the unique ID of the task.
     pub fn id(&self) -> &Arc<String> {
-        &self.id
+        &self.data.id
     }
 
     /// Gets the container in which the task is executing.
     pub fn container(&self) -> Option<&Arc<String>> {
-        self.container.as_ref()
+        self.data.container.as_ref()
     }
 
     /// Gets the allocated number of cpus for the task.
     pub fn cpu(&self) -> f64 {
-        self.cpu
+        self.data.cpu
     }
 
     /// Gets the allocated memory (in bytes) for the task.
     pub fn memory(&self) -> i64 {
-        self.memory
+        self.data.memory
     }
 
     /// Gets the GPU allocations for the task.
@@ -2633,7 +2644,7 @@ impl TaskValue {
     /// An array with one specification per allocated GPU; the specification is
     /// execution engine-specific.
     pub fn gpu(&self) -> &Array {
-        &self.gpu
+        &self.data.gpu
     }
 
     /// Gets the FPGA allocations for the task.
@@ -2641,7 +2652,7 @@ impl TaskValue {
     /// An array with one specification per allocated FPGA; the specification is
     /// execution engine-specific.
     pub fn fpga(&self) -> &Array {
-        &self.fpga
+        &self.data.fpga
     }
 
     /// Gets the disk allocations for the task.
@@ -2651,7 +2662,7 @@ impl TaskValue {
     /// The key is the mount point and the value is the initial amount of disk
     /// space allocated, in bytes.
     pub fn disks(&self) -> &Map {
-        &self.disks
+        &self.data.disks
     }
 
     /// Gets current task attempt count.
@@ -2666,7 +2677,7 @@ impl TaskValue {
     ///
     /// A value of `None` indicates there is no deadline.
     pub fn end_time(&self) -> Option<i64> {
-        self.end_time
+        self.data.end_time
     }
 
     /// Gets the task's return code.
@@ -2678,17 +2689,17 @@ impl TaskValue {
 
     /// Gets the task's `meta` section as an object.
     pub fn meta(&self) -> &Object {
-        &self.meta
+        &self.data.meta
     }
 
     /// Gets the tasks's `parameter_meta` section as an object.
     pub fn parameter_meta(&self) -> &Object {
-        &self.parameter_meta
+        &self.data.parameter_meta
     }
 
     /// Gets the task's extension metadata.
     pub fn ext(&self) -> &Object {
-        &self.ext
+        &self.data.ext
     }
 
     /// Sets the return code after the task execution has completed.
@@ -2701,29 +2712,32 @@ impl TaskValue {
     /// Returns `None` if the name is not a known field name.
     pub fn field(&self, name: &str) -> Option<Value> {
         match name {
-            n if n == TASK_FIELD_NAME => Some(PrimitiveValue::String(self.name.clone()).into()),
-            n if n == TASK_FIELD_ID => Some(PrimitiveValue::String(self.id.clone()).into()),
+            n if n == TASK_FIELD_NAME => {
+                Some(PrimitiveValue::String(self.data.name.clone()).into())
+            }
+            n if n == TASK_FIELD_ID => Some(PrimitiveValue::String(self.data.id.clone()).into()),
             n if n == TASK_FIELD_CONTAINER => Some(
-                self.container
+                self.data
+                    .container
                     .clone()
                     .map(|c| PrimitiveValue::String(c).into())
                     .unwrap_or(Value::None),
             ),
-            n if n == TASK_FIELD_CPU => Some(self.cpu.into()),
-            n if n == TASK_FIELD_MEMORY => Some(self.memory.into()),
-            n if n == TASK_FIELD_GPU => Some(self.gpu.clone().into()),
-            n if n == TASK_FIELD_FPGA => Some(self.fpga.clone().into()),
-            n if n == TASK_FIELD_DISKS => Some(self.disks.clone().into()),
+            n if n == TASK_FIELD_CPU => Some(self.data.cpu.into()),
+            n if n == TASK_FIELD_MEMORY => Some(self.data.memory.into()),
+            n if n == TASK_FIELD_GPU => Some(self.data.gpu.clone().into()),
+            n if n == TASK_FIELD_FPGA => Some(self.data.fpga.clone().into()),
+            n if n == TASK_FIELD_DISKS => Some(self.data.disks.clone().into()),
             n if n == TASK_FIELD_ATTEMPT => Some(self.attempt.into()),
             n if n == TASK_FIELD_END_TIME => {
-                Some(self.end_time.map(Into::into).unwrap_or(Value::None))
+                Some(self.data.end_time.map(Into::into).unwrap_or(Value::None))
             }
             n if n == TASK_FIELD_RETURN_CODE => {
                 Some(self.return_code.map(Into::into).unwrap_or(Value::None))
             }
-            n if n == TASK_FIELD_META => Some(self.meta.clone().into()),
-            n if n == TASK_FIELD_PARAMETER_META => Some(self.parameter_meta.clone().into()),
-            n if n == TASK_FIELD_EXT => Some(self.ext.clone().into()),
+            n if n == TASK_FIELD_META => Some(self.data.meta.clone().into()),
+            n if n == TASK_FIELD_PARAMETER_META => Some(self.data.parameter_meta.clone().into()),
+            n if n == TASK_FIELD_EXT => Some(self.data.ext.clone().into()),
             _ => None,
         }
     }
