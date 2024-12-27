@@ -48,11 +48,6 @@ pub trait Coercible: Sized {
     /// Coerces the value into the given type.
     ///
     /// Returns an error if the coercion is not supported.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the provided target type is not from the given types
-    /// collection.
     fn coerce(&self, target: &Type) -> Result<Self>;
 }
 
