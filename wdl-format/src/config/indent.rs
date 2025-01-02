@@ -2,13 +2,14 @@
 
 /// The default indentation.
 pub const DEFAULT_INDENT: Indent = Indent::Spaces(4);
+/// The maximum number of spaces to represent one indentation level.
+pub const MAX_SPACE_INDENT: usize = 16;
 
 /// An indentation level.
 #[derive(Clone, Copy, Debug)]
 pub enum Indent {
     /// Tabs.
     Tabs,
-
     /// Spaces.
     Spaces(usize),
 }

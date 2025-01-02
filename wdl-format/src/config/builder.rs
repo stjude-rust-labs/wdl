@@ -3,6 +3,7 @@
 use crate::Config;
 use crate::config::Indent;
 use crate::config::MaxLineLength;
+use crate::config::indent::MAX_SPACE_INDENT;
 
 /// An error related to a [`Builder`].
 #[derive(Debug)]
@@ -60,7 +61,7 @@ impl Builder {
     /// indentation level.
     pub fn indent(mut self, indent: Indent) -> Result<Self> {
         if let Indent::Spaces(n) = indent {
-            if n > 16 {
+            if n > MAX_SPACE_INDENT {
                 return Err(Error::Invalid("indent"));
             }
         }
