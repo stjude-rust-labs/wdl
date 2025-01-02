@@ -18,7 +18,6 @@ use crate::SPACE;
 use crate::Token;
 use crate::TokenStream;
 use crate::Trivia;
-use crate::config::Indent;
 
 /// A postprocessed token.
 #[derive(Clone, Eq, PartialEq)]
@@ -64,16 +63,7 @@ impl Token for PostToken {
                     PostToken::Space => write!(f, "{SPACE}"),
                     PostToken::Newline => write!(f, "{NEWLINE}"),
                     PostToken::Indent => {
-                        let (c, n) = match self.config.indent() {
-                            Indent::Spaces(n) => (' ', n),
-                            Indent::Tabs => ('\t', 1),
-                        };
-
-                        for _ in 0..n {
-                            write!(f, "{c}")?;
-                        }
-
-                        Ok(())
+                        write!(f, "{INDENT}", INDENT = self.config.indent().string())
                     }
                     PostToken::Literal(value) => write!(f, "{value}"),
                 }

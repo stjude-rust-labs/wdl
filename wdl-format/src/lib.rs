@@ -24,6 +24,9 @@ pub const NEWLINE: &str = "\n";
 /// A space.
 pub const SPACE: &str = " ";
 
+/// A tab.
+pub const TAB: &str = "\t";
+
 /// Returns exactly one entity from an enumerable list of entities (usually a
 /// [`Vec`]).
 #[macro_export]
