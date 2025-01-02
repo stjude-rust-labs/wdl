@@ -19,6 +19,10 @@ impl std::fmt::Display for Error {
 
 /// The default maximum line length.
 pub const DEFAULT_MAX_LINE_LENGTH: usize = 90;
+/// The minimum maximum line length.
+pub const MIN_MAX_LINE_LENGTH: usize = 60;
+/// The maximum maximum line length.
+pub const MAX_MAX_LINE_LENGTH: usize = 240;
 
 /// The maximum line length.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -29,7 +33,7 @@ impl MaxLineLength {
     pub fn with_value(value: usize) -> Result<Self, Error> {
         let val = match value {
             0 => Self(None),
-            60..=240 => Self(Some(value)),
+            MIN_MAX_LINE_LENGTH..=MAX_MAX_LINE_LENGTH => Self(Some(value)),
             _ => return Err(Error::Invalid("max_line_length")),
         };
         Ok(val)
