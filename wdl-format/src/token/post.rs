@@ -405,7 +405,7 @@ impl Postprocessor {
     fn trim_last_line(&mut self, stream: &mut TokenStream<PostToken>) {
         stream.trim_while(|token| {
             matches!(token, PostToken::Space | PostToken::Indent)
-                || token == &PostToken::Literal(self.temp_indent.clone())
+                || token == &PostToken::Literal(Rc::new(self.temp_indent.clone()))
         });
     }
 
@@ -440,7 +440,7 @@ impl Postprocessor {
         }
 
         if self.temp_indent_needed {
-            stream.push(PostToken::Literal(self.temp_indent.clone()));
+            stream.push(PostToken::Literal(Rc::new(self.temp_indent.clone())));
         }
     }
 
