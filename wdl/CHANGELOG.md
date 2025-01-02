@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+* Add `--shellcheck` flag to `wdl lint` subcommand to run shellcheck when linting ([#264](https://github.com/stjude-rust-labs/wdl/pull/264))
+* Implemented the `wdl doc` subcommand for generating documentation (**currently in ALPHA testing**) ([#248](https://github.com/stjude-rust-labs/wdl/pull/248)).
+* Added an `--open` flag to `wdl doc` subcommand ([#269](https://github.com/stjude-rust-labs/wdl/pull/269)).
+* Added the `engine` module containing the implementation of `wdl-engine` ([#265](https://github.com/stjude-rust-labs/wdl/pull/265)).
+* Implemented the `wdl run` subcommand for running tasks ([#265](https://github.com/stjude-rust-labs/wdl/pull/265)).
+
+### Fixed
+
+* Fixed accepting directories for the `check` and `analyze` commands for the
+  `wdl` binary ([#254](https://github.com/stjude-rust-labs/wdl/pull/254)).
+
 ## 0.10.0 - 10-22-2024
 
 ### Changed

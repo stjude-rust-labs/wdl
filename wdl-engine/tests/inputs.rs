@@ -21,6 +21,8 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
 use std::process::exit;
+use std::sync::atomic::AtomicUsize;
+use std::sync::atomic::Ordering;
 
 use anyhow::Context;
 use anyhow::Result;
@@ -32,14 +34,14 @@ use codespan_reporting::term::termcolor::Buffer;
 use colored::Colorize;
 use path_clean::clean;
 use pretty_assertions::StrComparison;
+use rayon::prelude::*;
 use wdl_analysis::AnalysisResult;
 use wdl_analysis::Analyzer;
+use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::rules;
 use wdl_ast::Diagnostic;
 use wdl_ast::Severity;
-use wdl_ast::SyntaxNode;
-use wdl_engine::Engine;
-use wdl_engine::InputsFile;
+use wdl_engine::Inputs;
 
 /// Finds tests to run as part of the analysis test suite.
 fn find_tests() -> Vec<PathBuf> {
@@ -100,39 +102,36 @@ fn compare_result(path: &Path, result: &str) -> Result<()> {
 
     if expected != result {
         bail!(
-            "result is not as expected:\n{}",
-            StrComparison::new(&expected, &result),
+            "result from `{path}` is not as expected:\n{diff}",
+            path = path.display(),
+            diff = StrComparison::new(&expected, &result),
         );
     }
 
     Ok(())
 }
 
-/// Runts the test given the provided analysis result.
-fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
+/// Runs the test given the provided analysis result.
+fn run_test(test: &Path, result: AnalysisResult, ntests: &AtomicUsize) -> Result<()> {
     let cwd = std::env::current_dir().expect("must have a CWD");
     let mut buffer = Buffer::no_color();
 
     // Attempt to strip the CWD from the result path
-    let path = result.uri().to_file_path();
+    let path = result.document().uri().to_file_path();
     let path: Cow<'_, str> = match &path {
         // Strip the CWD from the path
         Ok(path) => path.strip_prefix(&cwd).unwrap_or(path).to_string_lossy(),
         // Use the id itself if there is no path
-        Err(_) => result.uri().as_str().into(),
+        Err(_) => result.document().uri().as_str().into(),
     };
 
-    let diagnostics: Cow<'_, [Diagnostic]> = match result.parse_result().error() {
+    let diagnostics: Cow<'_, [Diagnostic]> = match result.error() {
         Some(e) => vec![Diagnostic::error(format!("failed to read `{path}`: {e:#}"))].into(),
-        None => result.diagnostics().into(),
+        None => result.document().diagnostics().into(),
     };
 
     if let Some(diagnostic) = diagnostics.iter().find(|d| d.severity() == Severity::Error) {
-        let source = result
-            .parse_result()
-            .root()
-            .map(|n| SyntaxNode::new_root(n.clone()).text().to_string())
-            .unwrap_or(String::new());
+        let source = result.document().node().syntax().text().to_string();
         let file = SimpleFile::new(&path, &source);
 
         term::emit(
@@ -147,44 +146,45 @@ fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
         bail!("document `{path}` contains at least one diagnostic error:\n{diagnostic}");
     }
 
-    let mut engine = Engine::default();
     let document = result.document();
-    let result = match InputsFile::parse(&mut engine, document, test.join("inputs.json")) {
-        Ok(inputs) => {
-            if let Some((task, inputs)) = inputs.as_task_inputs() {
+    let result = match Inputs::parse(document, test.join("inputs.json")) {
+        Ok(Some((name, inputs))) => match inputs {
+            Inputs::Task(inputs) => {
                 match inputs
                     .validate(
-                        &mut engine,
                         document,
-                        document.task_by_name(task).expect("task should be present"),
+                        document
+                            .task_by_name(&name)
+                            .expect("task should be present"),
                     )
-                    .with_context(|| format!("failed to validate the inputs to task `{task}`"))
+                    .with_context(|| format!("failed to validate the inputs to task `{name}`"))
                 {
                     Ok(()) => String::new(),
                     Err(e) => format!("{e:?}"),
                 }
-            } else if let Some(inputs) = inputs.as_workflow_inputs() {
+            }
+            Inputs::Workflow(inputs) => {
                 let workflow = document.workflow().expect("workflow should be present");
-                match inputs
-                    .validate(&mut engine, document, workflow)
-                    .with_context(|| {
-                        format!(
-                            "failed to validate the inputs to workflow `{workflow}`",
-                            workflow = workflow.name()
-                        )
-                    }) {
+                match inputs.validate(document, workflow).with_context(|| {
+                    format!(
+                        "failed to validate the inputs to workflow `{workflow}`",
+                        workflow = workflow.name()
+                    )
+                }) {
                     Ok(()) => String::new(),
                     Err(e) => format!("{e:?}"),
                 }
-            } else {
-                panic!("expected either a task input or a workflow input");
             }
-        }
+        },
+        Ok(None) => String::new(),
         Err(e) => format!("{e:?}"),
     };
 
     let output = test.join("error.txt");
-    compare_result(&output, &result)
+    compare_result(&output, &result)?;
+
+    ntests.fetch_add(1, Ordering::SeqCst);
+    Ok(())
 }
 
 #[tokio::main]
@@ -193,51 +193,89 @@ async fn main() {
     println!("\nrunning {} tests\n", tests.len());
 
     // Start with a single analysis pass over all the test files
-    let analyzer = Analyzer::new(rules(), |_, _, _, _| async {});
-    analyzer
-        .add_documents(tests.clone())
-        .await
-        .expect("should add documents");
+    let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_, _, _, _| async {});
+    for test in &tests {
+        analyzer
+            .add_directory(test.clone())
+            .await
+            .expect("should add directory");
+    }
     let results = analyzer
         .analyze(())
         .await
         .expect("failed to analyze documents");
 
-    let mut errors = Vec::new();
-    for test in &tests {
-        let test_name = test.file_stem().and_then(OsStr::to_str).unwrap();
+    let ntests = AtomicUsize::new(0);
+    let errors = tests
+        .par_iter()
+        .filter_map(|test| {
+            let test_name = test.file_stem().and_then(OsStr::to_str).unwrap();
 
-        // Discover the results that are relevant only to this test
-        let base = clean(absolute(test).expect("should be made absolute"));
+            // Discover the results that are relevant only to this test
+            let base = clean(absolute(test).expect("should be made absolute"));
 
-        let mut results = results.iter().filter_map(|r| {
-            if r.uri().to_file_path().ok()?.starts_with(&base) {
-                Some(r.clone())
-            } else {
-                None
+            let mut results = results.iter().filter_map(|r| {
+                if r.document().uri().to_file_path().ok()?.starts_with(&base) {
+                    Some(r.clone())
+                } else {
+                    None
+                }
+            });
+
+            let result = match results.find_map(|r| {
+                let path = r.document().uri().to_file_path().ok()?;
+                if path.parent()?.file_name()?.to_str()? == test_name {
+                    Some(r.clone())
+                } else {
+                    None
+                }
+            }) {
+                Some(document) => document,
+                None => {
+                    return Some((
+                        test_name,
+                        format!("failed to find analysis result for test `{test_name}`"),
+                    ));
+                }
+            };
+
+            let test_name = test.file_stem().and_then(OsStr::to_str).unwrap();
+            match std::panic::catch_unwind(|| {
+                match run_test(test, result, &ntests)
+                    .map_err(|e| format!("failed to run test `{path}`: {e}", path = test.display()))
+                    .err()
+                {
+                    Some(e) => {
+                        println!("test {test_name} ... {failed}", failed = "failed".red());
+                        Some((test_name, e))
+                    }
+                    None => {
+                        println!("test {test_name} ... {ok}", ok = "ok".green());
+                        None
+                    }
+                }
+            }) {
+                Ok(result) => result,
+                Err(e) => {
+                    println!(
+                        "test {test_name} ... {panicked}",
+                        panicked = "panicked".red()
+                    );
+                    Some((
+                        test_name,
+                        format!(
+                            "test panicked: {e:?}",
+                            e = e
+                                .downcast_ref::<String>()
+                                .map(|s| s.as_str())
+                                .or_else(|| e.downcast_ref::<&str>().copied())
+                                .unwrap_or("no panic message")
+                        ),
+                    ))
+                }
             }
-        });
-
-        let result = results.next().expect("should have a result");
-        if !results.next().is_none() {
-            println!("test {test_name} ... {failed}", failed = "failed".red());
-            errors.push((
-                test_name,
-                "more than one WDL file was in the test directory".to_string(),
-            ));
-            continue;
-        }
-
-        match run_test(test, result) {
-            Ok(_) => {
-                println!("test {test_name} ... {ok}", ok = "ok".green());
-            }
-            Err(e) => {
-                println!("test {test_name} ... {failed}", failed = "failed".red());
-                errors.push((test_name, e.to_string()));
-            }
-        }
-    }
+        })
+        .collect::<Vec<_>>();
 
     if !errors.is_empty() {
         eprintln!(
@@ -253,5 +291,8 @@ async fn main() {
         exit(1);
     }
 
-    println!("\ntest result: ok. {count} passed\n", count = tests.len());
+    println!(
+        "\ntest result: ok. {} passed\n",
+        ntests.load(Ordering::SeqCst)
+    );
 }

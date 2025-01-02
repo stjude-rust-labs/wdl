@@ -24,13 +24,16 @@ use tracing::info;
 use url::Url;
 use wdl_ast::Ast;
 use wdl_ast::AstToken;
+use wdl_ast::Node;
+use wdl_ast::Severity;
+use wdl_format::Formatter;
+use wdl_format::element::node::AstNodeFormatExt as _;
 
 use crate::AnalysisResult;
 use crate::DiagnosticsConfig;
 use crate::IncrementalChange;
 use crate::ProgressKind;
 use crate::document::Document;
-use crate::graph::Analysis;
 use crate::graph::DfsSpace;
 use crate::graph::DocumentGraph;
 use crate::graph::ParseState;
@@ -51,6 +54,8 @@ pub enum Request<Context> {
     NotifyIncrementalChange(NotifyIncrementalChangeRequest),
     /// A request to process a document's change.
     NotifyChange(NotifyChangeRequest),
+    /// A request to format a document.
+    Format(FormatRequest),
 }
 
 /// Represents a request to add documents to the graph.
@@ -95,6 +100,20 @@ pub struct NotifyChangeRequest {
     pub document: Url,
     /// Whether or not any existing incremental change should be discarded.
     pub discard_pending: bool,
+}
+
+/// Represents a request to format a document.
+pub struct FormatRequest {
+    /// The document to be formatted.
+    pub document: Url,
+    /// The sender for completing the request.
+    ///
+    /// The return type is an option format result, meaning (in order):
+    ///
+    /// * The line of the last character in the document,
+    /// * The column of the last character in the document, and
+    /// * The formatted document to replace the entire file with.
+    pub completed: oneshot::Sender<Option<(u32, u32, String)>>,
 }
 
 /// A simple enumeration to signal a cancellation to the caller.
@@ -238,6 +257,57 @@ where
                     if let Some(node) = graph.get_index(&document) {
                         graph.get_mut(node).notify_change(discard_pending);
                     }
+                }
+                Request::Format(FormatRequest {
+                    document,
+                    completed,
+                }) => {
+                    let graph = self.graph.read();
+
+                    let result = graph
+                        .get_index(&document)
+                        .and_then(|index| {
+                            graph.get(index).document().and_then(|document| {
+                                match graph.get(index).parse_state() {
+                                    // NOTE: if we haven't parsed the document yet, then
+                                    // we don't have the line lengths of the document,
+                                    // so we can't proceed with formatting and we should
+                                    // just silently return.
+                                    ParseState::NotParsed | ParseState::Error(_) => None,
+                                    ParseState::Parsed {
+                                        version: _,
+                                        root: _,
+                                        lines,
+                                        diagnostics,
+                                    } => {
+                                        // If there are any diagnostics that are
+                                        // errors, we shouldn't attempt to format the
+                                        // document.
+                                        if diagnostics.as_ref().iter().any(|diagnositic| {
+                                            diagnositic.severity() == Severity::Error
+                                        }) {
+                                            return None;
+                                        }
+
+                                        let line_col = lines.line_col(lines.len());
+                                        Some((line_col.line, line_col.col, document))
+                                    }
+                                }
+                            })
+                        })
+                        .and_then(|(line, col, document)| {
+                            document.ast().into_v1().and_then(|ast| {
+                                let formatter = Formatter::default();
+                                let element = Node::Ast(ast).into_format_element();
+
+                                formatter
+                                    .format(&element)
+                                    .ok()
+                                    .map(|formatted| (line, col, formatted))
+                            })
+                        });
+
+                    completed.send(result).ok();
                 }
             }
         }
@@ -398,9 +468,9 @@ where
                 };
 
             let mut graph = self.graph.write();
-            results.extend(analyzed.into_iter().filter_map(|(index, analysis)| {
+            results.extend(analyzed.into_iter().filter_map(|(index, document)| {
                 let node = graph.get_mut(index);
-                node.analysis_completed(analysis);
+                node.analysis_completed(document);
 
                 if graph.include_result(index) {
                     Some(AnalysisResult::new(graph.get(index)))
@@ -410,7 +480,7 @@ where
             }));
         }
 
-        results.sort_by(|a, b| a.uri().cmp(b.uri()));
+        results.sort_by(|a, b| a.document().uri().cmp(b.document().uri()));
         Cancelable::Completed(Ok(results))
     }
 
@@ -604,10 +674,10 @@ where
         config: DiagnosticsConfig,
         graph: Arc<RwLock<DocumentGraph>>,
         index: NodeIndex,
-    ) -> (NodeIndex, Analysis) {
+    ) -> (NodeIndex, Document) {
         let start = Instant::now();
         let graph = graph.read();
-        let (document, diagnostics) = Document::new(config, &graph, index);
+        let document = Document::from_graph_node(config, &graph, index);
 
         info!(
             "analysis of `{uri}` completed in {elapsed:?}",
@@ -615,6 +685,6 @@ where
             elapsed = start.elapsed()
         );
 
-        (index, Analysis::new(document, diagnostics))
+        (index, document)
     }
 }

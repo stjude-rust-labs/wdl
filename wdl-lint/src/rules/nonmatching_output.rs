@@ -110,7 +110,7 @@ pub struct NonmatchingOutputRule<'a> {
     prior_objects: Vec<String>,
 }
 
-impl<'a> Rule for NonmatchingOutputRule<'a> {
+impl Rule for NonmatchingOutputRule<'_> {
     fn id(&self) -> &'static str {
         ID
     }
@@ -233,7 +233,7 @@ fn handle_meta_outputs_and_reset(
     rule.meta_outputs_keys.clear();
 }
 
-impl<'a> Visitor for NonmatchingOutputRule<'a> {
+impl Visitor for NonmatchingOutputRule<'_> {
     type State = Diagnostics;
 
     fn document(
@@ -301,7 +301,14 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
     ) {
         match reason {
             VisitReason::Enter => {
-                self.current_meta_span = Some(section.syntax().text_range().to_span());
+                self.current_meta_span = Some(
+                    section
+                        .syntax()
+                        .first_token()
+                        .expect("metadata section should have tokens")
+                        .text_range()
+                        .to_span(),
+                );
                 self.in_meta = true;
             }
             VisitReason::Exit => {
@@ -318,7 +325,14 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
     ) {
         match reason {
             VisitReason::Enter => {
-                self.current_output_span = Some(section.syntax().text_range().to_span());
+                self.current_output_span = Some(
+                    section
+                        .syntax()
+                        .first_token()
+                        .expect("output section should have tokens")
+                        .text_range()
+                        .to_span(),
+                );
                 self.in_output = true;
             }
             VisitReason::Exit => {
@@ -336,7 +350,7 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
         if reason == VisitReason::Enter && self.in_output {
             self.output_keys.insert(
                 decl.name().as_str().to_string(),
-                decl.syntax().text_range().to_span(),
+                decl.name().syntax().text_range().to_span(),
             );
         }
     }

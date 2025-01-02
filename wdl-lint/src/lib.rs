@@ -48,6 +48,7 @@ pub const RESERVED_RULE_IDS: &[&str] = &[
     "UnusedInput",
     "UnusedDeclaration",
     "UnusedCall",
+    "UnnecessaryFunctionCall",
 ];
 
 /// A trait implemented by lint rules.
@@ -123,6 +124,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::VersionFormattingRule>::default(),
         Box::<rules::PreambleCommentAfterVersionRule>::default(),
         Box::<rules::MalformedLintDirectiveRule>::default(),
+        Box::<rules::RedundantInputAssignment>::default(),
     ];
 
     // Ensure all the rule ids are unique and pascal case
@@ -147,4 +149,35 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
     }
 
     rules
+}
+
+/// Gets the optional rule set.
+pub fn optional_rules() -> Vec<Box<dyn Rule>> {
+    let opt_rules: Vec<Box<dyn Rule>> = vec![Box::<rules::ShellCheckRule>::default()];
+
+    // Ensure all the rule ids are unique and pascal case
+    #[cfg(debug_assertions)]
+    {
+        use convert_case::Case;
+        use convert_case::Casing;
+
+        use crate::rules;
+        let mut set: std::collections::HashSet<&str> =
+            std::collections::HashSet::from_iter(rules().iter().map(|r| r.id()));
+        for r in opt_rules.iter() {
+            if r.id().to_case(Case::Pascal) != r.id() {
+                panic!("lint rule id `{id}` is not pascal case", id = r.id());
+            }
+
+            if !set.insert(r.id()) {
+                panic!("duplicate rule id `{id}`", id = r.id());
+            }
+
+            if RESERVED_RULE_IDS.contains(&r.id()) {
+                panic!("rule id `{id}` is reserved", id = r.id());
+            }
+        }
+    }
+
+    opt_rules
 }

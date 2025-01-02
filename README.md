@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">
-    wdl
+    <code>wdl</code>
   </h1>
 
   <p align="center">
@@ -10,7 +10,7 @@
     <a href="https://crates.io/crates/wdl" target="_blank">
       <img alt="crates.io version" src="https://img.shields.io/crates/v/wdl">
     </a>
-    <a href="https://rustseq.zulipchat.com" target="_blank">
+    <a href="https://rustseq.zulipchat.com/join/coxb7c7b3bbahlfx7poeqqrd/" target="_blank">
       <img alt="CI: Status" src="https://img.shields.io/badge/chat-%23workflows--lib--wdl-blue?logo=zulip&logoColor=f6f6f6" />
     </a>
     <img alt="crates.io downloads" src="https://img.shields.io/crates/d/wdl">
@@ -123,22 +123,25 @@ Where `$ARGS` are the command line arguments to the `wdl` CLI tool.
 
 The `wdl` CLI tool currently supports the following subcommands:
 
-* `parse` - Parses a WDL document and prints both the parse diagnostics and the
+- `parse` - Parses a WDL document and prints both the parse diagnostics and the
   resulting Concrete Syntax Tree (CST).
-* `check` - Parses, validates, and analyzes a WDL document or a directory
+- `check` - Parses, validates, and analyzes a WDL document or a directory
   containing WDL documents. Exits with a status code of `0` if the documents
   are valid; otherwise, prints the validation diagnostics and exits with a
   status code of `1`.
-* `lint` - Parses, validates, and runs the linting rules on a WDL document.
+- `lint` - Parses, validates, and runs the linting rules on a WDL document.
   Exits with a status code of `0` if the file passes all lints; otherwise,
   prints the linting diagnostics and exits with a status code of `1`.
-* `analyze` - Parses, validates, and analyzes a single WDL document or a
+- `analyze` - Parses, validates, and analyzes a single WDL document or a
   directory containing WDL documents. Prints a debug representation of the
   analysis result and exits with a status code of `0` if the documents are
   valid; otherwise, prints the validation diagnostics and exits with a status
   code of `1`.
-* `format` - Parses, validates, and then formats a single WDL document, printing
+- `format` - Parses, validates, and then formats a single WDL document, printing
   the result to STDOUT.
+- `doc` - Builds documentation for a WDL workspace.
+- `run` - Parses, validates, and then runs a workflow or task from a single WDL
+  document using a local (i.e. not in a container) executor.
 
 Each of the subcommands supports passing `-` as the file path to denote reading
 from STDIN instead of a file on disk.
@@ -187,10 +190,12 @@ cargo doc
 Contributions, issues, and feature requests are all welcome! Feel free to read our
 [contributing guide](https://github.com/stjude-rust-labs/wdl/blob/main/CONTRIBUTING.md).
 
-## 📝 License
+## 📝 License and Legal
 
 This project is licensed as either [Apache 2.0][license-apache] or
-[MIT][license-mit] at your discretion.
+[MIT][license-mit] at your discretion. Additionally, please see [the
+disclaimer](https://github.com/stjude-rust-labs#disclaimer) that applies to all
+crates and command line tools made available by St. Jude Rust Labs.
 
 Copyright © 2023-Present [St. Jude Children's Research Hospital](https://github.com/stjude).
 

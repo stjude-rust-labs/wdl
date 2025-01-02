@@ -12,6 +12,8 @@ documentation = "https://docs.rs/wdl-analysis"
 
 [dependencies]
 wdl-ast = { path = "../wdl-ast", version = "0.9.0" }
+wdl-format = { path = "../wdl-format", version = "0.3.0" }
+
 anyhow = { workspace = true }
 rowan = { workspace = true }
 url = { workspace = true }
@@ -26,7 +28,6 @@ indexmap = { workspace = true }
 line-index = { workspace = true }
 uuid = { workspace = true, features = ["v4"] }
 walkdir = { workspace = true }
-id-arena = { workspace = true }
 tracing = { workspace = true }
 convert_case = { workspace = true }
 

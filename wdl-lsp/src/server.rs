@@ -24,10 +24,12 @@ use tracing::error;
 use tracing::info;
 use uuid::Uuid;
 use wdl_analysis::Analyzer;
+use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::IncrementalChange;
 use wdl_analysis::SourceEdit;
 use wdl_analysis::SourcePosition;
 use wdl_analysis::SourcePositionEncoding;
+use wdl_analysis::path_to_uri;
 use wdl_analysis::rules;
 use wdl_ast::Validator;
 use wdl_lint::LintVisitor;
@@ -251,7 +253,7 @@ impl Server {
                 client,
                 options,
                 analyzer: Analyzer::<ProgressToken>::new_with_validator(
-                    rules(),
+                    DiagnosticsConfig::new(rules()),
                     move |token, kind, current, total| {
                         let client = analyzer_client.clone();
                         async move {
@@ -381,6 +383,7 @@ impl LanguageServer for Server {
                         ..Default::default()
                     },
                 )),
+                document_formatting_provider: Some(OneOf::Left(true)),
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
@@ -436,7 +439,7 @@ impl LanguageServer for Server {
         debug!("received `textDocument/didOpen` request: {params:#?}");
 
         if let Ok(path) = params.text_document.uri.to_file_path() {
-            if let Err(e) = self.analyzer.add_documents(vec![path]).await {
+            if let Err(e) = self.analyzer.add_directory(path).await {
                 error!(
                     "failed to add document {uri}: {e}",
                     uri = params.text_document.uri
@@ -591,19 +594,14 @@ impl LanguageServer for Server {
 
         // Progress the added folders
         if !params.event.added.is_empty() {
-            if let Err(e) = self
-                .analyzer
-                .add_documents(
-                    params
-                        .event
-                        .added
-                        .iter()
-                        .filter_map(|f| f.uri.to_file_path().ok())
-                        .collect(),
-                )
-                .await
-            {
-                error!("failed to add documents to analyzer: {e}");
+            for folder in &params.event.added {
+                if let Err(e) = self
+                    .analyzer
+                    .add_directory(folder.uri.to_file_path().expect("should be a file path"))
+                    .await
+                {
+                    error!("failed to add documents from directory to analyzer: {e}");
+                }
             }
         }
     }
@@ -655,8 +653,14 @@ impl LanguageServer for Server {
 
         // Add any documents to the analyzer
         if !added.is_empty() {
-            if let Err(e) = self.analyzer.add_documents(added).await {
-                error!("failed to add documents to analyzer: {e}");
+            for file in added {
+                if let Err(e) = self
+                    .analyzer
+                    .add_document(path_to_uri(&file).expect("should convert to uri"))
+                    .await
+                {
+                    error!("failed to add documents to analyzer: {e}");
+                }
             }
         }
 
@@ -666,5 +670,43 @@ impl LanguageServer for Server {
                 error!("failed to remove documents from analyzer: {e}");
             }
         }
+    }
+
+    async fn formatting(
+        &self,
+        mut params: DocumentFormattingParams,
+    ) -> RpcResult<Option<Vec<TextEdit>>> {
+        normalize_uri_path(&mut params.text_document.uri);
+
+        debug!("received `textDocument/formatting` request: {params:#?}");
+
+        let result = self
+            .analyzer
+            .format_document(params.text_document.uri)
+            .await
+            .map_err(|e| RpcError {
+                code: ErrorCode::InternalError,
+                message: e.to_string().into(),
+                data: None,
+            })?
+            .map(|(end_line, end_col, formatted)| {
+                vec![TextEdit {
+                    range: Range {
+                        // NOTE: always replace the full set of text starting at the
+                        // very first position.
+                        start: Position {
+                            line: 0,
+                            character: 0,
+                        },
+                        end: Position {
+                            line: end_line,
+                            character: end_col,
+                        },
+                    },
+                    new_text: formatted,
+                }]
+            });
+
+        Ok(result)
     }
 }

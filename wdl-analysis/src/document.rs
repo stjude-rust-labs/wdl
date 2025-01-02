@@ -2,11 +2,14 @@
 
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::str::FromStr;
 use std::sync::Arc;
 
 use indexmap::IndexMap;
 use petgraph::graph::NodeIndex;
+use rowan::GreenNode;
 use url::Url;
+use uuid::Uuid;
 use wdl_ast::Ast;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
@@ -14,6 +17,7 @@ use wdl_ast::Diagnostic;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
+use wdl_ast::SyntaxNode;
 use wdl_ast::ToSpan;
 use wdl_ast::WorkflowDescriptionLanguage;
 use wdl_ast::support::token;
@@ -24,13 +28,12 @@ use crate::graph::DocumentGraph;
 use crate::graph::ParseState;
 use crate::types::CallType;
 use crate::types::Type;
-use crate::types::Types;
 
 mod v1;
 
 /// The `task` variable name available in task command sections and outputs in
 /// WDL 1.2.
-pub(crate) const TASK_VAR_NAME: &str = "task";
+pub const TASK_VAR_NAME: &str = "task";
 
 /// Calculates the span of a scope given a braced node.
 fn braced_scope_span(parent: &impl AstNode<Language = WorkflowDescriptionLanguage>) -> Span {
@@ -143,13 +146,13 @@ impl Struct {
     ///
     /// A value of `None` indicates that the type could not be determined for
     /// the struct; this may happen if the struct definition is recursive.
-    pub fn ty(&self) -> Option<Type> {
-        self.ty
+    pub fn ty(&self) -> Option<&Type> {
+        self.ty.as_ref()
     }
 }
 
 /// Represents information about a name in a scope.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct Name {
     /// The span of the name.
     span: Span,
@@ -164,8 +167,8 @@ impl Name {
     }
 
     /// Gets the type of the name.
-    pub fn ty(&self) -> Type {
-        self.ty
+    pub fn ty(&self) -> &Type {
+        &self.ty
     }
 }
 
@@ -209,30 +212,12 @@ pub struct ScopeRef<'a> {
     scopes: &'a [Scope],
     /// The index of the scope in the collection.
     index: ScopeIndex,
-    /// The name of the task associated with the scope.
-    ///
-    /// This is `Some` only when evaluating a task `hints` section.
-    task_name: Option<&'a str>,
-    /// The input type map.
-    ///
-    /// This is `Some` only when evaluating a task `hints` section.
-    inputs: Option<&'a HashMap<String, Input>>,
-    /// The output type map.
-    ///
-    /// This is `Some` only when evaluating a task `hints` section.
-    outputs: Option<&'a HashMap<String, Output>>,
 }
 
 impl<'a> ScopeRef<'a> {
     /// Creates a new scope reference given the scope index.
     fn new(scopes: &'a [Scope], index: ScopeIndex) -> Self {
-        Self {
-            scopes,
-            index,
-            task_name: None,
-            inputs: None,
-            outputs: None,
-        }
+        Self { scopes, index }
     }
 
     /// Gets the span of the scope.
@@ -247,35 +232,32 @@ impl<'a> ScopeRef<'a> {
         self.scopes[self.index.0].parent.map(|p| Self {
             scopes: self.scopes,
             index: p,
-            task_name: self.task_name,
-            inputs: self.inputs,
-            outputs: self.outputs,
         })
     }
 
     /// Gets all of the names available at this scope.
-    pub fn names(&self) -> impl Iterator<Item = (&str, Name)> + use<'_> {
+    pub fn names(&self) -> impl Iterator<Item = (&str, &Name)> + use<'_> {
         self.scopes[self.index.0]
             .names
             .iter()
-            .map(|(name, span_ty)| (name.as_str(), *span_ty))
+            .map(|(name, n)| (name.as_str(), n))
     }
 
     /// Gets a name local to this scope.
     ///
     /// Returns `None` if a name local to this scope was not found.
-    pub fn local(&self, name: &str) -> Option<Name> {
-        self.scopes[self.index.0].names.get(name).copied()
+    pub fn local(&self, name: &str) -> Option<&Name> {
+        self.scopes[self.index.0].names.get(name)
     }
 
     /// Lookups a name in the scope.
     ///
     /// Returns `None` if the name is not available in the scope.
-    pub fn lookup(&self, name: &str) -> Option<Name> {
+    pub fn lookup(&self, name: &str) -> Option<&Name> {
         let mut current = Some(self.index);
 
         while let Some(index) = current {
-            if let Some(name) = self.scopes[index.0].names.get(name).copied() {
+            if let Some(name) = self.scopes[index.0].names.get(name) {
                 return Some(name);
             }
 
@@ -283,59 +265,6 @@ impl<'a> ScopeRef<'a> {
         }
 
         None
-    }
-
-    /// Gets an input for the given name.
-    ///
-    /// Returns `Err(())` if input hidden types are not supported by this scope.
-    ///
-    /// Returns `Ok(None)` if input hidden types are supported, but the
-    /// specified name is not a known input.
-    ///
-    /// Returns `Ok(Some)` if input hidden types are supported and the specified
-    /// name is a known input.
-    pub(crate) fn input(&self, name: &str) -> Result<Option<Input>, ()> {
-        match self.inputs {
-            Some(map) => Ok(map.get(name).copied()),
-            None => Err(()),
-        }
-    }
-
-    /// Gets an output for the given name.
-    ///
-    /// Returns `Err(())` if output hidden types are not supported by this
-    /// scope.
-    ///
-    /// Returns `Ok(None)` if input hidden types are supported, but the
-    /// specified name is not a known output.
-    ///
-    /// Returns `Ok(Some)` if input hidden types are supported and the specified
-    /// name is a known output.
-    pub(crate) fn output(&self, name: &str) -> Result<Option<Output>, ()> {
-        match self.outputs {
-            Some(map) => Ok(map.get(name).copied()),
-            None => Err(()),
-        }
-    }
-
-    /// The task name associated with the scope.
-    pub(crate) fn task_name(&self) -> Option<&str> {
-        self.task_name
-    }
-
-    /// Whether or not `hints` hidden types are supported by this scope.
-    pub(crate) fn supports_hints(&self) -> bool {
-        self.task_name.is_some()
-    }
-
-    /// Whether or not `input` hidden types are supported by this scope.
-    pub(crate) fn supports_inputs(&self) -> bool {
-        self.inputs.is_some()
-    }
-
-    /// Whether or not `output` hidden types are supported by this scope.
-    pub(crate) fn supports_outputs(&self) -> bool {
-        self.outputs.is_some()
     }
 }
 
@@ -357,11 +286,11 @@ impl<'a> ScopeRefMut<'a> {
     /// Lookups a name in the scope.
     ///
     /// Returns `None` if the name is not available in the scope.
-    pub fn lookup(&self, name: &str) -> Option<Name> {
+    pub fn lookup(&self, name: &str) -> Option<&Name> {
         let mut current = Some(self.index);
 
         while let Some(index) = current {
-            if let Some(name) = self.scopes[index.0].names.get(name).copied() {
+            if let Some(name) = self.scopes[index.0].names.get(name) {
                 return Some(name);
             }
 
@@ -379,19 +308,16 @@ impl<'a> ScopeRefMut<'a> {
     }
 
     /// Converts the mutable scope reference to an immutable scope reference.
-    pub fn into_scope_ref(self) -> ScopeRef<'a> {
+    pub fn as_scope_ref(&'a self) -> ScopeRef<'a> {
         ScopeRef {
             scopes: self.scopes,
             index: self.index,
-            task_name: None,
-            inputs: None,
-            outputs: None,
         }
     }
 }
 
 /// Represents a task or workflow input.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Input {
     /// The type of the input.
     ty: Type,
@@ -401,8 +327,8 @@ pub struct Input {
 
 impl Input {
     /// Gets the type of the input.
-    pub fn ty(&self) -> Type {
-        self.ty
+    pub fn ty(&self) -> &Type {
+        &self.ty
     }
 
     /// Whether or not the input is required.
@@ -412,7 +338,7 @@ impl Input {
 }
 
 /// Represents a task or workflow output.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Output {
     /// The type of the output.
     ty: Type,
@@ -425,8 +351,8 @@ impl Output {
     }
 
     /// Gets the type of the output.
-    pub fn ty(&self) -> Type {
-        self.ty
+    pub fn ty(&self) -> &Type {
+        &self.ty
     }
 }
 
@@ -444,9 +370,9 @@ pub struct Task {
     /// The scopes will be in sorted order by span start.
     scopes: Vec<Scope>,
     /// The inputs of the task.
-    inputs: Arc<HashMap<String, Input>>,
+    inputs: Arc<IndexMap<String, Input>>,
     /// The outputs of the task.
-    outputs: Arc<HashMap<String, Output>>,
+    outputs: Arc<IndexMap<String, Output>>,
 }
 
 impl Task {
@@ -461,12 +387,12 @@ impl Task {
     }
 
     /// Gets the inputs of the task.
-    pub fn inputs(&self) -> &HashMap<String, Input> {
+    pub fn inputs(&self) -> &IndexMap<String, Input> {
         &self.inputs
     }
 
     /// Gets the outputs of the task.
-    pub fn outputs(&self) -> &HashMap<String, Output> {
+    pub fn outputs(&self) -> &IndexMap<String, Output> {
         &self.outputs
     }
 }
@@ -485,9 +411,9 @@ pub struct Workflow {
     /// The scopes will be in sorted order by span start.
     scopes: Vec<Scope>,
     /// The inputs of the workflow.
-    inputs: Arc<HashMap<String, Input>>,
+    inputs: Arc<IndexMap<String, Input>>,
     /// The outputs of the workflow.
-    outputs: Arc<HashMap<String, Output>>,
+    outputs: Arc<IndexMap<String, Output>>,
     /// The calls made by the workflow.
     calls: HashMap<String, CallType>,
     /// Whether or not nested inputs are allowed for the workflow.
@@ -506,12 +432,12 @@ impl Workflow {
     }
 
     /// Gets the inputs of the workflow.
-    pub fn inputs(&self) -> &HashMap<String, Input> {
+    pub fn inputs(&self) -> &IndexMap<String, Input> {
         &self.inputs
     }
 
     /// Gets the outputs of the workflow.
-    pub fn outputs(&self) -> &HashMap<String, Output> {
+    pub fn outputs(&self) -> &IndexMap<String, Output> {
         &self.outputs
     }
 
@@ -527,8 +453,18 @@ impl Workflow {
 }
 
 /// Represents an analyzed WDL document.
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Document {
+    /// The root CST node of the document.
+    ///
+    /// This is `None` when the document could not be parsed.
+    root: Option<GreenNode>,
+    /// The document identifier.
+    ///
+    /// The identifier changes every time the document is analyzed.
+    id: Arc<String>,
+    /// The URI of the analyzed document.
+    uri: Arc<Url>,
     /// The version of the document.
     version: Option<SupportedVersion>,
     /// The namespaces in the document.
@@ -539,71 +475,129 @@ pub struct Document {
     workflow: Option<Workflow>,
     /// The structs in the document.
     structs: IndexMap<String, Struct>,
-    /// The collection of types for the document.
-    types: Types,
+    /// The diagnostics for the document.
+    diagnostics: Vec<Diagnostic>,
 }
 
 impl Document {
-    /// Creates a new analyzed document.
-    pub(crate) fn new(
+    /// Creates a new analyzed document from a document graph node.
+    pub(crate) fn from_graph_node(
         config: DiagnosticsConfig,
         graph: &DocumentGraph,
         index: NodeIndex,
-    ) -> (Self, Vec<Diagnostic>) {
+    ) -> Self {
         let node = graph.get(index);
 
-        let mut diagnostics = match node.parse_state() {
+        let diagnostics = match node.parse_state() {
             ParseState::NotParsed => panic!("node should have been parsed"),
-            ParseState::Error(_) => return (Default::default(), Default::default()),
+            ParseState::Error(_) => {
+                return Self::new(node.uri().clone(), None, None, Default::default());
+            }
             ParseState::Parsed { diagnostics, .. } => {
                 Vec::from_iter(diagnostics.as_ref().iter().cloned())
             }
         };
 
-        let document = node.document().expect("node should have been parsed");
-        let version = match document.version_statement() {
-            Some(stmt) => stmt.version(),
+        let root = node.document().expect("node should have been parsed");
+        let (version, config) = match root.version_statement() {
+            Some(stmt) => (stmt.version(), config.excepted_for_node(stmt.syntax())),
             None => {
                 // Don't process a document with a missing version
-                return (Default::default(), diagnostics);
+                return Self::new(
+                    node.uri().clone(),
+                    Some(root.syntax().green().into()),
+                    None,
+                    diagnostics,
+                );
             }
         };
 
-        let config =
-            config.excepted_for_node(&version.syntax().parent().expect("token should have parent"));
-
-        let document = match document.ast() {
-            Ast::Unsupported => Default::default(),
+        let mut document = Self::new(
+            node.uri().clone(),
+            Some(root.syntax().green().into()),
+            SupportedVersion::from_str(version.as_str()).ok(),
+            diagnostics,
+        );
+        match root.ast() {
+            Ast::Unsupported => {}
             Ast::V1(ast) => {
-                v1::create_document(config, graph, index, &ast, &version, &mut diagnostics)
-            }
-        };
-
-        // Check for unused imports
-        if let Some(severity) = config.unused_import {
-            for (name, ns) in document
-                .namespaces()
-                .filter(|(_, ns)| !ns.used && !ns.excepted)
-            {
-                diagnostics.push(unused_import(name, ns.span()).with_severity(severity));
+                v1::populate_document(&mut document, config, graph, index, &ast, &version)
             }
         }
 
-        // Sort the diagnostics by start
-        diagnostics.sort_by(|a, b| match (a.labels().next(), b.labels().next()) {
-            (None, None) => Ordering::Equal,
-            (None, Some(_)) => Ordering::Less,
-            (Some(_), None) => Ordering::Greater,
-            (Some(a), Some(b)) => a.span().start().cmp(&b.span().start()),
-        });
+        // Check for unused imports
+        if let Some(severity) = config.unused_import {
+            let Document {
+                namespaces,
+                diagnostics,
+                ..
+            } = &mut document;
 
-        // Perform a type check
-        (document, diagnostics)
+            diagnostics.extend(
+                namespaces
+                    .iter()
+                    .filter(|(_, ns)| !ns.used && !ns.excepted)
+                    .map(|(name, ns)| unused_import(name, ns.span()).with_severity(severity)),
+            );
+        }
+
+        // Sort the diagnostics by start
+        document
+            .diagnostics
+            .sort_by(|a, b| match (a.labels().next(), b.labels().next()) {
+                (None, None) => Ordering::Equal,
+                (None, Some(_)) => Ordering::Less,
+                (Some(_), None) => Ordering::Greater,
+                (Some(a), Some(b)) => a.span().start().cmp(&b.span().start()),
+            });
+
+        document
+    }
+
+    /// Constructs a new analysis document.
+    fn new(
+        uri: Arc<Url>,
+        root: Option<GreenNode>,
+        version: Option<SupportedVersion>,
+        diagnostics: Vec<Diagnostic>,
+    ) -> Self {
+        Self {
+            root,
+            id: Uuid::new_v4().to_string().into(),
+            uri,
+            version,
+            namespaces: Default::default(),
+            tasks: Default::default(),
+            workflow: Default::default(),
+            structs: Default::default(),
+            diagnostics,
+        }
+    }
+
+    /// Gets the root AST document node.
+    pub fn node(&self) -> wdl_ast::Document {
+        wdl_ast::Document::cast(SyntaxNode::new_root(
+            self.root.clone().expect("should have a root"),
+        ))
+        .expect("should cast")
+    }
+
+    /// Gets the identifier of the document.
+    ///
+    /// This value changes when a document is reanalyzed.
+    pub fn id(&self) -> &Arc<String> {
+        &self.id
+    }
+
+    /// Gets the URI of the document.
+    pub fn uri(&self) -> &Arc<Url> {
+        &self.uri
     }
 
     /// Gets the supported version of the document.
     ///
-    /// Returns `None` if the document version is not supported.
+    /// Returns `None` if the document could not be parsed or contains an
+    /// unsupported version.
     pub fn version(&self) -> Option<SupportedVersion> {
         self.version
     }
@@ -645,9 +639,9 @@ impl Document {
         self.structs.get(name)
     }
 
-    /// Gets the types of the document.
-    pub fn types(&self) -> &Types {
-        &self.types
+    /// Gets the analysis diagnostics for the document.
+    pub fn diagnostics(&self) -> &[Diagnostic] {
+        &self.diagnostics
     }
 
     /// Finds a scope based on a position within the document.

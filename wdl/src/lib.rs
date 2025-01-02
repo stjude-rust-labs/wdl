@@ -78,10 +78,12 @@ pub use wdl_analysis as analysis;
 #[cfg(feature = "ast")]
 #[doc(inline)]
 pub use wdl_ast as ast;
-// TODO: uncomment this when wdl-engine is ready for release.
-// #[cfg(feature = "engine")]
-// #[doc(inline)]
-// pub use wdl_engine as engine;
+#[cfg(feature = "doc")]
+#[doc(inline)]
+pub use wdl_doc as doc;
+#[cfg(feature = "engine")]
+#[doc(inline)]
+pub use wdl_engine as engine;
 #[cfg(feature = "format")]
 #[doc(inline)]
 pub use wdl_format as format;
@@ -105,7 +107,7 @@ mod test {
     #[test]
     fn reserved_rule_ids() {
         let rules: HashSet<_> = wdl_analysis::rules().iter().map(|r| r.id()).collect();
-        let reserved: HashSet<_> = wdl_lint::RESERVED_RULE_IDS.iter().map(|id| *id).collect();
+        let reserved: HashSet<_> = wdl_lint::RESERVED_RULE_IDS.iter().copied().collect();
 
         for id in &reserved {
             if !rules.contains(id) {

@@ -11,22 +11,32 @@ description = "Execution engine for Workflow Description Language (WDL) document
 documentation = "https://docs.rs/wdl-engine"
 
 [dependencies]
+wdl-grammar = { version = "0.10.0", path = "../wdl-grammar" }
 wdl-ast = { version = "0.9.0", path = "../wdl-ast" }
 wdl-analysis = { version = "0.5.0", path = "../wdl-analysis" }
 anyhow = { workspace = true }
-id-arena = { workspace = true }
 ordered-float = { workspace = true }
-string-interner = { workspace = true }
 indexmap = { workspace = true }
 serde_json = { workspace = true }
+regex = { workspace = true }
+glob = { workspace = true }
+tempfile = { workspace = true }
+itertools = { workspace = true }
+serde = { workspace = true }
+tracing = { workspace = true }
+petgraph = { workspace = true }
+futures = { workspace = true }
+tokio = { workspace = true }
+sysinfo = { workspace = true }
 
 [dev-dependencies]
-tokio = { workspace = true }
 pretty_assertions = { workspace = true }
 codespan-reporting = { workspace = true }
 path-clean = { workspace = true }
 colored = { workspace = true }
-tempfile = { workspace = true }
+approx = { workspace = true }
+walkdir = { workspace = true }
+rayon = { workspace = true }
 
 [lints]
 workspace = true
@@ -37,5 +47,10 @@ codespan = ["wdl-ast/codespan"]
 
 [[test]]
 name = "inputs"
+required-features = ["codespan"]
+harness = false
+
+[[test]]
+name = "tasks"
 required-features = ["codespan"]
 harness = false

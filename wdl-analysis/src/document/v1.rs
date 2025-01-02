@@ -1,7 +1,6 @@
 //! Conversion of a V1 AST to an analyzed document.
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::str::FromStr;
 use std::sync::Arc;
 
 use indexmap::IndexMap;
@@ -95,12 +94,12 @@ use crate::graph::ParseState;
 use crate::types::CallKind;
 use crate::types::CallType;
 use crate::types::Coercible;
-use crate::types::CompoundTypeDef;
+use crate::types::CompoundType;
 use crate::types::Optional;
-use crate::types::PrimitiveTypeKind;
+use crate::types::PrimitiveType;
 use crate::types::PromotionKind;
 use crate::types::Type;
-use crate::types::Types;
+use crate::types::TypeNameResolver;
 use crate::types::v1::AstTypeConverter;
 use crate::types::v1::ExprTypeEvaluator;
 
@@ -125,7 +124,7 @@ use crate::types::v1::ExprTypeEvaluator;
 /// * csi
 /// * fai
 /// * dict
-fn is_input_used(document: &Document, name: &str, ty: Type) -> bool {
+fn is_input_used(name: &str, ty: &Type) -> bool {
     /// The suffixes that cause the input to be "used"
     const SUFFIXES: &[&str] = &[
         "index", "indexes", "indices", "idx", "tbi", "bai", "crai", "csi", "fai", "dict",
@@ -133,12 +132,9 @@ fn is_input_used(document: &Document, name: &str, ty: Type) -> bool {
 
     // Determine if the input is `File` or `Array[File]`
     match ty {
-        Type::Primitive(ty) if ty.kind() == PrimitiveTypeKind::File => {}
-        Type::Compound(ty) => match document.types.type_definition(ty.definition()) {
-            CompoundTypeDef::Array(ty) => match ty.element_type() {
-                Type::Primitive(ty) if ty.kind() == PrimitiveTypeKind::File => {}
-                _ => return false,
-            },
+        Type::Primitive(PrimitiveType::File, _) => {}
+        Type::Compound(CompoundType::Array(ty), _) => match ty.element_type() {
+            Type::Primitive(PrimitiveType::File, _) => {}
             _ => return false,
         },
         _ => return false,
@@ -194,21 +190,19 @@ fn sort_scopes(scopes: &mut Vec<Scope>) {
 }
 
 /// Creates a new document for a V1 AST.
-pub(crate) fn create_document(
+pub(crate) fn populate_document(
+    document: &mut Document,
     config: DiagnosticsConfig,
     graph: &DocumentGraph,
     index: NodeIndex,
     ast: &Ast,
-    version: &Version,
-    diagnostics: &mut Vec<Diagnostic>,
-) -> Document {
-    let mut document = Document {
-        version: SupportedVersion::from_str(version.as_str()).ok(),
-        ..Default::default()
-    };
-
+    version: &wdl_ast::Version,
+) {
     assert!(
-        document.version.is_some(),
+        matches!(
+            document.version.expect("document should have a version"),
+            SupportedVersion::V1(_)
+        ),
         "expected a supported V1 version"
     );
 
@@ -218,10 +212,10 @@ pub(crate) fn create_document(
     for item in ast.items() {
         match item {
             DocumentItem::Import(import) => {
-                add_namespace(&mut document, graph, &import, index, version, diagnostics);
+                add_namespace(document, graph, &import, index, version);
             }
             DocumentItem::Struct(s) => {
-                add_struct(&mut document, &s, diagnostics);
+                add_struct(document, &s);
             }
             DocumentItem::Task(_) | DocumentItem::Workflow(_) => {
                 continue;
@@ -230,19 +224,19 @@ pub(crate) fn create_document(
     }
 
     // Populate the struct types now that all structs have been processed
-    set_struct_types(&mut document, diagnostics);
+    set_struct_types(document);
 
     // Now process the tasks and workflows
     let mut workflow = None;
     for item in ast.items() {
         match item {
             DocumentItem::Task(task) => {
-                add_task(config, &mut document, &task, diagnostics);
+                add_task(config, document, &task);
             }
             DocumentItem::Workflow(w) => {
                 // Note that this doesn't populate the workflow; we delay that until after
                 // we've seen every task in the document so that we can resolve call targets
-                if add_workflow(&mut document, &w, diagnostics) {
+                if add_workflow(document, &w) {
                     workflow = Some(w.clone());
                 }
             }
@@ -253,10 +247,8 @@ pub(crate) fn create_document(
     }
 
     if let Some(workflow) = workflow {
-        populate_workflow(config, &mut document, &workflow, diagnostics);
+        populate_workflow(config, document, &workflow);
     }
-
-    document
 }
 
 /// Adds a namespace to the document.
@@ -266,13 +258,12 @@ fn add_namespace(
     import: &ImportStatement,
     importer_index: NodeIndex,
     importer_version: &Version,
-    diagnostics: &mut Vec<Diagnostic>,
 ) {
     // Start by resolving the import to its document
     let (uri, imported) = match resolve_import(graph, import, importer_index, importer_version) {
         Ok(resolved) => resolved,
         Err(Some(diagnostic)) => {
-            diagnostics.push(diagnostic);
+            document.diagnostics.push(diagnostic);
             return;
         }
         Err(None) => return,
@@ -283,7 +274,7 @@ fn add_namespace(
     let ns = match import.namespace() {
         Some((ns, span)) => {
             if let Some(prev) = document.namespaces.get(&ns) {
-                diagnostics.push(namespace_conflict(
+                document.diagnostics.push(namespace_conflict(
                     &ns,
                     span,
                     prev.span,
@@ -314,7 +305,7 @@ fn add_namespace(
         .filter_map(|a| {
             let (from, to) = a.names();
             if !imported.structs.contains_key(from.as_str()) {
-                diagnostics.push(struct_not_in_document(&from));
+                document.diagnostics.push(struct_not_in_document(&from));
                 return None;
             }
 
@@ -324,26 +315,32 @@ fn add_namespace(
 
     // Insert the imported document's struct definitions
     for (name, s) in &imported.structs {
-        let namespace = document.namespaces.get(&ns).unwrap();
         let (span, aliased_name, aliased) = aliases
             .get(name)
             .map(|n| (n.span(), n.as_str(), true))
             .unwrap_or_else(|| (span, name, false));
         match document.structs.get(aliased_name) {
             Some(prev) => {
-                // Import conflicts with a struct defined in this document
-                if prev.namespace.is_none() {
-                    diagnostics.push(struct_conflicts_with_import(aliased_name, prev.span, span));
-                    continue;
-                }
-
-                if !are_structs_equal(prev, s) {
-                    diagnostics.push(imported_struct_conflict(
-                        aliased_name,
-                        span,
-                        prev.span,
-                        !aliased,
-                    ));
+                let a = StructDefinition::cast(SyntaxNode::new_root(prev.node.clone()))
+                    .expect("node should cast");
+                let b = StructDefinition::cast(SyntaxNode::new_root(s.node.clone()))
+                    .expect("node should cast");
+                if !are_structs_equal(&a, &b) {
+                    // Import conflicts with a struct defined in this document
+                    if prev.namespace.is_none() {
+                        document.diagnostics.push(struct_conflicts_with_import(
+                            aliased_name,
+                            prev.span,
+                            span,
+                        ));
+                    } else {
+                        document.diagnostics.push(imported_struct_conflict(
+                            aliased_name,
+                            span,
+                            prev.span,
+                            !aliased,
+                        ));
+                    }
                     continue;
                 }
             }
@@ -353,9 +350,7 @@ fn add_namespace(
                     offset: s.offset,
                     node: s.node.clone(),
                     namespace: Some(ns.clone()),
-                    ty: s
-                        .ty
-                        .map(|ty| document.types.import(&namespace.document.types, ty)),
+                    ty: s.ty.clone(),
                 });
             }
         }
@@ -363,9 +358,7 @@ fn add_namespace(
 }
 
 /// Compares two structs for structural equality.
-fn are_structs_equal(a: &Struct, b: &Struct) -> bool {
-    let a = StructDefinition::cast(SyntaxNode::new_root(a.node.clone())).expect("node should cast");
-    let b = StructDefinition::cast(SyntaxNode::new_root(b.node.clone())).expect("node should cast");
+fn are_structs_equal(a: &StructDefinition, b: &StructDefinition) -> bool {
     for (a, b) in a.members().zip(b.members()) {
         if a.name().as_str() != b.name().as_str() {
             return false;
@@ -380,21 +373,21 @@ fn are_structs_equal(a: &Struct, b: &Struct) -> bool {
 }
 
 /// Adds a struct to the document.
-fn add_struct(
-    document: &mut Document,
-    definition: &StructDefinition,
-    diagnostics: &mut Vec<Diagnostic>,
-) {
+fn add_struct(document: &mut Document, definition: &StructDefinition) {
     let name = definition.name();
     if let Some(prev) = document.structs.get(name.as_str()) {
         if prev.namespace.is_some() {
-            diagnostics.push(struct_conflicts_with_import(
-                name.as_str(),
-                name.span(),
-                prev.span,
-            ))
+            let prev_def = StructDefinition::cast(SyntaxNode::new_root(prev.node.clone()))
+                .expect("node should cast");
+            if !are_structs_equal(definition, &prev_def) {
+                document.diagnostics.push(struct_conflicts_with_import(
+                    name.as_str(),
+                    name.span(),
+                    prev.span,
+                ))
+            }
         } else {
-            diagnostics.push(name_conflict(
+            document.diagnostics.push(name_conflict(
                 name.as_str(),
                 Context::Struct(name.span()),
                 Context::Struct(prev.span),
@@ -408,7 +401,7 @@ fn add_struct(
     for decl in definition.members() {
         let name = decl.name();
         if let Some(prev_span) = members.get(name.as_str()) {
-            diagnostics.push(name_conflict(
+            document.diagnostics.push(name_conflict(
                 name.as_str(),
                 Context::StructMember(name.span()),
                 Context::StructMember(*prev_span),
@@ -428,19 +421,32 @@ fn add_struct(
 }
 
 /// Converts an AST type to an analysis type.
-fn convert_ast_type(
-    document: &mut Document,
-    ty: &wdl_ast::v1::Type,
-    diagnostics: &mut Vec<Diagnostic>,
-) -> Type {
-    let mut converter = AstTypeConverter::new(&mut document.types, |name, span| {
-        lookup_type(&mut document.namespaces, &document.structs, name, span)
-    });
+fn convert_ast_type(document: &mut Document, ty: &wdl_ast::v1::Type) -> Type {
+    /// Used to resolve a type name from a document.
+    struct Resolver<'a>(&'a mut Document);
 
+    impl TypeNameResolver for Resolver<'_> {
+        fn resolve(&mut self, name: &Ident) -> Result<Type, Diagnostic> {
+            self.0
+                .structs
+                .get(name.as_str())
+                .map(|s| {
+                    // Mark the struct's namespace as used
+                    if let Some(ns) = &s.namespace {
+                        self.0.namespaces[ns].used = true;
+                    }
+
+                    s.ty().expect("struct should have type").clone()
+                })
+                .ok_or_else(|| unknown_type(name.as_str(), name.span()))
+        }
+    }
+
+    let mut converter = AstTypeConverter::new(Resolver(document));
     match converter.convert_type(ty) {
         Ok(ty) => ty,
         Err(diagnostic) => {
-            diagnostics.push(diagnostic);
+            document.diagnostics.push(diagnostic);
             Type::Union
         }
     }
@@ -450,9 +456,8 @@ fn convert_ast_type(
 fn create_input_type_map(
     document: &mut Document,
     declarations: impl Iterator<Item = Decl>,
-    diagnostics: &mut Vec<Diagnostic>,
-) -> Arc<HashMap<String, Input>> {
-    let mut map = HashMap::new();
+) -> Arc<IndexMap<String, Input>> {
+    let mut map = IndexMap::new();
     for decl in declarations {
         let name = decl.name();
         if map.contains_key(name.as_str()) {
@@ -460,10 +465,11 @@ fn create_input_type_map(
             continue;
         }
 
-        let ty = convert_ast_type(document, &decl.ty(), diagnostics);
+        let ty = convert_ast_type(document, &decl.ty());
+        let optional = ty.is_optional();
         map.insert(name.as_str().to_string(), Input {
             ty,
-            required: decl.expr().is_none() && !ty.is_optional(),
+            required: decl.expr().is_none() && !optional,
         });
     }
 
@@ -474,9 +480,8 @@ fn create_input_type_map(
 fn create_output_type_map(
     document: &mut Document,
     declarations: impl Iterator<Item = Decl>,
-    diagnostics: &mut Vec<Diagnostic>,
-) -> Arc<HashMap<String, Output>> {
-    let mut map = HashMap::new();
+) -> Arc<IndexMap<String, Output>> {
+    let mut map = IndexMap::new();
     for decl in declarations {
         let name = decl.name();
         if map.contains_key(name.as_str()) {
@@ -484,7 +489,7 @@ fn create_output_type_map(
             continue;
         }
 
-        let ty = convert_ast_type(document, &decl.ty(), diagnostics);
+        let ty = convert_ast_type(document, &decl.ty());
         map.insert(name.as_str().to_string(), Output { ty });
     }
 
@@ -492,12 +497,7 @@ fn create_output_type_map(
 }
 
 /// Adds a task to the document.
-fn add_task(
-    config: DiagnosticsConfig,
-    document: &mut Document,
-    task: &TaskDefinition,
-    diagnostics: &mut Vec<Diagnostic>,
-) {
+fn add_task(config: DiagnosticsConfig, document: &mut Document, definition: &TaskDefinition) {
     /// Helper function for creating a scope for a task section.
     fn create_section_scope(
         version: Option<SupportedVersion>,
@@ -516,9 +516,9 @@ fn add_task(
     }
 
     // Check for a name conflict with another task or workflow
-    let name = task.name();
+    let name = definition.name();
     if let Some(s) = document.tasks.get(name.as_str()) {
-        diagnostics.push(name_conflict(
+        document.diagnostics.push(name_conflict(
             name.as_str(),
             Context::Task(name.span()),
             Context::Task(s.name_span),
@@ -526,7 +526,7 @@ fn add_task(
         return;
     } else if let Some(s) = &document.workflow {
         if s.name == name.as_str() {
-            diagnostics.push(name_conflict(
+            document.diagnostics.push(name_conflict(
                 name.as_str(),
                 Context::Task(name.span()),
                 Context::Workflow(s.name_span),
@@ -538,20 +538,34 @@ fn add_task(
     // Populate type maps for the task's inputs and outputs
     let inputs = create_input_type_map(
         document,
-        task.input().into_iter().flat_map(|s| s.declarations()),
-        diagnostics,
+        definition
+            .input()
+            .into_iter()
+            .flat_map(|s| s.declarations()),
     );
     let outputs = create_output_type_map(
         document,
-        task.output()
+        definition
+            .output()
             .into_iter()
             .flat_map(|s| s.declarations().map(Decl::Bound)),
-        diagnostics,
     );
 
     // Process the task in evaluation order
-    let graph = TaskGraphBuilder::default().build(document.version.unwrap(), task, diagnostics);
-    let mut scopes = vec![Scope::new(None, braced_scope_span(task))];
+    let graph = TaskGraphBuilder::default().build(
+        document.version.unwrap(),
+        definition,
+        &mut document.diagnostics,
+    );
+
+    let mut task = Task {
+        name_span: name.span(),
+        name: name.as_str().to_string(),
+        scopes: vec![Scope::new(None, braced_scope_span(definition))],
+        inputs,
+        outputs,
+    };
+
     let mut output_scope = None;
     let mut command_scope = None;
 
@@ -559,11 +573,11 @@ fn add_task(
         match graph[index].clone() {
             TaskGraphNode::Input(decl) => {
                 if !add_decl(
+                    config,
                     document,
-                    ScopeRefMut::new(&mut scopes, ScopeIndex(0)),
+                    ScopeRefMut::new(&mut task.scopes, ScopeIndex(0)),
                     &decl,
-                    |_, n, _, _| inputs[n].ty,
-                    diagnostics,
+                    |_, n, _| task.inputs[n].ty.clone(),
                 ) {
                     continue;
                 }
@@ -577,12 +591,12 @@ fn add_task(
                         .is_none()
                     {
                         // Determine if the input is really used based on its name and type
-                        if is_input_used(document, name.as_str(), inputs[name.as_str()].ty) {
+                        if is_input_used(name.as_str(), &task.inputs[name.as_str()].ty) {
                             continue;
                         }
 
                         if !decl.syntax().is_rule_excepted(UNUSED_INPUT_RULE_ID) {
-                            diagnostics.push(
+                            document.diagnostics.push(
                                 unused_input(name.as_str(), name.span()).with_severity(severity),
                             );
                         }
@@ -591,11 +605,11 @@ fn add_task(
             }
             TaskGraphNode::Decl(decl) => {
                 if !add_decl(
+                    config,
                     document,
-                    ScopeRefMut::new(&mut scopes, ScopeIndex(0)),
+                    ScopeRefMut::new(&mut task.scopes, ScopeIndex(0)),
                     &decl,
-                    |doc, _, decl, diag| convert_ast_type(doc, &decl.ty(), diag),
-                    diagnostics,
+                    |doc, _, decl| convert_ast_type(doc, &decl.ty()),
                 ) {
                     continue;
                 }
@@ -609,7 +623,7 @@ fn add_task(
                         .is_none()
                         && !decl.syntax().is_rule_excepted(UNUSED_DECL_RULE_ID)
                     {
-                        diagnostics.push(
+                        document.diagnostics.push(
                             unused_declaration(name.as_str(), name.span()).with_severity(severity),
                         );
                     }
@@ -619,17 +633,19 @@ fn add_task(
                 let scope_index = *output_scope.get_or_insert_with(|| {
                     create_section_scope(
                         document.version(),
-                        &mut scopes,
+                        &mut task.scopes,
                         &name,
-                        braced_scope_span(&task.output().expect("should have output section")),
+                        braced_scope_span(
+                            &definition.output().expect("should have output section"),
+                        ),
                     )
                 });
                 add_decl(
+                    config,
                     document,
-                    ScopeRefMut::new(&mut scopes, scope_index),
+                    ScopeRefMut::new(&mut task.scopes, scope_index),
                     &decl,
-                    |_, n, _, _| outputs[n].ty,
-                    diagnostics,
+                    |_, n, _| task.outputs[n].ty.clone(),
                 );
             }
             TaskGraphNode::Command(section) => {
@@ -640,105 +656,73 @@ fn add_task(
                         braced_scope_span(&section)
                     };
 
-                    create_section_scope(document.version(), &mut scopes, &name, span)
+                    create_section_scope(document.version(), &mut task.scopes, &name, span)
                 });
 
-                // Perform type checking on the command section's placeholders
-                let mut evaluator = ExprTypeEvaluator::new(
-                    document.version.unwrap(),
-                    &mut document.types,
-                    diagnostics,
-                    |name, span| {
-                        lookup_type(&mut document.namespaces, &document.structs, name, span)
-                    },
+                let mut context = EvaluationContext::new(
+                    document,
+                    ScopeRef::new(&task.scopes, scope_index),
+                    config,
                 );
-
-                let scope = ScopeRef::new(&scopes, scope_index);
+                let mut evaluator = ExprTypeEvaluator::new(&mut context);
                 for part in section.parts() {
                     if let CommandPart::Placeholder(p) = part {
-                        evaluator.check_placeholder(&scope, &p);
+                        evaluator.check_placeholder(&p);
                     }
                 }
             }
             TaskGraphNode::Runtime(section) => {
                 // Perform type checking on the runtime section's expressions
-                let mut evaluator = ExprTypeEvaluator::new(
-                    document.version.unwrap(),
-                    &mut document.types,
-                    diagnostics,
-                    |name, span| {
-                        lookup_type(&mut document.namespaces, &document.structs, name, span)
-                    },
+                let mut context = EvaluationContext::new(
+                    document,
+                    ScopeRef::new(&task.scopes, ScopeIndex(0)),
+                    config,
                 );
-
-                let scope = ScopeRef::new(&scopes, ScopeIndex(0));
+                let mut evaluator = ExprTypeEvaluator::new(&mut context);
                 for item in section.items() {
-                    evaluator.evaluate_runtime_item(&scope, &item.name(), &item.expr());
+                    evaluator.evaluate_runtime_item(&item.name(), &item.expr());
                 }
             }
             TaskGraphNode::Requirements(section) => {
                 // Perform type checking on the requirements section's expressions
-                let mut evaluator = ExprTypeEvaluator::new(
-                    document.version.unwrap(),
-                    &mut document.types,
-                    diagnostics,
-                    |name, span| {
-                        lookup_type(&mut document.namespaces, &document.structs, name, span)
-                    },
+                let mut context = EvaluationContext::new(
+                    document,
+                    ScopeRef::new(&task.scopes, ScopeIndex(0)),
+                    config,
                 );
-
-                let scope = ScopeRef::new(&scopes, ScopeIndex(0));
+                let mut evaluator = ExprTypeEvaluator::new(&mut context);
                 for item in section.items() {
-                    evaluator.evaluate_requirements_item(&scope, &item.name(), &item.expr());
+                    evaluator.evaluate_requirements_item(&item.name(), &item.expr());
                 }
             }
             TaskGraphNode::Hints(section) => {
                 // Perform type checking on the hints section's expressions
-                let mut evaluator = ExprTypeEvaluator::new(
-                    document.version.unwrap(),
-                    &mut document.types,
-                    diagnostics,
-                    |name, span| {
-                        lookup_type(&mut document.namespaces, &document.structs, name, span)
-                    },
+                let mut context = EvaluationContext::new_for_task(
+                    document,
+                    ScopeRef::new(&task.scopes, ScopeIndex(0)),
+                    config,
+                    &task,
                 );
-
-                // Create a special scope for evaluating the hints section which allows for the
-                // `hints`, `input`, and `output` hidden types
-                let scope = ScopeRef {
-                    scopes: &scopes,
-                    index: ScopeIndex(0),
-                    task_name: Some(name.as_str()),
-                    inputs: Some(&inputs),
-                    outputs: Some(&outputs),
-                };
-
+                let mut evaluator = ExprTypeEvaluator::new(&mut context);
                 for item in section.items() {
-                    evaluator.evaluate_hints_item(&scope, &item.name(), &item.expr())
+                    evaluator.evaluate_hints_item(&item.name(), &item.expr())
                 }
             }
         }
     }
 
     // Sort the scopes
-    sort_scopes(&mut scopes);
-
-    document.tasks.insert(name.as_str().to_string(), Task {
-        name_span: name.span(),
-        name: name.as_str().to_string(),
-        scopes,
-        inputs,
-        outputs,
-    });
+    sort_scopes(&mut task.scopes);
+    document.tasks.insert(name.as_str().to_string(), task);
 }
 
 /// Adds a declaration to a scope.
 fn add_decl(
+    config: DiagnosticsConfig,
     document: &mut Document,
     mut scope: ScopeRefMut<'_>,
     decl: &Decl,
-    ty: impl FnOnce(&mut Document, &str, &Decl, &mut Vec<Diagnostic>) -> Type,
-    diagnostics: &mut Vec<Diagnostic>,
+    ty: impl FnOnce(&mut Document, &str, &Decl) -> Type,
 ) -> bool {
     let (name, expr) = (decl.name(), decl.expr());
     if scope.lookup(name.as_str()).is_some() {
@@ -746,18 +730,18 @@ fn add_decl(
         return false;
     }
 
-    let ty = ty(document, name.as_str(), decl, diagnostics);
+    let ty = ty(document, name.as_str(), decl);
 
-    scope.insert(name.as_str(), name.span(), ty);
+    scope.insert(name.as_str(), name.span(), ty.clone());
 
     if let Some(expr) = expr {
         type_check_expr(
+            config,
             document,
-            scope.into_scope_ref(),
+            scope.as_scope_ref(),
             &expr,
-            ty,
+            &ty,
             name.span(),
-            diagnostics,
         );
     }
 
@@ -768,22 +752,20 @@ fn add_decl(
 ///
 /// Returns `true` if the workflow was added to the document or `false` if not
 /// (i.e. there was a conflict).
-fn add_workflow(
-    document: &mut Document,
-    workflow: &WorkflowDefinition,
-    diagnostics: &mut Vec<Diagnostic>,
-) -> bool {
+fn add_workflow(document: &mut Document, workflow: &WorkflowDefinition) -> bool {
     // Check for conflicts with task names or an existing workspace
     let name = workflow.name();
     if let Some(s) = document.tasks.get(name.as_str()) {
-        diagnostics.push(name_conflict(
+        document.diagnostics.push(name_conflict(
             name.as_str(),
             Context::Workflow(name.span()),
             Context::Task(s.name_span),
         ));
         return false;
     } else if let Some(s) = &document.workflow {
-        diagnostics.push(duplicate_workflow(&name, s.name_span));
+        document
+            .diagnostics
+            .push(duplicate_workflow(&name, s.name_span));
         return false;
     }
 
@@ -812,13 +794,11 @@ fn populate_workflow(
     config: DiagnosticsConfig,
     document: &mut Document,
     workflow: &WorkflowDefinition,
-    diagnostics: &mut Vec<Diagnostic>,
 ) {
     // Populate type maps for the workflow's inputs and outputs
     let inputs = create_input_type_map(
         document,
         workflow.input().into_iter().flat_map(|s| s.declarations()),
-        diagnostics,
     );
     let outputs = create_output_type_map(
         document,
@@ -826,7 +806,6 @@ fn populate_workflow(
             .output()
             .into_iter()
             .flat_map(|s| s.declarations().map(Decl::Bound)),
-        diagnostics,
     );
 
     // Keep a map of scopes from syntax node that introduced the scope to the scope
@@ -834,17 +813,17 @@ fn populate_workflow(
     let mut scope_indexes: HashMap<SyntaxNode, ScopeIndex> = HashMap::new();
     let mut scopes = vec![Scope::new(None, braced_scope_span(workflow))];
     let mut output_scope = None;
-    let graph = WorkflowGraphBuilder::default().build(workflow, diagnostics);
+    let graph = WorkflowGraphBuilder::default().build(workflow, &mut document.diagnostics);
 
     for index in toposort(&graph, None).expect("graph should be acyclic") {
         match graph[index].clone() {
             WorkflowGraphNode::Input(decl) => {
                 if !add_decl(
+                    config,
                     document,
                     ScopeRefMut::new(&mut scopes, ScopeIndex(0)),
                     &decl,
-                    |_, n, _, _| inputs[n].ty,
-                    diagnostics,
+                    |_, n, _| inputs[n].ty.clone(),
                 ) {
                     continue;
                 }
@@ -858,12 +837,12 @@ fn populate_workflow(
                         .is_none()
                     {
                         // Determine if the input is really used based on its name and type
-                        if is_input_used(document, name.as_str(), inputs[name.as_str()].ty) {
+                        if is_input_used(name.as_str(), &inputs[name.as_str()].ty) {
                             continue;
                         }
 
                         if !decl.syntax().is_rule_excepted(UNUSED_INPUT_RULE_ID) {
-                            diagnostics.push(
+                            document.diagnostics.push(
                                 unused_input(name.as_str(), name.span()).with_severity(severity),
                             );
                         }
@@ -877,11 +856,11 @@ fn populate_workflow(
                     .unwrap_or(ScopeIndex(0));
 
                 if !add_decl(
+                    config,
                     document,
                     ScopeRefMut::new(&mut scopes, scope_index),
                     &decl,
-                    |doc, _, decl, diag| convert_ast_type(doc, &decl.ty(), diag),
-                    diagnostics,
+                    |doc, _, decl| convert_ast_type(doc, &decl.ty()),
                 ) {
                     continue;
                 }
@@ -895,7 +874,7 @@ fn populate_workflow(
                         .is_none()
                         && !decl.syntax().is_rule_excepted(UNUSED_DECL_RULE_ID)
                     {
-                        diagnostics.push(
+                        document.diagnostics.push(
                             unused_declaration(name.as_str(), name.span()).with_severity(severity),
                         );
                     }
@@ -914,11 +893,11 @@ fn populate_workflow(
                     )
                 });
                 add_decl(
+                    config,
                     document,
                     ScopeRefMut::new(&mut scopes, scope_index),
                     &decl,
-                    |_, n, _, _| outputs[n].ty,
-                    diagnostics,
+                    |_, n, _| outputs[n].ty.clone(),
                 );
             }
             WorkflowGraphNode::Conditional(statement) => {
@@ -927,12 +906,12 @@ fn populate_workflow(
                     .copied()
                     .unwrap_or(ScopeIndex(0));
                 add_conditional_statement(
+                    config,
                     document,
                     &mut scopes,
                     parent,
                     &mut scope_indexes,
                     &statement,
-                    diagnostics,
                 );
             }
             WorkflowGraphNode::Scatter(statement) => {
@@ -941,12 +920,12 @@ fn populate_workflow(
                     .copied()
                     .unwrap_or(ScopeIndex(0));
                 add_scatter_statement(
+                    config,
                     document,
                     &mut scopes,
                     parent,
                     &mut scope_indexes,
                     &statement,
-                    diagnostics,
                 );
             }
             WorkflowGraphNode::Call(statement) => {
@@ -955,17 +934,16 @@ fn populate_workflow(
                     .copied()
                     .unwrap_or(ScopeIndex(0));
                 add_call_statement(
+                    config,
                     document,
                     workflow.name().as_str(),
-                    &mut scopes,
-                    scope_index,
+                    ScopeRefMut::new(&mut scopes, scope_index),
                     &statement,
                     document
                         .workflow
                         .as_ref()
                         .expect("should have workflow")
                         .allows_nested_inputs,
-                    diagnostics,
                 );
 
                 // Check for unused call
@@ -987,7 +965,8 @@ fn populate_workflow(
                             .map(|a| a.name())
                             .unwrap_or_else(|| target_name);
 
-                        diagnostics
+                        document
+                            .diagnostics
                             .push(unused_call(name.as_str(), name.span()).with_severity(severity));
                     }
                 }
@@ -997,13 +976,7 @@ fn populate_workflow(
                     .get(statement.syntax())
                     .copied()
                     .expect("should have scope");
-                promote_scope(
-                    &mut document.types,
-                    &mut scopes,
-                    scope_index,
-                    None,
-                    PromotionKind::Conditional,
-                );
+                promote_scope(&mut scopes, scope_index, None, PromotionKind::Conditional);
             }
             WorkflowGraphNode::ExitScatter(statement) => {
                 let scope_index = scope_indexes
@@ -1012,7 +985,6 @@ fn populate_workflow(
                     .expect("should have scope");
                 let variable = statement.variable();
                 promote_scope(
-                    &mut document.types,
                     &mut scopes,
                     scope_index,
                     Some(variable.as_str()),
@@ -1034,12 +1006,12 @@ fn populate_workflow(
 
 /// Adds a conditional statement to the current scope.
 fn add_conditional_statement(
+    config: DiagnosticsConfig,
     document: &mut Document,
     scopes: &mut Vec<Scope>,
     parent: ScopeIndex,
     scope_indexes: &mut HashMap<SyntaxNode, ScopeIndex>,
     statement: &ConditionalStatement,
-    diagnostics: &mut Vec<Diagnostic>,
 ) {
     let scope_index = add_scope(
         scopes,
@@ -1047,32 +1019,27 @@ fn add_conditional_statement(
     );
     scope_indexes.insert(statement.syntax().clone(), scope_index);
 
-    let mut evaluator = ExprTypeEvaluator::new(
-        document.version.unwrap(),
-        &mut document.types,
-        diagnostics,
-        |name, span| lookup_type(&mut document.namespaces, &document.structs, name, span),
-    );
-
     // Evaluate the statement's expression; it is expected to be a boolean
     let expr = statement.expr();
-    let ty = evaluator
-        .evaluate_expr(&ScopeRef::new(scopes, scope_index), &expr)
-        .unwrap_or(Type::Union);
+    let mut context = EvaluationContext::new(document, ScopeRef::new(scopes, scope_index), config);
+    let mut evaluator = ExprTypeEvaluator::new(&mut context);
+    let ty = evaluator.evaluate_expr(&expr).unwrap_or(Type::Union);
 
-    if !ty.is_coercible_to(&document.types, &PrimitiveTypeKind::Boolean.into()) {
-        diagnostics.push(if_conditional_mismatch(&document.types, ty, expr.span()));
+    if !ty.is_coercible_to(&PrimitiveType::Boolean.into()) {
+        document
+            .diagnostics
+            .push(if_conditional_mismatch(&ty, expr.span()));
     }
 }
 
 /// Adds a scatter statement to the current scope.
 fn add_scatter_statement(
+    config: DiagnosticsConfig,
     document: &mut Document,
     scopes: &mut Vec<Scope>,
     parent: ScopeIndex,
     scopes_indexes: &mut HashMap<SyntaxNode, ScopeIndex>,
     statement: &ScatterStatement,
-    diagnostics: &mut Vec<Diagnostic>,
 ) {
     let scope_index = add_scope(
         scopes,
@@ -1080,31 +1047,18 @@ fn add_scatter_statement(
     );
     scopes_indexes.insert(statement.syntax().clone(), scope_index);
 
-    let mut evaluator = ExprTypeEvaluator::new(
-        document.version.unwrap(),
-        &mut document.types,
-        diagnostics,
-        |name, span| lookup_type(&mut document.namespaces, &document.structs, name, span),
-    );
-
     // Evaluate the statement expression; it is expected to be an array
     let expr = statement.expr();
-    let ty = evaluator
-        .evaluate_expr(&ScopeRef::new(scopes, scope_index), &expr)
-        .unwrap_or(Type::Union);
+    let mut context = EvaluationContext::new(document, ScopeRef::new(scopes, scope_index), config);
+    let mut evaluator = ExprTypeEvaluator::new(&mut context);
+    let ty = evaluator.evaluate_expr(&expr).unwrap_or(Type::Union);
     let element_ty = match ty {
-        Type::Compound(compound_ty) => {
-            match document.types.type_definition(compound_ty.definition()) {
-                CompoundTypeDef::Array(ty) => ty.element_type(),
-                _ => {
-                    diagnostics.push(type_is_not_array(&document.types, ty, expr.span()));
-                    Type::Union
-                }
-            }
-        }
         Type::Union => Type::Union,
+        Type::Compound(CompoundType::Array(ty), _) => ty.element_type().clone(),
         _ => {
-            diagnostics.push(type_is_not_array(&document.types, ty, expr.span()));
+            document
+                .diagnostics
+                .push(type_is_not_array(&ty, expr.span()));
             Type::Union
         }
     };
@@ -1116,13 +1070,12 @@ fn add_scatter_statement(
 
 /// Adds a call statement to the current scope.
 fn add_call_statement(
+    config: DiagnosticsConfig,
     document: &mut Document,
     workflow_name: &str,
-    scopes: &mut [Scope],
-    index: ScopeIndex,
+    mut scope: ScopeRefMut<'_>,
     statement: &CallStatement,
     nested_inputs_allowed: bool,
-    diagnostics: &mut Vec<Diagnostic>,
 ) {
     // Determine the target name
     let target_name = statement
@@ -1137,7 +1090,7 @@ fn add_call_statement(
         .map(|a| a.name())
         .unwrap_or_else(|| target_name.clone());
 
-    let ty = if let Some(ty) = resolve_call_type(document, workflow_name, statement, diagnostics) {
+    let ty = if let Some(ty) = resolve_call_type(document, workflow_name, statement) {
         // Type check the call inputs
         let mut seen = HashSet::new();
         for input in statement.inputs() {
@@ -1146,34 +1099,34 @@ fn add_call_statement(
             let expected_ty = ty
                 .inputs()
                 .get(input_name.as_str())
-                .copied()
-                .map(|i| i.ty)
+                .map(|i| i.ty.clone())
                 .unwrap_or_else(|| {
-                    diagnostics.push(unknown_call_io(&ty, &input_name, Io::Input));
+                    document
+                        .diagnostics
+                        .push(unknown_call_io(&ty, &input_name, Io::Input));
                     Type::Union
                 });
 
             match input.expr() {
                 Some(expr) => {
                     type_check_expr(
+                        config,
                         document,
-                        ScopeRef::new(scopes, index),
+                        scope.as_scope_ref(),
                         &expr,
-                        expected_ty,
+                        &expected_ty,
                         input_name.span(),
-                        diagnostics,
                     );
                 }
                 None => {
-                    if let Some(name) = ScopeRef::new(scopes, index).lookup(input_name.as_str()) {
-                        if expected_ty != Type::Union
-                            && !name.ty.is_coercible_to(&document.types, &expected_ty)
+                    if let Some(name) = scope.lookup(input_name.as_str()) {
+                        if !matches!(expected_ty, Type::Union)
+                            && !name.ty.is_coercible_to(&expected_ty)
                         {
-                            diagnostics.push(call_input_type_mismatch(
-                                &document.types,
+                            document.diagnostics.push(call_input_type_mismatch(
                                 &input_name,
-                                expected_ty,
-                                name.ty,
+                                &expected_ty,
+                                &name.ty,
                             ));
                         }
                     }
@@ -1189,7 +1142,9 @@ fn add_call_statement(
         if !nested_inputs_allowed {
             for (name, input) in ty.inputs() {
                 if input.required && !seen.contains(name.as_str()) {
-                    diagnostics.push(missing_call_input(ty.kind(), &target_name, name));
+                    document
+                        .diagnostics
+                        .push(missing_call_input(ty.kind(), &target_name, name));
                 }
             }
         }
@@ -1204,14 +1159,14 @@ fn add_call_statement(
             calls.insert(name.as_str().to_string(), ty.clone());
         }
 
-        document.types.add_call(ty)
+        ty.into()
     } else {
         Type::Union
     };
 
     // Don't modify the scope if there's a conflict
-    if ScopeRef::new(scopes, index).lookup(name.as_str()).is_none() {
-        scopes[index.0].insert(name.as_str(), name.span(), ty);
+    if scope.lookup(name.as_str()).is_none() {
+        scope.insert(name.as_str(), name.span(), ty);
     }
 }
 
@@ -1222,7 +1177,6 @@ fn resolve_call_type(
     document: &mut Document,
     workflow_name: &str,
     statement: &CallStatement,
-    diagnostics: &mut Vec<Diagnostic>,
 ) -> Option<CallType> {
     let mut targets = statement.target().names().peekable();
     let mut namespace = None;
@@ -1234,7 +1188,7 @@ fn resolve_call_type(
         }
 
         if namespace.is_some() {
-            diagnostics.push(only_one_namespace(target.span()));
+            document.diagnostics.push(only_one_namespace(target.span()));
             return None;
         }
 
@@ -1244,7 +1198,7 @@ fn resolve_call_type(
                 namespace = Some(&document.namespaces[target.as_str()])
             }
             None => {
-                diagnostics.push(unknown_namespace(&target));
+                document.diagnostics.push(unknown_namespace(&target));
                 return None;
             }
         }
@@ -1253,11 +1207,11 @@ fn resolve_call_type(
     let target = namespace.map(|ns| ns.document.as_ref()).unwrap_or(document);
     let name = name.expect("should have name");
     if namespace.is_none() && name.as_str() == workflow_name {
-        diagnostics.push(recursive_workflow_call(&name));
+        document.diagnostics.push(recursive_workflow_call(&name));
         return None;
     }
 
-    let (kind, mut inputs, mut outputs) = if let Some(task) = target.tasks.get(name.as_str()) {
+    let (kind, inputs, outputs) = if let Some(task) = target.tasks.get(name.as_str()) {
         (CallKind::Task, task.inputs.clone(), task.outputs.clone())
     } else {
         match &target.workflow {
@@ -1267,7 +1221,9 @@ fn resolve_call_type(
                 workflow.outputs.clone(),
             ),
             _ => {
-                diagnostics.push(unknown_task_or_workflow(namespace.map(|ns| ns.span), &name));
+                document
+                    .diagnostics
+                    .push(unknown_task_or_workflow(namespace.map(|ns| ns.span), &name));
                 return None;
             }
         }
@@ -1280,17 +1236,7 @@ fn resolve_call_type(
             .collect(),
     );
 
-    // If the target is from an import, we need to import its type definitions into
-    // the current document's types collection
-    if let Some(types) = namespace.map(|ns| &ns.document.types) {
-        for input in Arc::make_mut(&mut inputs).values_mut() {
-            input.ty = document.types.import(types, input.ty);
-        }
-
-        for output in Arc::make_mut(&mut outputs).values_mut() {
-            output.ty = document.types.import(types, output.ty);
-        }
-
+    if namespace.is_some() {
         Some(CallType::namespaced(
             kind,
             statement.target().names().next().unwrap().as_str(),
@@ -1311,13 +1257,7 @@ fn resolve_call_type(
 }
 
 /// Promotes the names in the current to the parent scope.
-fn promote_scope(
-    types: &mut Types,
-    scopes: &mut [Scope],
-    index: ScopeIndex,
-    skip: Option<&str>,
-    kind: PromotionKind,
-) {
+fn promote_scope(scopes: &mut [Scope], index: ScopeIndex, skip: Option<&str>, kind: PromotionKind) {
     // We need to split the scopes as we want to read from one part of the slice and
     // write to another; the left side will contain the parent at it's index and the
     // right side will contain the child scope at it's index minus the parent's
@@ -1333,7 +1273,7 @@ fn promote_scope(
 
         parent.names.entry(name.clone()).or_insert_with(|| Name {
             span: *span,
-            ty: ty.promote(types, kind),
+            ty: ty.promote(kind),
         });
     }
 }
@@ -1378,7 +1318,7 @@ fn resolve_import(
     let import_document = import_node.document().expect("import should have parsed");
     let import_scope = import_node
         .analysis()
-        .map(|a| a.document().clone())
+        .cloned()
         .expect("import should have been analyzed");
 
     // Check for compatible imports
@@ -1403,7 +1343,35 @@ fn resolve_import(
 }
 
 /// Sets the struct types in the document.
-fn set_struct_types(document: &mut Document, diagnostics: &mut Vec<Diagnostic>) {
+fn set_struct_types(document: &mut Document) {
+    /// Used to resolve a type name from a document.
+    struct Resolver<'a> {
+        /// The document to resolve the type name from.
+        document: &'a mut Document,
+        /// The offset to use to adjust the start of diagnostics.
+        offset: usize,
+    }
+
+    impl TypeNameResolver for Resolver<'_> {
+        fn resolve(&mut self, name: &Ident) -> Result<Type, Diagnostic> {
+            if let Some(s) = self.document.structs.get(name.as_str()) {
+                // Mark the struct's namespace as used
+                if let Some(ns) = &s.namespace {
+                    self.document.namespaces[ns].used = true;
+                }
+
+                Ok(s.ty().cloned().unwrap_or(Type::Union))
+            } else {
+                let span = name.span();
+                self.document.diagnostics.push(unknown_type(
+                    name.as_str(),
+                    Span::new(span.start() + self.offset, span.len()),
+                ));
+                Ok(Type::Union)
+            }
+        }
+    }
+
     if document.structs.is_empty() {
         return;
     }
@@ -1435,7 +1403,7 @@ fn set_struct_types(document: &mut Document, diagnostics: &mut Vec<Diagnostic>) 
                         let name = definition.name();
                         let name_span = name.span();
                         let member_span = member.name().span();
-                        diagnostics.push(recursive_struct(
+                        document.diagnostics.push(recursive_struct(
                             name.as_str(),
                             Span::new(name_span.start() + s.offset, name_span.len()),
                             Span::new(member_span.start() + s.offset, member_span.len()),
@@ -1455,87 +1423,127 @@ fn set_struct_types(document: &mut Document, diagnostics: &mut Vec<Diagnostic>) 
             StructDefinition::cast(SyntaxNode::new_root(document.structs[index].node.clone()))
                 .expect("node should cast");
 
-        let mut converter = AstTypeConverter::new(&mut document.types, |name, span| {
-            if let Some(s) = document.structs.get(name) {
-                // Mark the struct's namespace as used
-                if let Some(ns) = &s.namespace {
-                    document.namespaces[ns].used = true;
-                }
-
-                Ok(s.ty().unwrap_or(Type::Union))
-            } else {
-                diagnostics.push(unknown_type(
-                    name,
-                    Span::new(span.start() + document.structs[index].offset, span.len()),
-                ));
-                Ok(Type::Union)
-            }
-        });
-
+        let offset = document.structs[index].offset;
+        let mut converter = AstTypeConverter::new(Resolver { document, offset });
         let ty = converter
             .convert_struct_type(&definition)
             .expect("struct type conversion should not fail");
 
         let s = &mut document.structs[index];
         assert!(s.ty.is_none(), "type should not already be present");
-        s.ty = Some(document.types.add_struct(ty));
+        s.ty = Some(ty.into());
     }
 }
 
-/// Looks up a struct type.
-fn lookup_type(
-    namespaces: &mut IndexMap<String, Namespace>,
-    structs: &IndexMap<String, Struct>,
-    name: &str,
-    span: Span,
-) -> Result<Type, Diagnostic> {
-    structs
-        .get(name)
-        .map(|s| {
-            // Mark the struct's namespace as used
-            if let Some(ns) = &s.namespace {
-                namespaces[ns].used = true;
-            }
+/// Represents context to an expression type evaluator.
+#[derive(Debug)]
+struct EvaluationContext<'a> {
+    /// The document being evaluated.
+    document: &'a mut Document,
+    /// The current evaluation scope.
+    scope: ScopeRef<'a>,
+    /// The diagnostics configuration to use for expression evaluation.
+    config: DiagnosticsConfig,
+    /// The context of the task being evaluated.
+    ///
+    /// This is only `Some` when evaluating a task's `hints` section.`
+    task: Option<&'a Task>,
+}
 
-            s.ty().expect("struct should have type")
-        })
-        .ok_or_else(|| unknown_type(name, span))
+impl<'a> EvaluationContext<'a> {
+    /// Constructs a new expression type evaluation context.
+    pub fn new(document: &'a mut Document, scope: ScopeRef<'a>, config: DiagnosticsConfig) -> Self {
+        Self {
+            document,
+            scope,
+            config,
+            task: None,
+        }
+    }
+
+    /// Constructs a new expression type evaluation context with the given task.
+    ///
+    /// This is used to evaluated the type of expressions inside of a task's
+    /// `hints` section.
+    pub fn new_for_task(
+        document: &'a mut Document,
+        scope: ScopeRef<'a>,
+        config: DiagnosticsConfig,
+        task: &'a Task,
+    ) -> Self {
+        Self {
+            document,
+            scope,
+            config,
+            task: Some(task),
+        }
+    }
+}
+
+impl crate::types::v1::EvaluationContext for EvaluationContext<'_> {
+    fn version(&self) -> SupportedVersion {
+        self.document
+            .version
+            .expect("document should have a version")
+    }
+
+    fn resolve_name(&self, name: &Ident) -> Option<Type> {
+        self.scope.lookup(name.as_str()).map(|n| n.ty().clone())
+    }
+
+    fn resolve_type_name(&mut self, name: &Ident) -> Result<Type, Diagnostic> {
+        self.document
+            .structs
+            .get(name.as_str())
+            .map(|s| {
+                // Mark the struct's namespace as used
+                if let Some(ns) = &s.namespace {
+                    self.document.namespaces[ns].used = true;
+                }
+
+                s.ty().expect("struct should have type").clone()
+            })
+            .ok_or_else(|| unknown_type(name.as_str(), name.span()))
+    }
+
+    fn task(&self) -> Option<&Task> {
+        self.task
+    }
+
+    fn diagnostics_config(&self) -> DiagnosticsConfig {
+        self.config
+    }
+
+    fn add_diagnostic(&mut self, diagnostic: Diagnostic) {
+        self.document.diagnostics.push(diagnostic);
+    }
 }
 
 /// Performs a type check of an expression.
 fn type_check_expr(
+    config: DiagnosticsConfig,
     document: &mut Document,
     scope: ScopeRef<'_>,
     expr: &Expr,
-    expected: Type,
+    expected: &Type,
     expected_span: Span,
-    diagnostics: &mut Vec<Diagnostic>,
 ) {
-    let mut evaluator = ExprTypeEvaluator::new(
-        document.version.unwrap(),
-        &mut document.types,
-        diagnostics,
-        |name, span| lookup_type(&mut document.namespaces, &document.structs, name, span),
-    );
+    let mut context = EvaluationContext::new(document, scope, config);
+    let mut evaluator = ExprTypeEvaluator::new(&mut context);
+    let actual = evaluator.evaluate_expr(expr).unwrap_or(Type::Union);
 
-    let actual = evaluator.evaluate_expr(&scope, expr).unwrap_or(Type::Union);
-
-    if expected != Type::Union && !actual.is_coercible_to(&document.types, &expected) {
-        diagnostics.push(type_mismatch(
-            &document.types,
-            expected,
-            expected_span,
-            actual,
-            expr.span(),
-        ));
+    if !matches!(expected, Type::Union) && !actual.is_coercible_to(expected) {
+        document
+            .diagnostics
+            .push(type_mismatch(expected, expected_span, &actual, expr.span()));
     }
     // Check to see if we're assigning an empty array literal to a non-empty type; we can statically
     // flag these as errors; otherwise, non-empty array constraints are checked at runtime
-    else if let Type::Compound(e) = expected {
-        if let CompoundTypeDef::Array(e) = document.types.type_definition(e.definition()) {
-            if e.is_non_empty() && expr.is_empty_array_literal() {
-                diagnostics.push(non_empty_array_assignment(expected_span, expr.span()));
-            }
+    else if let Type::Compound(CompoundType::Array(ty), _) = expected {
+        if ty.is_non_empty() && expr.is_empty_array_literal() {
+            document
+                .diagnostics
+                .push(non_empty_array_assignment(expected_span, expr.span()));
         }
     }
 }

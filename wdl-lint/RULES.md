@@ -41,7 +41,9 @@ be out of sync with released packages.
 | `PreambleCommentAfterVersion`    | Clarity                       | Ensures that documents have correct comments in the preamble.                                     |
 | `PreambleFormatting`             | Spacing, Style, Clarity       | Ensures that documents have correct whitespace in the preamble.                                   |
 | `RuntimeSectionKeys`             | Completeness, Deprecated      | Ensures that runtime sections have the appropriate keys.                                          |
+| `RedundantInputAssignment`       | Style                         | Ensures that redundant input assignments are shortened                                            |
 | `SectionOrdering`                | Sorting, Style                | Ensures that sections within tasks and workflows are sorted.                                      |
+| `ShellCheck`                     | Correctness, Portability      | (BETA) Ensures that command sections are free of shellcheck diagnostics.                          |
 | `SnakeCase`                      | Clarity, Naming, Style        | Ensures that tasks, workflows, and variables are defined with snake_case names.                   |
 | `Todo`                           | Completeness                  | Ensures that `TODO` statements are flagged for followup.                                          |
 | `TrailingComma`                  | Style                         | Ensures that lists and objects in meta have a trailing comma.                                     |

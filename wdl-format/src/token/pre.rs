@@ -44,6 +44,12 @@ pub enum PreToken {
 
     /// Trivia.
     Trivia(Trivia),
+
+    /// A temporary indent start. Used in command section formatting.
+    TempIndentStart,
+
+    /// A temporary indent end. Used in command section formatting.
+    TempIndentEnd,
 }
 
 impl std::fmt::Display for PreToken {
@@ -73,6 +79,8 @@ impl std::fmt::Display for PreToken {
                     }
                 },
             },
+            PreToken::TempIndentStart => write!(f, "<TempIndentStart>"),
+            PreToken::TempIndentEnd => write!(f, "<TempIndentEnd>"),
         }
     }
 }
