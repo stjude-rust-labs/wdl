@@ -1047,11 +1047,9 @@ workflow chip {
         ref_fa,
         read_genome_tsv.ref_fa,
     ])
+
     File? bwa_idx_tar_ = (
-        if defined(bwa_idx_tar)
-        then bwa_idx_tar
-        else read_genome_tsv.bwa_idx_tar
-    )
+        if defined(bwa_idx_tar) then bwa_idx_tar else read_genome_tsv.bwa_idx_tar)
     File bowtie2_idx_tar_ = select_first([
         bowtie2_idx_tar,
         read_genome_tsv.bowtie2_idx_tar,
@@ -1064,16 +1062,12 @@ workflow chip {
         gensz,
         read_genome_tsv.gensz,
     ])
+
     File? blacklist1_ = (
-        if defined(blacklist)
-        then blacklist
-        else read_genome_tsv.blacklist
-    )
+        if defined(blacklist) then blacklist else read_genome_tsv.blacklist)
+
     File? blacklist2_ = (
-        if defined(blacklist2)
-        then blacklist2
-        else read_genome_tsv.blacklist2
-    )
+        if defined(blacklist2) then blacklist2 else read_genome_tsv.blacklist2)
 
     # merge multiple blacklists
     # two blacklists can have different number of columns (3 vs 6)
@@ -1090,13 +1084,12 @@ workflow chip {
             runtime_environment = runtime_environment,
         }
     }
+
     File? blacklist_ = (
-        if length(blacklists) > 1
-        then pool_blacklist.ta_pooled
-        else if length(blacklists) > 0
-        then blacklists[0]
-        else blacklist2_
-    )
+        if length(
+        blacklists
+        ) > 1 then pool_blacklist.ta_pooled else if length(
+        blacklists) > 0 then blacklists[0] else blacklist2_)
     String mito_chr_name_ = select_first([
         mito_chr_name,
         read_genome_tsv.mito_chr_name,
@@ -1113,184 +1106,123 @@ workflow chip {
 
     ### temp vars (do not define these)
     String aligner_ = (
-        if defined(custom_align_py)
-        then "custom"
-        else aligner
-    )
-    String peak_caller_ = (
-        if pipeline_type == "tf"
-        then select_first([
-            peak_caller,
-            "spp",
-        ])
-        else select_first([
-            peak_caller,
-            "macs2",
-        ])
-    )
-    String peak_type_ = (
-        if peak_caller_ == "spp"
-        then "regionPeak"
-        else "narrowPeak"
-    )
+        if defined(custom_align_py) then "custom" else aligner)
+    String peak_caller_ = (if pipeline_type == "tf" then select_first([
+        peak_caller,
+        "spp",
+    ]) else select_first([
+        peak_caller,
+        "macs2",
+    ]))
+    String peak_type_ = (if peak_caller_ == "spp" then "regionPeak" else "narrowPeak")
     Boolean enable_idr = pipeline_type == "tf"  # enable_idr for TF chipseq only
+
     String idr_rank_ = (
-        if peak_caller_ == "spp"
-        then "signal.value"
-        else if peak_caller_ == "macs2"
-        then "p.value"
-        else "p.value"
-    )
+        if peak_caller_ == "spp" then "signal.value" else if peak_caller_ == "macs2" then "p.value" else "p.value"
+        )
     Int cap_num_peak_spp = 300000
     Int cap_num_peak_macs2 = 500000
-    Int cap_num_peak_ = (
-        if peak_caller_ == "spp"
-        then select_first([
-            cap_num_peak,
-            cap_num_peak_spp,
-        ])
-        else select_first([
-            cap_num_peak,
-            cap_num_peak_macs2,
-        ])
-    )
+    Int cap_num_peak_ = (if peak_caller_ == "spp" then select_first([
+        cap_num_peak,
+        cap_num_peak_spp,
+    ]) else select_first([
+        cap_num_peak,
+        cap_num_peak_macs2,
+    ]))
     Int mapq_thresh_ = mapq_thresh
-    Boolean enable_xcor_ = (
-        if pipeline_type == "control"
-        then false
-        else true
-    )
+    Boolean enable_xcor_ = (if pipeline_type == "control" then false else true)
+
     Boolean enable_count_signal_track_ = (
-        if pipeline_type == "control"
-        then false
-        else enable_count_signal_track
-    )
-    Boolean enable_jsd_ = (
-        if pipeline_type == "control"
-        then false
-        else enable_jsd
-    )
+        if pipeline_type == "control" then false else enable_count_signal_track)
+    Boolean enable_jsd_ = (if pipeline_type == "control" then false else enable_jsd)
+
     Boolean enable_gc_bias_ = (
-        if pipeline_type == "control"
-        then false
-        else enable_gc_bias
-    )
-    Boolean align_only_ = (
-        if pipeline_type == "control"
-        then true
-        else align_only
-    )
+        if pipeline_type == "control" then false else enable_gc_bias)
+    Boolean align_only_ = (if pipeline_type == "control" then true else align_only)
 
     Float align_mem_factor_ = (
-        if aligner_ == "bowtie2"
-        then align_bowtie2_mem_factor
-        else align_bwa_mem_factor
-    )
+        if aligner_ == "bowtie2" then align_bowtie2_mem_factor else align_bwa_mem_factor)
+
     Float align_disk_factor_ = (
-        if aligner_ == "bowtie2"
-        then align_bowtie2_disk_factor
-        else align_bwa_disk_factor
-    )
+        if aligner_ == "bowtie2" then align_bowtie2_disk_factor else align_bwa_disk_factor
+        )
+
     Float call_peak_mem_factor_ = (
-        if peak_caller_ == "spp"
-        then call_peak_spp_mem_factor
-        else call_peak_macs2_mem_factor
-    )
+        if peak_caller_ == "spp" then call_peak_spp_mem_factor else call_peak_macs2_mem_factor
+        )
+
     Float call_peak_disk_factor_ = (
-        if peak_caller_ == "spp"
-        then call_peak_spp_disk_factor
-        else call_peak_macs2_disk_factor
-    )
+        if peak_caller_ == "spp" then call_peak_spp_disk_factor else call_peak_macs2_disk_factor
+        )
 
     # temporary 2-dim fastqs array [rep_id][merge_id]
-    Array[Array[File]] fastqs_R1 = (
-        if length(fastqs_rep10_R1) > 0
-        then [
-            fastqs_rep1_R1,
-            fastqs_rep2_R1,
-            fastqs_rep3_R1,
-            fastqs_rep4_R1,
-            fastqs_rep5_R1,
-            fastqs_rep6_R1,
-            fastqs_rep7_R1,
-            fastqs_rep8_R1,
-            fastqs_rep9_R1,
-            fastqs_rep10_R1,
-        ]
-        else if length(fastqs_rep9_R1) > 0
-        then [
-            fastqs_rep1_R1,
-            fastqs_rep2_R1,
-            fastqs_rep3_R1,
-            fastqs_rep4_R1,
-            fastqs_rep5_R1,
-            fastqs_rep6_R1,
-            fastqs_rep7_R1,
-            fastqs_rep8_R1,
-            fastqs_rep9_R1,
-        ]
-        else if length(fastqs_rep8_R1) > 0
-        then [
-            fastqs_rep1_R1,
-            fastqs_rep2_R1,
-            fastqs_rep3_R1,
-            fastqs_rep4_R1,
-            fastqs_rep5_R1,
-            fastqs_rep6_R1,
-            fastqs_rep7_R1,
-            fastqs_rep8_R1,
-        ]
-        else if length(fastqs_rep7_R1) > 0
-        then [
-            fastqs_rep1_R1,
-            fastqs_rep2_R1,
-            fastqs_rep3_R1,
-            fastqs_rep4_R1,
-            fastqs_rep5_R1,
-            fastqs_rep6_R1,
-            fastqs_rep7_R1,
-        ]
-        else if length(fastqs_rep6_R1) > 0
-        then [
-            fastqs_rep1_R1,
-            fastqs_rep2_R1,
-            fastqs_rep3_R1,
-            fastqs_rep4_R1,
-            fastqs_rep5_R1,
-            fastqs_rep6_R1,
-        ]
-        else if length(fastqs_rep5_R1) > 0
-        then [
-            fastqs_rep1_R1,
-            fastqs_rep2_R1,
-            fastqs_rep3_R1,
-            fastqs_rep4_R1,
-            fastqs_rep5_R1,
-        ]
-        else if length(fastqs_rep4_R1) > 0
-        then [
-            fastqs_rep1_R1,
-            fastqs_rep2_R1,
-            fastqs_rep3_R1,
-            fastqs_rep4_R1,
-        ]
-        else if length(fastqs_rep3_R1) > 0
-        then [
-            fastqs_rep1_R1,
-            fastqs_rep2_R1,
-            fastqs_rep3_R1,
-        ]
-        else if length(fastqs_rep2_R1) > 0
-        then [
-            fastqs_rep1_R1,
-            fastqs_rep2_R1,
-        ]
-        else if length(fastqs_rep1_R1) > 0
-        then [
-            fastqs_rep1_R1,
-        ]
-        else []
-    )
+    Array[
+        Array[File]] fastqs_R1 = (if length(fastqs_rep10_R1) > 0 then [
+        fastqs_rep1_R1,
+        fastqs_rep2_R1,
+        fastqs_rep3_R1,
+        fastqs_rep4_R1,
+        fastqs_rep5_R1,
+        fastqs_rep6_R1,
+        fastqs_rep7_R1,
+        fastqs_rep8_R1,
+        fastqs_rep9_R1,
+        fastqs_rep10_R1,
+    ] else if length(fastqs_rep9_R1) > 0 then [
+        fastqs_rep1_R1,
+        fastqs_rep2_R1,
+        fastqs_rep3_R1,
+        fastqs_rep4_R1,
+        fastqs_rep5_R1,
+        fastqs_rep6_R1,
+        fastqs_rep7_R1,
+        fastqs_rep8_R1,
+        fastqs_rep9_R1,
+    ] else if length(fastqs_rep8_R1) > 0 then [
+        fastqs_rep1_R1,
+        fastqs_rep2_R1,
+        fastqs_rep3_R1,
+        fastqs_rep4_R1,
+        fastqs_rep5_R1,
+        fastqs_rep6_R1,
+        fastqs_rep7_R1,
+        fastqs_rep8_R1,
+    ] else if length(fastqs_rep7_R1) > 0 then [
+        fastqs_rep1_R1,
+        fastqs_rep2_R1,
+        fastqs_rep3_R1,
+        fastqs_rep4_R1,
+        fastqs_rep5_R1,
+        fastqs_rep6_R1,
+        fastqs_rep7_R1,
+    ] else if length(fastqs_rep6_R1) > 0 then [
+        fastqs_rep1_R1,
+        fastqs_rep2_R1,
+        fastqs_rep3_R1,
+        fastqs_rep4_R1,
+        fastqs_rep5_R1,
+        fastqs_rep6_R1,
+    ] else if length(fastqs_rep5_R1) > 0 then [
+        fastqs_rep1_R1,
+        fastqs_rep2_R1,
+        fastqs_rep3_R1,
+        fastqs_rep4_R1,
+        fastqs_rep5_R1,
+    ] else if length(fastqs_rep4_R1) > 0 then [
+        fastqs_rep1_R1,
+        fastqs_rep2_R1,
+        fastqs_rep3_R1,
+        fastqs_rep4_R1,
+    ] else if length(fastqs_rep3_R1) > 0 then [
+        fastqs_rep1_R1,
+        fastqs_rep2_R1,
+        fastqs_rep3_R1,
+    ] else if length(fastqs_rep2_R1) > 0 then [
+        fastqs_rep1_R1,
+        fastqs_rep2_R1,
+    ] else if length(fastqs_rep1_R1) > 0 then [
+        fastqs_rep1_R1,
+    ] else [])
 
     # no need to do that for R2 (R1 array will be used to determine presense of fastq for each rep)
     Array[
@@ -1309,94 +1241,72 @@ workflow chip {
 
     # temporary 2-dim ctl fastqs array [rep_id][merge_id]
     Array[
-        Array[File]] ctl_fastqs_R1 = (
-        if length(ctl_fastqs_rep10_R1) > 0
-        then [
-            ctl_fastqs_rep1_R1,
-            ctl_fastqs_rep2_R1,
-            ctl_fastqs_rep3_R1,
-            ctl_fastqs_rep4_R1,
-            ctl_fastqs_rep5_R1,
-            ctl_fastqs_rep6_R1,
-            ctl_fastqs_rep7_R1,
-            ctl_fastqs_rep8_R1,
-            ctl_fastqs_rep9_R1,
-            ctl_fastqs_rep10_R1,
-        ]
-        else if length(ctl_fastqs_rep9_R1) > 0
-        then [
-            ctl_fastqs_rep1_R1,
-            ctl_fastqs_rep2_R1,
-            ctl_fastqs_rep3_R1,
-            ctl_fastqs_rep4_R1,
-            ctl_fastqs_rep5_R1,
-            ctl_fastqs_rep6_R1,
-            ctl_fastqs_rep7_R1,
-            ctl_fastqs_rep8_R1,
-            ctl_fastqs_rep9_R1,
-        ]
-        else if length(ctl_fastqs_rep8_R1) > 0
-        then [
-            ctl_fastqs_rep1_R1,
-            ctl_fastqs_rep2_R1,
-            ctl_fastqs_rep3_R1,
-            ctl_fastqs_rep4_R1,
-            ctl_fastqs_rep5_R1,
-            ctl_fastqs_rep6_R1,
-            ctl_fastqs_rep7_R1,
-            ctl_fastqs_rep8_R1,
-        ]
-        else if length(ctl_fastqs_rep7_R1) > 0
-        then [
-            ctl_fastqs_rep1_R1,
-            ctl_fastqs_rep2_R1,
-            ctl_fastqs_rep3_R1,
-            ctl_fastqs_rep4_R1,
-            ctl_fastqs_rep5_R1,
-            ctl_fastqs_rep6_R1,
-            ctl_fastqs_rep7_R1,
-        ]
-        else if length(ctl_fastqs_rep6_R1) > 0
-        then [
-            ctl_fastqs_rep1_R1,
-            ctl_fastqs_rep2_R1,
-            ctl_fastqs_rep3_R1,
-            ctl_fastqs_rep4_R1,
-            ctl_fastqs_rep5_R1,
-            ctl_fastqs_rep6_R1,
-        ]
-        else if length(ctl_fastqs_rep5_R1) > 0
-        then [
-            ctl_fastqs_rep1_R1,
-            ctl_fastqs_rep2_R1,
-            ctl_fastqs_rep3_R1,
-            ctl_fastqs_rep4_R1,
-            ctl_fastqs_rep5_R1,
-        ]
-        else if length(ctl_fastqs_rep4_R1) > 0
-        then [
-            ctl_fastqs_rep1_R1,
-            ctl_fastqs_rep2_R1,
-            ctl_fastqs_rep3_R1,
-            ctl_fastqs_rep4_R1,
-        ]
-        else if length(ctl_fastqs_rep3_R1) > 0
-        then [
-            ctl_fastqs_rep1_R1,
-            ctl_fastqs_rep2_R1,
-            ctl_fastqs_rep3_R1,
-        ]
-        else if length(ctl_fastqs_rep2_R1) > 0
-        then [
-            ctl_fastqs_rep1_R1,
-            ctl_fastqs_rep2_R1,
-        ]
-        else if length(ctl_fastqs_rep1_R1) > 0
-        then [
-            ctl_fastqs_rep1_R1,
-        ]
-        else []
-    )
+        Array[File]] ctl_fastqs_R1 = (if length(ctl_fastqs_rep10_R1) > 0 then [
+        ctl_fastqs_rep1_R1,
+        ctl_fastqs_rep2_R1,
+        ctl_fastqs_rep3_R1,
+        ctl_fastqs_rep4_R1,
+        ctl_fastqs_rep5_R1,
+        ctl_fastqs_rep6_R1,
+        ctl_fastqs_rep7_R1,
+        ctl_fastqs_rep8_R1,
+        ctl_fastqs_rep9_R1,
+        ctl_fastqs_rep10_R1,
+    ] else if length(ctl_fastqs_rep9_R1) > 0 then [
+        ctl_fastqs_rep1_R1,
+        ctl_fastqs_rep2_R1,
+        ctl_fastqs_rep3_R1,
+        ctl_fastqs_rep4_R1,
+        ctl_fastqs_rep5_R1,
+        ctl_fastqs_rep6_R1,
+        ctl_fastqs_rep7_R1,
+        ctl_fastqs_rep8_R1,
+        ctl_fastqs_rep9_R1,
+    ] else if length(ctl_fastqs_rep8_R1) > 0 then [
+        ctl_fastqs_rep1_R1,
+        ctl_fastqs_rep2_R1,
+        ctl_fastqs_rep3_R1,
+        ctl_fastqs_rep4_R1,
+        ctl_fastqs_rep5_R1,
+        ctl_fastqs_rep6_R1,
+        ctl_fastqs_rep7_R1,
+        ctl_fastqs_rep8_R1,
+    ] else if length(ctl_fastqs_rep7_R1) > 0 then [
+        ctl_fastqs_rep1_R1,
+        ctl_fastqs_rep2_R1,
+        ctl_fastqs_rep3_R1,
+        ctl_fastqs_rep4_R1,
+        ctl_fastqs_rep5_R1,
+        ctl_fastqs_rep6_R1,
+        ctl_fastqs_rep7_R1,
+    ] else if length(ctl_fastqs_rep6_R1) > 0 then [
+        ctl_fastqs_rep1_R1,
+        ctl_fastqs_rep2_R1,
+        ctl_fastqs_rep3_R1,
+        ctl_fastqs_rep4_R1,
+        ctl_fastqs_rep5_R1,
+        ctl_fastqs_rep6_R1,
+    ] else if length(ctl_fastqs_rep5_R1) > 0 then [
+        ctl_fastqs_rep1_R1,
+        ctl_fastqs_rep2_R1,
+        ctl_fastqs_rep3_R1,
+        ctl_fastqs_rep4_R1,
+        ctl_fastqs_rep5_R1,
+    ] else if length(ctl_fastqs_rep4_R1) > 0 then [
+        ctl_fastqs_rep1_R1,
+        ctl_fastqs_rep2_R1,
+        ctl_fastqs_rep3_R1,
+        ctl_fastqs_rep4_R1,
+    ] else if length(ctl_fastqs_rep3_R1) > 0 then [
+        ctl_fastqs_rep1_R1,
+        ctl_fastqs_rep2_R1,
+        ctl_fastqs_rep3_R1,
+    ] else if length(ctl_fastqs_rep2_R1) > 0 then [
+        ctl_fastqs_rep1_R1,
+        ctl_fastqs_rep2_R1,
+    ] else if length(ctl_fastqs_rep1_R1) > 0 then [
+        ctl_fastqs_rep1_R1,
+    ] else [])
 
     # no need to do that for R2 (R1 array will be used to determine presense of fastq for each rep)
     Array[
@@ -1417,46 +1327,32 @@ workflow chip {
     #     WDLic implementation of max(A,B,C,...)
     Int num_rep_fastq = length(
         fastqs_R1)
+
     Int num_rep_bam = (
-        if length(bams) < num_rep_fastq
-        then num_rep_fastq
-        else length(bams)
-    )
+        if length(bams) < num_rep_fastq then num_rep_fastq else length(bams))
+
     Int num_rep_nodup_bam = (
-        if length(nodup_bams) < num_rep_bam
-        then num_rep_bam
-        else length(nodup_bams)
-    )
+        if length(nodup_bams) < num_rep_bam then num_rep_bam else length(nodup_bams))
+
     Int num_rep_ta = (
-        if length(tas) < num_rep_nodup_bam
-        then num_rep_nodup_bam
-        else length(tas)
-    )
-    Int num_rep_peak = (
-        if length(peaks) < num_rep_ta
-        then num_rep_ta
-        else length(peaks)
-    )
+        if length(tas) < num_rep_nodup_bam then num_rep_nodup_bam else length(tas))
+    Int num_rep_peak = (if length(peaks) < num_rep_ta then num_rep_ta else length(peaks))
     Int num_rep = num_rep_peak
 
     # temporary variables to get number of controls
     Int num_ctl_fastq = length(
         ctl_fastqs_R1)
+
     Int num_ctl_bam = (
-        if length(ctl_bams) < num_ctl_fastq
-        then num_ctl_fastq
-        else length(ctl_bams)
-    )
+        if length(ctl_bams) < num_ctl_fastq then num_ctl_fastq else length(ctl_bams))
+
     Int num_ctl_nodup_bam = (
-        if length(ctl_nodup_bams) < num_ctl_bam
-        then num_ctl_bam
-        else length(ctl_nodup_bams)
-    )
+        if length(
+        ctl_nodup_bams) < num_ctl_bam then num_ctl_bam else length(ctl_nodup_bams))
+
     Int num_ctl_ta = (
-        if length(ctl_tas) < num_ctl_nodup_bam
-        then num_ctl_nodup_bam
-        else length(ctl_tas)
-    )
+        if length(
+        ctl_tas) < num_ctl_nodup_bam then num_ctl_nodup_bam else length(ctl_tas))
     Int num_ctl = num_ctl_ta
 
     # sanity check for inputs
@@ -1533,1047 +1429,1024 @@ workflow chip {
             # align each replicate
             scatter (i in range(num_rep)) {
 
-                    # to override endedness definition for individual replicate
-                    #     paired_end will override paired_ends[i]
-                    Boolean paired_end_ = (
-                        if !defined(paired_end) && i < length(paired_ends)
-                        then paired_ends[i]
-                        else select_first([
-                            paired_end,
-                        ])
-                    )
-
-                    Boolean has_input_of_align = i < length(
-                        fastqs_R1) && length(fastqs_R1[i]) > 0
-                    Boolean has_output_of_align = i < length(bams)
-                    if (has_input_of_align && !has_output_of_align) {
-                        call align { input:
-                            fastqs_R1 = fastqs_R1[i],
-                            fastqs_R2 = (
-                                if paired_end_
-                                then fastqs_R2[i]
-                                else []
-                            ),
-                            crop_length = crop_length,
-                            crop_length_tol = crop_length_tol,
-                            trimmomatic_phred_score_format = trimmomatic_phred_score_format,
-
-                            aligner = aligner_,
-                            mito_chr_name = mito_chr_name_,
-                            custom_align_py = custom_align_py,
-                            idx_tar = (
-                                if aligner == "bwa"
-                                then bwa_idx_tar_
-                                else if aligner == "bowtie2"
-                                then bowtie2_idx_tar_
-                                else custom_aligner_idx_tar
-                            ),
-                            paired_end = paired_end_,
-                            use_bwa_mem_for_pe = use_bwa_mem_for_pe,
-                            bwa_mem_read_len_limit = bwa_mem_read_len_limit,
-                            use_bowtie2_local_mode = use_bowtie2_local_mode,
-                            ref_fa = ref_fa_,
-
-                            trimmomatic_java_heap = align_trimmomatic_java_heap,
-                            cpu = align_cpu,
-                            mem_factor = align_mem_factor_,
-                            time_hr = align_time_hr,
-                            disk_factor = align_disk_factor_,
-                            runtime_environment = runtime_environment,
-                        }
-                    }
-                    File? bam_ = (
-                        if has_output_of_align
-                        then bams[i]
-                        else align.bam
-                    )
-
-                    Boolean has_input_of_filter = has_output_of_align || defined(
-                        align.bam)
-                    Boolean has_output_of_filter = i < length(nodup_bams)
-
-                    # skip if we already have output of this step
-                    if (
-                        has_input_of_filter && !has_output_of_filter) {
-                        call filter { input:
-                            bam = bam_,
-                            paired_end = paired_end_,
-                            ref_fa = ref_fa_,
-                            redact_nodup_bam = redact_nodup_bam,
-                            dup_marker = dup_marker,
-                            mapq_thresh = mapq_thresh_,
-                            filter_chrs = filter_chrs,
-                            chrsz = chrsz_,
-                            no_dup_removal = no_dup_removal,
-                            mito_chr_name = mito_chr_name_,
-
-                            cpu = filter_cpu,
-                            mem_factor = filter_mem_factor,
-                            picard_java_heap = filter_picard_java_heap,
-                            time_hr = filter_time_hr,
-                            disk_factor = filter_disk_factor,
-                            runtime_environment = runtime_environment,
-                        }
-                    }
-                    File? nodup_bam_ = (
-                        if has_output_of_filter
-                        then nodup_bams[i]
-                        else filter.nodup_bam
-                    )
-
-                    Boolean has_input_of_bam2ta = has_output_of_filter || defined(
-                        filter.nodup_bam)
-                    Boolean has_output_of_bam2ta = i < length(tas)
-                    if (has_input_of_bam2ta && !has_output_of_bam2ta) {
-                        call bam2ta { input:
-                            bam = nodup_bam_,
-                            subsample = subsample_reads,
-                            paired_end = paired_end_,
-                            mito_chr_name = mito_chr_name_,
-
-                            cpu = bam2ta_cpu,
-                            mem_factor = bam2ta_mem_factor,
-                            time_hr = bam2ta_time_hr,
-                            disk_factor = bam2ta_disk_factor,
-                            runtime_environment = runtime_environment,
-                        }
-                    }
-                    File? ta_ = (
-                        if has_output_of_bam2ta
-                        then tas[i]
-                        else bam2ta.ta
-                    )
-
-                    Boolean has_input_of_spr = has_output_of_bam2ta || defined(bam2ta.ta)
-                    if (has_input_of_spr && !align_only_ && !true_rep_only) {
-                        call spr { input:
-                            ta = ta_,
-                            paired_end = paired_end_,
-                            pseudoreplication_random_seed = pseudoreplication_random_seed,
-                            mem_factor = spr_mem_factor,
-                            disk_factor = spr_disk_factor,
-                            runtime_environment = runtime_environment,
-                        }
-                    }
-
-                    Boolean has_input_of_count_signal_track = has_output_of_bam2ta || defined(
-                        bam2ta.ta)
-                    if (has_input_of_count_signal_track && enable_count_signal_track_) {
-
-                            # generate count signal track
-                            call count_signal_track {
-                                input:
-                                ta = ta_,
-                                chrsz = chrsz_,
-                                runtime_environment = runtime_environment,
-                            }
-                        }
-
-                        if (enable_gc_bias_ && defined(nodup_bam_) && defined(ref_fa_)) {
-                            call gc_bias { input:
-                                nodup_bam = nodup_bam_,
-                                ref_fa = ref_fa_,
-                                picard_java_heap = gc_bias_picard_java_heap,
-                                runtime_environment = runtime_environment,
-                            }
-                        }
-
-                        # special trimming/mapping for xcor (when starting from FASTQs)
-                        if (
-                            has_input_of_align) {
-                            call align as align_R1 { input:
-                                fastqs_R1 = fastqs_R1[i],
-                                fastqs_R2 = [],
-                                trim_bp = xcor_trim_bp,
-                                crop_length = 0,
-                                crop_length_tol = 0,
-                                trimmomatic_phred_score_format = trimmomatic_phred_score_format,
-
-                                aligner = aligner_,
-                                mito_chr_name = mito_chr_name_,
-                                custom_align_py = custom_align_py,
-                                idx_tar = (
-                                    if aligner == "bwa"
-                                    then bwa_idx_tar_
-                                    else if aligner == "bowtie2"
-                                    then bowtie2_idx_tar_
-                                    else custom_aligner_idx_tar
-                                ),
-                                paired_end = false,
-                                use_bwa_mem_for_pe = false,
-                                bwa_mem_read_len_limit = 0,
-                                use_bowtie2_local_mode = use_bowtie2_local_mode,
-                                ref_fa = ref_fa_,
-
-                                cpu = align_cpu,
-                                mem_factor = align_mem_factor_,
-                                time_hr = align_time_hr,
-                                disk_factor = align_disk_factor_,
-                                runtime_environment = runtime_environment,
-                            }
-
-                            # no bam deduping for xcor
-                            call filter as filter_R1 {
-                                input:
-                                bam = align_R1.bam,
-                                paired_end = false,
-                                redact_nodup_bam = false,
-                                dup_marker = dup_marker,
-                                mapq_thresh = mapq_thresh_,
-                                filter_chrs = filter_chrs,
-                                chrsz = chrsz_,
-                                no_dup_removal = true,
-                                mito_chr_name = mito_chr_name_,
-
-                                cpu = filter_cpu,
-                                mem_factor = filter_mem_factor,
-                                picard_java_heap = filter_picard_java_heap,
-                                time_hr = filter_time_hr,
-                                disk_factor = filter_disk_factor,
-                                runtime_environment = runtime_environment,
-                            }
-                            call bam2ta as bam2ta_no_dedup_R1 { input:
-                                bam = filter_R1.nodup_bam,  # it's named as nodup bam but it's not deduped but just filtered
-                                paired_end = false,
-                                subsample = 0,
-                                mito_chr_name = mito_chr_name_,
-
-                                cpu = bam2ta_cpu,
-                                mem_factor = bam2ta_mem_factor,
-                                time_hr = bam2ta_time_hr,
-                                disk_factor = bam2ta_disk_factor,
-                                runtime_environment = runtime_environment,
-                            }
-                        }
-
-                        # special trimming/mapping for xcor (when starting from BAMs)
-                        Boolean has_input_of_bam2ta_no_dedup = (
-                            has_output_of_align || defined(
-                            align.bam)) && !defined(bam2ta_no_dedup_R1.ta)
-                        if (has_input_of_bam2ta_no_dedup) {
-                            call filter as filter_no_dedup { input:
-                                bam = bam_,
-                                paired_end = paired_end_,
-                                redact_nodup_bam = false,
-                                dup_marker = dup_marker,
-                                mapq_thresh = mapq_thresh_,
-                                filter_chrs = filter_chrs,
-                                chrsz = chrsz_,
-                                no_dup_removal = true,
-                                mito_chr_name = mito_chr_name_,
-
-                                cpu = filter_cpu,
-                                mem_factor = filter_mem_factor,
-                                picard_java_heap = filter_picard_java_heap,
-                                time_hr = filter_time_hr,
-                                disk_factor = filter_disk_factor,
-                                runtime_environment = runtime_environment,
-                            }
-                            call bam2ta as bam2ta_no_dedup { input:
-                                bam = filter_no_dedup.nodup_bam,  # output name is nodup but it's not deduped
-                                paired_end = paired_end_,
-                                subsample = 0,
-                                mito_chr_name = mito_chr_name_,
-
-                                cpu = bam2ta_cpu,
-                                mem_factor = bam2ta_mem_factor,
-                                time_hr = bam2ta_time_hr,
-                                disk_factor = bam2ta_disk_factor,
-                                runtime_environment = runtime_environment,
-                            }
-                        }
-
-                        # use trimmed/unfilitered R1 tagAlign for paired end dataset
-                        # if not starting from fastqs, keep using old method
-                        #  (mapping with both ends for tag-aligns to be used for xcor)
-                        # subsample tagalign (non-mito) and cross-correlation analysis
-                        File? ta_xcor = (
-                            if defined(bam2ta_no_dedup_R1.ta)
-                            then bam2ta_no_dedup_R1.ta
-                            else if defined(bam2ta_no_dedup.ta)
-                            then bam2ta_no_dedup.ta
-                            else ta_
-                        )
-                        Boolean paired_end_xcor = (
-                            if defined(bam2ta_no_dedup_R1.ta)
-                            then false
-                            else paired_end_
-                        )
-
-                        Boolean has_input_of_xcor = defined(ta_xcor)
-                        if (has_input_of_xcor && enable_xcor_) {
-                            call xcor { input:
-                                ta = ta_xcor,
-                                paired_end = paired_end_xcor,
-                                subsample = xcor_subsample_reads,
-                                mito_chr_name = mito_chr_name_,
-                                chip_seq_type = pipeline_type,
-                                exclusion_range_min = xcor_exclusion_range_min,
-                                exclusion_range_max = xcor_exclusion_range_max,
-                                cpu = xcor_cpu,
-                                mem_factor = xcor_mem_factor,
-                                time_hr = xcor_time_hr,
-                                disk_factor = xcor_disk_factor,
-                                runtime_environment = runtime_environment_spp,
-                            }
-                        }
-
-                        # before peak calling, get fragment length from xcor analysis or given input
-                        # if fraglen [] is defined in the input JSON, fraglen from xcor will be ignored
-                        Int? fraglen_ = (
-                            if i < length(fraglen)
-                            then fraglen[i]
-                            else xcor.fraglen
-                        )
-                    }
-
-                    # align each control
-                    scatter (
-                        i in range(num_ctl)) {
-
-                            # to override endedness definition for individual control
-                            #     ctl_paired_end will override ctl_paired_ends[i]
-                            Boolean ctl_paired_end_ = (
-                                if !defined(ctl_paired_end) && i < length(ctl_paired_ends)
-                                then ctl_paired_ends[i]
-                                else select_first([
-                                    ctl_paired_end,
+                                # to override endedness definition for individual replicate
+                                #     paired_end will override paired_ends[i]
+                                Boolean paired_end_ = (
+                                    if !defined(
+                                    paired_end
+                                    ) && i < length(
+                                    paired_ends) then paired_ends[i] else select_first([
                                     paired_end,
-                                ])
-                            )
+                                ]))
 
-                            Boolean has_input_of_align_ctl = i < length(
-                                ctl_fastqs_R1) && length(ctl_fastqs_R1[i]) > 0
-                            Boolean has_output_of_align_ctl = i < length(ctl_bams)
-                            if (has_input_of_align_ctl && !has_output_of_align_ctl) {
-                                call align as align_ctl { input:
-                                    fastqs_R1 = ctl_fastqs_R1[i],
-                                    fastqs_R2 = (
-                                        if ctl_paired_end_
-                                        then ctl_fastqs_R2[i]
-                                        else []
-                                    ),
-                                    crop_length = crop_length,
-                                    crop_length_tol = crop_length_tol,
-                                    trimmomatic_phred_score_format = trimmomatic_phred_score_format,
+                                Boolean has_input_of_align = i < length(
+                                    fastqs_R1) && length(fastqs_R1[i]) > 0
+                                Boolean has_output_of_align = i < length(bams)
+                                if (has_input_of_align && !has_output_of_align) {
+                                    call align { input:
+                                        fastqs_R1 = fastqs_R1[i],
 
-                                    aligner = aligner_,
-                                    mito_chr_name = mito_chr_name_,
-                                    custom_align_py = custom_align_py,
-                                    idx_tar = (
-                                        if aligner == "bwa"
-                                        then bwa_idx_tar_
-                                        else if aligner == "bowtie2"
-                                        then bowtie2_idx_tar_
-                                        else custom_aligner_idx_tar
-                                    ),
-                                    paired_end = ctl_paired_end_,
-                                    use_bwa_mem_for_pe = use_bwa_mem_for_pe,
-                                    bwa_mem_read_len_limit = bwa_mem_read_len_limit,
-                                    use_bowtie2_local_mode = use_bowtie2_local_mode,
-                                    ref_fa = ref_fa_,
+                                        fastqs_R2 = (
+                                            if paired_end_ then fastqs_R2[i] else []),
+                                        crop_length = crop_length,
+                                        crop_length_tol = crop_length_tol,
+                                        trimmomatic_phred_score_format = trimmomatic_phred_score_format,
 
-                                    trimmomatic_java_heap = align_trimmomatic_java_heap,
-                                    cpu = align_cpu,
-                                    mem_factor = align_mem_factor_,
-                                    time_hr = align_time_hr,
-                                    disk_factor = align_disk_factor_,
-                                    runtime_environment = runtime_environment,
-                                }
-                            }
-                            File? ctl_bam_ = (
-                                if has_output_of_align_ctl
-                                then ctl_bams[i]
-                                else align_ctl.bam
-                            )
+                                        aligner = aligner_,
+                                        mito_chr_name = mito_chr_name_,
+                                        custom_align_py = custom_align_py,
 
-                            Boolean has_input_of_filter_ctl = has_output_of_align_ctl || defined(
-                                align_ctl.bam)
-                            Boolean has_output_of_filter_ctl = i < length(ctl_nodup_bams)
+                                        idx_tar = (
+                                            if aligner == "bwa" then bwa_idx_tar_ else if aligner == "bowtie2" then bowtie2_idx_tar_ else custom_aligner_idx_tar
+                                            ),
+                                        paired_end = paired_end_,
+                                        use_bwa_mem_for_pe = use_bwa_mem_for_pe,
+                                        bwa_mem_read_len_limit = bwa_mem_read_len_limit,
+                                        use_bowtie2_local_mode = use_bowtie2_local_mode,
+                                        ref_fa = ref_fa_,
 
-                            # skip if we already have output of this step
-                            if (
-                                has_input_of_filter_ctl && !has_output_of_filter_ctl) {
-                                call filter as filter_ctl { input:
-                                    bam = ctl_bam_,
-                                    paired_end = ctl_paired_end_,
-                                    ref_fa = ref_fa_,
-                                    redact_nodup_bam = redact_nodup_bam,
-                                    dup_marker = dup_marker,
-                                    mapq_thresh = mapq_thresh_,
-                                    filter_chrs = filter_chrs,
-                                    chrsz = chrsz_,
-                                    no_dup_removal = no_dup_removal,
-                                    mito_chr_name = mito_chr_name_,
-
-                                    cpu = filter_cpu,
-                                    mem_factor = filter_mem_factor,
-                                    picard_java_heap = filter_picard_java_heap,
-                                    time_hr = filter_time_hr,
-                                    disk_factor = filter_disk_factor,
-                                    runtime_environment = runtime_environment,
-                                }
-                            }
-                            File? ctl_nodup_bam_ = (
-                                if has_output_of_filter_ctl
-                                then ctl_nodup_bams[i]
-                                else filter_ctl.nodup_bam
-                            )
-
-                            Boolean has_input_of_bam2ta_ctl = has_output_of_filter_ctl || defined(
-                                filter_ctl.nodup_bam)
-                            Boolean has_output_of_bam2ta_ctl = i < length(ctl_tas)
-                            if (has_input_of_bam2ta_ctl && !has_output_of_bam2ta_ctl) {
-                                call bam2ta as bam2ta_ctl { input:
-                                    bam = ctl_nodup_bam_,
-                                    subsample = ctl_subsample_reads,
-                                    paired_end = ctl_paired_end_,
-                                    mito_chr_name = mito_chr_name_,
-
-                                    cpu = bam2ta_cpu,
-                                    mem_factor = bam2ta_mem_factor,
-                                    time_hr = bam2ta_time_hr,
-                                    disk_factor = bam2ta_disk_factor,
-                                    runtime_environment = runtime_environment,
-                                }
-                            }
-                            File? ctl_ta_ = (
-                                if has_output_of_bam2ta_ctl
-                                then ctl_tas[i]
-                                else bam2ta_ctl.ta
-                            )
-                        }
-
-                        # if there are TAs for ALL replicates then pool them
-                        Boolean has_all_inputs_of_pool_ta = length(
-                            select_all(ta_)) == num_rep
-                        if (has_all_inputs_of_pool_ta && num_rep > 1) {
-
-                                # pool tagaligns from true replicates
-                                call pool_ta {
-                                    input:
-                                    tas = ta_,
-                                    prefix = "rep",
-                                    runtime_environment = runtime_environment,
-                                }
-                            }
-
-                            # if there are pr1 TAs for ALL replicates then pool them
-                            Boolean has_all_inputs_of_pool_ta_pr1 = length(
-                                select_all(spr.ta_pr1)) == num_rep
-
-                            if (
-                                has_all_inputs_of_pool_ta_pr1 && num_rep > 1 && !align_only_ && !true_rep_only
-                                ) {
-
-                                    # pool tagaligns from pseudo replicate 1
-                                    call pool_ta as pool_ta_pr1 {
-                                        input:
-                                        tas = spr.ta_pr1,
-                                        prefix = "rep-pr1",
+                                        trimmomatic_java_heap = align_trimmomatic_java_heap,
+                                        cpu = align_cpu,
+                                        mem_factor = align_mem_factor_,
+                                        time_hr = align_time_hr,
+                                        disk_factor = align_disk_factor_,
                                         runtime_environment = runtime_environment,
                                     }
                                 }
 
-                                # if there are pr2 TAs for ALL replicates then pool them
-                                Boolean has_all_inputs_of_pool_ta_pr2 = length(
-                                    select_all(spr.ta_pr2)) == num_rep
+                                File? bam_ = (
+                                    if has_output_of_align then bams[i] else align.bam)
+
+                                Boolean has_input_of_filter = has_output_of_align || defined(
+                                    align.bam)
+                                Boolean has_output_of_filter = i < length(nodup_bams)
+
+                                # skip if we already have output of this step
+                                if (
+                                    has_input_of_filter && !has_output_of_filter) {
+                                    call filter { input:
+                                        bam = bam_,
+                                        paired_end = paired_end_,
+                                        ref_fa = ref_fa_,
+                                        redact_nodup_bam = redact_nodup_bam,
+                                        dup_marker = dup_marker,
+                                        mapq_thresh = mapq_thresh_,
+                                        filter_chrs = filter_chrs,
+                                        chrsz = chrsz_,
+                                        no_dup_removal = no_dup_removal,
+                                        mito_chr_name = mito_chr_name_,
+
+                                        cpu = filter_cpu,
+                                        mem_factor = filter_mem_factor,
+                                        picard_java_heap = filter_picard_java_heap,
+                                        time_hr = filter_time_hr,
+                                        disk_factor = filter_disk_factor,
+                                        runtime_environment = runtime_environment,
+                                    }
+                                }
+
+                                File? nodup_bam_ = (
+                                    if has_output_of_filter then nodup_bams[
+                                    i] else filter.nodup_bam)
+
+                                Boolean has_input_of_bam2ta = has_output_of_filter || defined(
+                                    filter.nodup_bam)
+                                Boolean has_output_of_bam2ta = i < length(tas)
+                                if (has_input_of_bam2ta && !has_output_of_bam2ta) {
+                                    call bam2ta { input:
+                                        bam = nodup_bam_,
+                                        subsample = subsample_reads,
+                                        paired_end = paired_end_,
+                                        mito_chr_name = mito_chr_name_,
+
+                                        cpu = bam2ta_cpu,
+                                        mem_factor = bam2ta_mem_factor,
+                                        time_hr = bam2ta_time_hr,
+                                        disk_factor = bam2ta_disk_factor,
+                                        runtime_environment = runtime_environment,
+                                    }
+                                }
+
+                                File? ta_ = (
+                                    if has_output_of_bam2ta then tas[i] else bam2ta.ta)
+
+                                Boolean has_input_of_spr = has_output_of_bam2ta || defined(
+                                    bam2ta.ta)
+                                if (has_input_of_spr && !align_only_ && !true_rep_only) {
+                                    call spr { input:
+                                        ta = ta_,
+                                        paired_end = paired_end_,
+                                        pseudoreplication_random_seed = pseudoreplication_random_seed,
+                                        mem_factor = spr_mem_factor,
+                                        disk_factor = spr_disk_factor,
+                                        runtime_environment = runtime_environment,
+                                    }
+                                }
+
+                                Boolean has_input_of_count_signal_track = has_output_of_bam2ta || defined(
+                                    bam2ta.ta)
 
                                 if (
-                                    has_all_inputs_of_pool_ta_pr1 && num_rep > 1 && !align_only_ && !true_rep_only
+                                    has_input_of_count_signal_track && enable_count_signal_track_
                                     ) {
 
-                                        # pool tagaligns from pseudo replicate 2
-                                        call pool_ta as pool_ta_pr2 {
+                                        # generate count signal track
+                                        call count_signal_track {
                                             input:
-                                            tas = spr.ta_pr2,
-                                            prefix = "rep-pr2",
+                                            ta = ta_,
+                                            chrsz = chrsz_,
                                             runtime_environment = runtime_environment,
                                         }
                                     }
 
-                                    # if there are CTL TAs for ALL replicates then pool them
-                                    Boolean has_all_inputs_of_pool_ta_ctl = length(
-                                        select_all(ctl_ta_)) == num_ctl
-                                    if (has_all_inputs_of_pool_ta_ctl && num_ctl > 1) {
+                                    if (
+                                        enable_gc_bias_ && defined(
+                                        nodup_bam_) && defined(ref_fa_)) {
+                                        call gc_bias { input:
+                                            nodup_bam = nodup_bam_,
+                                            ref_fa = ref_fa_,
+                                            picard_java_heap = gc_bias_picard_java_heap,
+                                            runtime_environment = runtime_environment,
+                                        }
+                                    }
 
-                                            # pool tagaligns from true replicates
-                                            call pool_ta as pool_ta_ctl {
-                                                input:
-                                                tas = ctl_ta_,
-                                                prefix = "ctl",
-                                                runtime_environment = runtime_environment,
-                                            }
+                                    # special trimming/mapping for xcor (when starting from FASTQs)
+                                    if (
+                                        has_input_of_align) {
+                                        call align as align_R1 { input:
+                                            fastqs_R1 = fastqs_R1[i],
+                                            fastqs_R2 = [],
+                                            trim_bp = xcor_trim_bp,
+                                            crop_length = 0,
+                                            crop_length_tol = 0,
+                                            trimmomatic_phred_score_format = trimmomatic_phred_score_format,
+
+                                            aligner = aligner_,
+                                            mito_chr_name = mito_chr_name_,
+                                            custom_align_py = custom_align_py,
+
+                                            idx_tar = (
+                                                if aligner == "bwa" then bwa_idx_tar_ else if aligner == "bowtie2" then bowtie2_idx_tar_ else custom_aligner_idx_tar
+                                                ),
+                                            paired_end = false,
+                                            use_bwa_mem_for_pe = false,
+                                            bwa_mem_read_len_limit = 0,
+                                            use_bowtie2_local_mode = use_bowtie2_local_mode,
+                                            ref_fa = ref_fa_,
+
+                                            cpu = align_cpu,
+                                            mem_factor = align_mem_factor_,
+                                            time_hr = align_time_hr,
+                                            disk_factor = align_disk_factor_,
+                                            runtime_environment = runtime_environment,
                                         }
 
-                                        Boolean has_input_of_count_signal_track_pooled = defined(
-                                            pool_ta.ta_pooled)
+                                        # no bam deduping for xcor
+                                        call filter as filter_R1 {
+                                            input:
+                                            bam = align_R1.bam,
+                                            paired_end = false,
+                                            redact_nodup_bam = false,
+                                            dup_marker = dup_marker,
+                                            mapq_thresh = mapq_thresh_,
+                                            filter_chrs = filter_chrs,
+                                            chrsz = chrsz_,
+                                            no_dup_removal = true,
+                                            mito_chr_name = mito_chr_name_,
 
-                                        if (
-                                            has_input_of_count_signal_track_pooled && enable_count_signal_track_ && num_rep > 1
-                                            ) {
+                                            cpu = filter_cpu,
+                                            mem_factor = filter_mem_factor,
+                                            picard_java_heap = filter_picard_java_heap,
+                                            time_hr = filter_time_hr,
+                                            disk_factor = filter_disk_factor,
+                                            runtime_environment = runtime_environment,
+                                        }
+                                        call bam2ta as bam2ta_no_dedup_R1 { input:
+                                            bam = filter_R1.nodup_bam,  # it's named as nodup bam but it's not deduped but just filtered
+                                            paired_end = false,
+                                            subsample = 0,
+                                            mito_chr_name = mito_chr_name_,
 
-                                                call count_signal_track as count_signal_track_pooled {
-                                                    input:
-                                                    ta = pool_ta.ta_pooled,
-                                                    chrsz = chrsz_,
-                                                    runtime_environment = runtime_environment,
-                                                }
-                                            }
+                                            cpu = bam2ta_cpu,
+                                            mem_factor = bam2ta_mem_factor,
+                                            time_hr = bam2ta_time_hr,
+                                            disk_factor = bam2ta_disk_factor,
+                                            runtime_environment = runtime_environment,
+                                        }
+                                    }
 
-                                            Boolean has_input_of_jsd = defined(
-                                                blacklist_
-                                                ) && length(
-                                                select_all(nodup_bam_)) == num_rep
+                                    # special trimming/mapping for xcor (when starting from BAMs)
+                                    Boolean has_input_of_bam2ta_no_dedup = (
+                                        has_output_of_align || defined(
+                                        align.bam)) && !defined(bam2ta_no_dedup_R1.ta)
+                                    if (has_input_of_bam2ta_no_dedup) {
+                                        call filter as filter_no_dedup { input:
+                                            bam = bam_,
+                                            paired_end = paired_end_,
+                                            redact_nodup_bam = false,
+                                            dup_marker = dup_marker,
+                                            mapq_thresh = mapq_thresh_,
+                                            filter_chrs = filter_chrs,
+                                            chrsz = chrsz_,
+                                            no_dup_removal = true,
+                                            mito_chr_name = mito_chr_name_,
 
-                                            if (
-                                                has_input_of_jsd && num_rep > 0 && enable_jsd_
-                                                ) {
+                                            cpu = filter_cpu,
+                                            mem_factor = filter_mem_factor,
+                                            picard_java_heap = filter_picard_java_heap,
+                                            time_hr = filter_time_hr,
+                                            disk_factor = filter_disk_factor,
+                                            runtime_environment = runtime_environment,
+                                        }
+                                        call bam2ta as bam2ta_no_dedup { input:
+                                            bam = filter_no_dedup.nodup_bam,  # output name is nodup but it's not deduped
+                                            paired_end = paired_end_,
+                                            subsample = 0,
+                                            mito_chr_name = mito_chr_name_,
 
-                                                    # fingerprint and JS-distance plot
-                                                    call jsd {
-                                                        input:
-                                                        nodup_bams = nodup_bam_,
-                                                        ctl_bams = ctl_nodup_bam_,  # use first control only
-                                                        blacklist = blacklist_,
-                                                        mapq_thresh = mapq_thresh_,
+                                            cpu = bam2ta_cpu,
+                                            mem_factor = bam2ta_mem_factor,
+                                            time_hr = bam2ta_time_hr,
+                                            disk_factor = bam2ta_disk_factor,
+                                            runtime_environment = runtime_environment,
+                                        }
+                                    }
 
-                                                        cpu = jsd_cpu,
-                                                        mem_factor = jsd_mem_factor,
-                                                        time_hr = jsd_time_hr,
-                                                        disk_factor = jsd_disk_factor,
-                                                        runtime_environment = runtime_environment,
-                                                    }
-                                                }
+                                    # use trimmed/unfilitered R1 tagAlign for paired end dataset
+                                    # if not starting from fastqs, keep using old method
+                                    #  (mapping with both ends for tag-aligns to be used for xcor)
+                                    # subsample tagalign (non-mito) and cross-correlation analysis
+                                    File? ta_xcor = (
+                                        if defined(
+                                        bam2ta_no_dedup_R1.ta
+                                        ) then bam2ta_no_dedup_R1.ta else if defined(
+                                        bam2ta_no_dedup.ta
+                                        ) then bam2ta_no_dedup.ta else ta_)
 
-                                                Boolean has_all_input_of_choose_ctl = length(
-                                                    select_all(
-                                                    ta_
-                                                    )
-                                                    ) == num_rep && length(
-                                                    select_all(
-                                                    ctl_ta_)) == num_ctl && num_ctl > 0
+                                    Boolean paired_end_xcor = (
+                                        if defined(
+                                        bam2ta_no_dedup_R1.ta
+                                        ) then false else paired_end_)
 
-                                                if (
-                                                    has_all_input_of_choose_ctl && !align_only_
-                                                    ) {
+                                    Boolean has_input_of_xcor = defined(ta_xcor)
+                                    if (has_input_of_xcor && enable_xcor_) {
+                                        call xcor { input:
+                                            ta = ta_xcor,
+                                            paired_end = paired_end_xcor,
+                                            subsample = xcor_subsample_reads,
+                                            mito_chr_name = mito_chr_name_,
+                                            chip_seq_type = pipeline_type,
+                                            exclusion_range_min = xcor_exclusion_range_min,
+                                            exclusion_range_max = xcor_exclusion_range_max,
+                                            cpu = xcor_cpu,
+                                            mem_factor = xcor_mem_factor,
+                                            time_hr = xcor_time_hr,
+                                            disk_factor = xcor_disk_factor,
+                                            runtime_environment = runtime_environment_spp,
+                                        }
+                                    }
 
-                                                        # choose appropriate control for each exp IP replicate
-                                                        # outputs:
-                                                        #     choose_ctl.idx : control replicate index for each exp replicate
-                                                        #                    -1 means pooled ctl replicate
-                                                        call choose_ctl {
-                                                            input:
-                                                            tas = ta_,
-                                                            ctl_tas = ctl_ta_,
-                                                            ta_pooled = pool_ta.ta_pooled,
-                                                            ctl_ta_pooled = pool_ta_ctl.ta_pooled,
-                                                            always_use_pooled_ctl = always_use_pooled_ctl,
-                                                            ctl_depth_ratio = ctl_depth_ratio,
-                                                            ctl_depth_limit = ctl_depth_limit,
-                                                            exp_ctl_depth_ratio_limit = exp_ctl_depth_ratio_limit,
-                                                            runtime_environment = runtime_environment,
-                                                        }
-                                                    }
+                                    # before peak calling, get fragment length from xcor analysis or given input
+                                    # if fraglen [] is defined in the input JSON, fraglen from xcor will be ignored
+                                    Int? fraglen_ = (
+                                        if i < length(
+                                        fraglen) then fraglen[i] else xcor.fraglen)
+                                }
 
-                                                    scatter (i in range(num_rep)) {
+                                # align each control
+                                scatter (
+                                    i in range(num_ctl)) {
 
-                                                            # make control ta array [[1,2,3,4]] -> [[1],[2],[3],[4]]
-                                                            # chosen_ctl_ta_id
-                                                            #     >=0: control TA index (this means that control TA with this index exists)
-                                                            #     -1: use pooled control
-                                                            #    -2: there is no control
-                                                            Int chosen_ctl_ta_id = (
-                                                                if has_all_input_of_choose_ctl && !align_only_
-                                                                then select_first([
-                                                                    choose_ctl.chosen_ctl_ta_ids,
-                                                                ])[i]
-                                                                else -2
-                                                            )
+                                                            # to override endedness definition for individual control
+                                                            #     ctl_paired_end will override ctl_paired_ends[i]
+                                                            Boolean ctl_paired_end_ = (
+                                                                if !defined(
+                                                                ctl_paired_end
+                                                                ) && i < length(
+                                                                ctl_paired_ends
+                                                                ) then ctl_paired_ends[
+                                                                i] else select_first([
+                                                                ctl_paired_end,
+                                                                paired_end,
+                                                            ]))
 
-                                                            Int chosen_ctl_ta_subsample = (
-                                                                if has_all_input_of_choose_ctl && !align_only_
-                                                                then select_first([
-                                                                    choose_ctl.chosen_ctl_ta_subsample,
-                                                                ])[i]
-                                                                else 0
-                                                            )
+                                                            Boolean has_input_of_align_ctl = i < length(
+                                                                ctl_fastqs_R1
+                                                                ) && length(
+                                                                ctl_fastqs_R1[i]) > 0
 
-                                                            Boolean chosen_ctl_paired_end = (
-                                                                if chosen_ctl_ta_id == -2
-                                                                then false
-                                                                else if chosen_ctl_ta_id == -1
-                                                                then ctl_paired_end_[0]
-
-                                                                else ctl_paired_end_[
-                                                                    chosen_ctl_ta_id]
-                                                            )
+                                                            Boolean has_output_of_align_ctl = i < length(
+                                                                ctl_bams)
 
                                                             if (
-                                                                chosen_ctl_ta_id > -2 && chosen_ctl_ta_subsample > 0
+                                                                has_input_of_align_ctl && !has_output_of_align_ctl
                                                                 ) {
 
-                                                                    call subsample_ctl {
+                                                                    call align as align_ctl {
                                                                         input:
-                                                                        ta = (
-                                                                            if chosen_ctl_ta_id == -1
-                                                                            then pool_ta_ctl.ta_pooled
 
-                                                                            else ctl_ta_[
-                                                                                chosen_ctl_ta_id
-                                                                                ]
-                                                                        ),
-                                                                        subsample = chosen_ctl_ta_subsample,
-                                                                        paired_end = chosen_ctl_paired_end,
-                                                                        mem_factor = subsample_ctl_mem_factor,
-                                                                        disk_factor = subsample_ctl_disk_factor,
-                                                                        runtime_environment = runtime_environment,
-                                                                    }
-                                                                }
+                                                                            fastqs_R1 = ctl_fastqs_R1[
+                                                                                i],
 
-                                                                Array[
-                                                                    File
-                                                                    ] chosen_ctl_tas = (
-                                                                    if chosen_ctl_ta_id <= -2
-                                                                    then []
-                                                                    else if chosen_ctl_ta_subsample > 0
-                                                                    then [
-                                                                        select_first([
-                                                                            subsample_ctl.ta_subsampled,
-                                                                        ]),
-                                                                    ]
-                                                                    else if chosen_ctl_ta_id == -1
-                                                                    then [
-                                                                        select_first([
-                                                                            pool_ta_ctl.ta_pooled,
-                                                                        ]),
-                                                                    ]
-                                                                    else [
-                                                                        select_first([
-
-                                                                                    ctl_ta_[
-                                                                                        chosen_ctl_ta_id
-                                                                                        ],
+                                                                            fastqs_R2 = (
+                                                                                if ctl_paired_end_ then ctl_fastqs_R2[
+                                                                                i
+                                                                                ] else [
                                                                                 ]),
-                                                                            ]
-                                                                        )
+                                                                            crop_length = crop_length,
+                                                                            crop_length_tol = crop_length_tol,
+                                                                            trimmomatic_phred_score_format = trimmomatic_phred_score_format,
+
+                                                                            aligner = aligner_,
+                                                                            mito_chr_name = mito_chr_name_,
+                                                                            custom_align_py = custom_align_py,
+
+                                                                            idx_tar = (
+                                                                                if aligner == "bwa" then bwa_idx_tar_ else if aligner == "bowtie2" then bowtie2_idx_tar_ else custom_aligner_idx_tar
+                                                                                ),
+                                                                            paired_end = ctl_paired_end_,
+                                                                            use_bwa_mem_for_pe = use_bwa_mem_for_pe,
+                                                                            bwa_mem_read_len_limit = bwa_mem_read_len_limit,
+                                                                            use_bowtie2_local_mode = use_bowtie2_local_mode,
+                                                                            ref_fa = ref_fa_,
+
+                                                                            trimmomatic_java_heap = align_trimmomatic_java_heap,
+                                                                            cpu = align_cpu,
+                                                                            mem_factor = align_mem_factor_,
+                                                                            time_hr = align_time_hr,
+                                                                            disk_factor = align_disk_factor_,
+                                                                            runtime_environment = runtime_environment,
+                                                                        }
                                                                     }
 
-                                                                    Int chosen_ctl_ta_pooled_subsample = (
-                                                                        if has_all_input_of_choose_ctl && !align_only_
+                                                                    File? ctl_bam_ = (
+                                                                        if has_output_of_align_ctl then ctl_bams[
+                                                                        i
+                                                                        ] else align_ctl.bam
+                                                                        )
 
-                                                                        then select_first(
-                                                                        [
-                                                                            choose_ctl.chosen_ctl_ta_subsample_pooled,
-                                                                        ])
-                                                                        else 0
-                                                                    )
+                                                                    Boolean has_input_of_filter_ctl = has_output_of_align_ctl || defined(
+                                                                        align_ctl.bam)
 
-                                                                    # workaround for dx error (Unsupported combination: womType: Int womValue: ([225], Array[Int]))
-                                                                    Array[
-                                                                        Int
-                                                                        ] fraglen_tmp = select_all(
-                                                                        fraglen_)
+                                                                    Boolean has_output_of_filter_ctl = i < length(
+                                                                        ctl_nodup_bams)
 
-                                                                    # we have all tas and ctl_tas (optional for histone chipseq) ready, let's call peaks
-                                                                    scatter (
-                                                                        i in range(
-                                                                        num_rep)) {
+                                                                    # skip if we already have output of this step
+                                                                    if (
+                                                                        has_input_of_filter_ctl && !has_output_of_filter_ctl
+                                                                        ) {
 
-                                                                            Boolean has_input_of_call_peak = defined(
-                                                                                ta_[i])
+                                                                            call filter as filter_ctl {
+                                                                                input:
+                                                                                bam = ctl_bam_,
+                                                                                paired_end = ctl_paired_end_,
+                                                                                ref_fa = ref_fa_,
+                                                                                redact_nodup_bam = redact_nodup_bam,
+                                                                                dup_marker = dup_marker,
+                                                                                mapq_thresh = mapq_thresh_,
+                                                                                filter_chrs = filter_chrs,
+                                                                                chrsz = chrsz_,
+                                                                                no_dup_removal = no_dup_removal,
+                                                                                mito_chr_name = mito_chr_name_,
 
-                                                                            Boolean has_output_of_call_peak = i < length(
-                                                                                peaks)
+                                                                                cpu = filter_cpu,
+                                                                                mem_factor = filter_mem_factor,
+                                                                                picard_java_heap = filter_picard_java_heap,
+                                                                                time_hr = filter_time_hr,
+                                                                                disk_factor = filter_disk_factor,
+                                                                                runtime_environment = runtime_environment,
+                                                                            }
+                                                                        }
 
-                                                                            if (
-                                                                                has_input_of_call_peak && !has_output_of_call_peak && !align_only_
-                                                                                ) {
+                                                                        File? ctl_nodup_bam_ = (
+                                                                            if has_output_of_filter_ctl then ctl_nodup_bams[
+                                                                            i
+                                                                            ] else filter_ctl.nodup_bam
+                                                                            )
 
-                                                                                    call call_peak {
-                                                                                        input:
-                                                                                        peak_caller = peak_caller_,
-                                                                                        peak_type = peak_type_,
+                                                                        Boolean has_input_of_bam2ta_ctl = has_output_of_filter_ctl || defined(
+                                                                            filter_ctl.nodup_bam
+                                                                            )
 
-                                                                                        tas = flatten(
-                                                                                        [
+                                                                        Boolean has_output_of_bam2ta_ctl = i < length(
+                                                                            ctl_tas)
 
-                                                                                                [
+                                                                        if (
+                                                                            has_input_of_bam2ta_ctl && !has_output_of_bam2ta_ctl
+                                                                            ) {
 
-                                                                                                            ta_[
-                                                                                                                i
-                                                                                                                ],
-
-                                                                                                    ],
-
-                                                                                                    chosen_ctl_tas[
-                                                                                                        i
-                                                                                                        ],
-
-                                                                                        ]
-                                                                                            ),
-                                                                                        gensz = gensz_,
-                                                                                        chrsz = chrsz_,
-                                                                                        cap_num_peak = cap_num_peak_,
-                                                                                        pval_thresh = pval_thresh,
-                                                                                        fdr_thresh = fdr_thresh,
-
-                                                                                        fraglen = fraglen_tmp[
-                                                                                            i
-                                                                                            ],
-                                                                                        blacklist = blacklist_,
-                                                                                        regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
-
-                                                                                        cpu = call_peak_cpu,
-                                                                                        mem_factor = call_peak_mem_factor_,
-                                                                                        disk_factor = call_peak_disk_factor_,
-                                                                                        time_hr = call_peak_time_hr,
-
-                                                                                        runtime_environment = (
-                                                                                            if peak_caller_ == "spp"
-                                                                                            then runtime_environment_spp
-                                                                                            else if peak_caller_ == "macs2"
-                                                                                            then runtime_environment_macs2
-                                                                                            else runtime_environment
-                                                                                        ),
-                                                                                    }
-                                                                                }
-
-                                                                                File? peak_ = (
-                                                                                    if has_output_of_call_peak
-
-                                                                                    then peaks[
-                                                                                        i]
-                                                                                    else call_peak.peak
-                                                                                )
-
-                                                                                # signal track
-                                                                                if (
-                                                                                    has_input_of_call_peak && !align_only_
-                                                                                    ) {
-
-                                                                                        call macs2_signal_track {
-                                                                                            input:
-
-                                                                                                    tas = flatten(
-                                                                                                    [
-
-                                                                                                            [
-
-                                                                                                                        ta_[
-                                                                                                                            i
-                                                                                                                            ],
-
-                                                                                                                ],
-
-                                                                                                                chosen_ctl_tas[
-                                                                                                                    i
-                                                                                                                    ],
-
-                                                                                                    ]
-                                                                                                        ),
-                                                                                                    gensz = gensz_,
-                                                                                                    chrsz = chrsz_,
-                                                                                                    pval_thresh = pval_thresh,
-
-                                                                                                    fraglen = fraglen_tmp[
-                                                                                                        i
-                                                                                                        ],
-
-                                                                                                    mem_factor = macs2_signal_track_mem_factor,
-                                                                                                    disk_factor = macs2_signal_track_disk_factor,
-                                                                                                    time_hr = macs2_signal_track_time_hr,
-                                                                                                    runtime_environment = runtime_environment_macs2,
-
-                                                                                            }
-                                                                                        }
-
-                                                                                        # call peaks on 1st pseudo replicated tagalign
-                                                                                        Boolean has_input_of_call_peak_pr1 = defined(
-                                                                                            spr.ta_pr1[
-                                                                                            i
-                                                                                            ]
-                                                                                            )
-
-                                                                                        Boolean has_output_of_call_peak_pr1 = i < length(
-                                                                                            peaks_pr1
-                                                                                            )
-
-                                                                                        if (
-                                                                                            has_input_of_call_peak_pr1 && !has_output_of_call_peak_pr1 && !true_rep_only
-                                                                                            ) {
-
-                                                                                                call call_peak as call_peak_pr1 {
-                                                                                                    input:
-                                                                                                    peak_caller = peak_caller_,
-                                                                                                    peak_type = peak_type_,
-
-                                                                                                    tas = flatten(
-                                                                                                    [
-
-                                                                                                            [
-
-                                                                                                                        spr.ta_pr1[
-                                                                                                                            i
-                                                                                                                            ],
-
-                                                                                                                ],
-
-                                                                                                                chosen_ctl_tas[
-                                                                                                                    i
-                                                                                                                    ],
-
-                                                                                                    ]
-                                                                                                        ),
-                                                                                                    gensz = gensz_,
-                                                                                                    chrsz = chrsz_,
-                                                                                                    cap_num_peak = cap_num_peak_,
-                                                                                                    pval_thresh = pval_thresh,
-                                                                                                    fdr_thresh = fdr_thresh,
-
-                                                                                                    fraglen = fraglen_tmp[
-                                                                                                        i
-                                                                                                        ],
-                                                                                                    blacklist = blacklist_,
-                                                                                                    regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
-
-                                                                                                    cpu = call_peak_cpu,
-                                                                                                    mem_factor = call_peak_mem_factor_,
-                                                                                                    disk_factor = call_peak_disk_factor_,
-                                                                                                    time_hr = call_peak_time_hr,
-
-                                                                                                    runtime_environment = (
-                                                                                                        if peak_caller_ == "spp"
-                                                                                                        then runtime_environment_spp
-                                                                                                        else if peak_caller_ == "macs2"
-                                                                                                        then runtime_environment_macs2
-                                                                                                        else runtime_environment
-
-                                                                                                ),
-
-                                                                                        }
-                                                                                    }
-
-                                                                                    File? peak_pr1_ = (
-                                                                                        if has_output_of_call_peak_pr1
-
-                                                                                        then peaks_pr1[
-                                                                                            i
-                                                                                            ]
-                                                                                        else call_peak_pr1.peak
-                                                                                    )
-
-                                                                                    # call peaks on 2nd pseudo replicated tagalign
-                                                                                    Boolean has_input_of_call_peak_pr2 = defined(
-                                                                                        spr.ta_pr2[
-                                                                                        i
-                                                                                        ])
-
-                                                                                    Boolean has_output_of_call_peak_pr2 = i < length(
-                                                                                        peaks_pr2
-                                                                                        )
-
-                                                                                    if (
-                                                                                        has_input_of_call_peak_pr2 && !has_output_of_call_peak_pr2 && !true_rep_only
-                                                                                        ) {
-
-                                                                                            call call_peak as call_peak_pr2 {
-                                                                                                input:
-                                                                                                peak_caller = peak_caller_,
-                                                                                                peak_type = peak_type_,
-
-                                                                                                tas = flatten(
-                                                                                                [
-
-                                                                                                        [
-
-                                                                                                                    spr.ta_pr2[
-                                                                                                                        i
-                                                                                                                        ],
-
-                                                                                                            ],
-
-                                                                                                            chosen_ctl_tas[
-                                                                                                                i
-                                                                                                                ],
-
-                                                                                                ]
-                                                                                                    ),
-                                                                                                gensz = gensz_,
-                                                                                                chrsz = chrsz_,
-                                                                                                cap_num_peak = cap_num_peak_,
-                                                                                                pval_thresh = pval_thresh,
-                                                                                                fdr_thresh = fdr_thresh,
-
-                                                                                                fraglen = fraglen_tmp[
-                                                                                                    i
-                                                                                                    ],
-                                                                                                blacklist = blacklist_,
-                                                                                                regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
-
-                                                                                                cpu = call_peak_cpu,
-                                                                                                mem_factor = call_peak_mem_factor_,
-                                                                                                disk_factor = call_peak_disk_factor_,
-                                                                                                time_hr = call_peak_time_hr,
-
-                                                                                                runtime_environment = (
-                                                                                                    if peak_caller_ == "spp"
-                                                                                                    then runtime_environment_spp
-                                                                                                    else if peak_caller_ == "macs2"
-                                                                                                    then runtime_environment_macs2
-                                                                                                    else runtime_environment
-
-                                                                                            ),
-                                                                                        }
-                                                                                    }
-
-                                                                                    File? peak_pr2_ = (
-                                                                                        if has_output_of_call_peak_pr2
-
-                                                                                        then peaks_pr2[
-                                                                                            i
-                                                                                            ]
-                                                                                        else call_peak_pr2.peak
-                                                                                    )
-                                                                                }
-
-                                                                                # if ( !align_only_ && num_rep > 1 ) {
-                                                                                # rounded mean of fragment length, which will be used for
-                                                                                #  1) calling peaks for pooled true/pseudo replicates
-                                                                                #  2) calculating FRiP
-                                                                                call rounded_mean as fraglen_mean {
+                                                                                call bam2ta as bam2ta_ctl {
                                                                                     input:
-                                                                                    ints = fraglen_tmp,
+                                                                                    bam = ctl_nodup_bam_,
+                                                                                    subsample = ctl_subsample_reads,
+                                                                                    paired_end = ctl_paired_end_,
+                                                                                    mito_chr_name = mito_chr_name_,
+
+                                                                                    cpu = bam2ta_cpu,
+                                                                                    mem_factor = bam2ta_mem_factor,
+                                                                                    time_hr = bam2ta_time_hr,
+                                                                                    disk_factor = bam2ta_disk_factor,
                                                                                     runtime_environment = runtime_environment,
                                                                                 }
+                                                                            }
 
-                                                                                # }
+                                                                            File? ctl_ta_ = (
+                                                                                if has_output_of_bam2ta_ctl then ctl_tas[
+                                                                                i
+                                                                                ] else bam2ta_ctl.ta
+                                                                                )
+                                                                        }
+
+                                                                        # if there are TAs for ALL replicates then pool them
+                                                                        Boolean has_all_inputs_of_pool_ta = length(
+                                                                            select_all(
+                                                                            ta_
+                                                                            )) == num_rep
+
+                                                                        if (
+                                                                            has_all_inputs_of_pool_ta && num_rep > 1
+                                                                            ) {
+
+                                                                                # pool tagaligns from true replicates
+                                                                                call pool_ta {
+                                                                                    input:
+                                                                                    tas = ta_,
+                                                                                    prefix = "rep",
+                                                                                    runtime_environment = runtime_environment,
+                                                                                }
+                                                                            }
+
+                                                                            # if there are pr1 TAs for ALL replicates then pool them
+                                                                            Boolean has_all_inputs_of_pool_ta_pr1 = length(
+                                                                                select_all(
+                                                                                spr.ta_pr1
+                                                                                )
+                                                                                ) == num_rep
+
+                                                                            if (
+                                                                                has_all_inputs_of_pool_ta_pr1 && num_rep > 1 && !align_only_ && !true_rep_only
+                                                                                ) {
+
+                                                                                    # pool tagaligns from pseudo replicate 1
+                                                                                    call pool_ta as pool_ta_pr1 {
+                                                                                        input:
+                                                                                        tas = spr.ta_pr1,
+                                                                                        prefix = "rep-pr1",
+                                                                                        runtime_environment = runtime_environment,
+                                                                                    }
+                                                                                }
+
+                                                                                # if there are pr2 TAs for ALL replicates then pool them
+                                                                                Boolean has_all_inputs_of_pool_ta_pr2 = length(
+                                                                                    select_all(
+                                                                                    spr.ta_pr2
+                                                                                    )
+                                                                                    ) == num_rep
 
                                                                                 if (
-                                                                                    has_all_input_of_choose_ctl && !align_only_ && chosen_ctl_ta_pooled_subsample > 0
+                                                                                    has_all_inputs_of_pool_ta_pr1 && num_rep > 1 && !align_only_ && !true_rep_only
                                                                                     ) {
 
-                                                                                        call subsample_ctl as subsample_ctl_pooled {
+                                                                                        # pool tagaligns from pseudo replicate 2
+                                                                                        call pool_ta as pool_ta_pr2 {
                                                                                             input:
-
-                                                                                                ta = (
-                                                                                                    if num_ctl < 2
-
-                                                                                                    then ctl_ta_[
-                                                                                                        0
-                                                                                                        ]
-                                                                                                    else pool_ta_ctl.ta_pooled
-
-                                                                                            ),
-                                                                                            subsample = chosen_ctl_ta_pooled_subsample,
-
-                                                                                            paired_end = ctl_paired_end_[
-                                                                                                0
-                                                                                                ],
-                                                                                            mem_factor = subsample_ctl_mem_factor,
-                                                                                            disk_factor = subsample_ctl_disk_factor,
+                                                                                            tas = spr.ta_pr2,
+                                                                                            prefix = "rep-pr2",
                                                                                             runtime_environment = runtime_environment,
                                                                                         }
                                                                                     }
 
-                                                                                    # actually not an array
-                                                                                    Array[
-                                                                                        File?
-                                                                                        ] chosen_ctl_ta_pooled = (
-                                                                                        if !has_all_input_of_choose_ctl || align_only_
+                                                                                    # if there are CTL TAs for ALL replicates then pool them
+                                                                                    Boolean has_all_inputs_of_pool_ta_ctl = length(
+                                                                                        select_all(
+                                                                                        ctl_ta_
+                                                                                        )
+                                                                                        ) == num_ctl
 
-                                                                                        then [
-                                                                                            ]
-                                                                                        else if chosen_ctl_ta_pooled_subsample > 0
+                                                                                    if (
+                                                                                        has_all_inputs_of_pool_ta_ctl && num_ctl > 1
+                                                                                        ) {
 
-                                                                                        then [
-                                                                                            subsample_ctl_pooled.ta_subsampled,
-                                                                                        ]
-                                                                                        else if num_ctl < 2
+                                                                                            # pool tagaligns from true replicates
+                                                                                            call pool_ta as pool_ta_ctl {
+                                                                                                input:
+                                                                                                tas = ctl_ta_,
+                                                                                                prefix = "ctl",
+                                                                                                runtime_environment = runtime_environment,
 
-                                                                                        then [
+                                                                                        }
+                                                                                    }
 
-                                                                                                    ctl_ta_[
-                                                                                                        0
-                                                                                                        ],
-
-                                                                                            ]
-
-                                                                                            else [
-                                                                                                pool_ta_ctl.ta_pooled,
-
-                                                                                        ]
-                                                                                    )
-
-                                                                                    Boolean has_input_of_call_peak_pooled = defined(
+                                                                                    Boolean has_input_of_count_signal_track_pooled = defined(
                                                                                         pool_ta.ta_pooled
                                                                                         )
 
-                                                                                    Boolean has_output_of_call_peak_pooled = defined(
-                                                                                        peak_pooled
-                                                                                        )
-
                                                                                     if (
-                                                                                        has_input_of_call_peak_pooled && !has_output_of_call_peak_pooled && !align_only_ && num_rep > 1
+                                                                                        has_input_of_count_signal_track_pooled && enable_count_signal_track_ && num_rep > 1
                                                                                         ) {
 
-                                                                                            # call peaks on pooled replicate
-                                                                                            # always call peaks for pooled replicate to get signal tracks
-                                                                                            call call_peak as call_peak_pooled {
+                                                                                            call count_signal_track as count_signal_track_pooled {
                                                                                                 input:
-                                                                                                peak_caller = peak_caller_,
-                                                                                                peak_type = peak_type_,
+                                                                                                ta = pool_ta.ta_pooled,
+                                                                                                chrsz = chrsz_,
+                                                                                                runtime_environment = runtime_environment,
 
-                                                                                                tas = flatten(
-                                                                                                [
+                                                                                        }
+                                                                                    }
 
-                                                                                                            select_all(
-                                                                                                            [
-                                                                                                                pool_ta.ta_pooled,
+                                                                                    Boolean has_input_of_jsd = defined(
+                                                                                        blacklist_
+                                                                                        ) && length(
+                                                                                        select_all(
+                                                                                        nodup_bam_
+                                                                                        )
+                                                                                        ) == num_rep
 
-                                                                                                    ]
-                                                                                                        ),
-                                                                                                    chosen_ctl_ta_pooled,
+                                                                                    if (
+                                                                                        has_input_of_jsd && num_rep > 0 && enable_jsd_
+                                                                                        ) {
+
+                                                                                            # fingerprint and JS-distance plot
+                                                                                            call jsd {
+                                                                                                input:
+                                                                                                nodup_bams = nodup_bam_,
+                                                                                                ctl_bams = ctl_nodup_bam_,  # use first control only
+                                                                                                blacklist = blacklist_,
+                                                                                                mapq_thresh = mapq_thresh_,
+
+                                                                                                cpu = jsd_cpu,
+                                                                                                mem_factor = jsd_mem_factor,
+                                                                                                time_hr = jsd_time_hr,
+                                                                                                disk_factor = jsd_disk_factor,
+                                                                                                runtime_environment = runtime_environment,
+
+                                                                                        }
+                                                                                    }
+
+                                                                                    Boolean has_all_input_of_choose_ctl = length(
+                                                                                        select_all(
+                                                                                        ta_
+                                                                                        )
+                                                                                        ) == num_rep && length(
+                                                                                        select_all(
+                                                                                        ctl_ta_
+                                                                                        )
+                                                                                        ) == num_ctl && num_ctl > 0
+
+                                                                                    if (
+                                                                                        has_all_input_of_choose_ctl && !align_only_
+                                                                                        ) {
+
+                                                                                            # choose appropriate control for each exp IP replicate
+                                                                                            # outputs:
+                                                                                            #     choose_ctl.idx : control replicate index for each exp replicate
+                                                                                            #                    -1 means pooled ctl replicate
+                                                                                            call choose_ctl {
+                                                                                                input:
+                                                                                                tas = ta_,
+                                                                                                ctl_tas = ctl_ta_,
+                                                                                                ta_pooled = pool_ta.ta_pooled,
+                                                                                                ctl_ta_pooled = pool_ta_ctl.ta_pooled,
+                                                                                                always_use_pooled_ctl = always_use_pooled_ctl,
+                                                                                                ctl_depth_ratio = ctl_depth_ratio,
+                                                                                                ctl_depth_limit = ctl_depth_limit,
+                                                                                                exp_ctl_depth_ratio_limit = exp_ctl_depth_ratio_limit,
+                                                                                                runtime_environment = runtime_environment,
+
+                                                                                        }
+                                                                                    }
+
+                                                                                    scatter (
+                                                                                        i in range(
+                                                                                        num_rep
+                                                                                        )
+                                                                                        ) {
+
+                                                                                                    # make control ta array [[1,2,3,4]] -> [[1],[2],[3],[4]]
+                                                                                                    # chosen_ctl_ta_id
+                                                                                                    #     >=0: control TA index (this means that control TA with this index exists)
+                                                                                                    #     -1: use pooled control
+                                                                                                    #    -2: there is no control
+                                                                                                    Int chosen_ctl_ta_id = (
+                                                                                                        if has_all_input_of_choose_ctl && !align_only_ then select_first(
+                                                                                                    [
+                                                                                                        choose_ctl.chosen_ctl_ta_ids,
+
+                                                                                ]
+                                                                                    )[
+                                                                                    i
+                                                                                    ] else -2
+                                                                                    )
+
+                                                                                Int chosen_ctl_ta_subsample = (
+                                                                                    if has_all_input_of_choose_ctl && !align_only_ then select_first(
+                                                                                [
+                                                                                    choose_ctl.chosen_ctl_ta_subsample,
+
+                                                                            ])[i] else 0)
+
+                                                                            Boolean chosen_ctl_paired_end = (
+                                                                                if chosen_ctl_ta_id == -2 then false else if chosen_ctl_ta_id == -1 then ctl_paired_end_[
+                                                                                0
+                                                                                ] else ctl_paired_end_[
+                                                                                chosen_ctl_ta_id
+                                                                                ])
+
+                                                                            if (
+                                                                                chosen_ctl_ta_id > -2 && chosen_ctl_ta_subsample > 0
+                                                                                ) {
+
+                                                                                    call subsample_ctl {
+                                                                                        input:
+
+                                                                                                        ta = (
+                                                                                                            if chosen_ctl_ta_id == -1 then pool_ta_ctl.ta_pooled else ctl_ta_[
+                                                                                                            chosen_ctl_ta_id
+                                                                                                            ]
+                                                                                                            ),
+                                                                                                        subsample = chosen_ctl_ta_subsample,
+                                                                                                        paired_end = chosen_ctl_paired_end,
+                                                                                                        mem_factor = subsample_ctl_mem_factor,
+                                                                                                        disk_factor = subsample_ctl_disk_factor,
+                                                                                                        runtime_environment = runtime_environment,
+
+                                                                                                }
+
+                                                                                        }
+
+                                                                                        Array[
+                                                                                            File
+                                                                                            ] chosen_ctl_tas = (
+                                                                                            if chosen_ctl_ta_id <= -2 then [
+                                                                                            ] else if chosen_ctl_ta_subsample > 0 then [
+
+                                                                                                    select_first(
+                                                                                                    [
+                                                                                                        subsample_ctl.ta_subsampled,
+
+                                                                                            ]
+                                                                                                ),
+
+                                                                                ] else if chosen_ctl_ta_id == -1 then [
+
+                                                                                        select_first(
+                                                                                        [
+                                                                                            pool_ta_ctl.ta_pooled,
+
+                                                                                    ]),
+                                                                                ] else [
+
+                                                                                        select_first(
+                                                                                        [
+
+                                                                                                    ctl_ta_[
+                                                                                                        chosen_ctl_ta_id
+                                                                                                        ],
 
                                                                                         ]
                                                                                             ),
-                                                                                        gensz = gensz_,
-                                                                                        chrsz = chrsz_,
-                                                                                        cap_num_peak = cap_num_peak_,
-                                                                                        pval_thresh = pval_thresh,
-                                                                                        fdr_thresh = fdr_thresh,
-                                                                                        fraglen = fraglen_mean.rounded_mean,
-                                                                                        blacklist = blacklist_,
-                                                                                        regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
-
-                                                                                        cpu = call_peak_cpu,
-                                                                                        mem_factor = call_peak_mem_factor_,
-                                                                                        disk_factor = call_peak_disk_factor_,
-                                                                                        time_hr = call_peak_time_hr,
-
-                                                                                        runtime_environment = (
-                                                                                            if peak_caller_ == "spp"
-                                                                                            then runtime_environment_spp
-                                                                                            else if peak_caller_ == "macs2"
-                                                                                            then runtime_environment_macs2
-                                                                                            else runtime_environment
-                                                                                        ),
-                                                                                    }
+                                                                                    ])
                                                                                 }
 
-                                                                                File? peak_pooled_ = (
-                                                                                    if has_output_of_call_peak_pooled
-                                                                                    then peak_pooled
-                                                                                    else call_peak_pooled.peak
-                                                                                )
+                                                                                Int chosen_ctl_ta_pooled_subsample = (
+                                                                                    if has_all_input_of_choose_ctl && !align_only_ then select_first(
+                                                                                [
+                                                                                    choose_ctl.chosen_ctl_ta_subsample_pooled,
+                                                                                ]) else 0)
 
-                                                                                # macs2 signal track for pooled rep
-                                                                                if (
-                                                                                    has_input_of_call_peak_pooled && !align_only_ && num_rep > 1
-                                                                                    ) {
+                                                                                # workaround for dx error (Unsupported combination: womType: Int womValue: ([225], Array[Int]))
+                                                                                Array[
+                                                                                    Int
+                                                                                    ] fraglen_tmp = select_all(
+                                                                                    fraglen_
+                                                                                    )
 
-                                                                                        call macs2_signal_track as macs2_signal_track_pooled {
+                                                                                # we have all tas and ctl_tas (optional for histone chipseq) ready, let's call peaks
+                                                                                scatter (
+                                                                                    i in range(
+                                                                                    num_rep
+                                                                                    )) {
+
+                                                                                                    Boolean has_input_of_call_peak = defined(
+                                                                                                        ta_[
+                                                                                                        i
+                                                                                                        ]
+                                                                                                        )
+
+                                                                                                    Boolean has_output_of_call_peak = i < length(
+                                                                                                        peaks
+                                                                                                        )
+
+                                                                                                    if (
+                                                                                                        has_input_of_call_peak && !has_output_of_call_peak && !align_only_
+                                                                                                        ) {
+
+                                                                                                            call call_peak {
+                                                                                                                input:
+                                                                                                                peak_caller = peak_caller_,
+                                                                                                                peak_type = peak_type_,
+
+                                                                                                                tas = flatten(
+                                                                                                                [
+
+                                                                                                                        [
+
+                                                                                                                                    ta_[
+                                                                                                                                        i
+                                                                                                                                        ],
+
+                                                                                                                            ],
+
+                                                                                                                            chosen_ctl_tas[
+                                                                                                                                i
+                                                                                                                                ],
+
+                                                                                                                ]
+                                                                                                                    ),
+                                                                                                                gensz = gensz_,
+                                                                                                                chrsz = chrsz_,
+                                                                                                                cap_num_peak = cap_num_peak_,
+                                                                                                                pval_thresh = pval_thresh,
+                                                                                                                fdr_thresh = fdr_thresh,
+
+                                                                                                                fraglen = fraglen_tmp[
+                                                                                                                    i
+                                                                                                                    ],
+                                                                                                                blacklist = blacklist_,
+                                                                                                                regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
+
+                                                                                                                cpu = call_peak_cpu,
+                                                                                                                mem_factor = call_peak_mem_factor_,
+                                                                                                                disk_factor = call_peak_disk_factor_,
+                                                                                                                time_hr = call_peak_time_hr,
+
+                                                                                                                runtime_environment = (
+                                                                                                                    if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment
+                                                                                                                    ),
+
+                                                                                                        }
+
+                                                                                                }
+
+                                                                                                File? peak_ = (
+                                                                                                    if has_output_of_call_peak then peaks[
+                                                                                                    i
+                                                                                                    ] else call_peak.peak
+                                                                                                    )
+
+                                                                                                # signal track
+                                                                                                if (
+                                                                                                    has_input_of_call_peak && !align_only_
+                                                                                                    ) {
+
+                                                                                                        call macs2_signal_track {
+                                                                                                            input:
+
+                                                                                                                    tas = flatten(
+                                                                                                                    [
+
+                                                                                                                            [
+
+                                                                                                                                        ta_[
+                                                                                                                                            i
+                                                                                                                                            ],
+
+                                                                                                                                ],
+
+                                                                                                                                chosen_ctl_tas[
+                                                                                                                                    i
+                                                                                                                                    ],
+
+                                                                                                                    ]
+                                                                                                                        ),
+                                                                                                                    gensz = gensz_,
+                                                                                                                    chrsz = chrsz_,
+                                                                                                                    pval_thresh = pval_thresh,
+
+                                                                                                                    fraglen = fraglen_tmp[
+                                                                                                                        i
+                                                                                                                        ],
+
+                                                                                                                    mem_factor = macs2_signal_track_mem_factor,
+                                                                                                                    disk_factor = macs2_signal_track_disk_factor,
+                                                                                                                    time_hr = macs2_signal_track_time_hr,
+                                                                                                                    runtime_environment = runtime_environment_macs2,
+
+                                                                                                            }
+
+                                                                                                    }
+
+                                                                                                    # call peaks on 1st pseudo replicated tagalign
+                                                                                                    Boolean has_input_of_call_peak_pr1 = defined(
+                                                                                                        spr.ta_pr1[
+                                                                                                        i
+                                                                                                        ]
+                                                                                                        )
+
+                                                                                                    Boolean has_output_of_call_peak_pr1 = i < length(
+                                                                                                        peaks_pr1
+                                                                                                        )
+
+                                                                                                    if (
+                                                                                                        has_input_of_call_peak_pr1 && !has_output_of_call_peak_pr1 && !true_rep_only
+                                                                                                        ) {
+
+                                                                                                            call call_peak as call_peak_pr1 {
+                                                                                                                input:
+                                                                                                                peak_caller = peak_caller_,
+                                                                                                                peak_type = peak_type_,
+
+                                                                                                                tas = flatten(
+                                                                                                                [
+
+                                                                                                                        [
+
+                                                                                                                                    spr.ta_pr1[
+                                                                                                                                        i
+                                                                                                                                        ],
+
+                                                                                                                            ],
+
+                                                                                                                            chosen_ctl_tas[
+                                                                                                                                i
+                                                                                                                                ],
+
+                                                                                                                ]
+                                                                                                                    ),
+                                                                                                                gensz = gensz_,
+                                                                                                                chrsz = chrsz_,
+                                                                                                                cap_num_peak = cap_num_peak_,
+                                                                                                                pval_thresh = pval_thresh,
+                                                                                                                fdr_thresh = fdr_thresh,
+
+                                                                                                                fraglen = fraglen_tmp[
+                                                                                                                    i
+                                                                                                                    ],
+                                                                                                                blacklist = blacklist_,
+                                                                                                                regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
+
+                                                                                                                cpu = call_peak_cpu,
+                                                                                                                mem_factor = call_peak_mem_factor_,
+                                                                                                                disk_factor = call_peak_disk_factor_,
+                                                                                                                time_hr = call_peak_time_hr,
+
+                                                                                                                runtime_environment = (
+                                                                                                                    if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment
+                                                                                                                    ),
+
+                                                                                                        }
+
+                                                                                                }
+
+                                                                                                File? peak_pr1_ = (
+                                                                                                    if has_output_of_call_peak_pr1 then peaks_pr1[
+                                                                                                    i
+                                                                                                    ] else call_peak_pr1.peak
+                                                                                                    )
+
+                                                                                                # call peaks on 2nd pseudo replicated tagalign
+                                                                                                Boolean has_input_of_call_peak_pr2 = defined(
+                                                                                                    spr.ta_pr2[
+                                                                                                    i
+                                                                                                    ]
+                                                                                                    )
+
+                                                                                                Boolean has_output_of_call_peak_pr2 = i < length(
+                                                                                                    peaks_pr2
+                                                                                                    )
+
+                                                                                                if (
+                                                                                                    has_input_of_call_peak_pr2 && !has_output_of_call_peak_pr2 && !true_rep_only
+                                                                                                    ) {
+
+                                                                                                        call call_peak as call_peak_pr2 {
+                                                                                                            input:
+                                                                                                            peak_caller = peak_caller_,
+                                                                                                            peak_type = peak_type_,
+
+                                                                                                            tas = flatten(
+                                                                                                            [
+
+                                                                                                                    [
+
+                                                                                                                                spr.ta_pr2[
+                                                                                                                                    i
+                                                                                                                                    ],
+
+                                                                                                                        ],
+
+                                                                                                                        chosen_ctl_tas[
+                                                                                                                            i
+                                                                                                                            ],
+
+                                                                                                            ]
+                                                                                                                ),
+                                                                                                            gensz = gensz_,
+                                                                                                            chrsz = chrsz_,
+                                                                                                            cap_num_peak = cap_num_peak_,
+                                                                                                            pval_thresh = pval_thresh,
+                                                                                                            fdr_thresh = fdr_thresh,
+
+                                                                                                            fraglen = fraglen_tmp[
+                                                                                                                i
+                                                                                                                ],
+                                                                                                            blacklist = blacklist_,
+                                                                                                            regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
+
+                                                                                                            cpu = call_peak_cpu,
+                                                                                                            mem_factor = call_peak_mem_factor_,
+                                                                                                            disk_factor = call_peak_disk_factor_,
+                                                                                                            time_hr = call_peak_time_hr,
+
+                                                                                                            runtime_environment = (
+                                                                                                                if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment
+                                                                                                                ),
+
+                                                                                                    }
+
+                                                                                            }
+
+                                                                                            File? peak_pr2_ = (
+                                                                                                if has_output_of_call_peak_pr2 then peaks_pr2[
+                                                                                                i
+                                                                                                ] else call_peak_pr2.peak
+                                                                                                )
+                                                                                        }
+
+                                                                                        # if ( !align_only_ && num_rep > 1 ) {
+                                                                                        # rounded mean of fragment length, which will be used for
+                                                                                        #  1) calling peaks for pooled true/pseudo replicates
+                                                                                        #  2) calculating FRiP
+                                                                                        call rounded_mean as fraglen_mean {
                                                                                             input:
+                                                                                            ints = fraglen_tmp,
+                                                                                            runtime_environment = runtime_environment,
+                                                                                        }
+
+                                                                                        # }
+
+                                                                                        if (
+                                                                                            has_all_input_of_choose_ctl && !align_only_ && chosen_ctl_ta_pooled_subsample > 0
+                                                                                            ) {
+
+                                                                                                call subsample_ctl as subsample_ctl_pooled {
+                                                                                                    input:
+
+                                                                                                                    ta = (
+                                                                                                                        if num_ctl < 2 then ctl_ta_[
+                                                                                                                        0
+                                                                                                                        ] else pool_ta_ctl.ta_pooled
+                                                                                                                        ),
+                                                                                                                    subsample = chosen_ctl_ta_pooled_subsample,
+
+                                                                                                                    paired_end = ctl_paired_end_[
+                                                                                                                        0
+                                                                                                                        ],
+                                                                                                                    mem_factor = subsample_ctl_mem_factor,
+                                                                                                                    disk_factor = subsample_ctl_disk_factor,
+                                                                                                                    runtime_environment = runtime_environment,
+
+                                                                                                            }
+
+                                                                                                    }
+
+                                                                                                    # actually not an array
+                                                                                                    Array[
+                                                                                                        File?
+                                                                                                        ] chosen_ctl_ta_pooled = (
+                                                                                                        if !has_all_input_of_choose_ctl || align_only_ then [
+                                                                                                        ] else if chosen_ctl_ta_pooled_subsample > 0 then [
+                                                                                                        subsample_ctl_pooled.ta_subsampled,
+
+                                                                                            ] else if num_ctl < 2 then [
+
+                                                                                                        ctl_ta_[
+                                                                                                            0
+                                                                                                            ],
+
+                                                                                            ] else [
+                                                                                                pool_ta_ctl.ta_pooled,
+
+                                                                                        ])
+
+                                                                                        Boolean has_input_of_call_peak_pooled = defined(
+                                                                                            pool_ta.ta_pooled
+                                                                                            )
+
+                                                                                        Boolean has_output_of_call_peak_pooled = defined(
+                                                                                            peak_pooled
+                                                                                            )
+
+                                                                                        if (
+                                                                                            has_input_of_call_peak_pooled && !has_output_of_call_peak_pooled && !align_only_ && num_rep > 1
+                                                                                            ) {
+
+                                                                                                # call peaks on pooled replicate
+                                                                                                # always call peaks for pooled replicate to get signal tracks
+                                                                                                call call_peak as call_peak_pooled {
+                                                                                                    input:
+                                                                                                    peak_caller = peak_caller_,
+                                                                                                    peak_type = peak_type_,
 
                                                                                                     tas = flatten(
                                                                                                     [
@@ -2590,13 +2463,59 @@ workflow chip {
                                                                                                 ),
                                                                                             gensz = gensz_,
                                                                                             chrsz = chrsz_,
+                                                                                            cap_num_peak = cap_num_peak_,
                                                                                             pval_thresh = pval_thresh,
+                                                                                            fdr_thresh = fdr_thresh,
                                                                                             fraglen = fraglen_mean.rounded_mean,
+                                                                                            blacklist = blacklist_,
+                                                                                            regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
 
-                                                                                            mem_factor = macs2_signal_track_mem_factor,
-                                                                                            disk_factor = macs2_signal_track_disk_factor,
-                                                                                            time_hr = macs2_signal_track_time_hr,
-                                                                                            runtime_environment = runtime_environment_macs2,
+                                                                                            cpu = call_peak_cpu,
+                                                                                            mem_factor = call_peak_mem_factor_,
+                                                                                            disk_factor = call_peak_disk_factor_,
+                                                                                            time_hr = call_peak_time_hr,
+
+                                                                                            runtime_environment = (
+                                                                                                if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment
+                                                                                                ),
+                                                                                        }
+                                                                                    }
+
+                                                                                    File? peak_pooled_ = (
+                                                                                        if has_output_of_call_peak_pooled then peak_pooled else call_peak_pooled.peak
+                                                                                        )
+
+                                                                                    # macs2 signal track for pooled rep
+                                                                                    if (
+                                                                                        has_input_of_call_peak_pooled && !align_only_ && num_rep > 1
+                                                                                        ) {
+
+                                                                                            call macs2_signal_track as macs2_signal_track_pooled {
+                                                                                                input:
+
+                                                                                                        tas = flatten(
+                                                                                                        [
+
+                                                                                                                    select_all(
+                                                                                                                    [
+                                                                                                                        pool_ta.ta_pooled,
+
+                                                                                                            ]
+                                                                                                                ),
+                                                                                                            chosen_ctl_ta_pooled,
+
+                                                                                                ]
+                                                                                                    ),
+                                                                                                gensz = gensz_,
+                                                                                                chrsz = chrsz_,
+                                                                                                pval_thresh = pval_thresh,
+                                                                                                fraglen = fraglen_mean.rounded_mean,
+
+                                                                                                mem_factor = macs2_signal_track_mem_factor,
+                                                                                                disk_factor = macs2_signal_track_disk_factor,
+                                                                                                time_hr = macs2_signal_track_time_hr,
+                                                                                                runtime_environment = runtime_environment_macs2,
+
                                                                                         }
                                                                                     }
 
@@ -2646,20 +2565,14 @@ workflow chip {
                                                                                         time_hr = call_peak_time_hr,
 
                                                                                         runtime_environment = (
-                                                                                            if peak_caller_ == "spp"
-                                                                                            then runtime_environment_spp
-                                                                                            else if peak_caller_ == "macs2"
-                                                                                            then runtime_environment_macs2
-                                                                                            else runtime_environment
-                                                                                        ),
+                                                                                            if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment
+                                                                                            ),
                                                                                     }
                                                                                 }
 
                                                                                 File? peak_ppr1_ = (
-                                                                                    if has_output_of_call_peak_ppr1
-                                                                                    then peak_ppr1
-                                                                                    else call_peak_ppr1.peak
-                                                                                )
+                                                                                    if has_output_of_call_peak_ppr1 then peak_ppr1 else call_peak_ppr1.peak
+                                                                                    )
 
                                                                                 Boolean has_input_of_call_peak_ppr2 = defined(
                                                                                     pool_ta_pr2.ta_pooled
@@ -2707,20 +2620,14 @@ workflow chip {
                                                                                     time_hr = call_peak_time_hr,
 
                                                                                     runtime_environment = (
-                                                                                        if peak_caller_ == "spp"
-                                                                                        then runtime_environment_spp
-                                                                                        else if peak_caller_ == "macs2"
-                                                                                        then runtime_environment_macs2
-                                                                                        else runtime_environment
-                                                                                    ),
+                                                                                        if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment
+                                                                                        ),
                                                                                 }
                                                                             }
 
                                                                             File? peak_ppr2_ = (
-                                                                                if has_output_of_call_peak_ppr2
-                                                                                then peak_ppr2
-                                                                                else call_peak_ppr2.peak
-                                                                            )
+                                                                                if has_output_of_call_peak_ppr2 then peak_ppr2 else call_peak_ppr2.peak
+                                                                                )
 
                                                                             # do IDR/overlap on all pairs of two replicates (i,j)
                                                                             #     where i and j are zero-based indices and 0 <= i < j < num_rep
@@ -2969,554 +2876,401 @@ workflow chip {
                                                                                                                                                                         ),
 
                                                                                                                                                                     peaks_pr = (
-
-                                                                                                                                                                                if defined(
-                                                                                                                                                                                    overlap_pr.bfilt_overlap_peak
-                                                                                                                                                                                    )
-
-                                                                                                                                                                                then select_first(
-                                                                                                                                                                                [
-                                                                                                                                                                                    overlap_pr.bfilt_overlap_peak,
-
-                                                                                                                                                                        ]
-                                                                                                                                                                            )
-
-                                                                                                                                                                        else [
-                                                                                                                                                                            ]
-
-                                                                                                                                                                ),
-                                                                                                                                                                peak_ppr = overlap_ppr.bfilt_overlap_peak,
-                                                                                                                                                                peak_type = peak_type_,
-                                                                                                                                                                chrsz = chrsz_,
-                                                                                                                                                                runtime_environment = runtime_environment,
-
-                                                                                                                                                        }
-
-                                                                                                                                                }
-
-                                                                                                                                                if (
-                                                                                                                                                    !align_only_ && !true_rep_only && num_rep > 0 && enable_idr
-                                                                                                                                                    ) {
-
-                                                                                                                                                        # reproducibility QC for IDR peaks
-                                                                                                                                                        call reproducibility as reproducibility_idr {
-                                                                                                                                                            input:
-                                                                                                                                                            prefix = "idr",
-
-                                                                                                                                                            peaks = select_all(
-                                                                                                                                                                idr.bfilt_idr_peak
-                                                                                                                                                                ),
-
-                                                                                                                                                            peaks_pr = (
-
                                                                                                                                                                         if defined(
-                                                                                                                                                                            idr_pr.bfilt_idr_peak
-                                                                                                                                                                            )
+                                                                                                                                                                        overlap_pr.bfilt_overlap_peak
+                                                                                                                                                                        ) then select_first(
+                                                                                                                                                                    [
+                                                                                                                                                                        overlap_pr.bfilt_overlap_peak,
 
-                                                                                                                                                                        then select_first(
-                                                                                                                                                                        [
-                                                                                                                                                                            idr_pr.bfilt_idr_peak,
-
-                                                                                                                                                                ]
-                                                                                                                                                                    )
-
-                                                                                                                                                                else [
-                                                                                                                                                                    ]
-
-                                                                                                                                                        ),
-                                                                                                                                                        peak_ppr = idr_ppr.bfilt_idr_peak,
-                                                                                                                                                        peak_type = peak_type_,
-                                                                                                                                                        chrsz = chrsz_,
-                                                                                                                                                        runtime_environment = runtime_environment,
-
-                                                                                                                                                }
-
-                                                                                                                                        }
-
-                                                                                                                                        # Generate final QC report and JSON
-                                                                                                                                        call qc_report {
-                                                                                                                                            input:
-                                                                                                                                            pipeline_ver = pipeline_ver,
-                                                                                                                                            title = title,
-                                                                                                                                            description = description,
-                                                                                                                                            genome = genome_name_,
-                                                                                                                                            paired_ends = paired_end_,
-                                                                                                                                            ctl_paired_ends = ctl_paired_end_,
-                                                                                                                                            pipeline_type = pipeline_type,
-                                                                                                                                            aligner = aligner_,
-                                                                                                                                            no_dup_removal = no_dup_removal,
-                                                                                                                                            peak_caller = peak_caller_,
-                                                                                                                                            cap_num_peak = cap_num_peak_,
-                                                                                                                                            idr_thresh = idr_thresh,
-                                                                                                                                            pval_thresh = pval_thresh,
-                                                                                                                                            xcor_trim_bp = xcor_trim_bp,
-                                                                                                                                            xcor_subsample_reads = xcor_subsample_reads,
-
-                                                                                                                                            samstat_qcs = select_all(
-                                                                                                                                                align.samstat_qc
-                                                                                                                                                ),
-
-                                                                                                                                            nodup_samstat_qcs = select_all(
-                                                                                                                                                filter.samstat_qc
-                                                                                                                                                ),
-
-                                                                                                                                            dup_qcs = select_all(
-                                                                                                                                                filter.dup_qc
-                                                                                                                                                ),
-
-                                                                                                                                            lib_complexity_qcs = select_all(
-                                                                                                                                                filter.lib_complexity_qc
-                                                                                                                                                ),
-
-                                                                                                                                            xcor_plots = select_all(
-                                                                                                                                                xcor.plot_png
-                                                                                                                                                ),
-
-                                                                                                                                            xcor_scores = select_all(
-                                                                                                                                                xcor.score
-                                                                                                                                                ),
-
-                                                                                                                                            ctl_samstat_qcs = select_all(
-                                                                                                                                                align_ctl.samstat_qc
-                                                                                                                                                ),
-
-                                                                                                                                            ctl_nodup_samstat_qcs = select_all(
-                                                                                                                                                filter_ctl.samstat_qc
-                                                                                                                                                ),
-
-                                                                                                                                            ctl_dup_qcs = select_all(
-                                                                                                                                                filter_ctl.dup_qc
-                                                                                                                                                ),
-
-                                                                                                                                            ctl_lib_complexity_qcs = select_all(
-                                                                                                                                                filter_ctl.lib_complexity_qc
-                                                                                                                                                ),
-
-                                                                                                                                            jsd_plot = jsd.plot,
-
-                                                                                                                                            jsd_qcs = (
-
-                                                                                                                                                        if defined(
-                                                                                                                                                            jsd.jsd_qcs
-                                                                                                                                                            )
-
-                                                                                                                                                        then select_first(
-                                                                                                                                                        [
-                                                                                                                                                            jsd.jsd_qcs,
-
-                                                                                                                                                ]
-                                                                                                                                                    )
-
-                                                                                                                                                else [
                                                                                                                                                     ]
+                                                                                                                                                        ) else [
+                                                                                                                                                        ]
+                                                                                                                                                        ),
+                                                                                                                                                    peak_ppr = overlap_ppr.bfilt_overlap_peak,
+                                                                                                                                                    peak_type = peak_type_,
+                                                                                                                                                    chrsz = chrsz_,
+                                                                                                                                                    runtime_environment = runtime_environment,
 
-                                                                                                                                        ),
+                                                                                                                                            }
 
-                                                                                                                                        frip_qcs = select_all(
-                                                                                                                                            call_peak.frip_qc
-                                                                                                                                            ),
+                                                                                                                                    }
 
-                                                                                                                                        frip_qcs_pr1 = select_all(
-                                                                                                                                            call_peak_pr1.frip_qc
-                                                                                                                                            ),
+                                                                                                                                    if (
+                                                                                                                                        !align_only_ && !true_rep_only && num_rep > 0 && enable_idr
+                                                                                                                                        ) {
 
-                                                                                                                                        frip_qcs_pr2 = select_all(
-                                                                                                                                            call_peak_pr2.frip_qc
-                                                                                                                                            ),
-                                                                                                                                        frip_qc_pooled = call_peak_pooled.frip_qc,
-                                                                                                                                        frip_qc_ppr1 = call_peak_ppr1.frip_qc,
-                                                                                                                                        frip_qc_ppr2 = call_peak_ppr2.frip_qc,
+                                                                                                                                            # reproducibility QC for IDR peaks
+                                                                                                                                            call reproducibility as reproducibility_idr {
+                                                                                                                                                input:
+                                                                                                                                                prefix = "idr",
 
-                                                                                                                                        idr_plots = select_all(
-                                                                                                                                            idr.idr_plot
-                                                                                                                                            ),
+                                                                                                                                                peaks = select_all(
+                                                                                                                                                    idr.bfilt_idr_peak
+                                                                                                                                                    ),
 
-                                                                                                                                        idr_plots_pr = (
-
+                                                                                                                                                peaks_pr = (
                                                                                                                                                     if defined(
-                                                                                                                                                        idr_pr.idr_plot
-                                                                                                                                                        )
-
-                                                                                                                                                    then select_first(
-                                                                                                                                                    [
-                                                                                                                                                        idr_pr.idr_plot,
-
-                                                                                                                                            ]
-                                                                                                                                                )
-
-                                                                                                                                            else [
-                                                                                                                                                ]
-
-                                                                                                                                    ),
-                                                                                                                                    idr_plot_ppr = idr_ppr.idr_plot,
-
-                                                                                                                                    frip_idr_qcs = select_all(
-                                                                                                                                        idr.frip_qc
-                                                                                                                                        ),
-
-                                                                                                                                    frip_idr_qcs_pr = (
-
-                                                                                                                                                if defined(
-                                                                                                                                                    idr_pr.frip_qc
-                                                                                                                                                    )
-
-                                                                                                                                                then select_first(
+                                                                                                                                                    idr_pr.bfilt_idr_peak
+                                                                                                                                                    ) then select_first(
                                                                                                                                                 [
-                                                                                                                                                    idr_pr.frip_qc,
+                                                                                                                                                    idr_pr.bfilt_idr_peak,
 
-                                                                                                                                        ]
-                                                                                                                                            )
-
-                                                                                                                                        else [
-                                                                                                                                            ]
-
-                                                                                                                                ),
-                                                                                                                                frip_idr_qc_ppr = idr_ppr.frip_qc,
-
-                                                                                                                                frip_overlap_qcs = select_all(
-                                                                                                                                    overlap.frip_qc
-                                                                                                                                    ),
-
-                                                                                                                                frip_overlap_qcs_pr = (
-
-                                                                                                                                            if defined(
-                                                                                                                                                overlap_pr.frip_qc
-                                                                                                                                                )
-
-                                                                                                                                            then select_first(
-                                                                                                                                            [
-                                                                                                                                                overlap_pr.frip_qc,
-
+                                                                                                                                ]
+                                                                                                                                    ) else [
                                                                                                                                     ]
-                                                                                                                                        )
+                                                                                                                                    ),
+                                                                                                                                peak_ppr = idr_ppr.bfilt_idr_peak,
+                                                                                                                                peak_type = peak_type_,
+                                                                                                                                chrsz = chrsz_,
+                                                                                                                                runtime_environment = runtime_environment,
 
-                                                                                                                                    else [
-                                                                                                                                        ]
-
-                                                                                                                            ),
-                                                                                                                            frip_overlap_qc_ppr = overlap_ppr.frip_qc,
-                                                                                                                            idr_reproducibility_qc = reproducibility_idr.reproducibility_qc,
-                                                                                                                            overlap_reproducibility_qc = reproducibility_overlap.reproducibility_qc,
-
-                                                                                                                            gc_plots = select_all(
-                                                                                                                                gc_bias.gc_plot
-                                                                                                                                ),
-
-                                                                                                                            peak_region_size_qcs = select_all(
-                                                                                                                                call_peak.peak_region_size_qc
-                                                                                                                                ),
-
-                                                                                                                            peak_region_size_plots = select_all(
-                                                                                                                                call_peak.peak_region_size_plot
-                                                                                                                                ),
-
-                                                                                                                            num_peak_qcs = select_all(
-                                                                                                                                call_peak.num_peak_qc
-                                                                                                                                ),
-
-                                                                                                                            idr_opt_peak_region_size_qc = reproducibility_idr.peak_region_size_qc,
-                                                                                                                            idr_opt_peak_region_size_plot = reproducibility_overlap.peak_region_size_plot,
-                                                                                                                            idr_opt_num_peak_qc = reproducibility_idr.num_peak_qc,
-
-                                                                                                                            overlap_opt_peak_region_size_qc = reproducibility_overlap.peak_region_size_qc,
-                                                                                                                            overlap_opt_peak_region_size_plot = reproducibility_overlap.peak_region_size_plot,
-                                                                                                                            overlap_opt_num_peak_qc = reproducibility_overlap.num_peak_qc,
-
-                                                                                                                            runtime_environment = runtime_environment,
-
-                                                                                                                    }
-
-                                                                                                                    output {
-                                                                                                                        File report = qc_report.report
-                                                                                                                        File qc_json = qc_report.qc_json
-                                                                                                                        Boolean qc_json_ref_match = qc_report.qc_json_ref_match
+                                                                                                                        }
 
                                                                                                                 }
 
-                                                                                                        }
+                                                                                                                # Generate final QC report and JSON
+                                                                                                                call qc_report {
+                                                                                                                    input:
+                                                                                                                    pipeline_ver = pipeline_ver,
+                                                                                                                    title = title,
+                                                                                                                    description = description,
+                                                                                                                    genome = genome_name_,
+                                                                                                                    paired_ends = paired_end_,
+                                                                                                                    ctl_paired_ends = ctl_paired_end_,
+                                                                                                                    pipeline_type = pipeline_type,
+                                                                                                                    aligner = aligner_,
+                                                                                                                    no_dup_removal = no_dup_removal,
+                                                                                                                    peak_caller = peak_caller_,
+                                                                                                                    cap_num_peak = cap_num_peak_,
+                                                                                                                    idr_thresh = idr_thresh,
+                                                                                                                    pval_thresh = pval_thresh,
+                                                                                                                    xcor_trim_bp = xcor_trim_bp,
+                                                                                                                    xcor_subsample_reads = xcor_subsample_reads,
 
-                                                                                                        task align {
+                                                                                                                    samstat_qcs = select_all(
+                                                                                                                        align.samstat_qc
+                                                                                                                        ),
 
-                                                                                                                input {
-                                                                                                                            Array[
-                                                                                                                                File
-                                                                                                                                ] fastqs_R1  # [merge_id]
+                                                                                                                    nodup_samstat_qcs = select_all(
+                                                                                                                        filter.samstat_qc
+                                                                                                                        ),
 
-                                                                                                                            Array[
-                                                                                                                                File
-                                                                                                                                ] fastqs_R2
-                                                                                                                            File? ref_fa
-                                                                                                                            Int? trim_bp  # this is for R1 only
-                                                                                                                            Int crop_length
-                                                                                                                            Int crop_length_tol
-                                                                                                                            String? trimmomatic_phred_score_format
-                                                                                                                            String aligner
-                                                                                                                            String mito_chr_name
-                                                                                                                            Int? multimapping
-                                                                                                                            File? custom_align_py
-                                                                                                                            File? idx_tar  # reference index tar
-                                                                                                                            Boolean paired_end
-                                                                                                                            Boolean use_bwa_mem_for_pe
-                                                                                                                            Int bwa_mem_read_len_limit
-                                                                                                                            Boolean use_bowtie2_local_mode
-                                                                                                                            String? trimmomatic_java_heap
-                                                                                                                            Int cpu
-                                                                                                                            Float mem_factor
-                                                                                                                            Int time_hr
-                                                                                                                            Float disk_factor
-                                                                                                                            RuntimeEnvironment runtime_environment
+                                                                                                                    dup_qcs = select_all(
+                                                                                                                        filter.dup_qc
+                                                                                                                        ),
 
-                                                                                                                    }
+                                                                                                                    lib_complexity_qcs = select_all(
+                                                                                                                        filter.lib_complexity_qc
+                                                                                                                        ),
 
-                                                                                                                    Float input_file_size_gb = size(
-                                                                                                                        fastqs_R1, "G"
-                                                                                                                        ) + size(
-                                                                                                                        fastqs_R2, "G"
-                                                                                                                        )
+                                                                                                                    xcor_plots = select_all(
+                                                                                                                        xcor.plot_png
+                                                                                                                        ),
 
-                                                                                                                    Float mem_gb = 5.0 + size(
-                                                                                                                        idx_tar, "G"
-                                                                                                                        ) + mem_factor * input_file_size_gb
-                                                                                                                    Float samtools_mem_gb = 0.8 * mem_gb
+                                                                                                                    xcor_scores = select_all(
+                                                                                                                        xcor.score
+                                                                                                                        ),
 
-                                                                                                                    Int disk_gb = round(
-                                                                                                                        40.0 + disk_factor * input_file_size_gb
-                                                                                                                        )
+                                                                                                                    ctl_samstat_qcs = select_all(
+                                                                                                                        align_ctl.samstat_qc
+                                                                                                                        ),
 
-                                                                                                                    Float trimmomatic_java_heap_factor = 0.9
+                                                                                                                    ctl_nodup_samstat_qcs = select_all(
+                                                                                                                        filter_ctl.samstat_qc
+                                                                                                                        ),
 
-                                                                                                                    Array[
-                                                                                                                        Array[
-                                                                                                                        File
-                                                                                                                        ]
-                                                                                                                        ] tmp_fastqs = (
-                                                                                                                        if paired_end
+                                                                                                                    ctl_dup_qcs = select_all(
+                                                                                                                        filter_ctl.dup_qc
+                                                                                                                        ),
 
-                                                                                                                        then transpose(
-                                                                                                                        [
-                                                                                                                            fastqs_R1,
-                                                                                                                            fastqs_R2,
+                                                                                                                    ctl_lib_complexity_qcs = select_all(
+                                                                                                                        filter_ctl.lib_complexity_qc
+                                                                                                                        ),
 
-                                                                                                                ]
-                                                                                                                    )
+                                                                                                                    jsd_plot = jsd.plot,
 
-                                                                                                                else transpose(
-                                                                                                                [
-                                                                                                                    fastqs_R1,
+                                                                                                                    jsd_qcs = (
+                                                                                                                        if defined(
+                                                                                                                        jsd.jsd_qcs
+                                                                                                                        ) then select_first(
+                                                                                                                    [
+                                                                                                                        jsd.jsd_qcs,
 
+                                                                                                    ]
+                                                                                                        ) else [
                                                                                                         ]
-                                                                                                            )
+                                                                                                        ),
 
-                                                                                                )
+                                                                                                    frip_qcs = select_all(
+                                                                                                        call_peak.frip_qc
+                                                                                                        ),
 
-                                                                                                command <<<
-                                                                                                    set -e
+                                                                                                    frip_qcs_pr1 = select_all(
+                                                                                                        call_peak_pr1.frip_qc
+                                                                                                        ),
 
-                                                                                                    # check if pipeline dependencies can be found
-                                                                                                    if [[ -z "$(which encode_task_merge_fastq.py 2> /dev/null || true)" ]]
-                                                                                                    then
-                                                                                                      echo -e "\n* Error: pipeline environment (docker, singularity or conda) not found." 1>&2
-                                                                                                      exit 3
-                                                                                                    fi
-                                                                                                    python3 $(which encode_task_merge_fastq.py) \
+                                                                                                    frip_qcs_pr2 = select_all(
+                                                                                                        call_peak_pr2.frip_qc
+                                                                                                        ),
+                                                                                                    frip_qc_pooled = call_peak_pooled.frip_qc,
+                                                                                                    frip_qc_ppr1 = call_peak_ppr1.frip_qc,
+                                                                                                    frip_qc_ppr2 = call_peak_ppr2.frip_qc,
 
-                                                                                                        ~{write_tsv(
-                                                                                                            tmp_fastqs
-                                                                                                            )
-                                                                                                            } \
+                                                                                                    idr_plots = select_all(
+                                                                                                        idr.idr_plot
+                                                                                                        ),
 
-                                                                                                            ~{(
-                                                                                                            if paired_end
-                                                                                                            then "--paired-end"
-                                                                                                            else ""
+                                                                                                    idr_plots_pr = (
+                                                                                                        if defined(
+                                                                                                        idr_pr.idr_plot
+                                                                                                        ) then select_first(
+                                                                                                    [
+                                                                                                        idr_pr.idr_plot,
 
-                                                                                            )
-                                                                                                } \
+                                                                                    ]
+                                                                                        ) else [
+                                                                                        ]
+                                                                                        ),
+                                                                                    idr_plot_ppr = idr_ppr.idr_plot,
 
-                                                                                                ~{"--nth " + cpu
-                                                                                                    }
+                                                                                    frip_idr_qcs = select_all(
+                                                                                        idr.frip_qc
+                                                                                        ),
 
+                                                                                    frip_idr_qcs_pr = (
+                                                                                        if defined(
+                                                                                        idr_pr.frip_qc
+                                                                                        ) then select_first(
+                                                                                    [
+                                                                                        idr_pr.frip_qc,
 
-                                                                                            if [ -z '~{trim_bp
-                                                                                                }' ]; then
-                                                                                                SUFFIX=
-                                                                                            else
-                                                                                                SUFFIX=_trimmed
-                                                                                                python3 $(which encode_task_trim_fastq.py) \
-                                                                                                    R1/*.fastq.gz \
+                                                                        ]
+                                                                            ) else [
+                                                                            ]),
+                                                                        frip_idr_qc_ppr = idr_ppr.frip_qc,
 
-                                                                                                    --trim-bp ~{trim_bp
-                                                                                                        } \
-                                                                                                    --out-dir R1$SUFFIX
+                                                                        frip_overlap_qcs = select_all(
+                                                                            overlap.frip_qc
+                                                                            ),
 
-                                                                                                if [ '~{paired_end
-                                                                                                    }' == 'true' ]; then
-                                                                                                    python3 $(which encode_task_trim_fastq.py) \
-                                                                                                        R2/*.fastq.gz \
+                                                                        frip_overlap_qcs_pr = (
+                                                                            if defined(
+                                                                            overlap_pr.frip_qc
+                                                                            ) then select_first(
+                                                                        [
+                                                                            overlap_pr.frip_qc,
+                                                                        ]) else []),
+                                                                        frip_overlap_qc_ppr = overlap_ppr.frip_qc,
+                                                                        idr_reproducibility_qc = reproducibility_idr.reproducibility_qc,
+                                                                        overlap_reproducibility_qc = reproducibility_overlap.reproducibility_qc,
 
-                                                                                                        --trim-bp ~{trim_bp
-                                                                                                            } \
-                                                                                                        --out-dir R2$SUFFIX
-                                                                                                fi
-                                                                                            fi
+                                                                        gc_plots = select_all(
+                                                                            gc_bias.gc_plot
+                                                                            ),
 
-                                                                                            if [ '~{crop_length
-                                                                                                }' == '0' ]; then
-                                                                                                SUFFIX=$SUFFIX
-                                                                                            else
-                                                                                                NEW_SUFFIX="$SUFFIX"_cropped
-                                                                                                python3 $(which encode_task_trimmomatic.py) \
-                                                                                                    --fastq1 R1$SUFFIX/*.fastq.gz \
+                                                                        peak_region_size_qcs = select_all(
+                                                                            call_peak.peak_region_size_qc
+                                                                            ),
 
-                                                                                                            ~{(
-                                                                                                        if paired_end
-                                                                                                        then "--fastq2 R2$SUFFIX/*.fastq.gz"
-                                                                                                        else ""
+                                                                        peak_region_size_plots = select_all(
+                                                                            call_peak.peak_region_size_plot
+                                                                            ),
 
-                                                                                    )
-                                                                                        } \
+                                                                        num_peak_qcs = select_all(
+                                                                            call_peak.num_peak_qc
+                                                                            ),
 
-                                                                                                    ~{(
-                                                                                                if paired_end
-                                                                                                then "--paired-end"
-                                                                                                else ""
+                                                                        idr_opt_peak_region_size_qc = reproducibility_idr.peak_region_size_qc,
+                                                                        idr_opt_peak_region_size_plot = reproducibility_overlap.peak_region_size_plot,
+                                                                        idr_opt_num_peak_qc = reproducibility_idr.num_peak_qc,
 
+                                                                        overlap_opt_peak_region_size_qc = reproducibility_overlap.peak_region_size_qc,
+                                                                        overlap_opt_peak_region_size_plot = reproducibility_overlap.peak_region_size_plot,
+                                                                        overlap_opt_num_peak_qc = reproducibility_overlap.num_peak_qc,
+
+                                                                        runtime_environment = runtime_environment,
+                                                                    }
+
+                                                                    output {
+                                                                        File report = qc_report.report
+                                                                        File qc_json = qc_report.qc_json
+                                                                        Boolean qc_json_ref_match = qc_report.qc_json_ref_match
+                                                                    }
+                                                                }
+
+                                                                task align {
+                                                                    input {
+                                                                            Array[
+                                                                                File] fastqs_R1  # [merge_id]
+
+                                                                            Array[
+                                                                                File
+                                                                                ] fastqs_R2
+                                                                            File? ref_fa
+                                                                            Int? trim_bp  # this is for R1 only
+                                                                            Int crop_length
+                                                                            Int crop_length_tol
+                                                                            String? trimmomatic_phred_score_format
+                                                                            String aligner
+                                                                            String mito_chr_name
+                                                                            Int? multimapping
+                                                                            File? custom_align_py
+                                                                            File? idx_tar  # reference index tar
+                                                                            Boolean paired_end
+                                                                            Boolean use_bwa_mem_for_pe
+                                                                            Int bwa_mem_read_len_limit
+                                                                            Boolean use_bowtie2_local_mode
+                                                                            String? trimmomatic_java_heap
+                                                                            Int cpu
+                                                                            Float mem_factor
+                                                                            Int time_hr
+                                                                            Float disk_factor
+                                                                            RuntimeEnvironment runtime_environment
+                                                                        }
+
+                                                                        Float input_file_size_gb = size(
+                                                                            fastqs_R1, "G"
+                                                                            ) + size(
+                                                                            fastqs_R2, "G"
+                                                                            )
+
+                                                                        Float mem_gb = 5.0 + size(
+                                                                            idx_tar, "G"
+                                                                            ) + mem_factor * input_file_size_gb
+                                                                        Float samtools_mem_gb = 0.8 * mem_gb
+
+                                                                        Int disk_gb = round(
+                                                                            40.0 + disk_factor * input_file_size_gb
+                                                                            )
+
+                                                                        Float trimmomatic_java_heap_factor = 0.9
+
+                                                                        Array[
+                                                                            Array[
+                                                                            File
+                                                                            ]
+                                                                            ] tmp_fastqs = (
+                                                                            if paired_end then transpose(
+                                                                        [
+                                                                            fastqs_R1,
+                                                                            fastqs_R2,
+
+                                                                    ]) else transpose([
+                                                                        fastqs_R1,
+                                                                    ]))
+
+                                                                    command <<<
+                                                                        set -e
+
+                                                                        # check if pipeline dependencies can be found
+                                                                        if [[ -z "$(which encode_task_merge_fastq.py 2> /dev/null || true)" ]]
+                                                                        then
+                                                                          echo -e "\n* Error: pipeline environment (docker, singularity or conda) not found." 1>&2
+                                                                          exit 3
+                                                                        fi
+                                                                        python3 $(which encode_task_merge_fastq.py) \
+
+                                                                            ~{write_tsv(
+                                                                                tmp_fastqs
                                                                                 )} \
 
-                                                                                        --crop-length ~{crop_length
-                                                                                            } \
-
-                                                                                        --crop-length-tol "~{crop_length_tol
-                                                                                            }" \
-
-                                                                                        ~{"--phred-score-format " + trimmomatic_phred_score_format
-                                                                                            } \
-                                                                                        --out-dir-R1 R1$NEW_SUFFIX \
-
-                                                                                                ~{(
-                                                                                            if paired_end
-                                                                                            then "--out-dir-R2 R2$NEW_SUFFIX"
-                                                                                            else ""
-
-                                                                            )} \
-
-                                                                                            ~{"--trimmomatic-java-heap " + (
-
-                                                                                                if defined(
-                                                                                                    trimmomatic_java_heap
-                                                                                                    )
-                                                                                                then trimmomatic_java_heap
-
-                                                                                                else (
-                                                                                                    round(
-                                                                                                    mem_gb * trimmomatic_java_heap_factor
-                                                                                                    ) + "G"
-                                                                                                    )
-
+                                                                            ~{(
+                                                                                if paired_end then "--paired-end" else ""
                                                                                 )} \
 
-                                                                                        ~{"--nth " + cpu
-                                                                                            }
-                                                                                    SUFFIX=$NEW_SUFFIX
-                                                                                fi
+                                                                            ~{"--nth " + cpu
+                                                                                }
 
 
-                                                                                if [ '~{aligner
-                                                                                    }' == 'bwa' ]; then
-                                                                                    python3 $(which encode_task_bwa.py) \
+                                                                        if [ -z '~{trim_bp
+                                                                            }' ]; then
+                                                                            SUFFIX=
+                                                                        else
+                                                                            SUFFIX=_trimmed
+                                                                            python3 $(which encode_task_trim_fastq.py) \
+                                                                                R1/*.fastq.gz \
 
-                                                                                        ~{idx_tar
-                                                                                            } \
-                                                                                        R1$SUFFIX/*.fastq.gz \
+                                                                                --trim-bp ~{trim_bp
+                                                                                    } \
+                                                                                --out-dir R1$SUFFIX
 
-                                                                                                ~{(
-                                                                                            if paired_end
-                                                                                            then "R2$SUFFIX/*.fastq.gz"
-                                                                                            else ""
+                                                                            if [ '~{paired_end
+                                                                                }' == 'true' ]; then
+                                                                                python3 $(which encode_task_trim_fastq.py) \
+                                                                                    R2/*.fastq.gz \
 
-                                                                            )} \
-                                                                                    ~{(
-                                                                                        if paired_end
-                                                                                        then "--paired-end"
-                                                                                        else ""
-                                                                                    )} \
-                                                                                    ~{(
-                                                                                        if use_bwa_mem_for_pe
-                                                                                        then "--use-bwa-mem-for-pe"
-                                                                                        else ""
-                                                                                    )} \
-
-                                                                                    ~{"--bwa-mem-read-len-limit " + bwa_mem_read_len_limit
+                                                                                    --trim-bp ~{trim_bp
                                                                                         } \
+                                                                                    --out-dir R2$SUFFIX
+                                                                            fi
+                                                                        fi
 
-                                                                                    ~{"--mem-gb " + samtools_mem_gb
-                                                                                        } \
+                                                                        if [ '~{crop_length
+                                                                            }' == '0' ]; then
+                                                                            SUFFIX=$SUFFIX
+                                                                        else
+                                                                            NEW_SUFFIX="$SUFFIX"_cropped
+                                                                            python3 $(which encode_task_trimmomatic.py) \
+                                                                                --fastq1 R1$SUFFIX/*.fastq.gz \
 
-                                                                                    ~{"--nth " + cpu
-                                                                                        }
-
-
-                                                                            elif [ '~{aligner
-                                                                                }' == 'bowtie2' ]; then
-                                                                                python3 $(which encode_task_bowtie2.py) \
-
-                                                                                    ~{idx_tar
-                                                                                        } \
-                                                                                    R1$SUFFIX/*.fastq.gz \
-                                                                                    ~{(
-                                                                                        if paired_end
-                                                                                        then "R2$SUFFIX/*.fastq.gz"
-                                                                                        else ""
+                                                                                ~{(
+                                                                                    if paired_end then "--fastq2 R2$SUFFIX/*.fastq.gz" else ""
                                                                                     )} \
 
-                                                                                    ~{"--multimapping " + multimapping
-                                                                                        } \
-                                                                                    ~{(
-                                                                                        if paired_end
-                                                                                        then "--paired-end"
-                                                                                        else ""
-                                                                                    )} \
-                                                                                    ~{(
-                                                                                        if use_bowtie2_local_mode
-                                                                                        then "--local"
-                                                                                        else ""
+                                                                                ~{(
+                                                                                    if paired_end then "--paired-end" else ""
                                                                                     )} \
 
-                                                                                    ~{"--mem-gb " + samtools_mem_gb
-                                                                                        } \
-
-                                                                                    ~{"--nth " + cpu
-                                                                                        }
-                                                                            else
-
-                                                                                python3 ~{custom_align_py
+                                                                                --crop-length ~{crop_length
                                                                                     } \
 
-                                                                                    ~{idx_tar
-                                                                                        } \
-                                                                                    R1$SUFFIX/*.fastq.gz \
-                                                                                    ~{(
-                                                                                        if paired_end
-                                                                                        then "R2$SUFFIX/*.fastq.gz"
-                                                                                        else ""
-                                                                                    )} \
-                                                                                    ~{(
-                                                                                        if paired_end
-                                                                                        then "--paired-end"
-                                                                                        else ""
+                                                                                --crop-length-tol "~{crop_length_tol
+                                                                                    }" \
+
+                                                                                ~{"--phred-score-format " + trimmomatic_phred_score_format
+                                                                                    } \
+                                                                                --out-dir-R1 R1$NEW_SUFFIX \
+
+                                                                                ~{(
+                                                                                    if paired_end then "--out-dir-R2 R2$NEW_SUFFIX" else ""
                                                                                     )} \
 
-                                                                                    ~{"--mem-gb " + samtools_mem_gb
-                                                                                        } \
+                                                                                ~{"--trimmomatic-java-heap " + (
+                                                                                    if defined(
+                                                                                    trimmomatic_java_heap
+                                                                                    ) then trimmomatic_java_heap else (
+                                                                                    round(
+                                                                                    mem_gb * trimmomatic_java_heap_factor
+                                                                                    ) + "G"
+                                                                                    ))} \
 
-                                                                                    ~{"--nth " + cpu
-                                                                                        }
-                                                                            fi 
+                                                                                ~{"--nth " + cpu
+                                                                                    }
+                                                                            SUFFIX=$NEW_SUFFIX
+                                                                        fi
 
-                                                                            python3 $(which encode_task_post_align.py) \
-                                                                                R1$SUFFIX/*.fastq.gz $(ls *.bam) \
 
-                                                                                ~{"--mito-chr-name " + mito_chr_name
+                                                                        if [ '~{aligner
+                                                                            }' == 'bwa' ]; then
+                                                                            python3 $(which encode_task_bwa.py) \
+
+                                                                                ~{idx_tar
+                                                                                    } \
+                                                                                R1$SUFFIX/*.fastq.gz \
+
+                                                                                ~{(
+                                                                                    if paired_end then "R2$SUFFIX/*.fastq.gz" else ""
+                                                                                    )} \
+
+                                                                                ~{(
+                                                                                    if paired_end then "--paired-end" else ""
+                                                                                    )} \
+
+                                                                                ~{(
+                                                                                    if use_bwa_mem_for_pe then "--use-bwa-mem-for-pe" else ""
+                                                                                    )} \
+
+                                                                                ~{"--bwa-mem-read-len-limit " + bwa_mem_read_len_limit
                                                                                     } \
 
                                                                                 ~{"--mem-gb " + samtools_mem_gb
@@ -3524,34 +3278,234 @@ workflow chip {
 
                                                                                 ~{"--nth " + cpu
                                                                                     }
-                                                                            rm -rf R1 R2 R1$SUFFIX R2$SUFFIX
-                                                                        >>>
 
-                                                                        output {
 
-                                                                                            File bam = glob(
-                                                                                                "*.bam"
-                                                                                                )[
-                                                                                                0
-                                                                                                ]
+                                                                        elif [ '~{aligner
+                                                                            }' == 'bowtie2' ]; then
+                                                                            python3 $(which encode_task_bowtie2.py) \
 
-                                                                                            File bai = glob(
-                                                                                                "*.bai"
-                                                                                                )[
-                                                                                                0
-                                                                                                ]
+                                                                                ~{idx_tar
+                                                                                    } \
+                                                                                R1$SUFFIX/*.fastq.gz \
 
-                                                                                            File samstat_qc = glob(
-                                                                                                "*.samstats.qc"
-                                                                                                )[
-                                                                                                0
-                                                                                                ]
+                                                                                ~{(
+                                                                                    if paired_end then "R2$SUFFIX/*.fastq.gz" else ""
+                                                                                    )} \
 
-                                                                                            File read_len_log = glob(
-                                                                                                "*.read_length.txt"
-                                                                                                )[
-                                                                                                0
-                                                                                                ]
+                                                                                ~{"--multimapping " + multimapping
+                                                                                    } \
+
+                                                                                ~{(
+                                                                                    if paired_end then "--paired-end" else ""
+                                                                                    )} \
+
+                                                                                ~{(
+                                                                                    if use_bowtie2_local_mode then "--local" else ""
+                                                                                    )} \
+
+                                                                                ~{"--mem-gb " + samtools_mem_gb
+                                                                                    } \
+
+                                                                                ~{"--nth " + cpu
+                                                                                    }
+                                                                        else
+
+                                                                            python3 ~{custom_align_py
+                                                                                } \
+
+                                                                                ~{idx_tar
+                                                                                    } \
+                                                                                R1$SUFFIX/*.fastq.gz \
+
+                                                                                ~{(
+                                                                                    if paired_end then "R2$SUFFIX/*.fastq.gz" else ""
+                                                                                    )} \
+
+                                                                                ~{(
+                                                                                    if paired_end then "--paired-end" else ""
+                                                                                    )} \
+
+                                                                                ~{"--mem-gb " + samtools_mem_gb
+                                                                                    } \
+
+                                                                                ~{"--nth " + cpu
+                                                                                    }
+                                                                        fi 
+
+                                                                        python3 $(which encode_task_post_align.py) \
+                                                                            R1$SUFFIX/*.fastq.gz $(ls *.bam) \
+
+                                                                            ~{"--mito-chr-name " + mito_chr_name
+                                                                                } \
+
+                                                                            ~{"--mem-gb " + samtools_mem_gb
+                                                                                } \
+
+                                                                            ~{"--nth " + cpu
+                                                                                }
+                                                                        rm -rf R1 R2 R1$SUFFIX R2$SUFFIX
+                                                                    >>>
+
+                                                                    output {
+
+                                                                                File bam = glob(
+                                                                                    "*.bam"
+                                                                                    )[0]
+
+                                                                                File bai = glob(
+                                                                                    "*.bai"
+                                                                                    )[0]
+
+                                                                                File samstat_qc = glob(
+                                                                                    "*.samstats.qc"
+                                                                                    )[0]
+
+                                                                                File read_len_log = glob(
+                                                                                    "*.read_length.txt"
+                                                                                    )[0]
+                                                                            }
+
+                                                                            runtime {
+                                                                                cpu: cpu
+
+                                                                                memory: "~{mem_gb
+                                                                                    } GB"
+                                                                                time: time_hr
+
+                                                                                disks: "local-disk ~{disk_gb
+                                                                                    } SSD"
+                                                                                preemptible: 0
+                                                                                docker: runtime_environment.docker
+                                                                                singularity: runtime_environment.singularity
+                                                                                conda: runtime_environment.conda
+                                                                            }
+                                                                        }
+
+                                                                        task filter {
+                                                                            input {
+                                                                                File? bam
+                                                                                Boolean paired_end
+                                                                                File? ref_fa
+                                                                                Boolean redact_nodup_bam
+                                                                                String dup_marker  # picard.jar MarkDuplicates (picard) or
+                                                                                # sambamba markdup (sambamba)
+                                                                                Int mapq_thresh  # threshold for low MAPQ reads removal
+                                                                                Array[
+                                                                                    String] filter_chrs  # chrs to be removed from final (nodup/filt) BAM
+                                                                                File chrsz  # 2-col chromosome sizes file
+                                                                                Boolean no_dup_removal  # no dupe reads removal when filtering BAM
+                                                                                String mito_chr_name
+                                                                                Int cpu
+                                                                                Float mem_factor
+                                                                                String? picard_java_heap
+                                                                                Int time_hr
+                                                                                Float disk_factor
+                                                                                RuntimeEnvironment runtime_environment
+                                                                            }
+
+                                                                            Float input_file_size_gb = size(
+                                                                                bam, "G")
+                                                                            Float picard_java_heap_factor = 0.9
+                                                                            Float mem_gb = 6.0 + mem_factor * input_file_size_gb
+                                                                            Float samtools_mem_gb = 0.8 * mem_gb
+
+                                                                            Int disk_gb = round(
+                                                                                20.0 + disk_factor * input_file_size_gb
+                                                                                )
+
+                                                                            command <<<
+                                                                                set -e
+                                                                                python3 $(which encode_task_filter.py) \
+
+                                                                                    ~{bam
+                                                                                        } \
+
+                                                                                    ~{(
+                                                                                        if paired_end then "--paired-end" else ""
+                                                                                        )
+                                                                                        } \
+                                                                                    --multimapping 0 \
+
+                                                                                    ~{"--dup-marker " + dup_marker
+                                                                                        } \
+
+                                                                                    ~{"--mapq-thresh " + mapq_thresh
+                                                                                        } \
+
+                                                                                    --filter-chrs ~{sep=" " filter_chrs
+                                                                                        } \
+
+                                                                                    ~{"--chrsz " + chrsz
+                                                                                        } \
+
+                                                                                    ~{(
+                                                                                        if no_dup_removal then "--no-dup-removal" else ""
+                                                                                        )
+                                                                                        } \
+
+                                                                                    ~{"--mito-chr-name " + mito_chr_name
+                                                                                        } \
+
+                                                                                    ~{"--mem-gb " + samtools_mem_gb
+                                                                                        } \
+
+                                                                                    ~{"--nth " + cpu
+                                                                                        } \
+
+                                                                                    ~{"--picard-java-heap " + (
+                                                                                        if defined(
+                                                                                        picard_java_heap
+                                                                                        ) then picard_java_heap else (
+                                                                                        round(
+                                                                                        mem_gb * picard_java_heap_factor
+                                                                                        ) + "G"
+                                                                                        )
+                                                                                        )}
+
+
+                                                                                if [ '~{redact_nodup_bam
+                                                                                    }' == 'true' ]; then
+                                                                                    python3 $(which encode_task_bam_to_pbam.py) \
+                                                                                        $(ls *.bam) \
+
+                                                                                        ~{"--ref-fa " + ref_fa
+                                                                                            } \
+                                                                                        '--delete-original-bam'
+                                                                                fi
+                                                                            >>>
+
+                                                                            output {
+
+                                                                                                File nodup_bam = glob(
+                                                                                                    "*.bam"
+                                                                                                    )[
+                                                                                                    0
+                                                                                                    ]
+
+                                                                                                File nodup_bai = glob(
+                                                                                                    "*.bai"
+                                                                                                    )[
+                                                                                                    0
+                                                                                                    ]
+
+                                                                                                File samstat_qc = glob(
+                                                                                                    "*.samstats.qc"
+                                                                                                    )[
+                                                                                                    0
+                                                                                                    ]
+
+                                                                                                File dup_qc = glob(
+                                                                                                    "*.dup.qc"
+                                                                                                    )[
+                                                                                                    0
+                                                                                                    ]
+
+                                                                                                File lib_complexity_qc = glob(
+                                                                                                    "*.lib_complexity.qc"
+                                                                                                    )[
+                                                                                                    0
+                                                                                                    ]
+
                                                                                         }
 
                                                                                         runtime {
@@ -3563,167 +3517,9 @@ workflow chip {
 
                                                                                             disks: "local-disk ~{disk_gb
                                                                                                 } SSD"
-                                                                                            preemptible: 0
                                                                                             docker: runtime_environment.docker
                                                                                             singularity: runtime_environment.singularity
                                                                                             conda: runtime_environment.conda
-                                                                                        }
-                                                                                    }
-
-                                                                                    task filter {
-
-                                                                                            input {
-                                                                                                File? bam
-                                                                                                Boolean paired_end
-                                                                                                File? ref_fa
-                                                                                                Boolean redact_nodup_bam
-                                                                                                String dup_marker  # picard.jar MarkDuplicates (picard) or
-                                                                                                # sambamba markdup (sambamba)
-                                                                                                Int mapq_thresh  # threshold for low MAPQ reads removal
-                                                                                                Array[
-                                                                                                    String
-                                                                                                    ] filter_chrs  # chrs to be removed from final (nodup/filt) BAM
-                                                                                                File chrsz  # 2-col chromosome sizes file
-                                                                                                Boolean no_dup_removal  # no dupe reads removal when filtering BAM
-                                                                                                String mito_chr_name
-                                                                                                Int cpu
-                                                                                                Float mem_factor
-                                                                                                String? picard_java_heap
-                                                                                                Int time_hr
-                                                                                                Float disk_factor
-                                                                                                RuntimeEnvironment runtime_environment
-
-                                                                                        }
-
-                                                                                        Float input_file_size_gb = size(
-                                                                                            bam, "G"
-                                                                                            )
-                                                                                        Float picard_java_heap_factor = 0.9
-                                                                                        Float mem_gb = 6.0 + mem_factor * input_file_size_gb
-                                                                                        Float samtools_mem_gb = 0.8 * mem_gb
-
-                                                                                        Int disk_gb = round(
-                                                                                            20.0 + disk_factor * input_file_size_gb
-                                                                                            )
-
-                                                                                        command <<<
-                                                                                            set -e
-                                                                                            python3 $(which encode_task_filter.py) \
-
-                                                                                                ~{bam
-                                                                                                    } \
-
-                                                                                                    ~{(
-                                                                                                    if paired_end
-                                                                                                    then "--paired-end"
-                                                                                                    else ""
-
-                                                                                    )
-                                                                                        } \
-                                                                                        --multimapping 0 \
-
-                                                                                        ~{"--dup-marker " + dup_marker
-                                                                                            } \
-
-                                                                                        ~{"--mapq-thresh " + mapq_thresh
-                                                                                            } \
-
-                                                                                        --filter-chrs ~{sep=" " filter_chrs
-                                                                                            } \
-
-                                                                                        ~{"--chrsz " + chrsz
-                                                                                            } \
-
-                                                                                            ~{(
-                                                                                            if no_dup_removal
-                                                                                            then "--no-dup-removal"
-                                                                                            else ""
-
-                                                                                )} \
-
-                                                                                    ~{"--mito-chr-name " + mito_chr_name
-                                                                                        } \
-
-                                                                                    ~{"--mem-gb " + samtools_mem_gb
-                                                                                        } \
-
-                                                                                    ~{"--nth " + cpu
-                                                                                        } \
-
-                                                                                        ~{"--picard-java-heap " + (
-
-                                                                                                if defined(
-                                                                                                    picard_java_heap
-                                                                                                    )
-                                                                                                then picard_java_heap
-
-                                                                                                else (
-                                                                                                    round(
-                                                                                                    mem_gb * picard_java_heap_factor
-                                                                                                    ) + "G"
-                                                                                                    )
-
-                                                                                    )}
-
-
-                                                                                    if [ '~{redact_nodup_bam
-                                                                                        }' == 'true' ]; then
-                                                                                        python3 $(which encode_task_bam_to_pbam.py) \
-                                                                                            $(ls *.bam) \
-
-                                                                                            ~{"--ref-fa " + ref_fa
-                                                                                                } \
-                                                                                            '--delete-original-bam'
-                                                                                    fi
-                                                                                >>>
-
-                                                                                output {
-
-                                                                                                    File nodup_bam = glob(
-                                                                                                        "*.bam"
-                                                                                                        )[
-                                                                                                        0
-                                                                                                        ]
-
-                                                                                                    File nodup_bai = glob(
-                                                                                                        "*.bai"
-                                                                                                        )[
-                                                                                                        0
-                                                                                                        ]
-
-                                                                                                    File samstat_qc = glob(
-                                                                                                        "*.samstats.qc"
-                                                                                                        )[
-                                                                                                        0
-                                                                                                        ]
-
-                                                                                                    File dup_qc = glob(
-                                                                                                        "*.dup.qc"
-                                                                                                        )[
-                                                                                                        0
-                                                                                                        ]
-
-                                                                                                    File lib_complexity_qc = glob(
-                                                                                                        "*.lib_complexity.qc"
-                                                                                                        )[
-                                                                                                        0
-                                                                                                        ]
-
-                                                                                            }
-
-                                                                                            runtime {
-                                                                                                cpu: cpu
-
-                                                                                                memory: "~{mem_gb
-                                                                                                    } GB"
-                                                                                                time: time_hr
-
-                                                                                                disks: "local-disk ~{disk_gb
-                                                                                                    } SSD"
-                                                                                                docker: runtime_environment.docker
-                                                                                                singularity: runtime_environment.singularity
-                                                                                                conda: runtime_environment.conda
-
                                                                                         }
                                                                                     }
 
@@ -3761,102 +3557,29 @@ workflow chip {
                                                                                                     } \
                                                                                                 --disable-tn5-shift \
 
-                                                                                                    ~{(
-                                                                                                    if paired_end
-                                                                                                    then "--paired-end"
-                                                                                                    else ""
-
-                                                                                    )
-                                                                                        } \
-
-                                                                                        ~{"--mito-chr-name " + mito_chr_name
-                                                                                            } \
-
-                                                                                        ~{"--subsample " + subsample
-                                                                                            } \
-
-                                                                                        ~{"--mem-gb " + samtools_mem_gb
-                                                                                            } \
-
-                                                                                        ~{"--nth " + cpu
-                                                                                            }
-                                                                                >>>
-
-                                                                                output {
-
-                                                                                                    File ta = glob(
-                                                                                                        "*.tagAlign.gz"
-                                                                                                        )[
-                                                                                                        0
-                                                                                                        ]
-
-                                                                                            }
-
-                                                                                            runtime {
-                                                                                                cpu: cpu
-
-                                                                                                memory: "~{mem_gb
-                                                                                                    } GB"
-                                                                                                time: time_hr
-
-                                                                                                disks: "local-disk ~{disk_gb
-                                                                                                    } SSD"
-                                                                                                docker: runtime_environment.docker
-                                                                                                singularity: runtime_environment.singularity
-                                                                                                conda: runtime_environment.conda
-
-                                                                                        }
-                                                                                    }
-
-                                                                                    task spr {
-
-                                                                                            input {
-                                                                                                File? ta
-                                                                                                Boolean paired_end
-                                                                                                Int pseudoreplication_random_seed
-                                                                                                Float mem_factor
-                                                                                                Float disk_factor
-                                                                                                RuntimeEnvironment runtime_environment
-
-                                                                                        }
-
-                                                                                        Float input_file_size_gb = size(
-                                                                                            ta, "G"
-                                                                                            )
-                                                                                        Float mem_gb = 4.0 + mem_factor * input_file_size_gb
-
-                                                                                        Int disk_gb = round(
-                                                                                            20.0 + disk_factor * input_file_size_gb
-                                                                                            )
-
-                                                                                        command <<<
-                                                                                            set -e
-                                                                                            python3 $(which encode_task_spr.py) \
-
-                                                                                                ~{ta
+                                                                                                ~{(
+                                                                                                    if paired_end then "--paired-end" else ""
+                                                                                                    )
                                                                                                     } \
 
-                                                                                                ~{"--pseudoreplication-random-seed " + pseudoreplication_random_seed
+                                                                                                ~{"--mito-chr-name " + mito_chr_name
                                                                                                     } \
 
-                                                                                                    ~{(
-                                                                                                    if paired_end
-                                                                                                    then "--paired-end"
-                                                                                                    else ""
+                                                                                                ~{"--subsample " + subsample
+                                                                                                    } \
 
-                                                                                        )}
+                                                                                                ~{"--mem-gb " + samtools_mem_gb
+                                                                                                    } \
+
+                                                                                                ~{"--nth " + cpu
+                                                                                                    }
+
                                                                                     >>>
 
                                                                                     output {
 
-                                                                                                        File ta_pr1 = glob(
-                                                                                                            "*.pr1.tagAlign.gz"
-                                                                                                            )[
-                                                                                                            0
-                                                                                                            ]
-
-                                                                                                        File ta_pr2 = glob(
-                                                                                                            "*.pr2.tagAlign.gz"
+                                                                                                        File ta = glob(
+                                                                                                            "*.tagAlign.gz"
                                                                                                             )[
                                                                                                             0
                                                                                                             ]
@@ -3864,11 +3587,11 @@ workflow chip {
                                                                                                 }
 
                                                                                                 runtime {
-                                                                                                    cpu: 1
+                                                                                                    cpu: cpu
 
                                                                                                     memory: "~{mem_gb
                                                                                                         } GB"
-                                                                                                    time: 4
+                                                                                                    time: time_hr
 
                                                                                                     disks: "local-disk ~{disk_gb
                                                                                                         } SSD"
@@ -3877,6 +3600,77 @@ workflow chip {
                                                                                                     conda: runtime_environment.conda
 
                                                                                             }
+                                                                                        }
+
+                                                                                        task spr {
+
+                                                                                                input {
+                                                                                                    File? ta
+                                                                                                    Boolean paired_end
+                                                                                                    Int pseudoreplication_random_seed
+                                                                                                    Float mem_factor
+                                                                                                    Float disk_factor
+                                                                                                    RuntimeEnvironment runtime_environment
+
+                                                                                            }
+
+                                                                                            Float input_file_size_gb = size(
+                                                                                                ta, "G"
+                                                                                                )
+                                                                                            Float mem_gb = 4.0 + mem_factor * input_file_size_gb
+
+                                                                                            Int disk_gb = round(
+                                                                                                20.0 + disk_factor * input_file_size_gb
+                                                                                                )
+
+                                                                                            command <<<
+                                                                                                set -e
+                                                                                                python3 $(which encode_task_spr.py) \
+
+                                                                                                    ~{ta
+                                                                                                        } \
+
+                                                                                                    ~{"--pseudoreplication-random-seed " + pseudoreplication_random_seed
+                                                                                                        } \
+
+                                                                                                    ~{(
+                                                                                                        if paired_end then "--paired-end" else ""
+                                                                                                        )
+                                                                                                        }
+
+                                                                                        >>>
+
+                                                                                        output {
+
+                                                                                                            File ta_pr1 = glob(
+                                                                                                                "*.pr1.tagAlign.gz"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
+
+                                                                                                            File ta_pr2 = glob(
+                                                                                                                "*.pr2.tagAlign.gz"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
+
+                                                                                                    }
+
+                                                                                                    runtime {
+                                                                                                        cpu: 1
+
+                                                                                                        memory: "~{mem_gb
+                                                                                                            } GB"
+                                                                                                        time: 4
+
+                                                                                                        disks: "local-disk ~{disk_gb
+                                                                                                            } SSD"
+                                                                                                        docker: runtime_environment.docker
+                                                                                                        singularity: runtime_environment.singularity
+                                                                                                        conda: runtime_environment.conda
+
+                                                                                                }
+
                                                                                         }
 
                                                                                         task pool_ta {
@@ -3968,145 +3762,27 @@ workflow chip {
                                                                                                             ~{ta
                                                                                                                 } \
 
-                                                                                                                ~{(
-                                                                                                                if paired_end
-                                                                                                                then "--paired-end"
-                                                                                                                else ""
-
-                                                                                                )
-                                                                                                    } \
-
-                                                                                                    ~{"--mito-chr-name " + mito_chr_name
-                                                                                                        } \
-
-                                                                                                    ~{"--subsample " + subsample
-                                                                                                        } \
-
-                                                                                                    ~{"--chip-seq-type " + chip_seq_type
-                                                                                                        } \
-
-                                                                                                    ~{"--exclusion-range-min " + exclusion_range_min
-                                                                                                        } \
-
-                                                                                                    ~{"--exclusion-range-max " + exclusion_range_max
-                                                                                                        } \
-
-                                                                                                    ~{"--subsample " + subsample
-                                                                                                        } \
-
-                                                                                                    ~{"--nth " + cpu
-                                                                                                        }
-
-                                                                                        >>>
-
-                                                                                        output {
-
-                                                                                                            File plot_pdf = glob(
-                                                                                                                "*.cc.plot.pdf"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                            File plot_png = glob(
-                                                                                                                "*.cc.plot.png"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                            File score = glob(
-                                                                                                                "*.cc.qc"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                            File fraglen_log = glob(
-                                                                                                                "*.cc.fraglen.txt"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                            Int fraglen = read_int(
-                                                                                                                fraglen_log
-                                                                                                                )
-
-                                                                                                    }
-
-                                                                                                    runtime {
-                                                                                                        cpu: cpu
-
-                                                                                                        memory: "~{mem_gb
-                                                                                                            } GB"
-                                                                                                        time: time_hr
-
-                                                                                                        disks: "local-disk ~{disk_gb
-                                                                                                            } SSD"
-                                                                                                        docker: runtime_environment.docker
-                                                                                                        singularity: runtime_environment.singularity
-                                                                                                        conda: runtime_environment.conda
-
-                                                                                                }
-
-                                                                                        }
-
-                                                                                        task jsd {
-
-                                                                                                input {
-
-                                                                                                            Array[
-                                                                                                                File?
-                                                                                                                ] nodup_bams
-
-                                                                                                            Array[
-                                                                                                                File?
-                                                                                                                ] ctl_bams
-                                                                                                            File? blacklist
-                                                                                                            Int mapq_thresh
-                                                                                                            Int cpu
-                                                                                                            Float mem_factor
-                                                                                                            Int time_hr
-                                                                                                            Float disk_factor
-                                                                                                            RuntimeEnvironment runtime_environment
-
-                                                                                                    }
-
-                                                                                                    Float input_file_size_gb = size(
-                                                                                                        nodup_bams, "G"
-                                                                                                        ) + size(
-                                                                                                        ctl_bams, "G"
-                                                                                                        )
-                                                                                                    Float mem_gb = 5.0 + mem_factor * input_file_size_gb
-
-                                                                                                    Int disk_gb = round(
-                                                                                                        20.0 + disk_factor * input_file_size_gb
-                                                                                                        )
-
-                                                                                                    command <<<
-                                                                                                        set -e
-                                                                                                        python3 $(which encode_task_jsd.py) \
-
-                                                                                                            ~{sep=" " select_all(
-                                                                                                                nodup_bams
+                                                                                                            ~{(
+                                                                                                                if paired_end then "--paired-end" else ""
                                                                                                                 )
                                                                                                                 } \
 
-                                                                                                                ~{(
-
-                                                                                                                        if length(
-                                                                                                                            ctl_bams
-                                                                                                                            ) > 0
-
-                                                                                                                        then "--ctl-bam " + select_first(
-                                                                                                                            ctl_bams
-                                                                                                                            )
-                                                                                                                        else ""
-
-                                                                                                        )
-                                                                                                            } \
-
-                                                                                                            ~{"--mapq-thresh " + mapq_thresh
+                                                                                                            ~{"--mito-chr-name " + mito_chr_name
                                                                                                                 } \
 
-                                                                                                            ~{"--blacklist " + blacklist
+                                                                                                            ~{"--subsample " + subsample
+                                                                                                                } \
+
+                                                                                                            ~{"--chip-seq-type " + chip_seq_type
+                                                                                                                } \
+
+                                                                                                            ~{"--exclusion-range-min " + exclusion_range_min
+                                                                                                                } \
+
+                                                                                                            ~{"--exclusion-range-max " + exclusion_range_max
+                                                                                                                } \
+
+                                                                                                            ~{"--subsample " + subsample
                                                                                                                 } \
 
                                                                                                             ~{"--nth " + cpu
@@ -4116,16 +3792,32 @@ workflow chip {
 
                                                                                                 output {
 
-                                                                                                                    File plot = glob(
-                                                                                                                        "*.png"
+                                                                                                                    File plot_pdf = glob(
+                                                                                                                        "*.cc.plot.pdf"
                                                                                                                         )[
                                                                                                                         0
                                                                                                                         ]
 
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] jsd_qcs = glob(
-                                                                                                                        "*.jsd.qc"
+                                                                                                                    File plot_png = glob(
+                                                                                                                        "*.cc.plot.png"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
+
+                                                                                                                    File score = glob(
+                                                                                                                        "*.cc.qc"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
+
+                                                                                                                    File fraglen_log = glob(
+                                                                                                                        "*.cc.fraglen.txt"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
+
+                                                                                                                    Int fraglen = read_int(
+                                                                                                                        fraglen_log
                                                                                                                         )
 
                                                                                                             }
@@ -4147,1670 +3839,611 @@ workflow chip {
 
                                                                                                 }
 
-                                                                                                task choose_ctl {
+                                                                                                task jsd {
 
                                                                                                         input {
 
                                                                                                                     Array[
                                                                                                                         File?
-                                                                                                                        ] tas
+                                                                                                                        ] nodup_bams
 
                                                                                                                     Array[
                                                                                                                         File?
-                                                                                                                        ] ctl_tas
-                                                                                                                    File? ta_pooled
-                                                                                                                    File? ctl_ta_pooled
-                                                                                                                    Boolean always_use_pooled_ctl  # always use pooled control for all exp rep.
-                                                                                                                    Float ctl_depth_ratio  # if ratio between controls is higher than this
-                                                                                                                    # then always use pooled control for all exp rep.
-                                                                                                                    Int ctl_depth_limit
-                                                                                                                    Float exp_ctl_depth_ratio_limit
+                                                                                                                        ] ctl_bams
+                                                                                                                    File? blacklist
+                                                                                                                    Int mapq_thresh
+                                                                                                                    Int cpu
+                                                                                                                    Float mem_factor
+                                                                                                                    Int time_hr
+                                                                                                                    Float disk_factor
                                                                                                                     RuntimeEnvironment runtime_environment
 
                                                                                                             }
 
+                                                                                                            Float input_file_size_gb = size(
+                                                                                                                nodup_bams, "G"
+                                                                                                                ) + size(
+                                                                                                                ctl_bams, "G"
+                                                                                                                )
+                                                                                                            Float mem_gb = 5.0 + mem_factor * input_file_size_gb
+
+                                                                                                            Int disk_gb = round(
+                                                                                                                20.0 + disk_factor * input_file_size_gb
+                                                                                                                )
+
                                                                                                             command <<<
                                                                                                                 set -e
-                                                                                                                python3 $(which encode_task_choose_ctl.py) \
+                                                                                                                python3 $(which encode_task_jsd.py) \
 
-                                                                                                                    --tas ~{sep=" " select_all(
-                                                                                                                        tas
+                                                                                                                    ~{sep=" " select_all(
+                                                                                                                        nodup_bams
                                                                                                                         )
                                                                                                                         } \
 
-                                                                                                                    --ctl-tas ~{sep=" " select_all(
-                                                                                                                        ctl_tas
+                                                                                                                    ~{(
+                                                                                                                        if length(
+                                                                                                                        ctl_bams
+                                                                                                                        ) > 0 then "--ctl-bam " + select_first(
+                                                                                                                        ctl_bams
+                                                                                                                        ) else ""
                                                                                                                         )
                                                                                                                         } \
 
-                                                                                                                    ~{"--ta-pooled " + ta_pooled
+                                                                                                                    ~{"--mapq-thresh " + mapq_thresh
                                                                                                                         } \
 
-                                                                                                                    ~{"--ctl-ta-pooled " + ctl_ta_pooled
+                                                                                                                    ~{"--blacklist " + blacklist
                                                                                                                         } \
 
-                                                                                                                        ~{(
-                                                                                                                        if always_use_pooled_ctl
-                                                                                                                        then "--always-use-pooled-ctl"
-                                                                                                                        else ""
+                                                                                                                    ~{"--nth " + cpu
+                                                                                                                        }
 
-                                                                                                        )
-                                                                                                            } \
+                                                                                                        >>>
 
-                                                                                                            ~{"--ctl-depth-ratio " + ctl_depth_ratio
-                                                                                                                } \
+                                                                                                        output {
 
-                                                                                                            ~{"--ctl-depth-limit " + ctl_depth_limit
-                                                                                                                } \
+                                                                                                                            File plot = glob(
+                                                                                                                                "*.png"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
-                                                                                                            ~{"--exp-ctl-depth-ratio-limit " + exp_ctl_depth_ratio_limit
-                                                                                                                }
+                                                                                                                            Array[
+                                                                                                                                File
+                                                                                                                                ] jsd_qcs = glob(
+                                                                                                                                "*.jsd.qc"
+                                                                                                                                )
 
-                                                                                                >>>
-
-                                                                                                output {
-
-                                                                                                                    File chosen_ctl_id_tsv = glob(
-                                                                                                                        "chosen_ctl.tsv"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                                    File chosen_ctl_subsample_tsv = glob(
-                                                                                                                        "chosen_ctl_subsample.tsv"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                                    File chosen_ctl_subsample_pooled_txt = glob(
-                                                                                                                        "chosen_ctl_subsample_pooled.txt"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                                    Array[
-                                                                                                                        Int
-                                                                                                                        ] chosen_ctl_ta_ids = read_lines(
-                                                                                                                        chosen_ctl_id_tsv
-                                                                                                                        )
-
-                                                                                                                    Array[
-                                                                                                                        Int
-                                                                                                                        ] chosen_ctl_ta_subsample = read_lines(
-                                                                                                                        chosen_ctl_subsample_tsv
-                                                                                                                        )
-
-                                                                                                                    Int chosen_ctl_ta_subsample_pooled = read_int(
-                                                                                                                        chosen_ctl_subsample_pooled_txt
-                                                                                                                        )
-
-                                                                                                            }
-
-                                                                                                            runtime {
-                                                                                                                cpu: 1
-                                                                                                                memory: "4 GB"
-                                                                                                                time: 4
-                                                                                                                disks: "local-disk 50 SSD"
-                                                                                                                docker: runtime_environment.docker
-                                                                                                                singularity: runtime_environment.singularity
-                                                                                                                conda: runtime_environment.conda
-
-                                                                                                        }
-
-                                                                                                }
-
-                                                                                                task count_signal_track {
-
-                                                                                                        input {
-                                                                                                            File? ta  # tag-align
-                                                                                                            File chrsz  # 2-col chromosome sizes file
-                                                                                                            RuntimeEnvironment runtime_environment
-
-                                                                                                    }
-
-                                                                                                    Float mem_gb = 8.0
-
-                                                                                                    command <<<
-                                                                                                        set -e
-                                                                                                        python3 $(which encode_task_count_signal_track.py) \
-
-                                                                                                            ~{ta
-                                                                                                                } \
-
-                                                                                                            ~{"--chrsz " + chrsz
-                                                                                                                } \
-
-                                                                                                            ~{"--mem-gb " + mem_gb
-                                                                                                                }
-
-                                                                                                >>>
-
-                                                                                                output {
-
-                                                                                                                    File pos_bw = glob(
-                                                                                                                        "*.positive.bigwig"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                                    File neg_bw = glob(
-                                                                                                                        "*.negative.bigwig"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                            }
-
-                                                                                                            runtime {
-                                                                                                                cpu: 1
-
-                                                                                                                memory: "~{mem_gb
-                                                                                                                    } GB"
-                                                                                                                time: 4
-                                                                                                                disks: "local-disk 50 SSD"
-                                                                                                                docker: runtime_environment.docker
-                                                                                                                singularity: runtime_environment.singularity
-                                                                                                                conda: runtime_environment.conda
-
-                                                                                                        }
-
-                                                                                                }
-
-                                                                                                task subsample_ctl {
-
-                                                                                                        input {
-                                                                                                            File? ta
-                                                                                                            Boolean paired_end
-                                                                                                            Int subsample
-                                                                                                            Float mem_factor
-                                                                                                            Float disk_factor
-                                                                                                            RuntimeEnvironment runtime_environment
-
-                                                                                                    }
-
-                                                                                                    Float input_file_size_gb = size(
-                                                                                                        ta, "G"
-                                                                                                        )
-                                                                                                    Float mem_gb = 4.0 + mem_factor * input_file_size_gb
-
-                                                                                                    Int disk_gb = round(
-                                                                                                        20.0 + disk_factor * input_file_size_gb
-                                                                                                        )
-
-                                                                                                    command <<<
-                                                                                                        python3 $(which encode_task_subsample_ctl.py) \
-
-                                                                                                            ~{ta
-                                                                                                                } \
-
-                                                                                                            ~{"--subsample " + subsample
-                                                                                                                } \
-
-                                                                                                                ~{(
-                                                                                                                if paired_end
-                                                                                                                then "--paired-end"
-                                                                                                                else ""
-
-                                                                                                )
-                                                                                                    } \
-
-                                                                                        >>>
-
-                                                                                        output {
-
-                                                                                                            File ta_subsampled = glob(
-                                                                                                                "*.tagAlign.gz"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                    }
-
-                                                                                                    runtime {
-                                                                                                        cpu: 1
-
-                                                                                                        memory: "~{mem_gb
-                                                                                                            } GB"
-                                                                                                        time: 4
-
-                                                                                                        disks: "local-disk ~{disk_gb
-                                                                                                            } SSD"
-                                                                                                        docker: runtime_environment.docker
-                                                                                                        singularity: runtime_environment.singularity
-                                                                                                        conda: runtime_environment.conda
-
-                                                                                                }
-
-                                                                                        }
-
-                                                                                        task call_peak {
-
-                                                                                                input {
-                                                                                                    String peak_caller
-                                                                                                    String peak_type
-                                                                                                    Array[
-                                                                                                        File?
-                                                                                                        ] tas  # [ta, control_ta]. control_ta is optional
-                                                                                                    Int fraglen  # fragment length from xcor
-                                                                                                    String gensz  # Genome size (sum of entries in 2nd column of
-                                                                                                    # chr. sizes file, or hs for human, ms for mouse)
-                                                                                                    File chrsz  # 2-col chromosome sizes file
-                                                                                                    Int cap_num_peak  # cap number of raw peaks called from MACS2
-                                                                                                    Float pval_thresh  # p.value threshold for MACS2
-                                                                                                    Float? fdr_thresh  # FDR threshold for SPP
-                                                                                                    File? blacklist  # blacklist BED to filter raw peaks
-                                                                                                    String? regex_bfilt_peak_chr_name
-                                                                                                    Int cpu
-                                                                                                    Float mem_factor
-                                                                                                    Int time_hr
-                                                                                                    Float disk_factor
-                                                                                                    RuntimeEnvironment runtime_environment
-
-                                                                                            }
-
-                                                                                            Float input_file_size_gb = size(
-                                                                                                tas, "G"
-                                                                                                )
-                                                                                            Float mem_gb = 4.0 + mem_factor * input_file_size_gb
-
-                                                                                            Int disk_gb = round(
-                                                                                                20.0 + disk_factor * input_file_size_gb
-                                                                                                )
-
-                                                                                            command <<<
-                                                                                                set -e
-
-
-                                                                                                if [ '~{peak_caller
-                                                                                                    }' == 'macs2' ]; then
-                                                                                                    python3 $(which encode_task_macs2_chip.py) \
-
-                                                                                                        ~{sep=" " select_all(
-                                                                                                            tas
-                                                                                                            )
-                                                                                                            } \
-
-                                                                                                        ~{"--gensz " + gensz
-                                                                                                            } \
-
-                                                                                                        ~{"--chrsz " + chrsz
-                                                                                                            } \
-
-                                                                                                        ~{"--fraglen " + fraglen
-                                                                                                            } \
-
-                                                                                                        ~{"--cap-num-peak " + cap_num_peak
-                                                                                                            } \
-
-                                                                                                        ~{"--pval-thresh " + pval_thresh
-                                                                                                            } \
-
-                                                                                                        ~{"--mem-gb " + mem_gb
-                                                                                                            }
-
-
-                                                                                                elif [ '~{peak_caller
-                                                                                                    }' == 'spp' ]; then
-                                                                                                    python3 $(which encode_task_spp.py) \
-
-                                                                                                        ~{sep=" " select_all(
-                                                                                                            tas
-                                                                                                            )
-                                                                                                            } \
-
-                                                                                                        ~{"--chrsz " + chrsz
-                                                                                                            } \
-
-                                                                                                        ~{"--fraglen " + fraglen
-                                                                                                            } \
-
-                                                                                                        ~{"--cap-num-peak " + cap_num_peak
-                                                                                                            } \
-
-                                                                                                        ~{"--fdr-thresh " + fdr_thresh
-                                                                                                            } \
-
-                                                                                                        ~{"--nth " + cpu
-                                                                                                            }
-                                                                                                fi
-
-                                                                                                python3 $(which encode_task_post_call_peak_chip.py) \
-                                                                                                    $(ls *Peak.gz) \
-
-                                                                                                    ~{"--ta " + tas[
-                                                                                                        0
-                                                                                                        ]
-                                                                                                        } \
-
-                                                                                                    ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"
-                                                                                                        } \
-
-                                                                                                    ~{"--chrsz " + chrsz
-                                                                                                        } \
-
-                                                                                                    ~{"--fraglen " + fraglen
-                                                                                                        } \
-
-                                                                                                    ~{"--peak-type " + peak_type
-                                                                                                        } \
-
-                                                                                                    ~{"--blacklist " + blacklist
-                                                                                                        }        
-
-                                                                                        >>>
-
-                                                                                        output {
-
-                                                                                                            File peak = glob(
-                                                                                                                "*[!.][!b][!f][!i][!l][!t]." + peak_type + ".gz"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                            # generated by post_call_peak py
-                                                                                                            File bfilt_peak = glob(
-                                                                                                                "*.bfilt." + peak_type + ".gz"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                            File bfilt_peak_bb = glob(
-                                                                                                                "*.bfilt." + peak_type + ".bb"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                            File bfilt_peak_starch = glob(
-                                                                                                                "*.bfilt." + peak_type + ".starch"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                            File bfilt_peak_hammock = glob(
-                                                                                                                "*.bfilt." + peak_type + ".hammock.gz*"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                            File bfilt_peak_hammock_tbi = glob(
-                                                                                                                "*.bfilt." + peak_type + ".hammock.gz*"
-                                                                                                                )[
-                                                                                                                1
-                                                                                                                ]
-
-                                                                                                            File frip_qc = glob(
-                                                                                                                "*.frip.qc"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                            File peak_region_size_qc = glob(
-                                                                                                                "*.peak_region_size.qc"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                            File peak_region_size_plot = glob(
-                                                                                                                "*.peak_region_size.png"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                            File num_peak_qc = glob(
-                                                                                                                "*.num_peak.qc"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-
-                                                                                                    }
-
-                                                                                                    runtime {
-
-                                                                                                            cpu: (
-                                                                                                                if peak_caller == "macs2"
-                                                                                                                then 2
-                                                                                                                else cpu
-
-                                                                                                        )
-
-                                                                                                        memory: "~{mem_gb
-                                                                                                            } GB"
-                                                                                                        time: time_hr
-
-                                                                                                        disks: "local-disk ~{disk_gb
-                                                                                                            } SSD"
-                                                                                                        preemptible: 0
-                                                                                                        docker: runtime_environment.docker
-                                                                                                        singularity: runtime_environment.singularity
-                                                                                                        conda: runtime_environment.conda
-
-                                                                                                }
-
-                                                                                        }
-
-                                                                                        task macs2_signal_track {
-
-                                                                                                input {
-                                                                                                            Array[
-                                                                                                                File?
-                                                                                                                ] tas  # [ta, control_ta]. control_ta is optional
-                                                                                                            Int fraglen  # fragment length from xcor
-                                                                                                            String gensz  # Genome size (sum of entries in 2nd column of
-                                                                                                            # chr. sizes file, or hs for human, ms for mouse)
-                                                                                                            File chrsz  # 2-col chromosome sizes file
-                                                                                                            Float pval_thresh  # p.value threshold
-                                                                                                            Float mem_factor
-                                                                                                            Int time_hr
-                                                                                                            Float disk_factor
-                                                                                                            RuntimeEnvironment runtime_environment
-
-                                                                                                    }
-
-                                                                                                    Float input_file_size_gb = size(
-                                                                                                        tas, "G"
-                                                                                                        )
-                                                                                                    Float mem_gb = 4.0 + mem_factor * input_file_size_gb
-
-                                                                                                    Int disk_gb = round(
-                                                                                                        20.0 + disk_factor * input_file_size_gb
-                                                                                                        )
-
-                                                                                                    command <<<
-                                                                                                        set -e
-                                                                                                        python3 $(which encode_task_macs2_signal_track_chip.py) \
-
-                                                                                                            ~{sep=" " select_all(
-                                                                                                                tas
-                                                                                                                )
-                                                                                                                } \
-
-                                                                                                            ~{"--gensz " + gensz
-                                                                                                                } \
-
-                                                                                                            ~{"--chrsz " + chrsz
-                                                                                                                } \
-
-                                                                                                            ~{"--fraglen " + fraglen
-                                                                                                                } \
-
-                                                                                                            ~{"--pval-thresh " + pval_thresh
-                                                                                                                } \
-
-                                                                                                            ~{"--mem-gb " + mem_gb
-                                                                                                                }
-
-                                                                                                >>>
-
-                                                                                                output {
-
-                                                                                                                    File pval_bw = glob(
-                                                                                                                        "*.pval.signal.bigwig"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                                    File fc_bw = glob(
-                                                                                                                        "*.fc.signal.bigwig"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                            }
-
-                                                                                                            runtime {
-                                                                                                                cpu: 1
-
-                                                                                                                memory: "~{mem_gb
-                                                                                                                    } GB"
-                                                                                                                time: time_hr
-
-                                                                                                                disks: "local-disk ~{disk_gb
-                                                                                                                    } SSD"
-                                                                                                                preemptible: 0
-                                                                                                                docker: runtime_environment.docker
-                                                                                                                singularity: runtime_environment.singularity
-                                                                                                                conda: runtime_environment.conda
-
-                                                                                                        }
-
-                                                                                                }
-
-                                                                                                task idr {
-
-                                                                                                        input {
-                                                                                                            String prefix  # prefix for IDR output file
-                                                                                                            File? peak1
-                                                                                                            File? peak2
-                                                                                                            File? peak_pooled
-                                                                                                            Float idr_thresh
-                                                                                                            File? blacklist  # blacklist BED to filter raw peaks
-                                                                                                            String regex_bfilt_peak_chr_name
-                                                                                                            # parameters to compute FRiP
-                                                                                                            File? ta  # to calculate FRiP
-                                                                                                            Int? fraglen  # fragment length from xcor
-                                                                                                            File chrsz  # 2-col chromosome sizes file
-                                                                                                            String peak_type
-                                                                                                            String rank
-                                                                                                            RuntimeEnvironment runtime_environment
-
-                                                                                                    }
-
-                                                                                                    command <<<
-                                                                                                        set -e
-
-                                                                                                        ~{(
-
-                                                                                                                    if defined(
-                                                                                                                        ta
-                                                                                                                        )
-                                                                                                                    then ""
-                                                                                                                    else "touch null.frip.qc"
-
-                                                                                                        )
-                                                                                                            }
-                                                                                                        touch null 
-                                                                                                        python3 $(which encode_task_idr.py) \
-
-                                                                                                            ~{peak1
-                                                                                                                } ~{peak2
-                                                                                                             } ~{peak_pooled
-                                                                                                             } \
-
-                                                                                                            ~{"--prefix " + prefix
-                                                                                                                } \
-
-                                                                                                            ~{"--idr-thresh " + idr_thresh
-                                                                                                                } \
-
-                                                                                                            ~{"--peak-type " + peak_type
-                                                                                                                } \
-
-                                                                                                            --idr-rank ~{rank
-                                                                                                                } \
-
-                                                                                                            ~{"--fraglen " + fraglen
-                                                                                                                } \
-
-                                                                                                            ~{"--chrsz " + chrsz
-                                                                                                                } \
-
-                                                                                                            ~{"--blacklist " + blacklist
-                                                                                                                } \
-
-                                                                                                            ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"
-                                                                                                                } \
-
-                                                                                                            ~{"--ta " + ta
-                                                                                                                }
-
-                                                                                                >>>
-
-                                                                                                output {
-
-                                                                                                                    File idr_peak = glob(
-                                                                                                                        "*[!.][!b][!f][!i][!l][!t]." + peak_type + ".gz"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                                    File bfilt_idr_peak = glob(
-                                                                                                                        "*.bfilt." + peak_type + ".gz"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                                    File bfilt_idr_peak_bb = glob(
-                                                                                                                        "*.bfilt." + peak_type + ".bb"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                                    File bfilt_idr_peak_starch = glob(
-                                                                                                                        "*.bfilt." + peak_type + ".starch"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                                    File bfilt_idr_peak_hammock = glob(
-                                                                                                                        "*.bfilt." + peak_type + ".hammock.gz*"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                                    File bfilt_idr_peak_hammock_tbi = glob(
-                                                                                                                        "*.bfilt." + peak_type + ".hammock.gz*"
-                                                                                                                        )[
-                                                                                                                        1
-                                                                                                                        ]
-
-                                                                                                                    File idr_plot = glob(
-                                                                                                                        "*.txt.png"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                                    File idr_unthresholded_peak = glob(
-                                                                                                                        "*.txt.gz"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                                    File idr_log = glob(
-                                                                                                                        "*.idr*.log"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
-
-                                                                                                                    File frip_qc = (
-
-                                                                                                                                if defined(
-                                                                                                                                    ta
-                                                                                                                                    )
-
-                                                                                                                                then glob(
-                                                                                                                                    "*.frip.qc"
-                                                                                                                                    )[
-                                                                                                                                    0
-                                                                                                                                    ]
-
-                                                                                                                                else glob(
-                                                                                                                                    "null"
-                                                                                                                                    )[
-                                                                                                                                    0
-                                                                                                                                    ]
-
-                                                                                                                        )
-
-                                                                                                                }
-
-                                                                                                                runtime {
-                                                                                                                    cpu: 1
-                                                                                                                    memory: "4 GB"
-                                                                                                                    time: 4
-                                                                                                                    disks: "local-disk 50 SSD"
-                                                                                                                    docker: runtime_environment.docker
-                                                                                                                    singularity: runtime_environment.singularity
-                                                                                                                    conda: runtime_environment.conda
-
-                                                                                                            }
-
-                                                                                                    }
-
-                                                                                                    task overlap {
-
-                                                                                                            input {
-                                                                                                                String prefix  # prefix for IDR output file
-                                                                                                                File? peak1
-                                                                                                                File? peak2
-                                                                                                                File? peak_pooled
-                                                                                                                File? blacklist  # blacklist BED to filter raw peaks
-                                                                                                                String regex_bfilt_peak_chr_name
-                                                                                                                # parameters to compute FRiP
-                                                                                                                File? ta  # to calculate FRiP
-                                                                                                                Int? fraglen  # fragment length from xcor (for FRIP)
-                                                                                                                File chrsz  # 2-col chromosome sizes file
-                                                                                                                String peak_type
-                                                                                                                RuntimeEnvironment runtime_environment
-
-                                                                                                        }
-
-                                                                                                        command <<<
-                                                                                                            set -e
-
-                                                                                                            ~{(
-
-                                                                                                                        if defined(
-                                                                                                                            ta
-                                                                                                                            )
-                                                                                                                        then ""
-                                                                                                                        else "touch null.frip.qc"
-
-                                                                                                            )
-                                                                                                                }
-                                                                                                            touch null 
-                                                                                                            python3 $(which encode_task_overlap.py) \
-
-                                                                                                                ~{peak1
-                                                                                                                    } ~{peak2
-                                                                                                                 } ~{peak_pooled
-                                                                                                                 } \
-
-                                                                                                                ~{"--prefix " + prefix
-                                                                                                                    } \
-
-                                                                                                                ~{"--peak-type " + peak_type
-                                                                                                                    } \
-
-                                                                                                                ~{"--fraglen " + fraglen
-                                                                                                                    } \
-
-                                                                                                                ~{"--chrsz " + chrsz
-                                                                                                                    } \
-
-                                                                                                                ~{"--blacklist " + blacklist
-                                                                                                                    } \
-                                                                                                                --nonamecheck \
-
-                                                                                                                ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"
-                                                                                                                    } \
-
-                                                                                                                ~{"--ta " + ta
                                                                                                                     }
 
-                                                                                                    >>>
+                                                                                                                    runtime {
+                                                                                                                        cpu: cpu
 
-                                                                                                    output {
+                                                                                                                        memory: "~{mem_gb
+                                                                                                                            } GB"
+                                                                                                                        time: time_hr
 
-                                                                                                                        File overlap_peak = glob(
-                                                                                                                            "*[!.][!b][!f][!i][!l][!t]." + peak_type + ".gz"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                        disks: "local-disk ~{disk_gb
+                                                                                                                            } SSD"
+                                                                                                                        docker: runtime_environment.docker
+                                                                                                                        singularity: runtime_environment.singularity
+                                                                                                                        conda: runtime_environment.conda
 
-                                                                                                                        File bfilt_overlap_peak = glob(
-                                                                                                                            "*.bfilt." + peak_type + ".gz"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                }
 
-                                                                                                                        File bfilt_overlap_peak_bb = glob(
-                                                                                                                            "*.bfilt." + peak_type + ".bb"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                        }
 
-                                                                                                                        File bfilt_overlap_peak_starch = glob(
-                                                                                                                            "*.bfilt." + peak_type + ".starch"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                        task choose_ctl {
 
-                                                                                                                        File bfilt_overlap_peak_hammock = glob(
-                                                                                                                            "*.bfilt." + peak_type + ".hammock.gz*"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                input {
 
-                                                                                                                        File bfilt_overlap_peak_hammock_tbi = glob(
-                                                                                                                            "*.bfilt." + peak_type + ".hammock.gz*"
-                                                                                                                            )[
-                                                                                                                            1
-                                                                                                                            ]
+                                                                                                                            Array[
+                                                                                                                                File?
+                                                                                                                                ] tas
 
-                                                                                                                        File frip_qc = (
+                                                                                                                            Array[
+                                                                                                                                File?
+                                                                                                                                ] ctl_tas
+                                                                                                                            File? ta_pooled
+                                                                                                                            File? ctl_ta_pooled
+                                                                                                                            Boolean always_use_pooled_ctl  # always use pooled control for all exp rep.
+                                                                                                                            Float ctl_depth_ratio  # if ratio between controls is higher than this
+                                                                                                                            # then always use pooled control for all exp rep.
+                                                                                                                            Int ctl_depth_limit
+                                                                                                                            Float exp_ctl_depth_ratio_limit
+                                                                                                                            RuntimeEnvironment runtime_environment
 
-                                                                                                                                    if defined(
-                                                                                                                                        ta
+                                                                                                                    }
+
+                                                                                                                    command <<<
+                                                                                                                        set -e
+                                                                                                                        python3 $(which encode_task_choose_ctl.py) \
+
+                                                                                                                            --tas ~{sep=" " select_all(
+                                                                                                                                tas
+                                                                                                                                )
+                                                                                                                                } \
+
+                                                                                                                            --ctl-tas ~{sep=" " select_all(
+                                                                                                                                ctl_tas
+                                                                                                                                )
+                                                                                                                                } \
+
+                                                                                                                            ~{"--ta-pooled " + ta_pooled
+                                                                                                                                } \
+
+                                                                                                                            ~{"--ctl-ta-pooled " + ctl_ta_pooled
+                                                                                                                                } \
+
+                                                                                                                            ~{(
+                                                                                                                                if always_use_pooled_ctl then "--always-use-pooled-ctl" else ""
+                                                                                                                                )
+                                                                                                                                } \
+
+                                                                                                                            ~{"--ctl-depth-ratio " + ctl_depth_ratio
+                                                                                                                                } \
+
+                                                                                                                            ~{"--ctl-depth-limit " + ctl_depth_limit
+                                                                                                                                } \
+
+                                                                                                                            ~{"--exp-ctl-depth-ratio-limit " + exp_ctl_depth_ratio_limit
+                                                                                                                                }
+
+                                                                                                                >>>
+
+                                                                                                                output {
+
+                                                                                                                                    File chosen_ctl_id_tsv = glob(
+                                                                                                                                        "chosen_ctl.tsv"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
+
+                                                                                                                                    File chosen_ctl_subsample_tsv = glob(
+                                                                                                                                        "chosen_ctl_subsample.tsv"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
+
+                                                                                                                                    File chosen_ctl_subsample_pooled_txt = glob(
+                                                                                                                                        "chosen_ctl_subsample_pooled.txt"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
+
+                                                                                                                                    Array[
+                                                                                                                                        Int
+                                                                                                                                        ] chosen_ctl_ta_ids = read_lines(
+                                                                                                                                        chosen_ctl_id_tsv
                                                                                                                                         )
 
-                                                                                                                                    then glob(
+                                                                                                                                    Array[
+                                                                                                                                        Int
+                                                                                                                                        ] chosen_ctl_ta_subsample = read_lines(
+                                                                                                                                        chosen_ctl_subsample_tsv
+                                                                                                                                        )
+
+                                                                                                                                    Int chosen_ctl_ta_subsample_pooled = read_int(
+                                                                                                                                        chosen_ctl_subsample_pooled_txt
+                                                                                                                                        )
+
+                                                                                                                            }
+
+                                                                                                                            runtime {
+                                                                                                                                cpu: 1
+                                                                                                                                memory: "4 GB"
+                                                                                                                                time: 4
+                                                                                                                                disks: "local-disk 50 SSD"
+                                                                                                                                docker: runtime_environment.docker
+                                                                                                                                singularity: runtime_environment.singularity
+                                                                                                                                conda: runtime_environment.conda
+
+                                                                                                                        }
+
+                                                                                                                }
+
+                                                                                                                task count_signal_track {
+
+                                                                                                                        input {
+                                                                                                                            File? ta  # tag-align
+                                                                                                                            File chrsz  # 2-col chromosome sizes file
+                                                                                                                            RuntimeEnvironment runtime_environment
+
+                                                                                                                    }
+
+                                                                                                                    Float mem_gb = 8.0
+
+                                                                                                                    command <<<
+                                                                                                                        set -e
+                                                                                                                        python3 $(which encode_task_count_signal_track.py) \
+
+                                                                                                                            ~{ta
+                                                                                                                                } \
+
+                                                                                                                            ~{"--chrsz " + chrsz
+                                                                                                                                } \
+
+                                                                                                                            ~{"--mem-gb " + mem_gb
+                                                                                                                                }
+
+                                                                                                                >>>
+
+                                                                                                                output {
+
+                                                                                                                                    File pos_bw = glob(
+                                                                                                                                        "*.positive.bigwig"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
+
+                                                                                                                                    File neg_bw = glob(
+                                                                                                                                        "*.negative.bigwig"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
+
+                                                                                                                            }
+
+                                                                                                                            runtime {
+                                                                                                                                cpu: 1
+
+                                                                                                                                memory: "~{mem_gb
+                                                                                                                                    } GB"
+                                                                                                                                time: 4
+                                                                                                                                disks: "local-disk 50 SSD"
+                                                                                                                                docker: runtime_environment.docker
+                                                                                                                                singularity: runtime_environment.singularity
+                                                                                                                                conda: runtime_environment.conda
+
+                                                                                                                        }
+
+                                                                                                                }
+
+                                                                                                                task subsample_ctl {
+
+                                                                                                                        input {
+                                                                                                                            File? ta
+                                                                                                                            Boolean paired_end
+                                                                                                                            Int subsample
+                                                                                                                            Float mem_factor
+                                                                                                                            Float disk_factor
+                                                                                                                            RuntimeEnvironment runtime_environment
+
+                                                                                                                    }
+
+                                                                                                                    Float input_file_size_gb = size(
+                                                                                                                        ta, "G"
+                                                                                                                        )
+                                                                                                                    Float mem_gb = 4.0 + mem_factor * input_file_size_gb
+
+                                                                                                                    Int disk_gb = round(
+                                                                                                                        20.0 + disk_factor * input_file_size_gb
+                                                                                                                        )
+
+                                                                                                                    command <<<
+                                                                                                                        python3 $(which encode_task_subsample_ctl.py) \
+
+                                                                                                                            ~{ta
+                                                                                                                                } \
+
+                                                                                                                            ~{"--subsample " + subsample
+                                                                                                                                } \
+
+                                                                                                                            ~{(
+                                                                                                                                if paired_end then "--paired-end" else ""
+                                                                                                                                )
+                                                                                                                                } \
+
+                                                                                                                >>>
+
+                                                                                                                output {
+
+                                                                                                                                    File ta_subsampled = glob(
+                                                                                                                                        "*.tagAlign.gz"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
+
+                                                                                                                            }
+
+                                                                                                                            runtime {
+                                                                                                                                cpu: 1
+
+                                                                                                                                memory: "~{mem_gb
+                                                                                                                                    } GB"
+                                                                                                                                time: 4
+
+                                                                                                                                disks: "local-disk ~{disk_gb
+                                                                                                                                    } SSD"
+                                                                                                                                docker: runtime_environment.docker
+                                                                                                                                singularity: runtime_environment.singularity
+                                                                                                                                conda: runtime_environment.conda
+
+                                                                                                                        }
+
+                                                                                                                }
+
+                                                                                                                task call_peak {
+
+                                                                                                                        input {
+                                                                                                                            String peak_caller
+                                                                                                                            String peak_type
+                                                                                                                            Array[
+                                                                                                                                File?
+                                                                                                                                ] tas  # [ta, control_ta]. control_ta is optional
+                                                                                                                            Int fraglen  # fragment length from xcor
+                                                                                                                            String gensz  # Genome size (sum of entries in 2nd column of
+                                                                                                                            # chr. sizes file, or hs for human, ms for mouse)
+                                                                                                                            File chrsz  # 2-col chromosome sizes file
+                                                                                                                            Int cap_num_peak  # cap number of raw peaks called from MACS2
+                                                                                                                            Float pval_thresh  # p.value threshold for MACS2
+                                                                                                                            Float? fdr_thresh  # FDR threshold for SPP
+                                                                                                                            File? blacklist  # blacklist BED to filter raw peaks
+                                                                                                                            String? regex_bfilt_peak_chr_name
+                                                                                                                            Int cpu
+                                                                                                                            Float mem_factor
+                                                                                                                            Int time_hr
+                                                                                                                            Float disk_factor
+                                                                                                                            RuntimeEnvironment runtime_environment
+
+                                                                                                                    }
+
+                                                                                                                    Float input_file_size_gb = size(
+                                                                                                                        tas, "G"
+                                                                                                                        )
+                                                                                                                    Float mem_gb = 4.0 + mem_factor * input_file_size_gb
+
+                                                                                                                    Int disk_gb = round(
+                                                                                                                        20.0 + disk_factor * input_file_size_gb
+                                                                                                                        )
+
+                                                                                                                    command <<<
+                                                                                                                        set -e
+
+
+                                                                                                                        if [ '~{peak_caller
+                                                                                                                            }' == 'macs2' ]; then
+                                                                                                                            python3 $(which encode_task_macs2_chip.py) \
+
+                                                                                                                                ~{sep=" " select_all(
+                                                                                                                                    tas
+                                                                                                                                    )
+                                                                                                                                    } \
+
+                                                                                                                                ~{"--gensz " + gensz
+                                                                                                                                    } \
+
+                                                                                                                                ~{"--chrsz " + chrsz
+                                                                                                                                    } \
+
+                                                                                                                                ~{"--fraglen " + fraglen
+                                                                                                                                    } \
+
+                                                                                                                                ~{"--cap-num-peak " + cap_num_peak
+                                                                                                                                    } \
+
+                                                                                                                                ~{"--pval-thresh " + pval_thresh
+                                                                                                                                    } \
+
+                                                                                                                                ~{"--mem-gb " + mem_gb
+                                                                                                                                    }
+
+
+                                                                                                                        elif [ '~{peak_caller
+                                                                                                                            }' == 'spp' ]; then
+                                                                                                                            python3 $(which encode_task_spp.py) \
+
+                                                                                                                                ~{sep=" " select_all(
+                                                                                                                                    tas
+                                                                                                                                    )
+                                                                                                                                    } \
+
+                                                                                                                                ~{"--chrsz " + chrsz
+                                                                                                                                    } \
+
+                                                                                                                                ~{"--fraglen " + fraglen
+                                                                                                                                    } \
+
+                                                                                                                                ~{"--cap-num-peak " + cap_num_peak
+                                                                                                                                    } \
+
+                                                                                                                                ~{"--fdr-thresh " + fdr_thresh
+                                                                                                                                    } \
+
+                                                                                                                                ~{"--nth " + cpu
+                                                                                                                                    }
+                                                                                                                        fi
+
+                                                                                                                        python3 $(which encode_task_post_call_peak_chip.py) \
+                                                                                                                            $(ls *Peak.gz) \
+
+                                                                                                                            ~{"--ta " + tas[
+                                                                                                                                0
+                                                                                                                                ]
+                                                                                                                                } \
+
+                                                                                                                            ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"
+                                                                                                                                } \
+
+                                                                                                                            ~{"--chrsz " + chrsz
+                                                                                                                                } \
+
+                                                                                                                            ~{"--fraglen " + fraglen
+                                                                                                                                } \
+
+                                                                                                                            ~{"--peak-type " + peak_type
+                                                                                                                                } \
+
+                                                                                                                            ~{"--blacklist " + blacklist
+                                                                                                                                }        
+
+                                                                                                                >>>
+
+                                                                                                                output {
+
+                                                                                                                                    File peak = glob(
+                                                                                                                                        "*[!.][!b][!f][!i][!l][!t]." + peak_type + ".gz"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
+
+                                                                                                                                    # generated by post_call_peak py
+                                                                                                                                    File bfilt_peak = glob(
+                                                                                                                                        "*.bfilt." + peak_type + ".gz"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
+
+                                                                                                                                    File bfilt_peak_bb = glob(
+                                                                                                                                        "*.bfilt." + peak_type + ".bb"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
+
+                                                                                                                                    File bfilt_peak_starch = glob(
+                                                                                                                                        "*.bfilt." + peak_type + ".starch"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
+
+                                                                                                                                    File bfilt_peak_hammock = glob(
+                                                                                                                                        "*.bfilt." + peak_type + ".hammock.gz*"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
+
+                                                                                                                                    File bfilt_peak_hammock_tbi = glob(
+                                                                                                                                        "*.bfilt." + peak_type + ".hammock.gz*"
+                                                                                                                                        )[
+                                                                                                                                        1
+                                                                                                                                        ]
+
+                                                                                                                                    File frip_qc = glob(
                                                                                                                                         "*.frip.qc"
                                                                                                                                         )[
                                                                                                                                         0
                                                                                                                                         ]
 
-                                                                                                                                    else glob(
-                                                                                                                                        "null"
+                                                                                                                                    File peak_region_size_qc = glob(
+                                                                                                                                        "*.peak_region_size.qc"
                                                                                                                                         )[
                                                                                                                                         0
                                                                                                                                         ]
 
-                                                                                                                            )
-
-                                                                                                                    }
-
-                                                                                                                    runtime {
-                                                                                                                        cpu: 1
-                                                                                                                        memory: "4 GB"
-                                                                                                                        time: 4
-                                                                                                                        disks: "local-disk 50 SSD"
-                                                                                                                        docker: runtime_environment.docker
-                                                                                                                        singularity: runtime_environment.singularity
-                                                                                                                        conda: runtime_environment.conda
-
-                                                                                                                }
-
-                                                                                                        }
-
-                                                                                                        task reproducibility {
-
-                                                                                                                input {
-                                                                                                                    String prefix
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] peaks  # peak files from pair of true replicates
-                                                                                                                    # in a sorted order. for example of 4 replicates,
-                                                                                                                    # 1,2 1,3 1,4 2,3 2,4 3,4.
-                                                                                                                    # x,y means peak file from rep-x vs rep-y
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] peaks_pr  # peak files from pseudo replicates
-                                                                                                                    File? peak_ppr  # Peak file from pooled pseudo replicate.
-                                                                                                                    String peak_type
-                                                                                                                    File chrsz  # 2-col chromosome sizes file
-                                                                                                                    RuntimeEnvironment runtime_environment
-
-                                                                                                            }
-
-                                                                                                            command <<<
-                                                                                                                set -e
-                                                                                                                python3 $(which encode_task_reproducibility.py) \
-
-                                                                                                                    ~{sep=" " peaks
-                                                                                                                        } \
-
-                                                                                                                    --peaks-pr ~{sep=" " peaks_pr
-                                                                                                                        } \
-
-                                                                                                                    ~{"--peak-ppr " + peak_ppr
-                                                                                                                        } \
-
-                                                                                                                    --prefix ~{prefix
-                                                                                                                        } \
-
-                                                                                                                    ~{"--peak-type " + peak_type
-                                                                                                                        } \
-
-                                                                                                                    ~{"--chrsz " + chrsz
-                                                                                                                        }
-
-                                                                                                        >>>
-
-                                                                                                        output {
-
-                                                                                                                            File optimal_peak = glob(
-                                                                                                                                "*optimal_peak.*.gz"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            File optimal_peak_bb = glob(
-                                                                                                                                "*optimal_peak.*.bb"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            File optimal_peak_starch = glob(
-                                                                                                                                "*optimal_peak.*.starch"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            File optimal_peak_hammock = glob(
-                                                                                                                                "*optimal_peak.*.hammock.gz*"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            File optimal_peak_hammock_tbi = glob(
-                                                                                                                                "*optimal_peak.*.hammock.gz*"
-                                                                                                                                )[
-                                                                                                                                1
-                                                                                                                                ]
-
-                                                                                                                            File conservative_peak = glob(
-                                                                                                                                "*conservative_peak.*.gz"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            File conservative_peak_bb = glob(
-                                                                                                                                "*conservative_peak.*.bb"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            File conservative_peak_starch = glob(
-                                                                                                                                "*conservative_peak.*.starch"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            File conservative_peak_hammock = glob(
-                                                                                                                                "*conservative_peak.*.hammock.gz*"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            File conservative_peak_hammock_tbi = glob(
-                                                                                                                                "*conservative_peak.*.hammock.gz*"
-                                                                                                                                )[
-                                                                                                                                1
-                                                                                                                                ]
-
-                                                                                                                            File reproducibility_qc = glob(
-                                                                                                                                "*reproducibility.qc"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            # QC metrics for optimal peak
-                                                                                                                            File peak_region_size_qc = glob(
-                                                                                                                                "*.peak_region_size.qc"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            File peak_region_size_plot = glob(
-                                                                                                                                "*.peak_region_size.png"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            File num_peak_qc = glob(
-                                                                                                                                "*.num_peak.qc"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                    }
-
-                                                                                                                    runtime {
-                                                                                                                        cpu: 1
-                                                                                                                        memory: "4 GB"
-                                                                                                                        time: 4
-                                                                                                                        disks: "local-disk 50 SSD"
-                                                                                                                        docker: runtime_environment.docker
-                                                                                                                        singularity: runtime_environment.singularity
-                                                                                                                        conda: runtime_environment.conda
-
-                                                                                                                }
-
-                                                                                                        }
-
-                                                                                                        task gc_bias {
-
-                                                                                                                input {
-                                                                                                                    File? nodup_bam
-                                                                                                                    File ref_fa
-                                                                                                                    String? picard_java_heap
-                                                                                                                    RuntimeEnvironment runtime_environment
-
-                                                                                                            }
-
-                                                                                                            Float mem_factor = 0.3
-
-                                                                                                            Float input_file_size_gb = size(
-                                                                                                                nodup_bam, "G"
-                                                                                                                )
-                                                                                                            Float mem_gb = 4.0 + mem_factor * input_file_size_gb
-                                                                                                            Float picard_java_heap_factor = 0.9
-
-                                                                                                            command <<<
-                                                                                                                set -e
-                                                                                                                python3 $(which encode_task_gc_bias.py) \
-
-                                                                                                                    ~{"--nodup-bam " + nodup_bam
-                                                                                                                        } \
-
-                                                                                                                    ~{"--ref-fa " + ref_fa
-                                                                                                                        } \
-
-                                                                                                                        ~{"--picard-java-heap " + (
-
-                                                                                                                                if defined(
-                                                                                                                                    picard_java_heap
-                                                                                                                                    )
-                                                                                                                                then picard_java_heap
-
-                                                                                                                                else (
-                                                                                                                                    round(
-                                                                                                                                    mem_gb * picard_java_heap_factor
-                                                                                                                                    ) + "G"
-                                                                                                                                    )
-
-                                                                                                                )
-                                                                                                                    }
-
-                                                                                                        >>>
-
-                                                                                                        output {
-
-                                                                                                                            File gc_plot = glob(
-                                                                                                                                "*.gc_plot.png"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            File gc_log = glob(
-                                                                                                                                "*.gc.txt"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                    }
-
-                                                                                                                    runtime {
-                                                                                                                        cpu: 1
-
-                                                                                                                        memory: "~{mem_gb
-                                                                                                                            } GB"
-                                                                                                                        time: 6
-                                                                                                                        disks: "local-disk 250 SSD"
-                                                                                                                        docker: runtime_environment.docker
-                                                                                                                        singularity: runtime_environment.singularity
-                                                                                                                        conda: runtime_environment.conda
-
-                                                                                                                }
-
-                                                                                                        }
-
-                                                                                                        task qc_report {
-
-                                                                                                                input {
-                                                                                                                    # optional metadata
-                                                                                                                    String pipeline_ver
-                                                                                                                    String title  # name of sample
-                                                                                                                    String description  # description for sample
-                                                                                                                    String? genome
-
-                                                                                                                    #String? encode_accession_id    # ENCODE accession ID of sample
-                                                                                                                    # workflow params
-                                                                                                                    Array[
-                                                                                                                        Boolean
-                                                                                                                        ] paired_ends
-
-                                                                                                                    Array[
-                                                                                                                        Boolean
-                                                                                                                        ] ctl_paired_ends
-                                                                                                                    String pipeline_type
-                                                                                                                    String aligner
-                                                                                                                    Boolean no_dup_removal
-                                                                                                                    String peak_caller
-                                                                                                                    Int cap_num_peak
-                                                                                                                    Float idr_thresh
-                                                                                                                    Float pval_thresh
-                                                                                                                    Int xcor_trim_bp
-                                                                                                                    Int xcor_subsample_reads
-
-                                                                                                                    # QCs
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] samstat_qcs
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] nodup_samstat_qcs
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] dup_qcs
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] lib_complexity_qcs
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] ctl_samstat_qcs
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] ctl_nodup_samstat_qcs
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] ctl_dup_qcs
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] ctl_lib_complexity_qcs
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] xcor_plots
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] xcor_scores
-                                                                                                                    File? jsd_plot
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] jsd_qcs
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] idr_plots
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] idr_plots_pr
-                                                                                                                    File? idr_plot_ppr
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] frip_qcs
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] frip_qcs_pr1
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] frip_qcs_pr2
-                                                                                                                    File? frip_qc_pooled
-                                                                                                                    File? frip_qc_ppr1
-                                                                                                                    File? frip_qc_ppr2
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] frip_idr_qcs
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] frip_idr_qcs_pr
-                                                                                                                    File? frip_idr_qc_ppr
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] frip_overlap_qcs
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] frip_overlap_qcs_pr
-                                                                                                                    File? frip_overlap_qc_ppr
-                                                                                                                    File? idr_reproducibility_qc
-                                                                                                                    File? overlap_reproducibility_qc
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] gc_plots
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] peak_region_size_qcs
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] peak_region_size_plots
-
-                                                                                                                    Array[
-                                                                                                                        File
-                                                                                                                        ] num_peak_qcs
-                                                                                                                    File? idr_opt_peak_region_size_qc
-                                                                                                                    File? idr_opt_peak_region_size_plot
-                                                                                                                    File? idr_opt_num_peak_qc
-                                                                                                                    File? overlap_opt_peak_region_size_qc
-                                                                                                                    File? overlap_opt_peak_region_size_plot
-                                                                                                                    File? overlap_opt_num_peak_qc
-                                                                                                                    File? qc_json_ref
-                                                                                                                    RuntimeEnvironment runtime_environment
-
-                                                                                                            }
-
-                                                                                                            command <<<
-                                                                                                                set -e
-                                                                                                                python3 $(which encode_task_qc_report.py) \
-                                                                                                                    --pipeline-prefix chip \
-
-                                                                                                                    ~{"--pipeline-ver " + pipeline_ver
-                                                                                                                        } \
-
-                                                                                                                    ~{"--title '" + sub(
-                                                                                                                        title, "'", "_"
-                                                                                                                        ) + "'"
-                                                                                                                        } \
-
-                                                                                                                    ~{"--desc '" + sub(
-                                                                                                                        description, "'", "_"
-                                                                                                                        ) + "'"
-                                                                                                                        } \
-
-                                                                                                                    ~{"--genome " + genome
-                                                                                                                        } \
-
-                                                                                                                    ~{"--multimapping " + 0
-                                                                                                                        } \
-
-                                                                                                                    --paired-ends ~{sep=" " paired_ends
-                                                                                                                        } \
-
-                                                                                                                    --ctl-paired-ends ~{sep=" " ctl_paired_ends
-                                                                                                                        } \
-
-                                                                                                                    --pipeline-type ~{pipeline_type
-                                                                                                                        } \
-
-                                                                                                                    --aligner ~{aligner
-                                                                                                                        } \
-
-                                                                                                                        ~{(
-
-                                                                                                                                if (
-                                                                                                                                    no_dup_removal
-                                                                                                                                    )
-                                                                                                                                then "--no-dup-removal "
-                                                                                                                                else ""
-
-                                                                                                                )
-                                                                                                                    } \
-
-                                                                                                                    --peak-caller ~{peak_caller
-                                                                                                                        } \
-
-                                                                                                                    ~{"--cap-num-peak " + cap_num_peak
-                                                                                                                        } \
-
-                                                                                                                    --idr-thresh ~{idr_thresh
-                                                                                                                        } \
-
-                                                                                                                    --pval-thresh ~{pval_thresh
-                                                                                                                        } \
-
-                                                                                                                    --xcor-trim-bp ~{xcor_trim_bp
-                                                                                                                        } \
-
-                                                                                                                    --xcor-subsample-reads ~{xcor_subsample_reads
-                                                                                                                        } \
-
-                                                                                                                    --samstat-qcs ~{sep="_:_" samstat_qcs
-                                                                                                                        } \
-
-                                                                                                                    --nodup-samstat-qcs ~{sep="_:_" nodup_samstat_qcs
-                                                                                                                        } \
-
-                                                                                                                    --dup-qcs ~{sep="_:_" dup_qcs
-                                                                                                                        } \
-
-                                                                                                                    --lib-complexity-qcs ~{sep="_:_" lib_complexity_qcs
-                                                                                                                        } \
-
-                                                                                                                    --xcor-plots ~{sep="_:_" xcor_plots
-                                                                                                                        } \
-
-                                                                                                                    --xcor-scores ~{sep="_:_" xcor_scores
-                                                                                                                        } \
-
-                                                                                                                    --idr-plots ~{sep="_:_" idr_plots
-                                                                                                                        } \
-
-                                                                                                                    --idr-plots-pr ~{sep="_:_" idr_plots_pr
-                                                                                                                        } \
-
-                                                                                                                    --ctl-samstat-qcs ~{sep="_:_" ctl_samstat_qcs
-                                                                                                                        } \
-
-                                                                                                                    --ctl-nodup-samstat-qcs ~{sep="_:_" ctl_nodup_samstat_qcs
-                                                                                                                        } \
-
-                                                                                                                    --ctl-dup-qcs ~{sep="_:_" ctl_dup_qcs
-                                                                                                                        } \
-
-                                                                                                                    --ctl-lib-complexity-qcs ~{sep="_:_" ctl_lib_complexity_qcs
-                                                                                                                        } \
-
-                                                                                                                    ~{"--jsd-plot " + jsd_plot
-                                                                                                                        } \
-
-                                                                                                                    --jsd-qcs ~{sep="_:_" jsd_qcs
-                                                                                                                        } \
-
-                                                                                                                    ~{"--idr-plot-ppr " + idr_plot_ppr
-                                                                                                                        } \
-
-                                                                                                                    --frip-qcs ~{sep="_:_" frip_qcs
-                                                                                                                        } \
-
-                                                                                                                    --frip-qcs-pr1 ~{sep="_:_" frip_qcs_pr1
-                                                                                                                        } \
-
-                                                                                                                    --frip-qcs-pr2 ~{sep="_:_" frip_qcs_pr2
-                                                                                                                        } \
-
-                                                                                                                    ~{"--frip-qc-pooled " + frip_qc_pooled
-                                                                                                                        } \
-
-                                                                                                                    ~{"--frip-qc-ppr1 " + frip_qc_ppr1
-                                                                                                                        } \
-
-                                                                                                                    ~{"--frip-qc-ppr2 " + frip_qc_ppr2
-                                                                                                                        } \
-
-                                                                                                                    --frip-idr-qcs ~{sep="_:_" frip_idr_qcs
-                                                                                                                        } \
-
-                                                                                                                    --frip-idr-qcs-pr ~{sep="_:_" frip_idr_qcs_pr
-                                                                                                                        } \
-
-                                                                                                                    ~{"--frip-idr-qc-ppr " + frip_idr_qc_ppr
-                                                                                                                        } \
-
-                                                                                                                    --frip-overlap-qcs ~{sep="_:_" frip_overlap_qcs
-                                                                                                                        } \
-
-                                                                                                                    --frip-overlap-qcs-pr ~{sep="_:_" frip_overlap_qcs_pr
-                                                                                                                        } \
-
-                                                                                                                    ~{"--frip-overlap-qc-ppr " + frip_overlap_qc_ppr
-                                                                                                                        } \
-
-                                                                                                                    ~{"--idr-reproducibility-qc " + idr_reproducibility_qc
-                                                                                                                        } \
-
-                                                                                                                    ~{"--overlap-reproducibility-qc " + overlap_reproducibility_qc
-                                                                                                                        } \
-
-                                                                                                                    --gc-plots ~{sep="_:_" gc_plots
-                                                                                                                        } \
-
-                                                                                                                    --peak-region-size-qcs ~{sep="_:_" peak_region_size_qcs
-                                                                                                                        } \
-
-                                                                                                                    --peak-region-size-plots ~{sep="_:_" peak_region_size_plots
-                                                                                                                        } \
-
-                                                                                                                    --num-peak-qcs ~{sep="_:_" num_peak_qcs
-                                                                                                                        } \
-
-                                                                                                                    ~{"--idr-opt-peak-region-size-qc " + idr_opt_peak_region_size_qc
-                                                                                                                        } \
-
-                                                                                                                    ~{"--idr-opt-peak-region-size-plot " + idr_opt_peak_region_size_plot
-                                                                                                                        } \
-
-                                                                                                                    ~{"--idr-opt-num-peak-qc " + idr_opt_num_peak_qc
-                                                                                                                        } \
-
-                                                                                                                    ~{"--overlap-opt-peak-region-size-qc " + overlap_opt_peak_region_size_qc
-                                                                                                                        } \
-
-                                                                                                                    ~{"--overlap-opt-peak-region-size-plot " + overlap_opt_peak_region_size_plot
-                                                                                                                        } \
-
-                                                                                                                    ~{"--overlap-opt-num-peak-qc " + overlap_opt_num_peak_qc
-                                                                                                                        } \
-                                                                                                                    --out-qc-html qc.html \
-                                                                                                                    --out-qc-json qc.json \
-
-                                                                                                                    ~{"--qc-json-ref " + qc_json_ref
-                                                                                                                        }
-
-                                                                                                        >>>
-
-                                                                                                        output {
-
-                                                                                                                            File report = glob(
-                                                                                                                                "*qc.html"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            File qc_json = glob(
-                                                                                                                                "*qc.json"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
-
-                                                                                                                            Boolean qc_json_ref_match = read_string(
-                                                                                                                                "qc_json_ref_match.txt"
-                                                                                                                                ) == "True"
-
-                                                                                                                    }
-
-                                                                                                                    runtime {
-                                                                                                                        cpu: 1
-                                                                                                                        memory: "4 GB"
-                                                                                                                        time: 4
-                                                                                                                        disks: "local-disk 50 SSD"
-                                                                                                                        docker: runtime_environment.docker
-                                                                                                                        singularity: runtime_environment.singularity
-                                                                                                                        conda: runtime_environment.conda
-
-                                                                                                                }
-
-                                                                                                        }
-
-                                                                                                        ### workflow system tasks
-                                                                                                        task read_genome_tsv {
-
-                                                                                                                input {
-                                                                                                                    File? genome_tsv
-                                                                                                                    String? null_s
-                                                                                                                    RuntimeEnvironment runtime_environment
-
-                                                                                                            }
-
-                                                                                                            command <<<
-
-                                                                                                                    echo "$(basename ~{genome_tsv
-                                                                                                                        })" > genome_name
-                                                                                                                    # create empty files for all entries
-                                                                                                                    touch ref_fa bowtie2_idx_tar bwa_idx_tar chrsz gensz blacklist blacklist2
-                                                                                                                    touch mito_chr_name
-                                                                                                                    touch regex_bfilt_peak_chr_name
-
-                                                                                                                    python <<CODE
-                                                                                                                    import os
-
-                                                                                                                    with open('~{genome_tsv
-                                                                                                                        }','r') as fp:
-                                                                                                                        for line in fp:
-                                                                                                                            arr = line.strip('\n').split('\t')
-                                                                                                                            if arr:
-                                                                                                                                key, val = arr
-                                                                                                                                with open(key,'w') as fp2:
-                                                                                                                                    fp2.write(val)
-                                                                                                                    CODE
-
-                                                                                                            >>>
-
-                                                                                                            output {
-
-                                                                                                                        String? genome_name = read_string(
-                                                                                                                            "genome_name"
-                                                                                                                            )
-
-                                                                                                                        String? ref_fa = (
-
-                                                                                                                                    if size(
-                                                                                                                                        "ref_fa"
-                                                                                                                                        ) == 0
-                                                                                                                                    then null_s
-
-                                                                                                                                    else read_string(
-                                                                                                                                        "ref_fa"
-                                                                                                                                        )
-
-                                                                                                                            )
-
-                                                                                                                            String? bwa_idx_tar = (
-
-                                                                                                                                        if size(
-                                                                                                                                            "bwa_idx_tar"
-                                                                                                                                            ) == 0
-                                                                                                                                        then null_s
-
-                                                                                                                                        else read_string(
-                                                                                                                                            "bwa_idx_tar"
+                                                                                                                                    File peak_region_size_plot = glob(
+                                                                                                                                        "*.peak_region_size.png"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
+
+                                                                                                                                    File num_peak_qc = glob(
+                                                                                                                                        "*.num_peak.qc"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
+
+                                                                                                                            }
+
+                                                                                                                            runtime {
+
+                                                                                                                                        cpu: (
+                                                                                                                                            if peak_caller == "macs2" then 2 else cpu
                                                                                                                                             )
 
-                                                                                                                                )
+                                                                                                                                        memory: "~{mem_gb
+                                                                                                                                            } GB"
+                                                                                                                                        time: time_hr
 
-                                                                                                                                String? bowtie2_idx_tar = (
+                                                                                                                                        disks: "local-disk ~{disk_gb
+                                                                                                                                            } SSD"
+                                                                                                                                        preemptible: 0
+                                                                                                                                        docker: runtime_environment.docker
+                                                                                                                                        singularity: runtime_environment.singularity
+                                                                                                                                        conda: runtime_environment.conda
 
-                                                                                                                                            if size(
-                                                                                                                                                "bowtie2_idx_tar"
-                                                                                                                                                ) == 0
-                                                                                                                                            then null_s
+                                                                                                                                }
 
-                                                                                                                                            else read_string(
-                                                                                                                                                "bowtie2_idx_tar"
-                                                                                                                                                )
+                                                                                                                        }
 
-                                                                                                                                    )
+                                                                                                                        task macs2_signal_track {
 
-                                                                                                                                    String? chrsz = (
+                                                                                                                                input {
+                                                                                                                                            Array[
+                                                                                                                                                File?
+                                                                                                                                                ] tas  # [ta, control_ta]. control_ta is optional
+                                                                                                                                            Int fraglen  # fragment length from xcor
+                                                                                                                                            String gensz  # Genome size (sum of entries in 2nd column of
+                                                                                                                                            # chr. sizes file, or hs for human, ms for mouse)
+                                                                                                                                            File chrsz  # 2-col chromosome sizes file
+                                                                                                                                            Float pval_thresh  # p.value threshold
+                                                                                                                                            Float mem_factor
+                                                                                                                                            Int time_hr
+                                                                                                                                            Float disk_factor
+                                                                                                                                            RuntimeEnvironment runtime_environment
 
-                                                                                                                                                if size(
-                                                                                                                                                    "chrsz"
-                                                                                                                                                    ) == 0
-                                                                                                                                                then null_s
+                                                                                                                                    }
 
-                                                                                                                                                else read_string(
-                                                                                                                                                    "chrsz"
-                                                                                                                                                    )
+                                                                                                                                    Float input_file_size_gb = size(
+                                                                                                                                        tas, "G"
+                                                                                                                                        )
+                                                                                                                                    Float mem_gb = 4.0 + mem_factor * input_file_size_gb
 
+                                                                                                                                    Int disk_gb = round(
+                                                                                                                                        20.0 + disk_factor * input_file_size_gb
                                                                                                                                         )
 
-                                                                                                                                        String? gensz = (
+                                                                                                                                    command <<<
+                                                                                                                                        set -e
+                                                                                                                                        python3 $(which encode_task_macs2_signal_track_chip.py) \
 
-                                                                                                                                                    if size(
-                                                                                                                                                        "gensz"
-                                                                                                                                                        ) == 0
-                                                                                                                                                    then null_s
-
-                                                                                                                                                    else read_string(
-                                                                                                                                                        "gensz"
-                                                                                                                                                        )
-
-                                                                                                                                            )
-
-                                                                                                                                            String? blacklist = (
-
-                                                                                                                                                        if size(
-                                                                                                                                                            "blacklist"
-                                                                                                                                                            ) == 0
-                                                                                                                                                        then null_s
-
-                                                                                                                                                        else read_string(
-                                                                                                                                                            "blacklist"
-                                                                                                                                                            )
-
+                                                                                                                                            ~{sep=" " select_all(
+                                                                                                                                                tas
                                                                                                                                                 )
+                                                                                                                                                } \
 
-                                                                                                                                                String? blacklist2 = (
+                                                                                                                                            ~{"--gensz " + gensz
+                                                                                                                                                } \
 
-                                                                                                                                                            if size(
-                                                                                                                                                                "blacklist2"
-                                                                                                                                                                ) == 0
-                                                                                                                                                            then null_s
+                                                                                                                                            ~{"--chrsz " + chrsz
+                                                                                                                                                } \
 
-                                                                                                                                                            else read_string(
-                                                                                                                                                                "blacklist2"
-                                                                                                                                                                )
+                                                                                                                                            ~{"--fraglen " + fraglen
+                                                                                                                                                } \
 
-                                                                                                                                                    )
+                                                                                                                                            ~{"--pval-thresh " + pval_thresh
+                                                                                                                                                } \
 
-                                                                                                                                                    String? mito_chr_name = (
-
-                                                                                                                                                                if size(
-                                                                                                                                                                    "mito_chr_name"
-                                                                                                                                                                    ) == 0
-                                                                                                                                                                then null_s
-
-                                                                                                                                                                else read_string(
-                                                                                                                                                                    "mito_chr_name"
-                                                                                                                                                                    )
-
-                                                                                                                                                        )
-
-                                                                                                                                                        String? regex_bfilt_peak_chr_name = (
-
-                                                                                                                                                                    if size(
-                                                                                                                                                                        "regex_bfilt_peak_chr_name"
-                                                                                                                                                                        ) == 0
-                                                                                                                                                                    then "chr[\\dXY]+"
-
-                                                                                                                                                                    else read_string(
-                                                                                                                                                                        "regex_bfilt_peak_chr_name"
-                                                                                                                                                                        )
-
-                                                                                                                                                            )
-
-                                                                                                                                                    }
-
-                                                                                                                                                    runtime {
-                                                                                                                                                        maxRetries: 0
-                                                                                                                                                        cpu: 1
-                                                                                                                                                        memory: "2 GB"
-                                                                                                                                                        time: 4
-                                                                                                                                                        disks: "local-disk 10 SSD"
-                                                                                                                                                        docker: runtime_environment.docker
-                                                                                                                                                        singularity: runtime_environment.singularity
-                                                                                                                                                        conda: runtime_environment.conda
-
+                                                                                                                                            ~{"--mem-gb " + mem_gb
                                                                                                                                                 }
 
-                                                                                                                                        }
+                                                                                                                                >>>
 
-                                                                                                                                        task rounded_mean {
+                                                                                                                                output {
 
-                                                                                                                                                input {
+                                                                                                                                                    File pval_bw = glob(
+                                                                                                                                                        "*.pval.signal.bigwig"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
 
-                                                                                                                                                            Array[
-                                                                                                                                                                Int
-                                                                                                                                                                ] ints
-                                                                                                                                                            RuntimeEnvironment runtime_environment
-
-                                                                                                                                                    }
-
-                                                                                                                                                    command <<<
-                                                                                                                                                        python <<CODE
-
-                                                                                                                                                        arr = [~{sep="," ints
-                                                                                                                                                            }]
-                                                                                                                                                        with open('tmp.txt','w') as fp:
-                                                                                                                                                            if len(arr):
-                                                                                                                                                                sum_ = sum(arr)
-                                                                                                                                                                mean_ = sum(arr)/float(len(arr))
-                                                                                                                                                                fp.write('{}'.format(int(round(mean_))))
-                                                                                                                                                            else:
-                                                                                                                                                                fp.write('0')
-                                                                                                                                                        CODE
-
-                                                                                                                                                >>>
-
-                                                                                                                                                output {
-
-                                                                                                                                                            Int rounded_mean = read_int(
-                                                                                                                                                                "tmp.txt"
-                                                                                                                                                                )
-
-                                                                                                                                                    }
-
-                                                                                                                                                    runtime {
-                                                                                                                                                        cpu: 1
-                                                                                                                                                        memory: "2 GB"
-                                                                                                                                                        time: 4
-                                                                                                                                                        disks: "local-disk 10 SSD"
-                                                                                                                                                        docker: runtime_environment.docker
-                                                                                                                                                        singularity: runtime_environment.singularity
-                                                                                                                                                        conda: runtime_environment.conda
-
-                                                                                                                                                }
-
-                                                                                                                                        }
-
-                                                                                                                                        task raise_exception {
-
-                                                                                                                                                input {
-                                                                                                                                                    String msg
-                                                                                                                                                    RuntimeEnvironment runtime_environment
-
-                                                                                                                                            }
-
-                                                                                                                                            command <<<
-
-                                                                                                                                                    echo -e "\n* Error: ~{msg
-                                                                                                                                                        }\n" >&2
-                                                                                                                                                    exit 2
-
-                                                                                                                                            >>>
-
-                                                                                                                                            output {
-
-                                                                                                                                                    String error_msg = "~{msg
-                                                                                                                                                        }"
+                                                                                                                                                    File fc_bw = glob(
+                                                                                                                                                        "*.fc.signal.bigwig"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
 
                                                                                                                                             }
 
                                                                                                                                             runtime {
-                                                                                                                                                maxRetries: 0
                                                                                                                                                 cpu: 1
-                                                                                                                                                memory: "2 GB"
-                                                                                                                                                time: 4
-                                                                                                                                                disks: "local-disk 10 SSD"
+
+                                                                                                                                                memory: "~{mem_gb
+                                                                                                                                                    } GB"
+                                                                                                                                                time: time_hr
+
+                                                                                                                                                disks: "local-disk ~{disk_gb
+                                                                                                                                                    } SSD"
+                                                                                                                                                preemptible: 0
                                                                                                                                                 docker: runtime_environment.docker
                                                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                                                 conda: runtime_environment.conda
@@ -5818,3 +4451,1073 @@ workflow chip {
                                                                                                                                         }
 
                                                                                                                                 }
+
+                                                                                                                                task idr {
+
+                                                                                                                                        input {
+                                                                                                                                            String prefix  # prefix for IDR output file
+                                                                                                                                            File? peak1
+                                                                                                                                            File? peak2
+                                                                                                                                            File? peak_pooled
+                                                                                                                                            Float idr_thresh
+                                                                                                                                            File? blacklist  # blacklist BED to filter raw peaks
+                                                                                                                                            String regex_bfilt_peak_chr_name
+                                                                                                                                            # parameters to compute FRiP
+                                                                                                                                            File? ta  # to calculate FRiP
+                                                                                                                                            Int? fraglen  # fragment length from xcor
+                                                                                                                                            File chrsz  # 2-col chromosome sizes file
+                                                                                                                                            String peak_type
+                                                                                                                                            String rank
+                                                                                                                                            RuntimeEnvironment runtime_environment
+
+                                                                                                                                    }
+
+                                                                                                                                    command <<<
+                                                                                                                                        set -e
+
+                                                                                                                                        ~{(
+                                                                                                                                            if defined(
+                                                                                                                                            ta
+                                                                                                                                            ) then "" else "touch null.frip.qc"
+                                                                                                                                            )
+                                                                                                                                            }
+                                                                                                                                        touch null 
+                                                                                                                                        python3 $(which encode_task_idr.py) \
+
+                                                                                                                                            ~{peak1
+                                                                                                                                                } ~{peak2
+                                                                                                                                             } ~{peak_pooled
+                                                                                                                                             } \
+
+                                                                                                                                            ~{"--prefix " + prefix
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--idr-thresh " + idr_thresh
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--peak-type " + peak_type
+                                                                                                                                                } \
+
+                                                                                                                                            --idr-rank ~{rank
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--fraglen " + fraglen
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--chrsz " + chrsz
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--blacklist " + blacklist
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--ta " + ta
+                                                                                                                                                }
+
+                                                                                                                                >>>
+
+                                                                                                                                output {
+
+                                                                                                                                                    File idr_peak = glob(
+                                                                                                                                                        "*[!.][!b][!f][!i][!l][!t]." + peak_type + ".gz"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File bfilt_idr_peak = glob(
+                                                                                                                                                        "*.bfilt." + peak_type + ".gz"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File bfilt_idr_peak_bb = glob(
+                                                                                                                                                        "*.bfilt." + peak_type + ".bb"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File bfilt_idr_peak_starch = glob(
+                                                                                                                                                        "*.bfilt." + peak_type + ".starch"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File bfilt_idr_peak_hammock = glob(
+                                                                                                                                                        "*.bfilt." + peak_type + ".hammock.gz*"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File bfilt_idr_peak_hammock_tbi = glob(
+                                                                                                                                                        "*.bfilt." + peak_type + ".hammock.gz*"
+                                                                                                                                                        )[
+                                                                                                                                                        1
+                                                                                                                                                        ]
+
+                                                                                                                                                    File idr_plot = glob(
+                                                                                                                                                        "*.txt.png"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File idr_unthresholded_peak = glob(
+                                                                                                                                                        "*.txt.gz"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File idr_log = glob(
+                                                                                                                                                        "*.idr*.log"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File frip_qc = (
+                                                                                                                                                        if defined(
+                                                                                                                                                        ta
+                                                                                                                                                        ) then glob(
+                                                                                                                                                        "*.frip.qc"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ] else glob(
+                                                                                                                                                        "null"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+                                                                                                                                                        )
+
+                                                                                                                                            }
+
+                                                                                                                                            runtime {
+                                                                                                                                                cpu: 1
+                                                                                                                                                memory: "4 GB"
+                                                                                                                                                time: 4
+                                                                                                                                                disks: "local-disk 50 SSD"
+                                                                                                                                                docker: runtime_environment.docker
+                                                                                                                                                singularity: runtime_environment.singularity
+                                                                                                                                                conda: runtime_environment.conda
+
+                                                                                                                                        }
+
+                                                                                                                                }
+
+                                                                                                                                task overlap {
+
+                                                                                                                                        input {
+                                                                                                                                            String prefix  # prefix for IDR output file
+                                                                                                                                            File? peak1
+                                                                                                                                            File? peak2
+                                                                                                                                            File? peak_pooled
+                                                                                                                                            File? blacklist  # blacklist BED to filter raw peaks
+                                                                                                                                            String regex_bfilt_peak_chr_name
+                                                                                                                                            # parameters to compute FRiP
+                                                                                                                                            File? ta  # to calculate FRiP
+                                                                                                                                            Int? fraglen  # fragment length from xcor (for FRIP)
+                                                                                                                                            File chrsz  # 2-col chromosome sizes file
+                                                                                                                                            String peak_type
+                                                                                                                                            RuntimeEnvironment runtime_environment
+
+                                                                                                                                    }
+
+                                                                                                                                    command <<<
+                                                                                                                                        set -e
+
+                                                                                                                                        ~{(
+                                                                                                                                            if defined(
+                                                                                                                                            ta
+                                                                                                                                            ) then "" else "touch null.frip.qc"
+                                                                                                                                            )
+                                                                                                                                            }
+                                                                                                                                        touch null 
+                                                                                                                                        python3 $(which encode_task_overlap.py) \
+
+                                                                                                                                            ~{peak1
+                                                                                                                                                } ~{peak2
+                                                                                                                                             } ~{peak_pooled
+                                                                                                                                             } \
+
+                                                                                                                                            ~{"--prefix " + prefix
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--peak-type " + peak_type
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--fraglen " + fraglen
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--chrsz " + chrsz
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--blacklist " + blacklist
+                                                                                                                                                } \
+                                                                                                                                            --nonamecheck \
+
+                                                                                                                                            ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--ta " + ta
+                                                                                                                                                }
+
+                                                                                                                                >>>
+
+                                                                                                                                output {
+
+                                                                                                                                                    File overlap_peak = glob(
+                                                                                                                                                        "*[!.][!b][!f][!i][!l][!t]." + peak_type + ".gz"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File bfilt_overlap_peak = glob(
+                                                                                                                                                        "*.bfilt." + peak_type + ".gz"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File bfilt_overlap_peak_bb = glob(
+                                                                                                                                                        "*.bfilt." + peak_type + ".bb"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File bfilt_overlap_peak_starch = glob(
+                                                                                                                                                        "*.bfilt." + peak_type + ".starch"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File bfilt_overlap_peak_hammock = glob(
+                                                                                                                                                        "*.bfilt." + peak_type + ".hammock.gz*"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File bfilt_overlap_peak_hammock_tbi = glob(
+                                                                                                                                                        "*.bfilt." + peak_type + ".hammock.gz*"
+                                                                                                                                                        )[
+                                                                                                                                                        1
+                                                                                                                                                        ]
+
+                                                                                                                                                    File frip_qc = (
+                                                                                                                                                        if defined(
+                                                                                                                                                        ta
+                                                                                                                                                        ) then glob(
+                                                                                                                                                        "*.frip.qc"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ] else glob(
+                                                                                                                                                        "null"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+                                                                                                                                                        )
+
+                                                                                                                                            }
+
+                                                                                                                                            runtime {
+                                                                                                                                                cpu: 1
+                                                                                                                                                memory: "4 GB"
+                                                                                                                                                time: 4
+                                                                                                                                                disks: "local-disk 50 SSD"
+                                                                                                                                                docker: runtime_environment.docker
+                                                                                                                                                singularity: runtime_environment.singularity
+                                                                                                                                                conda: runtime_environment.conda
+
+                                                                                                                                        }
+
+                                                                                                                                }
+
+                                                                                                                                task reproducibility {
+
+                                                                                                                                        input {
+                                                                                                                                            String prefix
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] peaks  # peak files from pair of true replicates
+                                                                                                                                            # in a sorted order. for example of 4 replicates,
+                                                                                                                                            # 1,2 1,3 1,4 2,3 2,4 3,4.
+                                                                                                                                            # x,y means peak file from rep-x vs rep-y
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] peaks_pr  # peak files from pseudo replicates
+                                                                                                                                            File? peak_ppr  # Peak file from pooled pseudo replicate.
+                                                                                                                                            String peak_type
+                                                                                                                                            File chrsz  # 2-col chromosome sizes file
+                                                                                                                                            RuntimeEnvironment runtime_environment
+
+                                                                                                                                    }
+
+                                                                                                                                    command <<<
+                                                                                                                                        set -e
+                                                                                                                                        python3 $(which encode_task_reproducibility.py) \
+
+                                                                                                                                            ~{sep=" " peaks
+                                                                                                                                                } \
+
+                                                                                                                                            --peaks-pr ~{sep=" " peaks_pr
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--peak-ppr " + peak_ppr
+                                                                                                                                                } \
+
+                                                                                                                                            --prefix ~{prefix
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--peak-type " + peak_type
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--chrsz " + chrsz
+                                                                                                                                                }
+
+                                                                                                                                >>>
+
+                                                                                                                                output {
+
+                                                                                                                                                    File optimal_peak = glob(
+                                                                                                                                                        "*optimal_peak.*.gz"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File optimal_peak_bb = glob(
+                                                                                                                                                        "*optimal_peak.*.bb"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File optimal_peak_starch = glob(
+                                                                                                                                                        "*optimal_peak.*.starch"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File optimal_peak_hammock = glob(
+                                                                                                                                                        "*optimal_peak.*.hammock.gz*"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File optimal_peak_hammock_tbi = glob(
+                                                                                                                                                        "*optimal_peak.*.hammock.gz*"
+                                                                                                                                                        )[
+                                                                                                                                                        1
+                                                                                                                                                        ]
+
+                                                                                                                                                    File conservative_peak = glob(
+                                                                                                                                                        "*conservative_peak.*.gz"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File conservative_peak_bb = glob(
+                                                                                                                                                        "*conservative_peak.*.bb"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File conservative_peak_starch = glob(
+                                                                                                                                                        "*conservative_peak.*.starch"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File conservative_peak_hammock = glob(
+                                                                                                                                                        "*conservative_peak.*.hammock.gz*"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File conservative_peak_hammock_tbi = glob(
+                                                                                                                                                        "*conservative_peak.*.hammock.gz*"
+                                                                                                                                                        )[
+                                                                                                                                                        1
+                                                                                                                                                        ]
+
+                                                                                                                                                    File reproducibility_qc = glob(
+                                                                                                                                                        "*reproducibility.qc"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    # QC metrics for optimal peak
+                                                                                                                                                    File peak_region_size_qc = glob(
+                                                                                                                                                        "*.peak_region_size.qc"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File peak_region_size_plot = glob(
+                                                                                                                                                        "*.peak_region_size.png"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File num_peak_qc = glob(
+                                                                                                                                                        "*.num_peak.qc"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                            }
+
+                                                                                                                                            runtime {
+                                                                                                                                                cpu: 1
+                                                                                                                                                memory: "4 GB"
+                                                                                                                                                time: 4
+                                                                                                                                                disks: "local-disk 50 SSD"
+                                                                                                                                                docker: runtime_environment.docker
+                                                                                                                                                singularity: runtime_environment.singularity
+                                                                                                                                                conda: runtime_environment.conda
+
+                                                                                                                                        }
+
+                                                                                                                                }
+
+                                                                                                                                task gc_bias {
+
+                                                                                                                                        input {
+                                                                                                                                            File? nodup_bam
+                                                                                                                                            File ref_fa
+                                                                                                                                            String? picard_java_heap
+                                                                                                                                            RuntimeEnvironment runtime_environment
+
+                                                                                                                                    }
+
+                                                                                                                                    Float mem_factor = 0.3
+
+                                                                                                                                    Float input_file_size_gb = size(
+                                                                                                                                        nodup_bam, "G"
+                                                                                                                                        )
+                                                                                                                                    Float mem_gb = 4.0 + mem_factor * input_file_size_gb
+                                                                                                                                    Float picard_java_heap_factor = 0.9
+
+                                                                                                                                    command <<<
+                                                                                                                                        set -e
+                                                                                                                                        python3 $(which encode_task_gc_bias.py) \
+
+                                                                                                                                            ~{"--nodup-bam " + nodup_bam
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--ref-fa " + ref_fa
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--picard-java-heap " + (
+                                                                                                                                                if defined(
+                                                                                                                                                picard_java_heap
+                                                                                                                                                ) then picard_java_heap else (
+                                                                                                                                                round(
+                                                                                                                                                mem_gb * picard_java_heap_factor
+                                                                                                                                                ) + "G"
+                                                                                                                                                )
+                                                                                                                                                )
+                                                                                                                                                }
+
+                                                                                                                                >>>
+
+                                                                                                                                output {
+
+                                                                                                                                                    File gc_plot = glob(
+                                                                                                                                                        "*.gc_plot.png"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File gc_log = glob(
+                                                                                                                                                        "*.gc.txt"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                            }
+
+                                                                                                                                            runtime {
+                                                                                                                                                cpu: 1
+
+                                                                                                                                                memory: "~{mem_gb
+                                                                                                                                                    } GB"
+                                                                                                                                                time: 6
+                                                                                                                                                disks: "local-disk 250 SSD"
+                                                                                                                                                docker: runtime_environment.docker
+                                                                                                                                                singularity: runtime_environment.singularity
+                                                                                                                                                conda: runtime_environment.conda
+
+                                                                                                                                        }
+
+                                                                                                                                }
+
+                                                                                                                                task qc_report {
+
+                                                                                                                                        input {
+                                                                                                                                            # optional metadata
+                                                                                                                                            String pipeline_ver
+                                                                                                                                            String title  # name of sample
+                                                                                                                                            String description  # description for sample
+                                                                                                                                            String? genome
+
+                                                                                                                                            #String? encode_accession_id    # ENCODE accession ID of sample
+                                                                                                                                            # workflow params
+                                                                                                                                            Array[
+                                                                                                                                                Boolean
+                                                                                                                                                ] paired_ends
+
+                                                                                                                                            Array[
+                                                                                                                                                Boolean
+                                                                                                                                                ] ctl_paired_ends
+                                                                                                                                            String pipeline_type
+                                                                                                                                            String aligner
+                                                                                                                                            Boolean no_dup_removal
+                                                                                                                                            String peak_caller
+                                                                                                                                            Int cap_num_peak
+                                                                                                                                            Float idr_thresh
+                                                                                                                                            Float pval_thresh
+                                                                                                                                            Int xcor_trim_bp
+                                                                                                                                            Int xcor_subsample_reads
+
+                                                                                                                                            # QCs
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] samstat_qcs
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] nodup_samstat_qcs
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] dup_qcs
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] lib_complexity_qcs
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] ctl_samstat_qcs
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] ctl_nodup_samstat_qcs
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] ctl_dup_qcs
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] ctl_lib_complexity_qcs
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] xcor_plots
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] xcor_scores
+                                                                                                                                            File? jsd_plot
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] jsd_qcs
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] idr_plots
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] idr_plots_pr
+                                                                                                                                            File? idr_plot_ppr
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] frip_qcs
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] frip_qcs_pr1
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] frip_qcs_pr2
+                                                                                                                                            File? frip_qc_pooled
+                                                                                                                                            File? frip_qc_ppr1
+                                                                                                                                            File? frip_qc_ppr2
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] frip_idr_qcs
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] frip_idr_qcs_pr
+                                                                                                                                            File? frip_idr_qc_ppr
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] frip_overlap_qcs
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] frip_overlap_qcs_pr
+                                                                                                                                            File? frip_overlap_qc_ppr
+                                                                                                                                            File? idr_reproducibility_qc
+                                                                                                                                            File? overlap_reproducibility_qc
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] gc_plots
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] peak_region_size_qcs
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] peak_region_size_plots
+
+                                                                                                                                            Array[
+                                                                                                                                                File
+                                                                                                                                                ] num_peak_qcs
+                                                                                                                                            File? idr_opt_peak_region_size_qc
+                                                                                                                                            File? idr_opt_peak_region_size_plot
+                                                                                                                                            File? idr_opt_num_peak_qc
+                                                                                                                                            File? overlap_opt_peak_region_size_qc
+                                                                                                                                            File? overlap_opt_peak_region_size_plot
+                                                                                                                                            File? overlap_opt_num_peak_qc
+                                                                                                                                            File? qc_json_ref
+                                                                                                                                            RuntimeEnvironment runtime_environment
+
+                                                                                                                                    }
+
+                                                                                                                                    command <<<
+                                                                                                                                        set -e
+                                                                                                                                        python3 $(which encode_task_qc_report.py) \
+                                                                                                                                            --pipeline-prefix chip \
+
+                                                                                                                                            ~{"--pipeline-ver " + pipeline_ver
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--title '" + sub(
+                                                                                                                                                title, "'", "_"
+                                                                                                                                                ) + "'"
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--desc '" + sub(
+                                                                                                                                                description, "'", "_"
+                                                                                                                                                ) + "'"
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--genome " + genome
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--multimapping " + 0
+                                                                                                                                                } \
+
+                                                                                                                                            --paired-ends ~{sep=" " paired_ends
+                                                                                                                                                } \
+
+                                                                                                                                            --ctl-paired-ends ~{sep=" " ctl_paired_ends
+                                                                                                                                                } \
+
+                                                                                                                                            --pipeline-type ~{pipeline_type
+                                                                                                                                                } \
+
+                                                                                                                                            --aligner ~{aligner
+                                                                                                                                                } \
+
+                                                                                                                                            ~{(
+                                                                                                                                                if (
+                                                                                                                                                no_dup_removal
+                                                                                                                                                ) then "--no-dup-removal " else ""
+                                                                                                                                                )
+                                                                                                                                                } \
+
+                                                                                                                                            --peak-caller ~{peak_caller
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--cap-num-peak " + cap_num_peak
+                                                                                                                                                } \
+
+                                                                                                                                            --idr-thresh ~{idr_thresh
+                                                                                                                                                } \
+
+                                                                                                                                            --pval-thresh ~{pval_thresh
+                                                                                                                                                } \
+
+                                                                                                                                            --xcor-trim-bp ~{xcor_trim_bp
+                                                                                                                                                } \
+
+                                                                                                                                            --xcor-subsample-reads ~{xcor_subsample_reads
+                                                                                                                                                } \
+
+                                                                                                                                            --samstat-qcs ~{sep="_:_" samstat_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            --nodup-samstat-qcs ~{sep="_:_" nodup_samstat_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            --dup-qcs ~{sep="_:_" dup_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            --lib-complexity-qcs ~{sep="_:_" lib_complexity_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            --xcor-plots ~{sep="_:_" xcor_plots
+                                                                                                                                                } \
+
+                                                                                                                                            --xcor-scores ~{sep="_:_" xcor_scores
+                                                                                                                                                } \
+
+                                                                                                                                            --idr-plots ~{sep="_:_" idr_plots
+                                                                                                                                                } \
+
+                                                                                                                                            --idr-plots-pr ~{sep="_:_" idr_plots_pr
+                                                                                                                                                } \
+
+                                                                                                                                            --ctl-samstat-qcs ~{sep="_:_" ctl_samstat_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            --ctl-nodup-samstat-qcs ~{sep="_:_" ctl_nodup_samstat_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            --ctl-dup-qcs ~{sep="_:_" ctl_dup_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            --ctl-lib-complexity-qcs ~{sep="_:_" ctl_lib_complexity_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--jsd-plot " + jsd_plot
+                                                                                                                                                } \
+
+                                                                                                                                            --jsd-qcs ~{sep="_:_" jsd_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--idr-plot-ppr " + idr_plot_ppr
+                                                                                                                                                } \
+
+                                                                                                                                            --frip-qcs ~{sep="_:_" frip_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            --frip-qcs-pr1 ~{sep="_:_" frip_qcs_pr1
+                                                                                                                                                } \
+
+                                                                                                                                            --frip-qcs-pr2 ~{sep="_:_" frip_qcs_pr2
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--frip-qc-pooled " + frip_qc_pooled
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--frip-qc-ppr1 " + frip_qc_ppr1
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--frip-qc-ppr2 " + frip_qc_ppr2
+                                                                                                                                                } \
+
+                                                                                                                                            --frip-idr-qcs ~{sep="_:_" frip_idr_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            --frip-idr-qcs-pr ~{sep="_:_" frip_idr_qcs_pr
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--frip-idr-qc-ppr " + frip_idr_qc_ppr
+                                                                                                                                                } \
+
+                                                                                                                                            --frip-overlap-qcs ~{sep="_:_" frip_overlap_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            --frip-overlap-qcs-pr ~{sep="_:_" frip_overlap_qcs_pr
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--frip-overlap-qc-ppr " + frip_overlap_qc_ppr
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--idr-reproducibility-qc " + idr_reproducibility_qc
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--overlap-reproducibility-qc " + overlap_reproducibility_qc
+                                                                                                                                                } \
+
+                                                                                                                                            --gc-plots ~{sep="_:_" gc_plots
+                                                                                                                                                } \
+
+                                                                                                                                            --peak-region-size-qcs ~{sep="_:_" peak_region_size_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            --peak-region-size-plots ~{sep="_:_" peak_region_size_plots
+                                                                                                                                                } \
+
+                                                                                                                                            --num-peak-qcs ~{sep="_:_" num_peak_qcs
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--idr-opt-peak-region-size-qc " + idr_opt_peak_region_size_qc
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--idr-opt-peak-region-size-plot " + idr_opt_peak_region_size_plot
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--idr-opt-num-peak-qc " + idr_opt_num_peak_qc
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--overlap-opt-peak-region-size-qc " + overlap_opt_peak_region_size_qc
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--overlap-opt-peak-region-size-plot " + overlap_opt_peak_region_size_plot
+                                                                                                                                                } \
+
+                                                                                                                                            ~{"--overlap-opt-num-peak-qc " + overlap_opt_num_peak_qc
+                                                                                                                                                } \
+                                                                                                                                            --out-qc-html qc.html \
+                                                                                                                                            --out-qc-json qc.json \
+
+                                                                                                                                            ~{"--qc-json-ref " + qc_json_ref
+                                                                                                                                                }
+
+                                                                                                                                >>>
+
+                                                                                                                                output {
+
+                                                                                                                                                    File report = glob(
+                                                                                                                                                        "*qc.html"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    File qc_json = glob(
+                                                                                                                                                        "*qc.json"
+                                                                                                                                                        )[
+                                                                                                                                                        0
+                                                                                                                                                        ]
+
+                                                                                                                                                    Boolean qc_json_ref_match = read_string(
+                                                                                                                                                        "qc_json_ref_match.txt"
+                                                                                                                                                        ) == "True"
+
+                                                                                                                                            }
+
+                                                                                                                                            runtime {
+                                                                                                                                                cpu: 1
+                                                                                                                                                memory: "4 GB"
+                                                                                                                                                time: 4
+                                                                                                                                                disks: "local-disk 50 SSD"
+                                                                                                                                                docker: runtime_environment.docker
+                                                                                                                                                singularity: runtime_environment.singularity
+                                                                                                                                                conda: runtime_environment.conda
+
+                                                                                                                                        }
+
+                                                                                                                                }
+
+                                                                                                                                ### workflow system tasks
+                                                                                                                                task read_genome_tsv {
+
+                                                                                                                                        input {
+                                                                                                                                            File? genome_tsv
+                                                                                                                                            String? null_s
+                                                                                                                                            RuntimeEnvironment runtime_environment
+
+                                                                                                                                    }
+
+                                                                                                                                    command <<<
+
+                                                                                                                                            echo "$(basename ~{genome_tsv
+                                                                                                                                                })" > genome_name
+                                                                                                                                            # create empty files for all entries
+                                                                                                                                            touch ref_fa bowtie2_idx_tar bwa_idx_tar chrsz gensz blacklist blacklist2
+                                                                                                                                            touch mito_chr_name
+                                                                                                                                            touch regex_bfilt_peak_chr_name
+
+                                                                                                                                            python <<CODE
+                                                                                                                                            import os
+
+                                                                                                                                            with open('~{genome_tsv
+                                                                                                                                                }','r') as fp:
+                                                                                                                                                for line in fp:
+                                                                                                                                                    arr = line.strip('\n').split('\t')
+                                                                                                                                                    if arr:
+                                                                                                                                                        key, val = arr
+                                                                                                                                                        with open(key,'w') as fp2:
+                                                                                                                                                            fp2.write(val)
+                                                                                                                                            CODE
+
+                                                                                                                                    >>>
+
+                                                                                                                                    output {
+
+                                                                                                                                                String? genome_name = read_string(
+                                                                                                                                                    "genome_name"
+                                                                                                                                                    )
+
+                                                                                                                                                String? ref_fa = (
+                                                                                                                                                    if size(
+                                                                                                                                                    "ref_fa"
+                                                                                                                                                    ) == 0 then null_s else read_string(
+                                                                                                                                                    "ref_fa"
+                                                                                                                                                    )
+                                                                                                                                                    )
+
+                                                                                                                                                String? bwa_idx_tar = (
+                                                                                                                                                    if size(
+                                                                                                                                                    "bwa_idx_tar"
+                                                                                                                                                    ) == 0 then null_s else read_string(
+                                                                                                                                                    "bwa_idx_tar"
+                                                                                                                                                    )
+                                                                                                                                                    )
+
+                                                                                                                                                String? bowtie2_idx_tar = (
+                                                                                                                                                    if size(
+                                                                                                                                                    "bowtie2_idx_tar"
+                                                                                                                                                    ) == 0 then null_s else read_string(
+                                                                                                                                                    "bowtie2_idx_tar"
+                                                                                                                                                    )
+                                                                                                                                                    )
+
+                                                                                                                                                String? chrsz = (
+                                                                                                                                                    if size(
+                                                                                                                                                    "chrsz"
+                                                                                                                                                    ) == 0 then null_s else read_string(
+                                                                                                                                                    "chrsz"
+                                                                                                                                                    )
+                                                                                                                                                    )
+
+                                                                                                                                                String? gensz = (
+                                                                                                                                                    if size(
+                                                                                                                                                    "gensz"
+                                                                                                                                                    ) == 0 then null_s else read_string(
+                                                                                                                                                    "gensz"
+                                                                                                                                                    )
+                                                                                                                                                    )
+
+                                                                                                                                                String? blacklist = (
+                                                                                                                                                    if size(
+                                                                                                                                                    "blacklist"
+                                                                                                                                                    ) == 0 then null_s else read_string(
+                                                                                                                                                    "blacklist"
+                                                                                                                                                    )
+                                                                                                                                                    )
+
+                                                                                                                                                String? blacklist2 = (
+                                                                                                                                                    if size(
+                                                                                                                                                    "blacklist2"
+                                                                                                                                                    ) == 0 then null_s else read_string(
+                                                                                                                                                    "blacklist2"
+                                                                                                                                                    )
+                                                                                                                                                    )
+
+                                                                                                                                                String? mito_chr_name = (
+                                                                                                                                                    if size(
+                                                                                                                                                    "mito_chr_name"
+                                                                                                                                                    ) == 0 then null_s else read_string(
+                                                                                                                                                    "mito_chr_name"
+                                                                                                                                                    )
+                                                                                                                                                    )
+
+                                                                                                                                                String? regex_bfilt_peak_chr_name = (
+                                                                                                                                                    if size(
+                                                                                                                                                    "regex_bfilt_peak_chr_name"
+                                                                                                                                                    ) == 0 then "chr[\\dXY]+" else read_string(
+                                                                                                                                                    "regex_bfilt_peak_chr_name"
+                                                                                                                                                    )
+                                                                                                                                                    )
+
+                                                                                                                                        }
+
+                                                                                                                                        runtime {
+                                                                                                                                            maxRetries: 0
+                                                                                                                                            cpu: 1
+                                                                                                                                            memory: "2 GB"
+                                                                                                                                            time: 4
+                                                                                                                                            disks: "local-disk 10 SSD"
+                                                                                                                                            docker: runtime_environment.docker
+                                                                                                                                            singularity: runtime_environment.singularity
+                                                                                                                                            conda: runtime_environment.conda
+
+                                                                                                                                    }
+
+                                                                                                                            }
+
+                                                                                                                            task rounded_mean {
+
+                                                                                                                                    input {
+
+                                                                                                                                                Array[
+                                                                                                                                                    Int
+                                                                                                                                                    ] ints
+                                                                                                                                                RuntimeEnvironment runtime_environment
+
+                                                                                                                                        }
+
+                                                                                                                                        command <<<
+                                                                                                                                            python <<CODE
+
+                                                                                                                                            arr = [~{sep="," ints
+                                                                                                                                                }]
+                                                                                                                                            with open('tmp.txt','w') as fp:
+                                                                                                                                                if len(arr):
+                                                                                                                                                    sum_ = sum(arr)
+                                                                                                                                                    mean_ = sum(arr)/float(len(arr))
+                                                                                                                                                    fp.write('{}'.format(int(round(mean_))))
+                                                                                                                                                else:
+                                                                                                                                                    fp.write('0')
+                                                                                                                                            CODE
+
+                                                                                                                                    >>>
+
+                                                                                                                                    output {
+
+                                                                                                                                                Int rounded_mean = read_int(
+                                                                                                                                                    "tmp.txt"
+                                                                                                                                                    )
+
+                                                                                                                                        }
+
+                                                                                                                                        runtime {
+                                                                                                                                            cpu: 1
+                                                                                                                                            memory: "2 GB"
+                                                                                                                                            time: 4
+                                                                                                                                            disks: "local-disk 10 SSD"
+                                                                                                                                            docker: runtime_environment.docker
+                                                                                                                                            singularity: runtime_environment.singularity
+                                                                                                                                            conda: runtime_environment.conda
+
+                                                                                                                                    }
+
+                                                                                                                            }
+
+                                                                                                                            task raise_exception {
+
+                                                                                                                                    input {
+                                                                                                                                        String msg
+                                                                                                                                        RuntimeEnvironment runtime_environment
+
+                                                                                                                                }
+
+                                                                                                                                command <<<
+
+                                                                                                                                        echo -e "\n* Error: ~{msg
+                                                                                                                                            }\n" >&2
+                                                                                                                                        exit 2
+
+                                                                                                                                >>>
+
+                                                                                                                                output {
+
+                                                                                                                                        String error_msg = "~{msg
+                                                                                                                                            }"
+
+                                                                                                                                }
+
+                                                                                                                                runtime {
+                                                                                                                                    maxRetries: 0
+                                                                                                                                    cpu: 1
+                                                                                                                                    memory: "2 GB"
+                                                                                                                                    time: 4
+                                                                                                                                    disks: "local-disk 10 SSD"
+                                                                                                                                    docker: runtime_environment.docker
+                                                                                                                                    singularity: runtime_environment.singularity
+                                                                                                                                    conda: runtime_environment.conda
+
+                                                                                                                            }
+
+                                                                                                                    }

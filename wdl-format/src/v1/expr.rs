@@ -686,29 +686,16 @@ pub fn format_if_expr(element: &FormatElement, stream: &mut TokenStream<PreToken
     if paren_needed {
         stream.push_literal("(".to_string(), SyntaxKind::OpenParen);
     }
-    if !nested_else_if {
-        stream.increment_indent();
-    }
 
     let if_keyword = children.next().expect("if keyword");
     assert!(if_keyword.element().kind() == SyntaxKind::IfKeyword);
     (&if_keyword).write(stream);
-    stream.end_word();
 
     for child in children {
-        let kind = child.element().kind();
-        if matches!(kind, SyntaxKind::ElseKeyword | SyntaxKind::ThenKeyword) {
-            stream.end_line();
-        }
+        stream.end_word();
         (&child).write(stream);
-        if matches!(kind, SyntaxKind::ElseKeyword | SyntaxKind::ThenKeyword) {
-            stream.end_word();
-        }
     }
 
-    if !nested_else_if {
-        stream.decrement_indent();
-    }
     if paren_needed {
         stream.push_literal(")".to_string(), SyntaxKind::CloseParen);
     }
