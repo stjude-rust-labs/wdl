@@ -212,9 +212,7 @@ impl Formatter {
 
     /// Gets the [`PostToken`] stream.
     ///
-    /// # Notes
-    ///
-    /// * This shouldn't be exposed publicly.
+    /// This shouldn't be exposed publicly.
     fn to_stream<W: Writable>(&self, element: W) -> TokenStream<PostToken> {
         let mut stream = TokenStream::default();
         element.write(&mut stream);

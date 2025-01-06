@@ -21,7 +21,6 @@ pub trait Token: Eq + PartialEq {
 /// [`PostToken`]s. Note that, unless you are working on formatting
 /// specifically, you should never need to work with [`PostToken`]s.
 #[derive(Debug)]
-
 pub struct TokenStream<T: Token>(Vec<T>);
 
 impl<T: Token> Default for TokenStream<T> {

@@ -55,8 +55,6 @@ impl Builder {
 
     /// Sets the indentation level.
     ///
-    /// # Notes
-    ///
     /// This silently overwrites any previously provided value for the
     /// indentation level.
     pub fn indent(mut self, indent: Indent) -> Result<Self> {
@@ -70,8 +68,6 @@ impl Builder {
     }
 
     /// Sets the maximum line length.
-    ///
-    /// # Notes
     ///
     /// This silently overwrites any previously provided value for the maximum
     /// line length.
