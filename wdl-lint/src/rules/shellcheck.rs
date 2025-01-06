@@ -9,6 +9,7 @@ use std::sync::OnceLock;
 use anyhow::Context;
 use anyhow::Result;
 use anyhow::bail;
+use ftree::FenwickTree;
 use rand::distributions::Alphanumeric;
 use rand::distributions::DistString;
 use serde::Deserialize;
@@ -36,6 +37,9 @@ use wdl_ast::v1::TaskDefinition;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
+use crate::fix::Fixer;
+use crate::fix::InsertionPoint;
+use crate::fix::Replacement;
 use crate::util::count_leading_whitespace;
 use crate::util::is_properly_quoted;
 use crate::util::lines_with_offset;
@@ -64,27 +68,87 @@ static SHELLCHECK_EXISTS: OnceLock<bool> = OnceLock::new();
 /// The identifier for the command section ShellCheck rule.
 const ID: &str = "ShellCheck";
 
-/// A ShellCheck diagnostic.
-///
-/// The `file` and `fix` fields are ommitted as we have no use for them.
 #[derive(Clone, Debug, Deserialize)]
-struct ShellCheckDiagnostic {
-    /// line number comment starts on
+/// Suggested fix for a ShellCheck diagnostic.
+struct ShellCheckFix {
+    /// The replacements to perform.
+    pub replacements: Vec<ShellCheckReplacement>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+/// A ShellCheck replacement.
+///
+/// This differs from a `Replacement` in that
+/// 1) columns are 1-indexed
+/// 2) it may span multiple lines and thus cannot be directly passed to a
+///    `Fixer`.
+///
+/// It must be normalized with `normalize_replacements` before use.
+struct ShellCheckReplacement {
+    /// Line number replacement occurs on.
     pub line: usize,
-    /// line number comment ends on
+    /// Line number replacement ends on.
     #[serde(rename = "endLine")]
     pub end_line: usize,
-    /// column comment starts on
+    /// Order in which replacements should happen. Highest precedence first.
+    pub precedence: usize,
+    /// An `InsertionPoint`.
+    #[serde(rename = "insertionPoint")]
+    pub insertion_point: InsertionPoint,
+    /// Column replacement occurs on.
     pub column: usize,
-    /// column comment ends on
+    /// Column replacements ends on.
     #[serde(rename = "endColumn")]
     pub end_column: usize,
-    /// severity of the comment
+    /// Replacement text.
+    pub replacement: String,
+}
+
+/// A ShellCheck diagnostic.
+///
+/// The `file` field is ommitted as we have no use for it.
+#[derive(Clone, Debug, Deserialize)]
+struct ShellCheckDiagnostic {
+    /// Line number comment starts on.
+    pub line: usize,
+    /// Line number comment ends on.
+    #[serde(rename = "endLine")]
+    pub end_line: usize,
+    /// Column comment starts on.
+    pub column: usize,
+    /// Column comment ends on.
+    #[serde(rename = "endColumn")]
+    pub end_column: usize,
+    /// Severity of the comment.
     pub level: String,
-    /// shellcheck error code
+    /// ShellCheck error code.
     pub code: usize,
-    /// message associated with the comment
+    /// Message associated with the comment.
     pub message: String,
+    /// Optional fixes to apply.
+    pub fix: Option<ShellCheckFix>,
+}
+
+/// Convert `ShellCheckReplacement`s into `Replacement`s.
+///
+/// Column indices are shifted to 0-based.
+/// Multi-line replacements are normalized so that column indices are
+/// as though the string is on a single line.
+fn normalize_replacements(
+    reps: &[ShellCheckReplacement],
+    shift_tree: &FenwickTree<usize>,
+) -> Vec<Replacement> {
+    reps.iter()
+        .map(|r| {
+            Replacement::new(
+                r.column + shift_tree.prefix_sum(r.line - 1, 0) - 1,
+                r.end_column + shift_tree.prefix_sum(r.end_line - 1, 0) - 1,
+                r.insertion_point,
+                r.replacement.clone(),
+                r.precedence,
+            )
+        })
+        .collect()
 }
 
 /// Run shellcheck on a command.
@@ -195,12 +259,49 @@ fn gather_task_declarations(task: &TaskDefinition) -> HashSet<String> {
     decls
 }
 
+/// Create an appropriate 'fix' message.
+///
+/// Returns only the slice of the command that falls between
+/// the first and last replacements. If there is only one replacement,
+/// this is the slice between the replacement's start and end.
+fn create_fix_message(reps: Vec<Replacement>, command_text: &str) -> String {
+    let mut fixer = Fixer::new(command_text.to_owned());
+    // Get the original left-most and right-most replacement indices.
+    let start = reps
+        .iter()
+        .map(|r| r.start())
+        .min()
+        .expect("replacements is non-empty");
+    let end = reps
+        .iter()
+        .map(|r| r.end())
+        .max()
+        .expect("replacements is non-empty");
+    fixer.apply_replacements(reps);
+    // Adjust start and end based on final tree.
+    let adj_range = fixer.adj_range_inc(start..=end);
+    format!("did you mean `{}`?", &fixer.value()[adj_range])
+}
+
 /// Creates a "ShellCheck lint" diagnostic from a `ShellCheckDiagnostic`
-fn shellcheck_lint(diagnostic: &ShellCheckDiagnostic, span: Span) -> Diagnostic {
+fn shellcheck_lint(
+    diagnostic: &ShellCheckDiagnostic,
+    command_text: &str,
+    line_map: &HashMap<usize, Span>,
+    shift_tree: &FenwickTree<usize>,
+) -> Diagnostic {
     let label = format!(
         "SC{}[{}]: {}",
         diagnostic.code, diagnostic.level, diagnostic.message
     );
+    let span = calculate_span(diagnostic, line_map);
+    let fix_msg = match diagnostic.fix {
+        Some(ref fix) => {
+            let reps = normalize_replacements(&fix.replacements, shift_tree);
+            create_fix_message(reps, command_text)
+        }
+        None => String::from("address the diagnostic as recommended in the message"),
+    };
     Diagnostic::note(&diagnostic.message)
         .with_rule(ID)
         .with_label(label, span)
@@ -208,7 +309,7 @@ fn shellcheck_lint(diagnostic: &ShellCheckDiagnostic, span: Span) -> Diagnostic 
             format!("more info: {}/SC{}", &SHELLCHECK_WIKI, diagnostic.code),
             span,
         )
-        .with_fix("address the diagnostic as recommended in the message")
+        .with_fix(fix_msg)
 }
 
 /// Sanitize a `CommandSection`.
@@ -258,9 +359,9 @@ fn sanitize_command(section: &CommandSection) -> Option<(String, HashSet<String>
     }
 }
 
-/// Maps each line as shellcheck sees it to its corresponding start position in
-/// the source.
-fn map_shellcheck_lines(section: &CommandSection) -> HashMap<usize, usize> {
+/// Maps each line as shellcheck sees it to its corresponding span in the
+/// source.
+fn map_shellcheck_lines(section: &CommandSection) -> HashMap<usize, Span> {
     let mut line_map = HashMap::new();
     let mut line_num = 1;
     let mut skip_next_line = false;
@@ -281,7 +382,7 @@ fn map_shellcheck_lines(section: &CommandSection) -> HashMap<usize, usize> {
                         continue;
                     };
                     let adjusted_start = text.span().start() + line_start + leading_ws;
-                    line_map.insert(line_num, adjusted_start);
+                    line_map.insert(line_num, Span::new(adjusted_start, line.len()));
                     line_num += 1;
                 }
             }
@@ -295,11 +396,12 @@ fn map_shellcheck_lines(section: &CommandSection) -> HashMap<usize, usize> {
 
 /// Calculates the correct `Span` for a `ShellCheckDiagnostic` relative to the
 /// source.
-fn calculate_span(diagnostic: &ShellCheckDiagnostic, line_map: &HashMap<usize, usize>) -> Span {
+fn calculate_span(diagnostic: &ShellCheckDiagnostic, line_map: &HashMap<usize, Span>) -> Span {
     // shellcheck 1-indexes columns, so subtract 1.
     let start = line_map
         .get(&diagnostic.line)
         .expect("shellcheck line corresponds to command line")
+        .start()
         + diagnostic.column
         - 1;
     let len = if diagnostic.end_line > diagnostic.line {
@@ -307,6 +409,7 @@ fn calculate_span(diagnostic: &ShellCheckDiagnostic, line_map: &HashMap<usize, u
         let end_line_end = line_map
             .get(&diagnostic.end_line)
             .expect("shellcheck line corresponds to command line")
+            .start()
             + diagnostic.end_column
             - 1;
         // - 2 to discount first and last newlines
@@ -387,6 +490,13 @@ impl Visitor for ShellCheckRule {
         decls.extend(cmd_decls);
         let line_map = map_shellcheck_lines(section);
 
+        // create a Fenwick tree where each index is a line number
+        // and each value is the length of the line.
+        // For efficiency, we do this only once.
+        let shift_values = lines_with_offset(&sanitized_command)
+            .map(|(_, line_start, next_start)| next_start - line_start);
+        let shift_tree = FenwickTree::from_iter(shift_values);
+
         match run_shellcheck(&sanitized_command) {
             Ok(diagnostics) => {
                 for diagnostic in diagnostics {
@@ -400,9 +510,8 @@ impl Visitor for ShellCheckRule {
                     {
                         continue;
                     }
-                    let span = calculate_span(&diagnostic, &line_map);
                     state.exceptable_add(
-                        shellcheck_lint(&diagnostic, span),
+                        shellcheck_lint(&diagnostic, &sanitized_command, &line_map, &shift_tree),
                         SyntaxElement::from(section.syntax().clone()),
                         &self.exceptable_nodes(),
                     )
@@ -421,5 +530,74 @@ impl Visitor for ShellCheckRule {
                 );
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use ftree::FenwickTree;
+    use pretty_assertions::assert_eq;
+
+    use super::ShellCheckReplacement;
+    use super::normalize_replacements;
+    use crate::fix::Fixer;
+    use crate::fix::{self};
+    use crate::util::lines_with_offset;
+
+    #[test]
+    fn test_normalize_replacements() {
+        // shellcheck would see this as
+        // ABBBB
+        // BBBA
+        let ref_str = String::from("ABBBB\nBBBA");
+        let expected = String::from("AAAAA");
+        let sc_rep = ShellCheckReplacement {
+            line: 1,
+            end_line: 2,
+            column: 2,
+            end_column: 4,
+            precedence: 1,
+            insertion_point: fix::InsertionPoint::AfterEnd,
+            replacement: String::from("AAA"),
+        };
+        let shift_values =
+            lines_with_offset(&ref_str).map(|(_, line_start, next_start)| next_start - line_start);
+        let shift_tree = FenwickTree::from_iter(shift_values);
+        let normalized = normalize_replacements(&[sc_rep], &shift_tree);
+        let rep = &normalized[0];
+
+        assert_eq!(rep.start(), 1);
+        assert_eq!(rep.end(), 9);
+
+        let mut fixer = Fixer::new(ref_str);
+        fixer.apply_replacement(rep);
+        assert_eq!(fixer.value(), expected);
+    }
+
+    #[test]
+    fn test_normalize_replacements2() {
+        let ref_str = String::from("ABBBBBBBA");
+        let expected = String::from("AAAAA");
+        let sc_rep = ShellCheckReplacement {
+            line: 1,
+            end_line: 1,
+            column: 2,
+            end_column: 9,
+            precedence: 1,
+            insertion_point: fix::InsertionPoint::AfterEnd,
+            replacement: String::from("AAA"),
+        };
+        let shift_values =
+            lines_with_offset(&ref_str).map(|(_, line_start, next_start)| next_start - line_start);
+        let shift_tree = FenwickTree::from_iter(shift_values);
+        let normalized = normalize_replacements(&[sc_rep], &shift_tree);
+        let rep = &normalized[0];
+
+        assert_eq!(rep.start(), 1);
+        assert_eq!(rep.end(), 8);
+
+        let mut fixer = Fixer::new(ref_str);
+        fixer.apply_replacement(rep);
+        assert_eq!(fixer.value(), expected);
     }
 }
