@@ -386,8 +386,10 @@ impl Postprocessor {
 
     /// Inserts an interrupting line break before the next token.
     fn interrupting_line_break(&mut self, stream: &mut TokenStream<PostToken>) {
-        // assert!(self.position == LinePosition::MiddleOfLine);
         self.interrupted = true;
+        if self.position == LinePosition::StartOfLine {
+            return;
+        }
         self.trim_last_line(stream);
         stream.push(PostToken::Newline);
         self.position = LinePosition::StartOfLine;

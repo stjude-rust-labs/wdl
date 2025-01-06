@@ -2204,15 +2204,13 @@ workflow chip {
                                                                                                                 i
                                                                                                                 ],
 
-
-                                                                                                        ],
+                                                                                                    ],
 
                                                                                                     chosen_ctl_tas[
                                                                                                         i
                                                                                                         ],
 
-
-                                                                                            ]
+                                                                                        ]
                                                                                             ),
                                                                                         gensz = gensz_,
                                                                                         chrsz = chrsz_,
@@ -2266,15 +2264,13 @@ workflow chip {
                                                                                                                             i
                                                                                                                             ],
 
-
-                                                                                                                    ],
+                                                                                                                ],
 
                                                                                                                 chosen_ctl_tas[
                                                                                                                     i
                                                                                                                     ],
 
-
-                                                                                                        ]
+                                                                                                    ]
                                                                                                         ),
                                                                                                     gensz = gensz_,
                                                                                                     chrsz = chrsz_,
@@ -2289,8 +2285,7 @@ workflow chip {
                                                                                                     time_hr = macs2_signal_track_time_hr,
                                                                                                     runtime_environment = runtime_environment_macs2,
 
-
-                                                                                                }
+                                                                                            }
                                                                                         }
 
                                                                                         # call peaks on 1st pseudo replicated tagalign
@@ -2322,15 +2317,13 @@ workflow chip {
                                                                                                                             i
                                                                                                                             ],
 
-
-                                                                                                                    ],
+                                                                                                                ],
 
                                                                                                                 chosen_ctl_tas[
                                                                                                                     i
                                                                                                                     ],
 
-
-                                                                                                        ]
+                                                                                                    ]
                                                                                                         ),
                                                                                                     gensz = gensz_,
                                                                                                     chrsz = chrsz_,
@@ -2356,11 +2349,9 @@ workflow chip {
                                                                                                         then runtime_environment_macs2
                                                                                                         else runtime_environment
 
+                                                                                                ),
 
-                                                                                                    ),
-
-
-                                                                                            }
+                                                                                        }
                                                                                     }
 
                                                                                     File? peak_pr1_ = (
@@ -2400,15 +2391,13 @@ workflow chip {
                                                                                                                         i
                                                                                                                         ],
 
-
-                                                                                                                ],
+                                                                                                            ],
 
                                                                                                             chosen_ctl_tas[
                                                                                                                 i
                                                                                                                 ],
 
-
-                                                                                                    ]
+                                                                                                ]
                                                                                                     ),
                                                                                                 gensz = gensz_,
                                                                                                 chrsz = chrsz_,
@@ -2434,8 +2423,7 @@ workflow chip {
                                                                                                     then runtime_environment_macs2
                                                                                                     else runtime_environment
 
-
-                                                                                                ),
+                                                                                            ),
                                                                                         }
                                                                                     }
 
@@ -2476,8 +2464,7 @@ workflow chip {
                                                                                                         ]
                                                                                                     else pool_ta_ctl.ta_pooled
 
-
-                                                                                                ),
+                                                                                            ),
                                                                                             subsample = chosen_ctl_ta_pooled_subsample,
 
                                                                                             paired_end = ctl_paired_end_[
@@ -2510,14 +2497,12 @@ workflow chip {
                                                                                                         0
                                                                                                         ],
 
-
-                                                                                                ]
+                                                                                            ]
 
                                                                                             else [
                                                                                                 pool_ta_ctl.ta_pooled,
 
-
-                                                                                            ]
+                                                                                        ]
                                                                                     )
 
                                                                                     Boolean has_input_of_call_peak_pooled = defined(
@@ -2546,13 +2531,11 @@ workflow chip {
                                                                                                             [
                                                                                                                 pool_ta.ta_pooled,
 
-
-                                                                                                        ]
+                                                                                                    ]
                                                                                                         ),
                                                                                                     chosen_ctl_ta_pooled,
 
-
-                                                                                            ]
+                                                                                        ]
                                                                                             ),
                                                                                         gensz = gensz_,
                                                                                         chrsz = chrsz_,
@@ -2599,13 +2582,11 @@ workflow chip {
                                                                                                                 [
                                                                                                                     pool_ta.ta_pooled,
 
-
-                                                                                                            ]
+                                                                                                        ]
                                                                                                             ),
                                                                                                         chosen_ctl_ta_pooled,
 
-
-                                                                                                ]
+                                                                                            ]
                                                                                                 ),
                                                                                             gensz = gensz_,
                                                                                             chrsz = chrsz_,
@@ -2644,13 +2625,11 @@ workflow chip {
                                                                                                             [
                                                                                                                 pool_ta_pr1.ta_pooled,
 
-
-                                                                                                        ]
+                                                                                                    ]
                                                                                                         ),
                                                                                                     chosen_ctl_ta_pooled,
 
-
-                                                                                            ]
+                                                                                        ]
                                                                                             ),
                                                                                         gensz = gensz_,
                                                                                         chrsz = chrsz_,
@@ -2707,13 +2686,11 @@ workflow chip {
                                                                                                         [
                                                                                                             pool_ta_pr2.ta_pooled,
 
-
-                                                                                                    ]
+                                                                                                ]
                                                                                                     ),
                                                                                                 chosen_ctl_ta_pooled,
 
-
-                                                                                        ]
+                                                                                    ]
                                                                                         ),
                                                                                     gensz = gensz_,
                                                                                     chrsz = chrsz_,
@@ -2789,11 +2766,9 @@ workflow chip {
                                                                                                                     ta = pool_ta.ta_pooled,
                                                                                                                     runtime_environment = runtime_environment,
 
+                                                                                                            }
 
-                                                                                                                }
-
-
-                                                                                                        }
+                                                                                                    }
 
                                                                                                     if (
                                                                                                         enable_idr && !align_only_ && pair.left < pair.right
@@ -2821,14 +2796,11 @@ workflow chip {
                                                                                                                                 ta = pool_ta.ta_pooled,
                                                                                                                                 runtime_environment = runtime_environment,
 
+                                                                                                                        }
 
-                                                                                                                            }
+                                                                                                                }
 
-
-                                                                                                                    }
-
-
-                                                                                                            }
+                                                                                                        }
 
                                                                                                         # overlap on pseudo-replicates (pr1, pr2) for each true replicate
                                                                                                         if (
@@ -2875,14 +2847,11 @@ workflow chip {
                                                                                                                                                                 ],
                                                                                                                                                             runtime_environment = runtime_environment,
 
+                                                                                                                                                    }
 
-                                                                                                                                                        }
+                                                                                                                                            }
 
-
-                                                                                                                                                }
-
-
-                                                                                                                                        }
+                                                                                                                                    }
 
                                                                                                                                     if (
                                                                                                                                         !align_only_ && !true_rep_only && enable_idr
@@ -2931,14 +2900,11 @@ workflow chip {
                                                                                                                                                                                             ],
                                                                                                                                                                                         runtime_environment = runtime_environment,
 
+                                                                                                                                                                                }
 
-                                                                                                                                                                                    }
+                                                                                                                                                                        }
 
-
-                                                                                                                                                                            }
-
-
-                                                                                                                                                                    }
+                                                                                                                                                                }
 
                                                                                                                                                                 if (
                                                                                                                                                                     !align_only_ && !true_rep_only && num_rep > 1
@@ -2959,11 +2925,9 @@ workflow chip {
                                                                                                                                                                             ta = pool_ta.ta_pooled,
                                                                                                                                                                             runtime_environment = runtime_environment,
 
+                                                                                                                                                                    }
 
-                                                                                                                                                                        }
-
-
-                                                                                                                                                                }
+                                                                                                                                                            }
 
                                                                                                                                                             if (
                                                                                                                                                                 !align_only_ && !true_rep_only && num_rep > 1 && enable_idr
@@ -2986,11 +2950,9 @@ workflow chip {
                                                                                                                                                                         ta = pool_ta.ta_pooled,
                                                                                                                                                                         runtime_environment = runtime_environment,
 
+                                                                                                                                                                }
 
-                                                                                                                                                                    }
-
-
-                                                                                                                                                            }
+                                                                                                                                                        }
 
                                                                                                                                                         # reproducibility QC for overlap/IDR peaks
                                                                                                                                                         if (
@@ -3016,25 +2978,21 @@ workflow chip {
                                                                                                                                                                                 [
                                                                                                                                                                                     overlap_pr.bfilt_overlap_peak,
 
-
-                                                                                                                                                                            ]
+                                                                                                                                                                        ]
                                                                                                                                                                             )
 
                                                                                                                                                                         else [
                                                                                                                                                                             ]
 
-
-                                                                                                                                                                    ),
+                                                                                                                                                                ),
                                                                                                                                                                 peak_ppr = overlap_ppr.bfilt_overlap_peak,
                                                                                                                                                                 peak_type = peak_type_,
                                                                                                                                                                 chrsz = chrsz_,
                                                                                                                                                                 runtime_environment = runtime_environment,
 
+                                                                                                                                                        }
 
-                                                                                                                                                            }
-
-
-                                                                                                                                                    }
+                                                                                                                                                }
 
                                                                                                                                                 if (
                                                                                                                                                     !align_only_ && !true_rep_only && num_rep > 0 && enable_idr
@@ -3059,25 +3017,21 @@ workflow chip {
                                                                                                                                                                         [
                                                                                                                                                                             idr_pr.bfilt_idr_peak,
 
-
-                                                                                                                                                                    ]
+                                                                                                                                                                ]
                                                                                                                                                                     )
 
                                                                                                                                                                 else [
                                                                                                                                                                     ]
 
-
-                                                                                                                                                            ),
+                                                                                                                                                        ),
                                                                                                                                                         peak_ppr = idr_ppr.bfilt_idr_peak,
                                                                                                                                                         peak_type = peak_type_,
                                                                                                                                                         chrsz = chrsz_,
                                                                                                                                                         runtime_environment = runtime_environment,
 
+                                                                                                                                                }
 
-                                                                                                                                                    }
-
-
-                                                                                                                                            }
+                                                                                                                                        }
 
                                                                                                                                         # Generate final QC report and JSON
                                                                                                                                         call qc_report {
@@ -3150,15 +3104,13 @@ workflow chip {
                                                                                                                                                         [
                                                                                                                                                             jsd.jsd_qcs,
 
-
-                                                                                                                                                    ]
+                                                                                                                                                ]
                                                                                                                                                     )
 
                                                                                                                                                 else [
                                                                                                                                                     ]
 
-
-                                                                                                                                            ),
+                                                                                                                                        ),
 
                                                                                                                                         frip_qcs = select_all(
                                                                                                                                             call_peak.frip_qc
@@ -3189,15 +3141,13 @@ workflow chip {
                                                                                                                                                     [
                                                                                                                                                         idr_pr.idr_plot,
 
-
-                                                                                                                                                ]
+                                                                                                                                            ]
                                                                                                                                                 )
 
                                                                                                                                             else [
                                                                                                                                                 ]
 
-
-                                                                                                                                        ),
+                                                                                                                                    ),
                                                                                                                                     idr_plot_ppr = idr_ppr.idr_plot,
 
                                                                                                                                     frip_idr_qcs = select_all(
@@ -3214,15 +3164,13 @@ workflow chip {
                                                                                                                                                 [
                                                                                                                                                     idr_pr.frip_qc,
 
-
-                                                                                                                                            ]
+                                                                                                                                        ]
                                                                                                                                             )
 
                                                                                                                                         else [
                                                                                                                                             ]
 
-
-                                                                                                                                    ),
+                                                                                                                                ),
                                                                                                                                 frip_idr_qc_ppr = idr_ppr.frip_qc,
 
                                                                                                                                 frip_overlap_qcs = select_all(
@@ -3239,15 +3187,13 @@ workflow chip {
                                                                                                                                             [
                                                                                                                                                 overlap_pr.frip_qc,
 
-
-                                                                                                                                        ]
+                                                                                                                                    ]
                                                                                                                                         )
 
                                                                                                                                     else [
                                                                                                                                         ]
 
-
-                                                                                                                                ),
+                                                                                                                            ),
                                                                                                                             frip_overlap_qc_ppr = overlap_ppr.frip_qc,
                                                                                                                             idr_reproducibility_qc = reproducibility_idr.reproducibility_qc,
                                                                                                                             overlap_reproducibility_qc = reproducibility_overlap.reproducibility_qc,
@@ -3278,19 +3224,16 @@ workflow chip {
 
                                                                                                                             runtime_environment = runtime_environment,
 
-
-                                                                                                                        }
+                                                                                                                    }
 
                                                                                                                     output {
                                                                                                                         File report = qc_report.report
                                                                                                                         File qc_json = qc_report.qc_json
                                                                                                                         Boolean qc_json_ref_match = qc_report.qc_json_ref_match
 
+                                                                                                                }
 
-                                                                                                                    }
-
-
-                                                                                                            }
+                                                                                                        }
 
                                                                                                         task align {
 
@@ -3323,8 +3266,7 @@ workflow chip {
                                                                                                                             Float disk_factor
                                                                                                                             RuntimeEnvironment runtime_environment
 
-
-                                                                                                                        }
+                                                                                                                    }
 
                                                                                                                     Float input_file_size_gb = size(
                                                                                                                         fastqs_R1, "G"
@@ -3355,20 +3297,17 @@ workflow chip {
                                                                                                                             fastqs_R1,
                                                                                                                             fastqs_R2,
 
-
-                                                                                                                    ]
+                                                                                                                ]
                                                                                                                     )
 
                                                                                                                 else transpose(
                                                                                                                 [
                                                                                                                     fastqs_R1,
 
-
-                                                                                                            ]
+                                                                                                        ]
                                                                                                             )
 
-
-                                                                                                    )
+                                                                                                )
 
                                                                                                 command <<<
                                                                                                     set -e
@@ -3391,8 +3330,7 @@ workflow chip {
                                                                                                             then "--paired-end"
                                                                                                             else ""
 
-
-                                                                                                )
+                                                                                            )
                                                                                                 } \
 
                                                                                                 ~{"--nth " + cpu
@@ -3435,8 +3373,7 @@ workflow chip {
                                                                                                         then "--fastq2 R2$SUFFIX/*.fastq.gz"
                                                                                                         else ""
 
-
-                                                                                        )
+                                                                                    )
                                                                                         } \
 
                                                                                                     ~{(
@@ -3444,8 +3381,7 @@ workflow chip {
                                                                                                 then "--paired-end"
                                                                                                 else ""
 
-
-                                                                                    )} \
+                                                                                )} \
 
                                                                                         --crop-length ~{crop_length
                                                                                             } \
@@ -3462,8 +3398,7 @@ workflow chip {
                                                                                             then "--out-dir-R2 R2$NEW_SUFFIX"
                                                                                             else ""
 
-
-                                                                                )} \
+                                                                            )} \
 
                                                                                             ~{"--trimmomatic-java-heap " + (
 
@@ -3478,8 +3413,7 @@ workflow chip {
                                                                                                     ) + "G"
                                                                                                     )
 
-
-                                                                                    )} \
+                                                                                )} \
 
                                                                                         ~{"--nth " + cpu
                                                                                             }
@@ -3500,8 +3434,7 @@ workflow chip {
                                                                                             then "R2$SUFFIX/*.fastq.gz"
                                                                                             else ""
 
-
-                                                                                )} \
+                                                                            )} \
                                                                                     ~{(
                                                                                         if paired_end
                                                                                         then "--paired-end"
@@ -3660,8 +3593,7 @@ workflow chip {
                                                                                                 Float disk_factor
                                                                                                 RuntimeEnvironment runtime_environment
 
-
-                                                                                            }
+                                                                                        }
 
                                                                                         Float input_file_size_gb = size(
                                                                                             bam, "G"
@@ -3686,8 +3618,7 @@ workflow chip {
                                                                                                     then "--paired-end"
                                                                                                     else ""
 
-
-                                                                                        )
+                                                                                    )
                                                                                         } \
                                                                                         --multimapping 0 \
 
@@ -3708,8 +3639,7 @@ workflow chip {
                                                                                             then "--no-dup-removal"
                                                                                             else ""
 
-
-                                                                                    )} \
+                                                                                )} \
 
                                                                                     ~{"--mito-chr-name " + mito_chr_name
                                                                                         } \
@@ -3733,8 +3663,7 @@ workflow chip {
                                                                                                     ) + "G"
                                                                                                     )
 
-
-                                                                                        )}
+                                                                                    )}
 
 
                                                                                     if [ '~{redact_nodup_bam
@@ -3780,8 +3709,7 @@ workflow chip {
                                                                                                         0
                                                                                                         ]
 
-
-                                                                                                }
+                                                                                            }
 
                                                                                             runtime {
                                                                                                 cpu: cpu
@@ -3796,8 +3724,7 @@ workflow chip {
                                                                                                 singularity: runtime_environment.singularity
                                                                                                 conda: runtime_environment.conda
 
-
-                                                                                            }
+                                                                                        }
                                                                                     }
 
                                                                                     task bam2ta {
@@ -3814,8 +3741,7 @@ workflow chip {
                                                                                                 Float disk_factor
                                                                                                 RuntimeEnvironment runtime_environment
 
-
-                                                                                            }
+                                                                                        }
 
                                                                                         Float input_file_size_gb = size(
                                                                                             bam, "G"
@@ -3840,8 +3766,7 @@ workflow chip {
                                                                                                     then "--paired-end"
                                                                                                     else ""
 
-
-                                                                                        )
+                                                                                    )
                                                                                         } \
 
                                                                                         ~{"--mito-chr-name " + mito_chr_name
@@ -3865,8 +3790,7 @@ workflow chip {
                                                                                                         0
                                                                                                         ]
 
-
-                                                                                                }
+                                                                                            }
 
                                                                                             runtime {
                                                                                                 cpu: cpu
@@ -3881,8 +3805,7 @@ workflow chip {
                                                                                                 singularity: runtime_environment.singularity
                                                                                                 conda: runtime_environment.conda
 
-
-                                                                                            }
+                                                                                        }
                                                                                     }
 
                                                                                     task spr {
@@ -3895,8 +3818,7 @@ workflow chip {
                                                                                                 Float disk_factor
                                                                                                 RuntimeEnvironment runtime_environment
 
-
-                                                                                            }
+                                                                                        }
 
                                                                                         Float input_file_size_gb = size(
                                                                                             ta, "G"
@@ -3922,212 +3844,31 @@ workflow chip {
                                                                                                     then "--paired-end"
                                                                                                     else ""
 
-
-                                                                                        )
-                                                                                        }
-                                                                                >>>
-
-                                                                                output {
-
-                                                                                                    File ta_pr1 = glob(
-                                                                                                        "*.pr1.tagAlign.gz"
-                                                                                                        )[
-                                                                                                        0
-                                                                                                        ]
-
-                                                                                                    File ta_pr2 = glob(
-                                                                                                        "*.pr2.tagAlign.gz"
-                                                                                                        )[
-                                                                                                        0
-                                                                                                        ]
-
-
-                                                                                                }
-
-                                                                                            runtime {
-                                                                                                cpu: 1
-
-                                                                                                memory: "~{mem_gb
-                                                                                                    } GB"
-                                                                                                time: 4
-
-                                                                                                disks: "local-disk ~{disk_gb
-                                                                                                    } SSD"
-                                                                                                docker: runtime_environment.docker
-                                                                                                singularity: runtime_environment.singularity
-                                                                                                conda: runtime_environment.conda
-
-
-                                                                                            }
-                                                                                    }
-
-                                                                                    task pool_ta {
-
-                                                                                            input {
-
-                                                                                                        Array[
-                                                                                                            File?
-                                                                                                            ] tas
-                                                                                                        Int? col  # number of columns in pooled TA
-                                                                                                        String? prefix  # basename prefix
-                                                                                                        RuntimeEnvironment runtime_environment
-
-
-                                                                                                    }
-
-                                                                                                command <<<
-                                                                                                    set -e
-                                                                                                    python3 $(which encode_task_pool_ta.py) \
-
-                                                                                                        ~{sep=" " select_all(
-                                                                                                            tas
-                                                                                                            )
-                                                                                                            } \
-
-                                                                                                        ~{"--prefix " + prefix
-                                                                                                            } \
-
-                                                                                                        ~{"--col " + col
-                                                                                                            }
-
-
-                                                                                                >>>
-
-                                                                                            output {
-
-                                                                                                                File ta_pooled = glob(
-                                                                                                                    "*.tagAlign.gz"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
-
-
-                                                                                                            }
-
-                                                                                                        runtime {
-                                                                                                            cpu: 1
-                                                                                                            memory: "8 GB"
-                                                                                                            time: 4
-                                                                                                            disks: "local-disk 100 SSD"
-                                                                                                            docker: runtime_environment.docker
-                                                                                                            singularity: runtime_environment.singularity
-                                                                                                            conda: runtime_environment.conda
-
-
-                                                                                                        }
-
-
-                                                                                                }
-
-                                                                                            task xcor {
-
-                                                                                                    input {
-                                                                                                        File? ta
-                                                                                                        Boolean paired_end
-                                                                                                        String mito_chr_name
-                                                                                                        Int subsample  # number of reads to subsample TAGALIGN
-                                                                                                        # this will be used for xcor only
-                                                                                                        # will not affect any downstream analysis
-                                                                                                        String? chip_seq_type
-                                                                                                        Int? exclusion_range_min
-                                                                                                        Int? exclusion_range_max
-                                                                                                        Int cpu
-                                                                                                        Float mem_factor
-                                                                                                        Int time_hr
-                                                                                                        Float disk_factor
-                                                                                                        RuntimeEnvironment runtime_environment
-
-
-                                                                                                    }
-
-                                                                                                Float input_file_size_gb = size(
-                                                                                                    ta, "G"
-                                                                                                    )
-                                                                                                Float mem_gb = 8.0 + mem_factor * input_file_size_gb
-
-                                                                                                Int disk_gb = round(
-                                                                                                    20.0 + disk_factor * input_file_size_gb
-                                                                                                    )
-
-                                                                                                command <<<
-                                                                                                    set -e
-                                                                                                    python3 $(which encode_task_xcor.py) \
-
-                                                                                                        ~{ta
-                                                                                                            } \
-
-                                                                                                            ~{(
-                                                                                                            if paired_end
-                                                                                                            then "--paired-end"
-                                                                                                            else ""
-
-
-                                                                                                )
-                                                                                                } \
-
-                                                                                                ~{"--mito-chr-name " + mito_chr_name
-                                                                                                    } \
-
-                                                                                                ~{"--subsample " + subsample
-                                                                                                    } \
-
-                                                                                                ~{"--chip-seq-type " + chip_seq_type
-                                                                                                    } \
-
-                                                                                                ~{"--exclusion-range-min " + exclusion_range_min
-                                                                                                    } \
-
-                                                                                                ~{"--exclusion-range-max " + exclusion_range_max
-                                                                                                    } \
-
-                                                                                                ~{"--subsample " + subsample
-                                                                                                    } \
-
-                                                                                                ~{"--nth " + cpu
-                                                                                                    }
-
-
-                                                                                        >>>
+                                                                                        )}
+                                                                                    >>>
 
                                                                                     output {
 
-                                                                                                        File plot_pdf = glob(
-                                                                                                            "*.cc.plot.pdf"
+                                                                                                        File ta_pr1 = glob(
+                                                                                                            "*.pr1.tagAlign.gz"
                                                                                                             )[
                                                                                                             0
                                                                                                             ]
 
-                                                                                                        File plot_png = glob(
-                                                                                                            "*.cc.plot.png"
+                                                                                                        File ta_pr2 = glob(
+                                                                                                            "*.pr2.tagAlign.gz"
                                                                                                             )[
                                                                                                             0
                                                                                                             ]
 
-                                                                                                        File score = glob(
-                                                                                                            "*.cc.qc"
-                                                                                                            )[
-                                                                                                            0
-                                                                                                            ]
-
-                                                                                                        File fraglen_log = glob(
-                                                                                                            "*.cc.fraglen.txt"
-                                                                                                            )[
-                                                                                                            0
-                                                                                                            ]
-
-                                                                                                        Int fraglen = read_int(
-                                                                                                            fraglen_log
-                                                                                                            )
-
-
-                                                                                                    }
+                                                                                                }
 
                                                                                                 runtime {
-                                                                                                    cpu: cpu
+                                                                                                    cpu: 1
 
                                                                                                     memory: "~{mem_gb
                                                                                                         } GB"
-                                                                                                    time: time_hr
+                                                                                                    time: 4
 
                                                                                                     disks: "local-disk ~{disk_gb
                                                                                                         } SSD"
@@ -4135,8 +3876,176 @@ workflow chip {
                                                                                                     singularity: runtime_environment.singularity
                                                                                                     conda: runtime_environment.conda
 
+                                                                                            }
+                                                                                        }
+
+                                                                                        task pool_ta {
+
+                                                                                                input {
+
+                                                                                                            Array[
+                                                                                                                File?
+                                                                                                                ] tas
+                                                                                                            Int? col  # number of columns in pooled TA
+                                                                                                            String? prefix  # basename prefix
+                                                                                                            RuntimeEnvironment runtime_environment
+
+                                                                                                    }
+
+                                                                                                    command <<<
+                                                                                                        set -e
+                                                                                                        python3 $(which encode_task_pool_ta.py) \
+
+                                                                                                            ~{sep=" " select_all(
+                                                                                                                tas
+                                                                                                                )
+                                                                                                                } \
+
+                                                                                                            ~{"--prefix " + prefix
+                                                                                                                } \
+
+                                                                                                            ~{"--col " + col
+                                                                                                                }
+
+                                                                                                >>>
+
+                                                                                                output {
+
+                                                                                                                    File ta_pooled = glob(
+                                                                                                                        "*.tagAlign.gz"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
+
+                                                                                                            }
+
+                                                                                                            runtime {
+                                                                                                                cpu: 1
+                                                                                                                memory: "8 GB"
+                                                                                                                time: 4
+                                                                                                                disks: "local-disk 100 SSD"
+                                                                                                                docker: runtime_environment.docker
+                                                                                                                singularity: runtime_environment.singularity
+                                                                                                                conda: runtime_environment.conda
+
+                                                                                                        }
 
                                                                                                 }
+
+                                                                                                task xcor {
+
+                                                                                                        input {
+                                                                                                            File? ta
+                                                                                                            Boolean paired_end
+                                                                                                            String mito_chr_name
+                                                                                                            Int subsample  # number of reads to subsample TAGALIGN
+                                                                                                            # this will be used for xcor only
+                                                                                                            # will not affect any downstream analysis
+                                                                                                            String? chip_seq_type
+                                                                                                            Int? exclusion_range_min
+                                                                                                            Int? exclusion_range_max
+                                                                                                            Int cpu
+                                                                                                            Float mem_factor
+                                                                                                            Int time_hr
+                                                                                                            Float disk_factor
+                                                                                                            RuntimeEnvironment runtime_environment
+
+                                                                                                    }
+
+                                                                                                    Float input_file_size_gb = size(
+                                                                                                        ta, "G"
+                                                                                                        )
+                                                                                                    Float mem_gb = 8.0 + mem_factor * input_file_size_gb
+
+                                                                                                    Int disk_gb = round(
+                                                                                                        20.0 + disk_factor * input_file_size_gb
+                                                                                                        )
+
+                                                                                                    command <<<
+                                                                                                        set -e
+                                                                                                        python3 $(which encode_task_xcor.py) \
+
+                                                                                                            ~{ta
+                                                                                                                } \
+
+                                                                                                                ~{(
+                                                                                                                if paired_end
+                                                                                                                then "--paired-end"
+                                                                                                                else ""
+
+                                                                                                )
+                                                                                                    } \
+
+                                                                                                    ~{"--mito-chr-name " + mito_chr_name
+                                                                                                        } \
+
+                                                                                                    ~{"--subsample " + subsample
+                                                                                                        } \
+
+                                                                                                    ~{"--chip-seq-type " + chip_seq_type
+                                                                                                        } \
+
+                                                                                                    ~{"--exclusion-range-min " + exclusion_range_min
+                                                                                                        } \
+
+                                                                                                    ~{"--exclusion-range-max " + exclusion_range_max
+                                                                                                        } \
+
+                                                                                                    ~{"--subsample " + subsample
+                                                                                                        } \
+
+                                                                                                    ~{"--nth " + cpu
+                                                                                                        }
+
+                                                                                        >>>
+
+                                                                                        output {
+
+                                                                                                            File plot_pdf = glob(
+                                                                                                                "*.cc.plot.pdf"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
+
+                                                                                                            File plot_png = glob(
+                                                                                                                "*.cc.plot.png"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
+
+                                                                                                            File score = glob(
+                                                                                                                "*.cc.qc"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
+
+                                                                                                            File fraglen_log = glob(
+                                                                                                                "*.cc.fraglen.txt"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
+
+                                                                                                            Int fraglen = read_int(
+                                                                                                                fraglen_log
+                                                                                                                )
+
+                                                                                                    }
+
+                                                                                                    runtime {
+                                                                                                        cpu: cpu
+
+                                                                                                        memory: "~{mem_gb
+                                                                                                            } GB"
+                                                                                                        time: time_hr
+
+                                                                                                        disks: "local-disk ~{disk_gb
+                                                                                                            } SSD"
+                                                                                                        docker: runtime_environment.docker
+                                                                                                        singularity: runtime_environment.singularity
+                                                                                                        conda: runtime_environment.conda
+
+                                                                                                }
+
                                                                                         }
 
                                                                                         task jsd {
@@ -4158,8 +4067,7 @@ workflow chip {
                                                                                                             Float disk_factor
                                                                                                             RuntimeEnvironment runtime_environment
 
-
-                                                                                                        }
+                                                                                                    }
 
                                                                                                     Float input_file_size_gb = size(
                                                                                                         nodup_bams, "G"
@@ -4192,8 +4100,7 @@ workflow chip {
                                                                                                                             )
                                                                                                                         else ""
 
-
-                                                                                                            )
+                                                                                                        )
                                                                                                             } \
 
                                                                                                             ~{"--mapq-thresh " + mapq_thresh
@@ -4205,8 +4112,7 @@ workflow chip {
                                                                                                             ~{"--nth " + cpu
                                                                                                                 }
 
-
-                                                                                                    >>>
+                                                                                                >>>
 
                                                                                                 output {
 
@@ -4222,8 +4128,7 @@ workflow chip {
                                                                                                                         "*.jsd.qc"
                                                                                                                         )
 
-
-                                                                                                                }
+                                                                                                            }
 
                                                                                                             runtime {
                                                                                                                 cpu: cpu
@@ -4238,11 +4143,9 @@ workflow chip {
                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                 conda: runtime_environment.conda
 
+                                                                                                        }
 
-                                                                                                            }
-
-
-                                                                                                    }
+                                                                                                }
 
                                                                                                 task choose_ctl {
 
@@ -4264,8 +4167,7 @@ workflow chip {
                                                                                                                     Float exp_ctl_depth_ratio_limit
                                                                                                                     RuntimeEnvironment runtime_environment
 
-
-                                                                                                                }
+                                                                                                            }
 
                                                                                                             command <<<
                                                                                                                 set -e
@@ -4292,8 +4194,7 @@ workflow chip {
                                                                                                                         then "--always-use-pooled-ctl"
                                                                                                                         else ""
 
-
-                                                                                                            )
+                                                                                                        )
                                                                                                             } \
 
                                                                                                             ~{"--ctl-depth-ratio " + ctl_depth_ratio
@@ -4305,8 +4206,7 @@ workflow chip {
                                                                                                             ~{"--exp-ctl-depth-ratio-limit " + exp_ctl_depth_ratio_limit
                                                                                                                 }
 
-
-                                                                                                    >>>
+                                                                                                >>>
 
                                                                                                 output {
 
@@ -4344,8 +4244,7 @@ workflow chip {
                                                                                                                         chosen_ctl_subsample_pooled_txt
                                                                                                                         )
 
-
-                                                                                                                }
+                                                                                                            }
 
                                                                                                             runtime {
                                                                                                                 cpu: 1
@@ -4356,11 +4255,9 @@ workflow chip {
                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                 conda: runtime_environment.conda
 
+                                                                                                        }
 
-                                                                                                            }
-
-
-                                                                                                    }
+                                                                                                }
 
                                                                                                 task count_signal_track {
 
@@ -4369,8 +4266,7 @@ workflow chip {
                                                                                                             File chrsz  # 2-col chromosome sizes file
                                                                                                             RuntimeEnvironment runtime_environment
 
-
-                                                                                                        }
+                                                                                                    }
 
                                                                                                     Float mem_gb = 8.0
 
@@ -4387,8 +4283,7 @@ workflow chip {
                                                                                                             ~{"--mem-gb " + mem_gb
                                                                                                                 }
 
-
-                                                                                                    >>>
+                                                                                                >>>
 
                                                                                                 output {
 
@@ -4404,8 +4299,7 @@ workflow chip {
                                                                                                                         0
                                                                                                                         ]
 
-
-                                                                                                                }
+                                                                                                            }
 
                                                                                                             runtime {
                                                                                                                 cpu: 1
@@ -4418,11 +4312,9 @@ workflow chip {
                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                 conda: runtime_environment.conda
 
+                                                                                                        }
 
-                                                                                                            }
-
-
-                                                                                                    }
+                                                                                                }
 
                                                                                                 task subsample_ctl {
 
@@ -4434,8 +4326,7 @@ workflow chip {
                                                                                                             Float disk_factor
                                                                                                             RuntimeEnvironment runtime_environment
 
-
-                                                                                                        }
+                                                                                                    }
 
                                                                                                     Float input_file_size_gb = size(
                                                                                                         ta, "G"
@@ -4460,12 +4351,10 @@ workflow chip {
                                                                                                                 then "--paired-end"
                                                                                                                 else ""
 
-
-                                                                                                    )
+                                                                                                )
                                                                                                     } \
 
-
-                                                                                            >>>
+                                                                                        >>>
 
                                                                                         output {
 
@@ -4475,8 +4364,7 @@ workflow chip {
                                                                                                                 0
                                                                                                                 ]
 
-
-                                                                                                        }
+                                                                                                    }
 
                                                                                                     runtime {
                                                                                                         cpu: 1
@@ -4491,11 +4379,9 @@ workflow chip {
                                                                                                         singularity: runtime_environment.singularity
                                                                                                         conda: runtime_environment.conda
 
+                                                                                                }
 
-                                                                                                    }
-
-
-                                                                                            }
+                                                                                        }
 
                                                                                         task call_peak {
 
@@ -4520,8 +4406,7 @@ workflow chip {
                                                                                                     Float disk_factor
                                                                                                     RuntimeEnvironment runtime_environment
 
-
-                                                                                                }
+                                                                                            }
 
                                                                                             Float input_file_size_gb = size(
                                                                                                 tas, "G"
@@ -4612,8 +4497,7 @@ workflow chip {
                                                                                                     ~{"--blacklist " + blacklist
                                                                                                         }        
 
-
-                                                                                            >>>
+                                                                                        >>>
 
                                                                                         output {
 
@@ -4678,8 +4562,7 @@ workflow chip {
                                                                                                                 0
                                                                                                                 ]
 
-
-                                                                                                        }
+                                                                                                    }
 
                                                                                                     runtime {
 
@@ -4688,8 +4571,7 @@ workflow chip {
                                                                                                                 then 2
                                                                                                                 else cpu
 
-
-                                                                                                            )
+                                                                                                        )
 
                                                                                                         memory: "~{mem_gb
                                                                                                             } GB"
@@ -4702,11 +4584,9 @@ workflow chip {
                                                                                                         singularity: runtime_environment.singularity
                                                                                                         conda: runtime_environment.conda
 
+                                                                                                }
 
-                                                                                                    }
-
-
-                                                                                            }
+                                                                                        }
 
                                                                                         task macs2_signal_track {
 
@@ -4724,8 +4604,7 @@ workflow chip {
                                                                                                             Float disk_factor
                                                                                                             RuntimeEnvironment runtime_environment
 
-
-                                                                                                        }
+                                                                                                    }
 
                                                                                                     Float input_file_size_gb = size(
                                                                                                         tas, "G"
@@ -4760,8 +4639,7 @@ workflow chip {
                                                                                                             ~{"--mem-gb " + mem_gb
                                                                                                                 }
 
-
-                                                                                                    >>>
+                                                                                                >>>
 
                                                                                                 output {
 
@@ -4777,8 +4655,7 @@ workflow chip {
                                                                                                                         0
                                                                                                                         ]
 
-
-                                                                                                                }
+                                                                                                            }
 
                                                                                                             runtime {
                                                                                                                 cpu: 1
@@ -4794,11 +4671,9 @@ workflow chip {
                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                 conda: runtime_environment.conda
 
+                                                                                                        }
 
-                                                                                                            }
-
-
-                                                                                                    }
+                                                                                                }
 
                                                                                                 task idr {
 
@@ -4818,8 +4693,7 @@ workflow chip {
                                                                                                             String rank
                                                                                                             RuntimeEnvironment runtime_environment
 
-
-                                                                                                        }
+                                                                                                    }
 
                                                                                                     command <<<
                                                                                                         set -e
@@ -4832,8 +4706,7 @@ workflow chip {
                                                                                                                     then ""
                                                                                                                     else "touch null.frip.qc"
 
-
-                                                                                                            )
+                                                                                                        )
                                                                                                             }
                                                                                                         touch null 
                                                                                                         python3 $(which encode_task_idr.py) \
@@ -4870,8 +4743,7 @@ workflow chip {
                                                                                                             ~{"--ta " + ta
                                                                                                                 }
 
-
-                                                                                                    >>>
+                                                                                                >>>
 
                                                                                                 output {
 
@@ -4947,11 +4819,9 @@ workflow chip {
                                                                                                                                     0
                                                                                                                                     ]
 
+                                                                                                                        )
 
-                                                                                                                            )
-
-
-                                                                                                                    }
+                                                                                                                }
 
                                                                                                                 runtime {
                                                                                                                     cpu: 1
@@ -4962,11 +4832,9 @@ workflow chip {
                                                                                                                     singularity: runtime_environment.singularity
                                                                                                                     conda: runtime_environment.conda
 
+                                                                                                            }
 
-                                                                                                                }
-
-
-                                                                                                        }
+                                                                                                    }
 
                                                                                                     task overlap {
 
@@ -4984,8 +4852,7 @@ workflow chip {
                                                                                                                 String peak_type
                                                                                                                 RuntimeEnvironment runtime_environment
 
-
-                                                                                                            }
+                                                                                                        }
 
                                                                                                         command <<<
                                                                                                             set -e
@@ -4998,8 +4865,7 @@ workflow chip {
                                                                                                                         then ""
                                                                                                                         else "touch null.frip.qc"
 
-
-                                                                                                                )
+                                                                                                            )
                                                                                                                 }
                                                                                                             touch null 
                                                                                                             python3 $(which encode_task_overlap.py) \
@@ -5031,8 +4897,7 @@ workflow chip {
                                                                                                                 ~{"--ta " + ta
                                                                                                                     }
 
-
-                                                                                                        >>>
+                                                                                                    >>>
 
                                                                                                     output {
 
@@ -5090,11 +4955,9 @@ workflow chip {
                                                                                                                                         0
                                                                                                                                         ]
 
+                                                                                                                            )
 
-                                                                                                                                )
-
-
-                                                                                                                        }
+                                                                                                                    }
 
                                                                                                                     runtime {
                                                                                                                         cpu: 1
@@ -5105,11 +4968,9 @@ workflow chip {
                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                         conda: runtime_environment.conda
 
+                                                                                                                }
 
-                                                                                                                    }
-
-
-                                                                                                            }
+                                                                                                        }
 
                                                                                                         task reproducibility {
 
@@ -5129,8 +4990,7 @@ workflow chip {
                                                                                                                     File chrsz  # 2-col chromosome sizes file
                                                                                                                     RuntimeEnvironment runtime_environment
 
-
-                                                                                                                }
+                                                                                                            }
 
                                                                                                             command <<<
                                                                                                                 set -e
@@ -5154,8 +5014,7 @@ workflow chip {
                                                                                                                     ~{"--chrsz " + chrsz
                                                                                                                         }
 
-
-                                                                                                            >>>
+                                                                                                        >>>
 
                                                                                                         output {
 
@@ -5244,8 +5103,7 @@ workflow chip {
                                                                                                                                 0
                                                                                                                                 ]
 
-
-                                                                                                                        }
+                                                                                                                    }
 
                                                                                                                     runtime {
                                                                                                                         cpu: 1
@@ -5256,11 +5114,9 @@ workflow chip {
                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                         conda: runtime_environment.conda
 
+                                                                                                                }
 
-                                                                                                                    }
-
-
-                                                                                                            }
+                                                                                                        }
 
                                                                                                         task gc_bias {
 
@@ -5270,8 +5126,7 @@ workflow chip {
                                                                                                                     String? picard_java_heap
                                                                                                                     RuntimeEnvironment runtime_environment
 
-
-                                                                                                                }
+                                                                                                            }
 
                                                                                                             Float mem_factor = 0.3
 
@@ -5304,12 +5159,10 @@ workflow chip {
                                                                                                                                     ) + "G"
                                                                                                                                     )
 
-
-                                                                                                                    )
+                                                                                                                )
                                                                                                                     }
 
-
-                                                                                                            >>>
+                                                                                                        >>>
 
                                                                                                         output {
 
@@ -5325,8 +5178,7 @@ workflow chip {
                                                                                                                                 0
                                                                                                                                 ]
 
-
-                                                                                                                        }
+                                                                                                                    }
 
                                                                                                                     runtime {
                                                                                                                         cpu: 1
@@ -5339,11 +5191,9 @@ workflow chip {
                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                         conda: runtime_environment.conda
 
+                                                                                                                }
 
-                                                                                                                    }
-
-
-                                                                                                            }
+                                                                                                        }
 
                                                                                                         task qc_report {
 
@@ -5487,8 +5337,7 @@ workflow chip {
                                                                                                                     File? qc_json_ref
                                                                                                                     RuntimeEnvironment runtime_environment
 
-
-                                                                                                                }
+                                                                                                            }
 
                                                                                                             command <<<
                                                                                                                 set -e
@@ -5534,8 +5383,7 @@ workflow chip {
                                                                                                                                 then "--no-dup-removal "
                                                                                                                                 else ""
 
-
-                                                                                                                    )
+                                                                                                                )
                                                                                                                     } \
 
                                                                                                                     --peak-caller ~{peak_caller
@@ -5678,8 +5526,7 @@ workflow chip {
                                                                                                                     ~{"--qc-json-ref " + qc_json_ref
                                                                                                                         }
 
-
-                                                                                                            >>>
+                                                                                                        >>>
 
                                                                                                         output {
 
@@ -5699,8 +5546,7 @@ workflow chip {
                                                                                                                                 "qc_json_ref_match.txt"
                                                                                                                                 ) == "True"
 
-
-                                                                                                                        }
+                                                                                                                    }
 
                                                                                                                     runtime {
                                                                                                                         cpu: 1
@@ -5711,11 +5557,9 @@ workflow chip {
                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                         conda: runtime_environment.conda
 
+                                                                                                                }
 
-                                                                                                                    }
-
-
-                                                                                                            }
+                                                                                                        }
 
                                                                                                         ### workflow system tasks
                                                                                                         task read_genome_tsv {
@@ -5725,8 +5569,7 @@ workflow chip {
                                                                                                                     String? null_s
                                                                                                                     RuntimeEnvironment runtime_environment
 
-
-                                                                                                                }
+                                                                                                            }
 
                                                                                                             command <<<
 
@@ -5750,8 +5593,7 @@ workflow chip {
                                                                                                                                     fp2.write(val)
                                                                                                                     CODE
 
-
-                                                                                                                >>>
+                                                                                                            >>>
 
                                                                                                             output {
 
@@ -5770,8 +5612,7 @@ workflow chip {
                                                                                                                                         "ref_fa"
                                                                                                                                         )
 
-
-                                                                                                                                )
+                                                                                                                            )
 
                                                                                                                             String? bwa_idx_tar = (
 
@@ -5784,8 +5625,7 @@ workflow chip {
                                                                                                                                             "bwa_idx_tar"
                                                                                                                                             )
 
-
-                                                                                                                                    )
+                                                                                                                                )
 
                                                                                                                                 String? bowtie2_idx_tar = (
 
@@ -5798,8 +5638,7 @@ workflow chip {
                                                                                                                                                 "bowtie2_idx_tar"
                                                                                                                                                 )
 
-
-                                                                                                                                        )
+                                                                                                                                    )
 
                                                                                                                                     String? chrsz = (
 
@@ -5812,8 +5651,7 @@ workflow chip {
                                                                                                                                                     "chrsz"
                                                                                                                                                     )
 
-
-                                                                                                                                            )
+                                                                                                                                        )
 
                                                                                                                                         String? gensz = (
 
@@ -5826,8 +5664,7 @@ workflow chip {
                                                                                                                                                         "gensz"
                                                                                                                                                         )
 
-
-                                                                                                                                                )
+                                                                                                                                            )
 
                                                                                                                                             String? blacklist = (
 
@@ -5840,8 +5677,7 @@ workflow chip {
                                                                                                                                                             "blacklist"
                                                                                                                                                             )
 
-
-                                                                                                                                                    )
+                                                                                                                                                )
 
                                                                                                                                                 String? blacklist2 = (
 
@@ -5854,8 +5690,7 @@ workflow chip {
                                                                                                                                                                 "blacklist2"
                                                                                                                                                                 )
 
-
-                                                                                                                                                        )
+                                                                                                                                                    )
 
                                                                                                                                                     String? mito_chr_name = (
 
@@ -5868,8 +5703,7 @@ workflow chip {
                                                                                                                                                                     "mito_chr_name"
                                                                                                                                                                     )
 
-
-                                                                                                                                                            )
+                                                                                                                                                        )
 
                                                                                                                                                         String? regex_bfilt_peak_chr_name = (
 
@@ -5882,11 +5716,9 @@ workflow chip {
                                                                                                                                                                         "regex_bfilt_peak_chr_name"
                                                                                                                                                                         )
 
+                                                                                                                                                            )
 
-                                                                                                                                                                )
-
-
-                                                                                                                                                        }
+                                                                                                                                                    }
 
                                                                                                                                                     runtime {
                                                                                                                                                         maxRetries: 0
@@ -5898,11 +5730,9 @@ workflow chip {
                                                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                                                         conda: runtime_environment.conda
 
+                                                                                                                                                }
 
-                                                                                                                                                    }
-
-
-                                                                                                                                            }
+                                                                                                                                        }
 
                                                                                                                                         task rounded_mean {
 
@@ -5913,8 +5743,7 @@ workflow chip {
                                                                                                                                                                 ] ints
                                                                                                                                                             RuntimeEnvironment runtime_environment
 
-
-                                                                                                                                                        }
+                                                                                                                                                    }
 
                                                                                                                                                     command <<<
                                                                                                                                                         python <<CODE
@@ -5930,8 +5759,7 @@ workflow chip {
                                                                                                                                                                 fp.write('0')
                                                                                                                                                         CODE
 
-
-                                                                                                                                                    >>>
+                                                                                                                                                >>>
 
                                                                                                                                                 output {
 
@@ -5939,8 +5767,7 @@ workflow chip {
                                                                                                                                                                 "tmp.txt"
                                                                                                                                                                 )
 
-
-                                                                                                                                                        }
+                                                                                                                                                    }
 
                                                                                                                                                     runtime {
                                                                                                                                                         cpu: 1
@@ -5951,11 +5778,9 @@ workflow chip {
                                                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                                                         conda: runtime_environment.conda
 
+                                                                                                                                                }
 
-                                                                                                                                                    }
-
-
-                                                                                                                                            }
+                                                                                                                                        }
 
                                                                                                                                         task raise_exception {
 
@@ -5963,8 +5788,7 @@ workflow chip {
                                                                                                                                                     String msg
                                                                                                                                                     RuntimeEnvironment runtime_environment
 
-
-                                                                                                                                                }
+                                                                                                                                            }
 
                                                                                                                                             command <<<
 
@@ -5972,16 +5796,14 @@ workflow chip {
                                                                                                                                                         }\n" >&2
                                                                                                                                                     exit 2
 
-
-                                                                                                                                                >>>
+                                                                                                                                            >>>
 
                                                                                                                                             output {
 
                                                                                                                                                     String error_msg = "~{msg
                                                                                                                                                         }"
 
-
-                                                                                                                                                }
+                                                                                                                                            }
 
                                                                                                                                             runtime {
                                                                                                                                                 maxRetries: 0
@@ -5993,8 +5815,6 @@ workflow chip {
                                                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                                                 conda: runtime_environment.conda
 
+                                                                                                                                        }
 
-                                                                                                                                            }
-
-
-                                                                                                                                    }
+                                                                                                                                }

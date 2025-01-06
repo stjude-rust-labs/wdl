@@ -282,8 +282,7 @@ workflow seaseq {
 
                                     Array[String] string_fastq = [
                                         1,
-
-                                    ]  #buffer to allow for fastq optionality
+                                ]  #buffer to allow for fastq optionality
                                 Array[File] s_fastq = select_first([
                                     sample_fastq,
                                     string_fastq,
@@ -473,8 +472,7 @@ workflow seaseq {
                                                 ), ".fastq.gz|.fq.gz", ""
                                                 ) + "/QC/SummaryStats",
                                         }
-
-                                    }  # end scatter (for each sample fastq)
+                                }  # end scatter (for each sample fastq)
 
                                 # MERGE BAM FILES
                                 # Execute analysis on merge bam file
@@ -556,8 +554,7 @@ workflow seaseq {
                                             mergebam.mergebam
                                             ), ".sorted.b.*$", "") + "/BAM_files",
                                     }
-
-                                }  # end if blacklist provided
+                            }  # end if blacklist provided
 
                             File mergebam_afterbklist = select_first([
                                 merge_rmblklist.intersect_out,
@@ -581,8 +578,7 @@ workflow seaseq {
                                     mergebam_afterbklist
                                     ), ".sorted.b.*$", "") + "/BAM_files",
                             }
-
-                        }  # end if length(fastqfiles) > 1: multi_fastq
+                    }  # end if length(fastqfiles) > 1: multi_fastq
 
                     ### ---------------------------------------- ###
                     ### ------------ S E C T I O N 2 ----------- ###
@@ -656,8 +652,7 @@ workflow seaseq {
                                 mapping.bklist_bam,
                                 mapping.sorted_bam,
                             ]) }
-
-                        }  # end if length(fastqfiles) == 1: one_fastq
+                    }  # end if length(fastqfiles) == 1: one_fastq
 
                     ### ---------------------------------------- ###
                     ### ------------ S E C T I O N 3 ----------- ###
