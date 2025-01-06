@@ -106,10 +106,15 @@ pub enum Trivia {
     Comment(Comment),
 }
 
-/// Whether optional blank lines are allowed in the current context.
+/// The policy for line spacing.
+///
+/// Blank lines before comments and between comments are always permitted.
 #[derive(Eq, PartialEq, Default, Debug, Clone, Copy)]
 pub enum LineSpacingPolicy {
-    /// Blank lines are allowed before comments.
+    /// Blank lines are allowed before and between comments, but not after.
+    ///
+    /// i.e. a comment, then a blank line, then code, would have the blank
+    /// removed.
     BeforeComments,
     /// Blank lines are always allowed.
     #[default]

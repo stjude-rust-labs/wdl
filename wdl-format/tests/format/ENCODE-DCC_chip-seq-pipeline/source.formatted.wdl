@@ -1079,7 +1079,7 @@ workflow chip {
     # two blacklists can have different number of columns (3 vs 6)
     # so we limit merged blacklist's columns to 3
     Array[
-    File] blacklists = select_all([
+        File] blacklists = select_all([
         blacklist1_,
         blacklist2_,
     ])
@@ -1294,7 +1294,7 @@ workflow chip {
 
     # no need to do that for R2 (R1 array will be used to determine presense of fastq for each rep)
     Array[
-    Array[File]] fastqs_R2 = [
+        Array[File]] fastqs_R2 = [
         fastqs_rep1_R2,
         fastqs_rep2_R2,
         fastqs_rep3_R2,
@@ -1309,7 +1309,7 @@ workflow chip {
 
     # temporary 2-dim ctl fastqs array [rep_id][merge_id]
     Array[
-    Array[File]] ctl_fastqs_R1 = (
+        Array[File]] ctl_fastqs_R1 = (
         if length(ctl_fastqs_rep10_R1) > 0
         then [
             ctl_fastqs_rep1_R1,
@@ -1400,7 +1400,7 @@ workflow chip {
 
     # no need to do that for R2 (R1 array will be used to determine presense of fastq for each rep)
     Array[
-    Array[File]] ctl_fastqs_R2 = [
+        Array[File]] ctl_fastqs_R2 = [
         ctl_fastqs_rep1_R2,
         ctl_fastqs_rep2_R2,
         ctl_fastqs_rep3_R2,
@@ -1416,7 +1416,7 @@ workflow chip {
     # temporary variables to get number of replicates
     #     WDLic implementation of max(A,B,C,...)
     Int num_rep_fastq = length(
-    fastqs_R1)
+        fastqs_R1)
     Int num_rep_bam = (
         if length(bams) < num_rep_fastq
         then num_rep_fastq
@@ -1441,7 +1441,7 @@ workflow chip {
 
     # temporary variables to get number of controls
     Int num_ctl_fastq = length(
-    ctl_fastqs_R1)
+        ctl_fastqs_R1)
     Int num_ctl_bam = (
         if length(ctl_bams) < num_ctl_fastq
         then num_ctl_fastq
@@ -1475,8 +1475,8 @@ workflow chip {
 
     if (
     (
-    num_rep_fastq > 0 || num_ctl_fastq > 0
-    ) && aligner_ != "bwa" && aligner_ != "bowtie2" && aligner_ != "custom") {
+        num_rep_fastq > 0 || num_ctl_fastq > 0
+        ) && aligner_ != "bwa" && aligner_ != "bowtie2" && aligner_ != "custom") {
         call raise_exception as error_wrong_aligner { input:
             msg = "Choose chip.aligner to align your fastqs. Choices: bwa, bowtie2, custom.",
             runtime_environment = runtime_environment,
@@ -1496,8 +1496,8 @@ workflow chip {
     }
 
     if (
-    aligner_ == "custom" && (
-    !defined(custom_align_py) || !defined(custom_aligner_idx_tar))) {
+        aligner_ == "custom" && (
+        !defined(custom_align_py) || !defined(custom_aligner_idx_tar))) {
         call raise_exception as error_custom_aligner { input:
             msg = "To use a custom aligner, define chip.custom_align_py and chip.custom_aligner_idx_tar.",
             runtime_environment = runtime_environment,
@@ -1506,11 +1506,11 @@ workflow chip {
 
     if (
     (
-    ctl_depth_limit > 0 || exp_ctl_depth_ratio_limit > 0
-    ) && num_ctl > 1 && length(ctl_paired_ends) > 1) {
+        ctl_depth_limit > 0 || exp_ctl_depth_ratio_limit > 0
+        ) && num_ctl > 1 && length(ctl_paired_ends) > 1) {
 
             call raise_exception as error_subsample_pooled_control_with_mixed_endedness {
-            input:
+                input:
                 msg = "Cannot use automatic control subsampling (\"chip.ctl_depth_limit\">0 and \"chip.exp_ctl_depth_limit\">0) for " + "multiple controls with mixed endedness (e.g. SE ctl-rep1 and PE ctl-rep2). " + "Automatic control subsampling is enabled by default. " + "Disable automatic control subsampling by explicitly defining the above two parameters as 0 in your input JSON file. " + "You can still use manual control subsamping (\"chip.ctl_subsample_reads\">0) since it is done " + "for individual control's TAG-ALIGN output according to each control's endedness. ",
                 runtime_environment = runtime_environment,
             }
@@ -1524,7 +1524,7 @@ workflow chip {
         if (pipeline_type == "control" && num_rep_fastq == 0) {
 
                 call raise_exception as error_ctl_fastq_input_required_for_control_mode {
-                input:
+                    input:
                     msg = "Control mode (chip.pipeline_type: control) is for FASTQs only. Define FASTQs in fastqs_repX_RY. Pipeline will recognize them as control FASTQs.",
                     runtime_environment = runtime_environment,
                 }
@@ -1544,7 +1544,7 @@ workflow chip {
                     )
 
                     Boolean has_input_of_align = i < length(
-                    fastqs_R1) && length(fastqs_R1[i]) > 0
+                        fastqs_R1) && length(fastqs_R1[i]) > 0
                     Boolean has_output_of_align = i < length(bams)
                     if (has_input_of_align && !has_output_of_align) {
                         call align { input:
@@ -1589,12 +1589,12 @@ workflow chip {
                     )
 
                     Boolean has_input_of_filter = has_output_of_align || defined(
-                    align.bam)
+                        align.bam)
                     Boolean has_output_of_filter = i < length(nodup_bams)
 
                     # skip if we already have output of this step
                     if (
-                    has_input_of_filter && !has_output_of_filter) {
+                        has_input_of_filter && !has_output_of_filter) {
                         call filter { input:
                             bam = bam_,
                             paired_end = paired_end_,
@@ -1622,7 +1622,7 @@ workflow chip {
                     )
 
                     Boolean has_input_of_bam2ta = has_output_of_filter || defined(
-                    filter.nodup_bam)
+                        filter.nodup_bam)
                     Boolean has_output_of_bam2ta = i < length(tas)
                     if (has_input_of_bam2ta && !has_output_of_bam2ta) {
                         call bam2ta { input:
@@ -1657,12 +1657,12 @@ workflow chip {
                     }
 
                     Boolean has_input_of_count_signal_track = has_output_of_bam2ta || defined(
-                    bam2ta.ta)
+                        bam2ta.ta)
                     if (has_input_of_count_signal_track && enable_count_signal_track_) {
 
                             # generate count signal track
                             call count_signal_track {
-                            input:
+                                input:
                                 ta = ta_,
                                 chrsz = chrsz_,
                                 runtime_environment = runtime_environment,
@@ -1680,7 +1680,7 @@ workflow chip {
 
                         # special trimming/mapping for xcor (when starting from FASTQs)
                         if (
-                        has_input_of_align) {
+                            has_input_of_align) {
                             call align as align_R1 { input:
                                 fastqs_R1 = fastqs_R1[i],
                                 fastqs_R2 = [],
@@ -1714,7 +1714,7 @@ workflow chip {
 
                             # no bam deduping for xcor
                             call filter as filter_R1 {
-                            input:
+                                input:
                                 bam = align_R1.bam,
                                 paired_end = false,
                                 redact_nodup_bam = false,
@@ -1748,8 +1748,8 @@ workflow chip {
 
                         # special trimming/mapping for xcor (when starting from BAMs)
                         Boolean has_input_of_bam2ta_no_dedup = (
-                        has_output_of_align || defined(
-                        align.bam)) && !defined(bam2ta_no_dedup_R1.ta)
+                            has_output_of_align || defined(
+                            align.bam)) && !defined(bam2ta_no_dedup_R1.ta)
                         if (has_input_of_bam2ta_no_dedup) {
                             call filter as filter_no_dedup { input:
                                 bam = bam_,
@@ -1829,7 +1829,7 @@ workflow chip {
 
                     # align each control
                     scatter (
-                    i in range(num_ctl)) {
+                        i in range(num_ctl)) {
 
                             # to override endedness definition for individual control
                             #     ctl_paired_end will override ctl_paired_ends[i]
@@ -1843,7 +1843,7 @@ workflow chip {
                             )
 
                             Boolean has_input_of_align_ctl = i < length(
-                            ctl_fastqs_R1) && length(ctl_fastqs_R1[i]) > 0
+                                ctl_fastqs_R1) && length(ctl_fastqs_R1[i]) > 0
                             Boolean has_output_of_align_ctl = i < length(ctl_bams)
                             if (has_input_of_align_ctl && !has_output_of_align_ctl) {
                                 call align as align_ctl { input:
@@ -1888,12 +1888,12 @@ workflow chip {
                             )
 
                             Boolean has_input_of_filter_ctl = has_output_of_align_ctl || defined(
-                            align_ctl.bam)
+                                align_ctl.bam)
                             Boolean has_output_of_filter_ctl = i < length(ctl_nodup_bams)
 
                             # skip if we already have output of this step
                             if (
-                            has_input_of_filter_ctl && !has_output_of_filter_ctl) {
+                                has_input_of_filter_ctl && !has_output_of_filter_ctl) {
                                 call filter as filter_ctl { input:
                                     bam = ctl_bam_,
                                     paired_end = ctl_paired_end_,
@@ -1921,7 +1921,7 @@ workflow chip {
                             )
 
                             Boolean has_input_of_bam2ta_ctl = has_output_of_filter_ctl || defined(
-                            filter_ctl.nodup_bam)
+                                filter_ctl.nodup_bam)
                             Boolean has_output_of_bam2ta_ctl = i < length(ctl_tas)
                             if (has_input_of_bam2ta_ctl && !has_output_of_bam2ta_ctl) {
                                 call bam2ta as bam2ta_ctl { input:
@@ -1946,12 +1946,12 @@ workflow chip {
 
                         # if there are TAs for ALL replicates then pool them
                         Boolean has_all_inputs_of_pool_ta = length(
-                        select_all(ta_)) == num_rep
+                            select_all(ta_)) == num_rep
                         if (has_all_inputs_of_pool_ta && num_rep > 1) {
 
                                 # pool tagaligns from true replicates
                                 call pool_ta {
-                                input:
+                                    input:
                                     tas = ta_,
                                     prefix = "rep",
                                     runtime_environment = runtime_environment,
@@ -1960,15 +1960,15 @@ workflow chip {
 
                             # if there are pr1 TAs for ALL replicates then pool them
                             Boolean has_all_inputs_of_pool_ta_pr1 = length(
-                            select_all(spr.ta_pr1)) == num_rep
+                                select_all(spr.ta_pr1)) == num_rep
 
                             if (
-                            has_all_inputs_of_pool_ta_pr1 && num_rep > 1 && !align_only_ && !true_rep_only
-                            ) {
+                                has_all_inputs_of_pool_ta_pr1 && num_rep > 1 && !align_only_ && !true_rep_only
+                                ) {
 
                                     # pool tagaligns from pseudo replicate 1
                                     call pool_ta as pool_ta_pr1 {
-                                    input:
+                                        input:
                                         tas = spr.ta_pr1,
                                         prefix = "rep-pr1",
                                         runtime_environment = runtime_environment,
@@ -1977,15 +1977,15 @@ workflow chip {
 
                                 # if there are pr2 TAs for ALL replicates then pool them
                                 Boolean has_all_inputs_of_pool_ta_pr2 = length(
-                                select_all(spr.ta_pr2)) == num_rep
+                                    select_all(spr.ta_pr2)) == num_rep
 
                                 if (
-                                has_all_inputs_of_pool_ta_pr1 && num_rep > 1 && !align_only_ && !true_rep_only
-                                ) {
+                                    has_all_inputs_of_pool_ta_pr1 && num_rep > 1 && !align_only_ && !true_rep_only
+                                    ) {
 
                                         # pool tagaligns from pseudo replicate 2
                                         call pool_ta as pool_ta_pr2 {
-                                        input:
+                                            input:
                                             tas = spr.ta_pr2,
                                             prefix = "rep-pr2",
                                             runtime_environment = runtime_environment,
@@ -1994,12 +1994,12 @@ workflow chip {
 
                                     # if there are CTL TAs for ALL replicates then pool them
                                     Boolean has_all_inputs_of_pool_ta_ctl = length(
-                                    select_all(ctl_ta_)) == num_ctl
+                                        select_all(ctl_ta_)) == num_ctl
                                     if (has_all_inputs_of_pool_ta_ctl && num_ctl > 1) {
 
                                             # pool tagaligns from true replicates
                                             call pool_ta as pool_ta_ctl {
-                                            input:
+                                                input:
                                                 tas = ctl_ta_,
                                                 prefix = "ctl",
                                                 runtime_environment = runtime_environment,
@@ -2007,14 +2007,14 @@ workflow chip {
                                         }
 
                                         Boolean has_input_of_count_signal_track_pooled = defined(
-                                        pool_ta.ta_pooled)
+                                            pool_ta.ta_pooled)
 
                                         if (
-                                        has_input_of_count_signal_track_pooled && enable_count_signal_track_ && num_rep > 1
-                                        ) {
+                                            has_input_of_count_signal_track_pooled && enable_count_signal_track_ && num_rep > 1
+                                            ) {
 
                                                 call count_signal_track as count_signal_track_pooled {
-                                                input:
+                                                    input:
                                                     ta = pool_ta.ta_pooled,
                                                     chrsz = chrsz_,
                                                     runtime_environment = runtime_environment,
@@ -2022,16 +2022,17 @@ workflow chip {
                                             }
 
                                             Boolean has_input_of_jsd = defined(
-                                            blacklist_
-                                            ) && length(select_all(nodup_bam_)) == num_rep
+                                                blacklist_
+                                                ) && length(
+                                                select_all(nodup_bam_)) == num_rep
 
                                             if (
-                                            has_input_of_jsd && num_rep > 0 && enable_jsd_
-                                            ) {
+                                                has_input_of_jsd && num_rep > 0 && enable_jsd_
+                                                ) {
 
                                                     # fingerprint and JS-distance plot
                                                     call jsd {
-                                                    input:
+                                                        input:
                                                         nodup_bams = nodup_bam_,
                                                         ctl_bams = ctl_nodup_bam_,  # use first control only
                                                         blacklist = blacklist_,
@@ -2046,23 +2047,23 @@ workflow chip {
                                                 }
 
                                                 Boolean has_all_input_of_choose_ctl = length(
-                                                select_all(
-                                                ta_
-                                                )
-                                                ) == num_rep && length(
-                                                select_all(
-                                                ctl_ta_)) == num_ctl && num_ctl > 0
+                                                    select_all(
+                                                    ta_
+                                                    )
+                                                    ) == num_rep && length(
+                                                    select_all(
+                                                    ctl_ta_)) == num_ctl && num_ctl > 0
 
                                                 if (
-                                                has_all_input_of_choose_ctl && !align_only_
-                                                ) {
+                                                    has_all_input_of_choose_ctl && !align_only_
+                                                    ) {
 
                                                         # choose appropriate control for each exp IP replicate
                                                         # outputs:
                                                         #     choose_ctl.idx : control replicate index for each exp replicate
                                                         #                    -1 means pooled ctl replicate
                                                         call choose_ctl {
-                                                        input:
+                                                            input:
                                                             tas = ta_,
                                                             ctl_tas = ctl_ta_,
                                                             ta_pooled = pool_ta.ta_pooled,
@@ -2105,22 +2106,22 @@ workflow chip {
                                                                 then ctl_paired_end_[0]
 
                                                                 else ctl_paired_end_[
-                                                                chosen_ctl_ta_id]
+                                                                    chosen_ctl_ta_id]
                                                             )
 
                                                             if (
-                                                            chosen_ctl_ta_id > -2 && chosen_ctl_ta_subsample > 0
-                                                            ) {
+                                                                chosen_ctl_ta_id > -2 && chosen_ctl_ta_subsample > 0
+                                                                ) {
 
                                                                     call subsample_ctl {
-                                                                    input:
+                                                                        input:
                                                                         ta = (
                                                                             if chosen_ctl_ta_id == -1
                                                                             then pool_ta_ctl.ta_pooled
 
                                                                             else ctl_ta_[
-                                                                            chosen_ctl_ta_id
-                                                                            ]
+                                                                                chosen_ctl_ta_id
+                                                                                ]
                                                                         ),
                                                                         subsample = chosen_ctl_ta_subsample,
                                                                         paired_end = chosen_ctl_paired_end,
@@ -2131,7 +2132,8 @@ workflow chip {
                                                                 }
 
                                                                 Array[
-                                                                File] chosen_ctl_tas = (
+                                                                    File
+                                                                    ] chosen_ctl_tas = (
                                                                     if chosen_ctl_ta_id <= -2
                                                                     then []
                                                                     else if chosen_ctl_ta_subsample > 0
@@ -2150,8 +2152,8 @@ workflow chip {
                                                                         select_first([
 
                                                                                     ctl_ta_[
-                                                                                    chosen_ctl_ta_id
-                                                                                    ],
+                                                                                        chosen_ctl_ta_id
+                                                                                        ],
                                                                                 ]),
                                                                             ]
                                                                         )
@@ -2169,26 +2171,27 @@ workflow chip {
 
                                                                     # workaround for dx error (Unsupported combination: womType: Int womValue: ([225], Array[Int]))
                                                                     Array[
-                                                                    Int
-                                                                    ] fraglen_tmp = select_all(
-                                                                    fraglen_)
+                                                                        Int
+                                                                        ] fraglen_tmp = select_all(
+                                                                        fraglen_)
 
                                                                     # we have all tas and ctl_tas (optional for histone chipseq) ready, let's call peaks
                                                                     scatter (
-                                                                    i in range(num_rep)) {
+                                                                        i in range(
+                                                                        num_rep)) {
 
                                                                             Boolean has_input_of_call_peak = defined(
-                                                                            ta_[i])
+                                                                                ta_[i])
 
                                                                             Boolean has_output_of_call_peak = i < length(
-                                                                            peaks)
+                                                                                peaks)
 
                                                                             if (
-                                                                            has_input_of_call_peak && !has_output_of_call_peak && !align_only_
-                                                                            ) {
+                                                                                has_input_of_call_peak && !has_output_of_call_peak && !align_only_
+                                                                                ) {
 
                                                                                     call call_peak {
-                                                                                    input:
+                                                                                        input:
                                                                                         peak_caller = peak_caller_,
                                                                                         peak_type = peak_type_,
 
@@ -2198,17 +2201,19 @@ workflow chip {
                                                                                                 [
 
                                                                                                             ta_[
-                                                                                                            i
-                                                                                                            ],
+                                                                                                                i
+                                                                                                                ],
 
-                                                                                                    ],
+
+                                                                                                        ],
 
                                                                                                     chosen_ctl_tas[
-                                                                                                    i
-                                                                                                    ],
+                                                                                                        i
+                                                                                                        ],
 
-                                                                                        ]
-                                                                                        ),
+
+                                                                                            ]
+                                                                                            ),
                                                                                         gensz = gensz_,
                                                                                         chrsz = chrsz_,
                                                                                         cap_num_peak = cap_num_peak_,
@@ -2216,8 +2221,8 @@ workflow chip {
                                                                                         fdr_thresh = fdr_thresh,
 
                                                                                         fraglen = fraglen_tmp[
-                                                                                        i
-                                                                                        ],
+                                                                                            i
+                                                                                            ],
                                                                                         blacklist = blacklist_,
                                                                                         regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
 
@@ -2240,17 +2245,17 @@ workflow chip {
                                                                                     if has_output_of_call_peak
 
                                                                                     then peaks[
-                                                                                    i]
+                                                                                        i]
                                                                                     else call_peak.peak
                                                                                 )
 
                                                                                 # signal track
                                                                                 if (
-                                                                                has_input_of_call_peak && !align_only_
-                                                                                ) {
+                                                                                    has_input_of_call_peak && !align_only_
+                                                                                    ) {
 
                                                                                         call macs2_signal_track {
-                                                                                        input:
+                                                                                            input:
 
                                                                                                     tas = flatten(
                                                                                                     [
@@ -2258,49 +2263,53 @@ workflow chip {
                                                                                                             [
 
                                                                                                                         ta_[
-                                                                                                                        i
-                                                                                                                        ],
+                                                                                                                            i
+                                                                                                                            ],
 
-                                                                                                                ],
+
+                                                                                                                    ],
 
                                                                                                                 chosen_ctl_tas[
-                                                                                                                i
-                                                                                                                ],
+                                                                                                                    i
+                                                                                                                    ],
 
-                                                                                                    ]
-                                                                                                    ),
+
+                                                                                                        ]
+                                                                                                        ),
                                                                                                     gensz = gensz_,
                                                                                                     chrsz = chrsz_,
                                                                                                     pval_thresh = pval_thresh,
 
                                                                                                     fraglen = fraglen_tmp[
-                                                                                                    i
-                                                                                                    ],
+                                                                                                        i
+                                                                                                        ],
 
                                                                                                     mem_factor = macs2_signal_track_mem_factor,
                                                                                                     disk_factor = macs2_signal_track_disk_factor,
                                                                                                     time_hr = macs2_signal_track_time_hr,
                                                                                                     runtime_environment = runtime_environment_macs2,
 
-                                                                                            }
+
+                                                                                                }
                                                                                         }
 
                                                                                         # call peaks on 1st pseudo replicated tagalign
                                                                                         Boolean has_input_of_call_peak_pr1 = defined(
-                                                                                        spr.ta_pr1[
-                                                                                        i
-                                                                                        ])
+                                                                                            spr.ta_pr1[
+                                                                                            i
+                                                                                            ]
+                                                                                            )
 
                                                                                         Boolean has_output_of_call_peak_pr1 = i < length(
-                                                                                        peaks_pr1
-                                                                                        )
+                                                                                            peaks_pr1
+                                                                                            )
 
                                                                                         if (
-                                                                                        has_input_of_call_peak_pr1 && !has_output_of_call_peak_pr1 && !true_rep_only
-                                                                                        ) {
+                                                                                            has_input_of_call_peak_pr1 && !has_output_of_call_peak_pr1 && !true_rep_only
+                                                                                            ) {
 
                                                                                                 call call_peak as call_peak_pr1 {
-                                                                                                input:
+                                                                                                    input:
                                                                                                     peak_caller = peak_caller_,
                                                                                                     peak_type = peak_type_,
 
@@ -2310,17 +2319,19 @@ workflow chip {
                                                                                                             [
 
                                                                                                                         spr.ta_pr1[
-                                                                                                                        i
-                                                                                                                        ],
+                                                                                                                            i
+                                                                                                                            ],
 
-                                                                                                                ],
+
+                                                                                                                    ],
 
                                                                                                                 chosen_ctl_tas[
-                                                                                                                i
-                                                                                                                ],
+                                                                                                                    i
+                                                                                                                    ],
 
-                                                                                                    ]
-                                                                                                    ),
+
+                                                                                                        ]
+                                                                                                        ),
                                                                                                     gensz = gensz_,
                                                                                                     chrsz = chrsz_,
                                                                                                     cap_num_peak = cap_num_peak_,
@@ -2328,8 +2339,8 @@ workflow chip {
                                                                                                     fdr_thresh = fdr_thresh,
 
                                                                                                     fraglen = fraglen_tmp[
-                                                                                                    i
-                                                                                                    ],
+                                                                                                        i
+                                                                                                        ],
                                                                                                     blacklist = blacklist_,
                                                                                                     regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
 
@@ -2345,34 +2356,38 @@ workflow chip {
                                                                                                         then runtime_environment_macs2
                                                                                                         else runtime_environment
 
-                                                                                                ),
 
-                                                                                        }
+                                                                                                    ),
+
+
+                                                                                            }
                                                                                     }
 
                                                                                     File? peak_pr1_ = (
                                                                                         if has_output_of_call_peak_pr1
 
                                                                                         then peaks_pr1[
-                                                                                        i]
+                                                                                            i
+                                                                                            ]
                                                                                         else call_peak_pr1.peak
                                                                                     )
 
                                                                                     # call peaks on 2nd pseudo replicated tagalign
                                                                                     Boolean has_input_of_call_peak_pr2 = defined(
-                                                                                    spr.ta_pr2[
-                                                                                    i])
+                                                                                        spr.ta_pr2[
+                                                                                        i
+                                                                                        ])
 
                                                                                     Boolean has_output_of_call_peak_pr2 = i < length(
-                                                                                    peaks_pr2
-                                                                                    )
+                                                                                        peaks_pr2
+                                                                                        )
 
                                                                                     if (
-                                                                                    has_input_of_call_peak_pr2 && !has_output_of_call_peak_pr2 && !true_rep_only
-                                                                                    ) {
+                                                                                        has_input_of_call_peak_pr2 && !has_output_of_call_peak_pr2 && !true_rep_only
+                                                                                        ) {
 
                                                                                             call call_peak as call_peak_pr2 {
-                                                                                            input:
+                                                                                                input:
                                                                                                 peak_caller = peak_caller_,
                                                                                                 peak_type = peak_type_,
 
@@ -2382,17 +2397,19 @@ workflow chip {
                                                                                                         [
 
                                                                                                                     spr.ta_pr2[
-                                                                                                                    i
-                                                                                                                    ],
+                                                                                                                        i
+                                                                                                                        ],
 
-                                                                                                            ],
+
+                                                                                                                ],
 
                                                                                                             chosen_ctl_tas[
-                                                                                                            i
-                                                                                                            ],
+                                                                                                                i
+                                                                                                                ],
 
-                                                                                                ]
-                                                                                                ),
+
+                                                                                                    ]
+                                                                                                    ),
                                                                                                 gensz = gensz_,
                                                                                                 chrsz = chrsz_,
                                                                                                 cap_num_peak = cap_num_peak_,
@@ -2400,8 +2417,8 @@ workflow chip {
                                                                                                 fdr_thresh = fdr_thresh,
 
                                                                                                 fraglen = fraglen_tmp[
-                                                                                                i
-                                                                                                ],
+                                                                                                    i
+                                                                                                    ],
                                                                                                 blacklist = blacklist_,
                                                                                                 regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
 
@@ -2417,7 +2434,8 @@ workflow chip {
                                                                                                     then runtime_environment_macs2
                                                                                                     else runtime_environment
 
-                                                                                            ),
+
+                                                                                                ),
                                                                                         }
                                                                                     }
 
@@ -2425,7 +2443,8 @@ workflow chip {
                                                                                         if has_output_of_call_peak_pr2
 
                                                                                         then peaks_pr2[
-                                                                                        i]
+                                                                                            i
+                                                                                            ]
                                                                                         else call_peak_pr2.peak
                                                                                     )
                                                                                 }
@@ -2435,7 +2454,7 @@ workflow chip {
                                                                                 #  1) calling peaks for pooled true/pseudo replicates
                                                                                 #  2) calculating FRiP
                                                                                 call rounded_mean as fraglen_mean {
-                                                                                input:
+                                                                                    input:
                                                                                     ints = fraglen_tmp,
                                                                                     runtime_environment = runtime_environment,
                                                                                 }
@@ -2443,26 +2462,27 @@ workflow chip {
                                                                                 # }
 
                                                                                 if (
-                                                                                has_all_input_of_choose_ctl && !align_only_ && chosen_ctl_ta_pooled_subsample > 0
-                                                                                ) {
+                                                                                    has_all_input_of_choose_ctl && !align_only_ && chosen_ctl_ta_pooled_subsample > 0
+                                                                                    ) {
 
                                                                                         call subsample_ctl as subsample_ctl_pooled {
-                                                                                        input:
+                                                                                            input:
 
                                                                                                 ta = (
                                                                                                     if num_ctl < 2
 
                                                                                                     then ctl_ta_[
-                                                                                                    0
-                                                                                                    ]
+                                                                                                        0
+                                                                                                        ]
                                                                                                     else pool_ta_ctl.ta_pooled
 
-                                                                                            ),
+
+                                                                                                ),
                                                                                             subsample = chosen_ctl_ta_pooled_subsample,
 
                                                                                             paired_end = ctl_paired_end_[
-                                                                                            0
-                                                                                            ],
+                                                                                                0
+                                                                                                ],
                                                                                             mem_factor = subsample_ctl_mem_factor,
                                                                                             disk_factor = subsample_ctl_disk_factor,
                                                                                             runtime_environment = runtime_environment,
@@ -2471,12 +2491,12 @@ workflow chip {
 
                                                                                     # actually not an array
                                                                                     Array[
-                                                                                    File?
-                                                                                    ] chosen_ctl_ta_pooled = (
+                                                                                        File?
+                                                                                        ] chosen_ctl_ta_pooled = (
                                                                                         if !has_all_input_of_choose_ctl || align_only_
 
                                                                                         then [
-                                                                                        ]
+                                                                                            ]
                                                                                         else if chosen_ctl_ta_pooled_subsample > 0
 
                                                                                         then [
@@ -2487,33 +2507,35 @@ workflow chip {
                                                                                         then [
 
                                                                                                     ctl_ta_[
-                                                                                                    0
-                                                                                                    ],
+                                                                                                        0
+                                                                                                        ],
 
-                                                                                            ]
+
+                                                                                                ]
 
                                                                                             else [
                                                                                                 pool_ta_ctl.ta_pooled,
 
-                                                                                        ]
+
+                                                                                            ]
                                                                                     )
 
                                                                                     Boolean has_input_of_call_peak_pooled = defined(
-                                                                                    pool_ta.ta_pooled
-                                                                                    )
+                                                                                        pool_ta.ta_pooled
+                                                                                        )
 
                                                                                     Boolean has_output_of_call_peak_pooled = defined(
-                                                                                    peak_pooled
-                                                                                    )
+                                                                                        peak_pooled
+                                                                                        )
 
                                                                                     if (
-                                                                                    has_input_of_call_peak_pooled && !has_output_of_call_peak_pooled && !align_only_ && num_rep > 1
-                                                                                    ) {
+                                                                                        has_input_of_call_peak_pooled && !has_output_of_call_peak_pooled && !align_only_ && num_rep > 1
+                                                                                        ) {
 
                                                                                             # call peaks on pooled replicate
                                                                                             # always call peaks for pooled replicate to get signal tracks
                                                                                             call call_peak as call_peak_pooled {
-                                                                                            input:
+                                                                                                input:
                                                                                                 peak_caller = peak_caller_,
                                                                                                 peak_type = peak_type_,
 
@@ -2524,12 +2546,14 @@ workflow chip {
                                                                                                             [
                                                                                                                 pool_ta.ta_pooled,
 
-                                                                                                    ]
-                                                                                                    ),
+
+                                                                                                        ]
+                                                                                                        ),
                                                                                                     chosen_ctl_ta_pooled,
 
-                                                                                        ]
-                                                                                        ),
+
+                                                                                            ]
+                                                                                            ),
                                                                                         gensz = gensz_,
                                                                                         chrsz = chrsz_,
                                                                                         cap_num_peak = cap_num_peak_,
@@ -2562,11 +2586,11 @@ workflow chip {
 
                                                                                 # macs2 signal track for pooled rep
                                                                                 if (
-                                                                                has_input_of_call_peak_pooled && !align_only_ && num_rep > 1
-                                                                                ) {
+                                                                                    has_input_of_call_peak_pooled && !align_only_ && num_rep > 1
+                                                                                    ) {
 
                                                                                         call macs2_signal_track as macs2_signal_track_pooled {
-                                                                                        input:
+                                                                                            input:
 
                                                                                                     tas = flatten(
                                                                                                     [
@@ -2575,12 +2599,14 @@ workflow chip {
                                                                                                                 [
                                                                                                                     pool_ta.ta_pooled,
 
-                                                                                                        ]
-                                                                                                        ),
+
+                                                                                                            ]
+                                                                                                            ),
                                                                                                         chosen_ctl_ta_pooled,
 
-                                                                                            ]
-                                                                                            ),
+
+                                                                                                ]
+                                                                                                ),
                                                                                             gensz = gensz_,
                                                                                             chrsz = chrsz_,
                                                                                             pval_thresh = pval_thresh,
@@ -2594,20 +2620,20 @@ workflow chip {
                                                                                     }
 
                                                                                     Boolean has_input_of_call_peak_ppr1 = defined(
-                                                                                    pool_ta_pr1.ta_pooled
-                                                                                    )
+                                                                                        pool_ta_pr1.ta_pooled
+                                                                                        )
 
                                                                                     Boolean has_output_of_call_peak_ppr1 = defined(
-                                                                                    peak_ppr1
-                                                                                    )
+                                                                                        peak_ppr1
+                                                                                        )
 
                                                                                     if (
-                                                                                    has_input_of_call_peak_ppr1 && !has_output_of_call_peak_ppr1 && !align_only_ && !true_rep_only && num_rep > 1
-                                                                                    ) {
+                                                                                        has_input_of_call_peak_ppr1 && !has_output_of_call_peak_ppr1 && !align_only_ && !true_rep_only && num_rep > 1
+                                                                                        ) {
 
                                                                                             # call peaks on 1st pooled pseudo replicates
                                                                                             call call_peak as call_peak_ppr1 {
-                                                                                            input:
+                                                                                                input:
                                                                                                 peak_caller = peak_caller_,
                                                                                                 peak_type = peak_type_,
 
@@ -2618,12 +2644,14 @@ workflow chip {
                                                                                                             [
                                                                                                                 pool_ta_pr1.ta_pooled,
 
-                                                                                                    ]
-                                                                                                    ),
+
+                                                                                                        ]
+                                                                                                        ),
                                                                                                     chosen_ctl_ta_pooled,
 
-                                                                                        ]
-                                                                                        ),
+
+                                                                                            ]
+                                                                                            ),
                                                                                         gensz = gensz_,
                                                                                         chrsz = chrsz_,
                                                                                         cap_num_peak = cap_num_peak_,
@@ -2655,19 +2683,20 @@ workflow chip {
                                                                                 )
 
                                                                                 Boolean has_input_of_call_peak_ppr2 = defined(
-                                                                                pool_ta_pr2.ta_pooled
-                                                                                )
+                                                                                    pool_ta_pr2.ta_pooled
+                                                                                    )
 
                                                                                 Boolean has_output_of_call_peak_ppr2 = defined(
-                                                                                peak_ppr2)
+                                                                                    peak_ppr2
+                                                                                    )
 
                                                                                 if (
-                                                                                has_input_of_call_peak_ppr2 && !has_output_of_call_peak_ppr2 && !align_only_ && !true_rep_only && num_rep > 1
-                                                                                ) {
+                                                                                    has_input_of_call_peak_ppr2 && !has_output_of_call_peak_ppr2 && !align_only_ && !true_rep_only && num_rep > 1
+                                                                                    ) {
 
                                                                                         # call peaks on 2nd pooled pseudo replicates
                                                                                         call call_peak as call_peak_ppr2 {
-                                                                                        input:
+                                                                                            input:
                                                                                             peak_caller = peak_caller_,
                                                                                             peak_type = peak_type_,
 
@@ -2678,12 +2707,14 @@ workflow chip {
                                                                                                         [
                                                                                                             pool_ta_pr2.ta_pooled,
 
-                                                                                                ]
-                                                                                                ),
+
+                                                                                                    ]
+                                                                                                    ),
                                                                                                 chosen_ctl_ta_pooled,
 
-                                                                                    ]
-                                                                                    ),
+
+                                                                                        ]
+                                                                                        ),
                                                                                     gensz = gensz_,
                                                                                     chrsz = chrsz_,
                                                                                     cap_num_peak = cap_num_peak_,
@@ -2717,35 +2748,36 @@ workflow chip {
                                                                             # do IDR/overlap on all pairs of two replicates (i,j)
                                                                             #     where i and j are zero-based indices and 0 <= i < j < num_rep
                                                                             scatter (
-                                                                            pair in cross(
-                                                                            range(
-                                                                            num_rep
-                                                                            ), range(
-                                                                            num_rep))) {
+                                                                                pair in cross(
+                                                                                range(
+                                                                                num_rep
+                                                                                ), range(
+                                                                                num_rep
+                                                                                ))) {
 
                                                                                         # pair.left = 0-based index of 1st replicate
                                                                                         # pair.right = 0-based index of 2nd replicate
                                                                                         File? peak1_ = peak_[
-                                                                                        pair.left
-                                                                                        ]
+                                                                                            pair.left
+                                                                                            ]
 
                                                                                         File? peak2_ = peak_[
-                                                                                        pair.right
-                                                                                        ]
+                                                                                            pair.right
+                                                                                            ]
 
                                                                                         if (
-                                                                                        !align_only_ && pair.left < pair.right
-                                                                                        ) {
+                                                                                            !align_only_ && pair.left < pair.right
+                                                                                            ) {
 
                                                                                                 # Naive overlap on every pair of true replicates
                                                                                                 call overlap {
-                                                                                                input:
+                                                                                                    input:
 
                                                                                                                     prefix = "rep" + (
-                                                                                                                    pair.left + 1
-                                                                                                                    ) + "_vs_rep" + (
-                                                                                                                    pair.right + 1
-                                                                                                                    ),
+                                                                                                                        pair.left + 1
+                                                                                                                        ) + "_vs_rep" + (
+                                                                                                                        pair.right + 1
+                                                                                                                        ),
                                                                                                                     peak1 = peak1_,
                                                                                                                     peak2 = peak2_,
                                                                                                                     peak_pooled = peak_pooled_,
@@ -2757,23 +2789,25 @@ workflow chip {
                                                                                                                     ta = pool_ta.ta_pooled,
                                                                                                                     runtime_environment = runtime_environment,
 
-                                                                                                            }
 
-                                                                                                    }
+                                                                                                                }
+
+
+                                                                                                        }
 
                                                                                                     if (
-                                                                                                    enable_idr && !align_only_ && pair.left < pair.right
-                                                                                                    ) {
+                                                                                                        enable_idr && !align_only_ && pair.left < pair.right
+                                                                                                        ) {
 
                                                                                                             # IDR on every pair of true replicates
                                                                                                             call idr {
-                                                                                                            input:
+                                                                                                                input:
 
                                                                                                                                 prefix = "rep" + (
-                                                                                                                                pair.left + 1
-                                                                                                                                ) + "_vs_rep" + (
-                                                                                                                                pair.right + 1
-                                                                                                                                ),
+                                                                                                                                    pair.left + 1
+                                                                                                                                    ) + "_vs_rep" + (
+                                                                                                                                    pair.right + 1
+                                                                                                                                    ),
                                                                                                                                 peak1 = peak1_,
                                                                                                                                 peak2 = peak2_,
                                                                                                                                 peak_pooled = peak_pooled_,
@@ -2787,98 +2821,104 @@ workflow chip {
                                                                                                                                 ta = pool_ta.ta_pooled,
                                                                                                                                 runtime_environment = runtime_environment,
 
-                                                                                                                        }
 
-                                                                                                                }
+                                                                                                                            }
 
-                                                                                                        }
+
+                                                                                                                    }
+
+
+                                                                                                            }
 
                                                                                                         # overlap on pseudo-replicates (pr1, pr2) for each true replicate
                                                                                                         if (
-                                                                                                        !align_only_ && !true_rep_only
-                                                                                                        ) {
+                                                                                                            !align_only_ && !true_rep_only
+                                                                                                            ) {
 
                                                                                                                                 scatter (
-                                                                                                                                i in range(
-                                                                                                                                num_rep
-                                                                                                                                )
-                                                                                                                                ) {
+                                                                                                                                    i in range(
+                                                                                                                                    num_rep
+                                                                                                                                    )
+                                                                                                                                    ) {
 
                                                                                                                                         call overlap as overlap_pr {
-                                                                                                                                        input:
+                                                                                                                                            input:
 
                                                                                                                                                             prefix = "rep" + (
-                                                                                                                                                            i + 1
-                                                                                                                                                            ) + "-pr1_vs_rep" + (
-                                                                                                                                                            i + 1
-                                                                                                                                                            ) + "-pr2",
+                                                                                                                                                                i + 1
+                                                                                                                                                                ) + "-pr1_vs_rep" + (
+                                                                                                                                                                i + 1
+                                                                                                                                                                ) + "-pr2",
 
                                                                                                                                                             peak1 = peak_pr1_[
-                                                                                                                                                            i
-                                                                                                                                                            ],
+                                                                                                                                                                i
+                                                                                                                                                                ],
 
                                                                                                                                                             peak2 = peak_pr2_[
-                                                                                                                                                            i
-                                                                                                                                                            ],
+                                                                                                                                                                i
+                                                                                                                                                                ],
 
                                                                                                                                                             peak_pooled = peak_[
-                                                                                                                                                            i
-                                                                                                                                                            ],
+                                                                                                                                                                i
+                                                                                                                                                                ],
 
                                                                                                                                                             fraglen = fraglen_[
-                                                                                                                                                            i
-                                                                                                                                                            ],
+                                                                                                                                                                i
+                                                                                                                                                                ],
                                                                                                                                                             peak_type = peak_type_,
                                                                                                                                                             blacklist = blacklist_,
                                                                                                                                                             chrsz = chrsz_,
                                                                                                                                                             regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
 
                                                                                                                                                             ta = ta_[
-                                                                                                                                                            i
-                                                                                                                                                            ],
+                                                                                                                                                                i
+                                                                                                                                                                ],
                                                                                                                                                             runtime_environment = runtime_environment,
 
-                                                                                                                                                    }
 
-                                                                                                                                            }
+                                                                                                                                                        }
 
-                                                                                                                                    }
+
+                                                                                                                                                }
+
+
+                                                                                                                                        }
 
                                                                                                                                     if (
-                                                                                                                                    !align_only_ && !true_rep_only && enable_idr
-                                                                                                                                    ) {
+                                                                                                                                        !align_only_ && !true_rep_only && enable_idr
+                                                                                                                                        ) {
 
                                                                                                                                                             scatter (
-                                                                                                                                                            i in range(
-                                                                                                                                                            num_rep
-                                                                                                                                                            )
-                                                                                                                                                            ) {
+                                                                                                                                                                i in range(
+                                                                                                                                                                num_rep
+                                                                                                                                                                )
+                                                                                                                                                                ) {
 
                                                                                                                                                                     # IDR on pseduo replicates
                                                                                                                                                                     call idr as idr_pr {
-                                                                                                                                                                    input:
+                                                                                                                                                                        input:
 
                                                                                                                                                                                         prefix = "rep" + (
-                                                                                                                                                                                        i + 1
-                                                                                                                                                                                        ) + "-pr1_vs_rep" + (
-                                                                                                                                                                                        i + 1
-                                                                                                                                                                                        ) + "-pr2",
+                                                                                                                                                                                            i + 1
+                                                                                                                                                                                            ) + "-pr1_vs_rep" + (
+                                                                                                                                                                                            i + 1
+                                                                                                                                                                                            ) + "-pr2",
 
                                                                                                                                                                                         peak1 = peak_pr1_[
-                                                                                                                                                                                        i
-                                                                                                                                                                                        ],
+                                                                                                                                                                                            i
+                                                                                                                                                                                            ],
 
                                                                                                                                                                                         peak2 = peak_pr2_[
-                                                                                                                                                                                        i
-                                                                                                                                                                                        ],
+                                                                                                                                                                                            i
+                                                                                                                                                                                            ],
 
                                                                                                                                                                                         peak_pooled = peak_[
-                                                                                                                                                                                        i
-                                                                                                                                                                                        ],
+                                                                                                                                                                                            i
+                                                                                                                                                                                            ],
 
                                                                                                                                                                                         fraglen = fraglen_[
-                                                                                                                                                                                        i
-                                                                                                                                                                                        ],
+                                                                                                                                                                                            i
+                                                                                                                                                                                            ],
                                                                                                                                                                                         idr_thresh = idr_thresh,
                                                                                                                                                                                         peak_type = peak_type_,
                                                                                                                                                                                         rank = idr_rank_,
@@ -2887,23 +2927,26 @@ workflow chip {
                                                                                                                                                                                         regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
 
                                                                                                                                                                                         ta = ta_[
-                                                                                                                                                                                        i
-                                                                                                                                                                                        ],
+                                                                                                                                                                                            i
+                                                                                                                                                                                            ],
                                                                                                                                                                                         runtime_environment = runtime_environment,
 
-                                                                                                                                                                                }
 
-                                                                                                                                                                        }
+                                                                                                                                                                                    }
 
-                                                                                                                                                                }
+
+                                                                                                                                                                            }
+
+
+                                                                                                                                                                    }
 
                                                                                                                                                                 if (
-                                                                                                                                                                !align_only_ && !true_rep_only && num_rep > 1
-                                                                                                                                                                ) {
+                                                                                                                                                                    !align_only_ && !true_rep_only && num_rep > 1
+                                                                                                                                                                    ) {
 
                                                                                                                                                                         # Naive overlap on pooled pseudo replicates
                                                                                                                                                                         call overlap as overlap_ppr {
-                                                                                                                                                                        input:
+                                                                                                                                                                            input:
                                                                                                                                                                             prefix = "pooled-pr1_vs_pooled-pr2",
                                                                                                                                                                             peak1 = peak_ppr1_,
                                                                                                                                                                             peak2 = peak_ppr2_,
@@ -2916,17 +2959,19 @@ workflow chip {
                                                                                                                                                                             ta = pool_ta.ta_pooled,
                                                                                                                                                                             runtime_environment = runtime_environment,
 
-                                                                                                                                                                    }
 
-                                                                                                                                                            }
+                                                                                                                                                                        }
+
+
+                                                                                                                                                                }
 
                                                                                                                                                             if (
-                                                                                                                                                            !align_only_ && !true_rep_only && num_rep > 1 && enable_idr
-                                                                                                                                                            ) {
+                                                                                                                                                                !align_only_ && !true_rep_only && num_rep > 1 && enable_idr
+                                                                                                                                                                ) {
 
                                                                                                                                                                     # IDR on pooled pseduo replicates
                                                                                                                                                                     call idr as idr_ppr {
-                                                                                                                                                                    input:
+                                                                                                                                                                        input:
                                                                                                                                                                         prefix = "pooled-pr1_vs_pooled-pr2",
                                                                                                                                                                         peak1 = peak_ppr1_,
                                                                                                                                                                         peak2 = peak_ppr2_,
@@ -2941,92 +2986,102 @@ workflow chip {
                                                                                                                                                                         ta = pool_ta.ta_pooled,
                                                                                                                                                                         runtime_environment = runtime_environment,
 
-                                                                                                                                                                }
 
-                                                                                                                                                        }
+                                                                                                                                                                    }
+
+
+                                                                                                                                                            }
 
                                                                                                                                                         # reproducibility QC for overlap/IDR peaks
                                                                                                                                                         if (
-                                                                                                                                                        !align_only_ && !true_rep_only && num_rep > 0
-                                                                                                                                                        ) {
+                                                                                                                                                            !align_only_ && !true_rep_only && num_rep > 0
+                                                                                                                                                            ) {
 
                                                                                                                                                                 # reproducibility QC for overlapping peaks
                                                                                                                                                                 call reproducibility as reproducibility_overlap {
-                                                                                                                                                                input:
+                                                                                                                                                                    input:
                                                                                                                                                                     prefix = "overlap",
 
                                                                                                                                                                     peaks = select_all(
-                                                                                                                                                                    overlap.bfilt_overlap_peak
-                                                                                                                                                                    ),
+                                                                                                                                                                        overlap.bfilt_overlap_peak
+                                                                                                                                                                        ),
 
                                                                                                                                                                     peaks_pr = (
 
                                                                                                                                                                                 if defined(
-                                                                                                                                                                                overlap_pr.bfilt_overlap_peak
-                                                                                                                                                                                )
+                                                                                                                                                                                    overlap_pr.bfilt_overlap_peak
+                                                                                                                                                                                    )
 
                                                                                                                                                                                 then select_first(
                                                                                                                                                                                 [
                                                                                                                                                                                     overlap_pr.bfilt_overlap_peak,
 
-                                                                                                                                                                        ]
-                                                                                                                                                                        )
+
+                                                                                                                                                                            ]
+                                                                                                                                                                            )
 
                                                                                                                                                                         else [
-                                                                                                                                                                        ]
+                                                                                                                                                                            ]
 
-                                                                                                                                                                ),
+
+                                                                                                                                                                    ),
                                                                                                                                                                 peak_ppr = overlap_ppr.bfilt_overlap_peak,
                                                                                                                                                                 peak_type = peak_type_,
                                                                                                                                                                 chrsz = chrsz_,
                                                                                                                                                                 runtime_environment = runtime_environment,
 
-                                                                                                                                                        }
 
-                                                                                                                                                }
+                                                                                                                                                            }
+
+
+                                                                                                                                                    }
 
                                                                                                                                                 if (
-                                                                                                                                                !align_only_ && !true_rep_only && num_rep > 0 && enable_idr
-                                                                                                                                                ) {
+                                                                                                                                                    !align_only_ && !true_rep_only && num_rep > 0 && enable_idr
+                                                                                                                                                    ) {
 
                                                                                                                                                         # reproducibility QC for IDR peaks
                                                                                                                                                         call reproducibility as reproducibility_idr {
-                                                                                                                                                        input:
+                                                                                                                                                            input:
                                                                                                                                                             prefix = "idr",
 
                                                                                                                                                             peaks = select_all(
-                                                                                                                                                            idr.bfilt_idr_peak
-                                                                                                                                                            ),
+                                                                                                                                                                idr.bfilt_idr_peak
+                                                                                                                                                                ),
 
                                                                                                                                                             peaks_pr = (
 
                                                                                                                                                                         if defined(
-                                                                                                                                                                        idr_pr.bfilt_idr_peak
-                                                                                                                                                                        )
+                                                                                                                                                                            idr_pr.bfilt_idr_peak
+                                                                                                                                                                            )
 
                                                                                                                                                                         then select_first(
                                                                                                                                                                         [
                                                                                                                                                                             idr_pr.bfilt_idr_peak,
 
-                                                                                                                                                                ]
-                                                                                                                                                                )
+
+                                                                                                                                                                    ]
+                                                                                                                                                                    )
 
                                                                                                                                                                 else [
-                                                                                                                                                                ]
+                                                                                                                                                                    ]
 
-                                                                                                                                                        ),
+
+                                                                                                                                                            ),
                                                                                                                                                         peak_ppr = idr_ppr.bfilt_idr_peak,
                                                                                                                                                         peak_type = peak_type_,
                                                                                                                                                         chrsz = chrsz_,
                                                                                                                                                         runtime_environment = runtime_environment,
 
-                                                                                                                                                }
 
-                                                                                                                                        }
+                                                                                                                                                    }
+
+
+                                                                                                                                            }
 
                                                                                                                                         # Generate final QC report and JSON
                                                                                                                                         call qc_report {
-                                                                                                                                        input:
+                                                                                                                                            input:
                                                                                                                                             pipeline_ver = pipeline_ver,
                                                                                                                                             title = title,
                                                                                                                                             description = description,
@@ -3044,166 +3099,174 @@ workflow chip {
                                                                                                                                             xcor_subsample_reads = xcor_subsample_reads,
 
                                                                                                                                             samstat_qcs = select_all(
-                                                                                                                                            align.samstat_qc
-                                                                                                                                            ),
+                                                                                                                                                align.samstat_qc
+                                                                                                                                                ),
 
                                                                                                                                             nodup_samstat_qcs = select_all(
-                                                                                                                                            filter.samstat_qc
-                                                                                                                                            ),
+                                                                                                                                                filter.samstat_qc
+                                                                                                                                                ),
 
                                                                                                                                             dup_qcs = select_all(
-                                                                                                                                            filter.dup_qc
-                                                                                                                                            ),
+                                                                                                                                                filter.dup_qc
+                                                                                                                                                ),
 
                                                                                                                                             lib_complexity_qcs = select_all(
-                                                                                                                                            filter.lib_complexity_qc
-                                                                                                                                            ),
+                                                                                                                                                filter.lib_complexity_qc
+                                                                                                                                                ),
 
                                                                                                                                             xcor_plots = select_all(
-                                                                                                                                            xcor.plot_png
-                                                                                                                                            ),
+                                                                                                                                                xcor.plot_png
+                                                                                                                                                ),
 
                                                                                                                                             xcor_scores = select_all(
-                                                                                                                                            xcor.score
-                                                                                                                                            ),
+                                                                                                                                                xcor.score
+                                                                                                                                                ),
 
                                                                                                                                             ctl_samstat_qcs = select_all(
-                                                                                                                                            align_ctl.samstat_qc
-                                                                                                                                            ),
+                                                                                                                                                align_ctl.samstat_qc
+                                                                                                                                                ),
 
                                                                                                                                             ctl_nodup_samstat_qcs = select_all(
-                                                                                                                                            filter_ctl.samstat_qc
-                                                                                                                                            ),
+                                                                                                                                                filter_ctl.samstat_qc
+                                                                                                                                                ),
 
                                                                                                                                             ctl_dup_qcs = select_all(
-                                                                                                                                            filter_ctl.dup_qc
-                                                                                                                                            ),
+                                                                                                                                                filter_ctl.dup_qc
+                                                                                                                                                ),
 
                                                                                                                                             ctl_lib_complexity_qcs = select_all(
-                                                                                                                                            filter_ctl.lib_complexity_qc
-                                                                                                                                            ),
+                                                                                                                                                filter_ctl.lib_complexity_qc
+                                                                                                                                                ),
 
                                                                                                                                             jsd_plot = jsd.plot,
 
                                                                                                                                             jsd_qcs = (
 
                                                                                                                                                         if defined(
-                                                                                                                                                        jsd.jsd_qcs
-                                                                                                                                                        )
+                                                                                                                                                            jsd.jsd_qcs
+                                                                                                                                                            )
 
                                                                                                                                                         then select_first(
                                                                                                                                                         [
                                                                                                                                                             jsd.jsd_qcs,
 
-                                                                                                                                                ]
-                                                                                                                                                )
+
+                                                                                                                                                    ]
+                                                                                                                                                    )
 
                                                                                                                                                 else [
-                                                                                                                                                ]
+                                                                                                                                                    ]
 
-                                                                                                                                        ),
+
+                                                                                                                                            ),
 
                                                                                                                                         frip_qcs = select_all(
-                                                                                                                                        call_peak.frip_qc
-                                                                                                                                        ),
+                                                                                                                                            call_peak.frip_qc
+                                                                                                                                            ),
 
                                                                                                                                         frip_qcs_pr1 = select_all(
-                                                                                                                                        call_peak_pr1.frip_qc
-                                                                                                                                        ),
+                                                                                                                                            call_peak_pr1.frip_qc
+                                                                                                                                            ),
 
                                                                                                                                         frip_qcs_pr2 = select_all(
-                                                                                                                                        call_peak_pr2.frip_qc
-                                                                                                                                        ),
+                                                                                                                                            call_peak_pr2.frip_qc
+                                                                                                                                            ),
                                                                                                                                         frip_qc_pooled = call_peak_pooled.frip_qc,
                                                                                                                                         frip_qc_ppr1 = call_peak_ppr1.frip_qc,
                                                                                                                                         frip_qc_ppr2 = call_peak_ppr2.frip_qc,
 
                                                                                                                                         idr_plots = select_all(
-                                                                                                                                        idr.idr_plot
-                                                                                                                                        ),
+                                                                                                                                            idr.idr_plot
+                                                                                                                                            ),
 
                                                                                                                                         idr_plots_pr = (
 
                                                                                                                                                     if defined(
-                                                                                                                                                    idr_pr.idr_plot
-                                                                                                                                                    )
+                                                                                                                                                        idr_pr.idr_plot
+                                                                                                                                                        )
 
                                                                                                                                                     then select_first(
                                                                                                                                                     [
                                                                                                                                                         idr_pr.idr_plot,
 
-                                                                                                                                            ]
-                                                                                                                                            )
+
+                                                                                                                                                ]
+                                                                                                                                                )
 
                                                                                                                                             else [
-                                                                                                                                            ]
+                                                                                                                                                ]
 
-                                                                                                                                    ),
+
+                                                                                                                                        ),
                                                                                                                                     idr_plot_ppr = idr_ppr.idr_plot,
 
                                                                                                                                     frip_idr_qcs = select_all(
-                                                                                                                                    idr.frip_qc
-                                                                                                                                    ),
+                                                                                                                                        idr.frip_qc
+                                                                                                                                        ),
 
                                                                                                                                     frip_idr_qcs_pr = (
 
                                                                                                                                                 if defined(
-                                                                                                                                                idr_pr.frip_qc
-                                                                                                                                                )
+                                                                                                                                                    idr_pr.frip_qc
+                                                                                                                                                    )
 
                                                                                                                                                 then select_first(
                                                                                                                                                 [
                                                                                                                                                     idr_pr.frip_qc,
 
-                                                                                                                                        ]
-                                                                                                                                        )
+
+                                                                                                                                            ]
+                                                                                                                                            )
 
                                                                                                                                         else [
-                                                                                                                                        ]
+                                                                                                                                            ]
 
-                                                                                                                                ),
+
+                                                                                                                                    ),
                                                                                                                                 frip_idr_qc_ppr = idr_ppr.frip_qc,
 
                                                                                                                                 frip_overlap_qcs = select_all(
-                                                                                                                                overlap.frip_qc
-                                                                                                                                ),
+                                                                                                                                    overlap.frip_qc
+                                                                                                                                    ),
 
                                                                                                                                 frip_overlap_qcs_pr = (
 
                                                                                                                                             if defined(
-                                                                                                                                            overlap_pr.frip_qc
-                                                                                                                                            )
+                                                                                                                                                overlap_pr.frip_qc
+                                                                                                                                                )
 
                                                                                                                                             then select_first(
                                                                                                                                             [
                                                                                                                                                 overlap_pr.frip_qc,
 
-                                                                                                                                    ]
-                                                                                                                                    )
+
+                                                                                                                                        ]
+                                                                                                                                        )
 
                                                                                                                                     else [
-                                                                                                                                    ]
+                                                                                                                                        ]
 
-                                                                                                                            ),
+
+                                                                                                                                ),
                                                                                                                             frip_overlap_qc_ppr = overlap_ppr.frip_qc,
                                                                                                                             idr_reproducibility_qc = reproducibility_idr.reproducibility_qc,
                                                                                                                             overlap_reproducibility_qc = reproducibility_overlap.reproducibility_qc,
 
                                                                                                                             gc_plots = select_all(
-                                                                                                                            gc_bias.gc_plot
-                                                                                                                            ),
+                                                                                                                                gc_bias.gc_plot
+                                                                                                                                ),
 
                                                                                                                             peak_region_size_qcs = select_all(
-                                                                                                                            call_peak.peak_region_size_qc
-                                                                                                                            ),
+                                                                                                                                call_peak.peak_region_size_qc
+                                                                                                                                ),
 
                                                                                                                             peak_region_size_plots = select_all(
-                                                                                                                            call_peak.peak_region_size_plot
-                                                                                                                            ),
+                                                                                                                                call_peak.peak_region_size_plot
+                                                                                                                                ),
 
                                                                                                                             num_peak_qcs = select_all(
-                                                                                                                            call_peak.num_peak_qc
-                                                                                                                            ),
+                                                                                                                                call_peak.num_peak_qc
+                                                                                                                                ),
 
                                                                                                                             idr_opt_peak_region_size_qc = reproducibility_idr.peak_region_size_qc,
                                                                                                                             idr_opt_peak_region_size_plot = reproducibility_overlap.peak_region_size_plot,
@@ -3215,27 +3278,30 @@ workflow chip {
 
                                                                                                                             runtime_environment = runtime_environment,
 
-                                                                                                                    }
+
+                                                                                                                        }
 
                                                                                                                     output {
                                                                                                                         File report = qc_report.report
                                                                                                                         File qc_json = qc_report.qc_json
                                                                                                                         Boolean qc_json_ref_match = qc_report.qc_json_ref_match
 
-                                                                                                                }
 
-                                                                                                        }
+                                                                                                                    }
+
+
+                                                                                                            }
 
                                                                                                         task align {
 
                                                                                                                 input {
                                                                                                                             Array[
-                                                                                                                            File
-                                                                                                                            ] fastqs_R1  # [merge_id]
+                                                                                                                                File
+                                                                                                                                ] fastqs_R1  # [merge_id]
 
                                                                                                                             Array[
-                                                                                                                            File
-                                                                                                                            ] fastqs_R2
+                                                                                                                                File
+                                                                                                                                ] fastqs_R2
                                                                                                                             File? ref_fa
                                                                                                                             Int? trim_bp  # this is for R1 only
                                                                                                                             Int crop_length
@@ -3257,30 +3323,31 @@ workflow chip {
                                                                                                                             Float disk_factor
                                                                                                                             RuntimeEnvironment runtime_environment
 
-                                                                                                                    }
+
+                                                                                                                        }
 
                                                                                                                     Float input_file_size_gb = size(
-                                                                                                                    fastqs_R1, "G"
-                                                                                                                    ) + size(
-                                                                                                                    fastqs_R2, "G"
-                                                                                                                    )
+                                                                                                                        fastqs_R1, "G"
+                                                                                                                        ) + size(
+                                                                                                                        fastqs_R2, "G"
+                                                                                                                        )
 
                                                                                                                     Float mem_gb = 5.0 + size(
-                                                                                                                    idx_tar, "G"
-                                                                                                                    ) + mem_factor * input_file_size_gb
+                                                                                                                        idx_tar, "G"
+                                                                                                                        ) + mem_factor * input_file_size_gb
                                                                                                                     Float samtools_mem_gb = 0.8 * mem_gb
 
                                                                                                                     Int disk_gb = round(
-                                                                                                                    40.0 + disk_factor * input_file_size_gb
-                                                                                                                    )
+                                                                                                                        40.0 + disk_factor * input_file_size_gb
+                                                                                                                        )
 
                                                                                                                     Float trimmomatic_java_heap_factor = 0.9
 
                                                                                                                     Array[
-                                                                                                                    Array[
-                                                                                                                    File
-                                                                                                                    ]
-                                                                                                                    ] tmp_fastqs = (
+                                                                                                                        Array[
+                                                                                                                        File
+                                                                                                                        ]
+                                                                                                                        ] tmp_fastqs = (
                                                                                                                         if paired_end
 
                                                                                                                         then transpose(
@@ -3288,17 +3355,20 @@ workflow chip {
                                                                                                                             fastqs_R1,
                                                                                                                             fastqs_R2,
 
-                                                                                                                ]
-                                                                                                                )
+
+                                                                                                                    ]
+                                                                                                                    )
 
                                                                                                                 else transpose(
                                                                                                                 [
                                                                                                                     fastqs_R1,
 
-                                                                                                        ]
-                                                                                                        )
 
-                                                                                                )
+                                                                                                            ]
+                                                                                                            )
+
+
+                                                                                                    )
 
                                                                                                 command <<<
                                                                                                     set -e
@@ -3312,24 +3382,25 @@ workflow chip {
                                                                                                     python3 $(which encode_task_merge_fastq.py) \
 
                                                                                                         ~{write_tsv(
-                                                                                                        tmp_fastqs
-                                                                                                        )
-                                                                                                        } \
+                                                                                                            tmp_fastqs
+                                                                                                            )
+                                                                                                            } \
 
                                                                                                             ~{(
                                                                                                             if paired_end
                                                                                                             then "--paired-end"
                                                                                                             else ""
 
-                                                                                            )
-                                                                                            } \
+
+                                                                                                )
+                                                                                                } \
 
                                                                                                 ~{"--nth " + cpu
-                                                                                                }
+                                                                                                    }
 
 
                                                                                             if [ -z '~{trim_bp
-                                                                                            }' ]; then
+                                                                                                }' ]; then
                                                                                                 SUFFIX=
                                                                                             else
                                                                                                 SUFFIX=_trimmed
@@ -3337,22 +3408,22 @@ workflow chip {
                                                                                                     R1/*.fastq.gz \
 
                                                                                                     --trim-bp ~{trim_bp
-                                                                                                    } \
+                                                                                                        } \
                                                                                                     --out-dir R1$SUFFIX
 
                                                                                                 if [ '~{paired_end
-                                                                                                }' == 'true' ]; then
+                                                                                                    }' == 'true' ]; then
                                                                                                     python3 $(which encode_task_trim_fastq.py) \
                                                                                                         R2/*.fastq.gz \
 
                                                                                                         --trim-bp ~{trim_bp
-                                                                                                        } \
+                                                                                                            } \
                                                                                                         --out-dir R2$SUFFIX
                                                                                                 fi
                                                                                             fi
 
                                                                                             if [ '~{crop_length
-                                                                                            }' == '0' ]; then
+                                                                                                }' == '0' ]; then
                                                                                                 SUFFIX=$SUFFIX
                                                                                             else
                                                                                                 NEW_SUFFIX="$SUFFIX"_cropped
@@ -3364,24 +3435,26 @@ workflow chip {
                                                                                                         then "--fastq2 R2$SUFFIX/*.fastq.gz"
                                                                                                         else ""
 
-                                                                                    )
-                                                                                    } \
+
+                                                                                        )
+                                                                                        } \
 
                                                                                                     ~{(
                                                                                                 if paired_end
                                                                                                 then "--paired-end"
                                                                                                 else ""
 
-                                                                                )} \
+
+                                                                                    )} \
 
                                                                                         --crop-length ~{crop_length
-                                                                                        } \
+                                                                                            } \
 
                                                                                         --crop-length-tol "~{crop_length_tol
-                                                                                        }" \
+                                                                                            }" \
 
                                                                                         ~{"--phred-score-format " + trimmomatic_phred_score_format
-                                                                                        } \
+                                                                                            } \
                                                                                         --out-dir-R1 R1$NEW_SUFFIX \
 
                                                                                                 ~{(
@@ -3389,35 +3462,37 @@ workflow chip {
                                                                                             then "--out-dir-R2 R2$NEW_SUFFIX"
                                                                                             else ""
 
-                                                                            )} \
+
+                                                                                )} \
 
                                                                                             ~{"--trimmomatic-java-heap " + (
 
                                                                                                 if defined(
-                                                                                                trimmomatic_java_heap
-                                                                                                )
+                                                                                                    trimmomatic_java_heap
+                                                                                                    )
                                                                                                 then trimmomatic_java_heap
 
                                                                                                 else (
-                                                                                                round(
-                                                                                                mem_gb * trimmomatic_java_heap_factor
-                                                                                                ) + "G"
-                                                                                                )
+                                                                                                    round(
+                                                                                                    mem_gb * trimmomatic_java_heap_factor
+                                                                                                    ) + "G"
+                                                                                                    )
 
-                                                                                )} \
+
+                                                                                    )} \
 
                                                                                         ~{"--nth " + cpu
-                                                                                        }
+                                                                                            }
                                                                                     SUFFIX=$NEW_SUFFIX
                                                                                 fi
 
 
                                                                                 if [ '~{aligner
-                                                                                }' == 'bwa' ]; then
+                                                                                    }' == 'bwa' ]; then
                                                                                     python3 $(which encode_task_bwa.py) \
 
                                                                                         ~{idx_tar
-                                                                                        } \
+                                                                                            } \
                                                                                         R1$SUFFIX/*.fastq.gz \
 
                                                                                                 ~{(
@@ -3425,7 +3500,8 @@ workflow chip {
                                                                                             then "R2$SUFFIX/*.fastq.gz"
                                                                                             else ""
 
-                                                                            )} \
+
+                                                                                )} \
                                                                                     ~{(
                                                                                         if paired_end
                                                                                         then "--paired-end"
@@ -3438,21 +3514,21 @@ workflow chip {
                                                                                     )} \
 
                                                                                     ~{"--bwa-mem-read-len-limit " + bwa_mem_read_len_limit
-                                                                                    } \
+                                                                                        } \
 
                                                                                     ~{"--mem-gb " + samtools_mem_gb
-                                                                                    } \
+                                                                                        } \
 
                                                                                     ~{"--nth " + cpu
-                                                                                    }
+                                                                                        }
 
 
                                                                             elif [ '~{aligner
-                                                                            }' == 'bowtie2' ]; then
+                                                                                }' == 'bowtie2' ]; then
                                                                                 python3 $(which encode_task_bowtie2.py) \
 
                                                                                     ~{idx_tar
-                                                                                    } \
+                                                                                        } \
                                                                                     R1$SUFFIX/*.fastq.gz \
                                                                                     ~{(
                                                                                         if paired_end
@@ -3461,7 +3537,7 @@ workflow chip {
                                                                                     )} \
 
                                                                                     ~{"--multimapping " + multimapping
-                                                                                    } \
+                                                                                        } \
                                                                                     ~{(
                                                                                         if paired_end
                                                                                         then "--paired-end"
@@ -3474,17 +3550,17 @@ workflow chip {
                                                                                     )} \
 
                                                                                     ~{"--mem-gb " + samtools_mem_gb
-                                                                                    } \
+                                                                                        } \
 
                                                                                     ~{"--nth " + cpu
-                                                                                    }
+                                                                                        }
                                                                             else
 
                                                                                 python3 ~{custom_align_py
-                                                                                } \
+                                                                                    } \
 
                                                                                     ~{idx_tar
-                                                                                    } \
+                                                                                        } \
                                                                                     R1$SUFFIX/*.fastq.gz \
                                                                                     ~{(
                                                                                         if paired_end
@@ -3498,157 +3574,176 @@ workflow chip {
                                                                                     )} \
 
                                                                                     ~{"--mem-gb " + samtools_mem_gb
-                                                                                    } \
+                                                                                        } \
 
                                                                                     ~{"--nth " + cpu
-                                                                                    }
+                                                                                        }
                                                                             fi 
 
                                                                             python3 $(which encode_task_post_align.py) \
                                                                                 R1$SUFFIX/*.fastq.gz $(ls *.bam) \
 
                                                                                 ~{"--mito-chr-name " + mito_chr_name
-                                                                                } \
+                                                                                    } \
 
                                                                                 ~{"--mem-gb " + samtools_mem_gb
-                                                                                } \
+                                                                                    } \
 
                                                                                 ~{"--nth " + cpu
-                                                                                }
+                                                                                    }
                                                                             rm -rf R1 R2 R1$SUFFIX R2$SUFFIX
                                                                         >>>
 
                                                                         output {
 
-                                                                                    File bam = glob(
-                                                                                    "*.bam"
-                                                                                    )[0]
+                                                                                            File bam = glob(
+                                                                                                "*.bam"
+                                                                                                )[
+                                                                                                0
+                                                                                                ]
 
-                                                                                    File bai = glob(
-                                                                                    "*.bai"
-                                                                                    )[0]
+                                                                                            File bai = glob(
+                                                                                                "*.bai"
+                                                                                                )[
+                                                                                                0
+                                                                                                ]
 
-                                                                                    File samstat_qc = glob(
-                                                                                    "*.samstats.qc"
-                                                                                    )[0]
+                                                                                            File samstat_qc = glob(
+                                                                                                "*.samstats.qc"
+                                                                                                )[
+                                                                                                0
+                                                                                                ]
 
-                                                                                    File read_len_log = glob(
-                                                                                    "*.read_length.txt"
-                                                                                    )[0]
-                                                                                }
+                                                                                            File read_len_log = glob(
+                                                                                                "*.read_length.txt"
+                                                                                                )[
+                                                                                                0
+                                                                                                ]
+                                                                                        }
 
-                                                                                runtime {
-                                                                                    cpu: cpu
+                                                                                        runtime {
+                                                                                            cpu: cpu
 
-                                                                                    memory: "~{mem_gb
-                                                                                    } GB"
-                                                                                    time: time_hr
+                                                                                            memory: "~{mem_gb
+                                                                                                } GB"
+                                                                                            time: time_hr
 
-                                                                                    disks: "local-disk ~{disk_gb
-                                                                                    } SSD"
-                                                                                    preemptible: 0
-                                                                                    docker: runtime_environment.docker
-                                                                                    singularity: runtime_environment.singularity
-                                                                                    conda: runtime_environment.conda
-                                                                                }
-                                                                            }
+                                                                                            disks: "local-disk ~{disk_gb
+                                                                                                } SSD"
+                                                                                            preemptible: 0
+                                                                                            docker: runtime_environment.docker
+                                                                                            singularity: runtime_environment.singularity
+                                                                                            conda: runtime_environment.conda
+                                                                                        }
+                                                                                    }
 
-                                                                            task filter {
-                                                                                input {
-                                                                                    File? bam
-                                                                                    Boolean paired_end
-                                                                                    File? ref_fa
-                                                                                    Boolean redact_nodup_bam
-                                                                                    String dup_marker  # picard.jar MarkDuplicates (picard) or
-                                                                                    # sambamba markdup (sambamba)
-                                                                                    Int mapq_thresh  # threshold for low MAPQ reads removal
-                                                                                    Array[
-                                                                                    String] filter_chrs  # chrs to be removed from final (nodup/filt) BAM
-                                                                                    File chrsz  # 2-col chromosome sizes file
-                                                                                    Boolean no_dup_removal  # no dupe reads removal when filtering BAM
-                                                                                    String mito_chr_name
-                                                                                    Int cpu
-                                                                                    Float mem_factor
-                                                                                    String? picard_java_heap
-                                                                                    Int time_hr
-                                                                                    Float disk_factor
-                                                                                    RuntimeEnvironment runtime_environment
-                                                                                }
+                                                                                    task filter {
 
-                                                                                Float input_file_size_gb = size(
-                                                                                bam, "G")
-                                                                                Float picard_java_heap_factor = 0.9
-                                                                                Float mem_gb = 6.0 + mem_factor * input_file_size_gb
-                                                                                Float samtools_mem_gb = 0.8 * mem_gb
+                                                                                            input {
+                                                                                                File? bam
+                                                                                                Boolean paired_end
+                                                                                                File? ref_fa
+                                                                                                Boolean redact_nodup_bam
+                                                                                                String dup_marker  # picard.jar MarkDuplicates (picard) or
+                                                                                                # sambamba markdup (sambamba)
+                                                                                                Int mapq_thresh  # threshold for low MAPQ reads removal
+                                                                                                Array[
+                                                                                                    String
+                                                                                                    ] filter_chrs  # chrs to be removed from final (nodup/filt) BAM
+                                                                                                File chrsz  # 2-col chromosome sizes file
+                                                                                                Boolean no_dup_removal  # no dupe reads removal when filtering BAM
+                                                                                                String mito_chr_name
+                                                                                                Int cpu
+                                                                                                Float mem_factor
+                                                                                                String? picard_java_heap
+                                                                                                Int time_hr
+                                                                                                Float disk_factor
+                                                                                                RuntimeEnvironment runtime_environment
 
-                                                                                Int disk_gb = round(
-                                                                                20.0 + disk_factor * input_file_size_gb
-                                                                                )
 
-                                                                                command <<<
-                                                                                    set -e
-                                                                                    python3 $(which encode_task_filter.py) \
+                                                                                            }
 
-                                                                                        ~{bam
+                                                                                        Float input_file_size_gb = size(
+                                                                                            bam, "G"
+                                                                                            )
+                                                                                        Float picard_java_heap_factor = 0.9
+                                                                                        Float mem_gb = 6.0 + mem_factor * input_file_size_gb
+                                                                                        Float samtools_mem_gb = 0.8 * mem_gb
+
+                                                                                        Int disk_gb = round(
+                                                                                            20.0 + disk_factor * input_file_size_gb
+                                                                                            )
+
+                                                                                        command <<<
+                                                                                            set -e
+                                                                                            python3 $(which encode_task_filter.py) \
+
+                                                                                                ~{bam
+                                                                                                    } \
+
+                                                                                                    ~{(
+                                                                                                    if paired_end
+                                                                                                    then "--paired-end"
+                                                                                                    else ""
+
+
+                                                                                        )
                                                                                         } \
+                                                                                        --multimapping 0 \
+
+                                                                                        ~{"--dup-marker " + dup_marker
+                                                                                            } \
+
+                                                                                        ~{"--mapq-thresh " + mapq_thresh
+                                                                                            } \
+
+                                                                                        --filter-chrs ~{sep=" " filter_chrs
+                                                                                            } \
+
+                                                                                        ~{"--chrsz " + chrsz
+                                                                                            } \
 
                                                                                             ~{(
-                                                                                            if paired_end
-                                                                                            then "--paired-end"
+                                                                                            if no_dup_removal
+                                                                                            then "--no-dup-removal"
                                                                                             else ""
 
-                                                                                )} \
-                                                                                    --multimapping 0 \
 
-                                                                                    ~{"--dup-marker " + dup_marker
-                                                                                    } \
-
-                                                                                    ~{"--mapq-thresh " + mapq_thresh
-                                                                                    } \
-
-                                                                                    --filter-chrs ~{sep=" " filter_chrs
-                                                                                    } \
-
-                                                                                    ~{"--chrsz " + chrsz
-                                                                                    } \
-                                                                                    ~{(
-                                                                                        if no_dup_removal
-                                                                                        then "--no-dup-removal"
-                                                                                        else ""
                                                                                     )} \
 
                                                                                     ~{"--mito-chr-name " + mito_chr_name
-                                                                                    } \
+                                                                                        } \
 
                                                                                     ~{"--mem-gb " + samtools_mem_gb
-                                                                                    } \
+                                                                                        } \
 
                                                                                     ~{"--nth " + cpu
-                                                                                    } \
+                                                                                        } \
 
                                                                                         ~{"--picard-java-heap " + (
 
                                                                                                 if defined(
-                                                                                                picard_java_heap
-                                                                                                )
+                                                                                                    picard_java_heap
+                                                                                                    )
                                                                                                 then picard_java_heap
 
                                                                                                 else (
-                                                                                                round(
-                                                                                                mem_gb * picard_java_heap_factor
-                                                                                                ) + "G"
-                                                                                                )
+                                                                                                    round(
+                                                                                                    mem_gb * picard_java_heap_factor
+                                                                                                    ) + "G"
+                                                                                                    )
 
-                                                                                    )}
+
+                                                                                        )}
 
 
                                                                                     if [ '~{redact_nodup_bam
-                                                                                    }' == 'true' ]; then
+                                                                                        }' == 'true' ]; then
                                                                                         python3 $(which encode_task_bam_to_pbam.py) \
                                                                                             $(ls *.bam) \
 
                                                                                             ~{"--ref-fa " + ref_fa
-                                                                                            } \
+                                                                                                } \
                                                                                             '--delete-original-bam'
                                                                                     fi
                                                                                 >>>
@@ -3656,51 +3751,53 @@ workflow chip {
                                                                                 output {
 
                                                                                                     File nodup_bam = glob(
-                                                                                                    "*.bam"
-                                                                                                    )[
-                                                                                                    0
-                                                                                                    ]
+                                                                                                        "*.bam"
+                                                                                                        )[
+                                                                                                        0
+                                                                                                        ]
 
                                                                                                     File nodup_bai = glob(
-                                                                                                    "*.bai"
-                                                                                                    )[
-                                                                                                    0
-                                                                                                    ]
+                                                                                                        "*.bai"
+                                                                                                        )[
+                                                                                                        0
+                                                                                                        ]
 
                                                                                                     File samstat_qc = glob(
-                                                                                                    "*.samstats.qc"
-                                                                                                    )[
-                                                                                                    0
-                                                                                                    ]
+                                                                                                        "*.samstats.qc"
+                                                                                                        )[
+                                                                                                        0
+                                                                                                        ]
 
                                                                                                     File dup_qc = glob(
-                                                                                                    "*.dup.qc"
-                                                                                                    )[
-                                                                                                    0
-                                                                                                    ]
+                                                                                                        "*.dup.qc"
+                                                                                                        )[
+                                                                                                        0
+                                                                                                        ]
 
                                                                                                     File lib_complexity_qc = glob(
-                                                                                                    "*.lib_complexity.qc"
-                                                                                                    )[
-                                                                                                    0
-                                                                                                    ]
+                                                                                                        "*.lib_complexity.qc"
+                                                                                                        )[
+                                                                                                        0
+                                                                                                        ]
 
-                                                                                            }
+
+                                                                                                }
 
                                                                                             runtime {
                                                                                                 cpu: cpu
 
                                                                                                 memory: "~{mem_gb
-                                                                                                } GB"
+                                                                                                    } GB"
                                                                                                 time: time_hr
 
                                                                                                 disks: "local-disk ~{disk_gb
-                                                                                                } SSD"
+                                                                                                    } SSD"
                                                                                                 docker: runtime_environment.docker
                                                                                                 singularity: runtime_environment.singularity
                                                                                                 conda: runtime_environment.conda
 
-                                                                                        }
+
+                                                                                            }
                                                                                     }
 
                                                                                     task bam2ta {
@@ -3717,24 +3814,25 @@ workflow chip {
                                                                                                 Float disk_factor
                                                                                                 RuntimeEnvironment runtime_environment
 
-                                                                                        }
+
+                                                                                            }
 
                                                                                         Float input_file_size_gb = size(
-                                                                                        bam, "G"
-                                                                                        )
+                                                                                            bam, "G"
+                                                                                            )
                                                                                         Float mem_gb = 4.0 + mem_factor * input_file_size_gb
                                                                                         Float samtools_mem_gb = 0.8 * mem_gb
 
                                                                                         Int disk_gb = round(
-                                                                                        20.0 + disk_factor * input_file_size_gb
-                                                                                        )
+                                                                                            20.0 + disk_factor * input_file_size_gb
+                                                                                            )
 
                                                                                         command <<<
                                                                                             set -e
                                                                                             python3 $(which encode_task_bam2ta.py) \
 
                                                                                                 ~{bam
-                                                                                                } \
+                                                                                                    } \
                                                                                                 --disable-tn5-shift \
 
                                                                                                     ~{(
@@ -3742,46 +3840,49 @@ workflow chip {
                                                                                                     then "--paired-end"
                                                                                                     else ""
 
-                                                                                    )
-                                                                                    } \
+
+                                                                                        )
+                                                                                        } \
 
                                                                                         ~{"--mito-chr-name " + mito_chr_name
-                                                                                        } \
+                                                                                            } \
 
                                                                                         ~{"--subsample " + subsample
-                                                                                        } \
+                                                                                            } \
 
                                                                                         ~{"--mem-gb " + samtools_mem_gb
-                                                                                        } \
+                                                                                            } \
 
                                                                                         ~{"--nth " + cpu
-                                                                                        }
+                                                                                            }
                                                                                 >>>
 
                                                                                 output {
 
                                                                                                     File ta = glob(
-                                                                                                    "*.tagAlign.gz"
-                                                                                                    )[
-                                                                                                    0
-                                                                                                    ]
+                                                                                                        "*.tagAlign.gz"
+                                                                                                        )[
+                                                                                                        0
+                                                                                                        ]
 
-                                                                                            }
+
+                                                                                                }
 
                                                                                             runtime {
                                                                                                 cpu: cpu
 
                                                                                                 memory: "~{mem_gb
-                                                                                                } GB"
+                                                                                                    } GB"
                                                                                                 time: time_hr
 
                                                                                                 disks: "local-disk ~{disk_gb
-                                                                                                } SSD"
+                                                                                                    } SSD"
                                                                                                 docker: runtime_environment.docker
                                                                                                 singularity: runtime_environment.singularity
                                                                                                 conda: runtime_environment.conda
 
-                                                                                        }
+
+                                                                                            }
                                                                                     }
 
                                                                                     task spr {
@@ -3794,234 +3895,248 @@ workflow chip {
                                                                                                 Float disk_factor
                                                                                                 RuntimeEnvironment runtime_environment
 
-                                                                                        }
+
+                                                                                            }
 
                                                                                         Float input_file_size_gb = size(
-                                                                                        ta, "G"
-                                                                                        )
+                                                                                            ta, "G"
+                                                                                            )
                                                                                         Float mem_gb = 4.0 + mem_factor * input_file_size_gb
 
                                                                                         Int disk_gb = round(
-                                                                                        20.0 + disk_factor * input_file_size_gb
-                                                                                        )
+                                                                                            20.0 + disk_factor * input_file_size_gb
+                                                                                            )
 
                                                                                         command <<<
                                                                                             set -e
                                                                                             python3 $(which encode_task_spr.py) \
 
                                                                                                 ~{ta
-                                                                                                } \
+                                                                                                    } \
 
                                                                                                 ~{"--pseudoreplication-random-seed " + pseudoreplication_random_seed
-                                                                                                } \
+                                                                                                    } \
 
                                                                                                     ~{(
                                                                                                     if paired_end
                                                                                                     then "--paired-end"
                                                                                                     else ""
 
-                                                                                        )}
-                                                                                    >>>
 
-                                                                                    output {
+                                                                                        )
+                                                                                        }
+                                                                                >>>
 
-                                                                                                        File ta_pr1 = glob(
+                                                                                output {
+
+                                                                                                    File ta_pr1 = glob(
                                                                                                         "*.pr1.tagAlign.gz"
                                                                                                         )[
                                                                                                         0
                                                                                                         ]
 
-                                                                                                        File ta_pr2 = glob(
+                                                                                                    File ta_pr2 = glob(
                                                                                                         "*.pr2.tagAlign.gz"
                                                                                                         )[
                                                                                                         0
                                                                                                         ]
 
+
                                                                                                 }
 
-                                                                                                runtime {
-                                                                                                    cpu: 1
+                                                                                            runtime {
+                                                                                                cpu: 1
 
-                                                                                                    memory: "~{mem_gb
+                                                                                                memory: "~{mem_gb
                                                                                                     } GB"
-                                                                                                    time: 4
+                                                                                                time: 4
 
-                                                                                                    disks: "local-disk ~{disk_gb
+                                                                                                disks: "local-disk ~{disk_gb
                                                                                                     } SSD"
-                                                                                                    docker: runtime_environment.docker
-                                                                                                    singularity: runtime_environment.singularity
-                                                                                                    conda: runtime_environment.conda
+                                                                                                docker: runtime_environment.docker
+                                                                                                singularity: runtime_environment.singularity
+                                                                                                conda: runtime_environment.conda
+
 
                                                                                             }
-                                                                                        }
+                                                                                    }
 
-                                                                                        task pool_ta {
+                                                                                    task pool_ta {
 
-                                                                                                input {
+                                                                                            input {
 
-                                                                                                            Array[
+                                                                                                        Array[
                                                                                                             File?
                                                                                                             ] tas
-                                                                                                            Int? col  # number of columns in pooled TA
-                                                                                                            String? prefix  # basename prefix
-                                                                                                            RuntimeEnvironment runtime_environment
+                                                                                                        Int? col  # number of columns in pooled TA
+                                                                                                        String? prefix  # basename prefix
+                                                                                                        RuntimeEnvironment runtime_environment
+
 
                                                                                                     }
 
-                                                                                                    command <<<
-                                                                                                        set -e
-                                                                                                        python3 $(which encode_task_pool_ta.py) \
+                                                                                                command <<<
+                                                                                                    set -e
+                                                                                                    python3 $(which encode_task_pool_ta.py) \
 
-                                                                                                            ~{sep=" " select_all(
+                                                                                                        ~{sep=" " select_all(
                                                                                                             tas
                                                                                                             )
                                                                                                             } \
 
-                                                                                                            ~{"--prefix " + prefix
+                                                                                                        ~{"--prefix " + prefix
                                                                                                             } \
 
-                                                                                                            ~{"--col " + col
+                                                                                                        ~{"--col " + col
                                                                                                             }
+
 
                                                                                                 >>>
 
-                                                                                                output {
+                                                                                            output {
 
-                                                                                                                    File ta_pooled = glob(
+                                                                                                                File ta_pooled = glob(
                                                                                                                     "*.tagAlign.gz"
                                                                                                                     )[
                                                                                                                     0
                                                                                                                     ]
 
+
                                                                                                             }
 
-                                                                                                            runtime {
-                                                                                                                cpu: 1
-                                                                                                                memory: "8 GB"
-                                                                                                                time: 4
-                                                                                                                disks: "local-disk 100 SSD"
-                                                                                                                docker: runtime_environment.docker
-                                                                                                                singularity: runtime_environment.singularity
-                                                                                                                conda: runtime_environment.conda
+                                                                                                        runtime {
+                                                                                                            cpu: 1
+                                                                                                            memory: "8 GB"
+                                                                                                            time: 4
+                                                                                                            disks: "local-disk 100 SSD"
+                                                                                                            docker: runtime_environment.docker
+                                                                                                            singularity: runtime_environment.singularity
+                                                                                                            conda: runtime_environment.conda
+
 
                                                                                                         }
 
+
                                                                                                 }
 
-                                                                                                task xcor {
+                                                                                            task xcor {
 
-                                                                                                        input {
-                                                                                                            File? ta
-                                                                                                            Boolean paired_end
-                                                                                                            String mito_chr_name
-                                                                                                            Int subsample  # number of reads to subsample TAGALIGN
-                                                                                                            # this will be used for xcor only
-                                                                                                            # will not affect any downstream analysis
-                                                                                                            String? chip_seq_type
-                                                                                                            Int? exclusion_range_min
-                                                                                                            Int? exclusion_range_max
-                                                                                                            Int cpu
-                                                                                                            Float mem_factor
-                                                                                                            Int time_hr
-                                                                                                            Float disk_factor
-                                                                                                            RuntimeEnvironment runtime_environment
+                                                                                                    input {
+                                                                                                        File? ta
+                                                                                                        Boolean paired_end
+                                                                                                        String mito_chr_name
+                                                                                                        Int subsample  # number of reads to subsample TAGALIGN
+                                                                                                        # this will be used for xcor only
+                                                                                                        # will not affect any downstream analysis
+                                                                                                        String? chip_seq_type
+                                                                                                        Int? exclusion_range_min
+                                                                                                        Int? exclusion_range_max
+                                                                                                        Int cpu
+                                                                                                        Float mem_factor
+                                                                                                        Int time_hr
+                                                                                                        Float disk_factor
+                                                                                                        RuntimeEnvironment runtime_environment
+
 
                                                                                                     }
 
-                                                                                                    Float input_file_size_gb = size(
+                                                                                                Float input_file_size_gb = size(
                                                                                                     ta, "G"
                                                                                                     )
-                                                                                                    Float mem_gb = 8.0 + mem_factor * input_file_size_gb
+                                                                                                Float mem_gb = 8.0 + mem_factor * input_file_size_gb
 
-                                                                                                    Int disk_gb = round(
+                                                                                                Int disk_gb = round(
                                                                                                     20.0 + disk_factor * input_file_size_gb
                                                                                                     )
 
-                                                                                                    command <<<
-                                                                                                        set -e
-                                                                                                        python3 $(which encode_task_xcor.py) \
+                                                                                                command <<<
+                                                                                                    set -e
+                                                                                                    python3 $(which encode_task_xcor.py) \
 
-                                                                                                            ~{ta
+                                                                                                        ~{ta
                                                                                                             } \
 
-                                                                                                                ~{(
-                                                                                                                if paired_end
-                                                                                                                then "--paired-end"
-                                                                                                                else ""
+                                                                                                            ~{(
+                                                                                                            if paired_end
+                                                                                                            then "--paired-end"
+                                                                                                            else ""
+
 
                                                                                                 )
                                                                                                 } \
 
-                                                                                                    ~{"--mito-chr-name " + mito_chr_name
+                                                                                                ~{"--mito-chr-name " + mito_chr_name
                                                                                                     } \
 
-                                                                                                    ~{"--subsample " + subsample
+                                                                                                ~{"--subsample " + subsample
                                                                                                     } \
 
-                                                                                                    ~{"--chip-seq-type " + chip_seq_type
+                                                                                                ~{"--chip-seq-type " + chip_seq_type
                                                                                                     } \
 
-                                                                                                    ~{"--exclusion-range-min " + exclusion_range_min
+                                                                                                ~{"--exclusion-range-min " + exclusion_range_min
                                                                                                     } \
 
-                                                                                                    ~{"--exclusion-range-max " + exclusion_range_max
+                                                                                                ~{"--exclusion-range-max " + exclusion_range_max
                                                                                                     } \
 
-                                                                                                    ~{"--subsample " + subsample
+                                                                                                ~{"--subsample " + subsample
                                                                                                     } \
 
-                                                                                                    ~{"--nth " + cpu
+                                                                                                ~{"--nth " + cpu
                                                                                                     }
+
 
                                                                                         >>>
 
-                                                                                        output {
+                                                                                    output {
 
-                                                                                                            File plot_pdf = glob(
+                                                                                                        File plot_pdf = glob(
                                                                                                             "*.cc.plot.pdf"
                                                                                                             )[
                                                                                                             0
                                                                                                             ]
 
-                                                                                                            File plot_png = glob(
+                                                                                                        File plot_png = glob(
                                                                                                             "*.cc.plot.png"
                                                                                                             )[
                                                                                                             0
                                                                                                             ]
 
-                                                                                                            File score = glob(
+                                                                                                        File score = glob(
                                                                                                             "*.cc.qc"
                                                                                                             )[
                                                                                                             0
                                                                                                             ]
 
-                                                                                                            File fraglen_log = glob(
+                                                                                                        File fraglen_log = glob(
                                                                                                             "*.cc.fraglen.txt"
                                                                                                             )[
                                                                                                             0
                                                                                                             ]
 
-                                                                                                            Int fraglen = read_int(
+                                                                                                        Int fraglen = read_int(
                                                                                                             fraglen_log
                                                                                                             )
 
+
                                                                                                     }
 
-                                                                                                    runtime {
-                                                                                                        cpu: cpu
+                                                                                                runtime {
+                                                                                                    cpu: cpu
 
-                                                                                                        memory: "~{mem_gb
+                                                                                                    memory: "~{mem_gb
                                                                                                         } GB"
-                                                                                                        time: time_hr
+                                                                                                    time: time_hr
 
-                                                                                                        disks: "local-disk ~{disk_gb
+                                                                                                    disks: "local-disk ~{disk_gb
                                                                                                         } SSD"
-                                                                                                        docker: runtime_environment.docker
-                                                                                                        singularity: runtime_environment.singularity
-                                                                                                        conda: runtime_environment.conda
+                                                                                                    docker: runtime_environment.docker
+                                                                                                    singularity: runtime_environment.singularity
+                                                                                                    conda: runtime_environment.conda
+
 
                                                                                                 }
-
                                                                                         }
 
                                                                                         task jsd {
@@ -4029,12 +4144,12 @@ workflow chip {
                                                                                                 input {
 
                                                                                                             Array[
-                                                                                                            File?
-                                                                                                            ] nodup_bams
+                                                                                                                File?
+                                                                                                                ] nodup_bams
 
                                                                                                             Array[
-                                                                                                            File?
-                                                                                                            ] ctl_bams
+                                                                                                                File?
+                                                                                                                ] ctl_bams
                                                                                                             File? blacklist
                                                                                                             Int mapq_thresh
                                                                                                             Int cpu
@@ -4043,97 +4158,103 @@ workflow chip {
                                                                                                             Float disk_factor
                                                                                                             RuntimeEnvironment runtime_environment
 
-                                                                                                    }
+
+                                                                                                        }
 
                                                                                                     Float input_file_size_gb = size(
-                                                                                                    nodup_bams, "G"
-                                                                                                    ) + size(
-                                                                                                    ctl_bams, "G"
-                                                                                                    )
+                                                                                                        nodup_bams, "G"
+                                                                                                        ) + size(
+                                                                                                        ctl_bams, "G"
+                                                                                                        )
                                                                                                     Float mem_gb = 5.0 + mem_factor * input_file_size_gb
 
                                                                                                     Int disk_gb = round(
-                                                                                                    20.0 + disk_factor * input_file_size_gb
-                                                                                                    )
+                                                                                                        20.0 + disk_factor * input_file_size_gb
+                                                                                                        )
 
                                                                                                     command <<<
                                                                                                         set -e
                                                                                                         python3 $(which encode_task_jsd.py) \
 
                                                                                                             ~{sep=" " select_all(
-                                                                                                            nodup_bams
-                                                                                                            )
-                                                                                                            } \
+                                                                                                                nodup_bams
+                                                                                                                )
+                                                                                                                } \
 
                                                                                                                 ~{(
 
                                                                                                                         if length(
-                                                                                                                        ctl_bams
-                                                                                                                        ) > 0
+                                                                                                                            ctl_bams
+                                                                                                                            ) > 0
 
                                                                                                                         then "--ctl-bam " + select_first(
-                                                                                                                        ctl_bams
-                                                                                                                        )
+                                                                                                                            ctl_bams
+                                                                                                                            )
                                                                                                                         else ""
 
-                                                                                                        )
-                                                                                                        } \
+
+                                                                                                            )
+                                                                                                            } \
 
                                                                                                             ~{"--mapq-thresh " + mapq_thresh
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--blacklist " + blacklist
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--nth " + cpu
-                                                                                                            }
+                                                                                                                }
 
-                                                                                                >>>
+
+                                                                                                    >>>
 
                                                                                                 output {
 
                                                                                                                     File plot = glob(
-                                                                                                                    "*.png"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "*.png"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] jsd_qcs = glob(
-                                                                                                                    "*.jsd.qc"
-                                                                                                                    )
+                                                                                                                        File
+                                                                                                                        ] jsd_qcs = glob(
+                                                                                                                        "*.jsd.qc"
+                                                                                                                        )
 
-                                                                                                            }
+
+                                                                                                                }
 
                                                                                                             runtime {
                                                                                                                 cpu: cpu
 
                                                                                                                 memory: "~{mem_gb
-                                                                                                                } GB"
+                                                                                                                    } GB"
                                                                                                                 time: time_hr
 
                                                                                                                 disks: "local-disk ~{disk_gb
-                                                                                                                } SSD"
+                                                                                                                    } SSD"
                                                                                                                 docker: runtime_environment.docker
                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                 conda: runtime_environment.conda
 
-                                                                                                        }
 
-                                                                                                }
+                                                                                                            }
+
+
+                                                                                                    }
 
                                                                                                 task choose_ctl {
 
                                                                                                         input {
 
                                                                                                                     Array[
-                                                                                                                    File?
-                                                                                                                    ] tas
+                                                                                                                        File?
+                                                                                                                        ] tas
 
                                                                                                                     Array[
-                                                                                                                    File?
-                                                                                                                    ] ctl_tas
+                                                                                                                        File?
+                                                                                                                        ] ctl_tas
                                                                                                                     File? ta_pooled
                                                                                                                     File? ctl_ta_pooled
                                                                                                                     Boolean always_use_pooled_ctl  # always use pooled control for all exp rep.
@@ -4143,84 +4264,88 @@ workflow chip {
                                                                                                                     Float exp_ctl_depth_ratio_limit
                                                                                                                     RuntimeEnvironment runtime_environment
 
-                                                                                                            }
+
+                                                                                                                }
 
                                                                                                             command <<<
                                                                                                                 set -e
                                                                                                                 python3 $(which encode_task_choose_ctl.py) \
 
                                                                                                                     --tas ~{sep=" " select_all(
-                                                                                                                    tas
-                                                                                                                    )
-                                                                                                                    } \
+                                                                                                                        tas
+                                                                                                                        )
+                                                                                                                        } \
 
                                                                                                                     --ctl-tas ~{sep=" " select_all(
-                                                                                                                    ctl_tas
-                                                                                                                    )
-                                                                                                                    } \
+                                                                                                                        ctl_tas
+                                                                                                                        )
+                                                                                                                        } \
 
                                                                                                                     ~{"--ta-pooled " + ta_pooled
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--ctl-ta-pooled " + ctl_ta_pooled
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                         ~{(
                                                                                                                         if always_use_pooled_ctl
                                                                                                                         then "--always-use-pooled-ctl"
                                                                                                                         else ""
 
-                                                                                                        )
-                                                                                                        } \
+
+                                                                                                            )
+                                                                                                            } \
 
                                                                                                             ~{"--ctl-depth-ratio " + ctl_depth_ratio
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--ctl-depth-limit " + ctl_depth_limit
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--exp-ctl-depth-ratio-limit " + exp_ctl_depth_ratio_limit
-                                                                                                            }
+                                                                                                                }
 
-                                                                                                >>>
+
+                                                                                                    >>>
 
                                                                                                 output {
 
                                                                                                                     File chosen_ctl_id_tsv = glob(
-                                                                                                                    "chosen_ctl.tsv"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "chosen_ctl.tsv"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     File chosen_ctl_subsample_tsv = glob(
-                                                                                                                    "chosen_ctl_subsample.tsv"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "chosen_ctl_subsample.tsv"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     File chosen_ctl_subsample_pooled_txt = glob(
-                                                                                                                    "chosen_ctl_subsample_pooled.txt"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "chosen_ctl_subsample_pooled.txt"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     Array[
-                                                                                                                    Int
-                                                                                                                    ] chosen_ctl_ta_ids = read_lines(
-                                                                                                                    chosen_ctl_id_tsv
-                                                                                                                    )
+                                                                                                                        Int
+                                                                                                                        ] chosen_ctl_ta_ids = read_lines(
+                                                                                                                        chosen_ctl_id_tsv
+                                                                                                                        )
 
                                                                                                                     Array[
-                                                                                                                    Int
-                                                                                                                    ] chosen_ctl_ta_subsample = read_lines(
-                                                                                                                    chosen_ctl_subsample_tsv
-                                                                                                                    )
+                                                                                                                        Int
+                                                                                                                        ] chosen_ctl_ta_subsample = read_lines(
+                                                                                                                        chosen_ctl_subsample_tsv
+                                                                                                                        )
 
                                                                                                                     Int chosen_ctl_ta_subsample_pooled = read_int(
-                                                                                                                    chosen_ctl_subsample_pooled_txt
-                                                                                                                    )
+                                                                                                                        chosen_ctl_subsample_pooled_txt
+                                                                                                                        )
 
-                                                                                                            }
+
+                                                                                                                }
 
                                                                                                             runtime {
                                                                                                                 cpu: 1
@@ -4231,9 +4356,11 @@ workflow chip {
                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                 conda: runtime_environment.conda
 
-                                                                                                        }
 
-                                                                                                }
+                                                                                                            }
+
+
+                                                                                                    }
 
                                                                                                 task count_signal_track {
 
@@ -4242,7 +4369,8 @@ workflow chip {
                                                                                                             File chrsz  # 2-col chromosome sizes file
                                                                                                             RuntimeEnvironment runtime_environment
 
-                                                                                                    }
+
+                                                                                                        }
 
                                                                                                     Float mem_gb = 8.0
 
@@ -4251,46 +4379,50 @@ workflow chip {
                                                                                                         python3 $(which encode_task_count_signal_track.py) \
 
                                                                                                             ~{ta
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--chrsz " + chrsz
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--mem-gb " + mem_gb
-                                                                                                            }
+                                                                                                                }
 
-                                                                                                >>>
+
+                                                                                                    >>>
 
                                                                                                 output {
 
                                                                                                                     File pos_bw = glob(
-                                                                                                                    "*.positive.bigwig"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "*.positive.bigwig"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     File neg_bw = glob(
-                                                                                                                    "*.negative.bigwig"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "*.negative.bigwig"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
-                                                                                                            }
+
+                                                                                                                }
 
                                                                                                             runtime {
                                                                                                                 cpu: 1
 
                                                                                                                 memory: "~{mem_gb
-                                                                                                                } GB"
+                                                                                                                    } GB"
                                                                                                                 time: 4
                                                                                                                 disks: "local-disk 50 SSD"
                                                                                                                 docker: runtime_environment.docker
                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                 conda: runtime_environment.conda
 
-                                                                                                        }
 
-                                                                                                }
+                                                                                                            }
+
+
+                                                                                                    }
 
                                                                                                 task subsample_ctl {
 
@@ -4302,62 +4434,68 @@ workflow chip {
                                                                                                             Float disk_factor
                                                                                                             RuntimeEnvironment runtime_environment
 
-                                                                                                    }
+
+                                                                                                        }
 
                                                                                                     Float input_file_size_gb = size(
-                                                                                                    ta, "G"
-                                                                                                    )
+                                                                                                        ta, "G"
+                                                                                                        )
                                                                                                     Float mem_gb = 4.0 + mem_factor * input_file_size_gb
 
                                                                                                     Int disk_gb = round(
-                                                                                                    20.0 + disk_factor * input_file_size_gb
-                                                                                                    )
+                                                                                                        20.0 + disk_factor * input_file_size_gb
+                                                                                                        )
 
                                                                                                     command <<<
                                                                                                         python3 $(which encode_task_subsample_ctl.py) \
 
                                                                                                             ~{ta
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--subsample " + subsample
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                                 ~{(
                                                                                                                 if paired_end
                                                                                                                 then "--paired-end"
                                                                                                                 else ""
 
-                                                                                                )
-                                                                                                } \
 
-                                                                                        >>>
+                                                                                                    )
+                                                                                                    } \
+
+
+                                                                                            >>>
 
                                                                                         output {
 
                                                                                                             File ta_subsampled = glob(
-                                                                                                            "*.tagAlign.gz"
-                                                                                                            )[
-                                                                                                            0
-                                                                                                            ]
+                                                                                                                "*.tagAlign.gz"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
 
-                                                                                                    }
+
+                                                                                                        }
 
                                                                                                     runtime {
                                                                                                         cpu: 1
 
                                                                                                         memory: "~{mem_gb
-                                                                                                        } GB"
+                                                                                                            } GB"
                                                                                                         time: 4
 
                                                                                                         disks: "local-disk ~{disk_gb
-                                                                                                        } SSD"
+                                                                                                            } SSD"
                                                                                                         docker: runtime_environment.docker
                                                                                                         singularity: runtime_environment.singularity
                                                                                                         conda: runtime_environment.conda
 
-                                                                                                }
 
-                                                                                        }
+                                                                                                    }
+
+
+                                                                                            }
 
                                                                                         task call_peak {
 
@@ -4365,8 +4503,8 @@ workflow chip {
                                                                                                     String peak_caller
                                                                                                     String peak_type
                                                                                                     Array[
-                                                                                                    File?
-                                                                                                    ] tas  # [ta, control_ta]. control_ta is optional
+                                                                                                        File?
+                                                                                                        ] tas  # [ta, control_ta]. control_ta is optional
                                                                                                     Int fraglen  # fragment length from xcor
                                                                                                     String gensz  # Genome size (sum of entries in 2nd column of
                                                                                                     # chr. sizes file, or hs for human, ms for mouse)
@@ -4382,163 +4520,166 @@ workflow chip {
                                                                                                     Float disk_factor
                                                                                                     RuntimeEnvironment runtime_environment
 
-                                                                                            }
+
+                                                                                                }
 
                                                                                             Float input_file_size_gb = size(
-                                                                                            tas, "G"
-                                                                                            )
+                                                                                                tas, "G"
+                                                                                                )
                                                                                             Float mem_gb = 4.0 + mem_factor * input_file_size_gb
 
                                                                                             Int disk_gb = round(
-                                                                                            20.0 + disk_factor * input_file_size_gb
-                                                                                            )
+                                                                                                20.0 + disk_factor * input_file_size_gb
+                                                                                                )
 
                                                                                             command <<<
                                                                                                 set -e
 
 
                                                                                                 if [ '~{peak_caller
-                                                                                                }' == 'macs2' ]; then
+                                                                                                    }' == 'macs2' ]; then
                                                                                                     python3 $(which encode_task_macs2_chip.py) \
 
                                                                                                         ~{sep=" " select_all(
-                                                                                                        tas
-                                                                                                        )
-                                                                                                        } \
+                                                                                                            tas
+                                                                                                            )
+                                                                                                            } \
 
                                                                                                         ~{"--gensz " + gensz
-                                                                                                        } \
+                                                                                                            } \
 
                                                                                                         ~{"--chrsz " + chrsz
-                                                                                                        } \
+                                                                                                            } \
 
                                                                                                         ~{"--fraglen " + fraglen
-                                                                                                        } \
+                                                                                                            } \
 
                                                                                                         ~{"--cap-num-peak " + cap_num_peak
-                                                                                                        } \
+                                                                                                            } \
 
                                                                                                         ~{"--pval-thresh " + pval_thresh
-                                                                                                        } \
+                                                                                                            } \
 
                                                                                                         ~{"--mem-gb " + mem_gb
-                                                                                                        }
+                                                                                                            }
 
 
                                                                                                 elif [ '~{peak_caller
-                                                                                                }' == 'spp' ]; then
+                                                                                                    }' == 'spp' ]; then
                                                                                                     python3 $(which encode_task_spp.py) \
 
                                                                                                         ~{sep=" " select_all(
-                                                                                                        tas
-                                                                                                        )
-                                                                                                        } \
+                                                                                                            tas
+                                                                                                            )
+                                                                                                            } \
 
                                                                                                         ~{"--chrsz " + chrsz
-                                                                                                        } \
+                                                                                                            } \
 
                                                                                                         ~{"--fraglen " + fraglen
-                                                                                                        } \
+                                                                                                            } \
 
                                                                                                         ~{"--cap-num-peak " + cap_num_peak
-                                                                                                        } \
+                                                                                                            } \
 
                                                                                                         ~{"--fdr-thresh " + fdr_thresh
-                                                                                                        } \
+                                                                                                            } \
 
                                                                                                         ~{"--nth " + cpu
-                                                                                                        }
+                                                                                                            }
                                                                                                 fi
 
                                                                                                 python3 $(which encode_task_post_call_peak_chip.py) \
                                                                                                     $(ls *Peak.gz) \
 
                                                                                                     ~{"--ta " + tas[
-                                                                                                    0
-                                                                                                    ]
-                                                                                                    } \
+                                                                                                        0
+                                                                                                        ]
+                                                                                                        } \
 
                                                                                                     ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"
-                                                                                                    } \
+                                                                                                        } \
 
                                                                                                     ~{"--chrsz " + chrsz
-                                                                                                    } \
+                                                                                                        } \
 
                                                                                                     ~{"--fraglen " + fraglen
-                                                                                                    } \
+                                                                                                        } \
 
                                                                                                     ~{"--peak-type " + peak_type
-                                                                                                    } \
+                                                                                                        } \
 
                                                                                                     ~{"--blacklist " + blacklist
-                                                                                                    }        
+                                                                                                        }        
 
-                                                                                        >>>
+
+                                                                                            >>>
 
                                                                                         output {
 
                                                                                                             File peak = glob(
-                                                                                                            "*[!.][!b][!f][!i][!l][!t]." + peak_type + ".gz"
-                                                                                                            )[
-                                                                                                            0
-                                                                                                            ]
+                                                                                                                "*[!.][!b][!f][!i][!l][!t]." + peak_type + ".gz"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
 
                                                                                                             # generated by post_call_peak py
                                                                                                             File bfilt_peak = glob(
-                                                                                                            "*.bfilt." + peak_type + ".gz"
-                                                                                                            )[
-                                                                                                            0
-                                                                                                            ]
+                                                                                                                "*.bfilt." + peak_type + ".gz"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
 
                                                                                                             File bfilt_peak_bb = glob(
-                                                                                                            "*.bfilt." + peak_type + ".bb"
-                                                                                                            )[
-                                                                                                            0
-                                                                                                            ]
+                                                                                                                "*.bfilt." + peak_type + ".bb"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
 
                                                                                                             File bfilt_peak_starch = glob(
-                                                                                                            "*.bfilt." + peak_type + ".starch"
-                                                                                                            )[
-                                                                                                            0
-                                                                                                            ]
+                                                                                                                "*.bfilt." + peak_type + ".starch"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
 
                                                                                                             File bfilt_peak_hammock = glob(
-                                                                                                            "*.bfilt." + peak_type + ".hammock.gz*"
-                                                                                                            )[
-                                                                                                            0
-                                                                                                            ]
+                                                                                                                "*.bfilt." + peak_type + ".hammock.gz*"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
 
                                                                                                             File bfilt_peak_hammock_tbi = glob(
-                                                                                                            "*.bfilt." + peak_type + ".hammock.gz*"
-                                                                                                            )[
-                                                                                                            1
-                                                                                                            ]
+                                                                                                                "*.bfilt." + peak_type + ".hammock.gz*"
+                                                                                                                )[
+                                                                                                                1
+                                                                                                                ]
 
                                                                                                             File frip_qc = glob(
-                                                                                                            "*.frip.qc"
-                                                                                                            )[
-                                                                                                            0
-                                                                                                            ]
+                                                                                                                "*.frip.qc"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
 
                                                                                                             File peak_region_size_qc = glob(
-                                                                                                            "*.peak_region_size.qc"
-                                                                                                            )[
-                                                                                                            0
-                                                                                                            ]
+                                                                                                                "*.peak_region_size.qc"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
 
                                                                                                             File peak_region_size_plot = glob(
-                                                                                                            "*.peak_region_size.png"
-                                                                                                            )[
-                                                                                                            0
-                                                                                                            ]
+                                                                                                                "*.peak_region_size.png"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
 
                                                                                                             File num_peak_qc = glob(
-                                                                                                            "*.num_peak.qc"
-                                                                                                            )[
-                                                                                                            0
-                                                                                                            ]
+                                                                                                                "*.num_peak.qc"
+                                                                                                                )[
+                                                                                                                0
+                                                                                                                ]
 
-                                                                                                    }
+
+                                                                                                        }
 
                                                                                                     runtime {
 
@@ -4547,29 +4688,32 @@ workflow chip {
                                                                                                                 then 2
                                                                                                                 else cpu
 
-                                                                                                        )
+
+                                                                                                            )
 
                                                                                                         memory: "~{mem_gb
-                                                                                                        } GB"
+                                                                                                            } GB"
                                                                                                         time: time_hr
 
                                                                                                         disks: "local-disk ~{disk_gb
-                                                                                                        } SSD"
+                                                                                                            } SSD"
                                                                                                         preemptible: 0
                                                                                                         docker: runtime_environment.docker
                                                                                                         singularity: runtime_environment.singularity
                                                                                                         conda: runtime_environment.conda
 
-                                                                                                }
 
-                                                                                        }
+                                                                                                    }
+
+
+                                                                                            }
 
                                                                                         task macs2_signal_track {
 
                                                                                                 input {
                                                                                                             Array[
-                                                                                                            File?
-                                                                                                            ] tas  # [ta, control_ta]. control_ta is optional
+                                                                                                                File?
+                                                                                                                ] tas  # [ta, control_ta]. control_ta is optional
                                                                                                             Int fraglen  # fragment length from xcor
                                                                                                             String gensz  # Genome size (sum of entries in 2nd column of
                                                                                                             # chr. sizes file, or hs for human, ms for mouse)
@@ -4580,76 +4724,81 @@ workflow chip {
                                                                                                             Float disk_factor
                                                                                                             RuntimeEnvironment runtime_environment
 
-                                                                                                    }
+
+                                                                                                        }
 
                                                                                                     Float input_file_size_gb = size(
-                                                                                                    tas, "G"
-                                                                                                    )
+                                                                                                        tas, "G"
+                                                                                                        )
                                                                                                     Float mem_gb = 4.0 + mem_factor * input_file_size_gb
 
                                                                                                     Int disk_gb = round(
-                                                                                                    20.0 + disk_factor * input_file_size_gb
-                                                                                                    )
+                                                                                                        20.0 + disk_factor * input_file_size_gb
+                                                                                                        )
 
                                                                                                     command <<<
                                                                                                         set -e
                                                                                                         python3 $(which encode_task_macs2_signal_track_chip.py) \
 
                                                                                                             ~{sep=" " select_all(
-                                                                                                            tas
-                                                                                                            )
-                                                                                                            } \
+                                                                                                                tas
+                                                                                                                )
+                                                                                                                } \
 
                                                                                                             ~{"--gensz " + gensz
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--chrsz " + chrsz
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--fraglen " + fraglen
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--pval-thresh " + pval_thresh
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--mem-gb " + mem_gb
-                                                                                                            }
+                                                                                                                }
 
-                                                                                                >>>
+
+                                                                                                    >>>
 
                                                                                                 output {
 
                                                                                                                     File pval_bw = glob(
-                                                                                                                    "*.pval.signal.bigwig"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "*.pval.signal.bigwig"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     File fc_bw = glob(
-                                                                                                                    "*.fc.signal.bigwig"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "*.fc.signal.bigwig"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
-                                                                                                            }
+
+                                                                                                                }
 
                                                                                                             runtime {
                                                                                                                 cpu: 1
 
                                                                                                                 memory: "~{mem_gb
-                                                                                                                } GB"
+                                                                                                                    } GB"
                                                                                                                 time: time_hr
 
                                                                                                                 disks: "local-disk ~{disk_gb
-                                                                                                                } SSD"
+                                                                                                                    } SSD"
                                                                                                                 preemptible: 0
                                                                                                                 docker: runtime_environment.docker
                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                 conda: runtime_environment.conda
 
-                                                                                                        }
 
-                                                                                                }
+                                                                                                            }
+
+
+                                                                                                    }
 
                                                                                                 task idr {
 
@@ -4669,7 +4818,8 @@ workflow chip {
                                                                                                             String rank
                                                                                                             RuntimeEnvironment runtime_environment
 
-                                                                                                    }
+
+                                                                                                        }
 
                                                                                                     command <<<
                                                                                                         set -e
@@ -4677,127 +4827,131 @@ workflow chip {
                                                                                                         ~{(
 
                                                                                                                     if defined(
-                                                                                                                    ta
-                                                                                                                    )
+                                                                                                                        ta
+                                                                                                                        )
                                                                                                                     then ""
                                                                                                                     else "touch null.frip.qc"
 
-                                                                                                        )
-                                                                                                        }
+
+                                                                                                            )
+                                                                                                            }
                                                                                                         touch null 
                                                                                                         python3 $(which encode_task_idr.py) \
 
                                                                                                             ~{peak1
-                                                                                                            } ~{peak2
-                                                                                                         } ~{peak_pooled
-                                                                                                         } \
+                                                                                                                } ~{peak2
+                                                                                                             } ~{peak_pooled
+                                                                                                             } \
 
                                                                                                             ~{"--prefix " + prefix
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--idr-thresh " + idr_thresh
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--peak-type " + peak_type
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             --idr-rank ~{rank
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--fraglen " + fraglen
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--chrsz " + chrsz
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--blacklist " + blacklist
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"
-                                                                                                            } \
+                                                                                                                } \
 
                                                                                                             ~{"--ta " + ta
-                                                                                                            }
+                                                                                                                }
 
-                                                                                                >>>
+
+                                                                                                    >>>
 
                                                                                                 output {
 
                                                                                                                     File idr_peak = glob(
-                                                                                                                    "*[!.][!b][!f][!i][!l][!t]." + peak_type + ".gz"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "*[!.][!b][!f][!i][!l][!t]." + peak_type + ".gz"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     File bfilt_idr_peak = glob(
-                                                                                                                    "*.bfilt." + peak_type + ".gz"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "*.bfilt." + peak_type + ".gz"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     File bfilt_idr_peak_bb = glob(
-                                                                                                                    "*.bfilt." + peak_type + ".bb"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "*.bfilt." + peak_type + ".bb"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     File bfilt_idr_peak_starch = glob(
-                                                                                                                    "*.bfilt." + peak_type + ".starch"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "*.bfilt." + peak_type + ".starch"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     File bfilt_idr_peak_hammock = glob(
-                                                                                                                    "*.bfilt." + peak_type + ".hammock.gz*"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "*.bfilt." + peak_type + ".hammock.gz*"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     File bfilt_idr_peak_hammock_tbi = glob(
-                                                                                                                    "*.bfilt." + peak_type + ".hammock.gz*"
-                                                                                                                    )[
-                                                                                                                    1
-                                                                                                                    ]
+                                                                                                                        "*.bfilt." + peak_type + ".hammock.gz*"
+                                                                                                                        )[
+                                                                                                                        1
+                                                                                                                        ]
 
                                                                                                                     File idr_plot = glob(
-                                                                                                                    "*.txt.png"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "*.txt.png"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     File idr_unthresholded_peak = glob(
-                                                                                                                    "*.txt.gz"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "*.txt.gz"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     File idr_log = glob(
-                                                                                                                    "*.idr*.log"
-                                                                                                                    )[
-                                                                                                                    0
-                                                                                                                    ]
+                                                                                                                        "*.idr*.log"
+                                                                                                                        )[
+                                                                                                                        0
+                                                                                                                        ]
 
                                                                                                                     File frip_qc = (
 
                                                                                                                                 if defined(
-                                                                                                                                ta
-                                                                                                                                )
+                                                                                                                                    ta
+                                                                                                                                    )
 
                                                                                                                                 then glob(
-                                                                                                                                "*.frip.qc"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
+                                                                                                                                    "*.frip.qc"
+                                                                                                                                    )[
+                                                                                                                                    0
+                                                                                                                                    ]
 
                                                                                                                                 else glob(
-                                                                                                                                "null"
-                                                                                                                                )[
-                                                                                                                                0
-                                                                                                                                ]
+                                                                                                                                    "null"
+                                                                                                                                    )[
+                                                                                                                                    0
+                                                                                                                                    ]
 
-                                                                                                                        )
 
-                                                                                                                }
+                                                                                                                            )
+
+
+                                                                                                                    }
 
                                                                                                                 runtime {
                                                                                                                     cpu: 1
@@ -4808,9 +4962,11 @@ workflow chip {
                                                                                                                     singularity: runtime_environment.singularity
                                                                                                                     conda: runtime_environment.conda
 
-                                                                                                            }
 
-                                                                                                    }
+                                                                                                                }
+
+
+                                                                                                        }
 
                                                                                                     task overlap {
 
@@ -4828,7 +4984,8 @@ workflow chip {
                                                                                                                 String peak_type
                                                                                                                 RuntimeEnvironment runtime_environment
 
-                                                                                                        }
+
+                                                                                                            }
 
                                                                                                         command <<<
                                                                                                             set -e
@@ -4836,104 +4993,108 @@ workflow chip {
                                                                                                             ~{(
 
                                                                                                                         if defined(
-                                                                                                                        ta
-                                                                                                                        )
+                                                                                                                            ta
+                                                                                                                            )
                                                                                                                         then ""
                                                                                                                         else "touch null.frip.qc"
 
-                                                                                                            )
-                                                                                                            }
+
+                                                                                                                )
+                                                                                                                }
                                                                                                             touch null 
                                                                                                             python3 $(which encode_task_overlap.py) \
 
                                                                                                                 ~{peak1
-                                                                                                                } ~{peak2
-                                                                                                             } ~{peak_pooled
-                                                                                                             } \
+                                                                                                                    } ~{peak2
+                                                                                                                 } ~{peak_pooled
+                                                                                                                 } \
 
                                                                                                                 ~{"--prefix " + prefix
-                                                                                                                } \
+                                                                                                                    } \
 
                                                                                                                 ~{"--peak-type " + peak_type
-                                                                                                                } \
+                                                                                                                    } \
 
                                                                                                                 ~{"--fraglen " + fraglen
-                                                                                                                } \
+                                                                                                                    } \
 
                                                                                                                 ~{"--chrsz " + chrsz
-                                                                                                                } \
+                                                                                                                    } \
 
                                                                                                                 ~{"--blacklist " + blacklist
-                                                                                                                } \
+                                                                                                                    } \
                                                                                                                 --nonamecheck \
 
                                                                                                                 ~{"--regex-bfilt-peak-chr-name '" + regex_bfilt_peak_chr_name + "'"
-                                                                                                                } \
+                                                                                                                    } \
 
                                                                                                                 ~{"--ta " + ta
-                                                                                                                }
+                                                                                                                    }
 
-                                                                                                    >>>
+
+                                                                                                        >>>
 
                                                                                                     output {
 
                                                                                                                         File overlap_peak = glob(
-                                                                                                                        "*[!.][!b][!f][!i][!l][!t]." + peak_type + ".gz"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
+                                                                                                                            "*[!.][!b][!f][!i][!l][!t]." + peak_type + ".gz"
+                                                                                                                            )[
+                                                                                                                            0
+                                                                                                                            ]
 
                                                                                                                         File bfilt_overlap_peak = glob(
-                                                                                                                        "*.bfilt." + peak_type + ".gz"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
+                                                                                                                            "*.bfilt." + peak_type + ".gz"
+                                                                                                                            )[
+                                                                                                                            0
+                                                                                                                            ]
 
                                                                                                                         File bfilt_overlap_peak_bb = glob(
-                                                                                                                        "*.bfilt." + peak_type + ".bb"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
+                                                                                                                            "*.bfilt." + peak_type + ".bb"
+                                                                                                                            )[
+                                                                                                                            0
+                                                                                                                            ]
 
                                                                                                                         File bfilt_overlap_peak_starch = glob(
-                                                                                                                        "*.bfilt." + peak_type + ".starch"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
+                                                                                                                            "*.bfilt." + peak_type + ".starch"
+                                                                                                                            )[
+                                                                                                                            0
+                                                                                                                            ]
 
                                                                                                                         File bfilt_overlap_peak_hammock = glob(
-                                                                                                                        "*.bfilt." + peak_type + ".hammock.gz*"
-                                                                                                                        )[
-                                                                                                                        0
-                                                                                                                        ]
+                                                                                                                            "*.bfilt." + peak_type + ".hammock.gz*"
+                                                                                                                            )[
+                                                                                                                            0
+                                                                                                                            ]
 
                                                                                                                         File bfilt_overlap_peak_hammock_tbi = glob(
-                                                                                                                        "*.bfilt." + peak_type + ".hammock.gz*"
-                                                                                                                        )[
-                                                                                                                        1
-                                                                                                                        ]
+                                                                                                                            "*.bfilt." + peak_type + ".hammock.gz*"
+                                                                                                                            )[
+                                                                                                                            1
+                                                                                                                            ]
 
                                                                                                                         File frip_qc = (
 
                                                                                                                                     if defined(
-                                                                                                                                    ta
-                                                                                                                                    )
+                                                                                                                                        ta
+                                                                                                                                        )
 
                                                                                                                                     then glob(
-                                                                                                                                    "*.frip.qc"
-                                                                                                                                    )[
-                                                                                                                                    0
-                                                                                                                                    ]
+                                                                                                                                        "*.frip.qc"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
 
                                                                                                                                     else glob(
-                                                                                                                                    "null"
-                                                                                                                                    )[
-                                                                                                                                    0
-                                                                                                                                    ]
+                                                                                                                                        "null"
+                                                                                                                                        )[
+                                                                                                                                        0
+                                                                                                                                        ]
 
-                                                                                                                            )
 
-                                                                                                                    }
+                                                                                                                                )
+
+
+                                                                                                                        }
 
                                                                                                                     runtime {
                                                                                                                         cpu: 1
@@ -4944,142 +5105,147 @@ workflow chip {
                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                         conda: runtime_environment.conda
 
-                                                                                                                }
 
-                                                                                                        }
+                                                                                                                    }
+
+
+                                                                                                            }
 
                                                                                                         task reproducibility {
 
                                                                                                                 input {
                                                                                                                     String prefix
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] peaks  # peak files from pair of true replicates
+                                                                                                                        File
+                                                                                                                        ] peaks  # peak files from pair of true replicates
                                                                                                                     # in a sorted order. for example of 4 replicates,
                                                                                                                     # 1,2 1,3 1,4 2,3 2,4 3,4.
                                                                                                                     # x,y means peak file from rep-x vs rep-y
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] peaks_pr  # peak files from pseudo replicates
+                                                                                                                        File
+                                                                                                                        ] peaks_pr  # peak files from pseudo replicates
                                                                                                                     File? peak_ppr  # Peak file from pooled pseudo replicate.
                                                                                                                     String peak_type
                                                                                                                     File chrsz  # 2-col chromosome sizes file
                                                                                                                     RuntimeEnvironment runtime_environment
 
-                                                                                                            }
+
+                                                                                                                }
 
                                                                                                             command <<<
                                                                                                                 set -e
                                                                                                                 python3 $(which encode_task_reproducibility.py) \
 
                                                                                                                     ~{sep=" " peaks
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --peaks-pr ~{sep=" " peaks_pr
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--peak-ppr " + peak_ppr
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --prefix ~{prefix
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--peak-type " + peak_type
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--chrsz " + chrsz
-                                                                                                                    }
+                                                                                                                        }
 
-                                                                                                        >>>
+
+                                                                                                            >>>
 
                                                                                                         output {
 
                                                                                                                             File optimal_peak = glob(
-                                                                                                                            "*optimal_peak.*.gz"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*optimal_peak.*.gz"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             File optimal_peak_bb = glob(
-                                                                                                                            "*optimal_peak.*.bb"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*optimal_peak.*.bb"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             File optimal_peak_starch = glob(
-                                                                                                                            "*optimal_peak.*.starch"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*optimal_peak.*.starch"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             File optimal_peak_hammock = glob(
-                                                                                                                            "*optimal_peak.*.hammock.gz*"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*optimal_peak.*.hammock.gz*"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             File optimal_peak_hammock_tbi = glob(
-                                                                                                                            "*optimal_peak.*.hammock.gz*"
-                                                                                                                            )[
-                                                                                                                            1
-                                                                                                                            ]
+                                                                                                                                "*optimal_peak.*.hammock.gz*"
+                                                                                                                                )[
+                                                                                                                                1
+                                                                                                                                ]
 
                                                                                                                             File conservative_peak = glob(
-                                                                                                                            "*conservative_peak.*.gz"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*conservative_peak.*.gz"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             File conservative_peak_bb = glob(
-                                                                                                                            "*conservative_peak.*.bb"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*conservative_peak.*.bb"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             File conservative_peak_starch = glob(
-                                                                                                                            "*conservative_peak.*.starch"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*conservative_peak.*.starch"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             File conservative_peak_hammock = glob(
-                                                                                                                            "*conservative_peak.*.hammock.gz*"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*conservative_peak.*.hammock.gz*"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             File conservative_peak_hammock_tbi = glob(
-                                                                                                                            "*conservative_peak.*.hammock.gz*"
-                                                                                                                            )[
-                                                                                                                            1
-                                                                                                                            ]
+                                                                                                                                "*conservative_peak.*.hammock.gz*"
+                                                                                                                                )[
+                                                                                                                                1
+                                                                                                                                ]
 
                                                                                                                             File reproducibility_qc = glob(
-                                                                                                                            "*reproducibility.qc"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*reproducibility.qc"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             # QC metrics for optimal peak
                                                                                                                             File peak_region_size_qc = glob(
-                                                                                                                            "*.peak_region_size.qc"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*.peak_region_size.qc"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             File peak_region_size_plot = glob(
-                                                                                                                            "*.peak_region_size.png"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*.peak_region_size.png"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             File num_peak_qc = glob(
-                                                                                                                            "*.num_peak.qc"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*.num_peak.qc"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
-                                                                                                                    }
+
+                                                                                                                        }
 
                                                                                                                     runtime {
                                                                                                                         cpu: 1
@@ -5090,9 +5256,11 @@ workflow chip {
                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                         conda: runtime_environment.conda
 
-                                                                                                                }
 
-                                                                                                        }
+                                                                                                                    }
+
+
+                                                                                                            }
 
                                                                                                         task gc_bias {
 
@@ -5102,13 +5270,14 @@ workflow chip {
                                                                                                                     String? picard_java_heap
                                                                                                                     RuntimeEnvironment runtime_environment
 
-                                                                                                            }
+
+                                                                                                                }
 
                                                                                                             Float mem_factor = 0.3
 
                                                                                                             Float input_file_size_gb = size(
-                                                                                                            nodup_bam, "G"
-                                                                                                            )
+                                                                                                                nodup_bam, "G"
+                                                                                                                )
                                                                                                             Float mem_gb = 4.0 + mem_factor * input_file_size_gb
                                                                                                             Float picard_java_heap_factor = 0.9
 
@@ -5117,59 +5286,64 @@ workflow chip {
                                                                                                                 python3 $(which encode_task_gc_bias.py) \
 
                                                                                                                     ~{"--nodup-bam " + nodup_bam
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--ref-fa " + ref_fa
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                         ~{"--picard-java-heap " + (
 
                                                                                                                                 if defined(
-                                                                                                                                picard_java_heap
-                                                                                                                                )
+                                                                                                                                    picard_java_heap
+                                                                                                                                    )
                                                                                                                                 then picard_java_heap
 
                                                                                                                                 else (
-                                                                                                                                round(
-                                                                                                                                mem_gb * picard_java_heap_factor
-                                                                                                                                ) + "G"
-                                                                                                                                )
+                                                                                                                                    round(
+                                                                                                                                    mem_gb * picard_java_heap_factor
+                                                                                                                                    ) + "G"
+                                                                                                                                    )
 
-                                                                                                                )
-                                                                                                                }
 
-                                                                                                        >>>
+                                                                                                                    )
+                                                                                                                    }
+
+
+                                                                                                            >>>
 
                                                                                                         output {
 
                                                                                                                             File gc_plot = glob(
-                                                                                                                            "*.gc_plot.png"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*.gc_plot.png"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             File gc_log = glob(
-                                                                                                                            "*.gc.txt"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*.gc.txt"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
-                                                                                                                    }
+
+                                                                                                                        }
 
                                                                                                                     runtime {
                                                                                                                         cpu: 1
 
                                                                                                                         memory: "~{mem_gb
-                                                                                                                        } GB"
+                                                                                                                            } GB"
                                                                                                                         time: 6
                                                                                                                         disks: "local-disk 250 SSD"
                                                                                                                         docker: runtime_environment.docker
                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                         conda: runtime_environment.conda
 
-                                                                                                                }
 
-                                                                                                        }
+                                                                                                                    }
+
+
+                                                                                                            }
 
                                                                                                         task qc_report {
 
@@ -5183,12 +5357,12 @@ workflow chip {
                                                                                                                     #String? encode_accession_id    # ENCODE accession ID of sample
                                                                                                                     # workflow params
                                                                                                                     Array[
-                                                                                                                    Boolean
-                                                                                                                    ] paired_ends
+                                                                                                                        Boolean
+                                                                                                                        ] paired_ends
 
                                                                                                                     Array[
-                                                                                                                    Boolean
-                                                                                                                    ] ctl_paired_ends
+                                                                                                                        Boolean
+                                                                                                                        ] ctl_paired_ends
                                                                                                                     String pipeline_type
                                                                                                                     String aligner
                                                                                                                     Boolean no_dup_removal
@@ -5201,109 +5375,109 @@ workflow chip {
 
                                                                                                                     # QCs
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] samstat_qcs
+                                                                                                                        File
+                                                                                                                        ] samstat_qcs
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] nodup_samstat_qcs
+                                                                                                                        File
+                                                                                                                        ] nodup_samstat_qcs
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] dup_qcs
+                                                                                                                        File
+                                                                                                                        ] dup_qcs
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] lib_complexity_qcs
+                                                                                                                        File
+                                                                                                                        ] lib_complexity_qcs
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] ctl_samstat_qcs
+                                                                                                                        File
+                                                                                                                        ] ctl_samstat_qcs
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] ctl_nodup_samstat_qcs
+                                                                                                                        File
+                                                                                                                        ] ctl_nodup_samstat_qcs
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] ctl_dup_qcs
+                                                                                                                        File
+                                                                                                                        ] ctl_dup_qcs
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] ctl_lib_complexity_qcs
+                                                                                                                        File
+                                                                                                                        ] ctl_lib_complexity_qcs
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] xcor_plots
+                                                                                                                        File
+                                                                                                                        ] xcor_plots
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] xcor_scores
+                                                                                                                        File
+                                                                                                                        ] xcor_scores
                                                                                                                     File? jsd_plot
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] jsd_qcs
+                                                                                                                        File
+                                                                                                                        ] jsd_qcs
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] idr_plots
+                                                                                                                        File
+                                                                                                                        ] idr_plots
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] idr_plots_pr
+                                                                                                                        File
+                                                                                                                        ] idr_plots_pr
                                                                                                                     File? idr_plot_ppr
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] frip_qcs
+                                                                                                                        File
+                                                                                                                        ] frip_qcs
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] frip_qcs_pr1
+                                                                                                                        File
+                                                                                                                        ] frip_qcs_pr1
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] frip_qcs_pr2
+                                                                                                                        File
+                                                                                                                        ] frip_qcs_pr2
                                                                                                                     File? frip_qc_pooled
                                                                                                                     File? frip_qc_ppr1
                                                                                                                     File? frip_qc_ppr2
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] frip_idr_qcs
+                                                                                                                        File
+                                                                                                                        ] frip_idr_qcs
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] frip_idr_qcs_pr
+                                                                                                                        File
+                                                                                                                        ] frip_idr_qcs_pr
                                                                                                                     File? frip_idr_qc_ppr
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] frip_overlap_qcs
+                                                                                                                        File
+                                                                                                                        ] frip_overlap_qcs
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] frip_overlap_qcs_pr
+                                                                                                                        File
+                                                                                                                        ] frip_overlap_qcs_pr
                                                                                                                     File? frip_overlap_qc_ppr
                                                                                                                     File? idr_reproducibility_qc
                                                                                                                     File? overlap_reproducibility_qc
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] gc_plots
+                                                                                                                        File
+                                                                                                                        ] gc_plots
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] peak_region_size_qcs
+                                                                                                                        File
+                                                                                                                        ] peak_region_size_qcs
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] peak_region_size_plots
+                                                                                                                        File
+                                                                                                                        ] peak_region_size_plots
 
                                                                                                                     Array[
-                                                                                                                    File
-                                                                                                                    ] num_peak_qcs
+                                                                                                                        File
+                                                                                                                        ] num_peak_qcs
                                                                                                                     File? idr_opt_peak_region_size_qc
                                                                                                                     File? idr_opt_peak_region_size_plot
                                                                                                                     File? idr_opt_num_peak_qc
@@ -5313,7 +5487,8 @@ workflow chip {
                                                                                                                     File? qc_json_ref
                                                                                                                     RuntimeEnvironment runtime_environment
 
-                                                                                                            }
+
+                                                                                                                }
 
                                                                                                             command <<<
                                                                                                                 set -e
@@ -5321,208 +5496,211 @@ workflow chip {
                                                                                                                     --pipeline-prefix chip \
 
                                                                                                                     ~{"--pipeline-ver " + pipeline_ver
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--title '" + sub(
-                                                                                                                    title, "'", "_"
-                                                                                                                    ) + "'"
-                                                                                                                    } \
+                                                                                                                        title, "'", "_"
+                                                                                                                        ) + "'"
+                                                                                                                        } \
 
                                                                                                                     ~{"--desc '" + sub(
-                                                                                                                    description, "'", "_"
-                                                                                                                    ) + "'"
-                                                                                                                    } \
+                                                                                                                        description, "'", "_"
+                                                                                                                        ) + "'"
+                                                                                                                        } \
 
                                                                                                                     ~{"--genome " + genome
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--multimapping " + 0
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --paired-ends ~{sep=" " paired_ends
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --ctl-paired-ends ~{sep=" " ctl_paired_ends
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --pipeline-type ~{pipeline_type
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --aligner ~{aligner
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                         ~{(
 
                                                                                                                                 if (
-                                                                                                                                no_dup_removal
-                                                                                                                                )
+                                                                                                                                    no_dup_removal
+                                                                                                                                    )
                                                                                                                                 then "--no-dup-removal "
                                                                                                                                 else ""
 
-                                                                                                                )
-                                                                                                                } \
+
+                                                                                                                    )
+                                                                                                                    } \
 
                                                                                                                     --peak-caller ~{peak_caller
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--cap-num-peak " + cap_num_peak
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --idr-thresh ~{idr_thresh
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --pval-thresh ~{pval_thresh
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --xcor-trim-bp ~{xcor_trim_bp
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --xcor-subsample-reads ~{xcor_subsample_reads
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --samstat-qcs ~{sep="_:_" samstat_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --nodup-samstat-qcs ~{sep="_:_" nodup_samstat_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --dup-qcs ~{sep="_:_" dup_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --lib-complexity-qcs ~{sep="_:_" lib_complexity_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --xcor-plots ~{sep="_:_" xcor_plots
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --xcor-scores ~{sep="_:_" xcor_scores
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --idr-plots ~{sep="_:_" idr_plots
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --idr-plots-pr ~{sep="_:_" idr_plots_pr
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --ctl-samstat-qcs ~{sep="_:_" ctl_samstat_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --ctl-nodup-samstat-qcs ~{sep="_:_" ctl_nodup_samstat_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --ctl-dup-qcs ~{sep="_:_" ctl_dup_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --ctl-lib-complexity-qcs ~{sep="_:_" ctl_lib_complexity_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--jsd-plot " + jsd_plot
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --jsd-qcs ~{sep="_:_" jsd_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--idr-plot-ppr " + idr_plot_ppr
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --frip-qcs ~{sep="_:_" frip_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --frip-qcs-pr1 ~{sep="_:_" frip_qcs_pr1
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --frip-qcs-pr2 ~{sep="_:_" frip_qcs_pr2
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--frip-qc-pooled " + frip_qc_pooled
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--frip-qc-ppr1 " + frip_qc_ppr1
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--frip-qc-ppr2 " + frip_qc_ppr2
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --frip-idr-qcs ~{sep="_:_" frip_idr_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --frip-idr-qcs-pr ~{sep="_:_" frip_idr_qcs_pr
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--frip-idr-qc-ppr " + frip_idr_qc_ppr
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --frip-overlap-qcs ~{sep="_:_" frip_overlap_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --frip-overlap-qcs-pr ~{sep="_:_" frip_overlap_qcs_pr
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--frip-overlap-qc-ppr " + frip_overlap_qc_ppr
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--idr-reproducibility-qc " + idr_reproducibility_qc
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--overlap-reproducibility-qc " + overlap_reproducibility_qc
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --gc-plots ~{sep="_:_" gc_plots
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --peak-region-size-qcs ~{sep="_:_" peak_region_size_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --peak-region-size-plots ~{sep="_:_" peak_region_size_plots
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     --num-peak-qcs ~{sep="_:_" num_peak_qcs
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--idr-opt-peak-region-size-qc " + idr_opt_peak_region_size_qc
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--idr-opt-peak-region-size-plot " + idr_opt_peak_region_size_plot
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--idr-opt-num-peak-qc " + idr_opt_num_peak_qc
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--overlap-opt-peak-region-size-qc " + overlap_opt_peak_region_size_qc
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--overlap-opt-peak-region-size-plot " + overlap_opt_peak_region_size_plot
-                                                                                                                    } \
+                                                                                                                        } \
 
                                                                                                                     ~{"--overlap-opt-num-peak-qc " + overlap_opt_num_peak_qc
-                                                                                                                    } \
+                                                                                                                        } \
                                                                                                                     --out-qc-html qc.html \
                                                                                                                     --out-qc-json qc.json \
 
                                                                                                                     ~{"--qc-json-ref " + qc_json_ref
-                                                                                                                    }
+                                                                                                                        }
 
-                                                                                                        >>>
+
+                                                                                                            >>>
 
                                                                                                         output {
 
                                                                                                                             File report = glob(
-                                                                                                                            "*qc.html"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*qc.html"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             File qc_json = glob(
-                                                                                                                            "*qc.json"
-                                                                                                                            )[
-                                                                                                                            0
-                                                                                                                            ]
+                                                                                                                                "*qc.json"
+                                                                                                                                )[
+                                                                                                                                0
+                                                                                                                                ]
 
                                                                                                                             Boolean qc_json_ref_match = read_string(
-                                                                                                                            "qc_json_ref_match.txt"
-                                                                                                                            ) == "True"
+                                                                                                                                "qc_json_ref_match.txt"
+                                                                                                                                ) == "True"
 
-                                                                                                                    }
+
+                                                                                                                        }
 
                                                                                                                     runtime {
                                                                                                                         cpu: 1
@@ -5533,9 +5711,11 @@ workflow chip {
                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                         conda: runtime_environment.conda
 
-                                                                                                                }
 
-                                                                                                        }
+                                                                                                                    }
+
+
+                                                                                                            }
 
                                                                                                         ### workflow system tasks
                                                                                                         task read_genome_tsv {
@@ -5545,12 +5725,13 @@ workflow chip {
                                                                                                                     String? null_s
                                                                                                                     RuntimeEnvironment runtime_environment
 
-                                                                                                            }
+
+                                                                                                                }
 
                                                                                                             command <<<
 
                                                                                                                     echo "$(basename ~{genome_tsv
-                                                                                                                    })" > genome_name
+                                                                                                                        })" > genome_name
                                                                                                                     # create empty files for all entries
                                                                                                                     touch ref_fa bowtie2_idx_tar bwa_idx_tar chrsz gensz blacklist blacklist2
                                                                                                                     touch mito_chr_name
@@ -5560,7 +5741,7 @@ workflow chip {
                                                                                                                     import os
 
                                                                                                                     with open('~{genome_tsv
-                                                                                                                    }','r') as fp:
+                                                                                                                        }','r') as fp:
                                                                                                                         for line in fp:
                                                                                                                             arr = line.strip('\n').split('\t')
                                                                                                                             if arr:
@@ -5569,132 +5750,143 @@ workflow chip {
                                                                                                                                     fp2.write(val)
                                                                                                                     CODE
 
-                                                                                                            >>>
+
+                                                                                                                >>>
 
                                                                                                             output {
 
                                                                                                                         String? genome_name = read_string(
-                                                                                                                        "genome_name"
-                                                                                                                        )
+                                                                                                                            "genome_name"
+                                                                                                                            )
 
                                                                                                                         String? ref_fa = (
 
                                                                                                                                     if size(
-                                                                                                                                    "ref_fa"
-                                                                                                                                    ) == 0
+                                                                                                                                        "ref_fa"
+                                                                                                                                        ) == 0
                                                                                                                                     then null_s
 
                                                                                                                                     else read_string(
-                                                                                                                                    "ref_fa"
-                                                                                                                                    )
+                                                                                                                                        "ref_fa"
+                                                                                                                                        )
 
-                                                                                                                            )
+
+                                                                                                                                )
 
                                                                                                                             String? bwa_idx_tar = (
 
                                                                                                                                         if size(
-                                                                                                                                        "bwa_idx_tar"
-                                                                                                                                        ) == 0
+                                                                                                                                            "bwa_idx_tar"
+                                                                                                                                            ) == 0
                                                                                                                                         then null_s
 
                                                                                                                                         else read_string(
-                                                                                                                                        "bwa_idx_tar"
-                                                                                                                                        )
+                                                                                                                                            "bwa_idx_tar"
+                                                                                                                                            )
 
-                                                                                                                                )
+
+                                                                                                                                    )
 
                                                                                                                                 String? bowtie2_idx_tar = (
 
                                                                                                                                             if size(
-                                                                                                                                            "bowtie2_idx_tar"
-                                                                                                                                            ) == 0
+                                                                                                                                                "bowtie2_idx_tar"
+                                                                                                                                                ) == 0
                                                                                                                                             then null_s
 
                                                                                                                                             else read_string(
-                                                                                                                                            "bowtie2_idx_tar"
-                                                                                                                                            )
+                                                                                                                                                "bowtie2_idx_tar"
+                                                                                                                                                )
 
-                                                                                                                                    )
+
+                                                                                                                                        )
 
                                                                                                                                     String? chrsz = (
 
                                                                                                                                                 if size(
-                                                                                                                                                "chrsz"
-                                                                                                                                                ) == 0
+                                                                                                                                                    "chrsz"
+                                                                                                                                                    ) == 0
                                                                                                                                                 then null_s
 
                                                                                                                                                 else read_string(
-                                                                                                                                                "chrsz"
-                                                                                                                                                )
+                                                                                                                                                    "chrsz"
+                                                                                                                                                    )
 
-                                                                                                                                        )
+
+                                                                                                                                            )
 
                                                                                                                                         String? gensz = (
 
                                                                                                                                                     if size(
-                                                                                                                                                    "gensz"
-                                                                                                                                                    ) == 0
+                                                                                                                                                        "gensz"
+                                                                                                                                                        ) == 0
                                                                                                                                                     then null_s
 
                                                                                                                                                     else read_string(
-                                                                                                                                                    "gensz"
-                                                                                                                                                    )
+                                                                                                                                                        "gensz"
+                                                                                                                                                        )
 
-                                                                                                                                            )
+
+                                                                                                                                                )
 
                                                                                                                                             String? blacklist = (
 
                                                                                                                                                         if size(
-                                                                                                                                                        "blacklist"
-                                                                                                                                                        ) == 0
+                                                                                                                                                            "blacklist"
+                                                                                                                                                            ) == 0
                                                                                                                                                         then null_s
 
                                                                                                                                                         else read_string(
-                                                                                                                                                        "blacklist"
-                                                                                                                                                        )
+                                                                                                                                                            "blacklist"
+                                                                                                                                                            )
 
-                                                                                                                                                )
+
+                                                                                                                                                    )
 
                                                                                                                                                 String? blacklist2 = (
 
                                                                                                                                                             if size(
-                                                                                                                                                            "blacklist2"
-                                                                                                                                                            ) == 0
+                                                                                                                                                                "blacklist2"
+                                                                                                                                                                ) == 0
                                                                                                                                                             then null_s
 
                                                                                                                                                             else read_string(
-                                                                                                                                                            "blacklist2"
-                                                                                                                                                            )
+                                                                                                                                                                "blacklist2"
+                                                                                                                                                                )
 
-                                                                                                                                                    )
+
+                                                                                                                                                        )
 
                                                                                                                                                     String? mito_chr_name = (
 
                                                                                                                                                                 if size(
-                                                                                                                                                                "mito_chr_name"
-                                                                                                                                                                ) == 0
+                                                                                                                                                                    "mito_chr_name"
+                                                                                                                                                                    ) == 0
                                                                                                                                                                 then null_s
 
                                                                                                                                                                 else read_string(
-                                                                                                                                                                "mito_chr_name"
-                                                                                                                                                                )
+                                                                                                                                                                    "mito_chr_name"
+                                                                                                                                                                    )
 
-                                                                                                                                                        )
+
+                                                                                                                                                            )
 
                                                                                                                                                         String? regex_bfilt_peak_chr_name = (
 
                                                                                                                                                                     if size(
-                                                                                                                                                                    "regex_bfilt_peak_chr_name"
-                                                                                                                                                                    ) == 0
+                                                                                                                                                                        "regex_bfilt_peak_chr_name"
+                                                                                                                                                                        ) == 0
                                                                                                                                                                     then "chr[\\dXY]+"
 
                                                                                                                                                                     else read_string(
-                                                                                                                                                                    "regex_bfilt_peak_chr_name"
-                                                                                                                                                                    )
+                                                                                                                                                                        "regex_bfilt_peak_chr_name"
+                                                                                                                                                                        )
 
-                                                                                                                                                            )
 
-                                                                                                                                                    }
+                                                                                                                                                                )
+
+
+                                                                                                                                                        }
 
                                                                                                                                                     runtime {
                                                                                                                                                         maxRetries: 0
@@ -5706,26 +5898,29 @@ workflow chip {
                                                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                                                         conda: runtime_environment.conda
 
-                                                                                                                                                }
 
-                                                                                                                                        }
+                                                                                                                                                    }
+
+
+                                                                                                                                            }
 
                                                                                                                                         task rounded_mean {
 
                                                                                                                                                 input {
 
                                                                                                                                                             Array[
-                                                                                                                                                            Int
-                                                                                                                                                            ] ints
+                                                                                                                                                                Int
+                                                                                                                                                                ] ints
                                                                                                                                                             RuntimeEnvironment runtime_environment
 
-                                                                                                                                                    }
+
+                                                                                                                                                        }
 
                                                                                                                                                     command <<<
                                                                                                                                                         python <<CODE
 
                                                                                                                                                         arr = [~{sep="," ints
-                                                                                                                                                        }]
+                                                                                                                                                            }]
                                                                                                                                                         with open('tmp.txt','w') as fp:
                                                                                                                                                             if len(arr):
                                                                                                                                                                 sum_ = sum(arr)
@@ -5735,15 +5930,17 @@ workflow chip {
                                                                                                                                                                 fp.write('0')
                                                                                                                                                         CODE
 
-                                                                                                                                                >>>
+
+                                                                                                                                                    >>>
 
                                                                                                                                                 output {
 
                                                                                                                                                             Int rounded_mean = read_int(
-                                                                                                                                                            "tmp.txt"
-                                                                                                                                                            )
+                                                                                                                                                                "tmp.txt"
+                                                                                                                                                                )
 
-                                                                                                                                                    }
+
+                                                                                                                                                        }
 
                                                                                                                                                     runtime {
                                                                                                                                                         cpu: 1
@@ -5754,9 +5951,11 @@ workflow chip {
                                                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                                                         conda: runtime_environment.conda
 
-                                                                                                                                                }
 
-                                                                                                                                        }
+                                                                                                                                                    }
+
+
+                                                                                                                                            }
 
                                                                                                                                         task raise_exception {
 
@@ -5764,22 +5963,25 @@ workflow chip {
                                                                                                                                                     String msg
                                                                                                                                                     RuntimeEnvironment runtime_environment
 
-                                                                                                                                            }
+
+                                                                                                                                                }
 
                                                                                                                                             command <<<
 
                                                                                                                                                     echo -e "\n* Error: ~{msg
-                                                                                                                                                    }\n" >&2
+                                                                                                                                                        }\n" >&2
                                                                                                                                                     exit 2
 
-                                                                                                                                            >>>
+
+                                                                                                                                                >>>
 
                                                                                                                                             output {
 
                                                                                                                                                     String error_msg = "~{msg
-                                                                                                                                                    }"
+                                                                                                                                                        }"
 
-                                                                                                                                            }
+
+                                                                                                                                                }
 
                                                                                                                                             runtime {
                                                                                                                                                 maxRetries: 0
@@ -5791,6 +5993,8 @@ workflow chip {
                                                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                                                 conda: runtime_environment.conda
 
-                                                                                                                                        }
 
-                                                                                                                                }
+                                                                                                                                            }
+
+
+                                                                                                                                    }

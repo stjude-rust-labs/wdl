@@ -19,6 +19,9 @@ use crate::Token;
 use crate::TokenStream;
 use crate::Trivia;
 
+/// [`PostToken`]s that precede an inline comment.
+const INLINE_COMMENT_PRECEDING_TOKENS: [PostToken; 2] = [PostToken::Space, PostToken::Space];
+
 /// A postprocessed token.
 #[derive(Clone, Eq, PartialEq)]
 pub enum PostToken {
@@ -144,13 +147,13 @@ pub struct Postprocessor {
     /// Whether the current line has been interrupted by trivia.
     interrupted: bool,
 
-    /// Whether blank lines are allowed in the current context.
+    /// The line spacing policy.
     line_spacing_policy: LineSpacingPolicy,
 
     /// Whether temporary indentation is needed.
     temp_indent_needed: bool,
 
-    /// Temporary indentation to add while formatting command blocks.
+    /// Temporary indentation to add.
     temp_indent: String,
 }
 
@@ -218,7 +221,7 @@ impl Postprocessor {
                 self.line_spacing_policy = policy;
             }
             PreToken::Literal(value, kind) => {
-                assert!(kind != SyntaxKind::Comment && kind != SyntaxKind::Whitespace);
+                assert!(!kind.is_trivia());
 
                 // This is special handling for inserting the empty string.
                 // We remove any indentation or spaces from the end of the
@@ -288,8 +291,9 @@ impl Postprocessor {
                                 }
                             }
                             self.trim_last_line(stream);
-                            stream.push(PostToken::Space);
-                            stream.push(PostToken::Space);
+                            for token in INLINE_COMMENT_PRECEDING_TOKENS.iter() {
+                                stream.push(token.clone());
+                            }
                             stream.push(PostToken::Literal(value));
                         }
                     }
@@ -357,8 +361,7 @@ impl Postprocessor {
             while let Some((i, token)) = pre_buffer.next() {
                 if inserted_line_breaks < max_line_breaks && line_breaks.contains(&i) {
                     inserted_line_breaks += 1;
-                    self.step(PreToken::LineEnd, None, &mut post_buffer);
-                    // self.interrupted = true;
+                    self.interrupting_line_break(&mut post_buffer);
                 }
                 self.step(
                     token.clone(),
@@ -379,6 +382,16 @@ impl Postprocessor {
         }
 
         out_stream.extend(post_buffer);
+    }
+
+    /// Inserts an interrupting line break before the next token.
+    fn interrupting_line_break(&mut self, stream: &mut TokenStream<PostToken>) {
+        // assert!(self.position == LinePosition::MiddleOfLine);
+        self.interrupted = true;
+        self.trim_last_line(stream);
+        stream.push(PostToken::Newline);
+        self.position = LinePosition::StartOfLine;
+        self.indent(stream);
     }
 
     /// Trims any and all whitespace from the end of the stream.
