@@ -3,19 +3,15 @@
 //! If you're here and not a developer of the `wdl` family of crates, you're
 //! probably looking for
 //! [Sprocket](https://github.com/stjude-rust-labs/sprocket) instead.
-use std::borrow::Cow;
-use std::collections::HashSet;
 use std::fs;
 use std::io::IsTerminal;
 use std::io::Read;
 use std::io::stderr;
 use std::path::Path;
 use std::path::PathBuf;
-use std::path::absolute;
 
 use anyhow::Context;
 use anyhow::Result;
-use anyhow::anyhow;
 use anyhow::bail;
 use clap::Args;
 use clap::Parser;
@@ -27,28 +23,17 @@ use codespan_reporting::term::emit;
 use codespan_reporting::term::termcolor::ColorChoice;
 use codespan_reporting::term::termcolor::StandardStream;
 use colored::Colorize;
-use indicatif::ProgressBar;
-use indicatif::ProgressStyle;
 use tracing_log::AsTrace;
-use url::Url;
 use wdl::ast::Diagnostic;
 use wdl::ast::Document;
 use wdl::ast::Validator;
 use wdl::lint::LintVisitor;
-use wdl_analysis::AnalysisResult;
-use wdl_analysis::Analyzer;
-use wdl_analysis::DiagnosticsConfig;
-use wdl_analysis::Rule;
-use wdl_analysis::path_to_uri;
-use wdl_analysis::rules;
+use wdl_analysis::analyze;
 use wdl_ast::Node;
 use wdl_ast::Severity;
 use wdl_doc::document_workspace;
-use wdl_engine::Engine;
-use wdl_engine::EvaluationError;
-use wdl_engine::Inputs;
-use wdl_engine::local::LocalTaskExecutionBackend;
-use wdl_engine::v1::TaskEvaluator;
+use wdl_engine::run;
+use wdl_engine::validate_inputs;
 use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt as _;
 use wdl_lint::rules::ShellCheckRule;
@@ -82,95 +67,6 @@ fn emit_diagnostics(path: &str, source: &str, diagnostics: &[Diagnostic]) -> Res
     }
 
     Ok(errors)
-}
-
-/// Analyzes a path.
-async fn analyze<T: AsRef<dyn Rule>>(
-    rules: impl IntoIterator<Item = T>,
-    file: &str,
-    lint: bool,
-) -> Result<Vec<AnalysisResult>> {
-    let bar = ProgressBar::new(0);
-    bar.set_style(
-        ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {msg} {pos}/{len}")
-            .unwrap(),
-    );
-
-    let analyzer = Analyzer::new_with_validator(
-        DiagnosticsConfig::new(rules),
-        move |bar: ProgressBar, kind, completed, total| async move {
-            bar.set_position(completed.try_into().unwrap());
-            if completed == 0 {
-                bar.set_length(total.try_into().unwrap());
-                bar.set_message(format!("{kind}"));
-            }
-        },
-        move || {
-            let mut validator = Validator::default();
-            if lint {
-                validator.add_visitor(LintVisitor::default());
-            }
-            validator
-        },
-    );
-
-    if let Ok(url) = Url::parse(file) {
-        analyzer.add_document(url).await?;
-    } else if fs::metadata(file)
-        .with_context(|| format!("failed to read metadata for file `{file}`"))?
-        .is_dir()
-    {
-        analyzer.add_directory(file.into()).await?;
-    } else if let Some(url) = path_to_uri(file) {
-        analyzer.add_document(url).await?;
-    } else {
-        bail!("failed to convert `{file}` to a URI", file = file)
-    }
-
-    let results = analyzer
-        .analyze(bar.clone())
-        .await
-        .context("failed to analyze documents")?;
-
-    drop(bar);
-
-    let mut errors = 0;
-    let cwd = std::env::current_dir().ok();
-    for result in results.iter() {
-        let path = result.document().uri().to_file_path().ok();
-
-        // Attempt to strip the CWD from the result path
-        let path = match (&cwd, &path) {
-            // Use the id itself if there is no path
-            (_, None) => result.document().uri().as_str().into(),
-            // Use just the path if there's no CWD
-            (None, Some(path)) => path.to_string_lossy(),
-            // Strip the CWD from the path
-            (Some(cwd), Some(path)) => path.strip_prefix(cwd).unwrap_or(path).to_string_lossy(),
-        };
-
-        let diagnostics: Cow<'_, [Diagnostic]> = match result.error() {
-            Some(e) => vec![Diagnostic::error(format!("failed to read `{path}`: {e:#}"))].into(),
-            None => result.document().diagnostics().into(),
-        };
-
-        if !diagnostics.is_empty() {
-            errors += emit_diagnostics(
-                &path,
-                &result.document().node().syntax().text().to_string(),
-                &diagnostics,
-            )?;
-        }
-    }
-
-    if errors > 0 {
-        bail!(
-            "aborting due to previous {errors} error{s}",
-            s = if errors == 1 { "" } else { "s" }
-        );
-    }
-
-    Ok(results)
 }
 
 /// Reads source from the given path.
@@ -242,30 +138,6 @@ impl AnalysisOptions {
 
         Ok(())
     }
-
-    /// Converts the analysis options into an analysis rules set.
-    pub fn into_rules(self) -> impl Iterator<Item = Box<dyn Rule>> {
-        let Self {
-            deny_all,
-            except_all,
-            except,
-            deny,
-        } = self;
-
-        let except: HashSet<_> = except.into_iter().collect();
-        let deny: HashSet<_> = deny.into_iter().collect();
-
-        rules()
-            .into_iter()
-            .filter(move |r| !except_all && !except.contains(r.id()))
-            .map(move |mut r| {
-                if deny_all || deny.contains(r.id()) {
-                    r.deny();
-                }
-
-                r
-            })
-    }
 }
 
 /// Checks a WDL source file for errors.
@@ -285,7 +157,7 @@ impl CheckCommand {
     /// Executes the `check` subcommand.
     async fn exec(self) -> Result<()> {
         self.options.check_for_conflicts()?;
-        analyze(self.options.into_rules(), &self.file, false).await?;
+        analyze(&self.file, self.options.except, false, false).await?;
         Ok(())
     }
 }
@@ -357,7 +229,7 @@ impl AnalyzeCommand {
     /// Executes the `analyze` subcommand.
     async fn exec(self) -> Result<()> {
         self.options.check_for_conflicts()?;
-        let results = analyze(self.options.into_rules(), &self.file, self.lint).await?;
+        let results = analyze(&self.file, self.options.except, self.lint, false).await?;
         println!("{:#?}", results);
         Ok(())
     }
@@ -436,7 +308,7 @@ pub struct DocCommand {
 }
 
 impl DocCommand {
-    /// Executes the `document` subcommand.
+    /// Executes the `doc` subcommand.
     async fn exec(self) -> Result<()> {
         document_workspace(self.path.clone()).await?;
 
@@ -452,6 +324,32 @@ impl DocCommand {
         }
 
         Ok(())
+    }
+}
+
+/// Validates an input JSON file against a WDL task or workflow.
+#[derive(Args)]
+#[clap(disable_version_flag = true)]
+pub struct ValidateCommand {
+    /// The path or URL to the source WDL file.
+    #[clap(value_name = "PATH or URL")]
+    pub document: String,
+
+    /// The path to the inputs file.
+    #[clap(long, value_name = "INPUTS")]
+    pub inputs: PathBuf,
+}
+
+impl ValidateCommand {
+    /// Executes the `validate` subcommand.
+    async fn exec(self) -> Result<()> {
+        validate_inputs(
+            self.document,
+            self.inputs,
+            &mut StandardStream::stderr(ColorChoice::Auto),
+            &Config::default(),
+        )
+        .await
     }
 }
 
@@ -486,176 +384,21 @@ pub struct RunCommand {
 }
 
 impl RunCommand {
-    /// Executes the `check` subcommand.
+    /// Executes the `run` subcommand.
     async fn exec(self) -> Result<()> {
         self.options.check_for_conflicts()?;
 
-        if Path::new(&self.file).is_dir() {
-            bail!("specified path cannot be a directory");
-        }
-
-        let results = analyze(self.options.into_rules(), &self.file, false).await?;
-
-        let uri = if let Ok(uri) = Url::parse(&self.file) {
-            uri
-        } else {
-            path_to_uri(&self.file).expect("file should be a local path")
-        };
-
-        let result = results
-            .iter()
-            .find(|r| **r.document().uri() == uri)
-            .context("failed to find document in analysis results")?;
-        let document = result.document();
-
-        // TODO: support other backends in the future
-        let mut engine = Engine::new(LocalTaskExecutionBackend::new());
-        let (path, name, inputs) = if let Some(path) = self.inputs {
-            let abs_path = absolute(&path).with_context(|| {
-                format!(
-                    "failed to determine the absolute path of `{path}`",
-                    path = path.display()
-                )
-            })?;
-            match Inputs::parse(document, &abs_path)? {
-                Some((name, inputs)) => (Some(path), name, inputs),
-                None => bail!(
-                    "inputs file `{path}` is empty; use the `--name` option to specify the name \
-                     of the task or workflow to run",
-                    path = path.display()
-                ),
-            }
-        } else if let Some(name) = self.name {
-            if document.task_by_name(&name).is_some() {
-                (None, name, Inputs::Task(Default::default()))
-            } else if document.workflow().is_some() {
-                (None, name, Inputs::Workflow(Default::default()))
-            } else {
-                bail!("document does not contain a task or workflow named `{name}`");
-            }
-        } else {
-            let mut iter = document.tasks();
-            let (name, inputs) = iter
-                .next()
-                .map(|t| (t.name().to_string(), Inputs::Task(Default::default())))
-                .or_else(|| {
-                    document
-                        .workflow()
-                        .map(|w| (w.name().to_string(), Inputs::Workflow(Default::default())))
-                })
-                .context(
-                    "inputs file is empty and the WDL document contains no tasks or workflow",
-                )?;
-
-            if iter.next().is_some() {
-                bail!("inputs file is empty and the WDL document contains more than one task");
-            }
-
-            (None, name, inputs)
-        };
-
-        let output_dir = self
-            .output
-            .unwrap_or_else(|| Path::new(&name).to_path_buf());
-
-        // Check to see if the output directory already exists and if it should be
-        // removed
-        if output_dir.exists() {
-            if !self.overwrite {
-                bail!(
-                    "output directory `{dir}` exists; use the `--overwrite` option to overwrite \
-                     its contents",
-                    dir = output_dir.display()
-                );
-            }
-
-            fs::remove_dir_all(&output_dir).with_context(|| {
-                format!(
-                    "failed to remove output directory `{dir}`",
-                    dir = output_dir.display()
-                )
-            })?;
-        }
-
-        match inputs {
-            Inputs::Task(mut inputs) => {
-                // Make any paths specified in the inputs absolute
-                let task = document
-                    .task_by_name(&name)
-                    .ok_or_else(|| anyhow!("document does not contain a task named `{name}`"))?;
-
-                // Ensure all the paths specified in the inputs file are relative to the file's
-                // directory
-                if let Some(path) = path.as_ref().and_then(|p| p.parent()) {
-                    inputs.join_paths(task, path);
-                }
-
-                let mut evaluator = TaskEvaluator::new(&mut engine);
-                match evaluator
-                    .evaluate(document, task, &inputs, &output_dir, &name)
-                    .await
-                {
-                    Ok(evaluated) => {
-                        match evaluated.into_result() {
-                            Ok(outputs) => {
-                                // Buffer the entire output before writing it out in case there are
-                                // errors during serialization.
-                                let mut buffer = Vec::new();
-                                let mut serializer = serde_json::Serializer::pretty(&mut buffer);
-                                outputs.serialize(&mut serializer)?;
-                                println!(
-                                    "{buffer}\n",
-                                    buffer = std::str::from_utf8(&buffer)
-                                        .expect("output should be UTF-8")
-                                );
-                            }
-                            Err(e) => match e {
-                                EvaluationError::Source(diagnostic) => {
-                                    emit_diagnostics(
-                                        &self.file,
-                                        &document.node().syntax().text().to_string(),
-                                        &[diagnostic],
-                                    )?;
-
-                                    bail!("aborting due to task evaluation failure");
-                                }
-                                EvaluationError::Other(e) => return Err(e),
-                            },
-                        }
-                    }
-                    Err(e) => match e {
-                        EvaluationError::Source(diagnostic) => {
-                            emit_diagnostics(
-                                &self.file,
-                                &document.node().syntax().text().to_string(),
-                                &[diagnostic],
-                            )?;
-
-                            bail!("aborting due to task evaluation failure");
-                        }
-                        EvaluationError::Other(e) => return Err(e),
-                    },
-                }
-            }
-            Inputs::Workflow(mut inputs) => {
-                let workflow = document
-                    .workflow()
-                    .ok_or_else(|| anyhow!("document does not contain a workflow"))?;
-                if workflow.name() != name {
-                    bail!("document does not contain a workflow named `{name}`");
-                }
-
-                // Ensure all the paths specified in the inputs file are relative to the file's
-                // directory
-                if let Some(path) = path.as_ref().and_then(|p| p.parent()) {
-                    inputs.join_paths(workflow, path);
-                }
-
-                bail!("running workflows is not yet supported")
-            }
-        }
-
-        Ok(())
+        run(
+            &self.file,
+            self.inputs,
+            self.name.clone(),
+            self.output.unwrap_or_else(|| {
+                PathBuf::from(self.name.unwrap_or_else(|| "outputs".to_string()))
+            }),
+            &mut StandardStream::stderr(ColorChoice::Auto),
+            &Config::default(),
+        )
+        .await
     }
 }
 
@@ -705,6 +448,9 @@ enum Command {
     /// Documents a workspace.
     Doc(DocCommand),
 
+    /// Validates an input file.
+    Validate(ValidateCommand),
+
     /// Runs a workflow or task.
     Run(RunCommand),
 }
@@ -727,6 +473,7 @@ async fn main() -> Result<()> {
         Command::Analyze(cmd) => cmd.exec().await,
         Command::Format(cmd) => cmd.exec().await,
         Command::Doc(cmd) => cmd.exec().await,
+        Command::Validate(cmd) => cmd.exec().await,
         Command::Run(cmd) => cmd.exec().await,
     } {
         eprintln!(

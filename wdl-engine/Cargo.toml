@@ -28,10 +28,11 @@ petgraph = { workspace = true }
 futures = { workspace = true }
 tokio = { workspace = true }
 sysinfo = { workspace = true }
+url = { workspace = true }
+codespan-reporting = { workspace = true }
 
 [dev-dependencies]
 pretty_assertions = { workspace = true }
-codespan-reporting = { workspace = true }
 path-clean = { workspace = true }
 colored = { workspace = true }
 approx = { workspace = true }
