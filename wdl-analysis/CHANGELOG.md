@@ -9,7 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Added `analyze()` function to simplify the API ([#283](https://github.com/stjude-rust-labs/wdl/pull/283)).
 * Added functions for getting type information of task requirements and hints ([#241](https://github.com/stjude-rust-labs/wdl/pull/241)).
 * Exposed information about workflow calls from an analyzed document ([#239](https://github.com/stjude-rust-labs/wdl/pull/239)).
 * Added formatting to the analyzer ([#247](https://github.com/stjude-rust-labs/wdl/pull/247)).
