@@ -107,6 +107,5 @@ pub async fn analyze(
 
     let results = analyzer.analyze(bar.clone()).await?;
 
-
     Ok(results)
 }
