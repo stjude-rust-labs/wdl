@@ -344,8 +344,8 @@ impl ValidateCommand {
     /// Executes the `validate` subcommand.
     async fn exec(self) -> Result<()> {
         validate_inputs(
-            self.document,
-            self.inputs,
+            &self.document,
+            &self.inputs,
             &mut StandardStream::stderr(ColorChoice::Auto),
             &Config::default(),
         )

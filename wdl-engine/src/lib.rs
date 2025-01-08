@@ -39,8 +39,8 @@ use wdl_grammar::Severity;
 
 /// Validates the inputs for a task or workflow.
 pub async fn validate_inputs(
-    document: String,
-    inputs: PathBuf,
+    document: &str,
+    inputs: &Path,
     stream: &mut codespan_reporting::term::termcolor::StandardStream,
     config: &codespan_reporting::term::Config,
 ) -> anyhow::Result<()> {
@@ -48,10 +48,10 @@ pub async fn validate_inputs(
         bail!("expected a WDL document, found a directory");
     }
 
-    let results = analyze(&document, vec![], false, false).await?;
+    let results = analyze(document, vec![], false, false).await?;
 
-    let uri = Url::parse(&document)
-        .unwrap_or_else(|_| path_to_uri(&document).expect("file should be a local path"));
+    let uri = Url::parse(document)
+        .unwrap_or_else(|_| path_to_uri(document).expect("file should be a local path"));
 
     let result = results
         .iter()
