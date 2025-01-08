@@ -207,32 +207,6 @@ pub async fn analyze(
     Ok(results)
 }
 
-#[cfg(test)]
-mod test {
-    use std::collections::HashSet;
-
-    /// This is a test for checking that the reserved rules in `wdl-lint` match
-    /// those from `wdl-analysis`.
-    #[cfg(all(feature = "analysis", feature = "lint"))]
-    #[test]
-    fn reserved_rule_ids() {
-        let rules: HashSet<_> = wdl_analysis::rules().iter().map(|r| r.id()).collect();
-        let reserved: HashSet<_> = wdl_lint::RESERVED_RULE_IDS.iter().copied().collect();
-
-        for id in &reserved {
-            if !rules.contains(id) {
-                panic!("analysis rule `{id}` is not in the reservation set");
-            }
-        }
-
-        for id in &rules {
-            if !reserved.contains(id) {
-                panic!("reserved rule `{id}` is not an analysis rule");
-            }
-        }
-    }
-}
-
 /// Validates the inputs for a task or workflow.
 pub async fn validate_inputs(
     document: &str,
@@ -453,4 +427,30 @@ pub async fn run(
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod test {
+    use std::collections::HashSet;
+
+    /// This is a test for checking that the reserved rules in `wdl-lint` match
+    /// those from `wdl-analysis`.
+    #[cfg(all(feature = "analysis", feature = "lint"))]
+    #[test]
+    fn reserved_rule_ids() {
+        let rules: HashSet<_> = wdl_analysis::rules().iter().map(|r| r.id()).collect();
+        let reserved: HashSet<_> = wdl_lint::RESERVED_RULE_IDS.iter().copied().collect();
+
+        for id in &reserved {
+            if !rules.contains(id) {
+                panic!("analysis rule `{id}` is not in the reservation set");
+            }
+        }
+
+        for id in &rules {
+            if !reserved.contains(id) {
+                panic!("reserved rule `{id}` is not an analysis rule");
+            }
+        }
+    }
 }
