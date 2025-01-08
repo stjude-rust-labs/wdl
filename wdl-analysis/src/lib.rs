@@ -107,8 +107,6 @@ pub async fn analyze(
 
     let results = analyzer.analyze(bar.clone()).await?;
 
-    // Drop (hide) the progress bar before emitting any diagnostics
-    drop(bar);
 
-    anyhow::Ok(results)
+    Ok(results)
 }
