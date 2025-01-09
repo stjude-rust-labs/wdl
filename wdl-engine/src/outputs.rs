@@ -3,12 +3,13 @@
 use std::cmp::Ordering;
 
 use indexmap::IndexMap;
+use serde::Serialize;
 
 use crate::Scope;
 use crate::Value;
 
 /// Represents outputs of a WDL workflow or task.
-#[derive(Default, Debug, Clone, serde::Serialize)]
+#[derive(Default, Debug, Clone, Serialize)]
 pub struct Outputs {
     /// The name of the outputs.
     ///
