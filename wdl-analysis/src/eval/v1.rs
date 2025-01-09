@@ -184,16 +184,22 @@ impl TaskGraphBuilder {
         let count = graph.node_count();
         if let Some(section) = outputs {
             for decl in section.declarations() {
-                if let Some(index) = self.add_named_node(
+                match self.add_named_node(
                     decl.name(),
                     TaskGraphNode::Output(Decl::Bound(decl)),
                     &mut graph,
                     diagnostics,
                 ) {
-                    // Add an edge to the command node as all outputs depend on the command
-                    if let Some(command) = self.command {
-                        graph.update_edge(command, index, ());
+                    Some(index) => {
+                        // Add an edge to the command node as all outputs depend on the command
+                        match self.command {
+                            Some(command) => {
+                                graph.update_edge(command, index, ());
+                            }
+                            _ => {}
+                        }
                     }
+                    _ => {}
                 }
             }
         }
@@ -211,8 +217,11 @@ impl TaskGraphBuilder {
                 graph.update_edge(requirements, command, ());
             }
 
-            if let Some(hints) = self.hints {
-                graph.update_edge(hints, command, ());
+            match self.hints {
+                Some(hints) => {
+                    graph.update_edge(hints, command, ());
+                }
+                _ => {}
             }
         }
 
@@ -260,10 +269,15 @@ impl TaskGraphBuilder {
 
             // Look up the name; we don't check for cycles here as decls can't
             // reference a section.
-            if let Some(to) = self.names.get(name.as_str()) {
-                graph.update_edge(*to, from, ());
-            } else if name.as_str() != TASK_VAR_NAME || !allow_task_var {
-                diagnostics.push(unknown_name(name.as_str(), name.span()));
+            match self.names.get(name.as_str()) {
+                Some(to) => {
+                    graph.update_edge(*to, from, ());
+                }
+                _ => {
+                    if name.as_str() != TASK_VAR_NAME || !allow_task_var {
+                        diagnostics.push(unknown_name(name.as_str(), name.span()));
+                    }
+                }
             }
         }
     }
@@ -279,13 +293,14 @@ impl TaskGraphBuilder {
         // Populate edges for any nodes that reference other nodes by name
         for from in graph.node_indices().skip(skip.unwrap_or(0)) {
             match graph[from].clone() {
-                TaskGraphNode::Input(decl) | TaskGraphNode::Decl(decl) => {
-                    if let Some(expr) = decl.expr() {
+                TaskGraphNode::Input(decl) | TaskGraphNode::Decl(decl) => match decl.expr() {
+                    Some(expr) => {
                         self.add_expr_edges(from, expr, false, graph, diagnostics);
                     }
-                }
-                TaskGraphNode::Output(decl) => {
-                    if let Some(expr) = decl.expr() {
+                    _ => {}
+                },
+                TaskGraphNode::Output(decl) => match decl.expr() {
+                    Some(expr) => {
                         self.add_expr_edges(
                             from,
                             expr,
@@ -294,19 +309,23 @@ impl TaskGraphBuilder {
                             diagnostics,
                         );
                     }
-                }
+                    _ => {}
+                },
                 TaskGraphNode::Command(section) => {
                     // Add name references from the command section to any decls in scope
                     let section = section.clone();
                     for part in section.parts() {
-                        if let CommandPart::Placeholder(p) = part {
-                            self.add_section_edges(
-                                from,
-                                p.syntax().descendants(),
-                                version >= SupportedVersion::V1(V1::Two),
-                                graph,
-                                diagnostics,
-                            );
+                        match part {
+                            CommandPart::Placeholder(p) => {
+                                self.add_section_edges(
+                                    from,
+                                    p.syntax().descendants(),
+                                    version >= SupportedVersion::V1(V1::Two),
+                                    graph,
+                                    diagnostics,
+                                );
+                            }
+                            _ => {}
                         }
                     }
                 }
@@ -366,37 +385,42 @@ impl TaskGraphBuilder {
             let name = r.name();
 
             // Only add an edge if the name is known
-            if let Some(to) = self.names.get(name.as_str()) {
-                // Check to see if the node is self-referential
-                if *to == from {
-                    diagnostics.push(self_referential(
-                        name.as_str(),
-                        graph[from]
-                            .context()
-                            .expect("node should have context")
-                            .span(),
-                        name.span(),
-                    ));
-                    continue;
-                }
+            match self.names.get(name.as_str()) {
+                Some(to) => {
+                    // Check to see if the node is self-referential
+                    if *to == from {
+                        diagnostics.push(self_referential(
+                            name.as_str(),
+                            graph[from]
+                                .context()
+                                .expect("node should have context")
+                                .span(),
+                            name.span(),
+                        ));
+                        continue;
+                    }
 
-                // Check for a dependency cycle
-                if has_path_connecting(graph as &_, from, *to, Some(&mut self.space)) {
-                    diagnostics.push(task_reference_cycle(
-                        &graph[from],
-                        r.span(),
-                        name.as_str(),
-                        graph[*to]
-                            .expr()
-                            .expect("should have expr to form a cycle")
-                            .span(),
-                    ));
-                    continue;
-                }
+                    // Check for a dependency cycle
+                    if has_path_connecting(graph as &_, from, *to, Some(&mut self.space)) {
+                        diagnostics.push(task_reference_cycle(
+                            &graph[from],
+                            r.span(),
+                            name.as_str(),
+                            graph[*to]
+                                .expr()
+                                .expect("should have expr to form a cycle")
+                                .span(),
+                        ));
+                        continue;
+                    }
 
-                graph.update_edge(*to, from, ());
-            } else if name.as_str() != TASK_VAR_NAME || !allow_task_var {
-                diagnostics.push(unknown_name(name.as_str(), name.span()));
+                    graph.update_edge(*to, from, ());
+                }
+                _ => {
+                    if name.as_str() != TASK_VAR_NAME || !allow_task_var {
+                        diagnostics.push(unknown_name(name.as_str(), name.span()));
+                    }
+                }
             }
         }
     }
@@ -634,19 +658,22 @@ impl WorkflowGraphBuilder {
 
                 // Push the scatter variable onto the stack if it isn't already conflicting
                 let variable = statement.variable();
-                let pushed = if let Some(existing) = self.names.get(variable.as_str()) {
-                    diagnostics.push(name_conflict(
-                        variable.as_str(),
-                        NameContext::ScatterVariable(variable.span()).into(),
-                        graph[*existing]
-                            .context()
-                            .expect("node should have context")
-                            .into(),
-                    ));
-                    false
-                } else {
-                    self.variables.push(variable);
-                    true
+                let pushed = match self.names.get(variable.as_str()) {
+                    Some(existing) => {
+                        diagnostics.push(name_conflict(
+                            variable.as_str(),
+                            NameContext::ScatterVariable(variable.span()).into(),
+                            graph[*existing]
+                                .context()
+                                .expect("node should have context")
+                                .into(),
+                        ));
+                        false
+                    }
+                    _ => {
+                        self.variables.push(variable);
+                        true
+                    }
                 };
 
                 // Add all of the statement's statements
@@ -709,35 +736,44 @@ impl WorkflowGraphBuilder {
     ) -> Option<NodeIndex> {
         // Check for a conflicting name, either from a declaration or from a scatter
         // variable
-        let (context, cont) = if let Some(existing) = self.names.get(name.as_str()) {
-            // Conflict with a declaration
-            (
-                Some(
-                    graph[*existing]
-                        .context()
-                        .expect("node should have context"),
-                ),
-                false,
-            )
-        } else if let Some(existing) = self.variables.iter().find(|i| i.as_str() == name.as_str()) {
-            // Conflict with a scatter variable; we continue to add the node so that any
-            // declaration overrides the scatter variable
-            (Some(NameContext::ScatterVariable(existing.span())), true)
-        } else {
-            // No conflict
-            (None, true)
+        let (context, cont) = match self.names.get(name.as_str()) {
+            Some(existing) => {
+                // Conflict with a declaration
+                (
+                    Some(
+                        graph[*existing]
+                            .context()
+                            .expect("node should have context"),
+                    ),
+                    false,
+                )
+            }
+            _ => {
+                match self.variables.iter().find(|i| i.as_str() == name.as_str()) {
+                    Some(existing) => {
+                        // Conflict with a scatter variable; we continue to add the node so that any
+                        // declaration overrides the scatter variable
+                        (Some(NameContext::ScatterVariable(existing.span())), true)
+                    }
+                    _ => {
+                        // No conflict
+                        (None, true)
+                    }
+                }
+            }
         };
 
         // Check to see if a diagnostic should be added
         if let Some(context) = context {
-            let diagnostic = if let WorkflowGraphNode::Call(call) = &node {
-                call_conflict(&name, context, call.alias().is_none())
-            } else {
-                name_conflict(
+            let diagnostic = match &node {
+                WorkflowGraphNode::Call(call) => {
+                    call_conflict(&name, context, call.alias().is_none())
+                }
+                _ => name_conflict(
                     name.as_str(),
                     node.context().expect("node should have context").into(),
                     context.into(),
-                )
+                ),
             };
 
             diagnostics.push(diagnostic);
@@ -764,11 +800,12 @@ impl WorkflowGraphBuilder {
             match graph[from].clone() {
                 WorkflowGraphNode::Input(decl)
                 | WorkflowGraphNode::Decl(decl)
-                | WorkflowGraphNode::Output(decl) => {
-                    if let Some(expr) = decl.expr() {
+                | WorkflowGraphNode::Output(decl) => match decl.expr() {
+                    Some(expr) => {
                         self.add_expr_edges(from, expr, graph, diagnostics);
                     }
-                }
+                    _ => {}
+                },
                 WorkflowGraphNode::Conditional(statement) => {
                     self.add_expr_edges(from, statement.expr(), graph, diagnostics);
                 }
@@ -780,50 +817,64 @@ impl WorkflowGraphBuilder {
                     // If an input does not have an expression, add an edge to the name
                     for input in statement.inputs() {
                         let name = input.name();
-                        if let Some(expr) = input.expr() {
-                            self.add_expr_edges(from, expr, graph, diagnostics);
-                        } else if let Some(to) =
-                            self.find_node_by_name(name.as_str(), input.syntax().clone())
-                        {
-                            // Check for a dependency cycle
-                            if has_path_connecting(graph as &_, from, to, Some(&mut self.space)) {
-                                diagnostics.push(workflow_reference_cycle(
-                                    &graph[from],
-                                    name.span(),
-                                    name.as_str(),
-                                    graph[to]
-                                        .context()
-                                        .expect("node should have context")
-                                        .span(),
-                                ));
-                                continue;
+                        match input.expr() {
+                            Some(expr) => {
+                                self.add_expr_edges(from, expr, graph, diagnostics);
                             }
+                            _ => {
+                                match self.find_node_by_name(name.as_str(), input.syntax().clone())
+                                {
+                                    Some(to) => {
+                                        // Check for a dependency cycle
+                                        if has_path_connecting(
+                                            graph as &_,
+                                            from,
+                                            to,
+                                            Some(&mut self.space),
+                                        ) {
+                                            diagnostics.push(workflow_reference_cycle(
+                                                &graph[from],
+                                                name.span(),
+                                                name.as_str(),
+                                                graph[to]
+                                                    .context()
+                                                    .expect("node should have context")
+                                                    .span(),
+                                            ));
+                                            continue;
+                                        }
 
-                            self.add_dependency_edge(from, to, graph);
+                                        self.add_dependency_edge(from, to, graph);
+                                    }
+                                    _ => {}
+                                }
+                            }
                         }
                     }
 
                     // Add edges to other the requested calls
                     for after in statement.after() {
                         let name = after.name();
-                        if let Some(to) =
-                            self.find_node_by_name(name.as_str(), after.syntax().clone())
-                        {
-                            // Check for a dependency cycle
-                            if has_path_connecting(graph as &_, from, to, Some(&mut self.space)) {
-                                diagnostics.push(workflow_reference_cycle(
-                                    &graph[from],
-                                    name.span(),
-                                    name.as_str(),
-                                    graph[to]
-                                        .context()
-                                        .expect("node should have context")
-                                        .span(),
-                                ));
-                                continue;
-                            }
+                        match self.find_node_by_name(name.as_str(), after.syntax().clone()) {
+                            Some(to) => {
+                                // Check for a dependency cycle
+                                if has_path_connecting(graph as &_, from, to, Some(&mut self.space))
+                                {
+                                    diagnostics.push(workflow_reference_cycle(
+                                        &graph[from],
+                                        name.span(),
+                                        name.as_str(),
+                                        graph[to]
+                                            .context()
+                                            .expect("node should have context")
+                                            .span(),
+                                    ));
+                                    continue;
+                                }
 
-                            self.add_dependency_edge(from, to, graph);
+                                self.add_dependency_edge(from, to, graph);
+                            }
+                            _ => {}
                         }
                     }
                 }
@@ -846,37 +897,40 @@ impl WorkflowGraphBuilder {
             let name = r.name();
 
             // Only add an edge if the name is known
-            if let Some(to) = self.find_node_by_name(name.as_str(), expr.syntax().clone()) {
-                // Check to see if the node is self-referential
-                if to == from {
-                    diagnostics.push(self_referential(
-                        name.as_str(),
-                        graph[from]
-                            .context()
-                            .expect("node should have a context")
-                            .span(),
-                        name.span(),
-                    ));
-                    continue;
-                }
+            match self.find_node_by_name(name.as_str(), expr.syntax().clone()) {
+                Some(to) => {
+                    // Check to see if the node is self-referential
+                    if to == from {
+                        diagnostics.push(self_referential(
+                            name.as_str(),
+                            graph[from]
+                                .context()
+                                .expect("node should have a context")
+                                .span(),
+                            name.span(),
+                        ));
+                        continue;
+                    }
 
-                // Check for a dependency cycle
-                if has_path_connecting(graph as &_, from, to, Some(&mut self.space)) {
-                    diagnostics.push(workflow_reference_cycle(
-                        &graph[from],
-                        r.span(),
-                        name.as_str(),
-                        graph[to]
-                            .context()
-                            .expect("node should have context")
-                            .span(),
-                    ));
-                    continue;
-                }
+                    // Check for a dependency cycle
+                    if has_path_connecting(graph as &_, from, to, Some(&mut self.space)) {
+                        diagnostics.push(workflow_reference_cycle(
+                            &graph[from],
+                            r.span(),
+                            name.as_str(),
+                            graph[to]
+                                .context()
+                                .expect("node should have context")
+                                .span(),
+                        ));
+                        continue;
+                    }
 
-                self.add_dependency_edge(from, to, graph);
-            } else {
-                diagnostics.push(unknown_name(name.as_str(), name.span()));
+                    self.add_dependency_edge(from, to, graph);
+                }
+                _ => {
+                    diagnostics.push(unknown_name(name.as_str(), name.span()));
+                }
             }
         }
     }
@@ -904,25 +958,25 @@ impl WorkflowGraphBuilder {
     ) {
         assert!(from != to, "cannot add a self dependency edge");
 
-        let (from, to) = if let Some((f, t)) =
-            self.ancestor_finder.find_children_of_common_ancestor(
-                graph[from].syntax().ancestors(),
-                graph[to].syntax().ancestors(),
-                SyntaxKind::WorkflowDefinitionNode,
-            ) {
-            let from = self
-                .entry_exits
-                .get(&f)
-                .map(|(entry, _)| *entry)
-                .unwrap_or(from);
-            let to = self
-                .entry_exits
-                .get(&t)
-                .map(|(_, exit)| *exit)
-                .unwrap_or(to);
-            (from, to)
-        } else {
-            (from, to)
+        let (from, to) = match self.ancestor_finder.find_children_of_common_ancestor(
+            graph[from].syntax().ancestors(),
+            graph[to].syntax().ancestors(),
+            SyntaxKind::WorkflowDefinitionNode,
+        ) {
+            Some((f, t)) => {
+                let from = self
+                    .entry_exits
+                    .get(&f)
+                    .map(|(entry, _)| *entry)
+                    .unwrap_or(from);
+                let to = self
+                    .entry_exits
+                    .get(&t)
+                    .map(|(_, exit)| *exit)
+                    .unwrap_or(to);
+                (from, to)
+            }
+            _ => (from, to),
         };
 
         if from == to {

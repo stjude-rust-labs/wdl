@@ -129,15 +129,18 @@ impl Visitor for MisplacedLintDirectiveRule {
                 offset += id.len() - trimmed.len();
 
                 if let Some(elem) = &excepted_element {
-                    if let Some(Some(exceptable_nodes)) = RULE_MAP.get(trimmed) {
-                        if !exceptable_nodes.contains(&elem.kind()) {
-                            state.add(misplaced_lint_directive(
-                                trimmed,
-                                Span::new(start + offset, trimmed.len()),
-                                elem,
-                                exceptable_nodes,
-                            ));
+                    match RULE_MAP.get(trimmed) {
+                        Some(Some(exceptable_nodes)) => {
+                            if !exceptable_nodes.contains(&elem.kind()) {
+                                state.add(misplaced_lint_directive(
+                                    trimmed,
+                                    Span::new(start + offset, trimmed.len()),
+                                    elem,
+                                    exceptable_nodes,
+                                ));
+                            }
                         }
+                        _ => {}
                     }
                 }
 

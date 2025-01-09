@@ -245,8 +245,11 @@ where
                     change,
                 }) => {
                     let mut graph = self.graph.write();
-                    if let Some(node) = graph.get_index(&document) {
-                        graph.get_mut(node).notify_incremental_change(change);
+                    match graph.get_index(&document) {
+                        Some(node) => {
+                            graph.get_mut(node).notify_incremental_change(change);
+                        }
+                        _ => {}
                     }
                 }
                 Request::NotifyChange(NotifyChangeRequest {
@@ -254,8 +257,11 @@ where
                     discard_pending,
                 }) => {
                     let mut graph = self.graph.write();
-                    if let Some(node) = graph.get_index(&document) {
-                        graph.get_mut(node).notify_change(discard_pending);
+                    match graph.get_index(&document) {
+                        Some(node) => {
+                            graph.get_mut(node).notify_change(discard_pending);
+                        }
+                        _ => {}
                     }
                 }
                 Request::Format(FormatRequest {

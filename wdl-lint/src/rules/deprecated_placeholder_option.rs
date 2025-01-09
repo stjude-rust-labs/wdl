@@ -142,21 +142,26 @@ impl Visitor for DeprecatedPlaceholderOptionRule {
             _ => return,
         };
 
-        if let Some(option) = placeholder.option() {
-            let diagnostic = match option {
-                PlaceholderOption::Sep(option) => deprecated_sep_placeholder_option(option.span()),
-                PlaceholderOption::Default(option) => {
-                    deprecated_default_placeholder_option(option.span())
-                }
-                PlaceholderOption::TrueFalse(option) => {
-                    deprecated_true_false_placeholder_option(option.span())
-                }
-            };
-            state.exceptable_add(
-                diagnostic,
-                SyntaxElement::from(placeholder.syntax().clone()),
-                &self.exceptable_nodes(),
-            )
+        match placeholder.option() {
+            Some(option) => {
+                let diagnostic = match option {
+                    PlaceholderOption::Sep(option) => {
+                        deprecated_sep_placeholder_option(option.span())
+                    }
+                    PlaceholderOption::Default(option) => {
+                        deprecated_default_placeholder_option(option.span())
+                    }
+                    PlaceholderOption::TrueFalse(option) => {
+                        deprecated_true_false_placeholder_option(option.span())
+                    }
+                };
+                state.exceptable_add(
+                    diagnostic,
+                    SyntaxElement::from(placeholder.syntax().clone()),
+                    &self.exceptable_nodes(),
+                )
+            }
+            _ => {}
         }
     }
 }

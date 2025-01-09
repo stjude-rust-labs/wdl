@@ -265,14 +265,18 @@ impl Visitor for ExpressionSpacingRule {
                 let mut prev = expr.syntax().prev_sibling_or_token();
                 if prev.is_none() {
                     // No prior elements, so we need to go up a level.
-                    if let Some(parent) = expr.syntax().parent() {
-                        if let Some(parent_prev) = parent.prev_sibling_or_token() {
-                            prev = Some(parent_prev);
+                    match expr.syntax().parent() {
+                        Some(parent) => match parent.prev_sibling_or_token() {
+                            Some(parent_prev) => {
+                                prev = Some(parent_prev);
+                            }
+                            _ => {}
+                        },
+                        _ => {
+                            unreachable!(
+                                "parenthesized expression should have a prior sibling or a parent"
+                            );
                         }
-                    } else {
-                        unreachable!(
-                            "parenthesized expression should have a prior sibling or a parent"
-                        );
                     }
                 }
 
@@ -325,22 +329,25 @@ impl Visitor for ExpressionSpacingRule {
 
                 // Closing parenthesis should not be preceded by a space, but can be preceded by
                 // a newline.
-                if let Some(close_prev) = close.prev_sibling_or_token() {
-                    if close_prev.kind() == SyntaxKind::Whitespace
-                        && !close_prev
-                            .as_token()
-                            .expect("should be a token")
-                            .text()
-                            .contains('\n')
-                    {
-                        // closing parenthesis should not be preceded by whitespace without a
-                        // newline
-                        state.exceptable_add(
-                            disallowed_space(close_prev.text_range().to_span()),
-                            SyntaxElement::from(expr.syntax().clone()),
-                            &self.exceptable_nodes(),
-                        );
+                match close.prev_sibling_or_token() {
+                    Some(close_prev) => {
+                        if close_prev.kind() == SyntaxKind::Whitespace
+                            && !close_prev
+                                .as_token()
+                                .expect("should be a token")
+                                .text()
+                                .contains('\n')
+                        {
+                            // closing parenthesis should not be preceded by whitespace without a
+                            // newline
+                            state.exceptable_add(
+                                disallowed_space(close_prev.text_range().to_span()),
+                                SyntaxElement::from(expr.syntax().clone()),
+                                &self.exceptable_nodes(),
+                            );
+                        }
                     }
+                    _ => {}
                 }
             }
             Expr::LogicalAnd(_) | Expr::LogicalOr(_) => {
@@ -611,12 +618,15 @@ impl Visitor for ExpressionSpacingRule {
                         &self.exceptable_nodes(),
                     );
                 }
-                if let Some(ws) = after_ws {
-                    state.exceptable_add(
-                        disallowed_space(ws.text_range().to_span()),
-                        SyntaxElement::from(acc.syntax().clone()),
-                        &self.exceptable_nodes(),
-                    );
+                match after_ws {
+                    Some(ws) => {
+                        state.exceptable_add(
+                            disallowed_space(ws.text_range().to_span()),
+                            SyntaxElement::from(acc.syntax().clone()),
+                            &self.exceptable_nodes(),
+                        );
+                    }
+                    _ => {}
                 }
             }
             Expr::Literal(l) => {
@@ -752,38 +762,41 @@ impl Visitor for ExpressionSpacingRule {
             return;
         }
 
-        if let Some(assign) = decl
+        match decl
             .syntax()
             .descendants_with_tokens()
             .find(|t| t.kind() == SyntaxKind::Assignment)
         {
-            let before_ws =
-                assign.prev_sibling_or_token().map(|t| t.kind()) == Some(SyntaxKind::Whitespace);
-            let after_ws =
-                assign.next_sibling_or_token().map(|t| t.kind()) == Some(SyntaxKind::Whitespace);
+            Some(assign) => {
+                let before_ws = assign.prev_sibling_or_token().map(|t| t.kind())
+                    == Some(SyntaxKind::Whitespace);
+                let after_ws = assign.next_sibling_or_token().map(|t| t.kind())
+                    == Some(SyntaxKind::Whitespace);
 
-            if !before_ws && !after_ws {
-                // assignments must be surrounded by whitespace
-                state.exceptable_add(
-                    assignment_missing_surrounding_whitespace(assign.text_range().to_span()),
-                    SyntaxElement::from(decl.syntax().clone()),
-                    &self.exceptable_nodes(),
-                );
-            } else if !before_ws {
-                // assignments must be preceded by whitespace
-                state.exceptable_add(
-                    assignment_missing_preceding_whitespace(assign.text_range().to_span()),
-                    SyntaxElement::from(decl.syntax().clone()),
-                    &self.exceptable_nodes(),
-                );
-            } else if !after_ws {
-                // assignments must be followed by whitespace
-                state.exceptable_add(
-                    assignment_missing_following_whitespace(assign.text_range().to_span()),
-                    SyntaxElement::from(decl.syntax().clone()),
-                    &self.exceptable_nodes(),
-                );
+                if !before_ws && !after_ws {
+                    // assignments must be surrounded by whitespace
+                    state.exceptable_add(
+                        assignment_missing_surrounding_whitespace(assign.text_range().to_span()),
+                        SyntaxElement::from(decl.syntax().clone()),
+                        &self.exceptable_nodes(),
+                    );
+                } else if !before_ws {
+                    // assignments must be preceded by whitespace
+                    state.exceptable_add(
+                        assignment_missing_preceding_whitespace(assign.text_range().to_span()),
+                        SyntaxElement::from(decl.syntax().clone()),
+                        &self.exceptable_nodes(),
+                    );
+                } else if !after_ws {
+                    // assignments must be followed by whitespace
+                    state.exceptable_add(
+                        assignment_missing_following_whitespace(assign.text_range().to_span()),
+                        SyntaxElement::from(decl.syntax().clone()),
+                        &self.exceptable_nodes(),
+                    );
+                }
             }
+            _ => {}
         }
     }
 }

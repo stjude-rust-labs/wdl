@@ -4385,8 +4385,11 @@ task test {
 
                 // Collect only the non-interpolated strings in the source
                 if let Expr::Literal(LiteralExpr::String(s)) = expr {
-                    if let Some(s) = s.text() {
-                        self.0.push(s.as_str().to_string());
+                    match s.text() {
+                        Some(s) => {
+                            self.0.push(s.as_str().to_string());
+                        }
+                        _ => {}
                     }
                 }
             }

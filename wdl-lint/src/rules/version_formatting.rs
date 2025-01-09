@@ -121,35 +121,38 @@ impl Visitor for VersionFormattingRule {
         if let Some(prev_ws) = stmt.syntax().prev_sibling_or_token() {
             let ws = prev_ws.as_token().expect("expected a token").text();
             // If there's a previous sibling or token, it must be a comment
-            if let Some(_prev_comment) = prev_ws.prev_sibling_or_token() {
-                if ws != "\n\n" && ws != "\r\n\r\n" {
-                    // There's a special case where the blank line has extra whitespace
-                    // but that doesn't appear in the printed diagnostic.
-                    let mut diagnostic =
-                        expected_blank_line_before_version(prev_ws.text_range().to_span());
+            match prev_ws.prev_sibling_or_token() {
+                Some(_prev_comment) => {
+                    if ws != "\n\n" && ws != "\r\n\r\n" {
+                        // There's a special case where the blank line has extra whitespace
+                        // but that doesn't appear in the printed diagnostic.
+                        let mut diagnostic =
+                            expected_blank_line_before_version(prev_ws.text_range().to_span());
 
-                    if ws.chars().filter(|&c| c == '\n').count() == 2 {
-                        for (line, start, end) in lines_with_offset(ws) {
-                            if !line.is_empty() {
-                                let end_offset = if ws.ends_with('\n') {
-                                    1
-                                } else if ws.ends_with("\r\n") {
-                                    2
-                                } else {
-                                    0
-                                };
+                        if ws.chars().filter(|&c| c == '\n').count() == 2 {
+                            for (line, start, end) in lines_with_offset(ws) {
+                                if !line.is_empty() {
+                                    let end_offset = if ws.ends_with('\n') {
+                                        1
+                                    } else if ws.ends_with("\r\n") {
+                                        2
+                                    } else {
+                                        0
+                                    };
 
-                                diagnostic = diagnostic.with_highlight(Span::new(
-                                    prev_ws.text_range().to_span().start() + start,
-                                    end - start - end_offset,
-                                ));
+                                    diagnostic = diagnostic.with_highlight(Span::new(
+                                        prev_ws.text_range().to_span().start() + start,
+                                        end - start - end_offset,
+                                    ));
+                                }
                             }
                         }
+                        state.add(diagnostic);
                     }
-                    state.add(diagnostic);
                 }
-            } else {
-                state.add(whitespace_before_version(prev_ws.text_range().to_span()));
+                _ => {
+                    state.add(whitespace_before_version(prev_ws.text_range().to_span()));
+                }
             }
         }
 
@@ -175,15 +178,22 @@ impl Visitor for VersionFormattingRule {
         }
 
         // 3. Handle whitespace after the version statement
-        if let Some(next) = stmt.syntax().next_sibling_or_token() {
-            if let Some(ws) = next.as_token().and_then(|s| Whitespace::cast(s.clone())) {
-                let s = ws.as_str();
-                // Don't add diagnostic if there's nothing but whitespace after the version
-                // statement
-                if s != "\n\n" && s != "\r\n\r\n" && next.next_sibling_or_token().is_some() {
-                    state.add(expected_blank_line_after_version(ws.span()));
+        match stmt.syntax().next_sibling_or_token() {
+            Some(next) => {
+                match next.as_token().and_then(|s| Whitespace::cast(s.clone())) {
+                    Some(ws) => {
+                        let s = ws.as_str();
+                        // Don't add diagnostic if there's nothing but whitespace after the version
+                        // statement
+                        if s != "\n\n" && s != "\r\n\r\n" && next.next_sibling_or_token().is_some()
+                        {
+                            state.add(expected_blank_line_after_version(ws.span()));
+                        }
+                    }
+                    _ => {}
                 }
             }
+            _ => {}
         } // else version is the last item in the document
     }
 }

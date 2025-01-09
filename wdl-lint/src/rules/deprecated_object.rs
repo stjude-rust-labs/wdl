@@ -95,12 +95,13 @@ impl Visitor for DeprecatedObjectRule {
             return;
         }
 
-        if let Type::Object(ty) = decl.ty() {
-            state.exceptable_add(
+        match decl.ty() {
+            Type::Object(ty) => state.exceptable_add(
                 deprecated_object_use(ty.span()),
                 SyntaxElement::from(decl.syntax().clone()),
                 &self.exceptable_nodes(),
-            )
+            ),
+            _ => {}
         }
     }
 
@@ -114,12 +115,13 @@ impl Visitor for DeprecatedObjectRule {
             return;
         }
 
-        if let Type::Object(ty) = decl.ty() {
-            state.exceptable_add(
+        match decl.ty() {
+            Type::Object(ty) => state.exceptable_add(
                 deprecated_object_use(ty.span()),
                 SyntaxElement::from(decl.syntax().clone()),
                 &self.exceptable_nodes(),
-            )
+            ),
+            _ => {}
         }
     }
 }

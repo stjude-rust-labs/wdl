@@ -406,29 +406,38 @@ impl Visitor for BlankLinesBetweenElementsRule {
             .syntax()
             .prev_sibling_or_token()
             .and_then(SyntaxElement::into_token);
-        if let Some(p) = prior {
-            if p.kind() == SyntaxKind::Whitespace {
-                let count = p.text().chars().filter(|c| *c == '\n').count();
-                // If we're in an `input` or `output`, we should have no blank lines, so only
-                // one `\n` is allowed.
-                if self.state == State::InputSection || self.state == State::OutputSection {
-                    if count > 1 {
-                        state.exceptable_add(
-                            excess_blank_line(p.text_range().to_span()),
-                            SyntaxElement::from(decl.syntax().clone()),
-                            &self.exceptable_nodes(),
-                        );
-                    }
-                } else {
-                    let first = is_first_body(decl.syntax());
+        match prior {
+            Some(p) => {
+                if p.kind() == SyntaxKind::Whitespace {
+                    let count = p.text().chars().filter(|c| *c == '\n').count();
+                    // If we're in an `input` or `output`, we should have no blank lines, so only
+                    // one `\n` is allowed.
+                    if self.state == State::InputSection || self.state == State::OutputSection {
+                        if count > 1 {
+                            state.exceptable_add(
+                                excess_blank_line(p.text_range().to_span()),
+                                SyntaxElement::from(decl.syntax().clone()),
+                                &self.exceptable_nodes(),
+                            );
+                        }
+                    } else {
+                        let first = is_first_body(decl.syntax());
 
-                    let prev = skip_preceding_comments(decl.syntax());
+                        let prev = skip_preceding_comments(decl.syntax());
 
-                    if first {
-                        check_prior_spacing(&prev, state, true, false, &self.exceptable_nodes());
+                        if first {
+                            check_prior_spacing(
+                                &prev,
+                                state,
+                                true,
+                                false,
+                                &self.exceptable_nodes(),
+                            );
+                        }
                     }
                 }
             }
+            _ => {}
         }
     }
 
@@ -442,29 +451,38 @@ impl Visitor for BlankLinesBetweenElementsRule {
         let prior = actual_start
             .prev_sibling_or_token()
             .and_then(SyntaxElement::into_token);
-        if let Some(p) = prior {
-            if p.kind() == SyntaxKind::Whitespace {
-                let count = p.text().chars().filter(|c| *c == '\n').count();
-                // If we're in an `input` or `output`, we should have no blank lines, so only
-                // one `\n` is allowed.
-                if self.state == State::InputSection || self.state == State::OutputSection {
-                    if count > 1 {
-                        state.exceptable_add(
-                            excess_blank_line(p.text_range().to_span()),
-                            SyntaxElement::from(decl.syntax().clone()),
-                            &self.exceptable_nodes(),
-                        );
-                    }
-                } else {
-                    let first = is_first_body(decl.syntax());
+        match prior {
+            Some(p) => {
+                if p.kind() == SyntaxKind::Whitespace {
+                    let count = p.text().chars().filter(|c| *c == '\n').count();
+                    // If we're in an `input` or `output`, we should have no blank lines, so only
+                    // one `\n` is allowed.
+                    if self.state == State::InputSection || self.state == State::OutputSection {
+                        if count > 1 {
+                            state.exceptable_add(
+                                excess_blank_line(p.text_range().to_span()),
+                                SyntaxElement::from(decl.syntax().clone()),
+                                &self.exceptable_nodes(),
+                            );
+                        }
+                    } else {
+                        let first = is_first_body(decl.syntax());
 
-                    let prev = skip_preceding_comments(decl.syntax());
+                        let prev = skip_preceding_comments(decl.syntax());
 
-                    if first {
-                        check_prior_spacing(&prev, state, true, false, &self.exceptable_nodes());
+                        if first {
+                            check_prior_spacing(
+                                &prev,
+                                state,
+                                true,
+                                false,
+                                &self.exceptable_nodes(),
+                            );
+                        }
                     }
                 }
             }
+            _ => {}
         }
     }
 
@@ -552,71 +570,74 @@ fn check_prior_spacing(
     first: bool,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
-    if let Some(prior) = syntax.prev_sibling_or_token() {
-        let span = match prior {
-            NodeOrToken::Token(ref t) => Span::new(
-                t.text_range().start().into(),
-                (syntax.text_range().start() - t.text_range().start()).into(),
-            ),
-            NodeOrToken::Node(ref n) => Span::new(
-                n.last_token()
-                    .expect("node should have tokens")
-                    .text_range()
-                    .start()
-                    .into(),
-                (syntax.text_range().start()
-                    - n.last_token()
+    match syntax.prev_sibling_or_token() {
+        Some(prior) => {
+            let span = match prior {
+                NodeOrToken::Token(ref t) => Span::new(
+                    t.text_range().start().into(),
+                    (syntax.text_range().start() - t.text_range().start()).into(),
+                ),
+                NodeOrToken::Node(ref n) => Span::new(
+                    n.last_token()
                         .expect("node should have tokens")
                         .text_range()
-                        .start())
-                .into(),
-            ),
-        };
-        match prior.kind() {
-            SyntaxKind::Whitespace => {
-                let count = prior
-                    .as_token()
-                    .expect("should be a token")
-                    .text()
-                    .chars()
-                    .filter(|c| *c == '\n')
-                    .count();
-                if first || !element_spacing_required {
-                    // first element cannot have a blank line before it.
-                    // Whitespace following the version statement is handled by the
-                    // `VersionFormatting` rule.
-                    if count > 1
-                        && prior
-                            .prev_sibling_or_token()
-                            .is_some_and(|p| p.kind() != SyntaxKind::VersionStatementNode)
-                    {
+                        .start()
+                        .into(),
+                    (syntax.text_range().start()
+                        - n.last_token()
+                            .expect("node should have tokens")
+                            .text_range()
+                            .start())
+                    .into(),
+                ),
+            };
+            match prior.kind() {
+                SyntaxKind::Whitespace => {
+                    let count = prior
+                        .as_token()
+                        .expect("should be a token")
+                        .text()
+                        .chars()
+                        .filter(|c| *c == '\n')
+                        .count();
+                    if first || !element_spacing_required {
+                        // first element cannot have a blank line before it.
+                        // Whitespace following the version statement is handled by the
+                        // `VersionFormatting` rule.
+                        if count > 1
+                            && prior
+                                .prev_sibling_or_token()
+                                .is_some_and(|p| p.kind() != SyntaxKind::VersionStatementNode)
+                        {
+                            state.exceptable_add(
+                                excess_blank_line(prior.text_range().to_span()),
+                                SyntaxElement::from(syntax.clone()),
+                                exceptable_nodes,
+                            );
+                        }
+                    } else if count < 2 && element_spacing_required {
                         state.exceptable_add(
-                            excess_blank_line(prior.text_range().to_span()),
+                            missing_blank_line(span),
                             SyntaxElement::from(syntax.clone()),
                             exceptable_nodes,
                         );
                     }
-                } else if count < 2 && element_spacing_required {
-                    state.exceptable_add(
-                        missing_blank_line(span),
-                        SyntaxElement::from(syntax.clone()),
-                        exceptable_nodes,
-                    );
                 }
-            }
-            // Something other than whitespace precedes
-            _ => {
-                // If we require between element spacing and are not the first element,
-                // we're missing a blank line.
-                if element_spacing_required && !first {
-                    state.exceptable_add(
-                        missing_blank_line(span),
-                        SyntaxElement::from(syntax.clone()),
-                        exceptable_nodes,
-                    );
+                // Something other than whitespace precedes
+                _ => {
+                    // If we require between element spacing and are not the first element,
+                    // we're missing a blank line.
+                    if element_spacing_required && !first {
+                        state.exceptable_add(
+                            missing_blank_line(span),
+                            SyntaxElement::from(syntax.clone()),
+                            exceptable_nodes,
+                        );
+                    }
                 }
             }
         }
+        _ => {}
     }
 }
 
@@ -630,17 +651,20 @@ fn check_last_token(
         .last_token()
         .expect("node should have last token")
         .prev_token();
-    if let Some(prev) = prev {
-        if prev.kind() == SyntaxKind::Whitespace {
-            let count = prev.text().chars().filter(|c| *c == '\n').count();
-            if count > 1 {
-                state.exceptable_add(
-                    excess_blank_line(prev.text_range().to_span()),
-                    SyntaxElement::from(syntax.clone()),
-                    exceptable_nodes,
-                );
+    match prev {
+        Some(prev) => {
+            if prev.kind() == SyntaxKind::Whitespace {
+                let count = prev.text().chars().filter(|c| *c == '\n').count();
+                if count > 1 {
+                    state.exceptable_add(
+                        excess_blank_line(prev.text_range().to_span()),
+                        SyntaxElement::from(syntax.clone()),
+                        exceptable_nodes,
+                    );
+                }
             }
         }
+        _ => {}
     }
 }
 
@@ -660,21 +684,24 @@ fn skip_preceding_comments(syntax: &SyntaxNode) -> NodeOrToken<SyntaxNode, Synta
                 // A preceding comment on a blank line is considered to belong to the element.
                 // Otherwise, the comment "belongs" to whatever
                 // else is on that line.
-                if let Some(before_cur) = cur.prev_token() {
-                    match before_cur.kind() {
-                        SyntaxKind::Whitespace => {
-                            if before_cur.text().contains('\n') {
-                                // The 'cur' comment is on is on its own line.
-                                // It "belongs" to the current element.
-                                preceding_comments.push(cur.clone());
+                match cur.prev_token() {
+                    Some(before_cur) => {
+                        match before_cur.kind() {
+                            SyntaxKind::Whitespace => {
+                                if before_cur.text().contains('\n') {
+                                    // The 'cur' comment is on is on its own line.
+                                    // It "belongs" to the current element.
+                                    preceding_comments.push(cur.clone());
+                                }
+                            }
+                            _ => {
+                                // The 'cur' comment is on the same line as this
+                                // token. It "belongs" to whatever is currently
+                                // being processed.
                             }
                         }
-                        _ => {
-                            // The 'cur' comment is on the same line as this
-                            // token. It "belongs" to whatever is currently
-                            // being processed.
-                        }
                     }
+                    _ => {}
                 }
             }
             SyntaxKind::Whitespace => {

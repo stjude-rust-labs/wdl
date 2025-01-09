@@ -177,10 +177,9 @@ impl Visitor for KeyValuePairsRule {
             if next_newline.is_none() {
                 // No newline found, report missing
                 let s = child.syntax().text_range().to_span();
-                let end = if let Some(next) = find_next_comma(child.syntax()).0 {
-                    next.text_range().end()
-                } else {
-                    close_delim.text_range().start()
+                let end = match find_next_comma(child.syntax()).0 {
+                    Some(next) => next.text_range().end(),
+                    _ => close_delim.text_range().start(),
                 };
                 state.exceptable_add(
                     missing_trailing_newline(Span::new(s.start(), usize::from(end) - s.start())),
@@ -190,55 +189,63 @@ impl Visitor for KeyValuePairsRule {
             }
             // Check indentation. If there is no prior whitespace, that will have been
             // reported already.
-            if let Some(prior_ws) = child.syntax().prev_sibling_or_token() {
-                if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
-                {
-                    // If there was no newline, that is already reported
-                    let ws = prior_ws.to_string();
-                    let ws = ws.split('\n').last().expect("should have a last element");
-                    let expected_ws = parent_ws.to_owned() + INDENT;
+            match child.syntax().prev_sibling_or_token() {
+                Some(prior_ws) => {
+                    if prior_ws.kind() == SyntaxKind::Whitespace
+                        && prior_ws.to_string().contains('\n')
+                    {
+                        // If there was no newline, that is already reported
+                        let ws = prior_ws.to_string();
+                        let ws = ws.split('\n').last().expect("should have a last element");
+                        let expected_ws = parent_ws.to_owned() + INDENT;
 
-                    if ws != expected_ws {
-                        state.exceptable_add(
-                            incorrect_indentation(
-                                prior_ws.text_range().to_span(),
-                                &expected_ws,
-                                ws,
-                            ),
-                            SyntaxElement::from(child.syntax().clone()),
-                            &self.exceptable_nodes(),
-                        );
+                        if ws != expected_ws {
+                            state.exceptable_add(
+                                incorrect_indentation(
+                                    prior_ws.text_range().to_span(),
+                                    &expected_ws,
+                                    ws,
+                                ),
+                                SyntaxElement::from(child.syntax().clone()),
+                                &self.exceptable_nodes(),
+                            );
+                        }
                     }
                 }
+                _ => {}
             }
         }
 
         // No need to check the closing delimiter as the last element must have
         // a newline. But we should check the indentation of the closing delimiter.
-        if let Some(prior_ws) = close_delim.prev_sibling_or_token() {
-            if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n') {
-                let ws = prior_ws.to_string();
-                let ws = ws
-                    .split('\n')
-                    .last()
-                    .expect("there should be a last element");
-                let expected_ws = parent_ws.to_owned();
+        match close_delim.prev_sibling_or_token() {
+            Some(prior_ws) => {
+                if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
+                {
+                    let ws = prior_ws.to_string();
+                    let ws = ws
+                        .split('\n')
+                        .last()
+                        .expect("there should be a last element");
+                    let expected_ws = parent_ws.to_owned();
 
-                if ws != expected_ws {
-                    state.exceptable_add(
-                        incorrect_indentation(
-                            Span::new(
-                                usize::from(close_delim.text_range().start()) - ws.len(),
-                                ws.len(),
+                    if ws != expected_ws {
+                        state.exceptable_add(
+                            incorrect_indentation(
+                                Span::new(
+                                    usize::from(close_delim.text_range().start()) - ws.len(),
+                                    ws.len(),
+                                ),
+                                &expected_ws,
+                                ws,
                             ),
-                            &expected_ws,
-                            ws,
-                        ),
-                        SyntaxElement::from(item.syntax().clone()),
-                        &self.exceptable_nodes(),
-                    );
+                            SyntaxElement::from(item.syntax().clone()),
+                            &self.exceptable_nodes(),
+                        );
+                    }
                 }
             }
+            _ => {}
         }
     }
 
@@ -298,10 +305,9 @@ impl Visitor for KeyValuePairsRule {
             if next_newline.is_none() {
                 // No newline found, report missing
                 let s = child.syntax().text_range().to_span();
-                let end = if let Some(next) = find_next_comma(child.syntax()).0 {
-                    next.text_range().end()
-                } else {
-                    close_delim.text_range().start()
+                let end = match find_next_comma(child.syntax()).0 {
+                    Some(next) => next.text_range().end(),
+                    _ => close_delim.text_range().start(),
                 };
                 state.exceptable_add(
                     missing_trailing_newline(Span::new(s.start(), usize::from(end) - s.start())),
@@ -311,58 +317,66 @@ impl Visitor for KeyValuePairsRule {
             }
             // Check indentation. If there is no prior whitespace, that will have been
             // reported already.
-            if let Some(prior_ws) = child.syntax().prev_sibling_or_token() {
-                if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
-                {
-                    // If there was no newline, that is already reported
-                    let ws = prior_ws.to_string();
-                    let ws = ws
-                        .split('\n')
-                        .last()
-                        .expect("there should be a last element");
-                    let expected_ws = parent_ws.to_owned() + INDENT;
+            match child.syntax().prev_sibling_or_token() {
+                Some(prior_ws) => {
+                    if prior_ws.kind() == SyntaxKind::Whitespace
+                        && prior_ws.to_string().contains('\n')
+                    {
+                        // If there was no newline, that is already reported
+                        let ws = prior_ws.to_string();
+                        let ws = ws
+                            .split('\n')
+                            .last()
+                            .expect("there should be a last element");
+                        let expected_ws = parent_ws.to_owned() + INDENT;
 
-                    if ws != expected_ws {
-                        state.exceptable_add(
-                            incorrect_indentation(
-                                prior_ws.text_range().to_span(),
-                                &expected_ws,
-                                ws,
-                            ),
-                            SyntaxElement::from(child.syntax().clone()),
-                            &self.exceptable_nodes(),
-                        );
+                        if ws != expected_ws {
+                            state.exceptable_add(
+                                incorrect_indentation(
+                                    prior_ws.text_range().to_span(),
+                                    &expected_ws,
+                                    ws,
+                                ),
+                                SyntaxElement::from(child.syntax().clone()),
+                                &self.exceptable_nodes(),
+                            );
+                        }
                     }
                 }
+                _ => {}
             }
         }
 
         // No need to check the closing delimiter as the last element must have
         // a newline. But we should check the indentation of the closing delimiter.
-        if let Some(prior_ws) = close_delim.prev_sibling_or_token() {
-            if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n') {
-                let ws = prior_ws.to_string();
-                let ws = ws
-                    .split('\n')
-                    .last()
-                    .expect("there should be a last element");
-                let expected_ws = parent_ws.to_owned();
+        match close_delim.prev_sibling_or_token() {
+            Some(prior_ws) => {
+                if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
+                {
+                    let ws = prior_ws.to_string();
+                    let ws = ws
+                        .split('\n')
+                        .last()
+                        .expect("there should be a last element");
+                    let expected_ws = parent_ws.to_owned();
 
-                if ws != expected_ws {
-                    state.exceptable_add(
-                        incorrect_indentation(
-                            Span::new(
-                                usize::from(close_delim.text_range().start()) - ws.len(),
-                                ws.len(),
+                    if ws != expected_ws {
+                        state.exceptable_add(
+                            incorrect_indentation(
+                                Span::new(
+                                    usize::from(close_delim.text_range().start()) - ws.len(),
+                                    ws.len(),
+                                ),
+                                &expected_ws,
+                                ws,
                             ),
-                            &expected_ws,
-                            ws,
-                        ),
-                        SyntaxElement::from(item.syntax().clone()),
-                        &self.exceptable_nodes(),
-                    );
+                            SyntaxElement::from(item.syntax().clone()),
+                            &self.exceptable_nodes(),
+                        );
+                    }
                 }
             }
+            _ => {}
         }
     }
 }
