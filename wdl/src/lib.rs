@@ -110,7 +110,7 @@ use wdl_analysis::Analyzer;
 #[cfg(feature = "analysis")]
 use wdl_analysis::DiagnosticsConfig;
 #[cfg(any(feature = "analysis", feature = "engine"))]
-use crate::analysis::path_to_uri;
+use wdl_analysis::path_to_uri;
 #[cfg(feature = "analysis")]
 use wdl_analysis::rules as analysis_rules;
 #[cfg(feature = "ast")]
@@ -122,10 +122,15 @@ pub use wdl_doc as doc;
 #[cfg(feature = "engine")]
 #[doc(inline)]
 pub use wdl_engine as engine;
+#[cfg(feature = "engine")]
 use wdl_engine::Engine;
+#[cfg(feature = "engine")]
 use wdl_engine::EvaluationError;
+#[cfg(feature = "engine")]
 use wdl_engine::Inputs;
+#[cfg(feature = "engine")]
 use wdl_engine::local::LocalTaskExecutionBackend;
+#[cfg(feature = "engine")]
 use wdl_engine::v1::TaskEvaluator;
 #[cfg(feature = "format")]
 #[doc(inline)]
@@ -133,10 +138,12 @@ pub use wdl_format as format;
 #[cfg(feature = "grammar")]
 #[doc(inline)]
 pub use wdl_grammar as grammar;
+#[cfg(feature = "engine")]
+use wdl_grammar::Diagnostic;
+#[cfg(feature = "engine")]
+use wdl_grammar::Severity;
 #[cfg(feature = "lint")]
 #[doc(inline)]
-use wdl_grammar::Diagnostic;
-use wdl_grammar::Severity;
 pub use wdl_lint as lint;
 #[cfg(feature = "analysis")]
 use wdl_lint::rules as lint_rules;
