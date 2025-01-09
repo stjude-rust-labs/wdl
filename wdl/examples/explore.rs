@@ -162,9 +162,12 @@ fn explore_task(task: &TaskDefinition) {
         explore_input(&input);
     }
 
-    if let Some(output) = task.output() {
-        println!("\n### Outputs");
-        explore_output(&output);
+    match task.output() {
+        Some(output) => {
+            println!("\n### Outputs");
+            explore_output(&output);
+        }
+        _ => {}
     }
 }
 
@@ -182,8 +185,11 @@ fn explore_workflow(workflow: &WorkflowDefinition) {
         explore_input(&input);
     }
 
-    if let Some(output) = workflow.output() {
-        println!("\n### Outputs");
-        explore_output(&output);
+    match workflow.output() {
+        Some(output) => {
+            println!("\n### Outputs");
+            explore_output(&output);
+        }
+        _ => {}
     }
 }
