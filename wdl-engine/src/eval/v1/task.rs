@@ -472,8 +472,8 @@ impl<'a> TaskEvaluator<'a> {
 
         let (value, span) = match inputs.get(name.as_str()) {
             Some(input) => (input.clone(), name.span()),
-            None => match decl.expr() {
-                Some(expr) => {
+            None => {
+                if let Some(expr) = decl.expr() {
                     debug!(
                         "evaluating input `{name}` for task `{task}` in `{uri}`",
                         name = name.as_str(),
@@ -490,12 +490,11 @@ impl<'a> TaskEvaluator<'a> {
                     ));
                     let value = evaluator.evaluate_expr(&expr)?;
                     (value, expr.span())
-                }
-                _ => {
+                } else {
                     assert!(decl.ty().is_optional(), "type should be optional");
                     (Value::None, name.span())
                 }
-            },
+            }
         };
 
         let value = value.coerce(&ty).map_err(|e| {
@@ -575,17 +574,12 @@ impl<'a> TaskEvaluator<'a> {
         let version = document.version().expect("document should have version");
         for item in section.items() {
             let name = item.name();
-            match inputs.requirement(name.as_str()) {
-                Some(value) => {
-                    requirements.insert(name.as_str().to_string(), value.clone());
-                    continue;
-                }
-                _ => {
-                    if let Some(value) = inputs.hint(name.as_str()) {
-                        hints.insert(name.as_str().to_string(), value.clone());
-                        continue;
-                    }
-                }
+            if let Some(value) = inputs.requirement(name.as_str()) {
+                requirements.insert(name.as_str().to_string(), value.clone());
+                continue;
+            } else if let Some(value) = inputs.hint(name.as_str()) {
+                hints.insert(name.as_str().to_string(), value.clone());
+                continue;
             }
 
             let mut evaluator = ExprEvaluator::new(TaskEvaluationContext::new(
@@ -745,44 +739,33 @@ impl<'a> TaskEvaluator<'a> {
         ));
 
         let mut command = String::new();
-        match section.strip_whitespace() {
-            Some(parts) => {
-                for part in parts {
-                    match part {
-                        StrippedCommandPart::Text(t) => {
-                            command.push_str(t.as_str());
-                        }
-                        StrippedCommandPart::Placeholder(placeholder) => {
-                            evaluator.evaluate_placeholder(
-                                &placeholder,
-                                &mut command,
-                                mapped_paths,
-                            )?;
-                        }
+        if let Some(parts) = section.strip_whitespace() {
+            for part in parts {
+                match part {
+                    StrippedCommandPart::Text(t) => {
+                        command.push_str(t.as_str());
+                    }
+                    StrippedCommandPart::Placeholder(placeholder) => {
+                        evaluator.evaluate_placeholder(&placeholder, &mut command, mapped_paths)?;
                     }
                 }
             }
-            _ => {
-                warn!(
-                    "command for task `{task}` in `{uri}` has mixed indentation; whitespace \
-                     stripping was skipped",
-                    task = task.name(),
-                    uri = document.uri(),
-                );
+        } else {
+            warn!(
+                "command for task `{task}` in `{uri}` has mixed indentation; whitespace stripping \
+                 was skipped",
+                task = task.name(),
+                uri = document.uri(),
+            );
 
-                let heredoc = section.is_heredoc();
-                for part in section.parts() {
-                    match part {
-                        CommandPart::Text(t) => {
-                            t.unescape_to(heredoc, &mut command);
-                        }
-                        CommandPart::Placeholder(placeholder) => {
-                            evaluator.evaluate_placeholder(
-                                &placeholder,
-                                &mut command,
-                                mapped_paths,
-                            )?;
-                        }
+            let heredoc = section.is_heredoc();
+            for part in section.parts() {
+                match part {
+                    CommandPart::Text(t) => {
+                        t.unescape_to(heredoc, &mut command);
+                    }
+                    CommandPart::Placeholder(placeholder) => {
+                        evaluator.evaluate_placeholder(&placeholder, &mut command, mapped_paths)?;
                     }
                 }
             }

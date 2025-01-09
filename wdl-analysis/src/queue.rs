@@ -245,18 +245,18 @@ where
                     change,
                 }) => {
                     let mut graph = self.graph.write();
-                    match graph.get_index(&document) { Some(node) => {
+                    if let Some(node) = graph.get_index(&document) {
                         graph.get_mut(node).notify_incremental_change(change);
-                    } _ => {}}
+                    }
                 }
                 Request::NotifyChange(NotifyChangeRequest {
                     document,
                     discard_pending,
                 }) => {
                     let mut graph = self.graph.write();
-                    match graph.get_index(&document) { Some(node) => {
+                    if let Some(node) = graph.get_index(&document) {
                         graph.get_mut(node).notify_change(discard_pending);
-                    } _ => {}}
+                    }
                 }
                 Request::Format(FormatRequest {
                     document,

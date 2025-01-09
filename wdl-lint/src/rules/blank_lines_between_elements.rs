@@ -406,7 +406,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
             .syntax()
             .prev_sibling_or_token()
             .and_then(SyntaxElement::into_token);
-        match prior { Some(p) => {
+        if let Some(p) = prior {
             if p.kind() == SyntaxKind::Whitespace {
                 let count = p.text().chars().filter(|c| *c == '\n').count();
                 // If we're in an `input` or `output`, we should have no blank lines, so only
@@ -425,17 +425,11 @@ impl Visitor for BlankLinesBetweenElementsRule {
                     let prev = skip_preceding_comments(decl.syntax());
 
                     if first {
-                        check_prior_spacing(
-                            &prev,
-                            state,
-                            true,
-                            false,
-                            &self.exceptable_nodes(),
-                        );
+                        check_prior_spacing(&prev, state, true, false, &self.exceptable_nodes());
                     }
                 }
             }
-        } _ => {}}
+        }
     }
 
     fn bound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &BoundDecl) {
@@ -448,7 +442,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         let prior = actual_start
             .prev_sibling_or_token()
             .and_then(SyntaxElement::into_token);
-        match prior { Some(p) => {
+        if let Some(p) = prior {
             if p.kind() == SyntaxKind::Whitespace {
                 let count = p.text().chars().filter(|c| *c == '\n').count();
                 // If we're in an `input` or `output`, we should have no blank lines, so only
@@ -467,17 +461,11 @@ impl Visitor for BlankLinesBetweenElementsRule {
                     let prev = skip_preceding_comments(decl.syntax());
 
                     if first {
-                        check_prior_spacing(
-                            &prev,
-                            state,
-                            true,
-                            false,
-                            &self.exceptable_nodes(),
-                        );
+                        check_prior_spacing(&prev, state, true, false, &self.exceptable_nodes());
                     }
                 }
             }
-        } _ => {}}
+        }
     }
 
     fn conditional_statement(
@@ -564,7 +552,7 @@ fn check_prior_spacing(
     first: bool,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
-    match syntax.prev_sibling_or_token() { Some(prior) => {
+    if let Some(prior) = syntax.prev_sibling_or_token() {
         let span = match prior {
             NodeOrToken::Token(ref t) => Span::new(
                 t.text_range().start().into(),
@@ -629,7 +617,7 @@ fn check_prior_spacing(
                 }
             }
         }
-    } _ => {}}
+    }
 }
 
 /// Check that the node's last token does not have a blank before it.
@@ -642,7 +630,7 @@ fn check_last_token(
         .last_token()
         .expect("node should have last token")
         .prev_token();
-    match prev { Some(prev) => {
+    if let Some(prev) = prev {
         if prev.kind() == SyntaxKind::Whitespace {
             let count = prev.text().chars().filter(|c| *c == '\n').count();
             if count > 1 {
@@ -653,7 +641,7 @@ fn check_last_token(
                 );
             }
         }
-    } _ => {}}
+    }
 }
 
 /// For a given node, walk background until a non-comment or blank line is
@@ -672,7 +660,7 @@ fn skip_preceding_comments(syntax: &SyntaxNode) -> NodeOrToken<SyntaxNode, Synta
                 // A preceding comment on a blank line is considered to belong to the element.
                 // Otherwise, the comment "belongs" to whatever
                 // else is on that line.
-                match cur.prev_token() { Some(before_cur) => {
+                if let Some(before_cur) = cur.prev_token() {
                     match before_cur.kind() {
                         SyntaxKind::Whitespace => {
                             if before_cur.text().contains('\n') {
@@ -687,7 +675,7 @@ fn skip_preceding_comments(syntax: &SyntaxNode) -> NodeOrToken<SyntaxNode, Synta
                             // being processed.
                         }
                     }
-                } _ => {}}
+                }
             }
             SyntaxKind::Whitespace => {
                 if cur.text().chars().filter(|c| *c == '\n').count() > 1 {

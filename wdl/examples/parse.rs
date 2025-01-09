@@ -63,13 +63,10 @@ pub fn main() -> Result<()> {
     }
 
     let mut validator = Validator::default();
-    match validator.validate(&document) {
-        Err(diagnostics) => {
-            emit_diagnostics(&args.path, &source, &diagnostics)?;
-        }
-        _ => {
-            println!("{document:#?}");
-        }
+    if let Err(diagnostics) = validator.validate(&document) {
+        emit_diagnostics(&args.path, &source, &diagnostics)?;
+    } else {
+        println!("{document:#?}");
     }
 
     Ok(())

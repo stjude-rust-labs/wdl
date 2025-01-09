@@ -246,9 +246,9 @@ pub(crate) fn populate_document(
         }
     }
 
-    match workflow { Some(workflow) => {
+    if let Some(workflow) = workflow {
         populate_workflow(config, document, &workflow);
-    } _ => {}}
+    }
 }
 
 /// Adds a namespace to the document.
@@ -272,8 +272,8 @@ fn add_namespace(
     // Check for conflicting namespaces
     let span = import.uri().syntax().text_range().to_span();
     let ns = match import.namespace() {
-        Some((ns, span)) => match document.namespaces.get(&ns) {
-            Some(prev) => {
+        Some((ns, span)) => {
+            if let Some(prev) = document.namespaces.get(&ns) {
                 document.diagnostics.push(namespace_conflict(
                     &ns,
                     span,
@@ -281,8 +281,7 @@ fn add_namespace(
                     import.explicit_namespace().is_none(),
                 ));
                 return;
-            }
-            _ => {
+            } else {
                 document.namespaces.insert(ns.clone(), Namespace {
                     span,
                     source: uri.clone(),
@@ -292,7 +291,7 @@ fn add_namespace(
                 });
                 ns
             }
-        },
+        }
         None => {
             // Invalid import namespaces are caught during validation, so there is already a
             // diagnostic for this issue; ignore the import here
@@ -401,17 +400,14 @@ fn add_struct(document: &mut Document, definition: &StructDefinition) {
     let mut members = IndexMap::new();
     for decl in definition.members() {
         let name = decl.name();
-        match members.get(name.as_str()) {
-            Some(prev_span) => {
-                document.diagnostics.push(name_conflict(
-                    name.as_str(),
-                    Context::StructMember(name.span()),
-                    Context::StructMember(*prev_span),
-                ));
-            }
-            _ => {
-                members.insert(name.as_str().to_string(), name.span());
-            }
+        if let Some(prev_span) = members.get(name.as_str()) {
+            document.diagnostics.push(name_conflict(
+                name.as_str(),
+                Context::StructMember(name.span()),
+                Context::StructMember(*prev_span),
+            ));
+        } else {
+            members.insert(name.as_str().to_string(), name.span());
         }
     }
 
@@ -521,25 +517,22 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, definition: &Tas
 
     // Check for a name conflict with another task or workflow
     let name = definition.name();
-    match document.tasks.get(name.as_str()) {
-        Some(s) => {
+    if let Some(s) = document.tasks.get(name.as_str()) {
+        document.diagnostics.push(name_conflict(
+            name.as_str(),
+            Context::Task(name.span()),
+            Context::Task(s.name_span),
+        ));
+        return;
+    } else if let Some(s) = &document.workflow {
+        if s.name == name.as_str() {
             document.diagnostics.push(name_conflict(
                 name.as_str(),
                 Context::Task(name.span()),
-                Context::Task(s.name_span),
+                Context::Workflow(s.name_span),
             ));
             return;
         }
-        _ => match &document.workflow { Some(s) => {
-            if s.name == name.as_str() {
-                document.diagnostics.push(name_conflict(
-                    name.as_str(),
-                    Context::Task(name.span()),
-                    Context::Workflow(s.name_span),
-                ));
-                return;
-            }
-        } _ => {}},
     }
 
     // Populate type maps for the task's inputs and outputs
@@ -673,9 +666,9 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, definition: &Tas
                 );
                 let mut evaluator = ExprTypeEvaluator::new(&mut context);
                 for part in section.parts() {
-                    match part { CommandPart::Placeholder(p) => {
+                    if let CommandPart::Placeholder(p) = part {
                         evaluator.check_placeholder(&p);
-                    } _ => {}}
+                    }
                 }
             }
             TaskGraphNode::Runtime(section) => {
@@ -762,21 +755,18 @@ fn add_decl(
 fn add_workflow(document: &mut Document, workflow: &WorkflowDefinition) -> bool {
     // Check for conflicts with task names or an existing workspace
     let name = workflow.name();
-    match document.tasks.get(name.as_str()) {
-        Some(s) => {
-            document.diagnostics.push(name_conflict(
-                name.as_str(),
-                Context::Workflow(name.span()),
-                Context::Task(s.name_span),
-            ));
-            return false;
-        }
-        _ => match &document.workflow { Some(s) => {
-            document
-                .diagnostics
-                .push(duplicate_workflow(&name, s.name_span));
-            return false;
-        } _ => {}},
+    if let Some(s) = document.tasks.get(name.as_str()) {
+        document.diagnostics.push(name_conflict(
+            name.as_str(),
+            Context::Workflow(name.span()),
+            Context::Task(s.name_span),
+        ));
+        return false;
+    } else if let Some(s) = &document.workflow {
+        document
+            .diagnostics
+            .push(duplicate_workflow(&name, s.name_span));
+        return false;
     }
 
     // Note: we delay populating the workflow until later on so that we can populate
@@ -1100,36 +1090,36 @@ fn add_call_statement(
         .map(|a| a.name())
         .unwrap_or_else(|| target_name.clone());
 
-    let ty = match resolve_call_type(document, workflow_name, statement) {
-        Some(ty) => {
-            // Type check the call inputs
-            let mut seen = HashSet::new();
-            for input in statement.inputs() {
-                let input_name = input.name();
+    let ty = if let Some(ty) = resolve_call_type(document, workflow_name, statement) {
+        // Type check the call inputs
+        let mut seen = HashSet::new();
+        for input in statement.inputs() {
+            let input_name = input.name();
 
-                let expected_ty = ty
-                    .inputs()
-                    .get(input_name.as_str())
-                    .map(|i| i.ty.clone())
-                    .unwrap_or_else(|| {
-                        document
-                            .diagnostics
-                            .push(unknown_call_io(&ty, &input_name, Io::Input));
-                        Type::Union
-                    });
+            let expected_ty = ty
+                .inputs()
+                .get(input_name.as_str())
+                .map(|i| i.ty.clone())
+                .unwrap_or_else(|| {
+                    document
+                        .diagnostics
+                        .push(unknown_call_io(&ty, &input_name, Io::Input));
+                    Type::Union
+                });
 
-                match input.expr() {
-                    Some(expr) => {
-                        type_check_expr(
-                            config,
-                            document,
-                            scope.as_scope_ref(),
-                            &expr,
-                            &expected_ty,
-                            input_name.span(),
-                        );
-                    }
-                    None => match scope.lookup(input_name.as_str()) { Some(name) => {
+            match input.expr() {
+                Some(expr) => {
+                    type_check_expr(
+                        config,
+                        document,
+                        scope.as_scope_ref(),
+                        &expr,
+                        &expected_ty,
+                        input_name.span(),
+                    );
+                }
+                None => {
+                    if let Some(name) = scope.lookup(input_name.as_str()) {
                         if !matches!(expected_ty, Type::Union)
                             && !name.ty.is_coercible_to(&expected_ty)
                         {
@@ -1139,40 +1129,39 @@ fn add_call_statement(
                                 &name.ty,
                             ));
                         }
-                    } _ => {}},
-                }
-
-                // Don't bother keeping track of seen inputs if nested inputs are allowed
-                if !nested_inputs_allowed {
-                    seen.insert(TokenStrHash::new(input_name));
-                }
-            }
-
-            if !nested_inputs_allowed {
-                for (name, input) in ty.inputs() {
-                    if input.required && !seen.contains(name.as_str()) {
-                        document.diagnostics.push(missing_call_input(
-                            ty.kind(),
-                            &target_name,
-                            name,
-                        ));
                     }
                 }
             }
 
-            // Add the call to the workflow
-            let calls = &mut document
-                .workflow
-                .as_mut()
-                .expect("should have workflow")
-                .calls;
-            if !calls.contains_key(name.as_str()) {
-                calls.insert(name.as_str().to_string(), ty.clone());
+            // Don't bother keeping track of seen inputs if nested inputs are allowed
+            if !nested_inputs_allowed {
+                seen.insert(TokenStrHash::new(input_name));
             }
-
-            ty.into()
         }
-        _ => Type::Union,
+
+        if !nested_inputs_allowed {
+            for (name, input) in ty.inputs() {
+                if input.required && !seen.contains(name.as_str()) {
+                    document
+                        .diagnostics
+                        .push(missing_call_input(ty.kind(), &target_name, name));
+                }
+            }
+        }
+
+        // Add the call to the workflow
+        let calls = &mut document
+            .workflow
+            .as_mut()
+            .expect("should have workflow")
+            .calls;
+        if !calls.contains_key(name.as_str()) {
+            calls.insert(name.as_str().to_string(), ty.clone());
+        }
+
+        ty.into()
+    } else {
+        Type::Union
     };
 
     // Don't modify the scope if there's a conflict
@@ -1222,9 +1211,10 @@ fn resolve_call_type(
         return None;
     }
 
-    let (kind, inputs, outputs) = match target.tasks.get(name.as_str()) {
-        Some(task) => (CallKind::Task, task.inputs.clone(), task.outputs.clone()),
-        _ => match &target.workflow {
+    let (kind, inputs, outputs) = if let Some(task) = target.tasks.get(name.as_str()) {
+        (CallKind::Task, task.inputs.clone(), task.outputs.clone())
+    } else {
+        match &target.workflow {
             Some(workflow) if workflow.name == name.as_str() => (
                 CallKind::Workflow,
                 workflow.inputs.clone(),
@@ -1236,7 +1226,7 @@ fn resolve_call_type(
                     .push(unknown_task_or_workflow(namespace.map(|ns| ns.span), &name));
                 return None;
             }
-        },
+        }
     };
 
     let specified = Arc::new(
@@ -1364,23 +1354,20 @@ fn set_struct_types(document: &mut Document) {
 
     impl TypeNameResolver for Resolver<'_> {
         fn resolve(&mut self, name: &Ident) -> Result<Type, Diagnostic> {
-            match self.document.structs.get(name.as_str()) {
-                Some(s) => {
-                    // Mark the struct's namespace as used
-                    if let Some(ns) = &s.namespace {
-                        self.document.namespaces[ns].used = true;
-                    }
+            if let Some(s) = self.document.structs.get(name.as_str()) {
+                // Mark the struct's namespace as used
+                if let Some(ns) = &s.namespace {
+                    self.document.namespaces[ns].used = true;
+                }
 
-                    Ok(s.ty().cloned().unwrap_or(Type::Union))
-                }
-                _ => {
-                    let span = name.span();
-                    self.document.diagnostics.push(unknown_type(
-                        name.as_str(),
-                        Span::new(span.start() + self.offset, span.len()),
-                    ));
-                    Ok(Type::Union)
-                }
+                Ok(s.ty().cloned().unwrap_or(Type::Union))
+            } else {
+                let span = name.span();
+                self.document.diagnostics.push(unknown_type(
+                    name.as_str(),
+                    Span::new(span.start() + self.offset, span.len()),
+                ));
+                Ok(Type::Union)
             }
         }
     }
@@ -1403,31 +1390,28 @@ fn set_struct_types(document: &mut Document) {
         let definition: StructDefinition =
             StructDefinition::cast(SyntaxNode::new_root(s.node.clone())).expect("node should cast");
         for member in definition.members() {
-            match member.ty() {
-                wdl_ast::v1::Type::Ref(r) => {
-                    // Add an edge to the referenced struct
-                    match document.structs.get_index_of(r.name().as_str()) { Some(to) => {
-                        // Only add an edge to another local struct definition
-                        if document.structs[to].namespace.is_some() {
-                            continue;
-                        }
+            if let wdl_ast::v1::Type::Ref(r) = member.ty() {
+                // Add an edge to the referenced struct
+                if let Some(to) = document.structs.get_index_of(r.name().as_str()) {
+                    // Only add an edge to another local struct definition
+                    if document.structs[to].namespace.is_some() {
+                        continue;
+                    }
 
-                        // Check to see if the edge would form a cycle
-                        if has_path_connecting(&graph, from, to, Some(&mut space)) {
-                            let name = definition.name();
-                            let name_span = name.span();
-                            let member_span = member.name().span();
-                            document.diagnostics.push(recursive_struct(
-                                name.as_str(),
-                                Span::new(name_span.start() + s.offset, name_span.len()),
-                                Span::new(member_span.start() + s.offset, member_span.len()),
-                            ));
-                        } else {
-                            graph.add_edge(to, from, ());
-                        }
-                    } _ => {}}
+                    // Check to see if the edge would form a cycle
+                    if has_path_connecting(&graph, from, to, Some(&mut space)) {
+                        let name = definition.name();
+                        let name_span = name.span();
+                        let member_span = member.name().span();
+                        document.diagnostics.push(recursive_struct(
+                            name.as_str(),
+                            Span::new(name_span.start() + s.offset, name_span.len()),
+                            Span::new(member_span.start() + s.offset, member_span.len()),
+                        ));
+                    } else {
+                        graph.add_edge(to, from, ());
+                    }
                 }
-                _ => {}
             }
         }
     }

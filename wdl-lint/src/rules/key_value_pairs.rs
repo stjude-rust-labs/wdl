@@ -177,9 +177,10 @@ impl Visitor for KeyValuePairsRule {
             if next_newline.is_none() {
                 // No newline found, report missing
                 let s = child.syntax().text_range().to_span();
-                let end = match find_next_comma(child.syntax()).0 {
-                    Some(next) => next.text_range().end(),
-                    _ => close_delim.text_range().start(),
+                let end = if let Some(next) = find_next_comma(child.syntax()).0 {
+                    next.text_range().end()
+                } else {
+                    close_delim.text_range().start()
                 };
                 state.exceptable_add(
                     missing_trailing_newline(Span::new(s.start(), usize::from(end) - s.start())),
@@ -189,9 +190,8 @@ impl Visitor for KeyValuePairsRule {
             }
             // Check indentation. If there is no prior whitespace, that will have been
             // reported already.
-            match child.syntax().prev_sibling_or_token() { Some(prior_ws) => {
-                if prior_ws.kind() == SyntaxKind::Whitespace
-                    && prior_ws.to_string().contains('\n')
+            if let Some(prior_ws) = child.syntax().prev_sibling_or_token() {
+                if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
                 {
                     // If there was no newline, that is already reported
                     let ws = prior_ws.to_string();
@@ -210,14 +210,13 @@ impl Visitor for KeyValuePairsRule {
                         );
                     }
                 }
-            } _ => {}}
+            }
         }
 
         // No need to check the closing delimiter as the last element must have
         // a newline. But we should check the indentation of the closing delimiter.
-        match close_delim.prev_sibling_or_token() { Some(prior_ws) => {
-            if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
-            {
+        if let Some(prior_ws) = close_delim.prev_sibling_or_token() {
+            if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n') {
                 let ws = prior_ws.to_string();
                 let ws = ws
                     .split('\n')
@@ -240,7 +239,7 @@ impl Visitor for KeyValuePairsRule {
                     );
                 }
             }
-        } _ => {}}
+        }
     }
 
     fn metadata_array(
@@ -299,9 +298,10 @@ impl Visitor for KeyValuePairsRule {
             if next_newline.is_none() {
                 // No newline found, report missing
                 let s = child.syntax().text_range().to_span();
-                let end = match find_next_comma(child.syntax()).0 {
-                    Some(next) => next.text_range().end(),
-                    _ => close_delim.text_range().start(),
+                let end = if let Some(next) = find_next_comma(child.syntax()).0 {
+                    next.text_range().end()
+                } else {
+                    close_delim.text_range().start()
                 };
                 state.exceptable_add(
                     missing_trailing_newline(Span::new(s.start(), usize::from(end) - s.start())),
@@ -311,9 +311,8 @@ impl Visitor for KeyValuePairsRule {
             }
             // Check indentation. If there is no prior whitespace, that will have been
             // reported already.
-            match child.syntax().prev_sibling_or_token() { Some(prior_ws) => {
-                if prior_ws.kind() == SyntaxKind::Whitespace
-                    && prior_ws.to_string().contains('\n')
+            if let Some(prior_ws) = child.syntax().prev_sibling_or_token() {
+                if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
                 {
                     // If there was no newline, that is already reported
                     let ws = prior_ws.to_string();
@@ -335,14 +334,13 @@ impl Visitor for KeyValuePairsRule {
                         );
                     }
                 }
-            } _ => {}}
+            }
         }
 
         // No need to check the closing delimiter as the last element must have
         // a newline. But we should check the indentation of the closing delimiter.
-        match close_delim.prev_sibling_or_token() { Some(prior_ws) => {
-            if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
-            {
+        if let Some(prior_ws) = close_delim.prev_sibling_or_token() {
+            if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n') {
                 let ws = prior_ws.to_string();
                 let ws = ws
                     .split('\n')
@@ -365,7 +363,7 @@ impl Visitor for KeyValuePairsRule {
                     );
                 }
             }
-        } _ => {}}
+        }
     }
 }
 

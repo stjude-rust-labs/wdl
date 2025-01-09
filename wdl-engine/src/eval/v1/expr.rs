@@ -388,28 +388,25 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         }
 
         let mut s = String::new();
-        match expr.strip_whitespace() {
-            Some(parts) => {
-                for part in parts {
-                    match part {
-                        StrippedStringPart::Text(t) => {
-                            s.push_str(&t);
-                        }
-                        StrippedStringPart::Placeholder(placeholder) => {
-                            self.evaluate_placeholder(&placeholder, &mut s, &Default::default())?;
-                        }
+        if let Some(parts) = expr.strip_whitespace() {
+            for part in parts {
+                match part {
+                    StrippedStringPart::Text(t) => {
+                        s.push_str(&t);
+                    }
+                    StrippedStringPart::Placeholder(placeholder) => {
+                        self.evaluate_placeholder(&placeholder, &mut s, &Default::default())?;
                     }
                 }
             }
-            _ => {
-                for part in expr.parts() {
-                    match part {
-                        StringPart::Text(t) => {
-                            t.unescape_to(&mut s);
-                        }
-                        StringPart::Placeholder(placeholder) => {
-                            self.evaluate_placeholder(&placeholder, &mut s, &Default::default())?;
-                        }
+        } else {
+            for part in expr.parts() {
+                match part {
+                    StringPart::Text(t) => {
+                        t.unescape_to(&mut s);
+                    }
+                    StringPart::Placeholder(placeholder) => {
+                        self.evaluate_placeholder(&placeholder, &mut s, &Default::default())?;
                     }
                 }
             }
@@ -436,19 +433,16 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
                     let value = self.evaluate_expr(&expr)?;
                     let actual = value.ty();
 
-                    match expected.common_type(&actual) {
-                        Some(ty) => {
-                            expected = ty;
-                            expected_span = expr.span();
-                        }
-                        _ => {
-                            return Err(no_common_type(
-                                &expected,
-                                expected_span,
-                                &actual,
-                                expr.span(),
-                            ));
-                        }
+                    if let Some(ty) = expected.common_type(&actual) {
+                        expected = ty;
+                        expected_span = expr.span();
+                    } else {
+                        return Err(no_common_type(
+                            &expected,
+                            expected_span,
+                            &actual,
+                            expr.span(),
+                        ));
                     }
 
                     values.push(value);
@@ -509,36 +503,30 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
                     let actual_value = self.evaluate_expr(&value)?;
                     let actual_value_ty = actual_value.ty();
 
-                    match expected_key_ty.common_type(&actual_key_ty) {
-                        Some(ty) => {
-                            expected_key_ty = ty;
-                            expected_key_span = key.span();
-                        }
-                        _ => {
-                            // No common key type
-                            return Err(no_common_type(
-                                &expected_key_ty,
-                                expected_key_span,
-                                &actual_key_ty,
-                                key.span(),
-                            ));
-                        }
+                    if let Some(ty) = expected_key_ty.common_type(&actual_key_ty) {
+                        expected_key_ty = ty;
+                        expected_key_span = key.span();
+                    } else {
+                        // No common key type
+                        return Err(no_common_type(
+                            &expected_key_ty,
+                            expected_key_span,
+                            &actual_key_ty,
+                            key.span(),
+                        ));
                     }
 
-                    match expected_value_ty.common_type(&actual_value_ty) {
-                        Some(ty) => {
-                            expected_value_ty = ty;
-                            expected_value_span = value.span();
-                        }
-                        _ => {
-                            // No common value type
-                            return Err(no_common_type(
-                                &expected_value_ty,
-                                expected_value_span,
-                                &actual_value_ty,
-                                value.span(),
-                            ));
-                        }
+                    if let Some(ty) = expected_value_ty.common_type(&actual_value_ty) {
+                        expected_value_ty = ty;
+                        expected_value_span = value.span();
+                    } else {
+                        // No common value type
+                        return Err(no_common_type(
+                            &expected_value_ty,
+                            expected_value_span,
+                            &actual_value_ty,
+                            value.span(),
+                        ));
                     }
 
                     let key = match actual_key {
@@ -583,19 +571,16 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         let mut members = IndexMap::with_capacity(struct_ty.members().len());
         for item in expr.items() {
             let (n, v) = item.name_value();
-            match struct_ty.members().get(n.as_str()) {
-                Some(expected) => {
-                    let value = self.evaluate_expr(&v)?;
-                    let value = value.coerce(expected).map_err(|e| {
-                        runtime_type_mismatch(e, expected, n.span(), &value.ty(), v.span())
-                    })?;
+            if let Some(expected) = struct_ty.members().get(n.as_str()) {
+                let value = self.evaluate_expr(&v)?;
+                let value = value.coerce(expected).map_err(|e| {
+                    runtime_type_mismatch(e, expected, n.span(), &value.ty(), v.span())
+                })?;
 
-                    members.insert(n.as_str().to_string(), value);
-                }
-                _ => {
-                    // Not a struct member
-                    return Err(not_a_struct_member(name.as_str(), &n));
-                }
+                members.insert(n.as_str().to_string(), value);
+            } else {
+                // Not a struct member
+                return Err(not_a_struct_member(name.as_str(), &n));
             }
         }
 
@@ -668,18 +653,15 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
     ) -> Result<Value, Diagnostic> {
         let value = self.evaluate_expr(expr)?;
         if let Some(expected) = task_hint_types(self.context.version(), name.as_str(), true) {
-            match expected.iter().find_map(|ty| value.coerce(ty).ok()) {
-                Some(value) => {
-                    return Ok(value);
-                }
-                _ => {
-                    return Err(multiple_type_mismatch(
-                        expected,
-                        name.span(),
-                        &value.ty(),
-                        expr.span(),
-                    ));
-                }
+            if let Some(value) = expected.iter().find_map(|ty| value.coerce(ty).ok()) {
+                return Ok(value);
+            } else {
+                return Err(multiple_type_mismatch(
+                    expected,
+                    name.span(),
+                    &value.ty(),
+                    expr.span(),
+                ));
             }
         }
 

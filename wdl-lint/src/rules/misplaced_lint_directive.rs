@@ -129,7 +129,7 @@ impl Visitor for MisplacedLintDirectiveRule {
                 offset += id.len() - trimmed.len();
 
                 if let Some(elem) = &excepted_element {
-                    match RULE_MAP.get(trimmed) { Some(Some(exceptable_nodes)) => {
+                    if let Some(Some(exceptable_nodes)) = RULE_MAP.get(trimmed) {
                         if !exceptable_nodes.contains(&elem.kind()) {
                             state.add(misplaced_lint_directive(
                                 trimmed,
@@ -138,7 +138,7 @@ impl Visitor for MisplacedLintDirectiveRule {
                                 exceptable_nodes,
                             ));
                         }
-                    } _ => {}}
+                    }
                 }
 
                 // Update the offset to account for the rule id and comma

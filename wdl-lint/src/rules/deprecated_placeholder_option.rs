@@ -142,11 +142,9 @@ impl Visitor for DeprecatedPlaceholderOptionRule {
             _ => return,
         };
 
-        match placeholder.option() { Some(option) => {
+        if let Some(option) = placeholder.option() {
             let diagnostic = match option {
-                PlaceholderOption::Sep(option) => {
-                    deprecated_sep_placeholder_option(option.span())
-                }
+                PlaceholderOption::Sep(option) => deprecated_sep_placeholder_option(option.span()),
                 PlaceholderOption::Default(option) => {
                     deprecated_default_placeholder_option(option.span())
                 }
@@ -159,6 +157,6 @@ impl Visitor for DeprecatedPlaceholderOptionRule {
                 SyntaxElement::from(placeholder.syntax().clone()),
                 &self.exceptable_nodes(),
             )
-        } _ => {}}
+        }
     }
 }

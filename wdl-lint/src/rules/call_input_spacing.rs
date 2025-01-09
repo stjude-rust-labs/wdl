@@ -128,7 +128,7 @@ impl Visitor for CallInputSpacingRule {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::InputKeyword)
         {
-            match input_keyword.prev_sibling_or_token() { Some(whitespace) => {
+            if let Some(whitespace) = input_keyword.prev_sibling_or_token() {
                 if whitespace.kind() != SyntaxKind::Whitespace {
                     // If there is no whitespace before the input keyword
                     state.exceptable_add(
@@ -144,15 +144,16 @@ impl Visitor for CallInputSpacingRule {
                         &self.exceptable_nodes(),
                     );
                 }
-            } _ => {}}
+            }
         }
 
         call.inputs().for_each(|input| {
             // Check for assignment spacing
-            match input
+            if let Some(assign) = input
                 .syntax()
                 .children_with_tokens()
-                .find(|c| c.kind() == SyntaxKind::Assignment) { Some(assign) => {
+                .find(|c| c.kind() == SyntaxKind::Assignment)
+            {
                 match (
                     assign.next_sibling_or_token().unwrap().kind(),
                     assign.prev_sibling_or_token().unwrap().kind(),
@@ -166,7 +167,7 @@ impl Visitor for CallInputSpacingRule {
                         );
                     }
                 }
-            } _ => {}}
+            }
         });
 
         // Check for one input per line

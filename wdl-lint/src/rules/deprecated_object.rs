@@ -95,11 +95,13 @@ impl Visitor for DeprecatedObjectRule {
             return;
         }
 
-        match decl.ty() { Type::Object(ty) => { state.exceptable_add(
-            deprecated_object_use(ty.span()),
-            SyntaxElement::from(decl.syntax().clone()),
-            &self.exceptable_nodes(),
-        ) } _ => {}}
+        if let Type::Object(ty) = decl.ty() {
+            state.exceptable_add(
+                deprecated_object_use(ty.span()),
+                SyntaxElement::from(decl.syntax().clone()),
+                &self.exceptable_nodes(),
+            )
+        }
     }
 
     fn unbound_decl(
@@ -112,10 +114,12 @@ impl Visitor for DeprecatedObjectRule {
             return;
         }
 
-        match decl.ty() { Type::Object(ty) => { state.exceptable_add(
-            deprecated_object_use(ty.span()),
-            SyntaxElement::from(decl.syntax().clone()),
-            &self.exceptable_nodes(),
-        ) } _ => {}}
+        if let Type::Object(ty) = decl.ty() {
+            state.exceptable_add(
+                deprecated_object_use(ty.span()),
+                SyntaxElement::from(decl.syntax().clone()),
+                &self.exceptable_nodes(),
+            )
+        }
     }
 }

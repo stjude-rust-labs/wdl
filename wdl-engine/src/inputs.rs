@@ -31,11 +31,10 @@ type JsonMap = serde_json::Map<String, JsonValue>;
 /// specified path with the input path.
 fn join_paths(inputs: &mut HashMap<String, Value>, path: &Path, ty: impl Fn(&str) -> Option<Type>) {
     for (name, value) in inputs.iter_mut() {
-        let ty = match ty(name) {
-            Some(ty) => ty,
-            _ => {
-                continue;
-            }
+        let ty = if let Some(ty) = ty(name) {
+            ty
+        } else {
+            continue;
         };
 
         // Replace the value with `None` temporarily

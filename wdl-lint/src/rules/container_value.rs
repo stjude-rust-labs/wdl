@@ -159,16 +159,15 @@ impl Visitor for ContainerValue {
             return;
         }
 
-        match section.container() {
-            Some(container) => match container.value() { Ok(value) => {
+        if let Some(container) = section.container() {
+            if let Ok(value) = container.value() {
                 check_container_value(
                     state,
                     value,
                     SyntaxElement::from(section.syntax().clone()),
                     &self.exceptable_nodes(),
                 );
-            } _ => {}},
-            _ => {}
+            }
         }
     }
 
@@ -182,16 +181,15 @@ impl Visitor for ContainerValue {
             return;
         }
 
-        match section.container() {
-            Some(container) => match container.value() { Ok(value) => {
+        if let Some(container) = section.container() {
+            if let Ok(value) = container.value() {
                 check_container_value(
                     state,
                     value,
                     SyntaxElement::from(section.syntax().clone()),
                     &self.exceptable_nodes(),
                 );
-            } _ => {}},
-            _ => {}
+            }
         }
     }
 }
