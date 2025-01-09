@@ -613,12 +613,9 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
             LiteralExpr::Float(_) => Some(PrimitiveType::Float.into()),
             LiteralExpr::String(s) => {
                 for p in s.parts() {
-                    match p {
-                        StringPart::Placeholder(p) => {
-                            self.check_placeholder(&p);
-                        }
-                        _ => {}
-                    }
+                    match p { StringPart::Placeholder(p) => {
+                        self.check_placeholder(&p);
+                    } _ => {}}
                 }
 
                 Some(PrimitiveType::String.into())
@@ -652,17 +649,14 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     // primitive.
                     let mut coercible = false;
                     if let Some(PlaceholderOption::Sep(_)) = placeholder.option() {
-                        match &ty {
-                            Type::Compound(CompoundType::Array(ty), _) => {
-                                if !ty.element_type().is_optional()
-                                    && ty.element_type().as_primitive().is_some()
-                                {
-                                    // OK
-                                    coercible = true;
-                                }
+                        match &ty { Type::Compound(CompoundType::Array(ty), _) => {
+                            if !ty.element_type().is_optional()
+                                && ty.element_type().as_primitive().is_some()
+                            {
+                                // OK
+                                coercible = true;
                             }
-                            _ => {}
-                        }
+                        } _ => {}}
                     }
 
                     if !coercible {
@@ -688,23 +682,20 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
             Some((mut expected, mut expected_span)) => {
                 // Ensure the remaining element types share a common type
                 for expr in elements {
-                    match self.evaluate_expr(&expr) {
-                        Some(actual) => match expected.common_type(&actual) {
-                            Some(ty) => {
-                                expected = ty;
-                                expected_span = expr.span();
-                            }
-                            _ => {
-                                self.context.add_diagnostic(no_common_type(
-                                    &expected,
-                                    expected_span,
-                                    &actual,
-                                    expr.span(),
-                                ));
-                            }
-                        },
-                        _ => {}
-                    }
+                    match self.evaluate_expr(&expr) { Some(actual) => { match expected.common_type(&actual) {
+                        Some(ty) => {
+                            expected = ty;
+                            expected_span = expr.span();
+                        }
+                        _ => {
+                            self.context.add_diagnostic(no_common_type(
+                                &expected,
+                                expected_span,
+                                &actual,
+                                expr.span(),
+                            ));
+                        }
+                    } } _ => {}}
                 }
 
                 ArrayType::non_empty(expected).into()
@@ -758,40 +749,37 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 for item in items {
                     let (key, value) = item.key_value();
                     match self.evaluate_expr(&key) {
-                        Some(actual_key) => match self.evaluate_expr(&value) {
-                            Some(actual_value) => {
-                                match expected_key.common_type(&actual_key) {
-                                    Some(ty) => {
-                                        expected_key = ty;
-                                        expected_key_span = key.span();
-                                    }
-                                    _ => {
-                                        self.context.add_diagnostic(no_common_type(
-                                            &expected_key,
-                                            expected_key_span,
-                                            &actual_key,
-                                            key.span(),
-                                        ));
-                                    }
+                        Some(actual_key) => match self.evaluate_expr(&value) { Some(actual_value) => {
+                            match expected_key.common_type(&actual_key) {
+                                Some(ty) => {
+                                    expected_key = ty;
+                                    expected_key_span = key.span();
                                 }
-
-                                match expected_value.common_type(&actual_value) {
-                                    Some(ty) => {
-                                        expected_value = ty;
-                                        expected_value_span = value.span();
-                                    }
-                                    _ => {
-                                        self.context.add_diagnostic(no_common_type(
-                                            &expected_value,
-                                            expected_value_span,
-                                            &actual_value,
-                                            value.span(),
-                                        ));
-                                    }
+                                _ => {
+                                    self.context.add_diagnostic(no_common_type(
+                                        &expected_key,
+                                        expected_key_span,
+                                        &actual_key,
+                                        key.span(),
+                                    ));
                                 }
                             }
-                            _ => {}
-                        },
+
+                            match expected_value.common_type(&actual_value) {
+                                Some(ty) => {
+                                    expected_value = ty;
+                                    expected_value_span = value.span();
+                                }
+                                _ => {
+                                    self.context.add_diagnostic(no_common_type(
+                                        &expected_value,
+                                        expected_value_span,
+                                        &actual_value,
+                                        value.span(),
+                                    ));
+                                }
+                            }
+                        } _ => {}},
                         _ => {}
                     }
                 }
@@ -833,19 +821,16 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     match ty.members.get_full(n.as_str()) {
                         Some((index, _, expected)) => {
                             present[index] = true;
-                            match self.evaluate_expr(&v) {
-                                Some(actual) => {
-                                    if !actual.is_coercible_to(expected) {
-                                        self.context.add_diagnostic(type_mismatch(
-                                            expected,
-                                            n.span(),
-                                            &actual,
-                                            v.span(),
-                                        ));
-                                    }
+                            match self.evaluate_expr(&v) { Some(actual) => {
+                                if !actual.is_coercible_to(expected) {
+                                    self.context.add_diagnostic(type_mismatch(
+                                        expected,
+                                        n.span(),
+                                        &actual,
+                                        v.span(),
+                                    ));
                                 }
-                                _ => {}
-                            }
+                            } _ => {}}
                         }
                         _ => {
                             // Not a struct member

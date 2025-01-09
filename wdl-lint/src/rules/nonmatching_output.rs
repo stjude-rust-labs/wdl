@@ -366,12 +366,9 @@ impl Visitor for NonmatchingOutputRule<'_> {
         }
 
         match reason {
-            VisitReason::Exit => match item.value() {
-                MetadataValue::Object(_) => {
-                    self.prior_objects.pop();
-                }
-                _ => {}
-            },
+            VisitReason::Exit => match item.value() { MetadataValue::Object(_) => {
+                self.prior_objects.pop();
+            } _ => {}},
             VisitReason::Enter => {
                 if let Some(_meta_span) = self.current_meta_span {
                     if item.name().as_str() == "outputs" {
@@ -407,12 +404,9 @@ impl Visitor for NonmatchingOutputRule<'_> {
                         }
                     }
                 }
-                match item.value() {
-                    MetadataValue::Object(_) => {
-                        self.prior_objects.push(item.name().as_str().to_string());
-                    }
-                    _ => {}
-                }
+                match item.value() { MetadataValue::Object(_) => {
+                    self.prior_objects.push(item.name().as_str().to_string());
+                } _ => {}}
             }
         }
     }

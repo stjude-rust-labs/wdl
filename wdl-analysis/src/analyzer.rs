@@ -676,12 +676,9 @@ where
 impl<C> Drop for Analyzer<C> {
     fn drop(&mut self) {
         unsafe { ManuallyDrop::drop(&mut self.sender) };
-        match self.handle.take() {
-            Some(handle) => {
-                handle.join().unwrap();
-            }
-            _ => {}
-        }
+        match self.handle.take() { Some(handle) => {
+            handle.join().unwrap();
+        } _ => {}}
     }
 }
 

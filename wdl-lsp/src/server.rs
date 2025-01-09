@@ -485,8 +485,7 @@ impl LanguageServer for Server {
         };
 
         // Notify the analyzer that the document has changed
-        if let Err(e) =
-            self.analyzer
+        if let Err(e) = self.analyzer
                 .notify_incremental_change(params.text_document.uri, IncrementalChange {
                     version: params.text_document.version,
                     start,
@@ -502,8 +501,7 @@ impl LanguageServer for Server {
                             )
                         })
                         .collect(),
-                })
-        {
+                }) {
             error!("failed to notify incremental change: {e}");
         }
     }
@@ -586,8 +584,7 @@ impl LanguageServer for Server {
                         })
                         .collect(),
                 )
-                .await
-            {
+                .await {
                 error!("failed to remove documents from analyzer: {e}");
             }
         }
@@ -598,8 +595,7 @@ impl LanguageServer for Server {
                 if let Err(e) = self
                     .analyzer
                     .add_directory(folder.uri.to_file_path().expect("should be a file path"))
-                    .await
-                {
+                    .await {
                     error!("failed to add documents from directory to analyzer: {e}");
                 }
             }
@@ -657,8 +653,7 @@ impl LanguageServer for Server {
                 if let Err(e) = self
                     .analyzer
                     .add_document(path_to_uri(&file).expect("should convert to uri"))
-                    .await
-                {
+                    .await {
                     error!("failed to add documents to analyzer: {e}");
                 }
             }

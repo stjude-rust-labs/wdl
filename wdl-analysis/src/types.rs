@@ -298,12 +298,9 @@ impl Type {
 
         // Check for a compound type that might have a common type within it
         if let (Some(this), Some(other)) = (self.as_compound(), other.as_compound()) {
-            match this.common_type(other) {
-                Some(ty) => {
-                    return Some(Self::Compound(ty, self.is_optional()));
-                }
-                _ => {}
-            }
+            match this.common_type(other) { Some(ty) => {
+                return Some(Self::Compound(ty, self.is_optional()));
+            } _ => {}}
         }
 
         None

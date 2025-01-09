@@ -95,18 +95,15 @@ impl Visitor for RedundantInputAssignment {
                 return;
             }
             stmt.inputs().for_each(|input| match input.expr() {
-                Some(expr) => match expr.as_name_ref() {
-                    Some(expr_name) => {
-                        if expr_name.name().as_str() == input.name().as_str() {
-                            state.exceptable_add(
-                                redundant_input_assignment(input.span(), input.name().as_str()),
-                                SyntaxElement::from(input.syntax().clone()),
-                                &self.exceptable_nodes(),
-                            );
-                        }
+                Some(expr) => match expr.as_name_ref() { Some(expr_name) => {
+                    if expr_name.name().as_str() == input.name().as_str() {
+                        state.exceptable_add(
+                            redundant_input_assignment(input.span(), input.name().as_str()),
+                            SyntaxElement::from(input.syntax().clone()),
+                            &self.exceptable_nodes(),
+                        );
                     }
-                    _ => {}
-                },
+                } _ => {}},
                 _ => {}
             });
         }

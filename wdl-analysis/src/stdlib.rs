@@ -1466,16 +1466,13 @@ impl PolymorphicFunction {
                 });
             }
 
-            match coercion1 {
-                Some((index, ty)) => {
-                    return Ok(Binding {
-                        return_type: ty,
-                        index,
-                        signature: &self.signatures[index],
-                    });
-                }
-                _ => {}
-            }
+            match coercion1 { Some((index, ty)) => {
+                return Ok(Binding {
+                    return_type: ty,
+                    index,
+                    signature: &self.signatures[index],
+                });
+            } _ => {}}
         }
 
         assert!(!expected_types.is_empty());

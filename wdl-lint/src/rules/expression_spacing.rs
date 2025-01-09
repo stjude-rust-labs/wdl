@@ -266,12 +266,9 @@ impl Visitor for ExpressionSpacingRule {
                 if prev.is_none() {
                     // No prior elements, so we need to go up a level.
                     match expr.syntax().parent() {
-                        Some(parent) => match parent.prev_sibling_or_token() {
-                            Some(parent_prev) => {
-                                prev = Some(parent_prev);
-                            }
-                            _ => {}
-                        },
+                        Some(parent) => match parent.prev_sibling_or_token() { Some(parent_prev) => {
+                            prev = Some(parent_prev);
+                        } _ => {}},
                         _ => {
                             unreachable!(
                                 "parenthesized expression should have a prior sibling or a parent"
@@ -329,26 +326,23 @@ impl Visitor for ExpressionSpacingRule {
 
                 // Closing parenthesis should not be preceded by a space, but can be preceded by
                 // a newline.
-                match close.prev_sibling_or_token() {
-                    Some(close_prev) => {
-                        if close_prev.kind() == SyntaxKind::Whitespace
-                            && !close_prev
-                                .as_token()
-                                .expect("should be a token")
-                                .text()
-                                .contains('\n')
-                        {
-                            // closing parenthesis should not be preceded by whitespace without a
-                            // newline
-                            state.exceptable_add(
-                                disallowed_space(close_prev.text_range().to_span()),
-                                SyntaxElement::from(expr.syntax().clone()),
-                                &self.exceptable_nodes(),
-                            );
-                        }
+                match close.prev_sibling_or_token() { Some(close_prev) => {
+                    if close_prev.kind() == SyntaxKind::Whitespace
+                        && !close_prev
+                            .as_token()
+                            .expect("should be a token")
+                            .text()
+                            .contains('\n')
+                    {
+                        // closing parenthesis should not be preceded by whitespace without a
+                        // newline
+                        state.exceptable_add(
+                            disallowed_space(close_prev.text_range().to_span()),
+                            SyntaxElement::from(expr.syntax().clone()),
+                            &self.exceptable_nodes(),
+                        );
                     }
-                    _ => {}
-                }
+                } _ => {}}
             }
             Expr::LogicalAnd(_) | Expr::LogicalOr(_) => {
                 // find the operator
@@ -618,16 +612,13 @@ impl Visitor for ExpressionSpacingRule {
                         &self.exceptable_nodes(),
                     );
                 }
-                match after_ws {
-                    Some(ws) => {
-                        state.exceptable_add(
-                            disallowed_space(ws.text_range().to_span()),
-                            SyntaxElement::from(acc.syntax().clone()),
-                            &self.exceptable_nodes(),
-                        );
-                    }
-                    _ => {}
-                }
+                match after_ws { Some(ws) => {
+                    state.exceptable_add(
+                        disallowed_space(ws.text_range().to_span()),
+                        SyntaxElement::from(acc.syntax().clone()),
+                        &self.exceptable_nodes(),
+                    );
+                } _ => {}}
             }
             Expr::Literal(l) => {
                 match l {
@@ -765,39 +756,35 @@ impl Visitor for ExpressionSpacingRule {
         match decl
             .syntax()
             .descendants_with_tokens()
-            .find(|t| t.kind() == SyntaxKind::Assignment)
-        {
-            Some(assign) => {
-                let before_ws = assign.prev_sibling_or_token().map(|t| t.kind())
-                    == Some(SyntaxKind::Whitespace);
-                let after_ws = assign.next_sibling_or_token().map(|t| t.kind())
-                    == Some(SyntaxKind::Whitespace);
+            .find(|t| t.kind() == SyntaxKind::Assignment) { Some(assign) => {
+            let before_ws = assign.prev_sibling_or_token().map(|t| t.kind())
+                == Some(SyntaxKind::Whitespace);
+            let after_ws = assign.next_sibling_or_token().map(|t| t.kind())
+                == Some(SyntaxKind::Whitespace);
 
-                if !before_ws && !after_ws {
-                    // assignments must be surrounded by whitespace
-                    state.exceptable_add(
-                        assignment_missing_surrounding_whitespace(assign.text_range().to_span()),
-                        SyntaxElement::from(decl.syntax().clone()),
-                        &self.exceptable_nodes(),
-                    );
-                } else if !before_ws {
-                    // assignments must be preceded by whitespace
-                    state.exceptable_add(
-                        assignment_missing_preceding_whitespace(assign.text_range().to_span()),
-                        SyntaxElement::from(decl.syntax().clone()),
-                        &self.exceptable_nodes(),
-                    );
-                } else if !after_ws {
-                    // assignments must be followed by whitespace
-                    state.exceptable_add(
-                        assignment_missing_following_whitespace(assign.text_range().to_span()),
-                        SyntaxElement::from(decl.syntax().clone()),
-                        &self.exceptable_nodes(),
-                    );
-                }
+            if !before_ws && !after_ws {
+                // assignments must be surrounded by whitespace
+                state.exceptable_add(
+                    assignment_missing_surrounding_whitespace(assign.text_range().to_span()),
+                    SyntaxElement::from(decl.syntax().clone()),
+                    &self.exceptable_nodes(),
+                );
+            } else if !before_ws {
+                // assignments must be preceded by whitespace
+                state.exceptable_add(
+                    assignment_missing_preceding_whitespace(assign.text_range().to_span()),
+                    SyntaxElement::from(decl.syntax().clone()),
+                    &self.exceptable_nodes(),
+                );
+            } else if !after_ws {
+                // assignments must be followed by whitespace
+                state.exceptable_add(
+                    assignment_missing_following_whitespace(assign.text_range().to_span()),
+                    SyntaxElement::from(decl.syntax().clone()),
+                    &self.exceptable_nodes(),
+                );
             }
-            _ => {}
-        }
+        } _ => {}}
     }
 }
 

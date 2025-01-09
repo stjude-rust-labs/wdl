@@ -189,64 +189,58 @@ impl Visitor for KeyValuePairsRule {
             }
             // Check indentation. If there is no prior whitespace, that will have been
             // reported already.
-            match child.syntax().prev_sibling_or_token() {
-                Some(prior_ws) => {
-                    if prior_ws.kind() == SyntaxKind::Whitespace
-                        && prior_ws.to_string().contains('\n')
-                    {
-                        // If there was no newline, that is already reported
-                        let ws = prior_ws.to_string();
-                        let ws = ws.split('\n').last().expect("should have a last element");
-                        let expected_ws = parent_ws.to_owned() + INDENT;
-
-                        if ws != expected_ws {
-                            state.exceptable_add(
-                                incorrect_indentation(
-                                    prior_ws.text_range().to_span(),
-                                    &expected_ws,
-                                    ws,
-                                ),
-                                SyntaxElement::from(child.syntax().clone()),
-                                &self.exceptable_nodes(),
-                            );
-                        }
-                    }
-                }
-                _ => {}
-            }
-        }
-
-        // No need to check the closing delimiter as the last element must have
-        // a newline. But we should check the indentation of the closing delimiter.
-        match close_delim.prev_sibling_or_token() {
-            Some(prior_ws) => {
-                if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
+            match child.syntax().prev_sibling_or_token() { Some(prior_ws) => {
+                if prior_ws.kind() == SyntaxKind::Whitespace
+                    && prior_ws.to_string().contains('\n')
                 {
+                    // If there was no newline, that is already reported
                     let ws = prior_ws.to_string();
-                    let ws = ws
-                        .split('\n')
-                        .last()
-                        .expect("there should be a last element");
-                    let expected_ws = parent_ws.to_owned();
+                    let ws = ws.split('\n').last().expect("should have a last element");
+                    let expected_ws = parent_ws.to_owned() + INDENT;
 
                     if ws != expected_ws {
                         state.exceptable_add(
                             incorrect_indentation(
-                                Span::new(
-                                    usize::from(close_delim.text_range().start()) - ws.len(),
-                                    ws.len(),
-                                ),
+                                prior_ws.text_range().to_span(),
                                 &expected_ws,
                                 ws,
                             ),
-                            SyntaxElement::from(item.syntax().clone()),
+                            SyntaxElement::from(child.syntax().clone()),
                             &self.exceptable_nodes(),
                         );
                     }
                 }
-            }
-            _ => {}
+            } _ => {}}
         }
+
+        // No need to check the closing delimiter as the last element must have
+        // a newline. But we should check the indentation of the closing delimiter.
+        match close_delim.prev_sibling_or_token() { Some(prior_ws) => {
+            if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
+            {
+                let ws = prior_ws.to_string();
+                let ws = ws
+                    .split('\n')
+                    .last()
+                    .expect("there should be a last element");
+                let expected_ws = parent_ws.to_owned();
+
+                if ws != expected_ws {
+                    state.exceptable_add(
+                        incorrect_indentation(
+                            Span::new(
+                                usize::from(close_delim.text_range().start()) - ws.len(),
+                                ws.len(),
+                            ),
+                            &expected_ws,
+                            ws,
+                        ),
+                        SyntaxElement::from(item.syntax().clone()),
+                        &self.exceptable_nodes(),
+                    );
+                }
+            }
+        } _ => {}}
     }
 
     fn metadata_array(
@@ -317,67 +311,61 @@ impl Visitor for KeyValuePairsRule {
             }
             // Check indentation. If there is no prior whitespace, that will have been
             // reported already.
-            match child.syntax().prev_sibling_or_token() {
-                Some(prior_ws) => {
-                    if prior_ws.kind() == SyntaxKind::Whitespace
-                        && prior_ws.to_string().contains('\n')
-                    {
-                        // If there was no newline, that is already reported
-                        let ws = prior_ws.to_string();
-                        let ws = ws
-                            .split('\n')
-                            .last()
-                            .expect("there should be a last element");
-                        let expected_ws = parent_ws.to_owned() + INDENT;
-
-                        if ws != expected_ws {
-                            state.exceptable_add(
-                                incorrect_indentation(
-                                    prior_ws.text_range().to_span(),
-                                    &expected_ws,
-                                    ws,
-                                ),
-                                SyntaxElement::from(child.syntax().clone()),
-                                &self.exceptable_nodes(),
-                            );
-                        }
-                    }
-                }
-                _ => {}
-            }
-        }
-
-        // No need to check the closing delimiter as the last element must have
-        // a newline. But we should check the indentation of the closing delimiter.
-        match close_delim.prev_sibling_or_token() {
-            Some(prior_ws) => {
-                if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
+            match child.syntax().prev_sibling_or_token() { Some(prior_ws) => {
+                if prior_ws.kind() == SyntaxKind::Whitespace
+                    && prior_ws.to_string().contains('\n')
                 {
+                    // If there was no newline, that is already reported
                     let ws = prior_ws.to_string();
                     let ws = ws
                         .split('\n')
                         .last()
                         .expect("there should be a last element");
-                    let expected_ws = parent_ws.to_owned();
+                    let expected_ws = parent_ws.to_owned() + INDENT;
 
                     if ws != expected_ws {
                         state.exceptable_add(
                             incorrect_indentation(
-                                Span::new(
-                                    usize::from(close_delim.text_range().start()) - ws.len(),
-                                    ws.len(),
-                                ),
+                                prior_ws.text_range().to_span(),
                                 &expected_ws,
                                 ws,
                             ),
-                            SyntaxElement::from(item.syntax().clone()),
+                            SyntaxElement::from(child.syntax().clone()),
                             &self.exceptable_nodes(),
                         );
                     }
                 }
-            }
-            _ => {}
+            } _ => {}}
         }
+
+        // No need to check the closing delimiter as the last element must have
+        // a newline. But we should check the indentation of the closing delimiter.
+        match close_delim.prev_sibling_or_token() { Some(prior_ws) => {
+            if prior_ws.kind() == SyntaxKind::Whitespace && prior_ws.to_string().contains('\n')
+            {
+                let ws = prior_ws.to_string();
+                let ws = ws
+                    .split('\n')
+                    .last()
+                    .expect("there should be a last element");
+                let expected_ws = parent_ws.to_owned();
+
+                if ws != expected_ws {
+                    state.exceptable_add(
+                        incorrect_indentation(
+                            Span::new(
+                                usize::from(close_delim.text_range().start()) - ws.len(),
+                                ws.len(),
+                            ),
+                            &expected_ws,
+                            ws,
+                        ),
+                        SyntaxElement::from(item.syntax().clone()),
+                        &self.exceptable_nodes(),
+                    );
+                }
+            }
+        } _ => {}}
     }
 }
 

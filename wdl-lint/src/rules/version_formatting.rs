@@ -180,18 +180,15 @@ impl Visitor for VersionFormattingRule {
         // 3. Handle whitespace after the version statement
         match stmt.syntax().next_sibling_or_token() {
             Some(next) => {
-                match next.as_token().and_then(|s| Whitespace::cast(s.clone())) {
-                    Some(ws) => {
-                        let s = ws.as_str();
-                        // Don't add diagnostic if there's nothing but whitespace after the version
-                        // statement
-                        if s != "\n\n" && s != "\r\n\r\n" && next.next_sibling_or_token().is_some()
-                        {
-                            state.add(expected_blank_line_after_version(ws.span()));
-                        }
+                match next.as_token().and_then(|s| Whitespace::cast(s.clone())) { Some(ws) => {
+                    let s = ws.as_str();
+                    // Don't add diagnostic if there's nothing but whitespace after the version
+                    // statement
+                    if s != "\n\n" && s != "\r\n\r\n" && next.next_sibling_or_token().is_some()
+                    {
+                        state.add(expected_blank_line_after_version(ws.span()));
                     }
-                    _ => {}
-                }
+                } _ => {}}
             }
             _ => {}
         } // else version is the last item in the document

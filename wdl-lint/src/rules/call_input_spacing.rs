@@ -128,26 +128,23 @@ impl Visitor for CallInputSpacingRule {
             .children_with_tokens()
             .find(|c| c.kind() == SyntaxKind::InputKeyword)
         {
-            match input_keyword.prev_sibling_or_token() {
-                Some(whitespace) => {
-                    if whitespace.kind() != SyntaxKind::Whitespace {
-                        // If there is no whitespace before the input keyword
-                        state.exceptable_add(
-                            call_input_keyword_spacing(input_keyword.text_range().to_span()),
-                            SyntaxElement::from(call.syntax().clone()),
-                            &self.exceptable_nodes(),
-                        );
-                    } else if !whitespace.as_token().unwrap().text().eq(" ") {
-                        // If there is anything other than one space before the input keyword
-                        state.exceptable_add(
-                            call_input_incorrect_spacing(whitespace.text_range().to_span()),
-                            SyntaxElement::from(call.syntax().clone()),
-                            &self.exceptable_nodes(),
-                        );
-                    }
+            match input_keyword.prev_sibling_or_token() { Some(whitespace) => {
+                if whitespace.kind() != SyntaxKind::Whitespace {
+                    // If there is no whitespace before the input keyword
+                    state.exceptable_add(
+                        call_input_keyword_spacing(input_keyword.text_range().to_span()),
+                        SyntaxElement::from(call.syntax().clone()),
+                        &self.exceptable_nodes(),
+                    );
+                } else if !whitespace.as_token().unwrap().text().eq(" ") {
+                    // If there is anything other than one space before the input keyword
+                    state.exceptable_add(
+                        call_input_incorrect_spacing(whitespace.text_range().to_span()),
+                        SyntaxElement::from(call.syntax().clone()),
+                        &self.exceptable_nodes(),
+                    );
                 }
-                _ => {}
-            }
+            } _ => {}}
         }
 
         call.inputs().for_each(|input| {
@@ -155,25 +152,21 @@ impl Visitor for CallInputSpacingRule {
             match input
                 .syntax()
                 .children_with_tokens()
-                .find(|c| c.kind() == SyntaxKind::Assignment)
-            {
-                Some(assign) => {
-                    match (
-                        assign.next_sibling_or_token().unwrap().kind(),
-                        assign.prev_sibling_or_token().unwrap().kind(),
-                    ) {
-                        (SyntaxKind::Whitespace, SyntaxKind::Whitespace) => {}
-                        _ => {
-                            state.exceptable_add(
-                                call_input_assignment(assign.text_range().to_span()),
-                                SyntaxElement::from(call.syntax().clone()),
-                                &self.exceptable_nodes(),
-                            );
-                        }
+                .find(|c| c.kind() == SyntaxKind::Assignment) { Some(assign) => {
+                match (
+                    assign.next_sibling_or_token().unwrap().kind(),
+                    assign.prev_sibling_or_token().unwrap().kind(),
+                ) {
+                    (SyntaxKind::Whitespace, SyntaxKind::Whitespace) => {}
+                    _ => {
+                        state.exceptable_add(
+                            call_input_assignment(assign.text_range().to_span()),
+                            SyntaxElement::from(call.syntax().clone()),
+                            &self.exceptable_nodes(),
+                        );
                     }
                 }
-                _ => {}
-            }
+            } _ => {}}
         });
 
         // Check for one input per line

@@ -246,12 +246,9 @@ pub(crate) fn populate_document(
         }
     }
 
-    match workflow {
-        Some(workflow) => {
-            populate_workflow(config, document, &workflow);
-        }
-        _ => {}
-    }
+    match workflow { Some(workflow) => {
+        populate_workflow(config, document, &workflow);
+    } _ => {}}
 }
 
 /// Adds a namespace to the document.
@@ -533,19 +530,16 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, definition: &Tas
             ));
             return;
         }
-        _ => match &document.workflow {
-            Some(s) => {
-                if s.name == name.as_str() {
-                    document.diagnostics.push(name_conflict(
-                        name.as_str(),
-                        Context::Task(name.span()),
-                        Context::Workflow(s.name_span),
-                    ));
-                    return;
-                }
+        _ => match &document.workflow { Some(s) => {
+            if s.name == name.as_str() {
+                document.diagnostics.push(name_conflict(
+                    name.as_str(),
+                    Context::Task(name.span()),
+                    Context::Workflow(s.name_span),
+                ));
+                return;
             }
-            _ => {}
-        },
+        } _ => {}},
     }
 
     // Populate type maps for the task's inputs and outputs
@@ -679,12 +673,9 @@ fn add_task(config: DiagnosticsConfig, document: &mut Document, definition: &Tas
                 );
                 let mut evaluator = ExprTypeEvaluator::new(&mut context);
                 for part in section.parts() {
-                    match part {
-                        CommandPart::Placeholder(p) => {
-                            evaluator.check_placeholder(&p);
-                        }
-                        _ => {}
-                    }
+                    match part { CommandPart::Placeholder(p) => {
+                        evaluator.check_placeholder(&p);
+                    } _ => {}}
                 }
             }
             TaskGraphNode::Runtime(section) => {
@@ -780,15 +771,12 @@ fn add_workflow(document: &mut Document, workflow: &WorkflowDefinition) -> bool 
             ));
             return false;
         }
-        _ => match &document.workflow {
-            Some(s) => {
-                document
-                    .diagnostics
-                    .push(duplicate_workflow(&name, s.name_span));
-                return false;
-            }
-            _ => {}
-        },
+        _ => match &document.workflow { Some(s) => {
+            document
+                .diagnostics
+                .push(duplicate_workflow(&name, s.name_span));
+            return false;
+        } _ => {}},
     }
 
     // Note: we delay populating the workflow until later on so that we can populate
@@ -1141,20 +1129,17 @@ fn add_call_statement(
                             input_name.span(),
                         );
                     }
-                    None => match scope.lookup(input_name.as_str()) {
-                        Some(name) => {
-                            if !matches!(expected_ty, Type::Union)
-                                && !name.ty.is_coercible_to(&expected_ty)
-                            {
-                                document.diagnostics.push(call_input_type_mismatch(
-                                    &input_name,
-                                    &expected_ty,
-                                    &name.ty,
-                                ));
-                            }
+                    None => match scope.lookup(input_name.as_str()) { Some(name) => {
+                        if !matches!(expected_ty, Type::Union)
+                            && !name.ty.is_coercible_to(&expected_ty)
+                        {
+                            document.diagnostics.push(call_input_type_mismatch(
+                                &input_name,
+                                &expected_ty,
+                                &name.ty,
+                            ));
                         }
-                        _ => {}
-                    },
+                    } _ => {}},
                 }
 
                 // Don't bother keeping track of seen inputs if nested inputs are allowed
@@ -1421,29 +1406,26 @@ fn set_struct_types(document: &mut Document) {
             match member.ty() {
                 wdl_ast::v1::Type::Ref(r) => {
                     // Add an edge to the referenced struct
-                    match document.structs.get_index_of(r.name().as_str()) {
-                        Some(to) => {
-                            // Only add an edge to another local struct definition
-                            if document.structs[to].namespace.is_some() {
-                                continue;
-                            }
-
-                            // Check to see if the edge would form a cycle
-                            if has_path_connecting(&graph, from, to, Some(&mut space)) {
-                                let name = definition.name();
-                                let name_span = name.span();
-                                let member_span = member.name().span();
-                                document.diagnostics.push(recursive_struct(
-                                    name.as_str(),
-                                    Span::new(name_span.start() + s.offset, name_span.len()),
-                                    Span::new(member_span.start() + s.offset, member_span.len()),
-                                ));
-                            } else {
-                                graph.add_edge(to, from, ());
-                            }
+                    match document.structs.get_index_of(r.name().as_str()) { Some(to) => {
+                        // Only add an edge to another local struct definition
+                        if document.structs[to].namespace.is_some() {
+                            continue;
                         }
-                        _ => {}
-                    }
+
+                        // Check to see if the edge would form a cycle
+                        if has_path_connecting(&graph, from, to, Some(&mut space)) {
+                            let name = definition.name();
+                            let name_span = name.span();
+                            let member_span = member.name().span();
+                            document.diagnostics.push(recursive_struct(
+                                name.as_str(),
+                                Span::new(name_span.start() + s.offset, name_span.len()),
+                                Span::new(member_span.start() + s.offset, member_span.len()),
+                            ));
+                        } else {
+                            graph.add_edge(to, from, ());
+                        }
+                    } _ => {}}
                 }
                 _ => {}
             }
