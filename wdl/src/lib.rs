@@ -78,33 +78,41 @@ use std::path::PathBuf;
 use std::path::absolute;
 use std::time::Duration;
 
-use analysis::AnalysisResult;
-use analysis::Analyzer;
-use analysis::DiagnosticsConfig;
-use analysis::path_to_uri;
-use analysis::rules as analysis_rules;
+#[cfg(any(feature = "analysis", feature = "engine"))]
 use anyhow::Context;
+#[cfg(any(feature = "analysis", feature = "engine"))]
 use anyhow::Result;
+#[cfg(any(feature = "analysis", feature = "engine"))]
 use anyhow::anyhow;
+#[cfg(any(feature = "analysis", feature = "engine"))]
 use anyhow::bail;
+#[cfg(feature = "engine")]
 use codespan_reporting::files::SimpleFile;
+#[cfg(feature = "engine")]
 use codespan_reporting::term::emit;
-use engine::Engine;
-use engine::EvaluationError;
-use engine::Inputs;
-use engine::local::LocalTaskExecutionBackend;
-use engine::v1::TaskEvaluator;
-use grammar::Diagnostic;
-use grammar::Severity;
-use indicatif::ProgressBar;
-use indicatif::ProgressStyle;
-use lint::rules as lint_rules;
-use serde_json::to_string_pretty;
-use tokio::fs;
-use url::Url;
 #[cfg(feature = "analysis")]
+use indicatif::ProgressBar;
+#[cfg(feature = "analysis")]
+use indicatif::ProgressStyle;
+#[cfg(feature = "engine")]
+use serde_json::to_string_pretty;
+#[cfg(feature = "analysis")]
+use tokio::fs;
+#[cfg(any(feature = "analysis", feature = "engine"))]
+use url::Url;
+#[cfg(any(feature = "analysis", feature = "engine"))]
 #[doc(inline)]
 pub use wdl_analysis as analysis;
+#[cfg(feature = "analysis")]
+use wdl_analysis::AnalysisResult;
+#[cfg(feature = "analysis")]
+use wdl_analysis::Analyzer;
+#[cfg(feature = "analysis")]
+use wdl_analysis::DiagnosticsConfig;
+#[cfg(any(feature = "analysis", feature = "engine"))]
+use crate::analysis::path_to_uri;
+#[cfg(feature = "analysis")]
+use wdl_analysis::rules as analysis_rules;
 #[cfg(feature = "ast")]
 #[doc(inline)]
 pub use wdl_ast as ast;
@@ -114,6 +122,11 @@ pub use wdl_doc as doc;
 #[cfg(feature = "engine")]
 #[doc(inline)]
 pub use wdl_engine as engine;
+use wdl_engine::Engine;
+use wdl_engine::EvaluationError;
+use wdl_engine::Inputs;
+use wdl_engine::local::LocalTaskExecutionBackend;
+use wdl_engine::v1::TaskEvaluator;
 #[cfg(feature = "format")]
 #[doc(inline)]
 pub use wdl_format as format;
@@ -122,7 +135,11 @@ pub use wdl_format as format;
 pub use wdl_grammar as grammar;
 #[cfg(feature = "lint")]
 #[doc(inline)]
+use wdl_grammar::Diagnostic;
+use wdl_grammar::Severity;
 pub use wdl_lint as lint;
+#[cfg(feature = "analysis")]
+use wdl_lint::rules as lint_rules;
 #[cfg(feature = "lsp")]
 #[doc(inline)]
 pub use wdl_lsp as lsp;
@@ -133,6 +150,7 @@ pub use wdl_lsp as lsp;
 /// very short analyses.
 const PROGRESS_BAR_DELAY_BEFORE_RENDER: Duration = Duration::from_secs(2);
 
+#[cfg(feature = "analysis")]
 /// Analyze the document or directory, returning [`AnalysisResult`]s.
 pub async fn analyze(
     file: &str,
@@ -207,6 +225,7 @@ pub async fn analyze(
     Ok(results)
 }
 
+#[cfg(feature = "engine")]
 /// Validates the inputs for a task or workflow.
 pub async fn validate_inputs(
     document: &str,
@@ -293,6 +312,7 @@ pub async fn validate_inputs(
     Ok(())
 }
 
+#[cfg(feature = "engine")]
 /// Run a WDL task or workflow.
 pub async fn run(
     file: &str,

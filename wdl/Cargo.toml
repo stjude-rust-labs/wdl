@@ -41,9 +41,9 @@ codespan-reporting = { workspace = true }
 
 [features]
 default = ["ast", "grammar", "lint", "format", "engine"]
-analysis = ["dep:wdl-analysis"]
+analysis = ["dep:wdl-analysis", "dep:anyhow", "dep:indicatif", "dep:tokio", "dep:url"]
 ast = ["dep:wdl-ast"]
-engine = ["dep:wdl-engine"]
+engine = ["analysis", "dep:wdl-engine", "dep:codespan-reporting", "dep:serde_json"]
 format = ["dep:wdl-format"]
 doc = ["dep:wdl-doc"]
 grammar = ["dep:wdl-grammar"]
