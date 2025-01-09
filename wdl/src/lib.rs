@@ -78,13 +78,13 @@ use std::path::PathBuf;
 use std::path::absolute;
 use std::time::Duration;
 
-#[cfg(any(feature = "analysis", feature = "engine"))]
+#[cfg(feature = "analysis")]
 use anyhow::Context;
-#[cfg(any(feature = "analysis", feature = "engine"))]
+#[cfg(feature = "analysis")]
 use anyhow::Result;
-#[cfg(any(feature = "analysis", feature = "engine"))]
+#[cfg(feature = "analysis")]
 use anyhow::anyhow;
-#[cfg(any(feature = "analysis", feature = "engine"))]
+#[cfg(feature = "analysis")]
 use anyhow::bail;
 #[cfg(feature = "engine")]
 use codespan_reporting::files::SimpleFile;
@@ -98,9 +98,9 @@ use indicatif::ProgressStyle;
 use serde_json::to_string_pretty;
 #[cfg(feature = "analysis")]
 use tokio::fs;
-#[cfg(any(feature = "analysis", feature = "engine"))]
+#[cfg(feature = "analysis")]
 use url::Url;
-#[cfg(any(feature = "analysis", feature = "engine"))]
+#[cfg(feature = "analysis")]
 #[doc(inline)]
 pub use wdl_analysis as analysis;
 #[cfg(feature = "analysis")]
@@ -109,7 +109,7 @@ use wdl_analysis::AnalysisResult;
 use wdl_analysis::Analyzer;
 #[cfg(feature = "analysis")]
 use wdl_analysis::DiagnosticsConfig;
-#[cfg(any(feature = "analysis", feature = "engine"))]
+#[cfg(feature = "analysis")]
 use wdl_analysis::path_to_uri;
 #[cfg(feature = "analysis")]
 use wdl_analysis::rules as analysis_rules;
