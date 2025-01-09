@@ -17,7 +17,7 @@ pub struct Outputs {
     /// for a direct task execution.
     name: Option<String>,
     /// The map of output name to value.
-    values: IndexMap<String, Value>,
+    pub values: IndexMap<String, Value>,
 }
 
 impl Outputs {

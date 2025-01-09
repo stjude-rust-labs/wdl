@@ -43,7 +43,7 @@ pub async fn analyze(
     exceptions: Vec<String>,
     lint: bool,
     shellcheck: bool,
-) -> anyhow::Result<Vec<AnalysisResult>> {
+) -> Result<Vec<AnalysisResult>> {
     let rules = analysis_rules();
     let rules = rules
         .iter()
@@ -108,7 +108,7 @@ pub async fn analyze(
 
     let results = analyzer.analyze(bar.clone()).await?;
 
-    Ok(results)
+    anyhow::Ok(results)
 }
 
 /// Validates the inputs for a task or workflow.
@@ -117,7 +117,7 @@ pub async fn validate_inputs(
     inputs: &Path,
     stream: &mut codespan_reporting::term::termcolor::StandardStream,
     config: &codespan_reporting::term::Config,
-) -> anyhow::Result<()> {
+) -> Result<()> {
     if Path::new(&document).is_dir() {
         bail!("expected a WDL document, found a directory");
     }
@@ -194,7 +194,7 @@ pub async fn validate_inputs(
         bail!("failed to validate inputs:\n{result}");
     }
 
-    Ok(())
+    anyhow::Ok(())
 }
 
 /// Run a WDL task or workflow.
@@ -286,7 +286,7 @@ pub async fn run(
             {
                 Ok(evaluated) => match evaluated.into_result() {
                     Ok(outputs) => {
-                        println!("{}", to_string_pretty(&outputs)?);
+                        println!("{}", to_string_pretty(&outputs.values)?);
                     }
                     Err(e) => match e {
                         EvaluationError::Source(diagnostic) => {
@@ -330,5 +330,5 @@ pub async fn run(
         }
     }
 
-    Ok(())
+    anyhow::Ok(())
 }
