@@ -396,7 +396,7 @@ impl RunCommand {
         self.options.check_for_conflicts()?;
 
         if Path::new(&self.file).is_dir() {
-            anyhow::bail!("expected a WDL document, found a directory");
+            bail!("expected a WDL document, found a directory");
         }
 
         let results = analyze(&self.file, vec![], false, false).await?;
