@@ -219,7 +219,8 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
             match evaluated.into_result() {
                 Ok(outputs) => {
                     let outputs = outputs.with_name(name);
-                    let outputs = to_string_pretty(&outputs).context("failed to serialize outputs")?;
+                    let outputs =
+                        to_string_pretty(&outputs).context("failed to serialize outputs")?;
                     let outputs = strip_paths(dir.path(), &outputs);
                     compare_result(&test.join("outputs.json"), &outputs)?;
                 }
