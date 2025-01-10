@@ -10,8 +10,6 @@ use anyhow::Context;
 use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
-use codespan_reporting::files::SimpleFile;
-use codespan_reporting::term::emit;
 use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
 use serde_json::to_string_pretty;
@@ -112,12 +110,7 @@ pub async fn analyze(
 }
 
 /// Validates the inputs for a task or workflow.
-pub async fn validate_inputs(
-    document: &str,
-    inputs: &Path,
-    stream: &mut codespan_reporting::term::termcolor::StandardStream,
-    config: &codespan_reporting::term::Config,
-) -> Result<()> {
+pub async fn validate_inputs(document: &str, inputs: &Path) -> Result<Option<Diagnostic>> {
     if Path::new(&document).is_dir() {
         bail!("expected a WDL document, found a directory");
     }
@@ -142,15 +135,7 @@ pub async fn validate_inputs(
     };
 
     if let Some(diagnostic) = diagnostics.iter().find(|d| d.severity() == Severity::Error) {
-        let source = result.document().node().syntax().text().to_string();
-        let file = SimpleFile::new(&document, &source);
-
-        emit(stream, config, &file, &diagnostic.to_codespan()).expect("should emit");
-
-        bail!(
-            "document `{document}` contains at least one diagnostic error!\ncan't validate inputs",
-            document = document
-        );
+        return Ok(Some(diagnostic.clone()));
     }
 
     let result = match Inputs::parse(analyzed_document, inputs) {
@@ -194,7 +179,7 @@ pub async fn validate_inputs(
         bail!("failed to validate inputs:\n{result}");
     }
 
-    anyhow::Ok(())
+    anyhow::Ok(None)
 }
 
 /// Parses the inputs for a task or workflow.

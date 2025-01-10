@@ -348,13 +348,15 @@ pub struct ValidateCommand {
 impl ValidateCommand {
     /// Executes the `validate` subcommand.
     async fn exec(self) -> Result<()> {
-        validate_inputs(
-            &self.document,
-            &self.inputs,
-            &mut StandardStream::stderr(ColorChoice::Auto),
-            &Config::default(),
-        )
-        .await
+        if let Some(diagnostic) = validate_inputs(&self.document, &self.inputs).await? {
+            let source = read_source(Path::new(&self.document))?;
+            emit_diagnostics(&self.document, &source, &[diagnostic])?;
+            bail!("aborting due to previous diagnostic");
+        }
+
+        println!("inputs are valid");
+
+        anyhow::Ok(())
     }
 }
 
