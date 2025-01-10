@@ -255,7 +255,6 @@ impl FormatCommand {
         let source = read_source(&self.path)?;
 
         let (document, diagnostics) = Document::parse(&source);
-        assert!(diagnostics.is_empty());
 
         if !diagnostics.is_empty() {
             emit_diagnostics(&self.path.to_string_lossy(), &source, &diagnostics)?;
