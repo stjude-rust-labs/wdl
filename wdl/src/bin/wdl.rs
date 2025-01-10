@@ -27,12 +27,10 @@ use tracing_log::AsTrace;
 use url::Url;
 use wdl::ast::Diagnostic;
 use wdl::ast::Document;
-use wdl::ast::Validator;
 use wdl::cli::analyze;
 use wdl::cli::parse_inputs;
 use wdl::cli::run;
 use wdl::cli::validate_inputs;
-use wdl::lint::LintVisitor;
 use wdl_analysis::path_to_uri;
 use wdl_ast::Node;
 use wdl_ast::Severity;
@@ -41,7 +39,6 @@ use wdl_engine::Engine;
 use wdl_engine::local::LocalTaskExecutionBackend;
 use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt as _;
-use wdl_lint::rules::ShellCheckRule;
 
 /// Emits the given diagnostics to the output stream.
 ///
@@ -114,37 +111,6 @@ impl ParseCommand {
     }
 }
 
-/// Represents common analysis options.
-#[derive(Args)]
-pub struct AnalysisOptions {
-    /// Denies all analysis rules by treating them as errors.
-    #[clap(long, conflicts_with = "deny", conflicts_with = "except_all")]
-    pub deny_all: bool,
-
-    /// Except (ignores) all analysis rules.
-    #[clap(long, conflicts_with = "except")]
-    pub except_all: bool,
-
-    /// Excepts (ignores) an analysis rule.
-    #[clap(long)]
-    pub except: Vec<String>,
-
-    /// Denies an analysis rule by treating it as an error.
-    #[clap(long)]
-    pub deny: Vec<String>,
-}
-
-impl AnalysisOptions {
-    /// Checks for conflicts in the analysis options.
-    pub fn check_for_conflicts(&self) -> Result<()> {
-        if let Some(id) = self.except.iter().find(|id| self.deny.contains(*id)) {
-            bail!("rule `{id}` cannot be specified for both the `--except` and `--deny`",);
-        }
-
-        Ok(())
-    }
-}
-
 /// Checks a WDL source file for errors.
 #[derive(Args)]
 #[clap(disable_version_flag = true)]
@@ -153,60 +119,32 @@ pub struct CheckCommand {
     #[clap(value_name = "PATH or URL")]
     pub file: String,
 
-    /// The analysis options.
-    #[clap(flatten)]
-    pub options: AnalysisOptions,
+    /// Excepts (ignores) an analysis or lint rule.
+    #[clap(long)]
+    pub except: Vec<String>,
+
+    /// Enables the default set of lints (everything but shellcheck).
+    #[clap(long)]
+    pub lint: bool,
+
+    /// Enable shellcheck lints.
+    #[clap(long)]
+    pub shellcheck: bool,
 }
 
 impl CheckCommand {
     /// Executes the `check` subcommand.
     async fn exec(self) -> Result<()> {
-        self.options.check_for_conflicts()?;
-        analyze(&self.file, self.options.except, false, false).await?;
-        Ok(())
-    }
-}
-
-/// Runs lint rules against a WDL source file.
-#[derive(Args)]
-#[clap(disable_version_flag = true)]
-pub struct LintCommand {
-    /// The path to the source WDL file.
-    #[clap(value_name = "PATH")]
-    pub path: PathBuf,
-    /// Enable shellcheck lints.
-    #[clap(long, action)]
-    pub shellcheck: bool,
-}
-
-impl LintCommand {
-    /// Executes the `lint` subcommand.
-    async fn exec(self) -> Result<()> {
-        let source = read_source(&self.path)?;
-        let (document, diagnostics) = Document::parse(&source);
-        if !diagnostics.is_empty() {
-            emit_diagnostics(&self.path.to_string_lossy(), &source, &diagnostics)?;
-
-            bail!(
-                "aborting due to previous {count} diagnostic{s}",
-                count = diagnostics.len(),
-                s = if diagnostics.len() == 1 { "" } else { "s" }
-            );
-        }
-
-        let mut validator = Validator::default();
-        validator.add_visitor(LintVisitor::default());
-        if self.shellcheck {
-            validator.add_visitor(ShellCheckRule);
-        }
-        if let Err(diagnostics) = validator.validate(&document) {
-            emit_diagnostics(&self.path.to_string_lossy(), &source, &diagnostics)?;
-
-            bail!(
-                "aborting due to previous {count} diagnostic{s}",
-                count = diagnostics.len(),
-                s = if diagnostics.len() == 1 { "" } else { "s" }
-            );
+        let results = analyze(&self.file, self.except, self.lint, self.shellcheck).await?;
+        for result in results {
+            let document = result.document();
+            if let Some(e) = result.error() {
+                bail!(e.to_owned());
+            }
+            document.diagnostics().iter().for_each(|d| {
+                let source = document.node().syntax().text().to_string();
+                emit_diagnostics(&document.uri().to_string(), &source, &[d.clone()]).unwrap();
+            });
         }
 
         Ok(())
@@ -221,20 +159,23 @@ pub struct AnalyzeCommand {
     #[clap(value_name = "PATH or URL")]
     pub file: String,
 
-    /// The analysis options.
-    #[clap(flatten)]
-    pub options: AnalysisOptions,
+    /// Excepts (ignores) an analysis or lint rule.
+    #[clap(long)]
+    pub except: Vec<String>,
 
-    /// Whether or not to run lints as part of analysis.
+    /// Enables the default set of lints (everything but shellcheck).
     #[clap(long)]
     pub lint: bool,
+
+    /// Enable shellcheck lints.
+    #[clap(long)]
+    pub shellcheck: bool,
 }
 
 impl AnalyzeCommand {
     /// Executes the `analyze` subcommand.
     async fn exec(self) -> Result<()> {
-        self.options.check_for_conflicts()?;
-        let results = analyze(&self.file, self.options.except, self.lint, false).await?;
+        let results = analyze(&self.file, self.except, self.lint, self.shellcheck).await?;
         println!("{:#?}", results);
         Ok(())
     }
@@ -383,17 +324,11 @@ pub struct RunCommand {
     /// Overwrites the task execution output directory if it exists.
     #[clap(long)]
     pub overwrite: bool,
-
-    /// The analysis options.
-    #[clap(flatten)]
-    pub options: AnalysisOptions,
 }
 
 impl RunCommand {
     /// Executes the `run` subcommand.
     async fn exec(self) -> Result<()> {
-        self.options.check_for_conflicts()?;
-
         if Path::new(&self.file).is_dir() {
             bail!("expected a WDL document, found a directory");
         }
@@ -474,9 +409,6 @@ enum Command {
     /// Checks a WDL file.
     Check(CheckCommand),
 
-    /// Lints a WDL file.
-    Lint(LintCommand),
-
     /// Analyzes a WDL workspace.
     Analyze(AnalyzeCommand),
 
@@ -507,7 +439,6 @@ async fn main() -> Result<()> {
     if let Err(e) = match app.command {
         Command::Parse(cmd) => cmd.exec().await,
         Command::Check(cmd) => cmd.exec().await,
-        Command::Lint(cmd) => cmd.exec().await,
         Command::Analyze(cmd) => cmd.exec().await,
         Command::Format(cmd) => cmd.exec().await,
         Command::Doc(cmd) => cmd.exec().await,

@@ -122,10 +122,7 @@ pub fn parse_inputs(
         })?;
         match Inputs::parse(document, &abs_path)? {
             Some((name, inputs)) => (Some(path.to_path_buf()), name, inputs),
-            None => bail!(
-                "inputs file `{path}` is empty",
-                path = path.display()
-            ),
+            None => bail!("inputs file `{path}` is empty", path = path.display()),
         }
     } else if let Some(name) = name {
         if document.task_by_name(name).is_some() {
