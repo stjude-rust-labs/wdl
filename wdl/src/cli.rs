@@ -1,6 +1,5 @@
 //! Entry point functions for the command-line interface.
 
-use std::borrow::Cow;
 use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
@@ -26,7 +25,6 @@ use wdl_engine::EvaluationError;
 use wdl_engine::Inputs;
 use wdl_engine::v1::TaskEvaluator;
 use wdl_grammar::Diagnostic;
-use wdl_grammar::Severity;
 use wdl_lint::rules as lint_rules;
 
 /// The delay in showing the progress bar.
@@ -109,79 +107,6 @@ pub async fn analyze(
     anyhow::Ok(results)
 }
 
-/// Validates the inputs for a task or workflow.
-pub async fn validate_inputs(document: &str, inputs: &Path) -> Result<Option<Diagnostic>> {
-    if Path::new(&document).is_dir() {
-        bail!("expected a WDL document, found a directory");
-    }
-
-    let results = analyze(document, vec![], false, false).await?;
-
-    let uri = Url::parse(document)
-        .unwrap_or_else(|_| path_to_uri(document).expect("file should be a local path"));
-
-    let result = results
-        .iter()
-        .find(|r| **r.document().uri() == uri)
-        .context("failed to find document in analysis results")?;
-    let analyzed_document = result.document();
-
-    let diagnostics: Cow<'_, [Diagnostic]> = match result.error() {
-        Some(e) => vec![Diagnostic::error(format!(
-            "failed to read `{document}`: {e:#}"
-        ))]
-        .into(),
-        None => analyzed_document.diagnostics().into(),
-    };
-
-    if let Some(diagnostic) = diagnostics.iter().find(|d| d.severity() == Severity::Error) {
-        return Ok(Some(diagnostic.clone()));
-    }
-
-    let result = match Inputs::parse(analyzed_document, inputs) {
-        Ok(Some((name, inputs))) => match inputs {
-            Inputs::Task(inputs) => {
-                match inputs
-                    .validate(
-                        analyzed_document,
-                        analyzed_document
-                            .task_by_name(&name)
-                            .expect("task should exist"),
-                        None,
-                    )
-                    .with_context(|| {
-                        format!("failed to validate inputs for task `{name}`", name = name)
-                    }) {
-                    Ok(()) => String::new(),
-                    Err(e) => format!("{e:?}"),
-                }
-            }
-            Inputs::Workflow(inputs) => {
-                let workflow = analyzed_document.workflow().expect("workflow should exist");
-                match inputs
-                    .validate(analyzed_document, workflow, None)
-                    .with_context(|| {
-                        format!(
-                            "failed to validate inputs for workflow `{name}`",
-                            name = name
-                        )
-                    }) {
-                    Ok(()) => String::new(),
-                    Err(e) => format!("{e:?}"),
-                }
-            }
-        },
-        Ok(None) => String::new(),
-        Err(e) => format!("{e:?}"),
-    };
-
-    if !result.is_empty() {
-        bail!("failed to validate inputs:\n{result}");
-    }
-
-    anyhow::Ok(None)
-}
-
 /// Parses the inputs for a task or workflow.
 pub fn parse_inputs(
     document: &Document,
@@ -198,8 +123,7 @@ pub fn parse_inputs(
         match Inputs::parse(document, &abs_path)? {
             Some((name, inputs)) => (Some(path.to_path_buf()), name, inputs),
             None => bail!(
-                "inputs file `{path}` is empty; use the `--name` option to specify the name of \
-                 the task or workflow to run",
+                "inputs file `{path}` is empty",
                 path = path.display()
             ),
         }
@@ -234,6 +158,33 @@ pub fn parse_inputs(
     };
 
     anyhow::Ok((path, name, inputs))
+}
+
+/// Validates the inputs for a task or workflow.
+pub async fn validate_inputs(document: &str, inputs: &Path) -> Result<Option<Diagnostic>> {
+    let results = analyze(document, vec![], false, false).await?;
+
+    let uri = Url::parse(document)
+        .unwrap_or_else(|_| path_to_uri(document).expect("file should be a local path"));
+
+    let result = results
+        .iter()
+        .find(|r| **r.document().uri() == uri)
+        .context("failed to find document in analysis results")?;
+    let document = result.document();
+
+    let (_path, name, inputs) = parse_inputs(document, None, Some(inputs))?;
+
+    match inputs {
+        Inputs::Task(inputs) => {
+            inputs.validate(document, document.task_by_name(&name).unwrap(), None)?
+        }
+        Inputs::Workflow(inputs) => {
+            inputs.validate(document, document.workflow().unwrap(), None)?
+        }
+    }
+
+    anyhow::Ok(None)
 }
 
 /// Run a WDL task or workflow.
