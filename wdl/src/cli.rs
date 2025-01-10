@@ -212,7 +212,7 @@ pub async fn run(
             {
                 Ok(evaluated) => match evaluated.into_result() {
                     Ok(outputs) => {
-                        println!("{}", to_string_pretty(&outputs.values)?);
+                        println!("{}", to_string_pretty(&outputs)?);
                     }
                     Err(e) => match e {
                         EvaluationError::Source(diagnostic) => return Ok(Some(diagnostic)),
