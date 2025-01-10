@@ -20,12 +20,12 @@ use url::Url;
 use wdl_analysis::AnalysisResult;
 use wdl_analysis::Analyzer;
 use wdl_analysis::DiagnosticsConfig;
+use wdl_analysis::document::Document;
 use wdl_analysis::path_to_uri;
 use wdl_analysis::rules as analysis_rules;
 use wdl_engine::Engine;
 use wdl_engine::EvaluationError;
 use wdl_engine::Inputs;
-use wdl_engine::local::LocalTaskExecutionBackend;
 use wdl_engine::v1::TaskEvaluator;
 use wdl_grammar::Diagnostic;
 use wdl_grammar::Severity;
@@ -197,40 +197,21 @@ pub async fn validate_inputs(
     anyhow::Ok(())
 }
 
-/// Run a WDL task or workflow.
-pub async fn run(
-    file: &str,
-    inputs: Option<PathBuf>,
-    name: Option<String>,
-    output: PathBuf,
-    stream: &mut codespan_reporting::term::termcolor::StandardStream,
-    config: &codespan_reporting::term::Config,
-) -> Result<()> {
-    if Path::new(file).is_dir() {
-        anyhow::bail!("expected a WDL document, found a directory");
-    }
-
-    let results = analyze(file, vec![], false, false).await?;
-
-    let uri = Url::parse(file)
-        .unwrap_or_else(|_| path_to_uri(file).expect("file should be a local path"));
-
-    let result = results
-        .iter()
-        .find(|r| **r.document().uri() == uri)
-        .context("failed to find document in analysis results")?;
-    let document = result.document();
-
-    let mut engine = Engine::new(LocalTaskExecutionBackend::new());
+/// Parses the inputs for a task or workflow.
+pub fn parse_inputs(
+    document: &Document,
+    name: Option<&str>,
+    inputs: Option<&Path>,
+) -> Result<(Option<PathBuf>, String, Inputs)> {
     let (path, name, inputs) = if let Some(path) = inputs {
-        let abs_path = absolute(&path).with_context(|| {
+        let abs_path = absolute(path).with_context(|| {
             format!(
                 "failed to determine the absolute path of `{path}`",
                 path = path.display()
             )
         })?;
         match Inputs::parse(document, &abs_path)? {
-            Some((name, inputs)) => (Some(path), name, inputs),
+            Some((name, inputs)) => (Some(path.to_path_buf()), name, inputs),
             None => bail!(
                 "inputs file `{path}` is empty; use the `--name` option to specify the name of \
                  the task or workflow to run",
@@ -238,13 +219,13 @@ pub async fn run(
             ),
         }
     } else if let Some(name) = name {
-        if document.task_by_name(&name).is_some() {
-            (None, name, Inputs::Task(Default::default()))
+        if document.task_by_name(name).is_some() {
+            (None, name.to_string(), Inputs::Task(Default::default()))
         } else if document.workflow().is_some() {
             if name != document.workflow().unwrap().name() {
                 bail!("document does not contain a workflow named `{name}`");
             }
-            (None, name, Inputs::Workflow(Default::default()))
+            (None, name.to_string(), Inputs::Workflow(Default::default()))
         } else {
             bail!("document does not contain a task or workflow named `{name}`");
         }
@@ -267,10 +248,22 @@ pub async fn run(
         (None, name, inputs)
     };
 
+    anyhow::Ok((path, name, inputs))
+}
+
+/// Run a WDL task or workflow.
+pub async fn run(
+    document: &Document,
+    path: Option<&Path>,
+    name: &str,
+    inputs: Inputs,
+    output: PathBuf,
+    engine: &mut Engine,
+) -> Result<Option<Diagnostic>> {
     match inputs {
         Inputs::Task(mut inputs) => {
             let task = document
-                .task_by_name(&name)
+                .task_by_name(name)
                 .ok_or_else(|| anyhow!("document does not contain a task named `{name}`"))?;
 
             // Ensure all the paths specified in the inputs file are relative to the file's
@@ -279,9 +272,9 @@ pub async fn run(
                 inputs.join_paths(task, path);
             }
 
-            let mut evaluator = TaskEvaluator::new(&mut engine);
+            let mut evaluator = TaskEvaluator::new(engine);
             match evaluator
-                .evaluate(document, task, &inputs, &output, &name)
+                .evaluate(document, task, &inputs, &output, name)
                 .await
             {
                 Ok(evaluated) => match evaluated.into_result() {
@@ -289,28 +282,12 @@ pub async fn run(
                         println!("{}", to_string_pretty(&outputs.values)?);
                     }
                     Err(e) => match e {
-                        EvaluationError::Source(diagnostic) => {
-                            let file = SimpleFile::new(
-                                uri.to_string(),
-                                document.node().syntax().text().to_string(),
-                            );
-                            emit(stream, config, &file, &diagnostic.to_codespan())?;
-
-                            bail!("aborting due to task evaluation failure");
-                        }
+                        EvaluationError::Source(diagnostic) => return Ok(Some(diagnostic)),
                         EvaluationError::Other(e) => return Err(e),
                     },
                 },
                 Err(e) => match e {
-                    EvaluationError::Source(diagnostic) => {
-                        let file = SimpleFile::new(
-                            uri.to_string(),
-                            document.node().syntax().text().to_string(),
-                        );
-                        emit(stream, config, &file, &diagnostic.to_codespan())?;
-
-                        bail!("aborting due to task evaluation failure");
-                    }
+                    EvaluationError::Source(diagnostic) => return Ok(Some(diagnostic)),
                     EvaluationError::Other(e) => return Err(e),
                 },
             }
@@ -330,5 +307,5 @@ pub async fn run(
         }
     }
 
-    anyhow::Ok(())
+    anyhow::Ok(None)
 }

@@ -24,16 +24,21 @@ use codespan_reporting::term::termcolor::ColorChoice;
 use codespan_reporting::term::termcolor::StandardStream;
 use colored::Colorize;
 use tracing_log::AsTrace;
+use url::Url;
 use wdl::ast::Diagnostic;
 use wdl::ast::Document;
 use wdl::ast::Validator;
 use wdl::cli::analyze;
+use wdl::cli::parse_inputs;
 use wdl::cli::run;
 use wdl::cli::validate_inputs;
 use wdl::lint::LintVisitor;
+use wdl_analysis::path_to_uri;
 use wdl_ast::Node;
 use wdl_ast::Severity;
 use wdl_doc::document_workspace;
+use wdl_engine::Engine;
+use wdl_engine::local::LocalTaskExecutionBackend;
 use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt as _;
 use wdl_lint::rules::ShellCheckRule;
@@ -388,17 +393,49 @@ impl RunCommand {
     async fn exec(self) -> Result<()> {
         self.options.check_for_conflicts()?;
 
-        run(
-            &self.file,
-            self.inputs,
-            self.name.clone(),
-            self.output.unwrap_or_else(|| {
-                PathBuf::from(self.name.unwrap_or_else(|| "outputs".to_string()))
-            }),
-            &mut StandardStream::stderr(ColorChoice::Auto),
-            &Config::default(),
+        if Path::new(&self.file).is_dir() {
+            anyhow::bail!("expected a WDL document, found a directory");
+        }
+
+        let results = analyze(&self.file, vec![], false, false).await?;
+
+        let uri = Url::parse(&self.file)
+            .unwrap_or_else(|_| path_to_uri(&self.file).expect("file should be a local path"));
+
+        let result = results
+            .iter()
+            .find(|r| **r.document().uri() == uri)
+            .context("failed to find document in analysis results")?;
+        let document = result.document();
+
+        let mut engine = Engine::new(LocalTaskExecutionBackend::new());
+
+        let (path, name, inputs) =
+            parse_inputs(document, self.name.as_deref(), self.inputs.as_deref())?;
+
+        let output_dir = self.output.as_deref().unwrap_or_else(|| {
+            self.name
+                .as_ref()
+                .map(Path::new)
+                .unwrap_or_else(|| Path::new("output"))
+        });
+
+        if let Some(diagnostic) = run(
+            document,
+            path.as_deref(),
+            &name,
+            inputs,
+            output_dir.to_path_buf(),
+            &mut engine,
         )
-        .await
+        .await?
+        {
+            let source = read_source(Path::new(&self.file))?;
+            emit_diagnostics(&self.file, &source, &[diagnostic])?;
+            bail!("aborting due to previous diagnostic");
+        }
+
+        anyhow::Ok(())
     }
 }
 
