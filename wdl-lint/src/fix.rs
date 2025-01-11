@@ -8,7 +8,6 @@ use serde::Deserialize;
 
 #[derive(Copy, Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-#[non_exhaustive]
 /// An insertion point.
 pub enum InsertionPoint {
     /// Insert immediately before a specified region.
