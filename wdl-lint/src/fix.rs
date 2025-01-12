@@ -84,6 +84,14 @@ impl Replacement {
 /// replacements referencing only the original input. Although the canonical
 /// Fenwick tree is 1-indexed this implementation is 0-indexed, so replacement
 /// positions must be directly equivalent to string indices.
+///
+/// The length of the tree is initialized to be 1 longer
+/// than the length of the initial value. This is because ftree provides
+/// no API for accessing the value of the final position, and the prefix sum
+/// only provides the cumulative sum < index. The extra index makes it possible
+/// to calculate the sum of the entire tree, which is necessary to enable
+/// slices of the value up to and beyond the original end of the value.
+/// Attempting to apply a replacement at this position will panic.
 #[derive(Clone, Debug)]
 pub struct Fixer {
     /// The string to be modified.
@@ -103,23 +111,27 @@ impl Fixer {
     }
 
     /// Apply a [`Replacement`] to the value contained in the Fixer.
-    pub fn apply_replacement(&mut self, rep: &Replacement) {
-        let old_start = rep.start;
-        let old_end = rep.end;
+    pub fn apply_replacement(&mut self, replacement: &Replacement) {
+        let old_start = replacement.start;
+        let old_end = replacement.end;
         let new_start = self.transform(old_start);
         let new_end = self.transform(old_end);
 
         let rep_len =
-            i32::try_from(rep.replacement().len()).expect("replacement length fits into i32");
+            i32::try_from(replacement.value().len()).expect("replacement length fits into i32");
         let range = i32::try_from(old_end - old_start).expect("range fits into i32");
         let shift = rep_len - range;
-        let insert_at = match rep.insertion_point {
+        let insert_at = match replacement.insertion_point {
             InsertionPoint::BeforeStart => old_start,
             InsertionPoint::AfterEnd => old_end + 1,
         };
+        assert!(
+            insert_at <= self.tree().len(),
+            "attempt to insert out-of-bounds"
+        );
         self.tree.add_at(insert_at, shift);
         self.value
-            .replace_range(new_start..new_end, &rep.replacement);
+            .replace_range(new_start..new_end, &replacement.value);
     }
 
     /// Apply multiple [`Replacement`]s in the correct order.
@@ -242,5 +254,16 @@ mod tests {
 
         fixer2.apply_replacements(vec![rep2, rep]);
         assert_eq!(fixer2.value(), "This statement is true.");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_out_of_bounds_insert() {
+        let value = String::from("012345");
+        let ins = String::from("6");
+        let rep = Replacement::new(7, 7, InsertionPoint::AfterEnd, ins, 1);
+
+        let mut fixer = Fixer::new(value);
+        fixer.apply_replacement(&rep);
     }
 }
