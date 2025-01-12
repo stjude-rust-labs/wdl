@@ -746,3 +746,36 @@ note[ShellCheck]: lint146 is referenced but not assigned.
     │
     = fix: address the diagnostic as recommended in the message
 
+note[ShellCheck]: version appears unused. Verify use (or export if used externally).
+    ┌─ tests/lints/shellcheck-warn/source.wdl:166:7
+    │
+166 │       version=`uname -r`
+    │       ^^^^^^^
+    │       │
+    │       SC2034[warning]: version appears unused. Verify use (or export if used externally).
+    │       more info: https://www.shellcheck.net/wiki/SC2034
+    │
+    = fix: address the diagnostic as recommended in the message
+
+note[ShellCheck]: Use $(...) notation instead of legacy backticks `...`.
+    ┌─ tests/lints/shellcheck-warn/source.wdl:166:15
+    │
+166 │       version=`uname -r`
+    │               ^^^^^^^^^^
+    │               │
+    │               SC2006[style]: Use $(...) notation instead of legacy backticks `...`.
+    │               more info: https://www.shellcheck.net/wiki/SC2006
+    │
+    = fix: did you mean `$(uname -r)`?
+
+note[ShellCheck]: Use 'cd ... || exit' or 'cd ... || return' in case cd fails.
+    ┌─ tests/lints/shellcheck-warn/source.wdl:168:7
+    │
+168 │       cd "DIR"
+    │       ^^^^^^^^
+    │       │
+    │       SC2164[warning]: Use 'cd ... || exit' or 'cd ... || return' in case cd fails.
+    │       more info: https://www.shellcheck.net/wiki/SC2164
+    │
+    = fix: did you mean `cd "DIR" || exit`?
+

@@ -97,7 +97,7 @@ impl Fixer {
     /// Create a new Fixer from a String.
     pub fn new(value: String) -> Self {
         Fixer {
-            tree: FenwickTree::from_iter(vec![0; value.len()]),
+            tree: FenwickTree::from_iter(vec![0; value.len() + 1]),
             value,
         }
     }

@@ -261,25 +261,38 @@ fn gather_task_declarations(task: &TaskDefinition) -> HashSet<String> {
 
 /// Create an appropriate 'fix' message.
 ///
-/// Returns only the slice of the command that falls between
-/// the first and last replacements. If there is only one replacement,
-/// this is the slice between the replacement's start and end.
-fn create_fix_message(reps: Vec<Replacement>, command_text: &str) -> String {
+/// Returns the following range of text:
+/// start = min(diagnostic highlight start, left-most replacement start)
+/// end = max(diagnostic highlight end, right-most replacement end)
+/// start..end
+fn create_fix_message(reps: Vec<Replacement>, command_text: &str, diag_span: Span) -> String {
     let mut fixer = Fixer::new(command_text.to_owned());
     // Get the original left-most and right-most replacement indices.
-    let start = reps
+    let rep_start = reps
         .iter()
         .map(|r| r.start())
         .min()
         .expect("replacements is non-empty");
-    let end = reps
+    let rep_end = reps
         .iter()
         .map(|r| r.end())
         .max()
         .expect("replacements is non-empty");
+    let start = rep_start.min(diag_span.start());
+    let end = rep_end.max(diag_span.end());
     fixer.apply_replacements(reps);
     // Adjust start and end based on final tree.
-    let adj_range = fixer.adj_range_inc(start..=end);
+    let adj_range = {
+        let range = fixer.adj_range(start..end);
+        // the prefix sum does not include the value at
+        // actual index. But, we want this value because
+        // we may have inserted text at the very end.
+        // ftree provides no method to get this value, so
+        // we must calculate it.
+        let max_pos = (end).min(fixer.value().len() - 1);
+        let extend_by = (fixer.transform(max_pos + 1) - fixer.transform(max_pos)).saturating_sub(1);
+        range.start..(range.end + extend_by)
+    };
     format!("did you mean `{}`?", &fixer.value()[adj_range])
 }
 
@@ -298,7 +311,13 @@ fn shellcheck_lint(
     let fix_msg = match diagnostic.fix {
         Some(ref fix) => {
             let reps = normalize_replacements(&fix.replacements, shift_tree);
-            create_fix_message(reps, command_text)
+            let diag_span = {
+                let start = diagnostic.column + shift_tree.prefix_sum(diagnostic.line - 1, 0) - 1;
+                let end =
+                    diagnostic.end_column + shift_tree.prefix_sum(diagnostic.end_line - 1, 0) - 1;
+                Span::new(start, end - start)
+            };
+            create_fix_message(reps, command_text, diag_span)
         }
         None => String::from("address the diagnostic as recommended in the message"),
     };
