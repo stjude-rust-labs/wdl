@@ -102,7 +102,7 @@ impl Fixer {
         }
     }
 
-    /// Apply a `Replacement` to the value contained in the Fixer.
+    /// Apply a [`Replacement`] to the value contained in the Fixer.
     pub fn apply_replacement(&mut self, rep: &Replacement) {
         let old_start = rep.start;
         let old_end = rep.end;
@@ -122,7 +122,7 @@ impl Fixer {
             .replace_range(new_start..new_end, &rep.replacement);
     }
 
-    /// Apply multiple `Replacement`s in the correct order.
+    /// Apply multiple [`Replacement`]s in the correct order.
     ///
     /// Order is determined by the precedence field.
     /// Higher precedences are applied first.

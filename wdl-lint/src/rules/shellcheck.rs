@@ -78,10 +78,10 @@ struct ShellCheckFix {
 #[derive(Clone, Debug, Deserialize)]
 /// A ShellCheck replacement.
 ///
-/// This differs from a `Replacement` in that
+/// This differs from a [`Replacement`] in that
 /// 1) columns are 1-indexed
 /// 2) it may span multiple lines and thus cannot be directly passed to a
-///    `Fixer`.
+///    [`Fixer`].
 ///
 /// It must be normalized with `normalize_replacements` before use.
 struct ShellCheckReplacement {
@@ -129,7 +129,7 @@ struct ShellCheckDiagnostic {
     pub fix: Option<ShellCheckFix>,
 }
 
-/// Convert `ShellCheckReplacement`s into `Replacement`s.
+/// Convert [`ShellCheckReplacement`]s into [`Replacement`]s.
 ///
 /// Column indices are shifted to 0-based.
 /// Multi-line replacements are normalized so that column indices are
