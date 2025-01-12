@@ -26,7 +26,7 @@ pub struct Replacement {
     /// where to insert the replacement.
     insertion_point: InsertionPoint,
     /// Value to be inserted.
-    replacement: String,
+    value: String,
     /// Precedence for replacement. Higher precedences are applied first.
     precedence: usize,
 }
@@ -38,14 +38,14 @@ impl Replacement {
         start: usize,
         end: usize,
         insertion_point: InsertionPoint,
-        replacement: String,
+        value: String,
         precedence: usize,
     ) -> Self {
         Replacement {
             start,
             end,
             insertion_point,
-            replacement,
+            value,
             precedence,
         }
     }
@@ -66,8 +66,8 @@ impl Replacement {
     }
 
     /// Value to be inserted.
-    pub fn replacement(&self) -> &str {
-        self.replacement.as_ref()
+    pub fn value(&self) -> &str {
+        self.value.as_ref()
     }
 
     /// Precedence for replacement. Higher precedences are applied first.

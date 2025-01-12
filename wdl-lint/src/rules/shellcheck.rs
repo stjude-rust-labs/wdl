@@ -135,10 +135,11 @@ struct ShellCheckDiagnostic {
 /// Multi-line replacements are normalized so that column indices are
 /// as though the string is on a single line.
 fn normalize_replacements(
-    reps: &[ShellCheckReplacement],
+    replacements: &[ShellCheckReplacement],
     shift_tree: &FenwickTree<usize>,
 ) -> Vec<Replacement> {
-    reps.iter()
+    replacements
+        .iter()
         .map(|r| {
             Replacement::new(
                 r.column + shift_tree.prefix_sum(r.line - 1, 0) - 1,
@@ -265,38 +266,42 @@ fn gather_task_declarations(task: &TaskDefinition) -> HashSet<String> {
 /// start = min(diagnostic highlight start, left-most replacement start)
 /// end = max(diagnostic highlight end, right-most replacement end)
 /// start..end
-fn create_fix_message(reps: Vec<Replacement>, command_text: &str, diag_span: Span) -> String {
+fn create_fix_message(
+    replacements: Vec<Replacement>,
+    command_text: &str,
+    diagnostic_span: Span,
+) -> String {
     let mut fixer = Fixer::new(command_text.to_owned());
     // Get the original left-most and right-most replacement indices.
-    let rep_start = reps
+    let rep_start = replacements
         .iter()
         .map(|r| r.start())
         .min()
         .expect("replacements is non-empty");
-    let rep_end = reps
+    let rep_end = replacements
         .iter()
         .map(|r| r.end())
         .max()
         .expect("replacements is non-empty");
-    let start = rep_start.min(diag_span.start());
-    let end = rep_end.max(diag_span.end());
-    fixer.apply_replacements(reps);
+    let start = rep_start.min(diagnostic_span.start());
+    let end = rep_end.max(diagnostic_span.end());
+    fixer.apply_replacements(replacements);
     // Adjust start and end based on final tree.
     let adj_range = {
         let range = fixer.adj_range(start..end);
         // the prefix sum does not include the value at
-        // actual index. But, we want this value because
+        // the actual index. But, we want this value because
         // we may have inserted text at the very end.
         // ftree provides no method to get this value, so
         // we must calculate it.
-        let max_pos = (end).min(fixer.value().len() - 1);
-        let extend_by = (fixer.transform(max_pos + 1) - fixer.transform(max_pos)).saturating_sub(1);
+        let max_pos = (end + 1).min(fixer.value().len());
+        let extend_by = (fixer.transform(max_pos) - fixer.transform(max_pos - 1)).saturating_sub(1);
         range.start..(range.end + extend_by)
     };
     format!("did you mean `{}`?", &fixer.value()[adj_range])
 }
 
-/// Creates a "ShellCheck lint" diagnostic from a `ShellCheckDiagnostic`
+/// Creates a "ShellCheck lint" diagnostic from a [ShellCheckDiagnostic]
 fn shellcheck_lint(
     diagnostic: &ShellCheckDiagnostic,
     command_text: &str,
@@ -331,7 +336,7 @@ fn shellcheck_lint(
         .with_fix(fix_msg)
 }
 
-/// Sanitize a `CommandSection`.
+/// Sanitize a [CommandSection].
 ///
 /// Removes all trailing whitespace, replaces placeholders
 /// with dummy bash variables or literals, and records declarations.
@@ -413,7 +418,7 @@ fn map_shellcheck_lines(section: &CommandSection) -> HashMap<usize, Span> {
     line_map
 }
 
-/// Calculates the correct `Span` for a `ShellCheckDiagnostic` relative to the
+/// Calculates the correct [Span] for a [ShellCheckDiagnostic] relative to the
 /// source.
 fn calculate_span(diagnostic: &ShellCheckDiagnostic, line_map: &HashMap<usize, Span>) -> Span {
     // shellcheck 1-indexes columns, so subtract 1.
