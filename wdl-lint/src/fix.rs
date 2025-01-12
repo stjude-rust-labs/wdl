@@ -90,7 +90,7 @@ impl Replacement {
 /// no API for accessing the value of the final position, and the prefix sum
 /// only provides the cumulative sum < index. The extra index makes it possible
 /// to calculate the sum of the entire tree, which is necessary to enable
-/// slices of the value up to and beyond the original end of the value.
+/// slices of the new value beyond the original end position.
 /// Attempting to apply a replacement at this position will panic.
 #[derive(Clone, Debug)]
 pub struct Fixer {
@@ -125,6 +125,9 @@ impl Fixer {
             InsertionPoint::BeforeStart => old_start,
             InsertionPoint::AfterEnd => old_end + 1,
         };
+        // The final position in the tree is reserved
+        // to work around the ftree API and is not
+        // a valid insertion point.
         assert!(
             insert_at <= self.tree().len(),
             "attempt to insert out-of-bounds"
