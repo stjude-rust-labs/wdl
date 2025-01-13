@@ -66,7 +66,7 @@ impl Token for PostToken {
                     PostToken::Space => write!(f, "{SPACE}"),
                     PostToken::Newline => write!(f, "{NEWLINE}"),
                     PostToken::Indent => {
-                        write!(f, "{INDENT}", INDENT = self.config.indent().string())
+                        write!(f, "{indent}", indent = self.config.indent().string())
                     }
                     PostToken::Literal(value) => write!(f, "{value}"),
                 }
@@ -110,6 +110,9 @@ enum LineBreak {
 }
 
 /// Returns whether a token can be line broken.
+/// 
+/// 
+/// TODO: not currently exhaustive.
 fn can_be_line_broken(kind: SyntaxKind) -> Option<LineBreak> {
     match kind {
         SyntaxKind::OpenBrace
@@ -352,15 +355,15 @@ impl Postprocessor {
         // Deduplicate the line breaks.
         let line_breaks = line_breaks.into_iter().collect::<HashSet<usize>>();
 
-        let mut inserted_line_breaks;
+        let mut num_inserted_line_breaks;
         for max_line_breaks in 1..=line_breaks.len() {
             let mut pre_buffer = in_stream.iter().enumerate().peekable();
-            inserted_line_breaks = 0;
+            num_inserted_line_breaks = 0;
             post_buffer.clear();
 
             while let Some((i, token)) = pre_buffer.next() {
-                if inserted_line_breaks < max_line_breaks && line_breaks.contains(&i) {
-                    inserted_line_breaks += 1;
+                if num_inserted_line_breaks < max_line_breaks && line_breaks.contains(&i) {
+                    num_inserted_line_breaks += 1;
                     self.interrupting_line_break(&mut post_buffer);
                 }
                 self.step(
