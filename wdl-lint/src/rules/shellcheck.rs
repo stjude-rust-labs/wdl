@@ -101,7 +101,8 @@ struct ShellCheckReplacement {
     #[serde(rename = "endColumn")]
     pub end_column: usize,
     /// Replacement text.
-    pub replacement: String,
+    #[serde(rename = "replacement")]
+    pub value: String,
 }
 
 /// A ShellCheck diagnostic.
@@ -145,7 +146,7 @@ fn normalize_replacements(
                 r.column + shift_tree.prefix_sum(r.line - 1, 0) - 1,
                 r.end_column + shift_tree.prefix_sum(r.end_line - 1, 0) - 1,
                 r.insertion_point,
-                r.replacement.clone(),
+                r.value.clone(),
                 r.precedence,
             )
         })
@@ -584,7 +585,7 @@ mod tests {
             end_column: 4,
             precedence: 1,
             insertion_point: fix::InsertionPoint::AfterEnd,
-            replacement: String::from("AAA"),
+            value: String::from("AAA"),
         };
         let shift_values =
             lines_with_offset(&ref_str).map(|(_, line_start, next_start)| next_start - line_start);
@@ -611,7 +612,7 @@ mod tests {
             end_column: 9,
             precedence: 1,
             insertion_point: fix::InsertionPoint::AfterEnd,
-            replacement: String::from("AAA"),
+            value: String::from("AAA"),
         };
         let shift_values =
             lines_with_offset(&ref_str).map(|(_, line_start, next_start)| next_start - line_start);
