@@ -183,7 +183,6 @@ impl Postprocessor {
                     output.push(PostToken::Newline);
 
                     buffer.clear();
-                    buffer.end_line();
                     self.position = LinePosition::StartOfLine;
                 }
                 _ => {
@@ -203,6 +202,11 @@ impl Postprocessor {
         next: Option<&PreToken>,
         stream: &mut TokenStream<PostToken>,
     ) {
+        if stream.is_empty() {
+            self.position = LinePosition::StartOfLine;
+            self.interrupted = false;
+            self.indent(stream);
+        }
         match token {
             PreToken::BlankLine => {
                 self.blank_line(stream);

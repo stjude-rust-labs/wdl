@@ -166,7 +166,6 @@ workflow seaseq {
     # Process SRRs
     if (
         defined(sample_sraid)) {
-
             # Download sample file(s) from SRA database
             # outputs:
             #    fastqdump.fastqfile : downloaded sample files in fastq.gz format
@@ -192,16 +191,13 @@ workflow seaseq {
         #1. Bowtie INDEX files if not provided
         if (
             !defined(bowtie_index)) {
-
                 # create bowtie index when not provided
                 call bowtie.index as bowtie_idx {
                     input: reference = reference }
             }
-
             #2. Make sure indexes are six else build indexes
             if (
                 defined(bowtie_index)) {
-
                     # check total number of bowtie indexes provided
                     Array[
                         String] string_bowtie_index = [
@@ -212,7 +208,6 @@ workflow seaseq {
                         string_bowtie_index,
                     ])
                     if (length(int_bowtie_index) != 6) {
-
                             # create bowtie index if 6 index files aren't provided
                             call bowtie.index as bowtie_idx_2 {
                                 input: reference = reference }
@@ -231,7 +226,6 @@ workflow seaseq {
                         1,
                     ]
                     if (!defined(spikein_bowtie_index) && defined(spikein_reference)) {
-
                             # create bowtie index on spikein genome
                             call bowtie.index as spikein_bowtie_idx {
                                 input: reference = select_first([
@@ -243,7 +237,6 @@ workflow seaseq {
                         #4. Make sure indexes are six else build indexes for Spike-in DNA
                         if (
                             defined(spikein_bowtie_index)) {
-
                                 # check total number of bowtie indexes provided
                                 Array[
                                     File] int_spikein_bowtie_index = select_first([
@@ -251,7 +244,6 @@ workflow seaseq {
                                     string_spikein_buffer,
                                 ])
                                 if (length(int_spikein_bowtie_index) != 6) {
-
                                         # create bowtie index if 6 index files aren't provided
                                         call bowtie.index as spikein_bowtie_idx_2 {
                                             input: reference = select_first([
@@ -271,7 +263,6 @@ workflow seaseq {
                                 call samtools.faidx as samtools_faidx {
                                     # create FASTA index and chrom sizes files
                                     input: reference = reference }
-
                                 call util.effective_genome_size as egs {
                                     # effective genome size for FASTA
                                     input: reference = reference }
@@ -303,7 +294,6 @@ workflow seaseq {
                             # if multiple fastqfiles are provided
                             Boolean multi_fastq = (
                                 if length(original_fastqfiles) > 1 then true else false)
-
                             Boolean one_fastq = (
                                 if length(original_fastqfiles) == 1 then true else false)
 
@@ -313,7 +303,6 @@ workflow seaseq {
                                 scatter (eachfastq in original_fastqfiles) {
                                     call fastqc.fastqc as spikein_indv_fastqc { input:
                                         inputfile = eachfastq,
-
                                         default_location = (
                                             if (
                                             one_fastq
@@ -329,7 +318,6 @@ workflow seaseq {
                                     }
                                     call util.basicfastqstats as spikein_indv_bfs { input:
                                         fastqfile = eachfastq,
-
                                         default_location = (
                                             if (
                                             one_fastq
@@ -347,7 +335,6 @@ workflow seaseq {
                                         fastqfile = eachfastq,
                                         index_files = actual_spikein_bowtie_index,
                                         metricsfile = spikein_indv_bfs.metrics_out,
-
                                         default_location = (
                                             if (
                                             one_fastq
@@ -379,7 +366,6 @@ workflow seaseq {
                             if (
                                 multi_fastq) {
                                 scatter (eachfastq in fastqfiles) {
-
                                         # Execute analysis on each fastq file provided
                                         # Analysis executed:
                                         #   FastQC
@@ -395,7 +381,6 @@ workflow seaseq {
                                         call fastqc.fastqc as indv_fastqc {
                                             input:
                                             inputfile = eachfastq,
-
                                             default_location = "SAMPLE/" + sub(
                                                 basename(
                                                 eachfastq
@@ -404,7 +389,6 @@ workflow seaseq {
 
                                         call util.basicfastqstats as indv_bfs { input:
                                             fastqfile = eachfastq,
-
                                             default_location = "SAMPLE/" + sub(
                                                 basename(
                                                 eachfastq
@@ -417,7 +401,6 @@ workflow seaseq {
                                             index_files = actual_bowtie_index,
                                             metricsfile = indv_bfs.metrics_out,
                                             blacklist = blacklist,
-
                                             default_location = "SAMPLE/" + sub(
                                                 basename(
                                                 eachfastq
@@ -426,7 +409,6 @@ workflow seaseq {
 
                                         call fastqc.fastqc as indv_bamfqc { input:
                                             inputfile = indv_mapping.sorted_bam,
-
                                             default_location = "SAMPLE/" + sub(
                                                 basename(
                                                 eachfastq
@@ -454,7 +436,6 @@ workflow seaseq {
                                             rmdupflag = indv_mapping.mkdup_stats,
                                             bkflag = indv_mapping.bklist_stats,
                                             fastqmetrics = indv_bfs.metrics_out,
-
                                             default_location = "SAMPLE/" + sub(
                                                 basename(
                                                 eachfastq
@@ -475,7 +456,6 @@ workflow seaseq {
                                     htmlfiles = indv_summarystats.xhtml,
                                     txtfiles = indv_summarystats.textfile,
                                     default_location = "SAMPLE",
-
                                     outputfile = "AllMapped_" + length(
                                         fastqfiles) + "_seaseq-summary-stats.html",
                                 }
@@ -483,14 +463,12 @@ workflow seaseq {
                                 call samtools.mergebam { input:
                                     bamfiles = indv_mapping.sorted_bam,
                                     metricsfiles = indv_bfs.metrics_out,
-
                                     default_location = (
                                         if defined(
                                         results_name
                                         ) then results_name + "/BAM_files" else "AllMerge_" + length(
                                         indv_mapping.sorted_bam
                                         ) + "_mapped" + "/BAM_files"),
-
                                     outputfile = (
                                         if defined(
                                         results_name
@@ -500,7 +478,6 @@ workflow seaseq {
 
                                 call fastqc.fastqc as mergebamfqc { input:
                                     inputfile = mergebam.mergebam,
-
                                     default_location = sub(
                                         basename(
                                         mergebam.mergebam
@@ -509,7 +486,6 @@ workflow seaseq {
 
                                 call samtools.indexstats as mergeindexstats { input:
                                     bamfile = mergebam.mergebam,
-
                                     default_location = sub(
                                         basename(
                                         mergebam.mergebam
@@ -526,7 +502,6 @@ workflow seaseq {
                                     call bedtools.intersect as merge_rmblklist { input:
                                         fileA = mergebam.mergebam,
                                         fileB = blacklist_file,
-
                                         default_location = sub(
                                             basename(
                                             mergebam.mergebam
@@ -535,7 +510,6 @@ workflow seaseq {
                                     }
                                     call samtools.indexstats as merge_bklist { input:
                                         bamfile = merge_rmblklist.intersect_out,
-
                                         default_location = sub(
                                             basename(
                                             mergebam.mergebam
@@ -550,7 +524,6 @@ workflow seaseq {
 
                             call samtools.markdup as merge_markdup { input:
                                 bamfile = mergebam_afterbklist,
-
                                 default_location = sub(
                                     basename(
                                     mergebam_afterbklist
@@ -559,7 +532,6 @@ workflow seaseq {
 
                             call samtools.indexstats as merge_mkdup { input:
                                 bamfile = merge_markdup.mkdupbam,
-
                                 default_location = sub(
                                     basename(
                                     mergebam_afterbklist
@@ -575,7 +547,6 @@ workflow seaseq {
                     # if only one fastqfile is provided
                     if (
                         one_fastq) {
-
                             # Execute analysis on each fastq file provided
                             # Analysis executed:
                             #   FastQC
@@ -591,7 +562,6 @@ workflow seaseq {
                             call fastqc.fastqc as uno_fastqc {
                                 input:
                                 inputfile = fastqfiles[0],
-
                                 default_location = sub(
                                     basename(
                                     fastqfiles[
@@ -600,7 +570,6 @@ workflow seaseq {
 
                             call util.basicfastqstats as uno_bfs { input:
                                 fastqfile = fastqfiles[0],
-
                                 default_location = sub(
                                     basename(
                                     fastqfiles[
@@ -612,7 +581,6 @@ workflow seaseq {
                                 index_files = actual_bowtie_index,
                                 metricsfile = uno_bfs.metrics_out,
                                 blacklist = blacklist,
-
                                 default_location = sub(
                                     basename(
                                     fastqfiles[
@@ -621,7 +589,6 @@ workflow seaseq {
 
                             call fastqc.fastqc as uno_bamfqc { input:
                                 inputfile = mapping.sorted_bam,
-
                                 default_location = sub(
                                     basename(
                                     fastqfiles[
@@ -667,14 +634,12 @@ workflow seaseq {
                         pvalue = "1e-9",
                         keep_dup = "auto",
                         egs = egs.genomesize,
-
                         default_location = sub(
                             basename(
                             sample_bam
                             ), ".sorted.b.*$", ""
                             ) + "/PEAKS/NARROW_peaks" + "/" + basename(
                             sample_bam, ".bam") + "-p9_kd-auto",
-
                         coverage_location = sub(
                             basename(
                             sample_bam
@@ -692,14 +657,12 @@ workflow seaseq {
                         pvalue = "1e-9",
                         keep_dup = "all",
                         egs = egs.genomesize,
-
                         default_location = sub(
                             basename(
                             sample_bam
                             ), ".sorted.b.*$", ""
                             ) + "/PEAKS/NARROW_peaks" + "/" + basename(
                             sample_bam, ".bam") + "-p9_kd-all",
-
                         coverage_location = sub(
                             basename(
                             sample_bam
@@ -712,14 +675,12 @@ workflow seaseq {
                         bamfile = sample_bam,
                         nomodel = true,
                         egs = egs.genomesize,
-
                         default_location = sub(
                             basename(
                             sample_bam
                             ), ".sorted.b.*$", ""
                             ) + "/PEAKS/NARROW_peaks" + "/" + basename(
                             sample_bam, ".bam") + "-nm",
-
                         coverage_location = sub(
                             basename(
                             sample_bam
@@ -739,7 +700,6 @@ workflow seaseq {
                             merge_mkdup.indexbam,
                             mapping.mkdup_index,
                         ]),
-
                         default_location = sub(
                             basename(sample_bam), ".sorted.b.*$", "") + "/BAM_Density",
                     }
@@ -758,11 +718,9 @@ workflow seaseq {
                             uno_bfs.readlength,
                             mergebam.avg_readlength,
                         ]),
-
                         default_location = sub(
                             basename(
                             sample_bam), ".sorted.b.*$", "") + "/PEAKS/BROAD_peaks",
-
                         coverage_location = sub(
                             basename(
                             sample_bam
@@ -781,7 +739,6 @@ workflow seaseq {
                         ]),
                         bedfile_auto = macs.peakbedfile,
                         bedfile_all = all.peakbedfile,
-
                         default_location = sub(
                             basename(
                             sample_bam), ".sorted.b.*$", "") + "/PEAKS/STITCHED_peaks",
@@ -794,7 +751,6 @@ workflow seaseq {
                         bedfile = macs.peakbedfile,
                         chromsizes = samtools_faidx.chromsizes,
                         summitfile = macs.summitsfile,
-
                         default_location = sub(
                             basename(
                             sample_bam
@@ -808,7 +764,6 @@ workflow seaseq {
                         bedfile = all.peakbedfile,
                         chromsizes = samtools_faidx.chromsizes,
                         summitfile = all.summitsfile,
-
                         default_location = sub(
                             basename(
                             sample_bam
@@ -822,7 +777,6 @@ workflow seaseq {
                         bedfile = nomodel.peakbedfile,
                         chromsizes = samtools_faidx.chromsizes,
                         summitfile = nomodel.summitsfile,
-
                         default_location = sub(
                             basename(
                             sample_bam
@@ -835,7 +789,6 @@ workflow seaseq {
                         gtffile = gtf,
                         bedfile = sicer.scoreisland,
                         chromsizes = samtools_faidx.chromsizes,
-
                         default_location = sub(
                             basename(
                             sample_bam
@@ -849,14 +802,12 @@ workflow seaseq {
                             reference_index = samtools_faidx.faidx_file,
                             bedfile = macs.peakbedfile,
                             motif_databases = motif_databases,
-
                             default_location = sub(
                                 basename(sample_bam), ".sorted.b.*$", "") + "/MOTIFS",
                         }
 
                         call util.flankbed { input:
                             bedfile = macs.summitsfile,
-
                             default_location = sub(
                                 basename(sample_bam), ".sorted.b.*$", "") + "/MOTIFS",
                         }
@@ -866,7 +817,6 @@ workflow seaseq {
                             reference_index = samtools_faidx.faidx_file,
                             bedfile = flankbed.flankbedfile,
                             motif_databases = motif_databases,
-
                             default_location = sub(
                                 basename(sample_bam), ".sorted.b.*$", "") + "/MOTIFS",
                         }
@@ -876,7 +826,6 @@ workflow seaseq {
                         wigfile = macs.wigfile,
                         chromsizes = samtools_faidx.chromsizes,
                         xlsfile = macs.peakxlsfile,
-
                         default_location = sub(
                             basename(
                             sample_bam
@@ -889,7 +838,6 @@ workflow seaseq {
                         wigfile = all.wigfile,
                         chromsizes = samtools_faidx.chromsizes,
                         xlsfile = all.peakxlsfile,
-
                         default_location = sub(
                             basename(
                             sample_bam
@@ -902,7 +850,6 @@ workflow seaseq {
                         wigfile = nomodel.wigfile,
                         chromsizes = samtools_faidx.chromsizes,
                         xlsfile = nomodel.peakxlsfile,
-
                         default_location = sub(
                             basename(
                             sample_bam
@@ -914,7 +861,6 @@ workflow seaseq {
                     call viz.visualization as vizsicer { input:
                         wigfile = sicer.wigfile,
                         chromsizes = samtools_faidx.chromsizes,
-
                         default_location = sub(
                             basename(
                             sample_bam
@@ -941,7 +887,6 @@ workflow seaseq {
 
                     #SUMMARY STATISTICS
                     if (one_fastq) {
-
                             call util.evalstats as uno_summarystats {
                                 # SUMMARY STATISTICS of sample file (only 1 sample file provided)
                                 input:
@@ -960,7 +905,6 @@ workflow seaseq {
                                 peaksxls = macs.peakxlsfile,
                                 enhancers = rose.enhancers,
                                 superenhancers = rose.super_enhancers,
-
                                 default_location = sub(
                                     basename(
                                     sample_bam), ".sorted.b.*$", "") + "/QC/SummaryStats",
@@ -975,7 +919,6 @@ workflow seaseq {
                         }  # end if one_fastq
 
                         if (multi_fastq) {
-
                                 call util.evalstats as merge_summarystats {
                                     # SUMMARY STATISTICS of all samples files (more than 1 sample file provided)
                                     input:
@@ -993,7 +936,6 @@ workflow seaseq {
                                     peaksxls = macs.peakxlsfile,
                                     enhancers = rose.enhancers,
                                     superenhancers = rose.super_enhancers,
-
                                     default_location = sub(
                                         basename(
                                         sample_bam
@@ -1011,16 +953,13 @@ workflow seaseq {
                             }  # end if multi_fastq
 
                             output {
-
                                         #SPIKE-IN
                                         Array[
                                             File?
                                             ]? spikein_indv_s_htmlfile = spikein_indv_fastqc.htmlfile
-
                                         Array[
                                             File?
                                             ]? spikein_indv_s_zipfile = spikein_indv_fastqc.zipfile
-
                                         Array[
                                             File?
                                             ]? spikein_s_metrics_out = spikein_indv_map.mapping_output
@@ -1029,11 +968,9 @@ workflow seaseq {
                                         Array[
                                             File?]? indv_s_htmlfile = indv_fastqc.htmlfile
                                         Array[File?]? indv_s_zipfile = indv_fastqc.zipfile
-
                                         Array[
                                             File?
                                             ]? indv_s_bam_htmlfile = indv_bamfqc.htmlfile
-
                                         Array[
                                             File?
                                             ]? indv_s_bam_zipfile = indv_bamfqc.zipfile
@@ -1053,21 +990,16 @@ workflow seaseq {
                                         Array[
                                             File?
                                             ]? indv_s_sortedbam = indv_mapping.sorted_bam
-
                                         Array[
                                             File?
                                             ]? indv_s_indexbam = indv_mapping.bam_index
-
                                         Array[
                                             File?]? indv_s_bkbam = indv_mapping.bklist_bam
-
                                         Array[
                                             File?
                                             ]? indv_s_bkindexbam = indv_mapping.bklist_index
-
                                         Array[
                                             File?]? indv_s_rmbam = indv_mapping.mkdup_bam
-
                                         Array[
                                             File?
                                             ]? indv_s_rmindexbam = indv_mapping.mkdup_index
@@ -1196,11 +1128,9 @@ workflow seaseq {
                                         Array[
                                             File?
                                             ]? s_qc_statsfile = indv_summarystats.statsfile
-
                                         Array[
                                             File?
                                             ]? s_qc_htmlfile = indv_summarystats.htmlfile
-
                                         Array[
                                             File?
                                             ]? s_qc_textfile = indv_summarystats.textfile

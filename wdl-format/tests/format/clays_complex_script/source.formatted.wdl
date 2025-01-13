@@ -82,7 +82,6 @@ task a_task {
         Boolean some_other_boolean = true
         Int some_other_integer = 42
         Float some_other_float = 0e3
-
         # This should not be higlighted, as it's not known within
         # the TextMate language that it's a custom struct.
         AStruct some_other_struct = AStruct {
@@ -180,7 +179,6 @@ workflow hello {
         Boolean some_other_boolean = true
         Int some_other_integer = 42
         Float some_other_float = 0e3
-
         # This should not be higlighted, as it's not known within
         # the TextMate language that it's a custom struct.
         AStruct some_other_struct = AStruct {
