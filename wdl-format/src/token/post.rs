@@ -108,6 +108,7 @@ impl TokenStream<PostToken> {
     fn width(&self, config: &Config) -> usize {
         self.iter().map(|t| t.width(config)).sum()
     }
+
     /// Gets the maximum width of the [`TokenStream`].
     ///
     /// This is suitable to call if the stream represents multiple lines.
