@@ -166,7 +166,7 @@ pub struct Postprocessor {
     temp_indent_needed: bool,
 
     /// Temporary indentation to add.
-    temp_indent: String,
+    temp_indent: Rc<String>,
 }
 
 impl Postprocessor {
@@ -270,10 +270,12 @@ impl Postprocessor {
                 }
 
                 if kind == SyntaxKind::LiteralCommandText {
-                    self.temp_indent = value
-                        .chars()
-                        .take_while(|c| matches!(c, ' ' | '\t'))
-                        .collect();
+                    self.temp_indent = Rc::new(
+                        value
+                            .chars()
+                            .take_while(|c| matches!(c, ' ' | '\t'))
+                            .collect(),
+                    );
                 }
 
                 stream.push(PostToken::Literal(value));
@@ -463,7 +465,7 @@ impl Postprocessor {
         }
 
         if self.temp_indent_needed {
-            stream.push(PostToken::TempIndent(Rc::new(self.temp_indent.clone())));
+            stream.push(PostToken::TempIndent(self.temp_indent.clone()));
         }
     }
 
