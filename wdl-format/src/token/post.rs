@@ -108,6 +108,21 @@ impl TokenStream<PostToken> {
     fn width(&self, config: &Config) -> usize {
         self.iter().map(|t| t.width(config)).sum()
     }
+    /// Gets the maximum width of the [`TokenStream`].
+    ///
+    /// This is suitable to call if the stream represents multiple lines.
+    fn max_width(&self, config: &Config) -> usize {
+        let mut max: usize = 0;
+        let mut cur_width: usize = 0;
+        for token in self.iter() {
+            cur_width += token.width(config);
+            if token == &PostToken::Newline {
+                max = max.max(cur_width);
+                cur_width = 0;
+            }
+        }
+        max
+    }
 }
 
 /// A line break.
@@ -349,7 +364,7 @@ impl Postprocessor {
         }
 
         if config.max_line_length().is_none()
-            || post_buffer.width(config) <= config.max_line_length().unwrap()
+            || post_buffer.max_width(config) <= config.max_line_length().unwrap()
         {
             dbg!("no line breaks needed");
             out_stream.extend(post_buffer);
