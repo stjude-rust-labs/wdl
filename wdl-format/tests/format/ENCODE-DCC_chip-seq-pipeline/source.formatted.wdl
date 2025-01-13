@@ -1874,7 +1874,7 @@ workflow chip {
                                                                                                 tas = ctl_ta_,
                                                                                                 prefix = "ctl",
                                                                                                 runtime_environment = runtime_environment,
-                                                                                        }
+                                                                                            }
                                                                                     }
 
                                                                                     Boolean has_input_of_count_signal_track_pooled = defined(
@@ -1888,7 +1888,7 @@ workflow chip {
                                                                                                 ta = pool_ta.ta_pooled,
                                                                                                 chrsz = chrsz_,
                                                                                                 runtime_environment = runtime_environment,
-                                                                                        }
+                                                                                            }
                                                                                     }
 
                                                                                     Boolean has_input_of_jsd = defined(
@@ -1914,7 +1914,7 @@ workflow chip {
                                                                                                 time_hr = jsd_time_hr,
                                                                                                 disk_factor = jsd_disk_factor,
                                                                                                 runtime_environment = runtime_environment,
-                                                                                        }
+                                                                                            }
                                                                                     }
 
                                                                                     Boolean has_all_input_of_choose_ctl = length(
@@ -1944,7 +1944,7 @@ workflow chip {
                                                                                                 ctl_depth_limit = ctl_depth_limit,
                                                                                                 exp_ctl_depth_ratio_limit = exp_ctl_depth_ratio_limit,
                                                                                                 runtime_environment = runtime_environment,
-                                                                                        }
+                                                                                            }
                                                                                     }
 
                                                                                     scatter (
@@ -1961,7 +1961,7 @@ workflow chip {
                                                                                                         if has_all_input_of_choose_ctl && !align_only_ then select_first(
                                                                                                     [
                                                                                                         choose_ctl.chosen_ctl_ta_ids,
-                                                                                ]
+                                                                                    ]
                                                                                     )[
                                                                                     i
                                                                                     ] else -2
@@ -1970,29 +1970,30 @@ workflow chip {
                                                                                     if has_all_input_of_choose_ctl && !align_only_ then select_first(
                                                                                 [
                                                                                     choose_ctl.chosen_ctl_ta_subsample,
-                                                                            ])[i] else 0)
-                                                                            Boolean chosen_ctl_paired_end = (
-                                                                                if chosen_ctl_ta_id == -2 then false else if chosen_ctl_ta_id == -1 then ctl_paired_end_[
-                                                                                0
-                                                                                ] else ctl_paired_end_[
-                                                                                chosen_ctl_ta_id
-                                                                                ])
+                                                                            ]
+                                                                            )[i] else 0)
+                                                                        Boolean chosen_ctl_paired_end = (
+                                                                            if chosen_ctl_ta_id == -2 then false else if chosen_ctl_ta_id == -1 then ctl_paired_end_[
+                                                                            0
+                                                                            ] else ctl_paired_end_[
+                                                                            chosen_ctl_ta_id
+                                                                            ])
 
-                                                                            if (
-                                                                                chosen_ctl_ta_id > -2 && chosen_ctl_ta_subsample > 0
-                                                                                ) {
-                                                                                    call subsample_ctl {
-                                                                                        input:
-                                                                                                        ta = (
-                                                                                                            if chosen_ctl_ta_id == -1 then pool_ta_ctl.ta_pooled else ctl_ta_[
-                                                                                                            chosen_ctl_ta_id
-                                                                                                            ]
-                                                                                                            ),
-                                                                                                        subsample = chosen_ctl_ta_subsample,
-                                                                                                        paired_end = chosen_ctl_paired_end,
-                                                                                                        mem_factor = subsample_ctl_mem_factor,
-                                                                                                        disk_factor = subsample_ctl_disk_factor,
-                                                                                                        runtime_environment = runtime_environment,
+                                                                        if (
+                                                                            chosen_ctl_ta_id > -2 && chosen_ctl_ta_subsample > 0
+                                                                            ) {
+                                                                                call subsample_ctl {
+                                                                                    input:
+                                                                                                    ta = (
+                                                                                                        if chosen_ctl_ta_id == -1 then pool_ta_ctl.ta_pooled else ctl_ta_[
+                                                                                                        chosen_ctl_ta_id
+                                                                                                        ]
+                                                                                                        ),
+                                                                                                    subsample = chosen_ctl_ta_subsample,
+                                                                                                    paired_end = chosen_ctl_paired_end,
+                                                                                                    mem_factor = subsample_ctl_mem_factor,
+                                                                                                    disk_factor = subsample_ctl_disk_factor,
+                                                                                                    runtime_environment = runtime_environment,
                                                                                                 }
                                                                                         }
                                                                                         Array[
@@ -2003,207 +2004,67 @@ workflow chip {
                                                                                                     select_first(
                                                                                                     [
                                                                                                         subsample_ctl.ta_subsampled,
-                                                                                            ]
+                                                                                                ]
                                                                                                 ),
-                                                                                ] else if chosen_ctl_ta_id == -1 then [
+                                                                                    ] else if chosen_ctl_ta_id == -1 then [
                                                                                         select_first(
                                                                                         [
                                                                                             pool_ta_ctl.ta_pooled,
-                                                                                    ]),
-                                                                                ] else [
-                                                                                        select_first(
-                                                                                        [
-                                                                                                    ctl_ta_[
-                                                                                                        chosen_ctl_ta_id
-                                                                                                        ],
+                                                                                    ]
+                                                                                    ),
+                                                                            ] else [
+                                                                                    select_first(
+                                                                                    [
+                                                                                                ctl_ta_[
+                                                                                                    chosen_ctl_ta_id
+                                                                                                    ],
                                                                                         ]
-                                                                                            ),
-                                                                                    ])
-                                                                                }
-                                                                                Int chosen_ctl_ta_pooled_subsample = (
-                                                                                    if has_all_input_of_choose_ctl && !align_only_ then select_first(
-                                                                                [
-                                                                                    choose_ctl.chosen_ctl_ta_subsample_pooled,
-                                                                                ]) else 0)
+                                                                                        ),
+                                                                                ])
+                                                                            }
+                                                                            Int chosen_ctl_ta_pooled_subsample = (
+                                                                                if has_all_input_of_choose_ctl && !align_only_ then select_first(
+                                                                            [
+                                                                                choose_ctl.chosen_ctl_ta_subsample_pooled,
+                                                                            ]) else 0)
 
-                                                                                # workaround for dx error (Unsupported combination: womType: Int womValue: ([225], Array[Int]))
-                                                                                Array[
-                                                                                    Int
-                                                                                    ] fraglen_tmp = select_all(
-                                                                                    fraglen_
-                                                                                    )
+                                                                            # workaround for dx error (Unsupported combination: womType: Int womValue: ([225], Array[Int]))
+                                                                            Array[
+                                                                                Int
+                                                                                ] fraglen_tmp = select_all(
+                                                                                fraglen_)
 
-                                                                                # we have all tas and ctl_tas (optional for histone chipseq) ready, let's call peaks
-                                                                                scatter (
-                                                                                    i in range(
-                                                                                    num_rep
-                                                                                    )) {
-                                                                                                    Boolean has_input_of_call_peak = defined(
-                                                                                                        ta_[
-                                                                                                        i
-                                                                                                        ]
-                                                                                                        )
-                                                                                                    Boolean has_output_of_call_peak = i < length(
-                                                                                                        peaks
-                                                                                                        )
-                                                                                                    if (
-                                                                                                        has_input_of_call_peak && !has_output_of_call_peak && !align_only_
-                                                                                                        ) {
-                                                                                                            call call_peak {
-                                                                                                                input:
-                                                                                                                peak_caller = peak_caller_,
-                                                                                                                peak_type = peak_type_,
-                                                                                                                tas = flatten(
-                                                                                                                [
-                                                                                                                        [
-                                                                                                                                    ta_[
-                                                                                                                                        i
-                                                                                                                                        ],
-                                                                                                                            ],
-                                                                                                                            chosen_ctl_tas[
-                                                                                                                                i
-                                                                                                                                ],
-                                                                                                                ]
-                                                                                                                    ),
-                                                                                                                gensz = gensz_,
-                                                                                                                chrsz = chrsz_,
-                                                                                                                cap_num_peak = cap_num_peak_,
-                                                                                                                pval_thresh = pval_thresh,
-                                                                                                                fdr_thresh = fdr_thresh,
-                                                                                                                fraglen = fraglen_tmp[
-                                                                                                                    i
-                                                                                                                    ],
-                                                                                                                blacklist = blacklist_,
-                                                                                                                regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
-
-                                                                                                                cpu = call_peak_cpu,
-                                                                                                                mem_factor = call_peak_mem_factor_,
-                                                                                                                disk_factor = call_peak_disk_factor_,
-                                                                                                                time_hr = call_peak_time_hr,
-                                                                                                                runtime_environment = (
-                                                                                                                    if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment
-                                                                                                                    ),
-                                                                                                        }
-                                                                                                }
-                                                                                                File? peak_ = (
-                                                                                                    if has_output_of_call_peak then peaks[
-                                                                                                    i
-                                                                                                    ] else call_peak.peak
-                                                                                                    )
-
-                                                                                                # signal track
-                                                                                                if (
-                                                                                                    has_input_of_call_peak && !align_only_
-                                                                                                    ) {
-                                                                                                        call macs2_signal_track {
-                                                                                                            input:
-                                                                                                                    tas = flatten(
-                                                                                                                    [
-                                                                                                                            [
-                                                                                                                                        ta_[
-                                                                                                                                            i
-                                                                                                                                            ],
-                                                                                                                                ],
-                                                                                                                                chosen_ctl_tas[
-                                                                                                                                    i
-                                                                                                                                    ],
-                                                                                                                    ]
-                                                                                                                        ),
-                                                                                                                    gensz = gensz_,
-                                                                                                                    chrsz = chrsz_,
-                                                                                                                    pval_thresh = pval_thresh,
-                                                                                                                    fraglen = fraglen_tmp[
-                                                                                                                        i
-                                                                                                                        ],
-
-                                                                                                                    mem_factor = macs2_signal_track_mem_factor,
-                                                                                                                    disk_factor = macs2_signal_track_disk_factor,
-                                                                                                                    time_hr = macs2_signal_track_time_hr,
-                                                                                                                    runtime_environment = runtime_environment_macs2,
-                                                                                                            }
-                                                                                                    }
-
-                                                                                                    # call peaks on 1st pseudo replicated tagalign
-                                                                                                    Boolean has_input_of_call_peak_pr1 = defined(
-                                                                                                        spr.ta_pr1[
-                                                                                                        i
-                                                                                                        ]
-                                                                                                        )
-                                                                                                    Boolean has_output_of_call_peak_pr1 = i < length(
-                                                                                                        peaks_pr1
-                                                                                                        )
-                                                                                                    if (
-                                                                                                        has_input_of_call_peak_pr1 && !has_output_of_call_peak_pr1 && !true_rep_only
-                                                                                                        ) {
-                                                                                                            call call_peak as call_peak_pr1 {
-                                                                                                                input:
-                                                                                                                peak_caller = peak_caller_,
-                                                                                                                peak_type = peak_type_,
-                                                                                                                tas = flatten(
-                                                                                                                [
-                                                                                                                        [
-                                                                                                                                    spr.ta_pr1[
-                                                                                                                                        i
-                                                                                                                                        ],
-                                                                                                                            ],
-                                                                                                                            chosen_ctl_tas[
-                                                                                                                                i
-                                                                                                                                ],
-                                                                                                                ]
-                                                                                                                    ),
-                                                                                                                gensz = gensz_,
-                                                                                                                chrsz = chrsz_,
-                                                                                                                cap_num_peak = cap_num_peak_,
-                                                                                                                pval_thresh = pval_thresh,
-                                                                                                                fdr_thresh = fdr_thresh,
-                                                                                                                fraglen = fraglen_tmp[
-                                                                                                                    i
-                                                                                                                    ],
-                                                                                                                blacklist = blacklist_,
-                                                                                                                regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
-
-                                                                                                                cpu = call_peak_cpu,
-                                                                                                                mem_factor = call_peak_mem_factor_,
-                                                                                                                disk_factor = call_peak_disk_factor_,
-                                                                                                                time_hr = call_peak_time_hr,
-                                                                                                                runtime_environment = (
-                                                                                                                    if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment
-                                                                                                                    ),
-                                                                                                        }
-                                                                                                }
-                                                                                                File? peak_pr1_ = (
-                                                                                                    if has_output_of_call_peak_pr1 then peaks_pr1[
-                                                                                                    i
-                                                                                                    ] else call_peak_pr1.peak
-                                                                                                    )
-
-                                                                                                # call peaks on 2nd pseudo replicated tagalign
-                                                                                                Boolean has_input_of_call_peak_pr2 = defined(
-                                                                                                    spr.ta_pr2[
+                                                                            # we have all tas and ctl_tas (optional for histone chipseq) ready, let's call peaks
+                                                                            scatter (
+                                                                                i in range(
+                                                                                num_rep
+                                                                                )) {
+                                                                                                Boolean has_input_of_call_peak = defined(
+                                                                                                    ta_[
                                                                                                     i
                                                                                                     ]
                                                                                                     )
-                                                                                                Boolean has_output_of_call_peak_pr2 = i < length(
-                                                                                                    peaks_pr2
+                                                                                                Boolean has_output_of_call_peak = i < length(
+                                                                                                    peaks
                                                                                                     )
                                                                                                 if (
-                                                                                                    has_input_of_call_peak_pr2 && !has_output_of_call_peak_pr2 && !true_rep_only
+                                                                                                    has_input_of_call_peak && !has_output_of_call_peak && !align_only_
                                                                                                     ) {
-                                                                                                        call call_peak as call_peak_pr2 {
+                                                                                                        call call_peak {
                                                                                                             input:
                                                                                                             peak_caller = peak_caller_,
                                                                                                             peak_type = peak_type_,
                                                                                                             tas = flatten(
                                                                                                             [
                                                                                                                     [
-                                                                                                                                spr.ta_pr2[
+                                                                                                                                ta_[
                                                                                                                                     i
                                                                                                                                     ],
-                                                                                                                        ],
+                                                                                                                            ],
                                                                                                                         chosen_ctl_tas[
                                                                                                                             i
                                                                                                                             ],
-                                                                                                            ]
+                                                                                                                ]
                                                                                                                 ),
                                                                                                             gensz = gensz_,
                                                                                                             chrsz = chrsz_,
@@ -2223,58 +2084,198 @@ workflow chip {
                                                                                                             runtime_environment = (
                                                                                                                 if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment
                                                                                                                 ),
-                                                                                                    }
-                                                                                            }
-                                                                                            File? peak_pr2_ = (
-                                                                                                if has_output_of_call_peak_pr2 then peaks_pr2[
+                                                                                                        }
+                                                                                                }
+                                                                                            File? peak_ = (
+                                                                                                if has_output_of_call_peak then peaks[
                                                                                                 i
-                                                                                                ] else call_peak_pr2.peak
+                                                                                                ] else call_peak.peak
                                                                                                 )
-                                                                                        }
 
-                                                                                        # if ( !align_only_ && num_rep > 1 ) {
-                                                                                        # rounded mean of fragment length, which will be used for
-                                                                                        #  1) calling peaks for pooled true/pseudo replicates
-                                                                                        #  2) calculating FRiP
-                                                                                        call rounded_mean as fraglen_mean {
-                                                                                            input:
-                                                                                            ints = fraglen_tmp,
-                                                                                            runtime_environment = runtime_environment,
-                                                                                        }
-                                                                                        # }
+                                                                                            # signal track
+                                                                                            if (
+                                                                                                has_input_of_call_peak && !align_only_
+                                                                                                ) {
+                                                                                                    call macs2_signal_track {
+                                                                                                        input:
+                                                                                                                tas = flatten(
+                                                                                                                [
+                                                                                                                        [
+                                                                                                                                    ta_[
+                                                                                                                                        i
+                                                                                                                                        ],
+                                                                                                                                ],
+                                                                                                                            chosen_ctl_tas[
+                                                                                                                                i
+                                                                                                                                ],
+                                                                                                                    ]
+                                                                                                                    ),
+                                                                                                                gensz = gensz_,
+                                                                                                                chrsz = chrsz_,
+                                                                                                                pval_thresh = pval_thresh,
+                                                                                                                fraglen = fraglen_tmp[
+                                                                                                                    i
+                                                                                                                    ],
 
-                                                                                        if (
-                                                                                            has_all_input_of_choose_ctl && !align_only_ && chosen_ctl_ta_pooled_subsample > 0
-                                                                                            ) {
-                                                                                                call subsample_ctl as subsample_ctl_pooled {
-                                                                                                    input:
-                                                                                                                    ta = (
-                                                                                                                        if num_ctl < 2 then ctl_ta_[
-                                                                                                                        0
-                                                                                                                        ] else pool_ta_ctl.ta_pooled
-                                                                                                                        ),
-                                                                                                                    subsample = chosen_ctl_ta_pooled_subsample,
-                                                                                                                    paired_end = ctl_paired_end_[
-                                                                                                                        0
-                                                                                                                        ],
-                                                                                                                    mem_factor = subsample_ctl_mem_factor,
-                                                                                                                    disk_factor = subsample_ctl_disk_factor,
-                                                                                                                    runtime_environment = runtime_environment,
+                                                                                                                mem_factor = macs2_signal_track_mem_factor,
+                                                                                                                disk_factor = macs2_signal_track_disk_factor,
+                                                                                                                time_hr = macs2_signal_track_time_hr,
+                                                                                                                runtime_environment = runtime_environment_macs2,
                                                                                                             }
                                                                                                     }
-                                                                                                    # actually not an array
-                                                                                                    Array[
-                                                                                                        File?
-                                                                                                        ] chosen_ctl_ta_pooled = (
-                                                                                                        if !has_all_input_of_choose_ctl || align_only_ then [
-                                                                                                        ] else if chosen_ctl_ta_pooled_subsample > 0 then [
-                                                                                                        subsample_ctl_pooled.ta_subsampled,
-                                                                                            ] else if num_ctl < 2 then [
-                                                                                                        ctl_ta_[
-                                                                                                            0
+
+                                                                                                # call peaks on 1st pseudo replicated tagalign
+                                                                                                Boolean has_input_of_call_peak_pr1 = defined(
+                                                                                                    spr.ta_pr1[
+                                                                                                    i
+                                                                                                    ]
+                                                                                                    )
+                                                                                                Boolean has_output_of_call_peak_pr1 = i < length(
+                                                                                                    peaks_pr1
+                                                                                                    )
+                                                                                                if (
+                                                                                                    has_input_of_call_peak_pr1 && !has_output_of_call_peak_pr1 && !true_rep_only
+                                                                                                    ) {
+                                                                                                        call call_peak as call_peak_pr1 {
+                                                                                                            input:
+                                                                                                            peak_caller = peak_caller_,
+                                                                                                            peak_type = peak_type_,
+                                                                                                            tas = flatten(
+                                                                                                            [
+                                                                                                                    [
+                                                                                                                                spr.ta_pr1[
+                                                                                                                                    i
+                                                                                                                                    ],
+                                                                                                                            ],
+                                                                                                                        chosen_ctl_tas[
+                                                                                                                            i
+                                                                                                                            ],
+                                                                                                                ]
+                                                                                                                ),
+                                                                                                            gensz = gensz_,
+                                                                                                            chrsz = chrsz_,
+                                                                                                            cap_num_peak = cap_num_peak_,
+                                                                                                            pval_thresh = pval_thresh,
+                                                                                                            fdr_thresh = fdr_thresh,
+                                                                                                            fraglen = fraglen_tmp[
+                                                                                                                i
+                                                                                                                ],
+                                                                                                            blacklist = blacklist_,
+                                                                                                            regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
+
+                                                                                                            cpu = call_peak_cpu,
+                                                                                                            mem_factor = call_peak_mem_factor_,
+                                                                                                            disk_factor = call_peak_disk_factor_,
+                                                                                                            time_hr = call_peak_time_hr,
+                                                                                                            runtime_environment = (
+                                                                                                                if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment
+                                                                                                                ),
+                                                                                                        }
+                                                                                                }
+                                                                                            File? peak_pr1_ = (
+                                                                                                if has_output_of_call_peak_pr1 then peaks_pr1[
+                                                                                                i
+                                                                                                ] else call_peak_pr1.peak
+                                                                                                )
+
+                                                                                            # call peaks on 2nd pseudo replicated tagalign
+                                                                                            Boolean has_input_of_call_peak_pr2 = defined(
+                                                                                                spr.ta_pr2[
+                                                                                                i
+                                                                                                ]
+                                                                                                )
+                                                                                            Boolean has_output_of_call_peak_pr2 = i < length(
+                                                                                                peaks_pr2
+                                                                                                )
+                                                                                            if (
+                                                                                                has_input_of_call_peak_pr2 && !has_output_of_call_peak_pr2 && !true_rep_only
+                                                                                                ) {
+                                                                                                    call call_peak as call_peak_pr2 {
+                                                                                                        input:
+                                                                                                        peak_caller = peak_caller_,
+                                                                                                        peak_type = peak_type_,
+                                                                                                        tas = flatten(
+                                                                                                        [
+                                                                                                                [
+                                                                                                                            spr.ta_pr2[
+                                                                                                                                i
+                                                                                                                                ],
+                                                                                                                        ],
+                                                                                                                    chosen_ctl_tas[
+                                                                                                                        i
+                                                                                                                        ],
+                                                                                                            ]
+                                                                                                            ),
+                                                                                                        gensz = gensz_,
+                                                                                                        chrsz = chrsz_,
+                                                                                                        cap_num_peak = cap_num_peak_,
+                                                                                                        pval_thresh = pval_thresh,
+                                                                                                        fdr_thresh = fdr_thresh,
+                                                                                                        fraglen = fraglen_tmp[
+                                                                                                            i
                                                                                                             ],
+                                                                                                        blacklist = blacklist_,
+                                                                                                        regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
+
+                                                                                                        cpu = call_peak_cpu,
+                                                                                                        mem_factor = call_peak_mem_factor_,
+                                                                                                        disk_factor = call_peak_disk_factor_,
+                                                                                                        time_hr = call_peak_time_hr,
+                                                                                                        runtime_environment = (
+                                                                                                            if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment
+                                                                                                            ),
+                                                                                                    }
+                                                                                            }
+                                                                                        File? peak_pr2_ = (
+                                                                                            if has_output_of_call_peak_pr2 then peaks_pr2[
+                                                                                            i
+                                                                                            ] else call_peak_pr2.peak
+                                                                                            )
+                                                                                    }
+
+                                                                                    # if ( !align_only_ && num_rep > 1 ) {
+                                                                                    # rounded mean of fragment length, which will be used for
+                                                                                    #  1) calling peaks for pooled true/pseudo replicates
+                                                                                    #  2) calculating FRiP
+                                                                                    call rounded_mean as fraglen_mean {
+                                                                                        input:
+                                                                                        ints = fraglen_tmp,
+                                                                                        runtime_environment = runtime_environment,
+                                                                                    }
+                                                                                    # }
+
+                                                                                    if (
+                                                                                        has_all_input_of_choose_ctl && !align_only_ && chosen_ctl_ta_pooled_subsample > 0
+                                                                                        ) {
+                                                                                            call subsample_ctl as subsample_ctl_pooled {
+                                                                                                input:
+                                                                                                                ta = (
+                                                                                                                    if num_ctl < 2 then ctl_ta_[
+                                                                                                                    0
+                                                                                                                    ] else pool_ta_ctl.ta_pooled
+                                                                                                                    ),
+                                                                                                                subsample = chosen_ctl_ta_pooled_subsample,
+                                                                                                                paired_end = ctl_paired_end_[
+                                                                                                                    0
+                                                                                                                    ],
+                                                                                                                mem_factor = subsample_ctl_mem_factor,
+                                                                                                                disk_factor = subsample_ctl_disk_factor,
+                                                                                                                runtime_environment = runtime_environment,
+                                                                                                            }
+                                                                                                    }
+                                                                                                # actually not an array
+                                                                                                Array[
+                                                                                                    File?
+                                                                                                    ] chosen_ctl_ta_pooled = (
+                                                                                                    if !has_all_input_of_choose_ctl || align_only_ then [
+                                                                                                    ] else if chosen_ctl_ta_pooled_subsample > 0 then [
+                                                                                                    subsample_ctl_pooled.ta_subsampled,
+                                                                                            ] else if num_ctl < 2 then [
+                                                                                                    ctl_ta_[
+                                                                                                        0
+                                                                                                        ],
                                                                                             ] else [
-                                                                                                pool_ta_ctl.ta_pooled,
+                                                                                            pool_ta_ctl.ta_pooled,
                                                                                         ])
 
                                                                                         Boolean has_input_of_call_peak_pooled = defined(
@@ -2297,10 +2298,10 @@ workflow chip {
                                                                                                                 select_all(
                                                                                                                 [
                                                                                                                     pool_ta.ta_pooled,
-                                                                                                        ]
+                                                                                                            ]
                                                                                                             ),
                                                                                                         chosen_ctl_ta_pooled,
-                                                                                            ]
+                                                                                                ]
                                                                                                 ),
                                                                                             gensz = gensz_,
                                                                                             chrsz = chrsz_,
@@ -2335,10 +2336,10 @@ workflow chip {
                                                                                                                     select_all(
                                                                                                                     [
                                                                                                                         pool_ta.ta_pooled,
-                                                                                                            ]
+                                                                                                                ]
                                                                                                                 ),
                                                                                                             chosen_ctl_ta_pooled,
-                                                                                                ]
+                                                                                                    ]
                                                                                                     ),
                                                                                                 gensz = gensz_,
                                                                                                 chrsz = chrsz_,
@@ -2349,7 +2350,7 @@ workflow chip {
                                                                                                 disk_factor = macs2_signal_track_disk_factor,
                                                                                                 time_hr = macs2_signal_track_time_hr,
                                                                                                 runtime_environment = runtime_environment_macs2,
-                                                                                        }
+                                                                                            }
                                                                                     }
 
                                                                                     Boolean has_input_of_call_peak_ppr1 = defined(
@@ -2371,10 +2372,10 @@ workflow chip {
                                                                                                             select_all(
                                                                                                             [
                                                                                                                 pool_ta_pr1.ta_pooled,
-                                                                                                    ]
+                                                                                                        ]
                                                                                                         ),
                                                                                                     chosen_ctl_ta_pooled,
-                                                                                        ]
+                                                                                            ]
                                                                                             ),
                                                                                         gensz = gensz_,
                                                                                         chrsz = chrsz_,
@@ -2417,10 +2418,10 @@ workflow chip {
                                                                                                         select_all(
                                                                                                         [
                                                                                                             pool_ta_pr2.ta_pooled,
-                                                                                                ]
+                                                                                                    ]
                                                                                                     ),
                                                                                                 chosen_ctl_ta_pooled,
-                                                                                    ]
+                                                                                        ]
                                                                                         ),
                                                                                     gensz = gensz_,
                                                                                     chrsz = chrsz_,
@@ -2482,8 +2483,8 @@ workflow chip {
                                                                                                                     regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
                                                                                                                     ta = pool_ta.ta_pooled,
                                                                                                                     runtime_environment = runtime_environment,
-                                                                                                            }
-                                                                                                    }
+                                                                                                                }
+                                                                                                        }
                                                                                                     if (
                                                                                                         enable_idr && !align_only_ && pair.left < pair.right
                                                                                                         ) {
@@ -2507,9 +2508,9 @@ workflow chip {
                                                                                                                                 regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
                                                                                                                                 ta = pool_ta.ta_pooled,
                                                                                                                                 runtime_environment = runtime_environment,
-                                                                                                                        }
-                                                                                                                }
-                                                                                                        }
+                                                                                                                            }
+                                                                                                                    }
+                                                                                                            }
 
                                                                                                         # overlap on pseudo-replicates (pr1, pr2) for each true replicate
                                                                                                         if (
@@ -2547,9 +2548,9 @@ workflow chip {
                                                                                                                                                                 i
                                                                                                                                                                 ],
                                                                                                                                                             runtime_environment = runtime_environment,
-                                                                                                                                                    }
-                                                                                                                                            }
-                                                                                                                                    }
+                                                                                                                                                        }
+                                                                                                                                                }
+                                                                                                                                        }
 
                                                                                                                                     if (
                                                                                                                                         !align_only_ && !true_rep_only && enable_idr
@@ -2589,9 +2590,9 @@ workflow chip {
                                                                                                                                                                                             i
                                                                                                                                                                                             ],
                                                                                                                                                                                         runtime_environment = runtime_environment,
-                                                                                                                                                                                }
-                                                                                                                                                                        }
-                                                                                                                                                                }
+                                                                                                                                                                                    }
+                                                                                                                                                                            }
+                                                                                                                                                                    }
 
                                                                                                                                                                 if (
                                                                                                                                                                     !align_only_ && !true_rep_only && num_rep > 1
@@ -2610,8 +2611,8 @@ workflow chip {
                                                                                                                                                                             regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
                                                                                                                                                                             ta = pool_ta.ta_pooled,
                                                                                                                                                                             runtime_environment = runtime_environment,
-                                                                                                                                                                    }
-                                                                                                                                                            }
+                                                                                                                                                                        }
+                                                                                                                                                                }
 
                                                                                                                                                             if (
                                                                                                                                                                 !align_only_ && !true_rep_only && num_rep > 1 && enable_idr
@@ -2632,8 +2633,8 @@ workflow chip {
                                                                                                                                                                         regex_bfilt_peak_chr_name = regex_bfilt_peak_chr_name_,
                                                                                                                                                                         ta = pool_ta.ta_pooled,
                                                                                                                                                                         runtime_environment = runtime_environment,
-                                                                                                                                                                }
-                                                                                                                                                        }
+                                                                                                                                                                    }
+                                                                                                                                                            }
 
                                                                                                                                                         # reproducibility QC for overlap/IDR peaks
                                                                                                                                                         if (
@@ -2652,7 +2653,7 @@ workflow chip {
                                                                                                                                                                         ) then select_first(
                                                                                                                                                                     [
                                                                                                                                                                         overlap_pr.bfilt_overlap_peak,
-                                                                                                                                                    ]
+                                                                                                                                                        ]
                                                                                                                                                         ) else [
                                                                                                                                                         ]
                                                                                                                                                         ),
@@ -2660,8 +2661,8 @@ workflow chip {
                                                                                                                                                     peak_type = peak_type_,
                                                                                                                                                     chrsz = chrsz_,
                                                                                                                                                     runtime_environment = runtime_environment,
-                                                                                                                                            }
-                                                                                                                                    }
+                                                                                                                                                }
+                                                                                                                                        }
 
                                                                                                                                     if (
                                                                                                                                         !align_only_ && !true_rep_only && num_rep > 0 && enable_idr
@@ -2679,7 +2680,7 @@ workflow chip {
                                                                                                                                                     ) then select_first(
                                                                                                                                                 [
                                                                                                                                                     idr_pr.bfilt_idr_peak,
-                                                                                                                                ]
+                                                                                                                                    ]
                                                                                                                                     ) else [
                                                                                                                                     ]
                                                                                                                                     ),
@@ -2687,8 +2688,8 @@ workflow chip {
                                                                                                                                 peak_type = peak_type_,
                                                                                                                                 chrsz = chrsz_,
                                                                                                                                 runtime_environment = runtime_environment,
-                                                                                                                        }
-                                                                                                                }
+                                                                                                                            }
+                                                                                                                    }
 
                                                                                                                 # Generate final QC report and JSON
                                                                                                                 call qc_report {
@@ -2748,7 +2749,7 @@ workflow chip {
                                                                                                                         ) then select_first(
                                                                                                                     [
                                                                                                                         jsd.jsd_qcs,
-                                                                                                    ]
+                                                                                                        ]
                                                                                                         ) else [
                                                                                                         ]
                                                                                                         ),
@@ -2775,7 +2776,7 @@ workflow chip {
                                                                                                         ) then select_first(
                                                                                                     [
                                                                                                         idr_pr.idr_plot,
-                                                                                    ]
+                                                                                        ]
                                                                                         ) else [
                                                                                         ]
                                                                                         ),
@@ -2789,7 +2790,7 @@ workflow chip {
                                                                                         ) then select_first(
                                                                                     [
                                                                                         idr_pr.frip_qc,
-                                                                        ]
+                                                                            ]
                                                                             ) else [
                                                                             ]),
                                                                         frip_idr_qc_ppr = idr_ppr.frip_qc,
@@ -2891,168 +2892,267 @@ workflow chip {
                                                                         [
                                                                             fastqs_R1,
                                                                             fastqs_R2,
-                                                                    ]) else transpose([
-                                                                        fastqs_R1,
-                                                                    ]))
+                                                                    ]
+                                                                    ) else transpose([
+                                                                    fastqs_R1,
+                                                                ]))
 
-                                                                    command <<<
-                                                                        set -e
+                                                                command <<<
+                                                                    set -e
 
-                                                                        # check if pipeline dependencies can be found
-                                                                        if [[ -z "$(which encode_task_merge_fastq.py 2> /dev/null || true)" ]]
-                                                                        then
-                                                                          echo -e "\n* Error: pipeline environment (docker, singularity or conda) not found." 1>&2
-                                                                          exit 3
+                                                                    # check if pipeline dependencies can be found
+                                                                    if [[ -z "$(which encode_task_merge_fastq.py 2> /dev/null || true)" ]]
+                                                                    then
+                                                                      echo -e "\n* Error: pipeline environment (docker, singularity or conda) not found." 1>&2
+                                                                      exit 3
+                                                                    fi
+                                                                    python3 $(which encode_task_merge_fastq.py) \
+                                                                        ~{write_tsv(
+                                                                            tmp_fastqs)} \
+                                                                        ~{(
+                                                                            if paired_end then "--paired-end" else ""
+                                                                            )} \
+                                                                        ~{"--nth " + cpu}
+
+                                                                    if [ -z '~{trim_bp
+                                                                        }' ]; then
+                                                                        SUFFIX=
+                                                                    else
+                                                                        SUFFIX=_trimmed
+                                                                        python3 $(which encode_task_trim_fastq.py) \
+                                                                            R1/*.fastq.gz \
+                                                                            --trim-bp ~{trim_bp
+                                                                                } \
+                                                                            --out-dir R1$SUFFIX
+                                                                        if [ '~{paired_end
+                                                                            }' == 'true' ]; then
+                                                                            python3 $(which encode_task_trim_fastq.py) \
+                                                                                R2/*.fastq.gz \
+                                                                                --trim-bp ~{trim_bp
+                                                                                    } \
+                                                                                --out-dir R2$SUFFIX
                                                                         fi
-                                                                        python3 $(which encode_task_merge_fastq.py) \
-                                                                            ~{write_tsv(
-                                                                                tmp_fastqs
+                                                                    fi
+                                                                    if [ '~{crop_length
+                                                                        }' == '0' ]; then
+                                                                        SUFFIX=$SUFFIX
+                                                                    else
+                                                                        NEW_SUFFIX="$SUFFIX"_cropped
+                                                                        python3 $(which encode_task_trimmomatic.py) \
+                                                                            --fastq1 R1$SUFFIX/*.fastq.gz \
+                                                                            ~{(
+                                                                                if paired_end then "--fastq2 R2$SUFFIX/*.fastq.gz" else ""
                                                                                 )} \
                                                                             ~{(
                                                                                 if paired_end then "--paired-end" else ""
                                                                                 )} \
+                                                                            --crop-length ~{crop_length
+                                                                                } \
+                                                                            --crop-length-tol "~{crop_length_tol
+                                                                                }" \
+                                                                            ~{"--phred-score-format " + trimmomatic_phred_score_format
+                                                                                } \
+                                                                            --out-dir-R1 R1$NEW_SUFFIX \
+                                                                            ~{(
+                                                                                if paired_end then "--out-dir-R2 R2$NEW_SUFFIX" else ""
+                                                                                )} \
+                                                                            ~{"--trimmomatic-java-heap " + (
+                                                                                if defined(
+                                                                                trimmomatic_java_heap
+                                                                                ) then trimmomatic_java_heap else (
+                                                                                round(
+                                                                                mem_gb * trimmomatic_java_heap_factor
+                                                                                ) + "G"
+                                                                                ))} \
                                                                             ~{"--nth " + cpu
                                                                                 }
+                                                                        SUFFIX=$NEW_SUFFIX
+                                                                    fi
 
-                                                                        if [ -z '~{trim_bp
-                                                                            }' ]; then
-                                                                            SUFFIX=
-                                                                        else
-                                                                            SUFFIX=_trimmed
-                                                                            python3 $(which encode_task_trim_fastq.py) \
-                                                                                R1/*.fastq.gz \
-                                                                                --trim-bp ~{trim_bp
-                                                                                    } \
-                                                                                --out-dir R1$SUFFIX
-                                                                            if [ '~{paired_end
-                                                                                }' == 'true' ]; then
-                                                                                python3 $(which encode_task_trim_fastq.py) \
-                                                                                    R2/*.fastq.gz \
-                                                                                    --trim-bp ~{trim_bp
-                                                                                        } \
-                                                                                    --out-dir R2$SUFFIX
-                                                                            fi
-                                                                        fi
-                                                                        if [ '~{crop_length
-                                                                            }' == '0' ]; then
-                                                                            SUFFIX=$SUFFIX
-                                                                        else
-                                                                            NEW_SUFFIX="$SUFFIX"_cropped
-                                                                            python3 $(which encode_task_trimmomatic.py) \
-                                                                                --fastq1 R1$SUFFIX/*.fastq.gz \
-                                                                                ~{(
-                                                                                    if paired_end then "--fastq2 R2$SUFFIX/*.fastq.gz" else ""
-                                                                                    )} \
-                                                                                ~{(
-                                                                                    if paired_end then "--paired-end" else ""
-                                                                                    )} \
-                                                                                --crop-length ~{crop_length
-                                                                                    } \
-                                                                                --crop-length-tol "~{crop_length_tol
-                                                                                    }" \
-                                                                                ~{"--phred-score-format " + trimmomatic_phred_score_format
-                                                                                    } \
-                                                                                --out-dir-R1 R1$NEW_SUFFIX \
-                                                                                ~{(
-                                                                                    if paired_end then "--out-dir-R2 R2$NEW_SUFFIX" else ""
-                                                                                    )} \
-                                                                                ~{"--trimmomatic-java-heap " + (
-                                                                                    if defined(
-                                                                                    trimmomatic_java_heap
-                                                                                    ) then trimmomatic_java_heap else (
-                                                                                    round(
-                                                                                    mem_gb * trimmomatic_java_heap_factor
-                                                                                    ) + "G"
-                                                                                    ))} \
-                                                                                ~{"--nth " + cpu
-                                                                                    }
-                                                                            SUFFIX=$NEW_SUFFIX
-                                                                        fi
-
-                                                                        if [ '~{aligner
-                                                                            }' == 'bwa' ]; then
-                                                                            python3 $(which encode_task_bwa.py) \
-                                                                                ~{idx_tar
-                                                                                    } \
-                                                                                R1$SUFFIX/*.fastq.gz \
-                                                                                ~{(
-                                                                                    if paired_end then "R2$SUFFIX/*.fastq.gz" else ""
-                                                                                    )} \
-                                                                                ~{(
-                                                                                    if paired_end then "--paired-end" else ""
-                                                                                    )} \
-                                                                                ~{(
-                                                                                    if use_bwa_mem_for_pe then "--use-bwa-mem-for-pe" else ""
-                                                                                    )} \
-                                                                                ~{"--bwa-mem-read-len-limit " + bwa_mem_read_len_limit
-                                                                                    } \
-                                                                                ~{"--mem-gb " + samtools_mem_gb
-                                                                                    } \
-                                                                                ~{"--nth " + cpu
-                                                                                    }
-
-                                                                        elif [ '~{aligner
-                                                                            }' == 'bowtie2' ]; then
-                                                                            python3 $(which encode_task_bowtie2.py) \
-                                                                                ~{idx_tar
-                                                                                    } \
-                                                                                R1$SUFFIX/*.fastq.gz \
-                                                                                ~{(
-                                                                                    if paired_end then "R2$SUFFIX/*.fastq.gz" else ""
-                                                                                    )} \
-                                                                                ~{"--multimapping " + multimapping
-                                                                                    } \
-                                                                                ~{(
-                                                                                    if paired_end then "--paired-end" else ""
-                                                                                    )} \
-                                                                                ~{(
-                                                                                    if use_bowtie2_local_mode then "--local" else ""
-                                                                                    )} \
-                                                                                ~{"--mem-gb " + samtools_mem_gb
-                                                                                    } \
-                                                                                ~{"--nth " + cpu
-                                                                                    }
-                                                                        else
-                                                                            python3 ~{custom_align_py
-                                                                                } \
-                                                                                ~{idx_tar
-                                                                                    } \
-                                                                                R1$SUFFIX/*.fastq.gz \
-                                                                                ~{(
-                                                                                    if paired_end then "R2$SUFFIX/*.fastq.gz" else ""
-                                                                                    )} \
-                                                                                ~{(
-                                                                                    if paired_end then "--paired-end" else ""
-                                                                                    )} \
-                                                                                ~{"--mem-gb " + samtools_mem_gb
-                                                                                    } \
-                                                                                ~{"--nth " + cpu
-                                                                                    }
-                                                                        fi 
-
-                                                                        python3 $(which encode_task_post_align.py) \
-                                                                            R1$SUFFIX/*.fastq.gz $(ls *.bam) \
-                                                                            ~{"--mito-chr-name " + mito_chr_name
+                                                                    if [ '~{aligner
+                                                                        }' == 'bwa' ]; then
+                                                                        python3 $(which encode_task_bwa.py) \
+                                                                            ~{idx_tar} \
+                                                                            R1$SUFFIX/*.fastq.gz \
+                                                                            ~{(
+                                                                                if paired_end then "R2$SUFFIX/*.fastq.gz" else ""
+                                                                                )} \
+                                                                            ~{(
+                                                                                if paired_end then "--paired-end" else ""
+                                                                                )} \
+                                                                            ~{(
+                                                                                if use_bwa_mem_for_pe then "--use-bwa-mem-for-pe" else ""
+                                                                                )} \
+                                                                            ~{"--bwa-mem-read-len-limit " + bwa_mem_read_len_limit
                                                                                 } \
                                                                             ~{"--mem-gb " + samtools_mem_gb
                                                                                 } \
                                                                             ~{"--nth " + cpu
                                                                                 }
-                                                                        rm -rf R1 R2 R1$SUFFIX R2$SUFFIX
+
+                                                                    elif [ '~{aligner
+                                                                        }' == 'bowtie2' ]; then
+                                                                        python3 $(which encode_task_bowtie2.py) \
+                                                                            ~{idx_tar} \
+                                                                            R1$SUFFIX/*.fastq.gz \
+                                                                            ~{(
+                                                                                if paired_end then "R2$SUFFIX/*.fastq.gz" else ""
+                                                                                )} \
+                                                                            ~{"--multimapping " + multimapping
+                                                                                } \
+                                                                            ~{(
+                                                                                if paired_end then "--paired-end" else ""
+                                                                                )} \
+                                                                            ~{(
+                                                                                if use_bowtie2_local_mode then "--local" else ""
+                                                                                )} \
+                                                                            ~{"--mem-gb " + samtools_mem_gb
+                                                                                } \
+                                                                            ~{"--nth " + cpu
+                                                                                }
+                                                                    else
+                                                                        python3 ~{custom_align_py
+                                                                            } \
+                                                                            ~{idx_tar} \
+                                                                            R1$SUFFIX/*.fastq.gz \
+                                                                            ~{(
+                                                                                if paired_end then "R2$SUFFIX/*.fastq.gz" else ""
+                                                                                )} \
+                                                                            ~{(
+                                                                                if paired_end then "--paired-end" else ""
+                                                                                )} \
+                                                                            ~{"--mem-gb " + samtools_mem_gb
+                                                                                } \
+                                                                            ~{"--nth " + cpu
+                                                                                }
+                                                                    fi 
+
+                                                                    python3 $(which encode_task_post_align.py) \
+                                                                        R1$SUFFIX/*.fastq.gz $(ls *.bam) \
+                                                                        ~{"--mito-chr-name " + mito_chr_name
+                                                                            } \
+                                                                        ~{"--mem-gb " + samtools_mem_gb
+                                                                            } \
+                                                                        ~{"--nth " + cpu}
+                                                                    rm -rf R1 R2 R1$SUFFIX R2$SUFFIX
+                                                                >>>
+
+                                                                output {
+                                                                        File bam = glob(
+                                                                            "*.bam")[0]
+                                                                        File bai = glob(
+                                                                            "*.bai")[0]
+                                                                        File samstat_qc = glob(
+                                                                            "*.samstats.qc"
+                                                                            )[0]
+                                                                        File read_len_log = glob(
+                                                                            "*.read_length.txt"
+                                                                            )[0]
+                                                                    }
+
+                                                                    runtime {
+                                                                        cpu: cpu
+                                                                        memory: "~{mem_gb
+                                                                            } GB"
+                                                                        time: time_hr
+                                                                        disks: "local-disk ~{disk_gb
+                                                                            } SSD"
+                                                                        preemptible: 0
+                                                                        docker: runtime_environment.docker
+                                                                        singularity: runtime_environment.singularity
+                                                                        conda: runtime_environment.conda
+                                                                    }
+                                                                }
+
+                                                                task filter {
+                                                                    input {
+                                                                        File? bam
+                                                                        Boolean paired_end
+                                                                        File? ref_fa
+                                                                        Boolean redact_nodup_bam
+                                                                        String dup_marker  # picard.jar MarkDuplicates (picard) or
+                                                                        # sambamba markdup (sambamba)
+                                                                        Int mapq_thresh  # threshold for low MAPQ reads removal
+                                                                        Array[
+                                                                            String] filter_chrs  # chrs to be removed from final (nodup/filt) BAM
+                                                                        File chrsz  # 2-col chromosome sizes file
+                                                                        Boolean no_dup_removal  # no dupe reads removal when filtering BAM
+                                                                        String mito_chr_name
+                                                                        Int cpu
+                                                                        Float mem_factor
+                                                                        String? picard_java_heap
+                                                                        Int time_hr
+                                                                        Float disk_factor
+                                                                        RuntimeEnvironment runtime_environment
+                                                                    }
+
+                                                                    Float input_file_size_gb = size(
+                                                                        bam, "G")
+                                                                    Float picard_java_heap_factor = 0.9
+                                                                    Float mem_gb = 6.0 + mem_factor * input_file_size_gb
+                                                                    Float samtools_mem_gb = 0.8 * mem_gb
+                                                                    Int disk_gb = round(
+                                                                        20.0 + disk_factor * input_file_size_gb
+                                                                        )
+
+                                                                    command <<<
+                                                                        set -e
+                                                                        python3 $(which encode_task_filter.py) \
+                                                                            ~{bam} \
+                                                                            ~{(
+                                                                                if paired_end then "--paired-end" else ""
+                                                                                )} \
+                                                                            --multimapping 0 \
+                                                                            ~{"--dup-marker " + dup_marker
+                                                                                } \
+                                                                            ~{"--mapq-thresh " + mapq_thresh
+                                                                                } \
+                                                                            --filter-chrs ~{sep=" " filter_chrs
+                                                                                } \
+                                                                            ~{"--chrsz " + chrsz
+                                                                                } \
+                                                                            ~{(
+                                                                                if no_dup_removal then "--no-dup-removal" else ""
+                                                                                )} \
+                                                                            ~{"--mito-chr-name " + mito_chr_name
+                                                                                } \
+                                                                            ~{"--mem-gb " + samtools_mem_gb
+                                                                                } \
+                                                                            ~{"--nth " + cpu
+                                                                                } \
+                                                                            ~{"--picard-java-heap " + (
+                                                                                if defined(
+                                                                                picard_java_heap
+                                                                                ) then picard_java_heap else (
+                                                                                round(
+                                                                                mem_gb * picard_java_heap_factor
+                                                                                ) + "G"))}
+
+                                                                        if [ '~{redact_nodup_bam
+                                                                            }' == 'true' ]; then
+                                                                            python3 $(which encode_task_bam_to_pbam.py) \
+                                                                                $(ls *.bam) \
+                                                                                ~{"--ref-fa " + ref_fa
+                                                                                    } \
+                                                                                '--delete-original-bam'
+                                                                        fi
                                                                     >>>
 
                                                                     output {
-                                                                                File bam = glob(
+                                                                                File nodup_bam = glob(
                                                                                     "*.bam"
                                                                                     )[0]
-                                                                                File bai = glob(
+                                                                                File nodup_bai = glob(
                                                                                     "*.bai"
                                                                                     )[0]
                                                                                 File samstat_qc = glob(
                                                                                     "*.samstats.qc"
                                                                                     )[0]
-                                                                                File read_len_log = glob(
-                                                                                    "*.read_length.txt"
+                                                                                File dup_qc = glob(
+                                                                                    "*.dup.qc"
+                                                                                    )[0]
+                                                                                File lib_complexity_qc = glob(
+                                                                                    "*.lib_complexity.qc"
                                                                                     )[0]
                                                                             }
 
@@ -3063,30 +3163,21 @@ workflow chip {
                                                                                 time: time_hr
                                                                                 disks: "local-disk ~{disk_gb
                                                                                     } SSD"
-                                                                                preemptible: 0
                                                                                 docker: runtime_environment.docker
                                                                                 singularity: runtime_environment.singularity
                                                                                 conda: runtime_environment.conda
                                                                             }
                                                                         }
 
-                                                                        task filter {
+                                                                        task bam2ta {
                                                                             input {
                                                                                 File? bam
                                                                                 Boolean paired_end
-                                                                                File? ref_fa
-                                                                                Boolean redact_nodup_bam
-                                                                                String dup_marker  # picard.jar MarkDuplicates (picard) or
-                                                                                # sambamba markdup (sambamba)
-                                                                                Int mapq_thresh  # threshold for low MAPQ reads removal
-                                                                                Array[
-                                                                                    String] filter_chrs  # chrs to be removed from final (nodup/filt) BAM
-                                                                                File chrsz  # 2-col chromosome sizes file
-                                                                                Boolean no_dup_removal  # no dupe reads removal when filtering BAM
-                                                                                String mito_chr_name
+                                                                                String mito_chr_name  # mito chromosome name
+                                                                                Int subsample  # number of reads to subsample TAGALIGN
+                                                                                # this affects all downstream analysis
                                                                                 Int cpu
                                                                                 Float mem_factor
-                                                                                String? picard_java_heap
                                                                                 Int time_hr
                                                                                 Float disk_factor
                                                                                 RuntimeEnvironment runtime_environment
@@ -3094,8 +3185,7 @@ workflow chip {
 
                                                                             Float input_file_size_gb = size(
                                                                                 bam, "G")
-                                                                            Float picard_java_heap_factor = 0.9
-                                                                            Float mem_gb = 6.0 + mem_factor * input_file_size_gb
+                                                                            Float mem_gb = 4.0 + mem_factor * input_file_size_gb
                                                                             Float samtools_mem_gb = 0.8 * mem_gb
                                                                             Int disk_gb = round(
                                                                                 20.0 + disk_factor * input_file_size_gb
@@ -3103,79 +3193,31 @@ workflow chip {
 
                                                                             command <<<
                                                                                 set -e
-                                                                                python3 $(which encode_task_filter.py) \
+                                                                                python3 $(which encode_task_bam2ta.py) \
                                                                                     ~{bam
                                                                                         } \
+                                                                                    --disable-tn5-shift \
                                                                                     ~{(
                                                                                         if paired_end then "--paired-end" else ""
                                                                                         )
                                                                                         } \
-                                                                                    --multimapping 0 \
-                                                                                    ~{"--dup-marker " + dup_marker
-                                                                                        } \
-                                                                                    ~{"--mapq-thresh " + mapq_thresh
-                                                                                        } \
-                                                                                    --filter-chrs ~{sep=" " filter_chrs
-                                                                                        } \
-                                                                                    ~{"--chrsz " + chrsz
-                                                                                        } \
-                                                                                    ~{(
-                                                                                        if no_dup_removal then "--no-dup-removal" else ""
-                                                                                        )
-                                                                                        } \
                                                                                     ~{"--mito-chr-name " + mito_chr_name
+                                                                                        } \
+                                                                                    ~{"--subsample " + subsample
                                                                                         } \
                                                                                     ~{"--mem-gb " + samtools_mem_gb
                                                                                         } \
                                                                                     ~{"--nth " + cpu
-                                                                                        } \
-                                                                                    ~{"--picard-java-heap " + (
-                                                                                        if defined(
-                                                                                        picard_java_heap
-                                                                                        ) then picard_java_heap else (
-                                                                                        round(
-                                                                                        mem_gb * picard_java_heap_factor
-                                                                                        ) + "G"
-                                                                                        )
-                                                                                        )}
-
-                                                                                if [ '~{redact_nodup_bam
-                                                                                    }' == 'true' ]; then
-                                                                                    python3 $(which encode_task_bam_to_pbam.py) \
-                                                                                        $(ls *.bam) \
-                                                                                        ~{"--ref-fa " + ref_fa
-                                                                                            } \
-                                                                                        '--delete-original-bam'
-                                                                                fi
+                                                                                        }
                                                                             >>>
 
                                                                             output {
-                                                                                                File nodup_bam = glob(
-                                                                                                    "*.bam"
+                                                                                                File ta = glob(
+                                                                                                    "*.tagAlign.gz"
                                                                                                     )[
                                                                                                     0
                                                                                                     ]
-                                                                                                File nodup_bai = glob(
-                                                                                                    "*.bai"
-                                                                                                    )[
-                                                                                                    0
-                                                                                                    ]
-                                                                                                File samstat_qc = glob(
-                                                                                                    "*.samstats.qc"
-                                                                                                    )[
-                                                                                                    0
-                                                                                                    ]
-                                                                                                File dup_qc = glob(
-                                                                                                    "*.dup.qc"
-                                                                                                    )[
-                                                                                                    0
-                                                                                                    ]
-                                                                                                File lib_complexity_qc = glob(
-                                                                                                    "*.lib_complexity.qc"
-                                                                                                    )[
-                                                                                                    0
-                                                                                                    ]
-                                                                                        }
+                                                                                            }
 
                                                                                         runtime {
                                                                                             cpu: cpu
@@ -3190,124 +3232,60 @@ workflow chip {
                                                                                         }
                                                                                     }
 
-                                                                                    task bam2ta {
+                                                                                    task spr {
                                                                                             input {
-                                                                                                File? bam
+                                                                                                File? ta
                                                                                                 Boolean paired_end
-                                                                                                String mito_chr_name  # mito chromosome name
-                                                                                                Int subsample  # number of reads to subsample TAGALIGN
-                                                                                                # this affects all downstream analysis
-                                                                                                Int cpu
+                                                                                                Int pseudoreplication_random_seed
                                                                                                 Float mem_factor
-                                                                                                Int time_hr
                                                                                                 Float disk_factor
                                                                                                 RuntimeEnvironment runtime_environment
-                                                                                        }
+                                                                                            }
 
                                                                                         Float input_file_size_gb = size(
-                                                                                            bam, "G"
+                                                                                            ta, "G"
                                                                                             )
                                                                                         Float mem_gb = 4.0 + mem_factor * input_file_size_gb
-                                                                                        Float samtools_mem_gb = 0.8 * mem_gb
                                                                                         Int disk_gb = round(
                                                                                             20.0 + disk_factor * input_file_size_gb
                                                                                             )
 
                                                                                         command <<<
                                                                                             set -e
-                                                                                            python3 $(which encode_task_bam2ta.py) \
-                                                                                                ~{bam
+                                                                                            python3 $(which encode_task_spr.py) \
+                                                                                                ~{ta
                                                                                                     } \
-                                                                                                --disable-tn5-shift \
+                                                                                                ~{"--pseudoreplication-random-seed " + pseudoreplication_random_seed
+                                                                                                    } \
                                                                                                 ~{(
                                                                                                     if paired_end then "--paired-end" else ""
                                                                                                     )
-                                                                                                    } \
-                                                                                                ~{"--mito-chr-name " + mito_chr_name
-                                                                                                    } \
-                                                                                                ~{"--subsample " + subsample
-                                                                                                    } \
-                                                                                                ~{"--mem-gb " + samtools_mem_gb
-                                                                                                    } \
-                                                                                                ~{"--nth " + cpu
                                                                                                     }
-                                                                                    >>>
+                                                                                        >>>
 
                                                                                     output {
-                                                                                                        File ta = glob(
-                                                                                                            "*.tagAlign.gz"
+                                                                                                        File ta_pr1 = glob(
+                                                                                                            "*.pr1.tagAlign.gz"
                                                                                                             )[
                                                                                                             0
                                                                                                             ]
-                                                                                                }
+                                                                                                        File ta_pr2 = glob(
+                                                                                                            "*.pr2.tagAlign.gz"
+                                                                                                            )[
+                                                                                                            0
+                                                                                                            ]
+                                                                                                    }
 
                                                                                                 runtime {
-                                                                                                    cpu: cpu
+                                                                                                    cpu: 1
                                                                                                     memory: "~{mem_gb
                                                                                                         } GB"
-                                                                                                    time: time_hr
+                                                                                                    time: 4
                                                                                                     disks: "local-disk ~{disk_gb
                                                                                                         } SSD"
                                                                                                     docker: runtime_environment.docker
                                                                                                     singularity: runtime_environment.singularity
                                                                                                     conda: runtime_environment.conda
-                                                                                            }
-                                                                                        }
-
-                                                                                        task spr {
-                                                                                                input {
-                                                                                                    File? ta
-                                                                                                    Boolean paired_end
-                                                                                                    Int pseudoreplication_random_seed
-                                                                                                    Float mem_factor
-                                                                                                    Float disk_factor
-                                                                                                    RuntimeEnvironment runtime_environment
-                                                                                            }
-
-                                                                                            Float input_file_size_gb = size(
-                                                                                                ta, "G"
-                                                                                                )
-                                                                                            Float mem_gb = 4.0 + mem_factor * input_file_size_gb
-                                                                                            Int disk_gb = round(
-                                                                                                20.0 + disk_factor * input_file_size_gb
-                                                                                                )
-
-                                                                                            command <<<
-                                                                                                set -e
-                                                                                                python3 $(which encode_task_spr.py) \
-                                                                                                    ~{ta
-                                                                                                        } \
-                                                                                                    ~{"--pseudoreplication-random-seed " + pseudoreplication_random_seed
-                                                                                                        } \
-                                                                                                    ~{(
-                                                                                                        if paired_end then "--paired-end" else ""
-                                                                                                        )
-                                                                                                        }
-                                                                                        >>>
-
-                                                                                        output {
-                                                                                                            File ta_pr1 = glob(
-                                                                                                                "*.pr1.tagAlign.gz"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-                                                                                                            File ta_pr2 = glob(
-                                                                                                                "*.pr2.tagAlign.gz"
-                                                                                                                )[
-                                                                                                                0
-                                                                                                                ]
-                                                                                                    }
-
-                                                                                                    runtime {
-                                                                                                        cpu: 1
-                                                                                                        memory: "~{mem_gb
-                                                                                                            } GB"
-                                                                                                        time: 4
-                                                                                                        disks: "local-disk ~{disk_gb
-                                                                                                            } SSD"
-                                                                                                        docker: runtime_environment.docker
-                                                                                                        singularity: runtime_environment.singularity
-                                                                                                        conda: runtime_environment.conda
                                                                                                 }
                                                                                         }
 
@@ -3319,7 +3297,7 @@ workflow chip {
                                                                                                             Int? col  # number of columns in pooled TA
                                                                                                             String? prefix  # basename prefix
                                                                                                             RuntimeEnvironment runtime_environment
-                                                                                                    }
+                                                                                                        }
 
                                                                                                     command <<<
                                                                                                         set -e
@@ -3332,7 +3310,7 @@ workflow chip {
                                                                                                                 } \
                                                                                                             ~{"--col " + col
                                                                                                                 }
-                                                                                                >>>
+                                                                                                    >>>
 
                                                                                                 output {
                                                                                                                     File ta_pooled = glob(
@@ -3340,7 +3318,7 @@ workflow chip {
                                                                                                                         )[
                                                                                                                         0
                                                                                                                         ]
-                                                                                                            }
+                                                                                                                }
 
                                                                                                             runtime {
                                                                                                                 cpu: 1
@@ -3350,8 +3328,8 @@ workflow chip {
                                                                                                                 docker: runtime_environment.docker
                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                 conda: runtime_environment.conda
-                                                                                                        }
-                                                                                                }
+                                                                                                            }
+                                                                                                    }
 
                                                                                                 task xcor {
                                                                                                         input {
@@ -3369,7 +3347,7 @@ workflow chip {
                                                                                                             Int time_hr
                                                                                                             Float disk_factor
                                                                                                             RuntimeEnvironment runtime_environment
-                                                                                                    }
+                                                                                                        }
 
                                                                                                     Float input_file_size_gb = size(
                                                                                                         ta, "G"
@@ -3402,7 +3380,7 @@ workflow chip {
                                                                                                                 } \
                                                                                                             ~{"--nth " + cpu
                                                                                                                 }
-                                                                                                >>>
+                                                                                                    >>>
 
                                                                                                 output {
                                                                                                                     File plot_pdf = glob(
@@ -3428,7 +3406,7 @@ workflow chip {
                                                                                                                     Int fraglen = read_int(
                                                                                                                         fraglen_log
                                                                                                                         )
-                                                                                                            }
+                                                                                                                }
 
                                                                                                             runtime {
                                                                                                                 cpu: cpu
@@ -3440,8 +3418,8 @@ workflow chip {
                                                                                                                 docker: runtime_environment.docker
                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                 conda: runtime_environment.conda
-                                                                                                        }
-                                                                                                }
+                                                                                                            }
+                                                                                                    }
 
                                                                                                 task jsd {
                                                                                                         input {
@@ -3458,7 +3436,7 @@ workflow chip {
                                                                                                                     Int time_hr
                                                                                                                     Float disk_factor
                                                                                                                     RuntimeEnvironment runtime_environment
-                                                                                                            }
+                                                                                                                }
 
                                                                                                             Float input_file_size_gb = size(
                                                                                                                 nodup_bams, "G"
@@ -3491,7 +3469,7 @@ workflow chip {
                                                                                                                         } \
                                                                                                                     ~{"--nth " + cpu
                                                                                                                         }
-                                                                                                        >>>
+                                                                                                            >>>
 
                                                                                                         output {
                                                                                                                             File plot = glob(
@@ -3504,7 +3482,7 @@ workflow chip {
                                                                                                                                 ] jsd_qcs = glob(
                                                                                                                                 "*.jsd.qc"
                                                                                                                                 )
-                                                                                                                    }
+                                                                                                                        }
 
                                                                                                                     runtime {
                                                                                                                         cpu: cpu
@@ -3516,8 +3494,8 @@ workflow chip {
                                                                                                                         docker: runtime_environment.docker
                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                         conda: runtime_environment.conda
-                                                                                                                }
-                                                                                                        }
+                                                                                                                    }
+                                                                                                            }
 
                                                                                                         task choose_ctl {
                                                                                                                 input {
@@ -3535,7 +3513,7 @@ workflow chip {
                                                                                                                             Int ctl_depth_limit
                                                                                                                             Float exp_ctl_depth_ratio_limit
                                                                                                                             RuntimeEnvironment runtime_environment
-                                                                                                                    }
+                                                                                                                        }
 
                                                                                                                     command <<<
                                                                                                                         set -e
@@ -3562,7 +3540,7 @@ workflow chip {
                                                                                                                                 } \
                                                                                                                             ~{"--exp-ctl-depth-ratio-limit " + exp_ctl_depth_ratio_limit
                                                                                                                                 }
-                                                                                                                >>>
+                                                                                                                    >>>
 
                                                                                                                 output {
                                                                                                                                     File chosen_ctl_id_tsv = glob(
@@ -3593,7 +3571,7 @@ workflow chip {
                                                                                                                                     Int chosen_ctl_ta_subsample_pooled = read_int(
                                                                                                                                         chosen_ctl_subsample_pooled_txt
                                                                                                                                         )
-                                                                                                                            }
+                                                                                                                                }
 
                                                                                                                             runtime {
                                                                                                                                 cpu: 1
@@ -3603,15 +3581,15 @@ workflow chip {
                                                                                                                                 docker: runtime_environment.docker
                                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                                 conda: runtime_environment.conda
-                                                                                                                        }
-                                                                                                                }
+                                                                                                                            }
+                                                                                                                    }
 
                                                                                                                 task count_signal_track {
                                                                                                                         input {
                                                                                                                             File? ta  # tag-align
                                                                                                                             File chrsz  # 2-col chromosome sizes file
                                                                                                                             RuntimeEnvironment runtime_environment
-                                                                                                                    }
+                                                                                                                        }
 
                                                                                                                     Float mem_gb = 8.0
 
@@ -3624,7 +3602,7 @@ workflow chip {
                                                                                                                                 } \
                                                                                                                             ~{"--mem-gb " + mem_gb
                                                                                                                                 }
-                                                                                                                >>>
+                                                                                                                    >>>
 
                                                                                                                 output {
                                                                                                                                     File pos_bw = glob(
@@ -3637,7 +3615,7 @@ workflow chip {
                                                                                                                                         )[
                                                                                                                                         0
                                                                                                                                         ]
-                                                                                                                            }
+                                                                                                                                }
 
                                                                                                                             runtime {
                                                                                                                                 cpu: 1
@@ -3648,8 +3626,8 @@ workflow chip {
                                                                                                                                 docker: runtime_environment.docker
                                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                                 conda: runtime_environment.conda
-                                                                                                                        }
-                                                                                                                }
+                                                                                                                            }
+                                                                                                                    }
 
                                                                                                                 task subsample_ctl {
                                                                                                                         input {
@@ -3659,7 +3637,7 @@ workflow chip {
                                                                                                                             Float mem_factor
                                                                                                                             Float disk_factor
                                                                                                                             RuntimeEnvironment runtime_environment
-                                                                                                                    }
+                                                                                                                        }
 
                                                                                                                     Float input_file_size_gb = size(
                                                                                                                         ta, "G"
@@ -3679,7 +3657,7 @@ workflow chip {
                                                                                                                                 if paired_end then "--paired-end" else ""
                                                                                                                                 )
                                                                                                                                 } \
-                                                                                                                >>>
+                                                                                                                    >>>
 
                                                                                                                 output {
                                                                                                                                     File ta_subsampled = glob(
@@ -3687,7 +3665,7 @@ workflow chip {
                                                                                                                                         )[
                                                                                                                                         0
                                                                                                                                         ]
-                                                                                                                            }
+                                                                                                                                }
 
                                                                                                                             runtime {
                                                                                                                                 cpu: 1
@@ -3699,8 +3677,8 @@ workflow chip {
                                                                                                                                 docker: runtime_environment.docker
                                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                                 conda: runtime_environment.conda
-                                                                                                                        }
-                                                                                                                }
+                                                                                                                            }
+                                                                                                                    }
 
                                                                                                                 task call_peak {
                                                                                                                         input {
@@ -3723,7 +3701,7 @@ workflow chip {
                                                                                                                             Int time_hr
                                                                                                                             Float disk_factor
                                                                                                                             RuntimeEnvironment runtime_environment
-                                                                                                                    }
+                                                                                                                        }
 
                                                                                                                     Float input_file_size_gb = size(
                                                                                                                         tas, "G"
@@ -3791,7 +3769,7 @@ workflow chip {
                                                                                                                                 } \
                                                                                                                             ~{"--blacklist " + blacklist
                                                                                                                                 }        
-                                                                                                                >>>
+                                                                                                                    >>>
 
                                                                                                                 output {
                                                                                                                                     File peak = glob(
@@ -3845,7 +3823,7 @@ workflow chip {
                                                                                                                                         )[
                                                                                                                                         0
                                                                                                                                         ]
-                                                                                                                            }
+                                                                                                                                }
 
                                                                                                                             runtime {
                                                                                                                                         cpu: (
@@ -3860,8 +3838,8 @@ workflow chip {
                                                                                                                                         docker: runtime_environment.docker
                                                                                                                                         singularity: runtime_environment.singularity
                                                                                                                                         conda: runtime_environment.conda
-                                                                                                                                }
-                                                                                                                        }
+                                                                                                                                    }
+                                                                                                                            }
 
                                                                                                                         task macs2_signal_track {
                                                                                                                                 input {
@@ -3877,7 +3855,7 @@ workflow chip {
                                                                                                                                             Int time_hr
                                                                                                                                             Float disk_factor
                                                                                                                                             RuntimeEnvironment runtime_environment
-                                                                                                                                    }
+                                                                                                                                        }
 
                                                                                                                                     Float input_file_size_gb = size(
                                                                                                                                         tas, "G"
@@ -3904,7 +3882,7 @@ workflow chip {
                                                                                                                                                 } \
                                                                                                                                             ~{"--mem-gb " + mem_gb
                                                                                                                                                 }
-                                                                                                                                >>>
+                                                                                                                                    >>>
 
                                                                                                                                 output {
                                                                                                                                                     File pval_bw = glob(
@@ -3917,7 +3895,7 @@ workflow chip {
                                                                                                                                                         )[
                                                                                                                                                         0
                                                                                                                                                         ]
-                                                                                                                                            }
+                                                                                                                                                }
 
                                                                                                                                             runtime {
                                                                                                                                                 cpu: 1
@@ -3930,8 +3908,8 @@ workflow chip {
                                                                                                                                                 docker: runtime_environment.docker
                                                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                                                 conda: runtime_environment.conda
-                                                                                                                                        }
-                                                                                                                                }
+                                                                                                                                            }
+                                                                                                                                    }
 
                                                                                                                                 task idr {
                                                                                                                                         input {
@@ -3949,7 +3927,7 @@ workflow chip {
                                                                                                                                             String peak_type
                                                                                                                                             String rank
                                                                                                                                             RuntimeEnvironment runtime_environment
-                                                                                                                                    }
+                                                                                                                                        }
 
                                                                                                                                     command <<<
                                                                                                                                         set -e
@@ -3983,7 +3961,7 @@ workflow chip {
                                                                                                                                                 } \
                                                                                                                                             ~{"--ta " + ta
                                                                                                                                                 }
-                                                                                                                                >>>
+                                                                                                                                    >>>
 
                                                                                                                                 output {
                                                                                                                                                     File idr_peak = glob(
@@ -4044,7 +4022,7 @@ workflow chip {
                                                                                                                                                         0
                                                                                                                                                         ]
                                                                                                                                                         )
-                                                                                                                                            }
+                                                                                                                                                }
 
                                                                                                                                             runtime {
                                                                                                                                                 cpu: 1
@@ -4054,8 +4032,8 @@ workflow chip {
                                                                                                                                                 docker: runtime_environment.docker
                                                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                                                 conda: runtime_environment.conda
-                                                                                                                                        }
-                                                                                                                                }
+                                                                                                                                            }
+                                                                                                                                    }
 
                                                                                                                                 task overlap {
                                                                                                                                         input {
@@ -4071,7 +4049,7 @@ workflow chip {
                                                                                                                                             File chrsz  # 2-col chromosome sizes file
                                                                                                                                             String peak_type
                                                                                                                                             RuntimeEnvironment runtime_environment
-                                                                                                                                    }
+                                                                                                                                        }
 
                                                                                                                                     command <<<
                                                                                                                                         set -e
@@ -4102,7 +4080,7 @@ workflow chip {
                                                                                                                                                 } \
                                                                                                                                             ~{"--ta " + ta
                                                                                                                                                 }
-                                                                                                                                >>>
+                                                                                                                                    >>>
 
                                                                                                                                 output {
                                                                                                                                                     File overlap_peak = glob(
@@ -4148,7 +4126,7 @@ workflow chip {
                                                                                                                                                         0
                                                                                                                                                         ]
                                                                                                                                                         )
-                                                                                                                                            }
+                                                                                                                                                }
 
                                                                                                                                             runtime {
                                                                                                                                                 cpu: 1
@@ -4158,8 +4136,8 @@ workflow chip {
                                                                                                                                                 docker: runtime_environment.docker
                                                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                                                 conda: runtime_environment.conda
-                                                                                                                                        }
-                                                                                                                                }
+                                                                                                                                            }
+                                                                                                                                    }
 
                                                                                                                                 task reproducibility {
                                                                                                                                         input {
@@ -4177,7 +4155,7 @@ workflow chip {
                                                                                                                                             String peak_type
                                                                                                                                             File chrsz  # 2-col chromosome sizes file
                                                                                                                                             RuntimeEnvironment runtime_environment
-                                                                                                                                    }
+                                                                                                                                        }
 
                                                                                                                                     command <<<
                                                                                                                                         set -e
@@ -4194,7 +4172,7 @@ workflow chip {
                                                                                                                                                 } \
                                                                                                                                             ~{"--chrsz " + chrsz
                                                                                                                                                 }
-                                                                                                                                >>>
+                                                                                                                                    >>>
 
                                                                                                                                 output {
                                                                                                                                                     File optimal_peak = glob(
@@ -4268,7 +4246,7 @@ workflow chip {
                                                                                                                                                         )[
                                                                                                                                                         0
                                                                                                                                                         ]
-                                                                                                                                            }
+                                                                                                                                                }
 
                                                                                                                                             runtime {
                                                                                                                                                 cpu: 1
@@ -4278,8 +4256,8 @@ workflow chip {
                                                                                                                                                 docker: runtime_environment.docker
                                                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                                                 conda: runtime_environment.conda
-                                                                                                                                        }
-                                                                                                                                }
+                                                                                                                                            }
+                                                                                                                                    }
 
                                                                                                                                 task gc_bias {
                                                                                                                                         input {
@@ -4287,7 +4265,7 @@ workflow chip {
                                                                                                                                             File ref_fa
                                                                                                                                             String? picard_java_heap
                                                                                                                                             RuntimeEnvironment runtime_environment
-                                                                                                                                    }
+                                                                                                                                        }
 
                                                                                                                                     Float mem_factor = 0.3
                                                                                                                                     Float input_file_size_gb = size(
@@ -4313,7 +4291,7 @@ workflow chip {
                                                                                                                                                 )
                                                                                                                                                 )
                                                                                                                                                 }
-                                                                                                                                >>>
+                                                                                                                                    >>>
 
                                                                                                                                 output {
                                                                                                                                                     File gc_plot = glob(
@@ -4326,7 +4304,7 @@ workflow chip {
                                                                                                                                                         )[
                                                                                                                                                         0
                                                                                                                                                         ]
-                                                                                                                                            }
+                                                                                                                                                }
 
                                                                                                                                             runtime {
                                                                                                                                                 cpu: 1
@@ -4337,8 +4315,8 @@ workflow chip {
                                                                                                                                                 docker: runtime_environment.docker
                                                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                                                 conda: runtime_environment.conda
-                                                                                                                                        }
-                                                                                                                                }
+                                                                                                                                            }
+                                                                                                                                    }
 
                                                                                                                                 task qc_report {
                                                                                                                                         input {
@@ -4454,7 +4432,7 @@ workflow chip {
                                                                                                                                             File? overlap_opt_num_peak_qc
                                                                                                                                             File? qc_json_ref
                                                                                                                                             RuntimeEnvironment runtime_environment
-                                                                                                                                    }
+                                                                                                                                        }
 
                                                                                                                                     command <<<
                                                                                                                                         set -e
@@ -4582,7 +4560,7 @@ workflow chip {
                                                                                                                                             --out-qc-json qc.json \
                                                                                                                                             ~{"--qc-json-ref " + qc_json_ref
                                                                                                                                                 }
-                                                                                                                                >>>
+                                                                                                                                    >>>
 
                                                                                                                                 output {
                                                                                                                                                     File report = glob(
@@ -4598,7 +4576,7 @@ workflow chip {
                                                                                                                                                     Boolean qc_json_ref_match = read_string(
                                                                                                                                                         "qc_json_ref_match.txt"
                                                                                                                                                         ) == "True"
-                                                                                                                                            }
+                                                                                                                                                }
 
                                                                                                                                             runtime {
                                                                                                                                                 cpu: 1
@@ -4608,8 +4586,8 @@ workflow chip {
                                                                                                                                                 docker: runtime_environment.docker
                                                                                                                                                 singularity: runtime_environment.singularity
                                                                                                                                                 conda: runtime_environment.conda
-                                                                                                                                        }
-                                                                                                                                }
+                                                                                                                                            }
+                                                                                                                                    }
 
                                                                                                                                 ### workflow system tasks
                                                                                                                                 task read_genome_tsv {
@@ -4617,7 +4595,7 @@ workflow chip {
                                                                                                                                             File? genome_tsv
                                                                                                                                             String? null_s
                                                                                                                                             RuntimeEnvironment runtime_environment
-                                                                                                                                    }
+                                                                                                                                        }
 
                                                                                                                                     command <<<
                                                                                                                                             echo "$(basename ~{genome_tsv
@@ -4638,7 +4616,7 @@ workflow chip {
                                                                                                                                                         with open(key,'w') as fp2:
                                                                                                                                                             fp2.write(val)
                                                                                                                                             CODE
-                                                                                                                                    >>>
+                                                                                                                                        >>>
 
                                                                                                                                     output {
                                                                                                                                                 String? genome_name = read_string(
@@ -4707,7 +4685,7 @@ workflow chip {
                                                                                                                                                     "regex_bfilt_peak_chr_name"
                                                                                                                                                     )
                                                                                                                                                     )
-                                                                                                                                        }
+                                                                                                                                            }
 
                                                                                                                                         runtime {
                                                                                                                                             maxRetries: 0
@@ -4718,8 +4696,8 @@ workflow chip {
                                                                                                                                             docker: runtime_environment.docker
                                                                                                                                             singularity: runtime_environment.singularity
                                                                                                                                             conda: runtime_environment.conda
-                                                                                                                                    }
-                                                                                                                            }
+                                                                                                                                        }
+                                                                                                                                }
 
                                                                                                                             task rounded_mean {
                                                                                                                                     input {
@@ -4727,7 +4705,7 @@ workflow chip {
                                                                                                                                                     Int
                                                                                                                                                     ] ints
                                                                                                                                                 RuntimeEnvironment runtime_environment
-                                                                                                                                        }
+                                                                                                                                            }
 
                                                                                                                                         command <<<
                                                                                                                                             python <<CODE
@@ -4741,13 +4719,13 @@ workflow chip {
                                                                                                                                                 else:
                                                                                                                                                     fp.write('0')
                                                                                                                                             CODE
-                                                                                                                                    >>>
+                                                                                                                                        >>>
 
                                                                                                                                     output {
                                                                                                                                                 Int rounded_mean = read_int(
                                                                                                                                                     "tmp.txt"
                                                                                                                                                     )
-                                                                                                                                        }
+                                                                                                                                            }
 
                                                                                                                                         runtime {
                                                                                                                                             cpu: 1
@@ -4757,25 +4735,25 @@ workflow chip {
                                                                                                                                             docker: runtime_environment.docker
                                                                                                                                             singularity: runtime_environment.singularity
                                                                                                                                             conda: runtime_environment.conda
-                                                                                                                                    }
-                                                                                                                            }
+                                                                                                                                        }
+                                                                                                                                }
 
                                                                                                                             task raise_exception {
                                                                                                                                     input {
                                                                                                                                         String msg
                                                                                                                                         RuntimeEnvironment runtime_environment
-                                                                                                                                }
+                                                                                                                                    }
 
                                                                                                                                 command <<<
                                                                                                                                         echo -e "\n* Error: ~{msg
                                                                                                                                             }\n" >&2
                                                                                                                                         exit 2
-                                                                                                                                >>>
+                                                                                                                                    >>>
 
                                                                                                                                 output {
                                                                                                                                         String error_msg = "~{msg
                                                                                                                                             }"
-                                                                                                                                }
+                                                                                                                                    }
 
                                                                                                                                 runtime {
                                                                                                                                     maxRetries: 0
@@ -4786,5 +4764,5 @@ workflow chip {
                                                                                                                                     docker: runtime_environment.docker
                                                                                                                                     singularity: runtime_environment.singularity
                                                                                                                                     conda: runtime_environment.conda
-                                                                                                                            }
-                                                                                                                    }
+                                                                                                                                }
+                                                                                                                        }

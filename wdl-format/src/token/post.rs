@@ -183,6 +183,7 @@ impl Postprocessor {
                     output.push(PostToken::Newline);
 
                     buffer.clear();
+                    self.interrupted = false;
                     self.position = LinePosition::StartOfLine;
                 }
                 _ => {
@@ -203,8 +204,8 @@ impl Postprocessor {
         stream: &mut TokenStream<PostToken>,
     ) {
         if stream.is_empty() {
-            self.position = LinePosition::StartOfLine;
             self.interrupted = false;
+            self.position = LinePosition::StartOfLine;
             self.indent(stream);
         }
         match token {
@@ -260,7 +261,10 @@ impl Postprocessor {
                             | SyntaxKind::OpenParen
                             | SyntaxKind::OpenHeredoc
                     )
-                    && stream.0.last() == Some(&PostToken::Indent)
+                    && matches!(
+                        stream.0.last(),
+                        Some(&PostToken::Indent) | Some(&PostToken::TempIndent(_))
+                    )
                 {
                     stream.0.pop();
                 }
@@ -291,16 +295,18 @@ impl Postprocessor {
                         Comment::Preceding(value) => {
                             if !matches!(
                                 stream.0.last(),
-                                Some(&PostToken::Newline) | Some(&PostToken::Indent) | None
+                                Some(&PostToken::Newline)
+                                    | Some(&PostToken::Indent)
+                                    | Some(&PostToken::TempIndent(_))
+                                    | None
                             ) {
                                 self.interrupted = true;
                             }
                             self.end_line(stream);
                             stream.push(PostToken::Literal(value));
-                            self.position = LinePosition::MiddleOfLine;
                         }
                         Comment::Inline(value) => {
-                            // assert!(self.position == LinePosition::MiddleOfLine);
+                            assert!(self.position == LinePosition::MiddleOfLine);
                             if let Some(next) = next {
                                 if next != &PreToken::LineEnd {
                                     self.interrupted = true;
@@ -313,6 +319,7 @@ impl Postprocessor {
                             stream.push(PostToken::Literal(value));
                         }
                     }
+                    self.position = LinePosition::MiddleOfLine;
                     self.end_line(stream);
                 }
             },
@@ -346,6 +353,7 @@ impl Postprocessor {
             out_stream.extend(post_buffer);
             return;
         }
+
         let max_length = config.max_line_length().unwrap();
         dbg!("splitting line");
         dbg!("in_stream ={:#?}", &in_stream);
@@ -377,7 +385,8 @@ impl Postprocessor {
             while let Some((i, token)) = pre_buffer.next() {
                 if num_inserted_line_breaks < max_line_breaks && line_breaks.contains(&i) {
                     num_inserted_line_breaks += 1;
-                    self.interrupting_line_break(&mut post_buffer);
+                    self.interrupted = true;
+                    self.end_line(&mut post_buffer);
                 }
                 self.step(
                     token.clone(),
@@ -398,18 +407,6 @@ impl Postprocessor {
         }
 
         out_stream.extend(post_buffer);
-    }
-
-    /// Inserts an interrupting line break before the next token.
-    fn interrupting_line_break(&mut self, stream: &mut TokenStream<PostToken>) {
-        self.interrupted = true;
-        if self.position == LinePosition::StartOfLine {
-            return;
-        }
-        self.trim_last_line(stream);
-        stream.push(PostToken::Newline);
-        self.position = LinePosition::StartOfLine;
-        self.indent(stream);
     }
 
     /// Trims any and all whitespace from the end of the stream.
