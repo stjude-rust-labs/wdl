@@ -34,6 +34,12 @@ pub enum PostToken {
     /// One indentation.
     Indent,
 
+    /// A temporary indent.
+    ///
+    /// This is added after a [`PostToken::Indent`] during the formatting of
+    /// command sections.
+    TempIndent(Rc<String>),
+
     /// A string literal.
     Literal(Rc<String>),
 }
@@ -44,6 +50,7 @@ impl std::fmt::Debug for PostToken {
             Self::Space => write!(f, "<SPACE>"),
             Self::Newline => write!(f, "<NEWLINE>"),
             Self::Indent => write!(f, "<INDENT>"),
+            Self::TempIndent(value) => write!(f, "<TEMP_INDENT@{value}>"),
             Self::Literal(value) => write!(f, "<LITERAL@{value}>"),
         }
     }
@@ -68,6 +75,7 @@ impl Token for PostToken {
                     PostToken::Indent => {
                         write!(f, "{indent}", indent = self.config.indent().string())
                     }
+                    PostToken::TempIndent(value) => write!(f, "{value}"),
                     PostToken::Literal(value) => write!(f, "{value}"),
                 }
             }
@@ -87,6 +95,7 @@ impl PostToken {
             Self::Space => SPACE.len(),
             Self::Newline => 0,
             Self::Indent => config.indent().num(),
+            Self::TempIndent(value) => value.len(),
             Self::Literal(value) => value.len(),
         }
     }
@@ -110,8 +119,8 @@ enum LineBreak {
 }
 
 /// Returns whether a token can be line broken.
-/// 
-/// 
+///
+///
 /// TODO: not currently exhaustive.
 fn can_be_line_broken(kind: SyntaxKind) -> Option<LineBreak> {
     match kind {
@@ -174,7 +183,7 @@ impl Postprocessor {
                     output.push(PostToken::Newline);
 
                     buffer.clear();
-                    buffer.push(token);
+                    buffer.end_line();
                     self.position = LinePosition::StartOfLine;
                 }
                 _ => {
@@ -404,7 +413,10 @@ impl Postprocessor {
         stream.trim_while(|token| {
             matches!(
                 token,
-                PostToken::Space | PostToken::Newline | PostToken::Indent
+                PostToken::Space
+                    | PostToken::Newline
+                    | PostToken::Indent
+                    | PostToken::TempIndent(_)
             )
         });
     }
@@ -412,8 +424,10 @@ impl Postprocessor {
     /// Trims spaces and indents (and not newlines) from the end of the stream.
     fn trim_last_line(&mut self, stream: &mut TokenStream<PostToken>) {
         stream.trim_while(|token| {
-            matches!(token, PostToken::Space | PostToken::Indent)
-                || token == &PostToken::Literal(Rc::new(self.temp_indent.clone()))
+            matches!(
+                token,
+                PostToken::Space | PostToken::Indent | PostToken::TempIndent(_)
+            )
         });
     }
 
@@ -448,7 +462,7 @@ impl Postprocessor {
         }
 
         if self.temp_indent_needed {
-            stream.push(PostToken::Literal(Rc::new(self.temp_indent.clone())));
+            stream.push(PostToken::TempIndent(Rc::new(self.temp_indent.clone())));
         }
     }
 
