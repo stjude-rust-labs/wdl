@@ -134,7 +134,7 @@ fn prepare_document(source: &str, path: &Path) -> Result<FormatElement, String> 
 }
 
 /// Parses and formats source string
-fn do_format(source: &str, path: &Path) -> Result<String, String> {
+fn format(source: &str, path: &Path) -> Result<String, String> {
     let document = prepare_document(&source, &path)?;
     let formatted = match Formatter::default().format(&document) {
         Ok(formatted) => formatted,
@@ -160,11 +160,11 @@ fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), String> {
         )
     })?;
 
-    let formatted = do_format(&source, path.as_path())?;
+    let formatted = format(&source, path.as_path())?;
     compare_result(formatted_path.as_path(), &formatted)?;
 
-    // test idepotency by formatting the formatted document
-    let twice_formatted = do_format(&formatted, formatted_path.as_path())?;
+    // test idempotency by formatting the formatted document
+    let twice_formatted = format(&formatted, formatted_path.as_path())?;
     compare_result(formatted_path.as_path(), &twice_formatted)?;
 
     ntests.fetch_add(1, Ordering::SeqCst);
