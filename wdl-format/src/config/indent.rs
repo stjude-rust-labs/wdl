@@ -44,7 +44,7 @@ impl Indent {
     pub fn string(&self) -> String {
         match self {
             Indent::Tabs => self.character().to_string(),
-            Indent::Spaces(n) => SPACE.repeat(*n),
+            Indent::Spaces(n) => self.character().repeat(*n),
         }
     }
 }
