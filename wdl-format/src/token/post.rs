@@ -102,13 +102,6 @@ impl PostToken {
 }
 
 impl TokenStream<PostToken> {
-    /// Gets the width of the [`TokenStream`].
-    ///
-    /// This only makes sense to call if the stream represents a single line.
-    fn width(&self, config: &Config) -> usize {
-        self.iter().map(|t| t.width(config)).sum()
-    }
-
     /// Gets the maximum width of the [`TokenStream`].
     ///
     /// This is suitable to call if the stream represents multiple lines.
@@ -122,7 +115,7 @@ impl TokenStream<PostToken> {
                 cur_width = 0;
             }
         }
-        max
+        max.max(cur_width)
     }
 }
 
@@ -140,14 +133,15 @@ enum LineBreak {
 /// TODO: not currently exhaustive.
 fn can_be_line_broken(kind: SyntaxKind) -> Option<LineBreak> {
     match kind {
+        SyntaxKind::CloseBrace
+        | SyntaxKind::CloseBracket
+        | SyntaxKind::CloseParen
+        | SyntaxKind::CloseHeredoc
+        | SyntaxKind::Assignment => Some(LineBreak::Before),
         SyntaxKind::OpenBrace
         | SyntaxKind::OpenBracket
         | SyntaxKind::OpenParen
         | SyntaxKind::OpenHeredoc => Some(LineBreak::After),
-        SyntaxKind::CloseBrace
-        | SyntaxKind::CloseBracket
-        | SyntaxKind::CloseParen
-        | SyntaxKind::CloseHeredoc => Some(LineBreak::Before),
         _ => None,
     }
 }
@@ -289,7 +283,7 @@ impl Postprocessor {
                     self.temp_indent = Rc::new(
                         value
                             .chars()
-                            .take_while(|c| matches!(c, ' ' | '\t'))
+                            .take_while(|c| matches!(c.to_string().as_str(), SPACE | crate::TAB))
                             .collect(),
                     );
                 }
@@ -367,41 +361,40 @@ impl Postprocessor {
         if config.max_line_length().is_none()
             || post_buffer.max_width(config) <= config.max_line_length().unwrap()
         {
-            dbg!("no line breaks needed");
             out_stream.extend(post_buffer);
             return;
         }
 
         let max_length = config.max_line_length().unwrap();
-        dbg!("splitting line");
-        dbg!("in_stream ={:#?}", &in_stream);
-        dbg!("post_buffer ={:#?}", &post_buffer);
 
-        let mut line_breaks: Vec<usize> = Vec::new();
+        let mut potential_line_breaks: Vec<usize> = Vec::new();
         for (i, token) in in_stream.iter().enumerate() {
             if let PreToken::Literal(_, kind) = token {
                 match can_be_line_broken(*kind) {
                     Some(LineBreak::Before) => {
-                        line_breaks.push(i);
+                        potential_line_breaks.push(i);
                     }
                     Some(LineBreak::After) => {
-                        line_breaks.push(i + 1);
+                        potential_line_breaks.push(i + 1);
                     }
                     None => {}
                 }
             }
         }
         // Deduplicate the line breaks.
-        let line_breaks = line_breaks.into_iter().collect::<HashSet<usize>>();
+        let potential_line_breaks = potential_line_breaks
+            .into_iter()
+            .collect::<HashSet<usize>>();
 
         let mut num_inserted_line_breaks;
-        for max_line_breaks in 1..=line_breaks.len() {
+        for max_line_breaks in 1..=potential_line_breaks.len() {
             let mut pre_buffer = in_stream.iter().enumerate().peekable();
             num_inserted_line_breaks = 0;
             post_buffer.clear();
 
             while let Some((i, token)) = pre_buffer.next() {
-                if num_inserted_line_breaks < max_line_breaks && line_breaks.contains(&i) {
+                if num_inserted_line_breaks < max_line_breaks && potential_line_breaks.contains(&i)
+                {
                     num_inserted_line_breaks += 1;
                     self.interrupted = true;
                     self.end_line(&mut post_buffer);
@@ -413,13 +406,7 @@ impl Postprocessor {
                 );
             }
 
-            let mut last_line = TokenStream::<PostToken>::default();
-            post_buffer
-                .iter()
-                .rev()
-                .take_while(|t| *t != &PostToken::Newline)
-                .for_each(|t| last_line.push(t.clone()));
-            if last_line.width(config) <= max_length {
+            if post_buffer.max_width(config) <= max_length {
                 break;
             }
         }
