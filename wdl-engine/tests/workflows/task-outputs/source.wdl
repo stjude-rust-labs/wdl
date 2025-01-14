@@ -20,7 +20,7 @@ task count_lines {
   }
 
   command <<<
-    wc -l ~{write_lines(array)} | awk '{print $1}'
+    wc -l '~{write_lines(array)}' | awk '{print $1}'
   >>>
   
   output {
