@@ -403,6 +403,12 @@ impl Postprocessor {
             .into_iter()
             .collect::<HashSet<usize>>();
 
+        if potential_line_breaks.is_empty() {
+            // There are no potential line breaks, so we can't do anything.
+            out_stream.extend(post_buffer);
+            return;
+        }
+
         post_buffer.clear();
         let mut pre_buffer = in_stream.iter().enumerate().peekable();
         while let Some((i, token)) = pre_buffer.next() {
