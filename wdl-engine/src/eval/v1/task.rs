@@ -107,7 +107,7 @@ impl<'a, 'b> TaskEvaluationContext<'a, 'b> {
         self
     }
 
-    /// Marks the evaluation has having associated task information.
+    /// Marks the evaluation as having associated task information.
     ///
     /// This is used in evaluating hints sections.
     pub fn with_task(mut self) -> Self {
