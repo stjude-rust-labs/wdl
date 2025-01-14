@@ -117,6 +117,18 @@ impl TokenStream<PostToken> {
         }
         max.max(cur_width)
     }
+
+    /// Gets the width of the last line of the [`TokenStream`].
+    fn last_line_width(&self, config: &Config) -> usize {
+        let mut width = 0;
+        for token in self.iter().rev() {
+            if token == &PostToken::Newline {
+                break;
+            }
+            width += token.width(config);
+        }
+        width
+    }
 }
 
 /// A line break.
@@ -386,28 +398,28 @@ impl Postprocessor {
             .into_iter()
             .collect::<HashSet<usize>>();
 
-        let mut num_inserted_line_breaks;
-        for max_line_breaks in 1..=potential_line_breaks.len() {
-            let mut pre_buffer = in_stream.iter().enumerate().peekable();
-            num_inserted_line_breaks = 0;
-            post_buffer.clear();
-
-            while let Some((i, token)) = pre_buffer.next() {
-                if num_inserted_line_breaks < max_line_breaks && potential_line_breaks.contains(&i)
-                {
-                    num_inserted_line_breaks += 1;
+        let mut post_buffer = TokenStream::<PostToken>::default();
+        let mut pre_buffer = in_stream.iter().enumerate().peekable();
+        while let Some((i, token)) = pre_buffer.next() {
+            let next = pre_buffer.peek().map(|(_, t)| t);
+            let mut cache = None;
+            if potential_line_breaks.contains(&i) {
+                if post_buffer.last_line_width(config) > max_length {
                     self.interrupted = true;
                     self.end_line(&mut post_buffer);
+                } else {
+                    cache = Some(post_buffer.clone());
                 }
-                self.step(
-                    token.clone(),
-                    pre_buffer.peek().map(|(_, t)| t).copied(),
-                    &mut post_buffer,
-                );
             }
+            self.step(token.clone(), next.map(|v| &**v), &mut post_buffer);
 
-            if post_buffer.max_width(config) <= max_length {
-                break;
+            if let Some(cache) = cache {
+                if post_buffer.last_line_width(config) > max_length {
+                    post_buffer = cache;
+                    self.interrupted = true;
+                    self.end_line(&mut post_buffer);
+                    self.step(token.clone(), next.map(|v| &**v), &mut post_buffer);
+                }
             }
         }
 

@@ -20,7 +20,7 @@ pub trait Token: Eq + PartialEq {
 /// A stream of tokens. Tokens in this case are either [`PreToken`]s or
 /// [`PostToken`]s. Note that, unless you are working on formatting
 /// specifically, you should never need to work with [`PostToken`]s.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TokenStream<T: Token>(Vec<T>);
 
 impl<T: Token> Default for TokenStream<T> {
