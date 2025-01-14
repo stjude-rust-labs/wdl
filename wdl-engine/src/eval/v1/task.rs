@@ -253,7 +253,11 @@ impl<'a> TaskEvaluator<'a> {
 
         let ast = match document.node().ast() {
             Ast::V1(ast) => ast,
-            _ => return Err(anyhow!("document is not a 1.x document").into()),
+            _ => {
+                return Err(
+                    anyhow!("task evaluation is only supported for WDL 1.x documents").into(),
+                );
+            }
         };
 
         // Find the task in the AST

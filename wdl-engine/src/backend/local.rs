@@ -18,6 +18,7 @@ use futures::future::BoxFuture;
 use tokio::process::Command;
 use tokio::sync::Semaphore;
 use tracing::info;
+use tracing::warn;
 use wdl_analysis::types::PrimitiveType;
 use wdl_ast::v1::TASK_REQUIREMENT_CPU;
 use wdl_ast::v1::TASK_REQUIREMENT_MEMORY;
@@ -294,8 +295,15 @@ impl LocalTaskExecutionBackend {
     /// If `max_concurrency` is `None`, the default available parallelism for
     /// the host will be used (typically the logical CPU count).
     pub fn new(max_concurrency: Option<usize>) -> Self {
-        let max_concurrency =
-            max_concurrency.unwrap_or_else(|| available_parallelism().map(Into::into).unwrap_or(1));
+        let max_concurrency = max_concurrency.unwrap_or_else(|| {
+            available_parallelism().map(Into::into).unwrap_or_else(|_| {
+                warn!(
+                    "unable to determine available parallelism: tasks will not be executed \
+                     concurrently"
+                );
+                1
+            })
+        });
         Self {
             lock: Semaphore::new(max_concurrency).into(),
             max_concurrency,
