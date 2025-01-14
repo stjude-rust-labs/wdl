@@ -10,7 +10,7 @@ workflow test_input_keyword {
   # These three calls are equivalent
   call lib.repeat as rep1 { i }
 
-  call lib.repeat as rep2 { i = i}
+  call lib.repeat as rep2 { i = i }
 
   call lib.repeat as rep3 {
     input:  # optional (for backward compatibility)
