@@ -377,6 +377,11 @@ impl Postprocessor {
             return;
         }
 
+        // At least one line in the post_buffer is too long.
+        // We iterate through the in_stream to find potential line breaks,
+        // and then we iterate through the in_stream again to actually insert
+        // them in the proper places.
+
         let max_length = config.max_line_length().unwrap();
 
         let mut potential_line_breaks: Vec<usize> = Vec::new();
@@ -398,27 +403,41 @@ impl Postprocessor {
             .into_iter()
             .collect::<HashSet<usize>>();
 
-        let mut post_buffer = TokenStream::<PostToken>::default();
+        post_buffer.clear();
         let mut pre_buffer = in_stream.iter().enumerate().peekable();
         while let Some((i, token)) = pre_buffer.next() {
-            let next = pre_buffer.peek().map(|(_, t)| t);
             let mut cache = None;
             if potential_line_breaks.contains(&i) {
                 if post_buffer.last_line_width(config) > max_length {
+                    // The line is already too long, and taking the next step
+                    // can only make it worse. Insert a line break here.
                     self.interrupted = true;
                     self.end_line(&mut post_buffer);
                 } else {
+                    // The line is not too long yet, but it might be after the
+                    // next step. Cache the current state so we can revert to it
+                    // if necessary.
                     cache = Some(post_buffer.clone());
                 }
             }
-            self.step(token.clone(), next.map(|v| &**v), &mut post_buffer);
+            self.step(
+                token.clone(),
+                pre_buffer.peek().map(|(_, v)| &**v),
+                &mut post_buffer,
+            );
 
             if let Some(cache) = cache {
                 if post_buffer.last_line_width(config) > max_length {
+                    // The line is too long after the next step. Revert to the
+                    // cached state and insert a line break.
                     post_buffer = cache;
                     self.interrupted = true;
                     self.end_line(&mut post_buffer);
-                    self.step(token.clone(), next.map(|v| &**v), &mut post_buffer);
+                    self.step(
+                        token.clone(),
+                        pre_buffer.peek().map(|(_, v)| &**v),
+                        &mut post_buffer,
+                    );
                 }
             }
         }
