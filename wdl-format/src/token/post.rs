@@ -363,13 +363,18 @@ impl Postprocessor {
         out_stream: &mut TokenStream<PostToken>,
         config: &Config,
     ) {
+        assert!(!self.interrupted);
+        assert!(self.position == LinePosition::StartOfLine);
         let mut post_buffer = TokenStream::<PostToken>::default();
         let mut pre_buffer = in_stream.iter().peekable();
+        let starting_indent = self.indent_level;
         while let Some(token) = pre_buffer.next() {
             let next = pre_buffer.peek().copied();
             self.step(token.clone(), next, &mut post_buffer);
         }
 
+        // If the line is short enough, we can just add the post_buffer to the
+        // out_stream and be done.
         if config.max_line_length().is_none()
             || post_buffer.max_width(config) <= config.max_line_length().unwrap()
         {
@@ -409,8 +414,13 @@ impl Postprocessor {
             return;
         }
 
+        // Set up the buffers for the second pass.
         post_buffer.clear();
         let mut pre_buffer = in_stream.iter().enumerate().peekable();
+
+        // Reset the indent level.
+        self.indent_level = starting_indent;
+
         while let Some((i, token)) = pre_buffer.next() {
             let mut cache = None;
             if potential_line_breaks.contains(&i) {
