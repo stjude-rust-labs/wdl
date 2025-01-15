@@ -140,9 +140,6 @@ enum LineBreak {
 }
 
 /// Returns whether a token can be line broken.
-///
-///
-/// TODO: not currently exhaustive.
 fn can_be_line_broken(kind: SyntaxKind) -> Option<LineBreak> {
     match kind {
         SyntaxKind::CloseBrace
@@ -395,7 +392,7 @@ impl Postprocessor {
             self.step(token.clone(), next, &mut post_buffer);
         }
 
-        // If the line is short enough, we can just add the post_buffer to the
+        // If all lines are short enough, we can just add the post_buffer to the
         // out_stream and be done.
         if config.max_line_length().is_none()
             || post_buffer.max_width(config) <= config.max_line_length().unwrap()
