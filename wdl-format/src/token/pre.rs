@@ -6,10 +6,10 @@ use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxTokenExt;
 
 use crate::Comment;
-use crate::LineSpacingPolicy;
 use crate::Token;
 use crate::TokenStream;
 use crate::Trivia;
+use crate::TriviaBlankLineSpacingPolicy;
 
 /// A token that can be written by elements.
 ///
@@ -36,8 +36,8 @@ pub enum PreToken {
     /// The end of an indented block.
     IndentEnd,
 
-    /// How to handle blank lines from this point onwards.
-    LineSpacingPolicy(LineSpacingPolicy),
+    /// How to handle trivial blank lines from this point onwards.
+    LineSpacingPolicy(TriviaBlankLineSpacingPolicy),
 
     /// Literal text.
     Literal(Rc<String>, SyntaxKind),
@@ -133,14 +133,15 @@ impl TokenStream<PreToken> {
 
     /// Inserts a blank lines allowed context change.
     pub fn blank_lines_allowed(&mut self) {
-        self.0
-            .push(PreToken::LineSpacingPolicy(LineSpacingPolicy::Always));
+        self.0.push(PreToken::LineSpacingPolicy(
+            TriviaBlankLineSpacingPolicy::Always,
+        ));
     }
 
     /// Inserts a blank lines allowed before comments context change.
     pub fn blank_lines_allowed_between_comments(&mut self) {
         self.0.push(PreToken::LineSpacingPolicy(
-            LineSpacingPolicy::BeforeComments,
+            TriviaBlankLineSpacingPolicy::BeforeComments,
         ));
     }
 

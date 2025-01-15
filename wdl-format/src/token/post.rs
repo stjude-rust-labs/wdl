@@ -11,13 +11,13 @@ use wdl_ast::SyntaxKind;
 
 use crate::Comment;
 use crate::Config;
-use crate::LineSpacingPolicy;
 use crate::NEWLINE;
 use crate::PreToken;
 use crate::SPACE;
 use crate::Token;
 use crate::TokenStream;
 use crate::Trivia;
+use crate::TriviaBlankLineSpacingPolicy;
 
 /// [`PostToken`]s that precede an inline comment.
 const INLINE_COMMENT_PRECEDING_TOKENS: [PostToken; 2] = [PostToken::Space, PostToken::Space];
@@ -200,8 +200,8 @@ pub struct Postprocessor {
     /// Whether the current line has been interrupted by trivia.
     interrupted: bool,
 
-    /// The line spacing policy.
-    line_spacing_policy: LineSpacingPolicy,
+    /// The current trivial blank line spacing policy.
+    line_spacing_policy: TriviaBlankLineSpacingPolicy,
 
     /// Whether temporary indentation is needed.
     temp_indent_needed: bool,
@@ -324,10 +324,10 @@ impl Postprocessor {
             }
             PreToken::Trivia(trivia) => match trivia {
                 Trivia::BlankLine => match self.line_spacing_policy {
-                    LineSpacingPolicy::Always => {
+                    TriviaBlankLineSpacingPolicy::Always => {
                         self.blank_line(stream);
                     }
-                    LineSpacingPolicy::BeforeComments => {
+                    TriviaBlankLineSpacingPolicy::BeforeComments => {
                         if matches!(next, Some(&PreToken::Trivia(Trivia::Comment(_)))) {
                             self.blank_line(stream);
                         }
