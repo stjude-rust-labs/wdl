@@ -101,11 +101,11 @@ pub enum Trivia {
     Comment(Comment),
 }
 
-/// The policy for line spacing.
+/// The policy for [`Trivia::BlankLine`] line spacing.
 ///
 /// Blank lines before comments and between comments are always permitted.
 #[derive(Eq, PartialEq, Default, Debug, Clone, Copy)]
-pub enum LineSpacingPolicy {
+pub enum TriviaBlankLineSpacingPolicy {
     /// Blank lines are allowed before and between comments, but not after.
     ///
     /// i.e. a comment, then a blank line, then code, would have the blank
