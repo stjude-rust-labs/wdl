@@ -131,17 +131,18 @@ impl TokenStream<PreToken> {
         self.0.push(PreToken::IndentEnd);
     }
 
-    /// Inserts a blank lines allowed context change.
+    /// Inserts a trivial blank lines "always allowed" context change.
     pub fn blank_lines_allowed(&mut self) {
         self.0.push(PreToken::LineSpacingPolicy(
             TriviaBlankLineSpacingPolicy::Always,
         ));
     }
 
-    /// Inserts a blank lines allowed before comments context change.
+    /// Inserts a trivial blank lines "not allowed after comments" context
+    /// change.
     pub fn blank_lines_allowed_between_comments(&mut self) {
         self.0.push(PreToken::LineSpacingPolicy(
-            TriviaBlankLineSpacingPolicy::BeforeComments,
+            TriviaBlankLineSpacingPolicy::RemoveTrailingBlanks,
         ));
     }
 

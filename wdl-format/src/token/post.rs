@@ -327,7 +327,7 @@ impl Postprocessor {
                     TriviaBlankLineSpacingPolicy::Always => {
                         self.blank_line(stream);
                     }
-                    TriviaBlankLineSpacingPolicy::BeforeComments => {
+                    TriviaBlankLineSpacingPolicy::RemoveTrailingBlanks => {
                         if matches!(next, Some(&PreToken::Trivia(Trivia::Comment(_)))) {
                             self.blank_line(stream);
                         }

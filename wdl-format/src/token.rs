@@ -110,7 +110,7 @@ pub enum TriviaBlankLineSpacingPolicy {
     ///
     /// i.e. a comment, then a blank line, then code, would have the blank
     /// removed.
-    BeforeComments,
+    RemoveTrailingBlanks,
     /// Blank lines are always allowed.
     #[default]
     Always,
