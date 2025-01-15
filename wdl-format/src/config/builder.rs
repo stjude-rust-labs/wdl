@@ -48,9 +48,9 @@ impl Builder {
     ///
     /// This silently overwrites any previously provided value for the
     /// indentation level.
-    pub fn indent(mut self, indent: Indent) -> Result<Self> {
+    pub fn indent(mut self, indent: Indent) -> Self {
         self.indent = Some(indent);
-        Ok(self)
+        self
     }
 
     /// Sets the maximum line length.
