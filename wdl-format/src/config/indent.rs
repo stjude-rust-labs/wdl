@@ -30,7 +30,9 @@ impl Indent {
     pub fn try_new(tab: bool, num_spaces: Option<usize>) -> Result<Self, String> {
         match (tab, num_spaces) {
             (true, None) => Ok(Indent::Tabs),
-            (true, Some(_)) => Err("Indentation with tabs cannot have a number of spaces".to_string()),
+            (true, Some(_)) => {
+                Err("Indentation with tabs cannot have a number of spaces".to_string())
+            }
             (false, Some(n)) => {
                 if n > MAX_SPACE_INDENT {
                     Err(format!(

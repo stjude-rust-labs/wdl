@@ -408,24 +408,20 @@ impl Postprocessor {
 
         let max_length = config.max_line_length().unwrap();
 
-        let mut potential_line_breaks: Vec<usize> = Vec::new();
+        let mut potential_line_breaks: HashSet<usize> = HashSet::new();
         for (i, token) in in_stream.iter().enumerate() {
             if let PreToken::Literal(_, kind) = token {
                 match can_be_line_broken(*kind) {
                     Some(LineBreak::Before) => {
-                        potential_line_breaks.push(i);
+                        potential_line_breaks.insert(i);
                     }
                     Some(LineBreak::After) => {
-                        potential_line_breaks.push(i + 1);
+                        potential_line_breaks.insert(i + 1);
                     }
                     None => {}
                 }
             }
         }
-        // Deduplicate the line breaks.
-        let potential_line_breaks = potential_line_breaks
-            .into_iter()
-            .collect::<HashSet<usize>>();
 
         if potential_line_breaks.is_empty() {
             // There are no potential line breaks, so we can't do anything.

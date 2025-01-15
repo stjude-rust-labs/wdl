@@ -68,11 +68,6 @@ impl<T: Token> TokenStream<T> {
         self.0.clear();
     }
 
-    /// Drains the stream.
-    pub fn drain(&mut self) -> std::vec::Drain<'_, T> {
-        self.0.drain(..)
-    }
-
     /// Extends the stream with the tokens from another stream.
     pub fn extend(&mut self, other: Self) {
         self.0.extend(other.0);
