@@ -1103,7 +1103,8 @@ workflow chip {
     ])
     String peak_type_ = if peak_caller_ == "spp" then "regionPeak" else "narrowPeak"
     Boolean enable_idr = pipeline_type == "tf"  # enable_idr for TF chipseq only
-    String idr_rank_ = if peak_caller_ == "spp" then "signal.value" else if peak_caller_ == "macs2" then "p.value" else "p.value"
+    String idr_rank_ = if peak_caller_ == "spp" then "signal.value" else if peak_caller_
+        == "macs2" then "p.value" else "p.value"
     Int cap_num_peak_spp = 300000
     Int cap_num_peak_macs2 = 500000
     Int cap_num_peak_ = if peak_caller_ == "spp" then select_first([
@@ -1121,9 +1122,12 @@ workflow chip {
     Boolean align_only_ = if pipeline_type == "control" then true else align_only
 
     Float align_mem_factor_ = if aligner_ == "bowtie2" then align_bowtie2_mem_factor else align_bwa_mem_factor
-    Float align_disk_factor_ = if aligner_ == "bowtie2" then align_bowtie2_disk_factor else align_bwa_disk_factor
-    Float call_peak_mem_factor_ = if peak_caller_ == "spp" then call_peak_spp_mem_factor else call_peak_macs2_mem_factor
-    Float call_peak_disk_factor_ = if peak_caller_ == "spp" then call_peak_spp_disk_factor else call_peak_macs2_disk_factor
+    Float align_disk_factor_ = if aligner_ == "bowtie2" then align_bowtie2_disk_factor
+        else align_bwa_disk_factor
+    Float call_peak_mem_factor_ = if peak_caller_ == "spp" then call_peak_spp_mem_factor
+        else call_peak_macs2_mem_factor
+    Float call_peak_disk_factor_ = if peak_caller_ == "spp" then call_peak_spp_disk_factor
+        else call_peak_macs2_disk_factor
 
     # temporary 2-dim fastqs array [rep_id][merge_id]
     Array[Array[File]] fastqs_R1 = if length(fastqs_rep10_R1) > 0 then [
@@ -1321,8 +1325,8 @@ workflow chip {
             runtime_environment = runtime_environment,
         }
     }
-    if ((num_rep_fastq > 0 || num_ctl_fastq > 0) && aligner_ != "bwa" && aligner_ != "bowtie2" && aligner_ != "custom"
-        ) {
+    if ((num_rep_fastq > 0 || num_ctl_fastq > 0) && aligner_ != "bwa" && aligner_ != "bowtie2"
+        && aligner_ != "custom") {
         call raise_exception as error_wrong_aligner { input:
             msg = "Choose chip.aligner to align your fastqs. Choices: bwa, bowtie2, custom.",
             runtime_environment = runtime_environment,
@@ -1351,7 +1355,11 @@ workflow chip {
     if ((ctl_depth_limit > 0 || exp_ctl_depth_ratio_limit > 0) && num_ctl > 1 && length(
         ctl_paired_ends) > 1) {
         call raise_exception as error_subsample_pooled_control_with_mixed_endedness { input:
-            msg = "Cannot use automatic control subsampling (\"chip.ctl_depth_limit\">0 and \"chip.exp_ctl_depth_limit\">0) for " + "multiple controls with mixed endedness (e.g. SE ctl-rep1 and PE ctl-rep2). " + "Automatic control subsampling is enabled by default. " + "Disable automatic control subsampling by explicitly defining the above two parameters as 0 in your input JSON file. " + "You can still use manual control subsamping (\"chip.ctl_subsample_reads\">0) since it is done " + "for individual control's TAG-ALIGN output according to each control's endedness. ",
+            msg = "Cannot use automatic control subsampling (\"chip.ctl_depth_limit\">0 and \"chip.exp_ctl_depth_limit\">0) for "
+                + "multiple controls with mixed endedness (e.g. SE ctl-rep1 and PE ctl-rep2). "
+                + "Automatic control subsampling is enabled by default. " + "Disable automatic control subsampling by explicitly defining the above two parameters as 0 in your input JSON file. "
+                + "You can still use manual control subsamping (\"chip.ctl_subsample_reads\">0) since it is done "
+                + "for individual control's TAG-ALIGN output according to each control's endedness. ",
             runtime_environment = runtime_environment,
         }
     }
@@ -1390,7 +1398,8 @@ workflow chip {
                 aligner = aligner_,
                 mito_chr_name = mito_chr_name_,
                 custom_align_py = custom_align_py,
-                idx_tar = if aligner == "bwa" then bwa_idx_tar_ else if aligner == "bowtie2" then bowtie2_idx_tar_ else custom_aligner_idx_tar,
+                idx_tar = if aligner == "bwa" then bwa_idx_tar_ else if aligner == "bowtie2"
+                    then bowtie2_idx_tar_ else custom_aligner_idx_tar,
                 paired_end = paired_end_,
                 use_bwa_mem_for_pe = use_bwa_mem_for_pe,
                 bwa_mem_read_len_limit = bwa_mem_read_len_limit,
@@ -1496,7 +1505,8 @@ workflow chip {
                 aligner = aligner_,
                 mito_chr_name = mito_chr_name_,
                 custom_align_py = custom_align_py,
-                idx_tar = if aligner == "bwa" then bwa_idx_tar_ else if aligner == "bowtie2" then bowtie2_idx_tar_ else custom_aligner_idx_tar,
+                idx_tar = if aligner == "bwa" then bwa_idx_tar_ else if aligner == "bowtie2"
+                    then bowtie2_idx_tar_ else custom_aligner_idx_tar,
                 paired_end = false,
                 use_bwa_mem_for_pe = false,
                 bwa_mem_read_len_limit = 0,
@@ -1543,8 +1553,8 @@ workflow chip {
         }
 
         # special trimming/mapping for xcor (when starting from BAMs)
-        Boolean has_input_of_bam2ta_no_dedup = (has_output_of_align || defined(align.bam)) && !defined(
-            bam2ta_no_dedup_R1.ta)
+        Boolean has_input_of_bam2ta_no_dedup = (has_output_of_align || defined(align.bam))
+            && !defined(bam2ta_no_dedup_R1.ta)
         if (has_input_of_bam2ta_no_dedup) {
             call filter as filter_no_dedup { input:
                 bam = bam_,
@@ -1582,8 +1592,8 @@ workflow chip {
         # if not starting from fastqs, keep using old method
         #  (mapping with both ends for tag-aligns to be used for xcor)
         # subsample tagalign (non-mito) and cross-correlation analysis
-        File? ta_xcor = if defined(bam2ta_no_dedup_R1.ta) then bam2ta_no_dedup_R1.ta else if defined(
-            bam2ta_no_dedup.ta) then bam2ta_no_dedup.ta else ta_
+        File? ta_xcor = if defined(bam2ta_no_dedup_R1.ta) then bam2ta_no_dedup_R1.ta else
+            if defined(bam2ta_no_dedup.ta) then bam2ta_no_dedup.ta else ta_
         Boolean paired_end_xcor = if defined(bam2ta_no_dedup_R1.ta) then false else paired_end_
 
         Boolean has_input_of_xcor = defined(ta_xcor)
@@ -1633,7 +1643,8 @@ workflow chip {
                 aligner = aligner_,
                 mito_chr_name = mito_chr_name_,
                 custom_align_py = custom_align_py,
-                idx_tar = if aligner == "bwa" then bwa_idx_tar_ else if aligner == "bowtie2" then bowtie2_idx_tar_ else custom_aligner_idx_tar,
+                idx_tar = if aligner == "bwa" then bwa_idx_tar_ else if aligner == "bowtie2"
+                    then bowtie2_idx_tar_ else custom_aligner_idx_tar,
                 paired_end = ctl_paired_end_,
                 use_bwa_mem_for_pe = use_bwa_mem_for_pe,
                 bwa_mem_read_len_limit = bwa_mem_read_len_limit,
@@ -1802,8 +1813,8 @@ workflow chip {
         [
             choose_ctl.chosen_ctl_ta_subsample,
         ])[i] else 0
-        Boolean chosen_ctl_paired_end = if chosen_ctl_ta_id == -2 then false else if chosen_ctl_ta_id == -1 then ctl_paired_end_[
-            0] else ctl_paired_end_[chosen_ctl_ta_id]
+        Boolean chosen_ctl_paired_end = if chosen_ctl_ta_id == -2 then false else if chosen_ctl_ta_id
+            == -1 then ctl_paired_end_[0] else ctl_paired_end_[chosen_ctl_ta_id]
 
         if (chosen_ctl_ta_id > -2 && chosen_ctl_ta_subsample > 0) {
             call subsample_ctl { input:
@@ -1816,7 +1827,8 @@ workflow chip {
                 runtime_environment = runtime_environment,
             }
         }
-        Array[File] chosen_ctl_tas = if chosen_ctl_ta_id <= -2 then [] else if chosen_ctl_ta_subsample > 0 then [
+        Array[File] chosen_ctl_tas = if chosen_ctl_ta_id <= -2 then [] else if chosen_ctl_ta_subsample
+            > 0 then [
             select_first([
                 subsample_ctl.ta_subsampled,
             ]),
@@ -1830,8 +1842,8 @@ workflow chip {
             ]),
         ]
     }
-    Int chosen_ctl_ta_pooled_subsample = if has_all_input_of_choose_ctl && !align_only_ then select_first(
-    [
+    Int chosen_ctl_ta_pooled_subsample = if has_all_input_of_choose_ctl && !align_only_
+        then select_first([
         choose_ctl.chosen_ctl_ta_subsample_pooled,
     ]) else 0
 
@@ -1865,7 +1877,8 @@ workflow chip {
                 mem_factor = call_peak_mem_factor_,
                 disk_factor = call_peak_disk_factor_,
                 time_hr = call_peak_time_hr,
-                runtime_environment = if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment,
+                runtime_environment = if peak_caller_ == "spp" then runtime_environment_spp
+                    else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment,
             }
         }
         File? peak_ = if has_output_of_call_peak then peaks[i] else call_peak.peak
@@ -1917,7 +1930,8 @@ workflow chip {
                 mem_factor = call_peak_mem_factor_,
                 disk_factor = call_peak_disk_factor_,
                 time_hr = call_peak_time_hr,
-                runtime_environment = if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment,
+                runtime_environment = if peak_caller_ == "spp" then runtime_environment_spp
+                    else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment,
             }
         }
         File? peak_pr1_ = if has_output_of_call_peak_pr1 then peaks_pr1[i] else call_peak_pr1.peak
@@ -1948,7 +1962,8 @@ workflow chip {
                 mem_factor = call_peak_mem_factor_,
                 disk_factor = call_peak_disk_factor_,
                 time_hr = call_peak_time_hr,
-                runtime_environment = if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment,
+                runtime_environment = if peak_caller_ == "spp" then runtime_environment_spp
+                    else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment,
             }
         }
         File? peak_pr2_ = if has_output_of_call_peak_pr2 then peaks_pr2[i] else call_peak_pr2.peak
@@ -1975,8 +1990,8 @@ workflow chip {
         }
     }
     # actually not an array
-    Array[File?] chosen_ctl_ta_pooled = if !has_all_input_of_choose_ctl || align_only_ then [
-        ] else if chosen_ctl_ta_pooled_subsample > 0 then [
+    Array[File?] chosen_ctl_ta_pooled = if !has_all_input_of_choose_ctl || align_only_
+        then [] else if chosen_ctl_ta_pooled_subsample > 0 then [
         subsample_ctl_pooled.ta_subsampled,
     ] else if num_ctl < 2 then [
         ctl_ta_[0],
@@ -1986,8 +2001,8 @@ workflow chip {
 
     Boolean has_input_of_call_peak_pooled = defined(pool_ta.ta_pooled)
     Boolean has_output_of_call_peak_pooled = defined(peak_pooled)
-    if (has_input_of_call_peak_pooled && !has_output_of_call_peak_pooled && !align_only_ && num_rep > 1
-        ) {
+    if (has_input_of_call_peak_pooled && !has_output_of_call_peak_pooled && !align_only_
+        && num_rep > 1) {
         # call peaks on pooled replicate
         # always call peaks for pooled replicate to get signal tracks
         call call_peak as call_peak_pooled { input:
@@ -2012,7 +2027,8 @@ workflow chip {
             mem_factor = call_peak_mem_factor_,
             disk_factor = call_peak_disk_factor_,
             time_hr = call_peak_time_hr,
-            runtime_environment = if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment,
+            runtime_environment = if peak_caller_ == "spp" then runtime_environment_spp
+                else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment,
         }
     }
     File? peak_pooled_ = if has_output_of_call_peak_pooled then peak_pooled else call_peak_pooled.peak
@@ -2040,8 +2056,8 @@ workflow chip {
 
     Boolean has_input_of_call_peak_ppr1 = defined(pool_ta_pr1.ta_pooled)
     Boolean has_output_of_call_peak_ppr1 = defined(peak_ppr1)
-    if (has_input_of_call_peak_ppr1 && !has_output_of_call_peak_ppr1 && !align_only_ && !true_rep_only && num_rep > 1
-        ) {
+    if (has_input_of_call_peak_ppr1 && !has_output_of_call_peak_ppr1 && !align_only_ && !true_rep_only
+        && num_rep > 1) {
         # call peaks on 1st pooled pseudo replicates
         call call_peak as call_peak_ppr1 { input:
             peak_caller = peak_caller_,
@@ -2065,15 +2081,16 @@ workflow chip {
             mem_factor = call_peak_mem_factor_,
             disk_factor = call_peak_disk_factor_,
             time_hr = call_peak_time_hr,
-            runtime_environment = if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment,
+            runtime_environment = if peak_caller_ == "spp" then runtime_environment_spp
+                else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment,
         }
     }
     File? peak_ppr1_ = if has_output_of_call_peak_ppr1 then peak_ppr1 else call_peak_ppr1.peak
 
     Boolean has_input_of_call_peak_ppr2 = defined(pool_ta_pr2.ta_pooled)
     Boolean has_output_of_call_peak_ppr2 = defined(peak_ppr2)
-    if (has_input_of_call_peak_ppr2 && !has_output_of_call_peak_ppr2 && !align_only_ && !true_rep_only && num_rep > 1
-        ) {
+    if (has_input_of_call_peak_ppr2 && !has_output_of_call_peak_ppr2 && !align_only_ && !true_rep_only
+        && num_rep > 1) {
         # call peaks on 2nd pooled pseudo replicates
         call call_peak as call_peak_ppr2 { input:
             peak_caller = peak_caller_,
@@ -2097,7 +2114,8 @@ workflow chip {
             mem_factor = call_peak_mem_factor_,
             disk_factor = call_peak_disk_factor_,
             time_hr = call_peak_time_hr,
-            runtime_environment = if peak_caller_ == "spp" then runtime_environment_spp else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment,
+            runtime_environment = if peak_caller_ == "spp" then runtime_environment_spp
+                else if peak_caller_ == "macs2" then runtime_environment_macs2 else runtime_environment,
         }
     }
     File? peak_ppr2_ = if has_output_of_call_peak_ppr2 then peak_ppr2 else call_peak_ppr2.peak
@@ -2417,8 +2435,8 @@ task align {
                 ~{"--phred-score-format " + trimmomatic_phred_score_format} \
                 --out-dir-R1 R1$NEW_SUFFIX \
                 ~{if paired_end then "--out-dir-R2 R2$NEW_SUFFIX" else ""} \
-                ~{"--trimmomatic-java-heap " + if defined(trimmomatic_java_heap) then trimmomatic_java_heap else (
-                    round(mem_gb * trimmomatic_java_heap_factor) + "G")} \
+                ~{"--trimmomatic-java-heap " + if defined(trimmomatic_java_heap) then trimmomatic_java_heap
+                    else (round(mem_gb * trimmomatic_java_heap_factor) + "G")} \
                 ~{"--nth " + cpu}
             SUFFIX=$NEW_SUFFIX
         fi
@@ -2522,8 +2540,8 @@ task filter {
             ~{"--mito-chr-name " + mito_chr_name} \
             ~{"--mem-gb " + samtools_mem_gb} \
             ~{"--nth " + cpu} \
-            ~{"--picard-java-heap " + if defined(picard_java_heap) then picard_java_heap else (
-                round(mem_gb * picard_java_heap_factor) + "G")}
+            ~{"--picard-java-heap " + if defined(picard_java_heap) then picard_java_heap
+                else (round(mem_gb * picard_java_heap_factor) + "G")}
 
         if [ '~{redact_nodup_bam}' == 'true' ]; then
             python3 $(which encode_task_bam_to_pbam.py) \
@@ -3196,8 +3214,8 @@ task gc_bias {
         python3 $(which encode_task_gc_bias.py) \
             ~{"--nodup-bam " + nodup_bam} \
             ~{"--ref-fa " + ref_fa} \
-            ~{"--picard-java-heap " + if defined(picard_java_heap) then picard_java_heap else (
-                round(mem_gb * picard_java_heap_factor) + "G")}
+            ~{"--picard-java-heap " + if defined(picard_java_heap) then picard_java_heap
+                else (round(mem_gb * picard_java_heap_factor) + "G")}
     >>>
 
     output {
@@ -3403,8 +3421,8 @@ task read_genome_tsv {
             )
         String? mito_chr_name = if size("mito_chr_name") == 0 then null_s else read_string(
             "mito_chr_name")
-        String? regex_bfilt_peak_chr_name = if size("regex_bfilt_peak_chr_name") == 0 then "chr[\\dXY]+" else read_string(
-            "regex_bfilt_peak_chr_name")
+        String? regex_bfilt_peak_chr_name = if size("regex_bfilt_peak_chr_name") == 0 then "chr[\\dXY]+"
+            else read_string("regex_bfilt_peak_chr_name")
     }
 
     runtime {

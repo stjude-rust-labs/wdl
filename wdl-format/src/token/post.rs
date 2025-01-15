@@ -149,11 +149,33 @@ fn can_be_line_broken(kind: SyntaxKind) -> Option<LineBreak> {
         | SyntaxKind::CloseBracket
         | SyntaxKind::CloseParen
         | SyntaxKind::CloseHeredoc
-        | SyntaxKind::Assignment => Some(LineBreak::Before),
+        | SyntaxKind::Assignment
+        | SyntaxKind::Plus
+        | SyntaxKind::Minus
+        | SyntaxKind::Asterisk
+        | SyntaxKind::Slash
+        | SyntaxKind::Percent
+        | SyntaxKind::Exponentiation
+        | SyntaxKind::Equal
+        | SyntaxKind::NotEqual
+        | SyntaxKind::Less
+        | SyntaxKind::LessEqual
+        | SyntaxKind::Greater
+        | SyntaxKind::GreaterEqual
+        | SyntaxKind::LogicalAnd
+        | SyntaxKind::LogicalOr
+        | SyntaxKind::AfterKeyword
+        | SyntaxKind::AsKeyword
+        | SyntaxKind::IfKeyword
+        | SyntaxKind::ElseKeyword
+        | SyntaxKind::ThenKeyword => Some(LineBreak::Before),
         SyntaxKind::OpenBrace
         | SyntaxKind::OpenBracket
         | SyntaxKind::OpenParen
-        | SyntaxKind::OpenHeredoc => Some(LineBreak::After),
+        | SyntaxKind::OpenHeredoc
+        | SyntaxKind::Colon
+        | SyntaxKind::PlaceholderOpen
+        | SyntaxKind::Comma => Some(LineBreak::After),
         _ => None,
     }
 }
