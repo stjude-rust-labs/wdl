@@ -36,6 +36,7 @@ impl std::error::Error for Error {}
 pub type Result<T> = std::result::Result<T, Error>;
 
 /// A builder for a [`Config`].
+#[derive(Default)]
 pub struct Builder {
     /// The number of characters to indent.
     indent: Option<Indent>,
@@ -44,15 +45,6 @@ pub struct Builder {
 }
 
 impl Builder {
-    /// Creates a new builder with default values.
-    pub fn new(indent: Option<Indent>, max_line_length: Option<MaxLineLength>) -> Result<Self> {
-        let indent = indent.unwrap_or_default();
-        let max_line_length = max_line_length.unwrap_or_default();
-        Ok(Self::default()
-            .indent(indent)?
-            .max_line_length(max_line_length))
-    }
-
     /// Sets the indentation level.
     ///
     /// This silently overwrites any previously provided value for the
@@ -76,25 +68,13 @@ impl Builder {
         self
     }
 
-    /// Consumes `self` and attempts to build a [`Config`].
-    pub fn try_build(self) -> Result<Config> {
-        let indent = self.indent.ok_or(Error::Missing("indent"))?;
-        let max_line_length = self
-            .max_line_length
-            .ok_or(Error::Missing("max_line_length"))?;
-
-        Ok(Config {
+    /// Consumes `self` to build a [`Config`].
+    pub fn build(self) -> Config {
+        let indent = self.indent.unwrap_or_default();
+        let max_line_length = self.max_line_length.unwrap_or_default();
+        Config {
             indent,
             max_line_length,
-        })
-    }
-}
-
-impl Default for Builder {
-    fn default() -> Self {
-        Self {
-            indent: Some(Default::default()),
-            max_line_length: Some(Default::default()),
         }
     }
 }

@@ -29,8 +29,10 @@ pub const MAX_MAX_LINE_LENGTH: usize = 240;
 pub struct MaxLineLength(Option<usize>);
 
 impl MaxLineLength {
-    /// Creates a new `MaxLineLength` with the provided value.
-    pub fn with_value(value: usize) -> Result<Self, Error> {
+    /// Attempts to create a new `MaxLineLength` with the provided value.
+    ///
+    /// A value of `0` indicates no maximum.
+    pub fn try_new(value: usize) -> Result<Self, Error> {
         let val = match value {
             0 => Self(None),
             MIN_MAX_LINE_LENGTH..=MAX_MAX_LINE_LENGTH => Self(Some(value)),
@@ -39,7 +41,7 @@ impl MaxLineLength {
         Ok(val)
     }
 
-    /// Gets the maximum line length.
+    /// Gets the maximum line length. A value of `None` indicates no maximum.
     pub fn get(&self) -> Option<usize> {
         self.0
     }
