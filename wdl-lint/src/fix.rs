@@ -111,6 +111,8 @@ impl Fixer {
     }
 
     /// Apply a [`Replacement`] to the value contained in the Fixer.
+    ///
+    /// Panics if the replacement is out-of-bounds.
     pub fn apply_replacement(&mut self, replacement: &Replacement) {
         let old_start = replacement.start;
         let old_end = replacement.end;
