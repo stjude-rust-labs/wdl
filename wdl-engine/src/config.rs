@@ -1,0 +1,221 @@
+//! Implementation of engine configuration.
+
+use std::sync::Arc;
+
+use anyhow::Context;
+use anyhow::Result;
+use anyhow::bail;
+use serde::Deserialize;
+use serde::Serialize;
+
+use crate::SYSTEM;
+use crate::TaskExecutionBackend;
+use crate::convert_unit_string;
+use crate::local::LocalTaskExecutionBackend;
+
+/// Represents WDL evaluation configuration.
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct Config {
+    /// Workflow evaluation configuration.
+    #[serde(default)]
+    pub workflow: WorkflowConfig,
+    /// Task evaluation configuration.
+    #[serde(default)]
+    pub task: TaskConfig,
+    /// Task execution backend configuration.
+    #[serde(default)]
+    pub backend: BackendConfig,
+}
+
+impl Config {
+    /// Validates the evaluation configuration.
+    pub fn validate(&self) -> Result<()> {
+        self.workflow.validate()?;
+        self.task.validate()?;
+        self.backend.validate()?;
+        Ok(())
+    }
+
+    /// Creates a new task execution backend based on this configuration.
+    pub fn create_backend(&self) -> Result<Arc<dyn TaskExecutionBackend>> {
+        match self.backend.default {
+            Backend::Local => Ok(Arc::new(LocalTaskExecutionBackend::new(
+                &self.backend.local,
+            )?)),
+        }
+    }
+}
+
+/// Represents workflow evaluation configuration.
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct WorkflowConfig {
+    /// Scatter statement evaluation configuration.
+    #[serde(default)]
+    pub scatter: ScatterConfig,
+}
+
+impl WorkflowConfig {
+    /// Validates the workflow configuration.
+    pub fn validate(&self) -> Result<()> {
+        self.scatter.validate()?;
+        Ok(())
+    }
+}
+
+/// Represents scatter statement evaluation configuration.
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct ScatterConfig {
+    /// The number of scatter array elements to process concurrently.
+    ///
+    /// By default, the value is the parallelism supported by the task
+    /// execution backend.
+    ///
+    /// A value of `0` is invalid.
+    ///
+    /// Lower values use less memory for evaluation and higher values may better
+    /// saturate the task execution backend with tasks to execute.
+    ///
+    /// <div class="warning">
+    /// Warning: nested scatter statements cause exponential memory usage based
+    /// on this value, as each scatter statement evaluation requires allocating
+    /// new scopes for scatter array elements being processed. </div>
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub concurrency: Option<u64>,
+}
+
+impl ScatterConfig {
+    /// Validates the scatter configuration.
+    pub fn validate(&self) -> Result<()> {
+        if let Some(concurrency) = self.concurrency {
+            if concurrency == 0 {
+                bail!("configuration value `workflow.scatter.concurrency` cannot be zero");
+            }
+        }
+
+        Ok(())
+    }
+}
+
+/// Represents task evaluation configuration.
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct TaskConfig {
+    /// The maximum number of retries to attempt if a task fails.
+    ///
+    /// Defaults to 0 (no retries).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub retries: Option<u8>,
+}
+
+impl TaskConfig {
+    /// Validates the task evaluation configuration.
+    pub fn validate(&self) -> Result<()> {
+        Ok(())
+    }
+}
+
+/// Represents supported task execution backends.
+#[derive(Debug, Default, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[serde(rename_all = "snake_case")]
+pub enum Backend {
+    /// Use the local task execution backend.
+    // TODO: change this to docker when supported.
+    #[default]
+    Local,
+}
+
+impl Backend {
+    /// Determines if the backend is the local task execution backend.
+    pub fn is_local(&self) -> bool {
+        matches!(self, Self::Local)
+    }
+}
+
+/// Represents task execution backend configuration.
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct BackendConfig {
+    /// The default execution backend to use.
+    // TODO: update this once local is no longer the default
+    #[serde(default, skip_serializing_if = "Backend::is_local")]
+    pub default: Backend,
+    /// Local task execution backend configuration.
+    pub local: LocalBackendConfig,
+}
+
+impl BackendConfig {
+    /// Validates the backend configuration.
+    pub fn validate(&self) -> Result<()> {
+        self.local.validate()?;
+        Ok(())
+    }
+}
+
+/// Represents configuration for the local task execution backend.
+///
+/// <div class="warning">
+/// Warning: the local task execution backend spawns processes on the host
+/// directly without the use of a container; only use this backend on trusted
+/// WDL. </div>
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct LocalBackendConfig {
+    /// Set the number of CPUs available for task execution.
+    ///
+    /// Defaults to the number of logical CPUs for the host.
+    ///
+    /// The value cannot be zero or exceed the host's number of CPUs.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cpu: Option<u64>,
+
+    /// Set the total amount of memory for task execution as a unit string (e.g.
+    /// `2 GiB`).
+    ///
+    /// Defaults to the total amount of memory for the host.
+    ///
+    /// The value cannot be zero or exceed the host's total amount of memory.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub memory: Option<String>,
+}
+
+impl LocalBackendConfig {
+    /// Validates the local task execution backend configuration.
+    pub fn validate(&self) -> Result<()> {
+        if let Some(cpu) = self.cpu {
+            if cpu == 0 {
+                bail!("configuration value `backend.local.cpu` cannot be zero");
+            }
+
+            let total = SYSTEM.cpus().len() as u64;
+            if cpu > total {
+                bail!(
+                    "configuration value `backend.local.cpu` cannot exceed the virtual CPUs \
+                     available to the host ({total})"
+                );
+            }
+        }
+
+        if let Some(memory) = &self.memory {
+            let memory = convert_unit_string(memory).with_context(|| {
+                format!("configuration value `backend.local.memory` has invalid value `{memory}`")
+            })?;
+
+            if memory == 0 {
+                bail!("configuration value `backend.local.memory` cannot be zero");
+            }
+
+            let total = SYSTEM.total_memory();
+            if memory > total {
+                bail!(
+                    "configuration value `backend.local.memory` cannot exceed the total memory of \
+                     the host ({total})"
+                );
+            }
+        }
+
+        Ok(())
+    }
+}

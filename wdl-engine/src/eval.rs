@@ -19,7 +19,7 @@ use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES_ALIAS;
 use crate::CompoundValue;
 use crate::Outputs;
 use crate::PrimitiveValue;
-use crate::TaskExecution;
+use crate::TaskExecutionRoot;
 use crate::Value;
 
 pub mod v1;
@@ -220,6 +220,7 @@ impl<'a> ScopeRef<'a> {
 }
 
 /// Represents an evaluated task.
+#[derive(Debug)]
 pub struct EvaluatedTask {
     /// The evaluated task's status code.
     status_code: i32,
@@ -247,27 +248,27 @@ impl EvaluatedTask {
     /// Constructs a new evaluated task.
     ///
     /// Returns an error if the stdout or stderr paths are not UTF-8.
-    fn new(execution: &dyn TaskExecution, status_code: i32) -> anyhow::Result<Self> {
-        let stdout = PrimitiveValue::new_file(execution.stdout().to_str().with_context(|| {
+    fn new(root: &TaskExecutionRoot, status_code: i32) -> anyhow::Result<Self> {
+        let stdout = PrimitiveValue::new_file(root.stdout().to_str().with_context(|| {
             format!(
                 "path to stdout file `{path}` is not UTF-8",
-                path = execution.stdout().display()
+                path = root.stdout().display()
             )
         })?)
         .into();
-        let stderr = PrimitiveValue::new_file(execution.stderr().to_str().with_context(|| {
+        let stderr = PrimitiveValue::new_file(root.stderr().to_str().with_context(|| {
             format!(
                 "path to stderr file `{path}` is not UTF-8",
-                path = execution.stderr().display()
+                path = root.stderr().display()
             )
         })?)
         .into();
 
         Ok(Self {
             status_code,
-            work_dir: execution.work_dir().into(),
-            temp_dir: execution.temp_dir().into(),
-            command: execution.command().into(),
+            work_dir: root.work_dir().into(),
+            temp_dir: root.temp_dir().into(),
+            command: root.command().into(),
             stdout,
             stderr,
             outputs: Ok(Default::default()),

@@ -91,7 +91,7 @@ pub struct AnalysisResult {
     /// The lines indexed for the parsed file.
     lines: Option<Arc<LineIndex>>,
     /// The analyzed document.
-    document: Arc<Document>,
+    document: Document,
 }
 
 impl AnalysisResult {
@@ -108,7 +108,7 @@ impl AnalysisResult {
             version,
             lines: lines.cloned(),
             document: node
-                .analysis()
+                .document()
                 .expect("analysis should have completed")
                 .clone(),
         }
@@ -139,7 +139,7 @@ impl AnalysisResult {
     }
 
     /// Gets the analyzed document.
-    pub fn document(&self) -> &Arc<Document> {
+    pub fn document(&self) -> &Document {
         &self.document
     }
 }

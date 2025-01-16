@@ -1783,6 +1783,7 @@ pub static STDLIB: LazyLock<StandardLibrary> = LazyLock::new(|| {
                     // `String` overload is required as `String` may coerce to either `File` or
                     // `Directory`, which is ambiguous.
                     FunctionSignature::builder()
+                        .min_version(SupportedVersion::V1(V1::Two))
                         .required(1)
                         .parameter(PrimitiveType::String)
                         .parameter(PrimitiveType::String)

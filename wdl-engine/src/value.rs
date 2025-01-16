@@ -470,11 +470,14 @@ impl Value {
     }
 
     /// Visits each file or directory path contained in the value.
-    pub(crate) fn visit_paths(&self, cb: &mut impl FnMut(&str)) {
+    ///
+    /// If the callback returns an error, visitation stops and the error result
+    /// is returned.
+    pub(crate) fn visit_paths(&self, cb: &mut impl FnMut(&str) -> Result<()>) -> Result<()> {
         match self {
             Self::Primitive(v) => v.visit_paths(cb),
             Self::Compound(v) => v.visit_paths(cb),
-            _ => {}
+            _ => Ok(()),
         }
     }
 
@@ -1099,10 +1102,10 @@ impl PrimitiveValue {
     }
 
     /// Visits each file or directory path contained in the value.
-    fn visit_paths(&self, cb: &mut impl FnMut(&str)) {
+    fn visit_paths(&self, cb: &mut impl FnMut(&str) -> Result<()>) -> Result<()> {
         match self {
             Self::File(path) | Self::Directory(path) => cb(path.as_str()),
-            _ => {}
+            _ => Ok(()),
         }
     }
 
@@ -2110,37 +2113,39 @@ impl CompoundValue {
     }
 
     /// Visits each file or directory path contained in the value.
-    fn visit_paths(&self, cb: &mut impl FnMut(&str)) {
+    fn visit_paths(&self, cb: &mut impl FnMut(&str) -> Result<()>) -> Result<()> {
         match self {
             Self::Pair(pair) => {
-                pair.left().visit_paths(cb);
-                pair.right().visit_paths(cb);
+                pair.left().visit_paths(cb)?;
+                pair.right().visit_paths(cb)?;
             }
             Self::Array(array) => {
                 for v in array.as_slice() {
-                    v.visit_paths(cb);
+                    v.visit_paths(cb)?;
                 }
             }
             Self::Map(map) => {
                 for (k, v) in map.iter() {
                     if let Some(k) = k {
-                        k.visit_paths(cb);
+                        k.visit_paths(cb)?;
                     }
 
-                    v.visit_paths(cb);
+                    v.visit_paths(cb)?;
                 }
             }
             Self::Object(object) => {
                 for v in object.values() {
-                    v.visit_paths(cb);
+                    v.visit_paths(cb)?;
                 }
             }
             Self::Struct(Struct { members, .. }) => {
                 for v in members.values() {
-                    v.visit_paths(cb);
+                    v.visit_paths(cb)?;
                 }
             }
         }
+
+        Ok(())
     }
 
     /// Replaces any inner path values by joining the specified path with the
@@ -2795,6 +2800,11 @@ impl TaskValue {
     /// Sets the return code after the task execution has completed.
     pub(crate) fn set_return_code(&mut self, code: i32) {
         self.return_code = Some(code as i64);
+    }
+
+    /// Sets the attempt number for the task.
+    pub(crate) fn set_attempt(&mut self, attempt: i64) {
+        self.attempt = attempt;
     }
 
     /// Accesses a field of the task value by name.
