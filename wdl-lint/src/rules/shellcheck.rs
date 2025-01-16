@@ -68,14 +68,13 @@ static SHELLCHECK_EXISTS: OnceLock<bool> = OnceLock::new();
 /// The identifier for the command section ShellCheck rule.
 const ID: &str = "ShellCheck";
 
-#[derive(Clone, Debug, Deserialize)]
 /// Suggested fix for a ShellCheck diagnostic.
+#[derive(Clone, Debug, Deserialize)]
 struct ShellCheckFix {
     /// The replacements to perform.
     pub replacements: Vec<ShellCheckReplacement>,
 }
 
-#[derive(Clone, Debug, Deserialize)]
 /// A ShellCheck replacement.
 ///
 /// This differs from a [`Replacement`] in that
@@ -84,6 +83,7 @@ struct ShellCheckFix {
 ///    [`Fixer`].
 ///
 /// It must be normalized with `normalize_replacements` before use.
+#[derive(Clone, Debug, Deserialize)]
 struct ShellCheckReplacement {
     /// Line number replacement occurs on.
     pub line: usize,
@@ -289,7 +289,7 @@ fn create_fix_message(
     fixer.apply_replacements(replacements);
     // Adjust start and end based on final tree.
     let adj_range = {
-        let range = fixer.adj_range(start..end);
+        let range = fixer.adjust_range(start..end);
         // the prefix sum does not include the value at
         // the actual index. But, we want this value because
         // we may have inserted text at the very end.

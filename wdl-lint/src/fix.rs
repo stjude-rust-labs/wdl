@@ -6,9 +6,9 @@ use std::ops::RangeInclusive;
 use ftree::FenwickTree;
 use serde::Deserialize;
 
+/// An insertion point.
 #[derive(Copy, Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-/// An insertion point.
 pub enum InsertionPoint {
     /// Insert immediately before a specified region.
     BeforeStart,
@@ -16,8 +16,8 @@ pub enum InsertionPoint {
     AfterEnd,
 }
 
-#[derive(Clone, Debug)]
 /// A replacement to be applied to a String.
+#[derive(Clone, Debug)]
 pub struct Replacement {
     /// The start position of the replacement.
     start: usize,
@@ -157,7 +157,7 @@ impl Fixer {
     ///
     /// Panics if the input does not fall within the bounds of the Fixer's
     /// value or if the adjusted index does not fit within usize.
-    pub fn adj_range(&self, range: Range<usize>) -> Range<usize> {
+    pub fn adjust_range(&self, range: Range<usize>) -> Range<usize> {
         self.transform(range.start)..self.transform(range.end)
     }
 
@@ -166,7 +166,7 @@ impl Fixer {
     ///
     /// Panics if the input does not fall within the bounds of the Fixer's
     /// value or if the adjusted index does not fit within usize.
-    pub fn adj_range_inc(&self, range: RangeInclusive<usize>) -> RangeInclusive<usize> {
+    pub fn adjust_range_inclusive(&self, range: RangeInclusive<usize>) -> RangeInclusive<usize> {
         self.transform(*range.start())..=self.transform(*range.end())
     }
 
