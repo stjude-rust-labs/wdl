@@ -31,7 +31,6 @@ pub struct Replacement {
     precedence: usize,
 }
 
-#[allow(unused)]
 impl Replacement {
     /// Create a new `Replacement`.
     pub fn new(
@@ -161,15 +160,6 @@ impl Fixer {
     /// value or if the adjusted index does not fit within usize.
     pub fn adjust_range(&self, range: Range<usize>) -> Range<usize> {
         self.transform(range.start)..self.transform(range.end)
-    }
-
-    /// Given a RangeInclusive, update the bounds to account for any applied
-    /// replacements.
-    ///
-    /// Panics if the input does not fall within the bounds of the Fixer's
-    /// value or if the adjusted index does not fit within usize.
-    pub fn adjust_range_inclusive(&self, range: RangeInclusive<usize>) -> RangeInclusive<usize> {
-        self.transform(*range.start())..=self.transform(*range.end())
     }
 
     /// Returns a reference to the internal Fenwick tree.
