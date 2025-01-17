@@ -1,4 +1,4 @@
-//! Validation of scoped expressions.
+//! Validation of `env` declarations.
 
 use crate::AstNodeExt;
 use crate::AstToken;
