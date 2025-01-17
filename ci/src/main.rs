@@ -56,8 +56,7 @@ const SORTED_CRATES_TO_PUBLISH: &[&str] = &[
     "wdl-lint",
     "wdl-format",
     "wdl-analysis",
-    // TODO: uncomment `wdl-doc` once it is ready for publishing.
-    // "wdl-doc",
+    "wdl-doc",
     "wdl-engine",
     "wdl-lsp",
     "wdl",
