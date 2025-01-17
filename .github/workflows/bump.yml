@@ -10,8 +10,10 @@ on:
         options:
           - wdl-grammar
           - wdl-ast
+          - wdl-format
           - wdl-lint
           - wdl-analysis
+          - wdl-engine
           - wdl-lsp
           - wdl
 
