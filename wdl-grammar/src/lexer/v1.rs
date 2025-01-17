@@ -381,7 +381,7 @@ pub enum Token {
     /// The `else` keyword.
     #[token("else")]
     ElseKeyword,
-    /// The `else` keyword.
+    /// The `env` keyword.
     #[token("env")]
     EnvKeyword,
     /// The `false` keyword.
