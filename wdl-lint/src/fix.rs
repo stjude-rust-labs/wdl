@@ -1,7 +1,6 @@
 //! Module for applying fixes for diagnostics.
 
 use std::ops::Range;
-use std::ops::RangeInclusive;
 
 use ftree::FenwickTree;
 use serde::Deserialize;
@@ -122,7 +121,7 @@ impl Fixer {
             i32::try_from(replacement.value().len()).expect("replacement length fits into i32");
         let range = i32::try_from(old_end - old_start).expect("range fits into i32");
         let shift = rep_len - range;
-        let insert_at = match replacement.insertion_point {
+        let insert_at = match replacement.insertion_point() {
             InsertionPoint::BeforeStart => old_start,
             InsertionPoint::AfterEnd => old_end + 1,
         };
@@ -143,7 +142,7 @@ impl Fixer {
     /// Order is determined by the precedence field.
     /// Higher precedences are applied first.
     pub fn apply_replacements(&mut self, mut reps: Vec<Replacement>) {
-        reps.sort_by_key(|r| r.precedence);
+        reps.sort_by_key(|r| r.precedence());
         reps.iter().rev().for_each(|r| self.apply_replacement(r));
     }
 
