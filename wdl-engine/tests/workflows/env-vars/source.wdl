@@ -1,6 +1,6 @@
 version 1.2
 
-task test  {
+task test {
   input {
     env String greeting
   }
