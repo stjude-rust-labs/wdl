@@ -2,7 +2,6 @@
 //!
 //! An analyzer can be used to implement the [Language Server Protocol (LSP)](https://microsoft.github.io/language-server-protocol/).
 #![doc = include_str!("../RULES.md")]
-
 #![warn(missing_docs)]
 #![warn(rust_2018_idioms)]
 #![warn(rust_2021_compatibility)]
