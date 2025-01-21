@@ -119,14 +119,18 @@ pub fn parse_inputs(
     inputs: Option<&Path>,
 ) -> Result<(Option<PathBuf>, String, Inputs)> {
     let (path, name, inputs) = if let Some(path) = inputs {
-        let abs_path = absolute(path).with_context(|| {
-            format!(
-                "failed to determine the absolute path of `{path}`",
-                path = path.display()
-            )
-        })?;
-        match Inputs::parse(document, &abs_path)? {
-            Some((name, inputs)) => (Some(path.to_path_buf()), name, inputs),
+        match Inputs::parse(document, path)? {
+            Some((name, inputs)) => {
+                // Make the inputs file path absolute so that we treat any file/directory inputs
+                // in the file as relative to the inputs file itself
+                let path = absolute(path).with_context(|| {
+                    format!(
+                        "failed to determine the absolute path of `{path}`",
+                        path = path.display()
+                    )
+                })?;
+                (Some(path), name, inputs)
+            }
             None => bail!("inputs file `{path}` is empty", path = path.display()),
         }
     } else if let Some(name) = name {
