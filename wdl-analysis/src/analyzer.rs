@@ -12,6 +12,7 @@ use std::sync::Arc;
 use std::thread::JoinHandle;
 
 use anyhow::Context;
+use anyhow::Error;
 use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
@@ -21,19 +22,18 @@ use line_index::LineIndex;
 use line_index::WideEncoding;
 use line_index::WideLineCol;
 use path_clean::clean;
-use rowan::GreenNode;
 use tokio::runtime::Handle;
 use tokio::sync::mpsc;
 use tokio::sync::oneshot;
 use url::Url;
 use walkdir::WalkDir;
-use wdl_ast::Diagnostic;
 use wdl_ast::Severity;
 use wdl_ast::SyntaxNode;
 use wdl_ast::SyntaxNodeExt;
 use wdl_ast::Validator;
 
 use crate::Rule;
+use crate::UNNECESSARY_FUNCTION_CALL;
 use crate::UNUSED_CALL_RULE_ID;
 use crate::UNUSED_DECL_RULE_ID;
 use crate::UNUSED_IMPORT_RULE_ID;
@@ -74,119 +74,22 @@ pub fn path_to_uri(path: impl AsRef<Path>) -> Option<Url> {
     Url::from_file_path(clean(absolute(path).ok()?)).ok()
 }
 
-/// Represents the result of a parse.
-#[derive(Debug, Clone)]
-pub enum ParseResult {
-    /// There was an error parsing the document.
-    Error(Arc<anyhow::Error>),
-    /// The document was parsed.
-    Parsed {
-        /// The monotonic version of the document that was parsed.
-        ///
-        /// This value comes from incremental changes to the file.
-        ///
-        /// If `None`, the parsed version had no incremental changes.
-        version: Option<i32>,
-        /// The root node of the document.
-        root: GreenNode,
-        /// The line index used to map line/column offsets to byte offsets and
-        /// vice versa.
-        lines: Arc<LineIndex>,
-    },
-}
-
-impl ParseResult {
-    /// Gets the version of the parsed document.
-    ///
-    /// Returns `None` if there was an error parsing the document or the parsed
-    /// document had no incremental changes.
-    pub fn version(&self) -> Option<i32> {
-        match self {
-            Self::Error(_) => None,
-            Self::Parsed { version, .. } => *version,
-        }
-    }
-
-    /// Gets the root from the parse result.
-    ///
-    /// Returns `None` if there was an error parsing the document.
-    pub fn root(&self) -> Option<&GreenNode> {
-        match self {
-            Self::Error(_) => None,
-            Self::Parsed { root, .. } => Some(root),
-        }
-    }
-
-    /// Gets the line index from the parse result.
-    ///
-    /// Returns `None` if there was an error parsing the document.
-    pub fn lines(&self) -> Option<&Arc<LineIndex>> {
-        match self {
-            Self::Error(_) => None,
-            Self::Parsed { lines, .. } => Some(lines),
-        }
-    }
-
-    /// Gets the AST document of the parse result.
-    ///
-    /// Returns `None` if there was an error parsing the document.
-    pub fn document(&self) -> Option<wdl_ast::Document> {
-        match &self {
-            ParseResult::Error(_) => None,
-            ParseResult::Parsed { root, .. } => Some(
-                wdl_ast::Document::cast(SyntaxNode::new_root(root.clone()))
-                    .expect("node should cast"),
-            ),
-        }
-    }
-
-    /// Gets the error parsing the document.
-    ///
-    /// Returns` None` if the document was parsed.
-    pub fn error(&self) -> Option<&Arc<anyhow::Error>> {
-        match self {
-            Self::Error(e) => Some(e),
-            ParseResult::Parsed { .. } => None,
-        }
-    }
-}
-
-impl From<&ParseState> for ParseResult {
-    fn from(state: &ParseState) -> Self {
-        match state {
-            ParseState::NotParsed => {
-                panic!("cannot create a result for an file that hasn't been parsed")
-            }
-            ParseState::Error(e) => Self::Error(e.clone()),
-            ParseState::Parsed {
-                version,
-                root,
-                lines,
-                diagnostics: _,
-            } => Self::Parsed {
-                version: *version,
-                root: root.clone(),
-                lines: lines.clone(),
-            },
-        }
-    }
-}
-
 /// Represents the result of an analysis.
 ///
 /// Analysis results are cheap to clone.
 #[derive(Debug, Clone)]
 pub struct AnalysisResult {
-    /// The analysis result id.
+    /// The error that occurred when attempting to parse the file (e.g. the file
+    /// could not be opened).
+    error: Option<Arc<Error>>,
+    /// The monotonic version of the document that was parsed.
     ///
-    /// The identifier changes every time the document is analyzed.
-    id: Arc<String>,
-    /// The URI of the analyzed document.
-    uri: Arc<Url>,
-    /// The result from parsing the file.
-    parse_result: ParseResult,
-    /// The diagnostics for the document.
-    diagnostics: Arc<[Diagnostic]>,
+    /// This value comes from incremental changes to the file.
+    ///
+    /// If `None`, the parsed version had no incremental changes.
+    version: Option<i32>,
+    /// The lines indexed for the parsed file.
+    lines: Option<Arc<LineIndex>>,
     /// The analyzed document.
     document: Arc<Document>,
 }
@@ -194,37 +97,45 @@ pub struct AnalysisResult {
 impl AnalysisResult {
     /// Constructs a new analysis result for the given graph node.
     pub(crate) fn new(node: &DocumentGraphNode) -> Self {
-        let analysis = node.analysis().expect("analysis not completed");
+        let (error, version, lines) = match node.parse_state() {
+            ParseState::NotParsed => unreachable!("document should have been parsed"),
+            ParseState::Error(e) => (Some(e), None, None),
+            ParseState::Parsed { version, lines, .. } => (None, *version, Some(lines)),
+        };
 
         Self {
-            id: analysis.id().clone(),
-            uri: node.uri().clone(),
-            parse_result: node.parse_state().into(),
-            diagnostics: analysis.diagnostics().clone(),
-            document: analysis.document().clone(),
+            error: error.cloned(),
+            version,
+            lines: lines.cloned(),
+            document: node
+                .analysis()
+                .expect("analysis should have completed")
+                .clone(),
         }
     }
 
-    /// Gets the identifier of the analysis result.
+    /// Gets the error that occurred when attempting to parse the document.
     ///
-    /// This value changes when a document is reanalyzed.
-    pub fn id(&self) -> &Arc<String> {
-        &self.id
+    /// An example error would be if the file could not be opened.
+    ///
+    /// Returns `None` if the document was parsed successfully.
+    pub fn error(&self) -> Option<&Arc<Error>> {
+        self.error.as_ref()
     }
 
-    /// Gets the URI of the document that was analyzed.
-    pub fn uri(&self) -> &Arc<Url> {
-        &self.uri
+    /// Gets the incremental version of the parsed document.
+    ///
+    /// Returns `None` if there was an error parsing the document or if the
+    /// parsed document had no incremental changes.
+    pub fn version(&self) -> Option<i32> {
+        self.version
     }
 
-    /// Gets the result of the parse.
-    pub fn parse_result(&self) -> &ParseResult {
-        &self.parse_result
-    }
-
-    /// Gets the diagnostics associated with the document.
-    pub fn diagnostics(&self) -> &[Diagnostic] {
-        &self.diagnostics
+    /// Gets the line index of the parsed document.
+    ///
+    /// Returns `None` if there was an error parsing the document.
+    pub fn lines(&self) -> Option<&Arc<LineIndex>> {
+        self.lines.as_ref()
     }
 
     /// Gets the analyzed document.
@@ -373,7 +284,7 @@ pub struct IncrementalChange {
 ///
 /// These diagnostics default to a warning severity.
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct DiagnosticsConfig {
+pub struct DiagnosticsConfig {
     /// The severity for the "unused import" diagnostic.
     ///
     /// A value of `None` disables the diagnostic.
@@ -390,15 +301,20 @@ pub(crate) struct DiagnosticsConfig {
     ///
     /// A value of `None` disables the diagnostic.
     pub unused_call: Option<Severity>,
+    /// The severity for the "unnecessary function call" diagnostic.
+    ///
+    /// A value of `None` disables the diagnostic.
+    pub unnecessary_function_call: Option<Severity>,
 }
 
 impl DiagnosticsConfig {
     /// Creates a new diagnostics configuration from a rule set.
-    pub fn new<T: AsRef<dyn Rule>>(rules: impl Iterator<Item = T>) -> Self {
+    pub fn new<T: AsRef<dyn Rule>>(rules: impl IntoIterator<Item = T>) -> Self {
         let mut unused_import = None;
         let mut unused_input = None;
         let mut unused_declaration = None;
         let mut unused_call = None;
+        let mut unnecessary_function_call = None;
 
         for rule in rules {
             let rule = rule.as_ref();
@@ -407,6 +323,7 @@ impl DiagnosticsConfig {
                 UNUSED_INPUT_RULE_ID => unused_input = Some(rule.severity()),
                 UNUSED_DECL_RULE_ID => unused_declaration = Some(rule.severity()),
                 UNUSED_CALL_RULE_ID => unused_call = Some(rule.severity()),
+                UNNECESSARY_FUNCTION_CALL => unnecessary_function_call = Some(rule.severity()),
                 _ => {}
             }
         }
@@ -416,6 +333,7 @@ impl DiagnosticsConfig {
             unused_input,
             unused_declaration,
             unused_call,
+            unnecessary_function_call,
         }
     }
 
@@ -440,7 +358,22 @@ impl DiagnosticsConfig {
             self.unused_call = None;
         }
 
+        if exceptions.contains(UNNECESSARY_FUNCTION_CALL) {
+            self.unnecessary_function_call = None;
+        }
+
         self
+    }
+
+    /// Excepts all of the diagnostics.
+    pub fn except_all() -> Self {
+        Self {
+            unused_import: None,
+            unused_input: None,
+            unused_declaration: None,
+            unused_call: None,
+            unnecessary_function_call: None,
+        }
     }
 }
 
@@ -469,26 +402,23 @@ impl<Context> Analyzer<Context>
 where
     Context: Send + Clone + 'static,
 {
-    /// Constructs a new analyzer with the given analysis rules.
+    /// Constructs a new analyzer with the given diagnostics config.
     ///
     /// The provided progress callback will be invoked during analysis.
     ///
     /// The analyzer will use a default validator for validation.
     ///
     /// The analyzer must be constructed from the context of a Tokio runtime.
-    pub fn new<T: AsRef<dyn Rule>, Progress, Return>(
-        rules: impl IntoIterator<Item = T>,
-        progress: Progress,
-    ) -> Self
+    pub fn new<Progress, Return>(config: DiagnosticsConfig, progress: Progress) -> Self
     where
         Progress: Fn(Context, ProgressKind, usize, usize) -> Return + Send + 'static,
         Return: Future<Output = ()>,
     {
-        Self::new_with_validator(rules, progress, Validator::default)
+        Self::new_with_validator(config, progress, Validator::default)
     }
 
-    /// Constructs a new analyzer with the given analysis rules and validator
-    /// function.
+    /// Constructs a new analyzer with the given diagnostics config and
+    /// validator function.
     ///
     /// The provided progress callback will be invoked during analysis.
     ///
@@ -496,8 +426,8 @@ where
     /// initialize a thread-local validator.
     ///
     /// The analyzer must be constructed from the context of a Tokio runtime.
-    pub fn new_with_validator<T: AsRef<dyn Rule>, Progress, Return, Validator>(
-        rules: impl IntoIterator<Item = T>,
+    pub fn new_with_validator<Progress, Return, Validator>(
+        config: DiagnosticsConfig,
         progress: Progress,
         validator: Validator,
     ) -> Self
@@ -508,7 +438,6 @@ where
     {
         let (tx, rx) = mpsc::unbounded_channel();
         let tokio = Handle::current();
-        let config = DiagnosticsConfig::new(rules.into_iter());
         let handle = std::thread::spawn(move || {
             let queue = AnalysisQueue::new(config, tokio, progress, validator);
             queue.run(rx);
@@ -615,7 +544,7 @@ where
     /// the analyzer, those documents will be removed.
     ///
     /// Documents are only removed when not referenced from importing documents.
-    pub async fn remove_documents<'a>(&self, documents: Vec<Url>) -> Result<()> {
+    pub async fn remove_documents(&self, documents: Vec<Url>) -> Result<()> {
         // Send the remove request to the queue
         let (tx, rx) = oneshot::channel();
         self.sender
@@ -773,7 +702,7 @@ mod test {
 
     #[tokio::test]
     async fn it_returns_empty_results() {
-        let analyzer = Analyzer::new(rules(), |_: (), _, _, _| async {});
+        let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
         let results = analyzer.analyze(()).await.unwrap();
         assert!(results.is_empty());
     }
@@ -797,7 +726,7 @@ workflow test {
         .expect("failed to create test file");
 
         // Analyze the file and check the resulting diagnostic
-        let analyzer = Analyzer::new(rules(), |_: (), _, _, _| async {});
+        let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
         analyzer
             .add_document(path_to_uri(&path).expect("should convert to URI"))
             .await
@@ -805,24 +734,30 @@ workflow test {
 
         let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 1);
-        assert_eq!(results[0].diagnostics().len(), 1);
-        assert_eq!(results[0].diagnostics()[0].rule(), None);
-        assert_eq!(results[0].diagnostics()[0].severity(), Severity::Error);
+        assert_eq!(results[0].document.diagnostics().len(), 1);
+        assert_eq!(results[0].document.diagnostics()[0].rule(), None);
         assert_eq!(
-            results[0].diagnostics()[0].message(),
+            results[0].document.diagnostics()[0].severity(),
+            Severity::Error
+        );
+        assert_eq!(
+            results[0].document.diagnostics()[0].message(),
             "conflicting workflow name `test`"
         );
 
         // Analyze again and ensure the analysis result id is unchanged
-        let id = results[0].id().clone();
+        let id = results[0].document.id().clone();
         let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 1);
-        assert_eq!(results[0].id().as_ref(), id.as_ref());
-        assert_eq!(results[0].diagnostics().len(), 1);
-        assert_eq!(results[0].diagnostics()[0].rule(), None);
-        assert_eq!(results[0].diagnostics()[0].severity(), Severity::Error);
+        assert_eq!(results[0].document.id().as_ref(), id.as_ref());
+        assert_eq!(results[0].document.diagnostics().len(), 1);
+        assert_eq!(results[0].document.diagnostics()[0].rule(), None);
         assert_eq!(
-            results[0].diagnostics()[0].message(),
+            results[0].document.diagnostics()[0].severity(),
+            Severity::Error
+        );
+        assert_eq!(
+            results[0].document.diagnostics()[0].message(),
             "conflicting workflow name `test`"
         );
     }
@@ -846,7 +781,7 @@ workflow test {
         .expect("failed to create test file");
 
         // Analyze the file and check the resulting diagnostic
-        let analyzer = Analyzer::new(rules(), |_: (), _, _, _| async {});
+        let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
         analyzer
             .add_document(path_to_uri(&path).expect("should convert to URI"))
             .await
@@ -854,11 +789,14 @@ workflow test {
 
         let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 1);
-        assert_eq!(results[0].diagnostics().len(), 1);
-        assert_eq!(results[0].diagnostics()[0].rule(), None);
-        assert_eq!(results[0].diagnostics()[0].severity(), Severity::Error);
+        assert_eq!(results[0].document.diagnostics().len(), 1);
+        assert_eq!(results[0].document.diagnostics()[0].rule(), None);
         assert_eq!(
-            results[0].diagnostics()[0].message(),
+            results[0].document.diagnostics()[0].severity(),
+            Severity::Error
+        );
+        assert_eq!(
+            results[0].document.diagnostics()[0].message(),
             "conflicting workflow name `test`"
         );
 
@@ -882,18 +820,18 @@ workflow something_else {
 
         // Analyze again and ensure the analysis result id is changed and the issue
         // fixed
-        let id = results[0].id().clone();
+        let id = results[0].document.id().clone();
         let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 1);
-        assert!(results[0].id().as_ref() != id.as_ref());
-        assert_eq!(results[0].diagnostics().len(), 0);
+        assert!(results[0].document.id().as_ref() != id.as_ref());
+        assert_eq!(results[0].document.diagnostics().len(), 0);
 
         // Analyze again and ensure the analysis result id is unchanged
-        let id = results[0].id().clone();
+        let id = results[0].document.id().clone();
         let results = analyzer.analyze_document((), uri).await.unwrap();
         assert_eq!(results.len(), 1);
-        assert!(results[0].id().as_ref() == id.as_ref());
-        assert_eq!(results[0].diagnostics().len(), 0);
+        assert!(results[0].document.id().as_ref() == id.as_ref());
+        assert_eq!(results[0].document.diagnostics().len(), 0);
     }
 
     #[tokio::test]
@@ -915,7 +853,7 @@ workflow test {
         .expect("failed to create test file");
 
         // Analyze the file and check the resulting diagnostic
-        let analyzer = Analyzer::new(rules(), |_: (), _, _, _| async {});
+        let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
         analyzer
             .add_document(path_to_uri(&path).expect("should convert to URI"))
             .await
@@ -923,11 +861,14 @@ workflow test {
 
         let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 1);
-        assert_eq!(results[0].diagnostics().len(), 1);
-        assert_eq!(results[0].diagnostics()[0].rule(), None);
-        assert_eq!(results[0].diagnostics()[0].severity(), Severity::Error);
+        assert_eq!(results[0].document.diagnostics().len(), 1);
+        assert_eq!(results[0].document.diagnostics()[0].rule(), None);
         assert_eq!(
-            results[0].diagnostics()[0].message(),
+            results[0].document.diagnostics()[0].severity(),
+            Severity::Error
+        );
+        assert_eq!(
+            results[0].document.diagnostics()[0].message(),
             "conflicting workflow name `test`"
         );
 
@@ -947,11 +888,11 @@ workflow test {
 
         // Analyze again and ensure the analysis result id is changed and the issue was
         // fixed
-        let id = results[0].id().clone();
+        let id = results[0].document.id().clone();
         let results = analyzer.analyze_document((), uri).await.unwrap();
         assert_eq!(results.len(), 1);
-        assert!(results[0].id().as_ref() != id.as_ref());
-        assert_eq!(results[0].diagnostics().len(), 0);
+        assert!(results[0].document.id().as_ref() != id.as_ref());
+        assert_eq!(results[0].document.diagnostics().len(), 0);
     }
 
     #[tokio::test]
@@ -988,7 +929,7 @@ workflow test {
         .expect("failed to create test file");
 
         // Add all three documents to the analyzer
-        let analyzer = Analyzer::new(rules(), |_: (), _, _, _| async {});
+        let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
         analyzer
             .add_directory(dir.path().to_path_buf())
             .await
@@ -997,9 +938,9 @@ workflow test {
         // Analyze the documents
         let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 3);
-        assert!(results[0].diagnostics().is_empty());
-        assert!(results[1].diagnostics().is_empty());
-        assert!(results[2].diagnostics().is_empty());
+        assert!(results[0].document.diagnostics().is_empty());
+        assert!(results[1].document.diagnostics().is_empty());
+        assert!(results[2].document.diagnostics().is_empty());
 
         // Analyze the documents again
         let results = analyzer.analyze(()).await.unwrap();

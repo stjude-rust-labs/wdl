@@ -30,6 +30,9 @@ fn expected_blank_line_before_version(span: Span) -> Diagnostic {
     )
     .with_rule(ID)
     .with_highlight(span)
+    .with_fix(
+        "ensure there is exactly one blank line between the last comment and the version statement",
+    )
 }
 
 /// Creates a diagnostic for an expected blank line after the version statement.
@@ -37,6 +40,7 @@ fn expected_blank_line_after_version(span: Span) -> Diagnostic {
     Diagnostic::note("expected exactly one blank line after the version statement")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("ensure there is exactly one blank line after the version statement")
 }
 
 /// Creates a diagnostic for unexpected whitespace before the version statement.
@@ -44,6 +48,7 @@ fn whitespace_before_version(span: Span) -> Diagnostic {
     Diagnostic::note("unexpected whitespace before the version statement")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("remove the unexpected whitespace before the version statement")
 }
 
 /// Creates a diagnostic for a comment inside the version statement.
@@ -51,6 +56,7 @@ fn comment_inside_version(span: Span) -> Diagnostic {
     Diagnostic::note("unexpected comment inside the version statement")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("remove the comment inside the version statement")
 }
 
 /// Creates a diagnostic for unexpected whitespace inside the version statement.
@@ -58,6 +64,7 @@ fn unexpected_whitespace_inside_version(span: Span) -> Diagnostic {
     Diagnostic::note("expected exactly one space between 'version' and the version number")
         .with_rule(ID)
         .with_highlight(span)
+        .with_fix("ensure there is exactly one space between 'version' and the version number")
 }
 
 /// Detects incorrect formatting of the version statement.
@@ -124,10 +131,10 @@ impl Visitor for VersionFormattingRule {
                     if ws.chars().filter(|&c| c == '\n').count() == 2 {
                         for (line, start, end) in lines_with_offset(ws) {
                             if !line.is_empty() {
-                                let end_offset = if ws.ends_with('\n') {
-                                    1
-                                } else if ws.ends_with("\r\n") {
+                                let end_offset = if ws.ends_with("\r\n") {
                                     2
+                                } else if ws.ends_with('\n') {
+                                    1
                                 } else {
                                     0
                                 };

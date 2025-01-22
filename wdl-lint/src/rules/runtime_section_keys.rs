@@ -9,7 +9,6 @@ use std::collections::HashSet;
 use std::sync::OnceLock;
 
 use wdl_ast::AstNode;
-use wdl_ast::AstNodeExt;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -18,11 +17,26 @@ use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
+use wdl_ast::ToSpan;
 use wdl_ast::TokenStrHash;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::v1::RuntimeItem;
 use wdl_ast::v1::RuntimeSection;
+use wdl_ast::v1::TASK_HINT_INPUTS;
+use wdl_ast::v1::TASK_HINT_LOCALIZATION_OPTIONAL_ALIAS;
+use wdl_ast::v1::TASK_HINT_MAX_CPU_ALIAS;
+use wdl_ast::v1::TASK_HINT_MAX_MEMORY_ALIAS;
+use wdl_ast::v1::TASK_HINT_OUTPUTS;
+use wdl_ast::v1::TASK_HINT_SHORT_TASK_ALIAS;
+use wdl_ast::v1::TASK_REQUIREMENT_CONTAINER;
+use wdl_ast::v1::TASK_REQUIREMENT_CONTAINER_ALIAS;
+use wdl_ast::v1::TASK_REQUIREMENT_CPU;
+use wdl_ast::v1::TASK_REQUIREMENT_DISKS;
+use wdl_ast::v1::TASK_REQUIREMENT_GPU;
+use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES_ALIAS;
+use wdl_ast::v1::TASK_REQUIREMENT_MEMORY;
+use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES_ALIAS;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::version::V1;
 
@@ -71,8 +85,8 @@ fn keys_v1_0() -> &'static HashMap<&'static str, KeyKind> {
 
     KEYS_V1_0.get_or_init(|| {
         let mut keys = HashMap::new();
-        keys.insert("docker", KeyKind::Recommended);
-        keys.insert("memory", KeyKind::Recommended);
+        keys.insert(TASK_REQUIREMENT_CONTAINER_ALIAS, KeyKind::Recommended);
+        keys.insert(TASK_REQUIREMENT_MEMORY, KeyKind::Recommended);
         keys
     })
 }
@@ -86,20 +100,29 @@ fn keys_v1_1() -> &'static HashMap<&'static str, KeyKind> {
 
     KEYS_V1_1.get_or_init(|| {
         let mut keys = HashMap::new();
-        keys.insert("container", KeyKind::Recommended);
-        keys.insert("docker", KeyKind::Deprecated("container"));
-        keys.insert("cpu", KeyKind::ReservedMandatory);
-        keys.insert("memory", KeyKind::ReservedMandatory);
-        keys.insert("gpu", KeyKind::ReservedMandatory);
-        keys.insert("disks", KeyKind::ReservedMandatory);
-        keys.insert("maxRetries", KeyKind::ReservedMandatory);
-        keys.insert("returnCodes", KeyKind::ReservedMandatory);
-        keys.insert("maxCpu", KeyKind::ReservedHint);
-        keys.insert("maxMemory", KeyKind::ReservedHint);
-        keys.insert("shortTask", KeyKind::ReservedHint);
-        keys.insert("localizationOptional", KeyKind::ReservedHint);
-        keys.insert("inputs", KeyKind::ReservedHint);
-        keys.insert("outputs", KeyKind::ReservedHint);
+        keys.insert(TASK_REQUIREMENT_CONTAINER, KeyKind::Recommended);
+        keys.insert(
+            TASK_REQUIREMENT_CONTAINER_ALIAS,
+            KeyKind::Deprecated(TASK_REQUIREMENT_CONTAINER),
+        );
+        keys.insert(TASK_REQUIREMENT_CPU, KeyKind::ReservedMandatory);
+        keys.insert(TASK_REQUIREMENT_MEMORY, KeyKind::ReservedMandatory);
+        keys.insert(TASK_REQUIREMENT_GPU, KeyKind::ReservedMandatory);
+        keys.insert(TASK_REQUIREMENT_DISKS, KeyKind::ReservedMandatory);
+        keys.insert(
+            TASK_REQUIREMENT_MAX_RETRIES_ALIAS,
+            KeyKind::ReservedMandatory,
+        );
+        keys.insert(
+            TASK_REQUIREMENT_RETURN_CODES_ALIAS,
+            KeyKind::ReservedMandatory,
+        );
+        keys.insert(TASK_HINT_MAX_CPU_ALIAS, KeyKind::ReservedHint);
+        keys.insert(TASK_HINT_MAX_MEMORY_ALIAS, KeyKind::ReservedHint);
+        keys.insert(TASK_HINT_SHORT_TASK_ALIAS, KeyKind::ReservedHint);
+        keys.insert(TASK_HINT_LOCALIZATION_OPTIONAL_ALIAS, KeyKind::ReservedHint);
+        keys.insert(TASK_HINT_INPUTS, KeyKind::ReservedHint);
+        keys.insert(TASK_HINT_OUTPUTS, KeyKind::ReservedHint);
         keys
     })
 }
@@ -152,7 +175,7 @@ fn deprecated_runtime_key(key: &Ident, replacement: &str) -> Diagnostic {
     .with_rule(ID)
     .with_highlight(key.span())
     .with_fix(format!(
-        "change the name of the `{key}` key to `{replacement}`",
+        "replace the `{key}` key with `{replacement}`",
         key = key.as_str()
     ))
 }
@@ -387,7 +410,7 @@ impl Visitor for RuntimeSectionKeysRule {
                 // SAFETY: the version must always be set before we get to this
                 // point, as document is the root node of the tree.
                 if let SupportedVersion::V1(minor_version) = self.version.unwrap() {
-                    let specification = format!("the {minor_version} specification");
+                    let specification = format!("the WDL {minor_version} specification");
 
                     if !self.non_reserved_keys.is_empty() {
                         state.exceptable_add(
@@ -451,7 +474,14 @@ impl Visitor for RuntimeSectionKeysRule {
                     // `runtime` section is entered before a previous `runtime`
                     // section is exited.
                     Some(_) => unreachable!(),
-                    None => Some(section.span()),
+                    None => Some(
+                        section
+                            .syntax()
+                            .first_token()
+                            .expect("runtime section should have tokens")
+                            .text_range()
+                            .to_span(),
+                    ),
                 };
             }
             VisitReason::Exit => {

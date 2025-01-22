@@ -2,6 +2,7 @@
 
 use indexmap::IndexMap;
 use wdl_ast::AstNode;
+use wdl_ast::AstNodeExt;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -110,7 +111,7 @@ pub struct NonmatchingOutputRule<'a> {
     prior_objects: Vec<String>,
 }
 
-impl<'a> Rule for NonmatchingOutputRule<'a> {
+impl Rule for NonmatchingOutputRule<'_> {
     fn id(&self) -> &'static str {
         ID
     }
@@ -233,7 +234,7 @@ fn handle_meta_outputs_and_reset(
     rule.meta_outputs_keys.clear();
 }
 
-impl<'a> Visitor for NonmatchingOutputRule<'a> {
+impl Visitor for NonmatchingOutputRule<'_> {
     type State = Diagnostics;
 
     fn document(
@@ -301,7 +302,14 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
     ) {
         match reason {
             VisitReason::Enter => {
-                self.current_meta_span = Some(section.syntax().text_range().to_span());
+                self.current_meta_span = Some(
+                    section
+                        .syntax()
+                        .first_token()
+                        .expect("metadata section should have tokens")
+                        .text_range()
+                        .to_span(),
+                );
                 self.in_meta = true;
             }
             VisitReason::Exit => {
@@ -318,7 +326,14 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
     ) {
         match reason {
             VisitReason::Enter => {
-                self.current_output_span = Some(section.syntax().text_range().to_span());
+                self.current_output_span = Some(
+                    section
+                        .syntax()
+                        .first_token()
+                        .expect("output section should have tokens")
+                        .text_range()
+                        .to_span(),
+                );
                 self.in_output = true;
             }
             VisitReason::Exit => {
@@ -334,10 +349,8 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
         decl: &wdl_ast::v1::BoundDecl,
     ) {
         if reason == VisitReason::Enter && self.in_output {
-            self.output_keys.insert(
-                decl.name().as_str().to_string(),
-                decl.syntax().text_range().to_span(),
-            );
+            self.output_keys
+                .insert(decl.name().as_str().to_string(), decl.name().span());
         }
     }
 
@@ -360,13 +373,13 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
             VisitReason::Enter => {
                 if let Some(_meta_span) = self.current_meta_span {
                     if item.name().as_str() == "outputs" {
-                        self.current_meta_outputs_span = Some(item.syntax().text_range().to_span());
+                        self.current_meta_outputs_span = Some(item.span());
                         match item.value() {
                             MetadataValue::Object(_) => {}
                             _ => {
                                 state.exceptable_add(
                                     non_object_meta_outputs(
-                                        item.syntax().text_range().to_span(),
+                                        item.span(),
                                         self.name.as_deref().expect("should have a name"),
                                         self.ty.expect("should have a type"),
                                     ),
@@ -376,7 +389,7 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
                             }
                         }
                     } else if let Some(meta_outputs_span) = self.current_meta_outputs_span {
-                        let span = item.syntax().text_range().to_span();
+                        let span = item.span();
                         if span.start() > meta_outputs_span.start()
                             && span.end() < meta_outputs_span.end()
                             && self
@@ -385,10 +398,8 @@ impl<'a> Visitor for NonmatchingOutputRule<'a> {
                                 .expect("should have seen `meta.outputs`")
                                 == "outputs"
                         {
-                            self.meta_outputs_keys.insert(
-                                item.name().as_str().to_string(),
-                                item.syntax().text_range().to_span(),
-                            );
+                            self.meta_outputs_keys
+                                .insert(item.name().as_str().to_string(), item.span());
                         }
                     }
                 }

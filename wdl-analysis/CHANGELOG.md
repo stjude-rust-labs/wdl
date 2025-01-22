@@ -7,11 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.6.0 - 01-17-2025
+
 ### Added
 
+* Added analysis support for the WDL 1.2 `env` declaration modifier ([#296](https://github.com/stjude-rust-labs/wdl/pull/296)).
+* Fixed missing diagnostic for unknown local name when using the abbreviated
+  syntax for specifying a call input ([#292](https://github.com/stjude-rust-labs/wdl/pull/292))
 * Added functions for getting type information of task requirements and hints ([#241](https://github.com/stjude-rust-labs/wdl/pull/241)).
 * Exposed information about workflow calls from an analyzed document ([#239](https://github.com/stjude-rust-labs/wdl/pull/239)).
 * Added formatting to the analyzer ([#247](https://github.com/stjude-rust-labs/wdl/pull/247)).
+
+### Changed
+
+* Entry nodes in a workflow evaluation graph now contain information about the
+  corresponding exit node. ([#292](https://github.com/stjude-rust-labs/wdl/pull/292))
+* Removed `Types` collection from `wdl-analysis` to simplify the API ([#277](https://github.com/stjude-rust-labs/wdl/pull/277)).
+* Changed the `new` and `new_with_validator` methods of `Analyzer` to take the
+  diagnostics configuration rather than a rule iterator ([#274](https://github.com/stjude-rust-labs/wdl/pull/274)).
+* Refactored the `AnalysisResult` and `Document` types to move properties of
+  the former into the latter; this will assist in evaluation of documents in
+  that the `Document` alone can be passed into evaluation ([#265](https://github.com/stjude-rust-labs/wdl/pull/265)).
+* Removed the "optional type" constraint for the `select_first`, `select_all`,
+  and `defined` functions; instead, these functions now accepted non-optional
+  types and analysis emits a warning when the functions are called with
+  non-optional types ([#258](https://github.com/stjude-rust-labs/wdl/pull/258)).
+* The "required primitive type" constraint has been removed as every place the
+  constraint was used should allow for optional primitive types as well;
+  consequently, the AnyPrimitiveTypeConstraint was renamed to simply
+  `PrimitiveTypeConstraint` ([#257](https://github.com/stjude-rust-labs/wdl/pull/257)).
+* The common type calculation now favors the "left-hand side" of the
+  calculation rather than the right, making it more intuitive to use. For
+  example, a calculation of `File | String` is now `File` rather than
+  `String` ([#257](https://github.com/stjude-rust-labs/wdl/pull/257)).
+* Refactored function call binding information to aid with call evaluation in
+  `wdl-engine` ([#251](https://github.com/stjude-rust-labs/wdl/pull/251)).
+* Made diagnostic creation functions public ([#249](https://github.com/stjude-rust-labs/wdl/pull/249)).
+* Refactored expression type evaluator to provide context via a trait ([#249](https://github.com/stjude-rust-labs/wdl/pull/249)).
+* Removed `PartialEq`, `Eq`, and `Hash` from WDL-type-related types ([#249](https://github.com/stjude-rust-labs/wdl/pull/249)).
+
+### Fixed
+
+* Fixed an issue where imported structs weren't always checked correctly for
+  type equivalence with local structs ([#265](https://github.com/stjude-rust-labs/wdl/pull/265)).
+* Common type calculation now supports discovering common types between the
+  compound types containing Union and None as inner types, e.g.
+  `Array[String] | Array[None] -> Array[String?]` ([#257](https://github.com/stjude-rust-labs/wdl/pull/257)).
+* Static analysis of expressions within object literal members now takes place ([#254](https://github.com/stjude-rust-labs/wdl/pull/254)).
+* Certain standard library functions with an existing constraint on generic
+  parameters that take structs are further constrained to take structs
+  containing only primitive members ([#254](https://github.com/stjude-rust-labs/wdl/pull/254)).
+* Fixed signatures and minimum required versions for certain standard library
+  functions ([#254](https://github.com/stjude-rust-labs/wdl/pull/254)).
 
 ## 0.5.0 - 10-22-2024
 

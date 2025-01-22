@@ -7,10 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.10.0 - 01-17-2025
+
 ### Added
 
+* Added AST support for the WDL 1.2 `env` declaration modifier ([#296](https://github.com/stjude-rust-labs/wdl/pull/296)).
+* Added `braced_scope_span` and `heredoc_scope_span` methods to `AstNodeExt` ([#292](https://github.com/stjude-rust-labs/wdl/pull/292))
+* Added constants for the task variable fields, task requirement names, and
+  task hint names ([#265](https://github.com/stjude-rust-labs/wdl/pull/265)).
 * Added `allows_nested_inputs` function to `Workflow` (#[241](https://github.com/stjude-rust-labs/wdl/pull/241)).
 * `strip_whitespace()` method to `LiteralString` and `CommandSection` AST nodes ([#238](https://github.com/stjude-rust-labs/wdl/pull/238)).
+
+### Changed
+
+* Reduced allocations in stripping whitespace from commands and multiline
+  strings and provided unescaping of escape sequences ([#265](https://github.com/stjude-rust-labs/wdl/pull/265)).
+
+### Fixed
+
+* Fixed a bug in `strip_whitespace` that left a trailing carriage return at the
+  end of commands and multiline strings when using Windows line endings ([#291](https://github.com/stjude-rust-labs/wdl/pull/291)).
+* Fixed bug in `strip_whitespace()` that erroneously stripped characters from the first line when it had content.
+  Closed [issue #268](https://github.com/stjude-rust-labs/wdl/issues/268) ([#271](https://github.com/stjude-rust-labs/wdl/pull/271)).
+* Fixed same #268 bug in mutliline strings as well as command sections  ([#272](https://github.com/stjude-rust-labs/wdl/pull/272)).
 
 ## 0.9.0 - 10-22-2024
 

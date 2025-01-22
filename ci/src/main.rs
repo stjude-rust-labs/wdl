@@ -56,8 +56,8 @@ const SORTED_CRATES_TO_PUBLISH: &[&str] = &[
     "wdl-lint",
     "wdl-format",
     "wdl-analysis",
-    // TODO: uncomment `wdl-engine` once it is ready for publishing.
-    // "wdl-engine",
+    "wdl-doc",
+    "wdl-engine",
     "wdl-lsp",
     "wdl",
 ];
@@ -247,10 +247,7 @@ fn read_crate(manifest_path: &Path) -> Option<Crate> {
     let mut manifest =
         toml_edit::DocumentMut::from_str(&contents).expect("failed to parse manifest");
 
-    let package = match manifest.get_mut("package") {
-        Some(p) => p,
-        None => return None, // workspace manifests don't have a package section
-    };
+    let package = manifest.get_mut("package")?;
     let name = package["name"].as_str().expect("name").to_string();
     let version = package["version"].as_str().expect("version").to_string();
 
@@ -330,10 +327,8 @@ fn bump(version: &str, patch_bump: bool) -> String {
     }
     if major != 0 {
         format!("{}.0.0", major + 1)
-    } else if minor != 0 {
-        format!("0.{}.0", minor + 1)
     } else {
-        format!("0.0.{}", patch + 1)
+        format!("0.{}.0", minor + 1)
     }
 }
 

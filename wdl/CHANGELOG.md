@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+* Fixed `wdl run` not correctly updating file/directory paths in an inputs file ([#302](https://github.com/stjude-rust-labs/wdl/pull/302)).
+
+## 0.11.0 - 01-17-2025
+
+### Added
+
+* Added support for workflow evaluation to `wdl run` ([#292](https://github.com/stjude-rust-labs/wdl/pull/292))
+* Add `--shellcheck` flag to `wdl lint` subcommand to run shellcheck when linting ([#264](https://github.com/stjude-rust-labs/wdl/pull/264))
+* Implemented the `wdl doc` subcommand for generating documentation (**currently in ALPHA testing**) ([#248](https://github.com/stjude-rust-labs/wdl/pull/248)).
+* Added an `--open` flag to `wdl doc` subcommand ([#269](https://github.com/stjude-rust-labs/wdl/pull/269)).
+* Added the `engine` module containing the implementation of `wdl-engine` ([#265](https://github.com/stjude-rust-labs/wdl/pull/265)).
+* Implemented the `wdl run` subcommand for running tasks ([#265](https://github.com/stjude-rust-labs/wdl/pull/265)).
+* Added a `validate` subcommand for validating input JSONs ([#283](https://github.com/stjude-rust-labs/wdl/pull/283)).
+* Added `analyze()`, `parse_inputs()`, `validate_inputs()`, and `run()` entrypoints ([#283](https://github.com/stjude-rust-labs/wdl/pull/283)).
+
+### Fixed
+
+* Fixed accepting directories for the `check` and `analyze` commands for the
+  `wdl` binary ([#254](https://github.com/stjude-rust-labs/wdl/pull/254)).
+
 ## 0.10.0 - 10-22-2024
 
 ### Changed
