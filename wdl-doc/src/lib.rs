@@ -14,8 +14,7 @@ pub mod task;
 pub mod workflow;
 
 use std::collections::HashMap;
-use std::env::current_dir;
-use std::fmt::Display;
+use std::path::Path;
 use std::path::PathBuf;
 
 use anyhow::Result;
@@ -53,17 +52,26 @@ impl Render for Css<'_> {
     }
 }
 
-/// A basic header with a dynamic `page_title`.
-pub(crate) fn header(page_title: &str) -> Markup {
-    let style_path = current_dir().unwrap().join("theme/dist/styles.css");
+/// A full HTML page with a header and body.
+pub(crate) fn full_page(page_title: &str, style_sheet: &Path, body: Markup) -> Markup {
     html! {
         (DOCTYPE)
-        html lang="en" {
-            head {
-                meta charset="utf-8";
-                title { (page_title) }
-                (Css(style_path.to_str().unwrap()))
+        html {
+            (header(page_title, style_sheet))
+            body {
+                    (body)
             }
+        }
+    }
+}
+
+/// A basic header with a dynamic `page_title` and link to the stylesheet.
+pub(crate) fn header(page_title: &str, style_sheet: &Path) -> Markup {
+    html! {
+        head {
+            meta charset="utf-8";
+            title { (page_title) }
+            (Css(style_sheet.to_str().unwrap()))
         }
     }
 }
@@ -118,20 +126,16 @@ impl Document {
         let preamble = fetch_preamble_comments(self.version.clone());
         Markdown(&preamble).render()
     }
-}
 
-impl Display for Document {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let markup = html! {
-            (header(&self.name()))
-            body {
-                h1 { (self.name()) }
-                h2 { "WDL Version: " (self.version()) }
-                div { (self.preamble()) }
-            }
+    /// Render the document as HTML.
+    pub fn render(&self, parent_dir: &Path) -> Markup {
+        let body = html! {
+            h1 { (self.name()) }
+            h2 { "WDL Version: " (self.version()) }
+            div { (self.preamble()) }
         };
 
-        write!(f, "{}", markup.into_string())
+        full_page(self.name(), parent_dir, body)
     }
 }
 
@@ -158,7 +162,7 @@ fn fetch_preamble_comments(version: VersionStatement) -> String {
 /// Generate HTML documentation for a workspace.
 pub async fn document_workspace(path: PathBuf) -> Result<()> {
     if !path.is_dir() {
-        return Err(anyhow!("The path is not a directory"));
+        return Err(anyhow!("Workspace is not a directory"));
     }
 
     let abs_path = std::path::absolute(&path)?;
@@ -167,6 +171,16 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
     if !docs_dir.exists() {
         std::fs::create_dir(&docs_dir)?;
     }
+
+    // Get the relative path to the CSS style sheet.
+    // TODO: This is a hack. We should have a better way to do this.
+    let css_path = PathBuf::from("..")
+        .join("..")
+        .join("..")
+        .join("..")
+        .join("theme")
+        .join("dist")
+        .join("styles.css");
 
     let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
     analyzer.add_directory(abs_path.clone()).await?;
@@ -201,7 +215,9 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
         let index = cur_dir.join("index.html");
         let mut index = tokio::fs::File::create(index).await?;
 
-        index.write_all(document.to_string().as_bytes()).await?;
+        index
+            .write_all(document.render(&css_path).into_string().as_bytes())
+            .await?;
 
         for item in ast.items() {
             match item {
@@ -212,7 +228,7 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
                     let r#struct = r#struct::Struct::new(s.clone());
                     struct_file
-                        .write_all(r#struct.to_string().as_bytes())
+                        .write_all(r#struct.render(&css_path).into_string().as_bytes())
                         .await?;
                 }
                 DocumentItem::Task(t) => {
@@ -281,7 +297,9 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
                     let task = task::Task::new(task_name, t.metadata(), inputs, outputs);
 
-                    task_file.write_all(task.to_string().as_bytes()).await?;
+                    task_file
+                        .write_all(task.render(&css_path).into_string().as_bytes())
+                        .await?;
                 }
                 DocumentItem::Workflow(w) => {
                     let workflow_name = w.name().as_str().to_owned();
@@ -351,7 +369,7 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
                         workflow::Workflow::new(workflow_name, w.metadata(), inputs, outputs);
 
                     workflow_file
-                        .write_all(workflow.to_string().as_bytes())
+                        .write_all(workflow.render(&css_path).into_string().as_bytes())
                         .await?;
                 }
                 DocumentItem::Import(_) => {}

@@ -1,12 +1,12 @@
 //! Create HTML documentation for WDL tasks.
 
-use std::fmt::Display;
+use std::path::Path;
 
 use maud::Markup;
 use maud::html;
 use wdl_ast::v1::MetadataSection;
 
-use crate::header;
+use crate::full_page;
 use crate::meta::Meta;
 use crate::parameter::Parameter;
 
@@ -63,12 +63,10 @@ impl Task {
     pub fn outputs(&self) -> &[Parameter] {
         &self.outputs
     }
-}
 
-impl Display for Task {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let markup = html! {
-            (header(&self.name()))
+    /// Render the task as HTML.
+    pub fn render(&self, parent_dir: &Path) -> Markup {
+        let body = html! {
             h1 { (self.name()) }
             (self.meta_section())
             h2 { "Inputs" }
@@ -89,6 +87,6 @@ impl Display for Task {
             }
         };
 
-        write!(f, "{}", markup.into_string())
+        full_page(self.name(), parent_dir, body)
     }
 }

@@ -1,12 +1,13 @@
 //! Create HTML documentation for WDL structs.
 
-use std::fmt::Display;
+use std::path::Path;
 
+use maud::Markup;
 use maud::html;
 use wdl_ast::AstToken;
 use wdl_ast::v1::StructDefinition;
 
-use crate::header;
+use crate::full_page;
 
 /// A struct in a WDL document.
 #[derive(Debug)]
@@ -34,12 +35,10 @@ impl Struct {
             (name, ty)
         })
     }
-}
 
-impl Display for Struct {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let markup = html! {
-            (header(&self.name()))
+    /// Render the struct as HTML.
+    pub fn render(&self, parent_dir: &Path) -> Markup {
+        let body = html! {
             h1 { (self.name()) }
             h2 { "Members" }
             ul {
@@ -49,13 +48,12 @@ impl Display for Struct {
                             (name)
                             ":"
                         }
-                        " "
-                        (ty)
+                        " " (ty)
                     }
                 }
             }
         };
 
-        write!(f, "{}", markup.into_string())
+        full_page(&self.name(), parent_dir, body)
     }
 }
