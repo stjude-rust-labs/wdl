@@ -2,10 +2,11 @@
 
 use std::fmt::Display;
 
-use html::content;
-use html::text_content;
+use maud::html;
 use wdl_ast::AstToken;
 use wdl_ast::v1::StructDefinition;
+
+use crate::header;
 
 /// A struct in a WDL document.
 #[derive(Debug)]
@@ -22,7 +23,7 @@ impl Struct {
 
     /// Get the name of the struct.
     pub fn name(&self) -> String {
-        self.def.name().as_str().to_owned()
+        self.def.name().as_str().to_string()
     }
 
     /// Get the members of the struct.
@@ -37,19 +38,24 @@ impl Struct {
 
 impl Display for Struct {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let struct_name = content::Heading1::builder().text(self.name()).build();
+        let markup = html! {
+            (header(&self.name()))
+            h1 { (self.name()) }
+            h2 { "Members" }
+            ul {
+                @for (name, ty) in self.members() {
+                    li {
+                        b {
+                            (name)
+                            ":"
+                        }
+                        " "
+                        (ty)
+                    }
+                }
+            }
+        };
 
-        let mut members = text_content::UnorderedList::builder();
-        for (name, ty) in self.members() {
-            members.push(
-                text_content::ListItem::builder()
-                    .text(format!("{}: {}", name, ty))
-                    .build(),
-            );
-        }
-        let members = members.build();
-
-        write!(f, "{}", struct_name)?;
-        write!(f, "{}", members)
+        write!(f, "{}", markup.into_string())
     }
 }

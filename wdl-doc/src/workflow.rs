@@ -1,12 +1,13 @@
-//! Create HTML documentation for WDL tasks.
+//! Create HTML documentation for WDL workflows.
 
 use std::fmt::Display;
 
-use html::content;
-use html::text_content;
-use wdl_ast::AstNode;
+use maud::Markup;
+use maud::html;
 use wdl_ast::v1::MetadataSection;
 
+use crate::header;
+use crate::meta::Meta;
 use crate::parameter::Parameter;
 
 /// A task in a WDL document.
@@ -43,9 +44,14 @@ impl Workflow {
         &self.name
     }
 
-    /// Get the meta section of the task.
-    pub fn meta_section(&self) -> Option<&MetadataSection> {
-        self.meta_section.as_ref()
+    /// Get the meta section of the workflow as HTML.
+    pub fn meta_section(&self) -> Markup {
+        if let Some(meta_section) = &self.meta_section {
+            let meta = Meta::new(meta_section.clone());
+            meta.render()
+        } else {
+            html! {}
+        }
     }
 
     /// Get the input parameters of the task.
@@ -61,49 +67,28 @@ impl Workflow {
 
 impl Display for Workflow {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let task_name = content::Heading1::builder()
-            .text(self.name().to_owned())
-            .build();
+        let markup = html! {
+            (header(&self.name()))
+            h1 { (self.name()) }
+            (self.meta_section())
+            h2 { "Inputs" }
+            ul {
+                @for param in self.inputs() {
+                    li {
+                        (param.render())
+                    }
+                }
+            }
+            h2 { "Outputs" }
+            ul {
+                @for param in self.outputs() {
+                    li {
+                        (param.render())
+                    }
+                }
+            }
+        };
 
-        let mut content = text_content::UnorderedList::builder();
-        if let Some(meta_section) = self.meta_section() {
-            content.push(
-                text_content::ListItem::builder()
-                    .text("Meta:")
-                    .push(meta_section.syntax().to_string())
-                    .build(),
-            );
-        }
-        content.push(
-            text_content::ListItem::builder()
-                .text("Inputs:")
-                .push(
-                    text_content::UnorderedList::builder()
-                        .extend(self.inputs().iter().map(|param| {
-                            text_content::ListItem::builder()
-                                .push(param.to_string())
-                                .build()
-                        }))
-                        .build(),
-                )
-                .build(),
-        );
-        content.push(
-            text_content::ListItem::builder()
-                .text("Outputs:")
-                .push(
-                    text_content::UnorderedList::builder()
-                        .extend(self.outputs().iter().map(|param| {
-                            text_content::ListItem::builder()
-                                .push(param.to_string())
-                                .build()
-                        }))
-                        .build(),
-                )
-                .build(),
-        );
-
-        write!(f, "{}", task_name)?;
-        write!(f, "{}", content.build())
+        write!(f, "{}", markup.into_string())
     }
 }

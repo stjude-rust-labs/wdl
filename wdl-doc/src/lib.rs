@@ -6,21 +6,25 @@
 #![warn(missing_debug_implementations)]
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
-#![recursion_limit = "512"]
 
-pub mod parameter;
+pub(crate) mod meta;
+pub(crate) mod parameter;
 pub mod r#struct;
 pub mod task;
 pub mod workflow;
 
 use std::collections::HashMap;
+use std::env::current_dir;
 use std::fmt::Display;
 use std::path::PathBuf;
 
 use anyhow::Result;
 use anyhow::anyhow;
-use html::content;
-use html::text_content;
+use maud::DOCTYPE;
+use maud::Markup;
+use maud::PreEscaped;
+use maud::Render;
+use maud::html;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
 use tokio::io::AsyncWriteExt;
@@ -28,9 +32,8 @@ use wdl_analysis::Analyzer;
 use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::rules;
 use wdl_ast::AstToken;
-use wdl_ast::Document as AstDocument;
 use wdl_ast::SyntaxTokenExt;
-use wdl_ast::Version;
+use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::MetadataValue;
 
@@ -38,6 +41,50 @@ use wdl_ast::v1::MetadataValue;
 ///
 /// This directory will be created in the workspace directory.
 const DOCS_DIR: &str = "docs";
+
+/// Links to a CSS stylesheet at the given path.
+struct Css<'a>(&'a str);
+
+impl Render for Css<'_> {
+    fn render(&self) -> Markup {
+        html! {
+            link rel="stylesheet" type="text/css" href=(self.0);
+        }
+    }
+}
+
+/// A basic header with a dynamic `page_title`.
+pub(crate) fn header(page_title: &str) -> Markup {
+    let style_path = current_dir().unwrap().join("theme/dist/styles.css");
+    html! {
+        (DOCTYPE)
+        html lang="en" {
+            head {
+                meta charset="utf-8";
+                title { (page_title) }
+                (Css(style_path.to_str().unwrap()))
+            }
+        }
+    }
+}
+
+/// Renders a block of Markdown using `pulldown-cmark`.
+pub(crate) struct Markdown<T>(T);
+
+impl<T: AsRef<str>> Render for Markdown<T> {
+    fn render(&self) -> Markup {
+        // Generate raw HTML
+        let mut unsafe_html = String::new();
+        let mut options = Options::empty();
+        options.insert(Options::ENABLE_TABLES);
+        options.insert(Options::ENABLE_STRIKETHROUGH);
+        let parser = Parser::new_ext(self.0.as_ref(), options);
+        pulldown_cmark::html::push_html(&mut unsafe_html, parser);
+        // Sanitize it with ammonia
+        let safe_html = ammonia::clean(&unsafe_html);
+        PreEscaped(safe_html)
+    }
+}
 
 /// A WDL document.
 #[derive(Debug)]
@@ -47,19 +94,13 @@ pub struct Document {
     /// This is the filename of the document without the extension.
     name: String,
     /// The version of the document.
-    version: Version,
-    /// The Markdown preamble comments.
-    preamble: String,
+    version: VersionStatement,
 }
 
 impl Document {
     /// Create a new document.
-    pub fn new(name: String, version: Version, preamble: String) -> Self {
-        Self {
-            name,
-            version,
-            preamble,
-        }
+    pub fn new(name: String, version: VersionStatement) -> Self {
+        Self { name, version }
     }
 
     /// Get the name of the document.
@@ -67,66 +108,51 @@ impl Document {
         &self.name
     }
 
-    /// Get the version of the document.
+    /// Get the version of the document as text.
     pub fn version(&self) -> String {
-        self.version.as_str().to_owned()
+        self.version.version().as_str().to_string()
     }
 
     /// Get the preamble comments of the document.
-    pub fn preamble(&self) -> &str {
-        &self.preamble
+    pub fn preamble(&self) -> Markup {
+        let preamble = fetch_preamble_comments(self.version.clone());
+        Markdown(&preamble).render()
     }
 }
 
 impl Display for Document {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let document_name = content::Heading1::builder()
-            .text(self.name().to_owned())
-            .build();
-        let version = text_content::Paragraph::builder()
-            .text(format!("WDL Version: {}", self.version()))
-            .build();
+        let markup = html! {
+            (header(&self.name()))
+            body {
+                h1 { (self.name()) }
+                h2 { "WDL Version: " (self.version()) }
+                div { (self.preamble()) }
+            }
+        };
 
-        let mut options = Options::empty();
-        options.insert(Options::ENABLE_TABLES);
-        options.insert(Options::ENABLE_STRIKETHROUGH);
-        let parser = Parser::new_ext(&self.preamble, options);
-        let mut preamble = String::new();
-        pulldown_cmark::html::push_html(&mut preamble, parser);
-
-        write!(f, "{}", document_name)?;
-        write!(f, "{}", version)?;
-        write!(f, "{}", preamble)
+        write!(f, "{}", markup.into_string())
     }
 }
 
 /// Fetch the preamble comments from a document.
-pub fn fetch_preamble_comments(document: AstDocument) -> String {
-    let comments = match document.version_statement() {
-        Some(version) => {
-            let comments = version
-                .keyword()
-                .syntax()
-                .preceding_trivia()
-                .map(|t| match t.kind() {
-                    wdl_ast::SyntaxKind::Comment => match t.to_string().strip_prefix("## ") {
-                        Some(comment) => comment.to_string(),
-                        None => "".to_string(),
-                    },
-                    wdl_ast::SyntaxKind::Whitespace => "".to_string(),
-                    _ => {
-                        panic!("Unexpected token kind: {:?}", t.kind())
-                    }
-                })
-                .collect::<Vec<_>>();
-            comments
-        }
-        None => {
-            vec![]
-        }
-    }
-    .join("\n");
-    comments
+fn fetch_preamble_comments(version: VersionStatement) -> String {
+    let comments = version
+        .keyword()
+        .syntax()
+        .preceding_trivia()
+        .map(|t| match t.kind() {
+            wdl_ast::SyntaxKind::Comment => match t.to_string().strip_prefix("## ") {
+                Some(comment) => comment.to_string(),
+                None => "".to_string(),
+            },
+            wdl_ast::SyntaxKind::Whitespace => "".to_string(),
+            _ => {
+                panic!("Unexpected token kind: {:?}", t.kind())
+            }
+        })
+        .collect::<Vec<_>>();
+    comments.join("\n")
 }
 
 /// Generate HTML documentation for a workspace.
@@ -167,12 +193,10 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
         let ast_doc = result.document().node();
         let version = ast_doc
             .version_statement()
-            .expect("document should have a version statement")
-            .version();
-        let preamble = fetch_preamble_comments(ast_doc.clone());
+            .expect("Document should have a version statement");
         let ast = ast_doc.ast().unwrap_v1();
 
-        let document = Document::new(name.to_string(), version, preamble);
+        let document = Document::new(name.to_string(), version);
 
         let index = cur_dir.join("index.html");
         let mut index = tokio::fs::File::create(index).await?;
@@ -339,6 +363,8 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
 #[cfg(test)]
 mod tests {
+    use wdl_ast::Document as AstDocument;
+
     use super::*;
 
     #[test]
@@ -361,7 +387,7 @@ mod tests {
         }
         "#;
         let (document, _) = AstDocument::parse(source);
-        let preamble = fetch_preamble_comments(document);
+        let preamble = fetch_preamble_comments(document.version_statement().unwrap());
         assert_eq!(preamble, "This is a comment\nThis is also a comment");
     }
 }

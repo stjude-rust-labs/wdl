@@ -1,14 +1,14 @@
-//! Parameter module
+//! Create HTML documentation for WDL parameters.
 
 use std::fmt::Display;
 
-use html::content;
-use html::text_content;
+use maud::Markup;
+use maud::html;
 use wdl_ast::AstToken;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::MetadataValue;
 
-/// A parameter in a workflow or task.
+/// A parameter (input or output) in a workflow or task.
 #[derive(Debug)]
 pub struct Parameter {
     /// The declaration of the parameter.
@@ -42,26 +42,25 @@ impl Parameter {
     pub fn meta(&self) -> Option<&MetadataValue> {
         self.meta.as_ref()
     }
+
+    /// Render the parameter as HTML.
+    pub fn render(&self) -> Markup {
+        html! {
+            h2 { (self.name()) }
+            p { "Type: " (self.ty()) }
+            @if let Some(expr) = self.expr() {
+                p { "Expr: " (expr) }
+            } @else {
+                p { "Expr: None" }
+            }
+        }
+    }
 }
 
 impl Display for Parameter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let parameter_name = content::Heading2::builder().text(self.name()).build();
-        let parameter_type = text_content::Paragraph::builder()
-            .text(format!("Type: {}", self.ty()))
-            .build();
-        let parameter_expr = if let Some(expr) = self.expr() {
-            text_content::Paragraph::builder()
-                .text(format!("Expr: {}", expr))
-                .build()
-        } else {
-            text_content::Paragraph::builder()
-                .text("Expr: None")
-                .build()
-        };
+        let markup = self.render();
 
-        write!(f, "{}", parameter_name)?;
-        write!(f, "{}", parameter_type)?;
-        write!(f, "{}", parameter_expr)
+        write!(f, "{}", markup.into_string())
     }
 }
