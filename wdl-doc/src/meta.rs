@@ -21,7 +21,7 @@ impl Meta {
     /// Render the meta section as HTML.
     pub fn render(&self) -> Markup {
         html! {
-            h2 { "Meta" }
+            h3 { "Meta" }
             ul {
                 @for entry in self.0.items() {
                     li {

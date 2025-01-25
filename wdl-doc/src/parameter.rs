@@ -46,7 +46,7 @@ impl Parameter {
     /// Render the parameter as HTML.
     pub fn render(&self) -> Markup {
         html! {
-            h2 { (self.name()) }
+            h3 { (self.name()) }
             p { "Type: " (self.ty()) }
             @if let Some(expr) = self.expr() {
                 p { "Expr: " (expr) }

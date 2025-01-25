@@ -40,7 +40,7 @@ impl Struct {
     pub fn render(&self, parent_dir: &Path) -> Markup {
         let body = html! {
             h1 { (self.name()) }
-            h2 { "Members" }
+            h3 { "Members" }
             ul {
                 @for (name, ty) in self.members() {
                     li {

@@ -1,4 +1,7 @@
 h1 {
-  color: aqua;
-  background-color: red;
+  font-size: 48px;
+}
+
+h3 {
+  font-size: 30px;
 }

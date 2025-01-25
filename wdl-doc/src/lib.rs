@@ -56,11 +56,14 @@ impl Render for Css<'_> {
 pub(crate) fn full_page(page_title: &str, style_sheet: &Path, body: Markup) -> Markup {
     html! {
         (DOCTYPE)
-        html {
+        html class="dark
+                    size-full" {
             (header(page_title, style_sheet))
-            body {
-                    (body)
-            }
+            body class="size-full
+                        dark:bg-slate-950
+                        dark:text-white" {
+                (body)
+           }
         }
     }
 }
@@ -73,6 +76,9 @@ pub(crate) fn header(page_title: &str, style_sheet: &Path) -> Markup {
             meta name="viewport" content="width=device-width, initial-scale=1.0";
             title { (page_title) }
             (Css(style_sheet.to_str().unwrap()))
+            link rel="preconnect" href="https://fonts.googleapis.com";
+            link rel="preconnect" href="https://fonts.gstatic.com" crossorigin;
+            link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet";
         }
     }
 }
@@ -132,7 +138,7 @@ impl Document {
     pub fn render(&self, parent_dir: &Path) -> Markup {
         let body = html! {
             h1 { (self.name()) }
-            h2 { "WDL Version: " (self.version()) }
+            h3 { "WDL Version: " (self.version()) }
             div { (self.preamble()) }
         };
 
@@ -175,13 +181,7 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
     // Get the relative path to the CSS style sheet.
     // TODO: This is a hack. We should have a better way to do this.
-    let css_path = PathBuf::from("..")
-        .join("..")
-        .join("..")
-        .join("..")
-        .join("theme")
-        .join("dist")
-        .join("styles.css");
+    let css_path = PathBuf::from("/styles.css");
 
     let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
     analyzer.add_directory(abs_path.clone()).await?;

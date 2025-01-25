@@ -69,7 +69,7 @@ impl Workflow {
         let body = html! {
             h1 { (self.name()) }
             (self.meta_section())
-            h2 { "Inputs" }
+            h3 { "Inputs" }
             ul {
                 @for param in self.inputs() {
                     li {
@@ -77,7 +77,7 @@ impl Workflow {
                     }
                 }
             }
-            h2 { "Outputs" }
+            h3 { "Outputs" }
             ul {
                 @for param in self.outputs() {
                     li {
