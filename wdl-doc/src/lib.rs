@@ -70,6 +70,7 @@ pub(crate) fn header(page_title: &str, style_sheet: &Path) -> Markup {
     html! {
         head {
             meta charset="utf-8";
+            meta name="viewport" content="width=device-width, initial-scale=1.0";
             title { (page_title) }
             (Css(style_sheet.to_str().unwrap()))
         }
