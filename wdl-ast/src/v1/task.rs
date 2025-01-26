@@ -872,7 +872,7 @@ impl CommandSection {
         None
     }
 
-    /// Counts leading whitespace for the command.
+    /// Counts the leading whitespace of the command.
     ///
     /// If the command has mixed indentation, this will return None.
     pub fn count_whitepsace(&self) -> Option<usize> {
