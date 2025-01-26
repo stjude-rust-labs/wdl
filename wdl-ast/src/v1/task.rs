@@ -1,7 +1,5 @@
 //! V1 AST representation for task definitions.
 
-use core::num;
-
 use super::BoundDecl;
 use super::Decl;
 use super::Expr;
