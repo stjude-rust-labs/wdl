@@ -843,7 +843,7 @@ note[ShellCheck]: Double quote to prevent globbing and word splitting.
     │                                              SC2086[info]: Double quote to prevent globbing and word splitting.
     │                                              more info: https://www.shellcheck.net/wiki/SC2086
     │
-    = fix: did you mean `"${WDLKC0gutybX}"`?
+    = fix: did you mean `"${WDLqqXIAEUdv}"`?
 
 note[ShellCheck]: Double quote to prevent globbing and word splitting.
     ┌─ tests/lints/shellcheck-warn/source.wdl:202:18
