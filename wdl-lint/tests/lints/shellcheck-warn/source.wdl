@@ -195,7 +195,7 @@ task test6 {
         done
         
         if ! ~{succeed_on_errors} \
-            && [ "$(grep -Ec "$GREP_PATTERN" ~{outfile_name})" -gt 0 ]
+            && [ "$(grep -Ec "$GREP_PATTERN" $outfile_name)" -gt 0 ]
         then
             >&2 echo "Problems detected by Picard ValidateSamFile"
             >&2 grep -E "$GREP_PATTERN" ~{outfile_name}

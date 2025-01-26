@@ -837,13 +837,24 @@ note[ShellCheck]: Double quote to prevent globbing and word splitting.
 note[ShellCheck]: Double quote to prevent globbing and word splitting.
     ┌─ tests/lints/shellcheck-warn/source.wdl:198:46
     │
-198 │             && [ "$(grep -Ec "$GREP_PATTERN" ~{outfile_name})" -gt 0 ]
-    │                                              ^^^^^^^^^^^^^^^
+198 │             && [ "$(grep -Ec "$GREP_PATTERN" $outfile_name)" -gt 0 ]
+    │                                              ^^^^^^^^^^^^^
     │                                              │
     │                                              SC2086[info]: Double quote to prevent globbing and word splitting.
     │                                              more info: https://www.shellcheck.net/wiki/SC2086
     │
-    = fix: did you mean `"${WDLqqXIAEUdv}"`?
+    = fix: did you mean `"$outfile_name"`?
+
+note[ShellCheck]: outfile_name is referenced but not assigned.
+    ┌─ tests/lints/shellcheck-warn/source.wdl:198:46
+    │
+198 │             && [ "$(grep -Ec "$GREP_PATTERN" $outfile_name)" -gt 0 ]
+    │                                              ^^^^^^^^^^^^^
+    │                                              │
+    │                                              SC2154[warning]: outfile_name is referenced but not assigned.
+    │                                              more info: https://www.shellcheck.net/wiki/SC2154
+    │
+    = fix: address the diagnostic as recommended in the message
 
 note[ShellCheck]: Double quote to prevent globbing and word splitting.
     ┌─ tests/lints/shellcheck-warn/source.wdl:202:18
