@@ -345,7 +345,7 @@ fn shellcheck_lint(
 ///
 /// If the section contains mixed indentation, returns None.
 fn sanitize_command(section: &CommandSection) -> Option<(String, HashSet<String>, usize)> {
-    let amount_stripped = section.count_whitepsace()?;
+    let amount_stripped = section.count_whitespace()?;
     let mut sanitized_command = String::new();
     let mut decls = HashSet::new();
     let mut needs_quotes = true;

@@ -875,7 +875,7 @@ impl CommandSection {
     /// Counts the leading whitespace of the command.
     ///
     /// If the command has mixed indentation, this will return None.
-    pub fn count_whitepsace(&self) -> Option<usize> {
+    pub fn count_whitespace(&self) -> Option<usize> {
         let mut min_leading_spaces = usize::MAX;
         let mut min_leading_tabs = usize::MAX;
         let mut parsing_leading_whitespace = false; // init to false so that the first line is skipped
@@ -998,7 +998,7 @@ impl CommandSection {
         }
 
         // Return immediately if command contains mixed indentation
-        let num_stripped_chars = self.count_whitepsace()?;
+        let num_stripped_chars = self.count_whitespace()?;
 
         // If there is no leading whitespace, we're done
         if num_stripped_chars == 0 {
