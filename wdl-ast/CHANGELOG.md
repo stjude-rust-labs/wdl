@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+
+* Updated `strip_whitespace` to return the amount of leading whitespace that was removed ([#317](https://github.com/stjude-rust-labs/wdl/pull/317)).
+
 ## 0.10.0 - 01-17-2025
 
 ### Added

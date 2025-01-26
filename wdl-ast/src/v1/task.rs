@@ -874,6 +874,9 @@ impl CommandSection {
 
     /// Strips leading whitespace from the command.
     ///
+    /// Returns a vector of [StrippedCommandPart]s and the amount
+    /// of leading whitespace that was stripped.
+    ///
     /// If the command has mixed indentation, this will return `None`.
     pub fn strip_whitespace(&self) -> Option<Vec<StrippedCommandPart>> {
         let mut min_leading_spaces = usize::MAX;
