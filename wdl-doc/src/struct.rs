@@ -1,11 +1,13 @@
 //! Create HTML documentation for WDL structs.
 
-use std::fmt::Display;
+use std::path::Path;
 
-use html::content;
-use html::text_content;
+use maud::Markup;
+use maud::html;
 use wdl_ast::AstToken;
 use wdl_ast::v1::StructDefinition;
+
+use crate::full_page;
 
 /// A struct in a WDL document.
 #[derive(Debug)]
@@ -22,7 +24,7 @@ impl Struct {
 
     /// Get the name of the struct.
     pub fn name(&self) -> String {
-        self.def.name().as_str().to_owned()
+        self.def.name().as_str().to_string()
     }
 
     /// Get the members of the struct.
@@ -33,23 +35,25 @@ impl Struct {
             (name, ty)
         })
     }
-}
 
-impl Display for Struct {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let struct_name = content::Heading1::builder().text(self.name()).build();
+    /// Render the struct as HTML.
+    pub fn render(&self, parent_dir: &Path) -> Markup {
+        let body = html! {
+            h1 { (self.name()) }
+            h3 { "Members" }
+            ul {
+                @for (name, ty) in self.members() {
+                    li {
+                        b {
+                            (name)
+                            ":"
+                        }
+                        " " (ty)
+                    }
+                }
+            }
+        };
 
-        let mut members = text_content::UnorderedList::builder();
-        for (name, ty) in self.members() {
-            members.push(
-                text_content::ListItem::builder()
-                    .text(format!("{}: {}", name, ty))
-                    .build(),
-            );
-        }
-        let members = members.build();
-
-        write!(f, "{}", struct_name)?;
-        write!(f, "{}", members)
+        full_page(&self.name(), parent_dir, body)
     }
 }
