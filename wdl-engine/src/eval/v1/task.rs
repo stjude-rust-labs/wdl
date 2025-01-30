@@ -707,7 +707,7 @@ impl TaskEvaluator {
         }
 
         // If the backend uses containers, add a mapping entry for any paths the value
-        // might contain Initially, it will be an empty value, but will be
+        // might contain. Initially, it will be an empty value, but will be
         // populated in `map_request_paths`.
         if self.backend.container_root().is_some() {
             value.visit_paths(&mut |path| {
