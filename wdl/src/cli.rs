@@ -326,7 +326,7 @@ pub async fn run(
                             ProgressKind::TaskStarted { .. } => {
                                 state.ready += 1;
                             }
-                            ProgressKind::TaskExecutionStarted { id } => {
+                            ProgressKind::TaskExecutionStarted { id, .. } => {
                                 state.ready -= 1;
                                 state.executing += 1;
                                 state.ids.insert(id.to_string());

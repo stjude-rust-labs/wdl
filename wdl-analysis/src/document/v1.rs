@@ -588,23 +588,26 @@ fn add_task(config: DiagnosticsConfig, document: &mut DocumentData, definition: 
 
                 // Check for unused input
                 if let Some(severity) = config.unused_input {
-                    let name = decl.name();
-                    // Don't warn for environment variables as they are always implicitly used
-                    if decl.env().is_none()
-                        && graph
-                            .edges_directed(index, Direction::Outgoing)
-                            .next()
-                            .is_none()
-                    {
-                        // Determine if the input is really used based on its name and type
-                        if is_input_used(name.as_str(), &task.inputs[name.as_str()].ty) {
-                            continue;
-                        }
+                    if decl.env().is_none() {
+                        // For any input that isn't an environment variable, check to see if there's
+                        // a single implicit dependency edge; if so, it might be unused
+                        let mut edges = graph.edges_directed(index, Direction::Outgoing);
 
-                        if !decl.syntax().is_rule_excepted(UNUSED_INPUT_RULE_ID) {
-                            document.diagnostics.push(
-                                unused_input(name.as_str(), name.span()).with_severity(severity),
-                            );
+                        if let (Some(true), None) = (edges.next().map(|e| e.weight()), edges.next())
+                        {
+                            let name = decl.name();
+
+                            // Determine if the input is really used based on its name and type
+                            if is_input_used(name.as_str(), &task.inputs[name.as_str()].ty) {
+                                continue;
+                            }
+
+                            if !decl.syntax().is_rule_excepted(UNUSED_INPUT_RULE_ID) {
+                                document.diagnostics.push(
+                                    unused_input(name.as_str(), name.span())
+                                        .with_severity(severity),
+                                );
+                            }
                         }
                     }
                 }

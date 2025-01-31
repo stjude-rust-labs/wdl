@@ -77,6 +77,8 @@ fn memory(requirements: &HashMap<String, Value>) -> Result<i64> {
 struct LocalTaskSpawnRequest {
     /// The inner task spawn request.
     inner: Arc<TaskSpawnRequest>,
+    /// The attempt count for the task.
+    attempt: u64,
     /// The requested CPU reservation for the task.
     ///
     /// Note that CPU isn't actually reserved for the task process.
@@ -297,7 +299,7 @@ impl LocalTaskExecutionBackend {
             let spawned = request.spawned.take().unwrap();
             spawned.send(()).ok();
 
-            let result = Self::spawn_task(request.inner.clone()).await;
+            let result = Self::spawn_task(request.inner.clone(), request.attempt).await;
             LocalTaskSpawnResponse { request, result }
         });
     }
@@ -305,19 +307,10 @@ impl LocalTaskExecutionBackend {
     /// Spawns the requested task.
     ///
     /// Returns the status code of the process when it has exited.
-    async fn spawn_task(request: Arc<TaskSpawnRequest>) -> Result<i32> {
+    async fn spawn_task(request: Arc<TaskSpawnRequest>, attempt: u64) -> Result<i32> {
         // Recreate the working directory
-        let work_dir = request.root.work_dir();
-        if work_dir.exists() {
-            fs::remove_dir_all(work_dir).with_context(|| {
-                format!(
-                    "failed to remove directory `{path}`",
-                    path = work_dir.display()
-                )
-            })?;
-        }
-
-        fs::create_dir_all(work_dir).with_context(|| {
+        let work_dir = request.root.work_dir(attempt);
+        fs::create_dir_all(&work_dir).with_context(|| {
             format!(
                 "failed to create directory `{path}`",
                 path = work_dir.display()
@@ -450,6 +443,7 @@ impl TaskExecutionBackend for LocalTaskExecutionBackend {
     fn spawn(
         &self,
         request: Arc<TaskSpawnRequest>,
+        attempt: u64,
         spawned: oneshot::Sender<()>,
     ) -> Result<oneshot::Receiver<Result<i32>>> {
         let (tx, rx) = oneshot::channel();
@@ -460,6 +454,7 @@ impl TaskExecutionBackend for LocalTaskExecutionBackend {
         self.tx
             .send(LocalTaskSpawnRequest {
                 inner: request,
+                attempt,
                 cpu,
                 memory,
                 spawned: Some(spawned),

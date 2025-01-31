@@ -54,7 +54,7 @@ pub struct TaskExecutionConstraints {
 }
 
 /// Represents the root directory of a task execution.
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct TaskExecutionRoot {
     /// The path to the working directory for the execution.
     work_dir: PathBuf,
@@ -96,11 +96,11 @@ impl TaskExecutionRoot {
         })
     }
 
-    /// Gets the working directory path for the task's execution.
+    /// Gets the working directory for the given attempt number.
     ///
     /// The working directory will be created upon spawning the task.
-    pub fn work_dir(&self) -> &Path {
-        &self.work_dir
+    pub fn work_dir(&self, attempt: u64) -> PathBuf {
+        self.work_dir.join(format!("{attempt}"))
     }
 
     /// Gets the temporary directory path for the task's execution.
@@ -250,6 +250,7 @@ pub trait TaskExecutionBackend: Send + Sync {
     fn spawn(
         &self,
         request: Arc<TaskSpawnRequest>,
+        attempt: u64,
         spawned: oneshot::Sender<()>,
     ) -> Result<Receiver<Result<i32>>>;
 }

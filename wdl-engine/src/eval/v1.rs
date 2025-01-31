@@ -63,6 +63,11 @@ pub enum ProgressKind<'a> {
     TaskExecutionStarted {
         /// The identifier of the task.
         id: &'a str,
+        /// The attempt number for the task's execution, starting at 0 to
+        /// indicate the first attempt.
+        ///
+        /// This value is incremented upon each retry.
+        attempt: u64,
     },
     /// A task with the given id has completed execution.
     TaskExecutionCompleted {

@@ -248,7 +248,7 @@ impl EvaluatedTask {
     /// Constructs a new evaluated task.
     ///
     /// Returns an error if the stdout or stderr paths are not UTF-8.
-    fn new(root: &TaskExecutionRoot, status_code: i32) -> anyhow::Result<Self> {
+    fn new(root: &TaskExecutionRoot, work_dir: &Path, status_code: i32) -> anyhow::Result<Self> {
         let stdout = PrimitiveValue::new_file(root.stdout().to_str().with_context(|| {
             format!(
                 "path to stdout file `{path}` is not UTF-8",
@@ -266,7 +266,7 @@ impl EvaluatedTask {
 
         Ok(Self {
             status_code,
-            work_dir: root.work_dir().into(),
+            work_dir: work_dir.into(),
             temp_dir: root.temp_dir().into(),
             command: root.command().into(),
             stdout,

@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::future::Future;
 use std::mem;
 use std::path::Path;
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use anyhow::Context;
@@ -40,6 +41,8 @@ use wdl_ast::v1::Decl;
 use wdl_ast::v1::RequirementsSection;
 use wdl_ast::v1::RuntimeSection;
 use wdl_ast::v1::StrippedCommandPart;
+use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES;
+use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES_ALIAS;
 use wdl_ast::v1::TaskHintsSection;
 use wdl_ast::version::V1;
 
@@ -68,6 +71,8 @@ use crate::v1::ExprEvaluator;
 pub const DEFAULT_TASK_REQUIREMENT_CPU: f64 = 1.0;
 /// The default value for the `memory` requirement.
 pub const DEFAULT_TASK_REQUIREMENT_MEMORY: i64 = 2 * 1024 * 1024 * 1024;
+/// The default value for the `max_retries` requirement.
+pub const DEFAULT_TASK_REQUIREMENT_MAX_RETRIES: u64 = 0;
 
 /// The index of a task's root scope.
 const ROOT_SCOPE_INDEX: ScopeIndex = ScopeIndex::new(0);
@@ -137,8 +142,8 @@ impl TaskGraphNodePtr {
 
 /// Used to evaluate expressions in tasks.
 struct TaskEvaluationContext<'a, 'b> {
-    /// The task execution root.
-    root: &'a TaskExecutionRoot,
+    /// The temp directory for evaluation.
+    temp_dir: &'a Path,
     /// The associated evaluation state.
     state: &'a State<'b>,
     /// The current evaluation scope.
@@ -157,7 +162,7 @@ impl<'a, 'b> TaskEvaluationContext<'a, 'b> {
     /// Constructs a new expression evaluation context.
     pub fn new(root: &'a TaskExecutionRoot, state: &'a State<'b>, scope: ScopeIndex) -> Self {
         Self {
-            root,
+            temp_dir: root.temp_dir(),
             state,
             scope,
             stdout: None,
@@ -207,11 +212,11 @@ impl EvaluationContext for TaskEvaluationContext<'_, '_> {
     }
 
     fn work_dir(&self) -> &Path {
-        self.root.work_dir()
+        &self.state.work_dir
     }
 
     fn temp_dir(&self) -> &Path {
-        self.root.temp_dir()
+        self.temp_dir
     }
 
     fn stdout(&self) -> Option<&Value> {
@@ -233,6 +238,10 @@ impl EvaluationContext for TaskEvaluationContext<'_, '_> {
 
 /// Represents task evaluation state.
 struct State<'a> {
+    /// The current working directory for task evaluation.
+    ///
+    /// This is changed upon every retry of the task.
+    work_dir: PathBuf,
     /// The task spawn request being built by task evaluation.
     ///
     /// Initially `State` is the only reference holder of the request and is
@@ -268,8 +277,12 @@ impl<'a> State<'a> {
             Scope::new(OUTPUT_SCOPE_INDEX),
         ];
 
+        let request = TaskSpawnRequest::new(root)?;
+        let work_dir = request.root().work_dir(0);
+
         Ok(Self {
-            request: Arc::new(TaskSpawnRequest::new(root)?),
+            work_dir,
+            request: Arc::new(request),
             document,
             task,
             scopes,
@@ -522,17 +535,33 @@ impl TaskEvaluator {
         // TODO: check call cache for a hit. if so, skip task execution and use cache
         // paths for output evaluation
 
+        // Get the maximum number of retries, either from the task's requirements or
+        // from configuration
+        let max_retries = state
+            .request
+            .requirements()
+            .get(TASK_REQUIREMENT_MAX_RETRIES)
+            .or_else(|| {
+                state
+                    .request
+                    .requirements()
+                    .get(TASK_REQUIREMENT_MAX_RETRIES_ALIAS)
+            })
+            .cloned()
+            .map(|v| v.unwrap_integer() as u64)
+            .or_else(|| self.config.task.retries)
+            .unwrap_or(DEFAULT_TASK_REQUIREMENT_MAX_RETRIES);
+
         // Spawn the task in a retry loop
-        let mut retry = 0;
+        let mut attempt: u64 = 0;
         let mut evaluated = loop {
             let (tx, rx) = oneshot::channel();
-
-            let task = self.backend.spawn(state.request.clone(), tx)?;
+            let task = self.backend.spawn(state.request.clone(), attempt, tx)?;
 
             // Await the spawned notification first
             rx.await.expect("failed to await spawned notification");
 
-            progress(ProgressKind::TaskExecutionStarted { id });
+            progress(ProgressKind::TaskExecutionStarted { id, attempt });
 
             let result = task
                 .await
@@ -544,7 +573,7 @@ impl TaskEvaluator {
             });
 
             let status_code = result?;
-            let evaluated = EvaluatedTask::new(state.request.root(), status_code)?;
+            let evaluated = EvaluatedTask::new(state.request.root(), &state.work_dir, status_code)?;
 
             // Update the task variable
             if version >= SupportedVersion::V1(V1::Two) {
@@ -554,16 +583,29 @@ impl TaskEvaluator {
                     .as_task_mut()
                     .unwrap();
 
-                task.set_attempt(retry as i64 + 1);
+                task.set_attempt(attempt.try_into().with_context(|| {
+                    format!(
+                        "too many attempts were made to run the task `{task}`",
+                        task = state.task.name()
+                    )
+                })?);
                 task.set_return_code(evaluated.status_code);
             }
 
             if let Err(e) = evaluated.handle_exit(state.request.requirements()) {
-                if retry >= self.config.task.retries.unwrap_or(0) {
+                if attempt >= max_retries {
                     return Err(e.into());
                 }
 
-                retry += 1;
+                attempt += 1;
+
+                // Update the working directory for the next attempt
+                state.work_dir = state.request.root().work_dir(attempt);
+
+                info!(
+                    "retrying execution of task `{name}` (retry {attempt})",
+                    name = state.task.name()
+                );
                 continue;
             }
 
@@ -573,9 +615,6 @@ impl TaskEvaluator {
         // Evaluate the remaining inputs (unused), and decls, and outputs
         for index in &nodes[current..] {
             match graph[*index].to_node(document) {
-                TaskGraphNode::Input(decl) => {
-                    self.evaluate_input(&mut state, &decl, inputs)?;
-                }
                 TaskGraphNode::Decl(decl) => {
                     self.evaluate_decl(&mut state, &decl)?;
                 }
@@ -583,7 +622,9 @@ impl TaskEvaluator {
                     self.evaluate_output(&mut state, &decl, &evaluated)?;
                 }
                 _ => {
-                    unreachable!("only declarations should be evaluated after the command")
+                    unreachable!(
+                        "only declarations and outputs should be evaluated after the command"
+                    )
                 }
             }
         }

@@ -1,8 +1,8 @@
 {
   "glob.outfiles": [
-    "work/file_1.txt",
-    "work/file_2.txt",
-    "work/file_3.txt"
+    "work/0/file_1.txt",
+    "work/0/file_2.txt",
+    "work/0/file_3.txt"
   ],
   "glob.last_file_contents": 3
 }

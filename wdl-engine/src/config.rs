@@ -78,6 +78,44 @@ pub struct ScatterConfig {
     /// Lower values use less memory for evaluation and higher values may better
     /// saturate the task execution backend with tasks to execute.
     ///
+    /// This setting does not change how many tasks an execution backend can run
+    /// concurrently, but may affect how many tasks are sent to the backend to
+    /// run at a time.
+    ///
+    /// For example, if `concurrency` was set to 10 and we evaluate the
+    /// following scatters:
+    ///
+    /// ```wdl
+    /// scatter (i in range(100)) {
+    ///     call my_task
+    /// }
+    ///
+    /// scatter (j in range(100)) {
+    ///     call my_task as my_task2
+    /// }
+    /// ```
+    ///
+    /// Here each scatter is independent and therefore there will be 20 calls
+    /// (10 for each scatter) made concurrently. If the task execution
+    /// backend can only execute 5 tasks concurrently, 5 tasks will execute
+    /// and 15 will be "ready" to execute and waiting for an executing task
+    /// to complete.
+    ///
+    /// If instead we evaluate the following scatters:
+    ///
+    /// ```wdl
+    /// scatter (i in range(100)) {
+    ///     scatter (j in range(100)) {
+    ///         call my_task
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// Then there will be 100 calls (10*10 as 10 are made for each outer
+    /// element) made concurrently. If the task execution backend can only
+    /// execute 5 tasks concurrently, 5 tasks will execute and 95 will be
+    /// "ready" to execute and waiting for an executing task to complete.
+    ///
     /// <div class="warning">
     /// Warning: nested scatter statements cause exponential memory usage based
     /// on this value, as each scatter statement evaluation requires allocating
@@ -103,11 +141,13 @@ impl ScatterConfig {
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct TaskConfig {
-    /// The maximum number of retries to attempt if a task fails.
+    /// The default maximum number of retries to attempt if a task fails.
+    ///
+    /// A task's `max_retries` requirement will override this value.
     ///
     /// Defaults to 0 (no retries).
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub retries: Option<u8>,
+    pub retries: Option<u64>,
 }
 
 impl TaskConfig {
