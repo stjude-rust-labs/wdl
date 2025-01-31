@@ -251,11 +251,60 @@ impl LocalBackendConfig {
             if memory > total {
                 bail!(
                     "configuration value `backend.local.memory` cannot exceed the total memory of \
-                     the host ({total})"
+                     the host ({total} bytes)"
                 );
             }
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_config_validate() {
+        // Test invalid scatter concurrency config
+        let mut config = Config::default();
+        config.workflow.scatter.concurrency = Some(0);
+        assert_eq!(
+            config.validate().unwrap_err().to_string(),
+            "configuration value `workflow.scatter.concurrency` cannot be zero"
+        );
+
+        // Test invalid local backend cpu config
+        let mut config = Config::default();
+        config.backend.local.cpu = Some(0);
+        assert_eq!(
+            config.validate().unwrap_err().to_string(),
+            "configuration value `backend.local.cpu` cannot be zero"
+        );
+        let mut config = Config::default();
+        config.backend.local.cpu = Some(10000000);
+        assert!(config.validate().unwrap_err().to_string().starts_with(
+            "configuration value `backend.local.cpu` cannot exceed the virtual CPUs available to \
+             the host"
+        ));
+
+        // Test invalid local backend memory config
+        let mut config = Config::default();
+        config.backend.local.memory = Some("0 GiB".to_string());
+        assert_eq!(
+            config.validate().unwrap_err().to_string(),
+            "configuration value `backend.local.memory` cannot be zero"
+        );
+        let mut config = Config::default();
+        config.backend.local.memory = Some("100 meows".to_string());
+        assert_eq!(
+            config.validate().unwrap_err().to_string(),
+            "configuration value `backend.local.memory` has invalid value `100 meows`"
+        );
+        let mut config = Config::default();
+        config.backend.local.memory = Some("10000 TiB".to_string());
+        assert!(config.validate().unwrap_err().to_string().starts_with(
+            "configuration value `backend.local.memory` cannot exceed the total memory of the host"
+        ));
     }
 }
