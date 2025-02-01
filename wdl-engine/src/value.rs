@@ -3328,20 +3328,23 @@ Caused by:
         );
 
         // Map[String, File] -> Struct
-        let ty = StructType::new("Foo", [
-            ("foo", PrimitiveType::File),
-            ("baz", PrimitiveType::File),
-        ])
+        let ty = StructType::new(
+            "Foo",
+            [("foo", PrimitiveType::File), ("baz", PrimitiveType::File)],
+        )
         .into();
         let struct_value = value.coerce(&ty).expect("value should coerce");
         assert_eq!(struct_value.to_string(), r#"Foo {foo: "bar", baz: "qux"}"#);
 
         // Map[String, File] -> Struct (invalid)
-        let ty = StructType::new("Foo", [
-            ("foo", PrimitiveType::File),
-            ("baz", PrimitiveType::File),
-            ("qux", PrimitiveType::File),
-        ])
+        let ty = StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveType::File),
+                ("baz", PrimitiveType::File),
+                ("qux", PrimitiveType::File),
+            ],
+        )
         .into();
         assert_eq!(
             format!("{e:?}", e = value.coerce(&ty).unwrap_err()),
@@ -3402,11 +3405,14 @@ Caused by:
 
     #[test]
     fn struct_coercion() {
-        let ty = StructType::new("Foo", [
-            ("foo", PrimitiveType::Float),
-            ("bar", PrimitiveType::Float),
-            ("baz", PrimitiveType::Float),
-        ]);
+        let ty = StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveType::Float),
+                ("bar", PrimitiveType::Float),
+                ("baz", PrimitiveType::Float),
+            ],
+        );
         let value: Value = Struct::new(ty, [("foo", 1.0), ("bar", 2.0), ("baz", 3.0)])
             .expect("should create map value")
             .into();
@@ -3420,11 +3426,14 @@ Caused by:
         );
 
         // Struct -> Struct
-        let ty = StructType::new("Bar", [
-            ("foo", PrimitiveType::Float),
-            ("bar", PrimitiveType::Float),
-            ("baz", PrimitiveType::Float),
-        ])
+        let ty = StructType::new(
+            "Bar",
+            [
+                ("foo", PrimitiveType::Float),
+                ("bar", PrimitiveType::Float),
+                ("baz", PrimitiveType::Float),
+            ],
+        )
         .into();
         let struct_value = value.coerce(&ty).expect("value should coerce");
         assert_eq!(
@@ -3442,16 +3451,22 @@ Caused by:
 
     #[test]
     fn struct_display() {
-        let ty = StructType::new("Foo", [
-            ("foo", PrimitiveType::Float),
-            ("bar", PrimitiveType::String),
-            ("baz", PrimitiveType::Integer),
-        ]);
-        let value: Value = Struct::new(ty, [
-            ("foo", Value::from(1.101)),
-            ("bar", PrimitiveValue::new_string("foo").into()),
-            ("baz", 1234.into()),
-        ])
+        let ty = StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveType::Float),
+                ("bar", PrimitiveType::String),
+                ("baz", PrimitiveType::Integer),
+            ],
+        );
+        let value: Value = Struct::new(
+            ty,
+            [
+                ("foo", Value::from(1.101)),
+                ("bar", PrimitiveValue::new_string("foo").into()),
+                ("baz", 1234.into()),
+            ],
+        )
         .expect("should create map value")
         .into();
         assert_eq!(

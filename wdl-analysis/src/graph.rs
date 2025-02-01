@@ -152,10 +152,13 @@ impl DocumentGraphNode {
         // Clear the analyzed document as there has been a change
         self.document = None;
 
-        if !matches!(self.parse_state, ParseState::Parsed {
-            version: Some(_),
-            ..
-        }) || discard_pending
+        if !matches!(
+            self.parse_state,
+            ParseState::Parsed {
+                version: Some(_),
+                ..
+            }
+        ) || discard_pending
         {
             self.parse_state = ParseState::NotParsed;
             self.change = None;

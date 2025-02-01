@@ -281,13 +281,16 @@ fn add_namespace(
                 ));
                 return;
             } else {
-                document.namespaces.insert(ns.clone(), Namespace {
-                    span,
-                    source: uri.clone(),
-                    document: imported.clone(),
-                    used: false,
-                    excepted: import.syntax().is_rule_excepted(UNUSED_IMPORT_RULE_ID),
-                });
+                document.namespaces.insert(
+                    ns.clone(),
+                    Namespace {
+                        span,
+                        source: uri.clone(),
+                        document: imported.clone(),
+                        used: false,
+                        excepted: import.syntax().is_rule_excepted(UNUSED_IMPORT_RULE_ID),
+                    },
+                );
                 ns
             }
         }
@@ -344,13 +347,16 @@ fn add_namespace(
                 }
             }
             None => {
-                document.structs.insert(aliased_name.to_string(), Struct {
-                    span,
-                    offset: s.offset,
-                    node: s.node.clone(),
-                    namespace: Some(ns.clone()),
-                    ty: s.ty.clone(),
-                });
+                document.structs.insert(
+                    aliased_name.to_string(),
+                    Struct {
+                        span,
+                        offset: s.offset,
+                        node: s.node.clone(),
+                        namespace: Some(ns.clone()),
+                        ty: s.ty.clone(),
+                    },
+                );
             }
         }
     }
@@ -410,13 +416,16 @@ fn add_struct(document: &mut DocumentData, definition: &StructDefinition) {
         }
     }
 
-    document.structs.insert(name.as_str().to_string(), Struct {
-        span: name.span(),
-        namespace: None,
-        offset: definition.span().start(),
-        node: definition.syntax().green().into(),
-        ty: None,
-    });
+    document.structs.insert(
+        name.as_str().to_string(),
+        Struct {
+            span: name.span(),
+            namespace: None,
+            offset: definition.span().start(),
+            node: definition.syntax().green().into(),
+            ty: None,
+        },
+    );
 }
 
 /// Converts an AST type to an analysis type.
@@ -466,10 +475,13 @@ fn create_input_type_map(
 
         let ty = convert_ast_type(document, &decl.ty());
         let optional = ty.is_optional();
-        map.insert(name.as_str().to_string(), Input {
-            ty,
-            required: decl.expr().is_none() && !optional,
-        });
+        map.insert(
+            name.as_str().to_string(),
+            Input {
+                ty,
+                required: decl.expr().is_none() && !optional,
+            },
+        );
     }
 
     map.into()
