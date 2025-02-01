@@ -73,10 +73,10 @@ pub enum ProgressKind<'a> {
     TaskExecutionCompleted {
         /// The identifier of the task.
         id: &'a str,
-        /// The result of the task's execution.
+        /// The status code from the task's execution.
         ///
-        /// Upon success, this holds the process status code.
-        result: &'a Result<i32>,
+        /// This may be `Err` if the task failed to spawn.
+        status_code: &'a Result<i32>,
     },
     /// A task with the given id has completed evaluation.
     TaskCompleted {

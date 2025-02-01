@@ -7,7 +7,6 @@ use std::fs;
 use std::fs::File;
 use std::path::Path;
 use std::process::Stdio;
-use std::sync::Arc;
 
 use anyhow::Context;
 use anyhow::Result;
@@ -26,6 +25,7 @@ use wdl_ast::v1::TASK_REQUIREMENT_MEMORY;
 use super::TaskExecutionBackend;
 use super::TaskExecutionConstraints;
 use super::TaskSpawnRequest;
+use super::TaskSpawnResponse;
 use crate::Coercible;
 use crate::SYSTEM;
 use crate::Value;
@@ -76,9 +76,7 @@ fn memory(requirements: &HashMap<String, Value>) -> Result<i64> {
 #[derive(Debug)]
 struct LocalTaskSpawnRequest {
     /// The inner task spawn request.
-    inner: Arc<TaskSpawnRequest>,
-    /// The attempt count for the task.
-    attempt: u64,
+    inner: TaskSpawnRequest,
     /// The requested CPU reservation for the task.
     ///
     /// Note that CPU isn't actually reserved for the task process.
@@ -87,18 +85,25 @@ struct LocalTaskSpawnRequest {
     ///
     /// Note that memory isn't actually reserved for the task process.
     memory: u64,
-    /// The sender to notify that the task has spawned.
-    spawned: Option<oneshot::Sender<()>>,
-    /// The sender to send the task execution result back on.
-    tx: oneshot::Sender<Result<i32>>,
+    /// The sender to send the response back on.
+    tx: oneshot::Sender<TaskSpawnResponse>,
 }
 
+/// Represents a local task spawn response.
 #[derive(Debug)]
 struct LocalTaskSpawnResponse {
-    /// The spawn request the response is for.
-    request: LocalTaskSpawnRequest,
-    /// The result of the task's execution.
-    result: Result<i32>,
+    /// The inner task spawn response.
+    inner: TaskSpawnResponse,
+    /// The requested CPU reservation for the task.
+    ///
+    /// Note that CPU isn't actually reserved for the task process.
+    cpu: f64,
+    /// The requested memory reservation for the task.
+    ///
+    /// Note that memory isn't actually reserved for the task process.
+    memory: u64,
+    /// The sender to send the response back on.
+    tx: oneshot::Sender<TaskSpawnResponse>,
 }
 
 /// Represents state for the local task execution backend.
@@ -213,9 +218,9 @@ impl LocalTaskExecutionBackend {
                     }
                 }
                 Some(Ok(response)) = state.spawned.join_next() => {
-                    state.cpu += response.request.cpu;
-                    state.memory += response.request.memory;
-                    response.request.tx.send(response.result).ok();
+                    state.cpu += response.cpu;
+                    state.memory += response.memory;
+                    response.tx.send(response.inner).ok();
 
                     // Look for tasks to unpark
                     while let Some(pos) = state.parked.iter().position(|r| r.cpu <= state.cpu && r.memory <= state.memory) {
@@ -246,11 +251,16 @@ impl LocalTaskExecutionBackend {
         if request.cpu > total_cpu {
             request
                 .tx
-                .send(Err(anyhow!(
-                    "requested task CPU count of {cpu} exceeds the total host CPU count of \
-                     {total_cpu}",
-                    cpu = request.cpu
-                )))
+                .send(TaskSpawnResponse {
+                    requirements: request.inner.requirements,
+                    hints: request.inner.hints,
+                    env: request.inner.env,
+                    status_code: Err(anyhow!(
+                        "requested task CPU count of {cpu} exceeds the total host CPU count of \
+                         {total_cpu}",
+                        cpu = request.cpu
+                    )),
+                })
                 .ok();
             return;
         }
@@ -259,12 +269,17 @@ impl LocalTaskExecutionBackend {
         if request.memory > total_memory {
             request
                 .tx
-                .send(Err(anyhow!(
-                    "requested task memory of {memory} byte{s} exceeds the total host memory of \
-                     {total_memory}",
-                    memory = request.memory,
-                    s = if request.memory == 1 { "" } else { "s" }
-                )))
+                .send(TaskSpawnResponse {
+                    requirements: request.inner.requirements,
+                    hints: request.inner.hints,
+                    env: request.inner.env,
+                    status_code: Err(anyhow!(
+                        "requested task memory of {memory} byte{s} exceeds the total host memory \
+                         of {total_memory}",
+                        memory = request.memory,
+                        s = if request.memory == 1 { "" } else { "s" }
+                    )),
+                })
                 .ok();
             return;
         }
@@ -296,21 +311,31 @@ impl LocalTaskExecutionBackend {
         );
 
         state.spawned.spawn(async move {
-            let spawned = request.spawned.take().unwrap();
+            let spawned = request.inner.spawned.take().unwrap();
             spawned.send(()).ok();
 
-            let result = Self::spawn_task(request.inner.clone(), request.attempt).await;
-            LocalTaskSpawnResponse { request, result }
+            let status_code = Self::spawn_task(&request.inner).await;
+            LocalTaskSpawnResponse {
+                inner: TaskSpawnResponse {
+                    requirements: request.inner.requirements,
+                    hints: request.inner.hints,
+                    env: request.inner.env,
+                    status_code,
+                },
+                cpu: request.cpu,
+                memory: request.memory,
+                tx: request.tx,
+            }
         });
     }
 
     /// Spawns the requested task.
     ///
     /// Returns the status code of the process when it has exited.
-    async fn spawn_task(request: Arc<TaskSpawnRequest>, attempt: u64) -> Result<i32> {
+    async fn spawn_task(request: &TaskSpawnRequest) -> Result<i32> {
         // Recreate the working directory
-        let work_dir = request.root.work_dir(attempt);
-        fs::create_dir_all(&work_dir).with_context(|| {
+        let work_dir = request.root.work_dir();
+        fs::create_dir_all(work_dir).with_context(|| {
             format!(
                 "failed to create directory `{path}`",
                 path = work_dir.display()
@@ -440,24 +465,16 @@ impl TaskExecutionBackend for LocalTaskExecutionBackend {
         None
     }
 
-    fn spawn(
-        &self,
-        request: Arc<TaskSpawnRequest>,
-        attempt: u64,
-        spawned: oneshot::Sender<()>,
-    ) -> Result<oneshot::Receiver<Result<i32>>> {
+    fn spawn(&self, request: TaskSpawnRequest) -> Result<oneshot::Receiver<TaskSpawnResponse>> {
         let (tx, rx) = oneshot::channel();
-
         let cpu = cpu(&request.requirements);
         let memory = memory(&request.requirements)? as u64;
 
         self.tx
             .send(LocalTaskSpawnRequest {
                 inner: request,
-                attempt,
                 cpu,
                 memory,
-                spawned: Some(spawned),
                 tx,
             })
             .ok();

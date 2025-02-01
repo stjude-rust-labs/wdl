@@ -226,8 +226,6 @@ pub struct EvaluatedTask {
     status_code: i32,
     /// The working directory of the executed task.
     work_dir: PathBuf,
-    /// The temp directory of the executed task.
-    temp_dir: PathBuf,
     /// The command file of the executed task.
     command: PathBuf,
     /// The value to return from the `stdout` function.
@@ -248,7 +246,7 @@ impl EvaluatedTask {
     /// Constructs a new evaluated task.
     ///
     /// Returns an error if the stdout or stderr paths are not UTF-8.
-    fn new(root: &TaskExecutionRoot, work_dir: &Path, status_code: i32) -> anyhow::Result<Self> {
+    fn new(root: &TaskExecutionRoot, status_code: i32) -> anyhow::Result<Self> {
         let stdout = PrimitiveValue::new_file(root.stdout().to_str().with_context(|| {
             format!(
                 "path to stdout file `{path}` is not UTF-8",
@@ -266,8 +264,7 @@ impl EvaluatedTask {
 
         Ok(Self {
             status_code,
-            work_dir: work_dir.into(),
-            temp_dir: root.temp_dir().into(),
+            work_dir: root.work_dir().into(),
             command: root.command().into(),
             stdout,
             stderr,
@@ -283,11 +280,6 @@ impl EvaluatedTask {
     /// Gets the working directory of the evaluated task.
     pub fn work_dir(&self) -> &Path {
         &self.work_dir
-    }
-
-    /// Gets the temp directory of the evaluated task.
-    pub fn temp_dir(&self) -> &Path {
-        &self.temp_dir
     }
 
     /// Gets the command file of the evaluated task.

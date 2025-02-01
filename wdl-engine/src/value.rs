@@ -2661,6 +2661,7 @@ impl TaskValue {
         id: impl Into<String>,
         definition: &v1::TaskDefinition,
         constraints: TaskExecutionConstraints,
+        attempt: i64,
     ) -> Self {
         Self {
             data: Arc::new(TaskData {
@@ -2704,7 +2705,7 @@ impl TaskValue {
                     .unwrap_or_else(Object::empty),
                 ext: Object::empty(),
             }),
-            attempt: 1,
+            attempt,
             return_code: None,
         }
     }

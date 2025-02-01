@@ -13,6 +13,9 @@ use crate::TaskExecutionBackend;
 use crate::convert_unit_string;
 use crate::local::LocalTaskExecutionBackend;
 
+/// The inclusive maximum number of task retries the engine supports.
+pub const MAX_RETRIES: u64 = 100;
+
 /// Represents WDL evaluation configuration.
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -153,6 +156,9 @@ pub struct TaskConfig {
 impl TaskConfig {
     /// Validates the task evaluation configuration.
     pub fn validate(&self) -> Result<()> {
+        if self.retries.unwrap_or(0) > MAX_RETRIES {
+            bail!("configuration value `task.retries` cannot exceed {MAX_RETRIES}");
+        }
         Ok(())
     }
 }
@@ -266,6 +272,14 @@ mod test {
 
     #[test]
     fn test_config_validate() {
+        // Test invalid task config
+        let mut config = Config::default();
+        config.task.retries = Some(1000000);
+        assert_eq!(
+            config.validate().unwrap_err().to_string(),
+            "configuration value `task.retries` cannot exceed 100"
+        );
+
         // Test invalid scatter concurrency config
         let mut config = Config::default();
         config.workflow.scatter.concurrency = Some(0);

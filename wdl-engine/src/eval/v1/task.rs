@@ -1,10 +1,10 @@
 //! Implementation of evaluation for V1 tasks.
 
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::future::Future;
 use std::mem;
 use std::path::Path;
-use std::path::PathBuf;
 use std::sync::Arc;
 
 use anyhow::Context;
@@ -12,7 +12,6 @@ use anyhow::Result;
 use anyhow::anyhow;
 use petgraph::algo::toposort;
 use rowan::ast::AstPtr;
-use tokio::sync::oneshot;
 use tracing::debug;
 use tracing::info;
 use tracing::warn;
@@ -43,6 +42,7 @@ use wdl_ast::v1::RuntimeSection;
 use wdl_ast::v1::StrippedCommandPart;
 use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES;
 use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES_ALIAS;
+use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::TaskHintsSection;
 use wdl_ast::version::V1;
 
@@ -62,6 +62,7 @@ use crate::TaskSpawnRequest;
 use crate::TaskValue;
 use crate::Value;
 use crate::config::Config;
+use crate::config::MAX_RETRIES;
 use crate::diagnostics::output_evaluation_failed;
 use crate::diagnostics::runtime_type_mismatch;
 use crate::eval::EvaluatedTask;
@@ -142,12 +143,14 @@ impl TaskGraphNodePtr {
 
 /// Used to evaluate expressions in tasks.
 struct TaskEvaluationContext<'a, 'b> {
-    /// The temp directory for evaluation.
-    temp_dir: &'a Path,
     /// The associated evaluation state.
     state: &'a State<'b>,
     /// The current evaluation scope.
     scope: ScopeIndex,
+    /// The working directory to use for evaluation.
+    work_dir: &'a Path,
+    /// The temp directory to use for evaluation.
+    temp_dir: &'a Path,
     /// The standard out value to use.
     stdout: Option<&'a Value>,
     /// The standard error value to use.
@@ -160,12 +163,13 @@ struct TaskEvaluationContext<'a, 'b> {
 
 impl<'a, 'b> TaskEvaluationContext<'a, 'b> {
     /// Constructs a new expression evaluation context.
-    pub fn new(root: &'a TaskExecutionRoot, state: &'a State<'b>, scope: ScopeIndex) -> Self {
+    pub fn new(state: &'a State<'b>, temp_dir: &'a Path, scope: ScopeIndex) -> Self {
         Self {
-            temp_dir: root.temp_dir(),
             state,
             scope,
+            work_dir: state.root.work_dir(),
             stdout: None,
+            temp_dir,
             stderr: None,
             task: false,
         }
@@ -212,7 +216,7 @@ impl EvaluationContext for TaskEvaluationContext<'_, '_> {
     }
 
     fn work_dir(&self) -> &Path {
-        &self.state.work_dir
+        self.work_dir
     }
 
     fn temp_dir(&self) -> &Path {
@@ -238,16 +242,6 @@ impl EvaluationContext for TaskEvaluationContext<'_, '_> {
 
 /// Represents task evaluation state.
 struct State<'a> {
-    /// The current working directory for task evaluation.
-    ///
-    /// This is changed upon every retry of the task.
-    work_dir: PathBuf,
-    /// The task spawn request being built by task evaluation.
-    ///
-    /// Initially `State` is the only reference holder of the request and is
-    /// therefore mutable; once the task is spawned, there will be more than
-    /// one reference and the request can no longer be made mutable.
-    request: Arc<TaskSpawnRequest>,
     /// The document containing the workflow being evaluated.
     document: &'a Document,
     /// The task being evaluated.
@@ -258,6 +252,16 @@ struct State<'a> {
     /// the third is the scope where the "task" variable is visible in 1.2+
     /// evaluations.
     scopes: [Scope; 3],
+    /// The execution root to spawn the task with.
+    root: Arc<TaskExecutionRoot>,
+    /// The environment variables of the task.
+    ///
+    /// Environment variables do not change between retries.
+    env: HashMap<String, String>,
+    /// Host paths that need to be mapped to guest paths.
+    ///
+    /// This is only populated for backends that have a container root.
+    paths: HashSet<String>,
 }
 
 impl<'a> State<'a> {
@@ -277,17 +281,63 @@ impl<'a> State<'a> {
             Scope::new(OUTPUT_SCOPE_INDEX),
         ];
 
-        let request = TaskSpawnRequest::new(root)?;
-        let work_dir = request.root().work_dir(0);
-
         Ok(Self {
-            work_dir,
-            request: Arc::new(request),
             document,
             task,
             scopes,
+            root: Arc::new(TaskExecutionRoot::new(root, 0)?),
+            env: Default::default(),
+            paths: Default::default(),
         })
     }
+
+    /// Updates the state for retrying task execution.
+    fn retry(&mut self, root: &Path, attempt: u64, env: HashMap<String, String>) -> Result<()> {
+        self.root = Arc::new(TaskExecutionRoot::new(root, attempt)?);
+        self.env = env;
+        Ok(())
+    }
+
+    /// Updates state for a declaration.
+    fn update_for_decl(
+        &mut self,
+        name: &Ident,
+        value: &Value,
+        is_env_var: bool,
+        map_paths: bool,
+    ) -> Result<(), crate::EvaluationError> {
+        if is_env_var {
+            self.env.insert(
+                name.as_str().to_string(),
+                value
+                    .as_primitive()
+                    .expect("value should be primitive")
+                    .raw()
+                    .to_string(),
+            );
+        }
+
+        if map_paths {
+            value.visit_paths(&mut |path| {
+                self.paths.insert(path.to_string());
+                Ok(())
+            })?;
+        }
+
+        Ok(())
+    }
+}
+
+/// Represents the result of evaluating task sections before execution.
+struct EvaluatedSections {
+    /// The evaluated command.
+    command: String,
+    /// The evaluated requirements.
+    requirements: HashMap<String, Value>,
+    /// The evaluated hints.
+    hints: HashMap<String, Value>,
+    /// The mapped paths from host path to guest path.
+    mapped: HashMap<String, String>,
 }
 
 /// Represents a WDL V1 task evaluator.
@@ -469,53 +519,15 @@ impl TaskEvaluator {
                         self.evaluate_decl(&mut state, &decl)?;
                     }
                     TaskGraphNode::Output(_) => {
-                        // Stop at the first output; at this point the task can be executed
+                        // Stop at the first output
                         break;
                     }
-                    TaskGraphNode::Command(section) => {
-                        // Get the execution constraints
-                        let constraints = self
-                            .backend
-                            .constraints(state.request.requirements(), state.request.hints())
-                            .with_context(|| {
-                                format!("failed to execute task `{task}`", task = task.name())
-                            })?;
-
-                        // Introduce the task variable at this point; valid for both the command
-                        // section and the outputs section
-                        if version >= SupportedVersion::V1(V1::Two) {
-                            let task = TaskValue::new_v1(task.name(), id, &definition, constraints);
-                            state.scopes[TASK_SCOPE_INDEX.0]
-                                .insert(TASK_VAR_NAME, Value::Task(task));
-                        }
-
-                        self.evaluate_command(&mut state, &section)?;
-                    }
-                    TaskGraphNode::Runtime(section) => {
-                        assert!(
-                            state.request.requirements().is_empty(),
-                            "requirements should not have been evaluated"
-                        );
-                        assert!(
-                            state.request.hints().is_empty(),
-                            "hints should not have been evaluated"
-                        );
-
-                        self.evaluate_runtime_section(&mut state, &section, inputs)?;
-                    }
-                    TaskGraphNode::Requirements(section) => {
-                        assert!(
-                            state.request.requirements().is_empty(),
-                            "requirements should not have been evaluated"
-                        );
-                        self.evaluate_requirements_section(&mut state, &section, inputs)?;
-                    }
-                    TaskGraphNode::Hints(section) => {
-                        assert!(
-                            state.request.hints().is_empty(),
-                            "hints should not have been evaluated"
-                        );
-                        self.evaluate_hints_section(&mut state, &section, inputs)?;
+                    TaskGraphNode::Command(_)
+                    | TaskGraphNode::Runtime(_)
+                    | TaskGraphNode::Requirements(_)
+                    | TaskGraphNode::Hints(_) => {
+                        // Skip these sections for now; they'll evaluate in the
+                        // retry loop
                     }
                 }
 
@@ -535,45 +547,59 @@ impl TaskEvaluator {
         // TODO: check call cache for a hit. if so, skip task execution and use cache
         // paths for output evaluation
 
-        // Get the maximum number of retries, either from the task's requirements or
-        // from configuration
-        let max_retries = state
-            .request
-            .requirements()
-            .get(TASK_REQUIREMENT_MAX_RETRIES)
-            .or_else(|| {
-                state
-                    .request
-                    .requirements()
-                    .get(TASK_REQUIREMENT_MAX_RETRIES_ALIAS)
-            })
-            .cloned()
-            .map(|v| v.unwrap_integer() as u64)
-            .or_else(|| self.config.task.retries)
-            .unwrap_or(DEFAULT_TASK_REQUIREMENT_MAX_RETRIES);
-
         // Spawn the task in a retry loop
-        let mut attempt: u64 = 0;
+        let mut attempt = 0;
         let mut evaluated = loop {
-            let (tx, rx) = oneshot::channel();
-            let task = self.backend.spawn(state.request.clone(), attempt, tx)?;
+            let EvaluatedSections {
+                command,
+                requirements,
+                hints,
+                mapped,
+            } = self.evaluate_sections(&mut state, definition.clone(), inputs, id, attempt)?;
+
+            // Get the maximum number of retries, either from the task's requirements or
+            // from configuration
+            let max_retries = requirements
+                .get(TASK_REQUIREMENT_MAX_RETRIES)
+                .or_else(|| requirements.get(TASK_REQUIREMENT_MAX_RETRIES_ALIAS))
+                .cloned()
+                .map(|v| v.unwrap_integer() as u64)
+                .or_else(|| self.config.task.retries)
+                .unwrap_or(DEFAULT_TASK_REQUIREMENT_MAX_RETRIES);
+
+            if max_retries > MAX_RETRIES {
+                return Err(anyhow!(
+                    "task `max_retries` requirement of {max_retries} cannot exceed {MAX_RETRIES}"
+                )
+                .into());
+            }
+
+            let (request, rx) = TaskSpawnRequest::new(
+                state.root.clone(),
+                command,
+                requirements,
+                hints,
+                std::mem::take(&mut state.env),
+                mapped,
+            );
+            let response = self.backend.spawn(request)?;
 
             // Await the spawned notification first
             rx.await.expect("failed to await spawned notification");
 
             progress(ProgressKind::TaskExecutionStarted { id, attempt });
 
-            let result = task
+            let response = response
                 .await
                 .expect("failed to receive response from spawned task");
 
             progress(ProgressKind::TaskExecutionCompleted {
                 id,
-                result: &result,
+                status_code: &response.status_code,
             });
 
-            let status_code = result?;
-            let evaluated = EvaluatedTask::new(state.request.root(), &state.work_dir, status_code)?;
+            let status_code = response.status_code?;
+            let evaluated = EvaluatedTask::new(&state.root, status_code)?;
 
             // Update the task variable
             if version >= SupportedVersion::V1(V1::Two) {
@@ -585,22 +611,22 @@ impl TaskEvaluator {
 
                 task.set_attempt(attempt.try_into().with_context(|| {
                     format!(
-                        "too many attempts were made to run the task `{task}`",
+                        "too many attempts were made to run task `{task}`",
                         task = state.task.name()
                     )
                 })?);
                 task.set_return_code(evaluated.status_code);
             }
 
-            if let Err(e) = evaluated.handle_exit(state.request.requirements()) {
+            if let Err(e) = evaluated.handle_exit(&response.requirements) {
                 if attempt >= max_retries {
                     return Err(e.into());
                 }
 
                 attempt += 1;
 
-                // Update the working directory for the next attempt
-                state.work_dir = state.request.root().work_dir(attempt);
+                // Update the state for the next attempt
+                state.retry(root, attempt, response.env)?;
 
                 info!(
                     "retrying execution of task `{name}` (retry {attempt})",
@@ -646,7 +672,7 @@ impl TaskEvaluator {
 
     /// Evaluates a task input.
     fn evaluate_input(
-        &mut self,
+        &self,
         state: &mut State<'_>,
         decl: &Decl,
         inputs: &TaskInputs,
@@ -667,8 +693,8 @@ impl TaskEvaluator {
                     );
 
                     let mut evaluator = ExprEvaluator::new(TaskEvaluationContext::new(
-                        state.request.root(),
                         state,
+                        state.root.temp_dir(),
                         ROOT_SCOPE_INDEX,
                     ));
                     let value = evaluator.evaluate_expr(&expr)?;
@@ -685,16 +711,18 @@ impl TaskEvaluator {
             .map_err(|e| runtime_type_mismatch(e, &ty, name.span(), &value.ty(), span))?;
         state.scopes[ROOT_SCOPE_INDEX.0].insert(name.as_str(), value.clone());
 
-        // If the request is still mutable, update it for the declaration
-        if let Some(request) = Arc::get_mut(&mut state.request) {
-            self.update_request_for_decl(request, &name, &value, decl.env().is_some())?;
-        }
+        state.update_for_decl(
+            &name,
+            &value,
+            decl.env().is_some(),
+            self.backend.container_root().is_some(),
+        )?;
 
         Ok(())
     }
 
     /// Evaluates a task private declaration.
-    fn evaluate_decl(&mut self, state: &mut State<'_>, decl: &Decl) -> EvaluationResult<()> {
+    fn evaluate_decl(&self, state: &mut State<'_>, decl: &Decl) -> EvaluationResult<()> {
         let name = decl.name();
         debug!(
             "evaluating private declaration `{name}` for task `{task}` in `{uri}`",
@@ -707,8 +735,8 @@ impl TaskEvaluator {
         let ty = crate::convert_ast_type_v1(state.document, &decl_ty)?;
 
         let mut evaluator = ExprEvaluator::new(TaskEvaluationContext::new(
-            state.request.root(),
             state,
+            state.root.temp_dir(),
             ROOT_SCOPE_INDEX,
         ));
 
@@ -719,61 +747,33 @@ impl TaskEvaluator {
             .map_err(|e| runtime_type_mismatch(e, &ty, name.span(), &value.ty(), expr.span()))?;
         state.scopes[ROOT_SCOPE_INDEX.0].insert(name.as_str(), value.clone());
 
-        // If the request is still mutable, update it for the declaration
-        if let Some(request) = Arc::get_mut(&mut state.request) {
-            self.update_request_for_decl(request, &name, &value, decl.env().is_some())?;
-        }
-
-        Ok(())
-    }
-
-    /// Helper for updating the task spawn request for a declaration.
-    fn update_request_for_decl(
-        &mut self,
-        request: &mut TaskSpawnRequest,
-        name: &Ident,
-        value: &Value,
-        env: bool,
-    ) -> Result<(), crate::EvaluationError> {
-        // Update the environment variables if the decl is marked `env`
-        if env {
-            request.env_mut().insert(
-                name.as_str().to_string(),
-                value
-                    .as_primitive()
-                    .expect("value should be primitive")
-                    .raw()
-                    .to_string(),
-            );
-        }
-
-        // If the backend uses containers, add a mapping entry for any paths the value
-        // might contain. Initially, it will be an empty value, but will be
-        // populated in `map_request_paths`.
-        if self.backend.container_root().is_some() {
-            value.visit_paths(&mut |path| {
-                request
-                    .path_mapping_mut()
-                    .insert(path.to_string(), String::new());
-                Ok(())
-            })?;
-        }
+        state.update_for_decl(
+            &name,
+            &value,
+            decl.env().is_some(),
+            self.backend.container_root().is_some(),
+        )?;
 
         Ok(())
     }
 
     /// Evaluates the runtime section.
+    ///
+    /// Returns both the task's hints and requirements.
     fn evaluate_runtime_section(
-        &mut self,
-        state: &mut State<'_>,
+        &self,
+        state: &State<'_>,
         section: &RuntimeSection,
         inputs: &TaskInputs,
-    ) -> EvaluationResult<()> {
+    ) -> EvaluationResult<(HashMap<String, Value>, HashMap<String, Value>)> {
         debug!(
             "evaluating runtimes section for task `{task}` in `{uri}`",
             task = state.task.name(),
             uri = state.document.uri()
         );
+
+        let mut requirements = HashMap::new();
+        let mut hints = HashMap::new();
 
         let version = state
             .document
@@ -782,22 +782,16 @@ impl TaskEvaluator {
         for item in section.items() {
             let name = item.name();
             if let Some(value) = inputs.requirement(name.as_str()) {
-                Arc::get_mut(&mut state.request)
-                    .expect("request should still be mutable")
-                    .requirements_mut()
-                    .insert(name.as_str().to_string(), value.clone());
+                requirements.insert(name.as_str().to_string(), value.clone());
                 continue;
             } else if let Some(value) = inputs.hint(name.as_str()) {
-                Arc::get_mut(&mut state.request)
-                    .expect("request should still be mutable")
-                    .hints_mut()
-                    .insert(name.as_str().to_string(), value.clone());
+                hints.insert(name.as_str().to_string(), value.clone());
                 continue;
             }
 
             let mut evaluator = ExprEvaluator::new(TaskEvaluationContext::new(
-                state.request.root(),
                 state,
+                state.root.temp_dir(),
                 ROOT_SCOPE_INDEX,
             ));
 
@@ -822,33 +816,29 @@ impl TaskEvaluator {
             }
 
             if requirement {
-                Arc::get_mut(&mut state.request)
-                    .expect("request should still be mutable")
-                    .requirements_mut()
-                    .insert(name.as_str().to_string(), value);
+                requirements.insert(name.as_str().to_string(), value);
             } else {
-                Arc::get_mut(&mut state.request)
-                    .expect("request should still be mutable")
-                    .hints_mut()
-                    .insert(name.as_str().to_string(), value);
+                hints.insert(name.as_str().to_string(), value);
             }
         }
 
-        Ok(())
+        Ok((requirements, hints))
     }
 
     /// Evaluates the requirements section.
     fn evaluate_requirements_section(
-        &mut self,
-        state: &mut State<'_>,
+        &self,
+        state: &State<'_>,
         section: &RequirementsSection,
         inputs: &TaskInputs,
-    ) -> EvaluationResult<()> {
+    ) -> EvaluationResult<HashMap<String, Value>> {
         debug!(
             "evaluating requirements section for task `{task}` in `{uri}`",
             task = state.task.name(),
             uri = state.document.uri()
         );
+
+        let mut requirements = HashMap::new();
 
         let version = state
             .document
@@ -857,16 +847,13 @@ impl TaskEvaluator {
         for item in section.items() {
             let name = item.name();
             if let Some(value) = inputs.requirement(name.as_str()) {
-                Arc::get_mut(&mut state.request)
-                    .expect("request should still be mutable")
-                    .requirements_mut()
-                    .insert(name.as_str().to_string(), value.clone());
+                requirements.insert(name.as_str().to_string(), value.clone());
                 continue;
             }
 
             let mut evaluator = ExprEvaluator::new(TaskEvaluationContext::new(
-                state.request.root(),
                 state,
+                state.root.temp_dir(),
                 ROOT_SCOPE_INDEX,
             ));
 
@@ -883,75 +870,69 @@ impl TaskEvaluator {
                     multiple_type_mismatch(types, name.span(), &value.ty(), expr.span())
                 })?;
 
-            Arc::get_mut(&mut state.request)
-                .expect("request should still be mutable")
-                .requirements_mut()
-                .insert(name.as_str().to_string(), value);
+            requirements.insert(name.as_str().to_string(), value);
         }
 
-        Ok(())
+        Ok(requirements)
     }
 
     /// Evaluates the hints section.
     fn evaluate_hints_section(
-        &mut self,
-        state: &mut State<'_>,
+        &self,
+        state: &State<'_>,
         section: &TaskHintsSection,
         inputs: &TaskInputs,
-    ) -> EvaluationResult<()> {
+    ) -> EvaluationResult<HashMap<String, Value>> {
         debug!(
             "evaluating hints section for task `{task}` in `{uri}`",
             task = state.task.name(),
             uri = state.document.uri()
         );
 
+        let mut hints = HashMap::new();
+
         for item in section.items() {
             let name = item.name();
             if let Some(value) = inputs.hint(name.as_str()) {
-                Arc::get_mut(&mut state.request)
-                    .expect("request should still be mutable")
-                    .hints_mut()
-                    .insert(name.as_str().to_string(), value.clone());
+                hints.insert(name.as_str().to_string(), value.clone());
                 continue;
             }
 
             let mut evaluator = ExprEvaluator::new(
-                TaskEvaluationContext::new(state.request.root(), state, ROOT_SCOPE_INDEX)
+                TaskEvaluationContext::new(state, state.root.temp_dir(), ROOT_SCOPE_INDEX)
                     .with_task(),
             );
 
             let value = evaluator.evaluate_hints_item(&name, &item.expr())?;
-            Arc::get_mut(&mut state.request)
-                .expect("request should still be mutable")
-                .hints_mut()
-                .insert(name.as_str().to_string(), value);
+            hints.insert(name.as_str().to_string(), value);
         }
 
-        Ok(())
+        Ok(hints)
     }
 
     /// Evaluates the command of a task.
+    ///
+    /// Returns the evaluated command and a mapping between host paths and guest
+    /// paths.
     fn evaluate_command(
-        &mut self,
-        state: &mut State<'_>,
+        &self,
+        state: &State<'_>,
         section: &CommandSection,
-    ) -> EvaluationResult<()> {
+    ) -> EvaluationResult<(String, HashMap<String, String>)> {
         debug!(
             "evaluating command section for task `{task}` in `{uri}`",
             task = state.task.name(),
             uri = state.document.uri()
         );
 
-        assert!(state.request.command().is_empty());
-
-        // Map any paths needed for command evaluation
-        self.map_request_paths(state)?;
+        // TODO: map paths from host to guest
+        let mapping = Default::default();
 
         let mut command = String::new();
         if let Some(parts) = section.strip_whitespace() {
             let mut evaluator = ExprEvaluator::new(TaskEvaluationContext::new(
-                state.request.root(),
                 state,
+                state.root.attempt_temp_dir(),
                 TASK_SCOPE_INDEX,
             ));
 
@@ -961,11 +942,7 @@ impl TaskEvaluator {
                         command.push_str(t.as_str());
                     }
                     StrippedCommandPart::Placeholder(placeholder) => {
-                        evaluator.evaluate_placeholder(
-                            &placeholder,
-                            &mut command,
-                            state.request.path_mapping(),
-                        )?;
+                        evaluator.evaluate_placeholder(&placeholder, &mut command, &mapping)?;
                     }
                 }
             }
@@ -978,8 +955,8 @@ impl TaskEvaluator {
             );
 
             let mut evaluator = ExprEvaluator::new(TaskEvaluationContext::new(
-                state.request.root(),
                 state,
+                state.root.attempt_temp_dir(),
                 TASK_SCOPE_INDEX,
             ));
 
@@ -990,20 +967,96 @@ impl TaskEvaluator {
                         t.unescape_to(heredoc, &mut command);
                     }
                     CommandPart::Placeholder(placeholder) => {
-                        evaluator.evaluate_placeholder(
-                            &placeholder,
-                            &mut command,
-                            state.request.path_mapping(),
-                        )?;
+                        evaluator.evaluate_placeholder(&placeholder, &mut command, &mapping)?;
                     }
                 }
             }
         }
 
-        *Arc::get_mut(&mut state.request)
-            .expect("request should still be mutable")
-            .command_mut() = command;
-        Ok(())
+        Ok((command, mapping))
+    }
+
+    /// Evaluates sections prior to spawning the command.
+    ///
+    /// This method evaluates the following sections:
+    ///   * runtime
+    ///   * requirements
+    ///   * hints
+    ///   * command
+    fn evaluate_sections(
+        &self,
+        state: &mut State<'_>,
+        definition: AstPtr<TaskDefinition>,
+        inputs: &TaskInputs,
+        id: &str,
+        attempt: u64,
+    ) -> EvaluationResult<EvaluatedSections> {
+        let definition = definition.to_node(state.document.node().syntax());
+
+        // Start by evaluating requirements and hints
+        let (requirements, hints) = if let Some(section) = definition.runtime() {
+            self.evaluate_runtime_section(state, &section, inputs)?
+        } else {
+            (
+                definition
+                    .requirements()
+                    .map(|s| self.evaluate_requirements_section(state, &s, inputs))
+                    .transpose()?
+                    .unwrap_or_default(),
+                definition
+                    .hints()
+                    .map(|s| self.evaluate_hints_section(state, &s, inputs))
+                    .transpose()?
+                    .unwrap_or_default(),
+            )
+        };
+
+        // Update or insert the `task` variable in the task scope
+        // TODO: if task variables become visible in `requirements` or `hints`  section,
+        // this needs to be relocated to before we evaluate those sections
+        if state.document.version() >= Some(SupportedVersion::V1(V1::Two)) {
+            // Get the execution constraints
+            let constraints = self
+                .backend
+                .constraints(&requirements, &hints)
+                .with_context(|| {
+                    format!(
+                        "failed to get constraints for task `{task}`",
+                        task = state.task.name()
+                    )
+                })?;
+
+            let task = TaskValue::new_v1(
+                state.task.name(),
+                id,
+                &definition,
+                constraints,
+                attempt.try_into().with_context(|| {
+                    format!(
+                        "too many attempts were made to run task `{task}`",
+                        task = state.task.name()
+                    )
+                })?,
+            );
+
+            let scope = &mut state.scopes[TASK_SCOPE_INDEX.0];
+            if let Some(v) = scope.get_mut(TASK_VAR_NAME) {
+                *v = Value::Task(task);
+            } else {
+                scope.insert(TASK_VAR_NAME, Value::Task(task));
+            }
+        }
+
+        let (command, mapped) = self.evaluate_command(
+            state,
+            &definition.command().expect("must have command section"),
+        )?;
+        Ok(EvaluatedSections {
+            command,
+            requirements,
+            hints,
+            mapped,
+        })
     }
 
     /// Evaluates a task output.
@@ -1024,7 +1077,7 @@ impl TaskEvaluator {
         let decl_ty = decl.ty();
         let ty = crate::convert_ast_type_v1(state.document, &decl_ty)?;
         let mut evaluator = ExprEvaluator::new(
-            TaskEvaluationContext::new(state.request.root(), state, TASK_SCOPE_INDEX)
+            TaskEvaluationContext::new(state, state.root.temp_dir(), TASK_SCOPE_INDEX)
                 .with_stdout(&evaluated.stdout)
                 .with_stderr(&evaluated.stderr),
         );
@@ -1045,12 +1098,6 @@ impl TaskEvaluator {
             })?;
 
         state.scopes[OUTPUT_SCOPE_INDEX.0].insert(name.as_str(), value);
-        Ok(())
-    }
-
-    /// Maps any host paths to guest paths for task execution.
-    fn map_request_paths(&self, _state: &mut State<'_>) -> EvaluationResult<()> {
-        // TODO: implement this for container backends
         Ok(())
     }
 }

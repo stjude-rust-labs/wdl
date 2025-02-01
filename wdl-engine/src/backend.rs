@@ -54,12 +54,35 @@ pub struct TaskExecutionConstraints {
 }
 
 /// Represents the root directory of a task execution.
+///
+/// The directory layout for task execution is:
+///
+/// ```text
+/// <root>/
+/// ├─ tmp/             # Where files are created by the stdlib before/after the command evaluation
+/// ├─ attempt/         # Stores the execution attempts
+/// │  ├─ 0/            # First attempt
+/// │  │  ├─ work/      # Working directory for the task's first execution
+/// │  │  ├─ tmp/       # Where files are created by the stdlib during command evaluation
+/// │  │  ├─ command    # The evaluated command for the first execution
+/// │  │  ├─ stdout     # The standard output of the first execution
+/// │  │  ├─ stderr     # The standard error of the first execution
+/// │  ├─ 1/            # Second attempt (first retry)
+/// │  │  ├─ ...
+/// ```
 #[derive(Debug)]
 pub struct TaskExecutionRoot {
+    /// The path to the directory for files created by the stdlib before and
+    /// after command evaluation.
+    temp_dir: PathBuf,
+    /// The path to the directory for files created by the stdlib during command
+    /// evaluation.
+    ///
+    /// This needs to be a different location from `temp_dir` because commands
+    /// are re-evaluated on retry.
+    command_temp_dir: PathBuf,
     /// The path to the working directory for the execution.
     work_dir: PathBuf,
-    /// The path to the temp directory for the execution.
-    temp_dir: PathBuf,
     /// The path to the command file.
     command: PathBuf,
     /// The path to the stdout file.
@@ -69,8 +92,8 @@ pub struct TaskExecutionRoot {
 }
 
 impl TaskExecutionRoot {
-    /// Creates a task execution root for the given path.
-    pub fn new(path: &Path) -> Result<Self> {
+    /// Creates a task execution root for the given path and execution attempt.
+    pub fn new(path: &Path, attempt: u64) -> Result<Self> {
         let path = absolute(path).with_context(|| {
             format!(
                 "failed to determine absolute path of `{path}`",
@@ -78,7 +101,10 @@ impl TaskExecutionRoot {
             )
         })?;
 
-        // Create the temp directory now as it may be needed for task evaluation
+        let mut attempts = path.join("attempts");
+        attempts.push(attempt.to_string());
+
+        // Create both temp directories now as it may be needed for task evaluation
         let temp_dir = path.join("tmp");
         fs::create_dir_all(&temp_dir).with_context(|| {
             format!(
@@ -87,23 +113,26 @@ impl TaskExecutionRoot {
             )
         })?;
 
+        let command_temp_dir = attempts.join("tmp");
+        fs::create_dir_all(&command_temp_dir).with_context(|| {
+            format!(
+                "failed to create directory `{path}`",
+                path = command_temp_dir.display()
+            )
+        })?;
+
         Ok(Self {
-            work_dir: path.join("work"),
             temp_dir,
-            command: path.join("command"),
-            stdout: path.join("stdout"),
-            stderr: path.join("stderr"),
+            command_temp_dir,
+            work_dir: attempts.join("work"),
+            command: attempts.join("command"),
+            stdout: attempts.join("stdout"),
+            stderr: attempts.join("stderr"),
         })
     }
 
-    /// Gets the working directory for the given attempt number.
-    ///
-    /// The working directory will be created upon spawning the task.
-    pub fn work_dir(&self, attempt: u64) -> PathBuf {
-        self.work_dir.join(format!("{attempt}"))
-    }
-
-    /// Gets the temporary directory path for the task's execution.
+    /// Gets the temporary directory path for task evaluation before and after
+    /// command evaluation.
     ///
     /// The temporary directory is created before spawning the task so that it
     /// is available for task evaluation.
@@ -111,8 +140,25 @@ impl TaskExecutionRoot {
         &self.temp_dir
     }
 
-    /// Gets the command file path.
+    /// Gets the temporary directory path for the current task attempt.
     ///
+    /// This is the location for storing files created during evaluation of the
+    /// command.
+    ///
+    /// The temporary directory is created before spawning the task so that it
+    /// is available for task evaluation.
+    pub fn attempt_temp_dir(&self) -> &Path {
+        &self.command_temp_dir
+    }
+
+    /// Gets the working directory for task execution.
+    ///
+    /// The working directory will be created upon spawning the task.
+    pub fn work_dir(&self) -> &Path {
+        &self.work_dir
+    }
+
+    //// Gets the command file path.
     /// The command file is created upon spawning the task.
     pub fn command(&self) -> &Path {
         &self.command
@@ -136,90 +182,101 @@ impl TaskExecutionRoot {
 /// Represents a request to spawn a task.
 #[derive(Debug)]
 pub struct TaskSpawnRequest {
-    /// The task's execution root.
-    root: TaskExecutionRoot,
-    /// The task's evaluated command script.
+    /// The execution root of the task.
+    root: Arc<TaskExecutionRoot>,
+    /// The command of the task.
     command: String,
-    /// The task's requirements.
+    /// The requirements of the task.
     requirements: HashMap<String, Value>,
-    /// The task's hints.
+    /// The hints of the task.
     hints: HashMap<String, Value>,
-    /// The task's environment variables.
+    /// The environment variables of the task.
     env: HashMap<String, String>,
-    /// The path mapping from host path to guest path.
+    /// The mapping between host paths and guest paths.
     ///
     /// This is only populated for backends that have a container root.
-    path_mapping: HashMap<String, String>,
+    mapping: HashMap<String, String>,
+    /// The channel to send a message on when the task is spawned.
+    ///
+    /// This value will be `None` once the task is spawned.
+    spawned: Option<oneshot::Sender<()>>,
 }
 
 impl TaskSpawnRequest {
-    /// Creates a new task spawn request with the given root directory.
-    pub fn new(root: &Path) -> Result<Self> {
-        Ok(Self {
-            root: TaskExecutionRoot::new(root)?,
-            command: Default::default(),
-            requirements: Default::default(),
-            hints: Default::default(),
-            env: Default::default(),
-            path_mapping: Default::default(),
-        })
+    /// Creates a new task spawn request.
+    ///
+    /// Returns the new request along with a receiver that is notified when the
+    /// task is spawned.
+    pub fn new(
+        root: Arc<TaskExecutionRoot>,
+        command: String,
+        requirements: HashMap<String, Value>,
+        hints: HashMap<String, Value>,
+        env: HashMap<String, String>,
+        mapping: HashMap<String, String>,
+    ) -> (Self, oneshot::Receiver<()>) {
+        let (tx, rx) = oneshot::channel();
+
+        (
+            Self {
+                root,
+                command,
+                requirements,
+                hints,
+                env,
+                mapping,
+                spawned: Some(tx),
+            },
+            rx,
+        )
     }
 
-    /// Gets the task execution root for the request.
+    /// Gets the execution root to spawn the task with.
     pub fn root(&self) -> &TaskExecutionRoot {
         &self.root
     }
 
-    /// Gets the task's evaluated command script.
+    /// Gets the command for the task.
     pub fn command(&self) -> &str {
         &self.command
     }
 
-    /// Gets a mutable reference to the task's evaluated command script.
-    pub fn command_mut(&mut self) -> &mut String {
-        &mut self.command
-    }
-
-    /// Gets the task's evaluated requirements.
+    /// Gets the requirements of the task.
     pub fn requirements(&self) -> &HashMap<String, Value> {
         &self.requirements
     }
 
-    /// Gets a mutable reference to the task's evaluated requirements.
-    pub fn requirements_mut(&mut self) -> &mut HashMap<String, Value> {
-        &mut self.requirements
-    }
-
-    /// Gets the task's evaluated hints.
+    /// Gets the hints of the task.
     pub fn hints(&self) -> &HashMap<String, Value> {
         &self.hints
     }
 
-    /// Gets a mutable reference to the task's evaluated hints.
-    pub fn hints_mut(&mut self) -> &mut HashMap<String, Value> {
-        &mut self.hints
-    }
-
-    /// Gets the task's environment variables.
+    /// Gets the environment variables of the task.
     pub fn env(&self) -> &HashMap<String, String> {
         &self.env
     }
 
-    /// Gets a mutable reference to the task's environment variables.
-    pub fn env_mut(&mut self) -> &mut HashMap<String, String> {
-        &mut self.env
+    /// Gets the mapping between host paths and guest paths.
+    ///
+    /// This is only populated for backends that have a container root.
+    pub fn mapping(&self) -> &HashMap<String, String> {
+        &self.mapping
     }
+}
 
-    /// Gets the task's path mapping from host path to guest path.
-    pub fn path_mapping(&self) -> &HashMap<String, String> {
-        &self.path_mapping
-    }
-
-    /// Gets a mutable reference to the task's path mapping from host path to
-    /// guest path.
-    pub fn path_mapping_mut(&mut self) -> &mut HashMap<String, String> {
-        &mut self.path_mapping
-    }
+/// Represents the response from spawning a task.
+#[derive(Debug)]
+pub struct TaskSpawnResponse {
+    /// The requirements the task was spawned with.
+    pub requirements: HashMap<String, Value>,
+    /// The hints the task was spawned with.
+    pub hints: HashMap<String, Value>,
+    /// The environment the task was spawned with.
+    pub env: HashMap<String, String>,
+    /// The status code of the task's execution.
+    ///
+    /// This may be `Err` if the task failed to spawn.
+    pub status_code: Result<i32>,
 }
 
 /// Represents a task execution backend.
@@ -244,13 +301,6 @@ pub trait TaskExecutionBackend: Send + Sync {
 
     /// Spawns a task with the execution backend.
     ///
-    /// The provided channel will be sent a message when the task is spawned.
-    ///
-    /// Upon success, returns a receiver that will receive the task's exit code.
-    fn spawn(
-        &self,
-        request: Arc<TaskSpawnRequest>,
-        attempt: u64,
-        spawned: oneshot::Sender<()>,
-    ) -> Result<Receiver<Result<i32>>>;
+    /// Upon success, returns a receiver for receiving the response.
+    fn spawn(&self, request: TaskSpawnRequest) -> Result<Receiver<TaskSpawnResponse>>;
 }
