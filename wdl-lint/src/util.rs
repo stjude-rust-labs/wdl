@@ -7,13 +7,6 @@ use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::SyntaxKind;
 
-/// Counts the amount of leading whitespace in a string slice.
-///
-/// Returns when the first non-whitespace character is encountered.
-pub fn count_leading_whitespace(input: &str) -> usize {
-    input.chars().take_while(|ch| ch.is_whitespace()).count()
-}
-
 /// Detect if a comment is in-line or not by looking for `\n` in the prior
 /// whitespace.
 pub fn is_inline_comment(token: &Comment) -> bool {
@@ -178,28 +171,17 @@ task foo {  # an in-line comment
         let s = "This string\nhas many\n\nnewlines, including Windows\r\n\r\nand even a \r that \
                  should not be a newline\n";
         let lines = lines_with_offset(s).collect::<Vec<_>>();
-        assert_eq!(lines, &[
-            ("This string", 0, 12),
-            ("has many", 12, 21),
-            ("", 21, 22),
-            ("newlines, including Windows", 22, 51),
-            ("", 51, 53),
-            ("and even a \r that should not be a newline", 53, 95),
-        ]);
-    }
-
-    #[test]
-    fn test_count_leading_whitespace() {
-        let s = "    this string has four leading spaces";
-        assert_eq!(count_leading_whitespace(s), 4);
-        let s = "\t\t\t\tthis string has four leading tabs";
-        assert_eq!(count_leading_whitespace(s), 4);
-        let s = "\r\r\r\rthis has four leading carriage returns";
-        assert_eq!(count_leading_whitespace(s), 4);
-        let s = "\n starts with a newline";
-        assert_eq!(count_leading_whitespace(s), 2);
-        let s = "I have no leading whitespace";
-        assert_eq!(count_leading_whitespace(s), 0);
+        assert_eq!(
+            lines,
+            &[
+                ("This string", 0, 12),
+                ("has many", 12, 21),
+                ("", 21, 22),
+                ("newlines, including Windows", 22, 51),
+                ("", 51, 53),
+                ("and even a \r that should not be a newline", 53, 95),
+            ]
+        );
     }
 
     #[test]

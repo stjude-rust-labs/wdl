@@ -1,20 +1,23 @@
 //! Entry point functions for the command-line interface.
 
+use std::fmt;
 use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
-use std::sync::Arc;
+use std::sync::Mutex;
 use std::time::Duration;
+use std::time::Instant;
 
 use anyhow::Context;
 use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
 use colored::Colorize;
-use indicatif::ProgressBar;
+use indexmap::IndexSet;
 use indicatif::ProgressStyle;
 use serde_json::to_string_pretty;
 use tokio::fs;
+use tracing_indicatif::span_ext::IndicatifSpanExt;
 use url::Url;
 use wdl_analysis::AnalysisResult;
 use wdl_analysis::Analyzer;
@@ -22,9 +25,11 @@ use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::document::Document;
 use wdl_analysis::path_to_uri;
 use wdl_analysis::rules as analysis_rules;
+use wdl_engine::EvaluatedTask;
 use wdl_engine::EvaluationError;
 use wdl_engine::Inputs;
-use wdl_engine::local::LocalTaskExecutionBackend;
+use wdl_engine::config::Config;
+use wdl_engine::v1::ProgressKind;
 use wdl_engine::v1::TaskEvaluator;
 use wdl_engine::v1::WorkflowEvaluator;
 use wdl_grammar::Diagnostic;
@@ -49,19 +54,32 @@ pub async fn analyze(
         .filter(|rule| !exceptions.iter().any(|e| e == rule.id()));
     let rules_config = DiagnosticsConfig::new(rules);
 
+    let pb = tracing::warn_span!("progress");
+    pb.pb_set_style(
+        &ProgressStyle::with_template(
+            "[{elapsed_precise:.cyan/blue}] {bar:40.cyan/blue} {msg} {pos}/{len}",
+        )
+        .unwrap(),
+    );
+
+    let start = Instant::now();
     let analyzer = Analyzer::new_with_validator(
         rules_config,
-        move |bar: ProgressBar, kind, completed, total| async move {
-            if bar.elapsed() < PROGRESS_BAR_DELAY_BEFORE_RENDER {
-                return;
-            }
+        move |_: (), kind, completed, total| {
+            let pb = pb.clone();
+            async move {
+                if start.elapsed() < PROGRESS_BAR_DELAY_BEFORE_RENDER {
+                    return;
+                }
 
-            if completed == 0 || bar.length() == Some(0) {
-                bar.set_length(total.try_into().unwrap());
-                bar.set_message(format!("{kind}"));
-            }
+                if completed == 0 {
+                    pb.pb_start();
+                    pb.pb_set_length(total.try_into().unwrap());
+                    pb.pb_set_message(&format!("{kind}"));
+                }
 
-            bar.set_position(completed.try_into().unwrap());
+                pb.pb_set_position(completed.try_into().unwrap());
+            }
         },
         move || {
             let mut validator = wdl_ast::Validator::default();
@@ -99,16 +117,7 @@ pub async fn analyze(
         bail!("failed to convert `{file}` to a URI", file = file)
     }
 
-    let bar = ProgressBar::new(0);
-    bar.set_style(
-        ProgressStyle::with_template(
-            "[{elapsed_precise:.cyan/blue}] {bar:40.cyan/blue} {msg} {pos}/{len}",
-        )
-        .unwrap(),
-    );
-
-    let results = analyzer.analyze(bar.clone()).await?;
-
+    let results = analyzer.analyze(()).await?;
     Ok(results)
 }
 
@@ -152,22 +161,26 @@ pub fn parse_inputs(
             bail!("document does not contain a task or workflow named `{name}`");
         }
     } else {
-        // Neither a inputs file or name was provided, look for a single task or
-        // workflow in the document
-        let mut iter = document.tasks();
-        let (name, inputs) = iter
-            .next()
-            .map(|t| (t.name().to_string(), Inputs::Task(Default::default())))
-            .or_else(|| {
-                document
-                    .workflow()
-                    .map(|w| (w.name().to_string(), Inputs::Workflow(Default::default())))
-            })
-            .context("inputs file is empty and the WDL document contains no tasks or workflow")?;
+        // Neither an inputs file or name was provided, look for a workflow in the
+        // document; failing that, find at most one task in the document
+        let (name, inputs) = document
+            .workflow()
+            .map(|w| Ok((w.name().to_string(), Inputs::Workflow(Default::default()))))
+            .unwrap_or_else(|| {
+                let mut iter = document.tasks();
+                let (name, inputs) = iter
+                    .next()
+                    .map(|t| (t.name().to_string(), Inputs::Task(Default::default())))
+                    .context(
+                        "inputs file is empty and the document contains no workflow or task",
+                    )?;
 
-        if iter.next().is_some() {
-            bail!("inputs file is empty and the WDL document contains more than one task");
-        }
+                if iter.next().is_some() {
+                    bail!("inputs file is empty and the document contains more than one task");
+                }
+
+                Ok((name, inputs))
+            })?;
 
         Ok((None, name, inputs))
     }
@@ -208,23 +221,53 @@ pub async fn run(
     inputs: Inputs,
     output_dir: &Path,
 ) -> Result<Option<Diagnostic>> {
-    let bar = ProgressBar::new_spinner();
-    bar.set_message(format!(
-        "{running} {kind} {name}",
-        running = "running".cyan(),
-        kind = match &inputs {
-            Inputs::Task(_) => "task",
-            Inputs::Workflow(_) => "workflow",
-        },
-        name = name.magenta().bold()
-    ));
-    bar.enable_steady_tick(Duration::from_millis(100));
-    bar.set_style(
-        ProgressStyle::with_template("[{elapsed_precise:.cyan/blue}] {spinner:.cyan/blue} {msg}")
-            .unwrap(),
+    /// Helper for displaying task ids
+    struct Ids<'a>(&'a IndexSet<String>);
+
+    impl fmt::Display for Ids<'_> {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            /// The maximum number of executing task names to display at a time
+            const MAX_TASKS: usize = 10;
+
+            let mut first = true;
+            for (i, id) in self.0.iter().enumerate() {
+                if i == MAX_TASKS {
+                    write!(f, "...")?;
+                    break;
+                }
+
+                if first {
+                    first = false;
+                } else {
+                    write!(f, ", ")?;
+                }
+
+                write!(f, "{id}", id = id.magenta().bold())?;
+            }
+
+            Ok(())
+        }
+    }
+
+    let run_kind = match &inputs {
+        Inputs::Task(_) => "task",
+        Inputs::Workflow(_) => "workflow",
+    };
+
+    let pb = tracing::warn_span!("progress");
+    pb.pb_set_style(
+        &ProgressStyle::with_template(&format!(
+            "[{{elapsed_precise:.cyan/blue}}] {{spinner:.cyan/blue}} {running} {run_kind} \
+             {name}{{msg}}",
+            running = "running".cyan(),
+            name = name.magenta().bold()
+        ))
+        .unwrap(),
     );
 
-    match inputs {
+    // TODO: take config from command line argument
+    let config = Config::default();
+    let result = match inputs {
         Inputs::Task(mut inputs) => {
             // Make any paths specified in the inputs absolute
             let task = document
@@ -237,29 +280,11 @@ pub async fn run(
                 inputs.join_paths(task, path);
             }
 
-            let backend = LocalTaskExecutionBackend::new(None);
-            let mut evaluator = TaskEvaluator::new(&backend);
-            match evaluator
-                .evaluate(document, task, &inputs, output_dir, name)
+            let mut evaluator = TaskEvaluator::new(config)?;
+            evaluator
+                .evaluate(document, task, &inputs, output_dir, |_| async {})
                 .await
-            {
-                Ok(evaluated) => match evaluated.into_result() {
-                    Ok(outputs) => {
-                        drop(bar);
-                        let s = to_string_pretty(&outputs)?;
-                        println!("{s}\n");
-                        Ok(None)
-                    }
-                    Err(e) => match e {
-                        EvaluationError::Source(diagnostic) => Ok(Some(diagnostic)),
-                        EvaluationError::Other(e) => Err(e),
-                    },
-                },
-                Err(e) => match e {
-                    EvaluationError::Source(diagnostic) => Ok(Some(diagnostic)),
-                    EvaluationError::Other(e) => Err(e),
-                },
-            }
+                .and_then(EvaluatedTask::into_result)
         }
         Inputs::Workflow(mut inputs) => {
             let workflow = document
@@ -275,20 +300,80 @@ pub async fn run(
                 inputs.join_paths(workflow, path);
             }
 
-            let mut evaluator =
-                WorkflowEvaluator::new(Arc::new(LocalTaskExecutionBackend::new(None)));
-            match evaluator.evaluate(document, &inputs, output_dir).await {
-                Ok(outputs) => {
-                    drop(bar);
-                    let s = to_string_pretty(&outputs)?;
-                    println!("{s}\n");
-                    Ok(None)
-                }
-                Err(e) => match e {
-                    EvaluationError::Source(diagnostic) => Ok(Some(diagnostic)),
-                    EvaluationError::Other(e) => Err(e),
-                },
+            /// Represents state for reporting progress
+            #[derive(Default)]
+            struct State {
+                /// The set of currently executing task identifiers
+                ids: IndexSet<String>,
+                /// The number of completed tasks
+                completed: usize,
+                /// The number of tasks awaiting execution.
+                ready: usize,
+                /// The number of currently executing tasks
+                executing: usize,
             }
+
+            let state = Mutex::<State>::default();
+            let mut evaluator = WorkflowEvaluator::new(config)?;
+
+            evaluator
+                .evaluate(document, inputs, output_dir, move |kind| {
+                    pb.pb_start();
+
+                    let message = {
+                        let mut state = state.lock().expect("failed to lock progress mutex");
+                        match kind {
+                            ProgressKind::TaskStarted { .. } => {
+                                state.ready += 1;
+                            }
+                            ProgressKind::TaskExecutionStarted { id, .. } => {
+                                state.ready -= 1;
+                                state.executing += 1;
+                                state.ids.insert(id.to_string());
+                            }
+                            ProgressKind::TaskExecutionCompleted { id, .. } => {
+                                state.executing -= 1;
+                                state.ids.swap_remove(id);
+                            }
+                            ProgressKind::TaskCompleted { .. } => {
+                                state.completed += 1;
+                            }
+                            _ => {}
+                        }
+
+                        format!(
+                            " - {c} {completed} task{s1}, {r} {ready} task{s2}, {e} {executing} \
+                             task{s3}: {ids}",
+                            c = state.completed,
+                            completed = "completed".cyan(),
+                            s1 = if state.completed == 1 { "" } else { "s" },
+                            r = state.ready,
+                            ready = "ready".cyan(),
+                            s2 = if state.ready == 1 { "" } else { "s" },
+                            e = state.executing,
+                            executing = "executing".cyan(),
+                            s3 = if state.executing == 1 { "" } else { "s" },
+                            ids = Ids(&state.ids)
+                        )
+                    };
+
+                    pb.pb_set_message(&message);
+
+                    async {}
+                })
+                .await
         }
+    };
+
+    match result {
+        Ok(outputs) => {
+            let s = to_string_pretty(&outputs)?;
+            println!("{s}");
+            Ok(None)
+        }
+        Err(e) => match e {
+            EvaluationError::Source(diagnostic) => Ok(Some(diagnostic)),
+            EvaluationError::Other(e) => Err(e),
+        },
     }
 }

@@ -33,9 +33,9 @@ Rule specific checks:
       (`wdl-ast/src/validation.rs`) and `LintVisitor`
       (`wdl-lint/src/visitor.rs`) visitors. These are required to ensure the new
       visitor callback will execute.
-- [ ] You have run `wdl-gauntlet --refresh` to ensure that there are no 
+- [ ] You have run `gauntlet --refresh` to ensure that there are no 
       unintended changes to the baseline configuration file (`Gauntlet.toml`).
-- [ ] You have run `wdl-gauntlet --refresh --arena` to ensure that all of the 
+- [ ] You have run `gauntlet --refresh --arena` to ensure that all of the 
       rules added/removed are now reflected in the baseline configuration file 
       (`Arena.toml`).
 
@@ -61,4 +61,4 @@ Before submitting this PR, please make sure:
 END SECTION -->
 
 [conventional commit]: https://www.conventionalcommits.org/en/v1.0.0/#summary
-["keep a changelog"]: https://keepachangelog.com/en/1.0.0/
+["keep a changelog"]: https://keepachangelog.com/en/1.1.0/

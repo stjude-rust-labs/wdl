@@ -470,11 +470,14 @@ impl Value {
     }
 
     /// Visits each file or directory path contained in the value.
-    pub(crate) fn visit_paths(&self, cb: &mut impl FnMut(&str)) {
+    ///
+    /// If the callback returns an error, visitation stops and the error result
+    /// is returned.
+    pub(crate) fn visit_paths(&self, cb: &mut impl FnMut(&str) -> Result<()>) -> Result<()> {
         match self {
             Self::Primitive(v) => v.visit_paths(cb),
             Self::Compound(v) => v.visit_paths(cb),
-            _ => {}
+            _ => Ok(()),
         }
     }
 
@@ -1099,10 +1102,10 @@ impl PrimitiveValue {
     }
 
     /// Visits each file or directory path contained in the value.
-    fn visit_paths(&self, cb: &mut impl FnMut(&str)) {
+    fn visit_paths(&self, cb: &mut impl FnMut(&str) -> Result<()>) -> Result<()> {
         match self {
             Self::File(path) | Self::Directory(path) => cb(path.as_str()),
-            _ => {}
+            _ => Ok(()),
         }
     }
 
@@ -1357,6 +1360,7 @@ impl Pair {
     /// Constructs a new pair without checking the given left and right conform
     /// to the given type.
     pub(crate) fn new_unchecked(ty: Type, left: Value, right: Value) -> Self {
+        assert!(ty.as_pair().is_some());
         Self {
             ty,
             values: Arc::new((left, right)),
@@ -1441,6 +1445,7 @@ impl Array {
     /// Constructs a new array without checking the given elements conform to
     /// the given type.
     pub(crate) fn new_unchecked(ty: Type, elements: Vec<Value>) -> Self {
+        assert!(ty.as_array().is_some());
         Self {
             ty,
             elements: if elements.is_empty() {
@@ -1567,6 +1572,7 @@ impl Map {
         ty: Type,
         elements: IndexMap<Option<PrimitiveValue>, Value>,
     ) -> Self {
+        assert!(ty.as_map().is_some());
         Self {
             ty,
             elements: if elements.is_empty() {
@@ -1852,6 +1858,7 @@ impl Struct {
         name: Arc<String>,
         members: Arc<IndexMap<String, Value>>,
     ) -> Self {
+        assert!(ty.as_struct().is_some());
         Self { ty, name, members }
     }
 
@@ -2106,37 +2113,39 @@ impl CompoundValue {
     }
 
     /// Visits each file or directory path contained in the value.
-    fn visit_paths(&self, cb: &mut impl FnMut(&str)) {
+    fn visit_paths(&self, cb: &mut impl FnMut(&str) -> Result<()>) -> Result<()> {
         match self {
             Self::Pair(pair) => {
-                pair.left().visit_paths(cb);
-                pair.right().visit_paths(cb);
+                pair.left().visit_paths(cb)?;
+                pair.right().visit_paths(cb)?;
             }
             Self::Array(array) => {
                 for v in array.as_slice() {
-                    v.visit_paths(cb);
+                    v.visit_paths(cb)?;
                 }
             }
             Self::Map(map) => {
                 for (k, v) in map.iter() {
                     if let Some(k) = k {
-                        k.visit_paths(cb);
+                        k.visit_paths(cb)?;
                     }
 
-                    v.visit_paths(cb);
+                    v.visit_paths(cb)?;
                 }
             }
             Self::Object(object) => {
                 for v in object.values() {
-                    v.visit_paths(cb);
+                    v.visit_paths(cb)?;
                 }
             }
             Self::Struct(Struct { members, .. }) => {
                 for v in members.values() {
-                    v.visit_paths(cb);
+                    v.visit_paths(cb)?;
                 }
             }
         }
+
+        Ok(())
     }
 
     /// Replaces any inner path values by joining the specified path with the
@@ -2652,6 +2661,7 @@ impl TaskValue {
         id: impl Into<String>,
         definition: &v1::TaskDefinition,
         constraints: TaskExecutionConstraints,
+        attempt: i64,
     ) -> Self {
         Self {
             data: Arc::new(TaskData {
@@ -2695,7 +2705,7 @@ impl TaskValue {
                     .unwrap_or_else(Object::empty),
                 ext: Object::empty(),
             }),
-            attempt: 1,
+            attempt,
             return_code: None,
         }
     }
@@ -2791,6 +2801,11 @@ impl TaskValue {
     /// Sets the return code after the task execution has completed.
     pub(crate) fn set_return_code(&mut self, code: i32) {
         self.return_code = Some(code as i64);
+    }
+
+    /// Sets the attempt number for the task.
+    pub(crate) fn set_attempt(&mut self, attempt: i64) {
+        self.attempt = attempt;
     }
 
     /// Accesses a field of the task value by name.
@@ -3313,20 +3328,23 @@ Caused by:
         );
 
         // Map[String, File] -> Struct
-        let ty = StructType::new("Foo", [
-            ("foo", PrimitiveType::File),
-            ("baz", PrimitiveType::File),
-        ])
+        let ty = StructType::new(
+            "Foo",
+            [("foo", PrimitiveType::File), ("baz", PrimitiveType::File)],
+        )
         .into();
         let struct_value = value.coerce(&ty).expect("value should coerce");
         assert_eq!(struct_value.to_string(), r#"Foo {foo: "bar", baz: "qux"}"#);
 
         // Map[String, File] -> Struct (invalid)
-        let ty = StructType::new("Foo", [
-            ("foo", PrimitiveType::File),
-            ("baz", PrimitiveType::File),
-            ("qux", PrimitiveType::File),
-        ])
+        let ty = StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveType::File),
+                ("baz", PrimitiveType::File),
+                ("qux", PrimitiveType::File),
+            ],
+        )
         .into();
         assert_eq!(
             format!("{e:?}", e = value.coerce(&ty).unwrap_err()),
@@ -3387,11 +3405,14 @@ Caused by:
 
     #[test]
     fn struct_coercion() {
-        let ty = StructType::new("Foo", [
-            ("foo", PrimitiveType::Float),
-            ("bar", PrimitiveType::Float),
-            ("baz", PrimitiveType::Float),
-        ]);
+        let ty = StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveType::Float),
+                ("bar", PrimitiveType::Float),
+                ("baz", PrimitiveType::Float),
+            ],
+        );
         let value: Value = Struct::new(ty, [("foo", 1.0), ("bar", 2.0), ("baz", 3.0)])
             .expect("should create map value")
             .into();
@@ -3405,11 +3426,14 @@ Caused by:
         );
 
         // Struct -> Struct
-        let ty = StructType::new("Bar", [
-            ("foo", PrimitiveType::Float),
-            ("bar", PrimitiveType::Float),
-            ("baz", PrimitiveType::Float),
-        ])
+        let ty = StructType::new(
+            "Bar",
+            [
+                ("foo", PrimitiveType::Float),
+                ("bar", PrimitiveType::Float),
+                ("baz", PrimitiveType::Float),
+            ],
+        )
         .into();
         let struct_value = value.coerce(&ty).expect("value should coerce");
         assert_eq!(
@@ -3427,16 +3451,22 @@ Caused by:
 
     #[test]
     fn struct_display() {
-        let ty = StructType::new("Foo", [
-            ("foo", PrimitiveType::Float),
-            ("bar", PrimitiveType::String),
-            ("baz", PrimitiveType::Integer),
-        ]);
-        let value: Value = Struct::new(ty, [
-            ("foo", Value::from(1.101)),
-            ("bar", PrimitiveValue::new_string("foo").into()),
-            ("baz", 1234.into()),
-        ])
+        let ty = StructType::new(
+            "Foo",
+            [
+                ("foo", PrimitiveType::Float),
+                ("bar", PrimitiveType::String),
+                ("baz", PrimitiveType::Integer),
+            ],
+        );
+        let value: Value = Struct::new(
+            ty,
+            [
+                ("foo", Value::from(1.101)),
+                ("bar", PrimitiveValue::new_string("foo").into()),
+                ("baz", 1234.into()),
+            ],
+        )
         .expect("should create map value")
         .into();
         assert_eq!(

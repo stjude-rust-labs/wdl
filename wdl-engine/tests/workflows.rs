@@ -23,7 +23,6 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
 use std::process::exit;
-use std::sync::Arc;
 use std::thread::available_parallelism;
 
 use anyhow::Context;
@@ -49,7 +48,8 @@ use wdl_ast::Diagnostic;
 use wdl_ast::Severity;
 use wdl_engine::EvaluationError;
 use wdl_engine::Inputs;
-use wdl_engine::local::LocalTaskExecutionBackend;
+use wdl_engine::config;
+use wdl_engine::config::Backend;
 use wdl_engine::v1::WorkflowEvaluator;
 
 /// Finds tests to run as part of the analysis test suite.
@@ -182,10 +182,12 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
     inputs.join_paths(workflow, &test_dir);
 
     let dir = TempDir::new().context("failed to create temporary directory")?;
-    let backend = Arc::new(LocalTaskExecutionBackend::new(None));
-    let mut evaluator = WorkflowEvaluator::new(backend);
+
+    let mut config = config::Config::default();
+    config.backend.default = Backend::Local;
+    let mut evaluator = WorkflowEvaluator::new(config)?;
     match evaluator
-        .evaluate(result.document(), &inputs, dir.path())
+        .evaluate(result.document(), inputs, dir.path(), |_| async {})
         .await
     {
         Ok(outputs) => {
