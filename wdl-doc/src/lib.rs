@@ -53,15 +53,12 @@ impl Render for Css<'_> {
 }
 
 /// A full HTML page with a header and body.
-pub(crate) fn full_page(page_title: &str, style_sheet: &Path, body: Markup) -> Markup {
+pub(crate) fn full_page(page_title: &str, stylesheet: &Path, body: Markup) -> Markup {
     html! {
         (DOCTYPE)
-        html class="dark
-                    size-full" {
-            (header(page_title, style_sheet))
-            body class="size-full
-                        dark:bg-slate-950
-                        dark:text-white" {
+        html class="dark size-full" {
+            (header(page_title, stylesheet))
+            body class="size-full dark:bg-slate-950 dark:text-white" {
                 (body)
            }
         }
@@ -69,13 +66,13 @@ pub(crate) fn full_page(page_title: &str, style_sheet: &Path, body: Markup) -> M
 }
 
 /// A basic header with a dynamic `page_title` and link to the stylesheet.
-pub(crate) fn header(page_title: &str, style_sheet: &Path) -> Markup {
+pub(crate) fn header(page_title: &str, stylesheet: &Path) -> Markup {
     html! {
         head {
             meta charset="utf-8";
             meta name="viewport" content="width=device-width, initial-scale=1.0";
             title { (page_title) }
-            (Css(style_sheet.to_str().unwrap()))
+            (Css(stylesheet.to_str().unwrap()))
             link rel="preconnect" href="https://fonts.googleapis.com";
             link rel="preconnect" href="https://fonts.gstatic.com" crossorigin;
             link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet";
@@ -135,14 +132,14 @@ impl Document {
     }
 
     /// Render the document as HTML.
-    pub fn render(&self, parent_dir: &Path) -> Markup {
+    pub fn render(&self, stylesheet: &Path) -> Markup {
         let body = html! {
             h1 { (self.name()) }
             h3 { "WDL Version: " (self.version()) }
             div { (self.preamble()) }
         };
 
-        full_page(self.name(), parent_dir, body)
+        full_page(self.name(), stylesheet, body)
     }
 }
 
@@ -166,22 +163,24 @@ fn fetch_preamble_comments(version: VersionStatement) -> String {
     comments.join("\n")
 }
 
+/// Build stylesheet.
+fn build_stylesheet(theme: &Path) -> Result<PathBuf> {
+    
+    Ok(css_path)
+}
+
 /// Generate HTML documentation for a workspace.
-pub async fn document_workspace(path: PathBuf) -> Result<()> {
-    if !path.is_dir() {
+pub async fn document_workspace(workspace: PathBuf, theme: PathBuf) -> Result<()> {
+    if !workspace.is_dir() {
         return Err(anyhow!("Workspace is not a directory"));
     }
 
-    let abs_path = std::path::absolute(&path)?;
+    let abs_path = std::path::absolute(&workspace)?;
 
     let docs_dir = abs_path.clone().join(DOCS_DIR);
     if !docs_dir.exists() {
         std::fs::create_dir(&docs_dir)?;
     }
-
-    // Get the relative path to the CSS style sheet.
-    // TODO: This is a hack. We should have a better way to do this.
-    let css_path = PathBuf::from("/styles.css");
 
     let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
     analyzer.add_directory(abs_path.clone()).await?;
@@ -197,7 +196,7 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
             Ok(path) => path,
             Err(_) => &PathBuf::from("external").join(cur_path.strip_prefix("/").unwrap()),
         };
-        let cur_dir = docs_dir.join(relative_path.with_extension(""));
+        let cur_dir = docs_dir.clone().join(relative_path.with_extension(""));
         if !cur_dir.exists() {
             std::fs::create_dir_all(&cur_dir)?;
         }
@@ -213,8 +212,8 @@ pub async fn document_workspace(path: PathBuf) -> Result<()> {
 
         let document = Document::new(name.to_string(), version);
 
-        let index = cur_dir.join("index.html");
-        let mut index = tokio::fs::File::create(index).await?;
+        let index_path = cur_dir.join("index.html");
+        let mut index = tokio::fs::File::create(index_path.clone()).await?;
 
         index
             .write_all(document.render(&css_path).into_string().as_bytes())

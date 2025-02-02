@@ -37,7 +37,7 @@ impl Struct {
     }
 
     /// Render the struct as HTML.
-    pub fn render(&self, parent_dir: &Path) -> Markup {
+    pub fn render(&self, stylesheet: &Path) -> Markup {
         let body = html! {
             h1 { (self.name()) }
             h3 { "Members" }
@@ -54,6 +54,6 @@ impl Struct {
             }
         };
 
-        full_page(&self.name(), parent_dir, body)
+        full_page(&self.name(), stylesheet, body)
     }
 }
