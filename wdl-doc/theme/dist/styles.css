@@ -1,0 +1,10 @@
+/*! tailwindcss v4.0.3 | MIT License | https://tailwindcss.com */
+h1 {
+  font-size: 48px;
+}
+h3 {
+  font-size: 30px;
+}
+:root, :host {
+  --font-sans: "DM Sans";
+}
