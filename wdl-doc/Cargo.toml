@@ -18,6 +18,7 @@ pulldown-cmark = "0.12.2"
 tokio.workspace = true
 wdl-analysis = { path = "../wdl-analysis", version = "0.6.0" }
 wdl-ast = { path = "../wdl-ast", version = "0.10.0" }
+dioxus = { version = "0.6.0", features = [] }
 
 [lints]
 workspace = true
@@ -25,3 +26,9 @@ workspace = true
 [[test]]
 name = "doc"
 harness = false
+
+[features]
+default = ["web"]
+web = ["dioxus/web"]
+desktop = ["dioxus/desktop"]
+mobile = ["dioxus/mobile"]

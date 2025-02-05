@@ -1,0 +1,57 @@
+/*! tailwindcss v4.0.3 | MIT License | https://tailwindcss.com */
+.visible {
+  visibility: visible;
+}
+.relative {
+  position: relative;
+}
+.container {
+  width: 100%;
+}
+.block {
+  display: block;
+}
+.contents {
+  display: contents;
+}
+.size-full {
+  width: 100%;
+  height: 100%;
+}
+.transform {
+  transform: var(--tw-rotate-x) var(--tw-rotate-y) var(--tw-rotate-z) var(--tw-skew-x) var(--tw-skew-y);
+}
+h1 {
+  font-size: 48px;
+}
+h3 {
+  font-size: 30px;
+}
+:root, :host {
+  --font-sans: "DM Sans";
+}
+@property --tw-rotate-x {
+  syntax: "*";
+  inherits: false;
+  initial-value: rotateX(0);
+}
+@property --tw-rotate-y {
+  syntax: "*";
+  inherits: false;
+  initial-value: rotateY(0);
+}
+@property --tw-rotate-z {
+  syntax: "*";
+  inherits: false;
+  initial-value: rotateZ(0);
+}
+@property --tw-skew-x {
+  syntax: "*";
+  inherits: false;
+  initial-value: skewX(0);
+}
+@property --tw-skew-y {
+  syntax: "*";
+  inherits: false;
+  initial-value: skewY(0);
+}

@@ -102,3 +102,15 @@ broken_intra_doc_links = "warn"
 
 [workspace.lints.clippy]
 missing_docs_in_private_items = "warn"
+
+[profile]
+
+[profile.wasm-dev]
+inherits = "dev"
+opt-level = 1
+
+[profile.server-dev]
+inherits = "dev"
+
+[profile.android-dev]
+inherits = "dev"

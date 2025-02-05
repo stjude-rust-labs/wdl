@@ -163,12 +163,6 @@ fn fetch_preamble_comments(version: VersionStatement) -> String {
     comments.join("\n")
 }
 
-/// Build stylesheet.
-fn build_stylesheet(theme: &Path) -> Result<PathBuf> {
-    
-    Ok(css_path)
-}
-
 /// Generate HTML documentation for a workspace.
 pub async fn document_workspace(workspace: PathBuf, theme: PathBuf) -> Result<()> {
     if !workspace.is_dir() {
@@ -181,6 +175,8 @@ pub async fn document_workspace(workspace: PathBuf, theme: PathBuf) -> Result<()
     if !docs_dir.exists() {
         std::fs::create_dir(&docs_dir)?;
     }
+
+    let css_path = theme.join("style.css");
 
     let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
     analyzer.add_directory(abs_path.clone()).await?;
