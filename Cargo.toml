@@ -23,6 +23,9 @@ repository = "https://github.com/stjude-rust-labs/wdl"
 rust-version = "1.82.0"
 
 [workspace.dependencies]
+ammonia = "4.0.0"
+maud = "0.26.0"
+pulldown-cmark = "0.12.2"
 anyhow = "1.0.86"
 approx = "0.5.1"
 clap = { version = "4.5.7", features = ["derive"] }
@@ -30,6 +33,7 @@ clap-verbosity-flag = "2.2.1"
 codespan-reporting = "0.11.1"
 colored = "2.1.0"
 convert_case = "0.6.0"
+dioxus = { version = "0.6.0", features = [] }
 dirs = "5.0.1"
 faster-hex = "0.9.0"
 ftree = "1.2.0"
