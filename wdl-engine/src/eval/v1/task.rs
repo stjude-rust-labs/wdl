@@ -1,5 +1,6 @@
 //! Implementation of evaluation for V1 tasks.
 
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::future::Future;
 use std::mem;
@@ -9,9 +10,14 @@ use std::sync::Arc;
 use anyhow::Context;
 use anyhow::Result;
 use anyhow::anyhow;
+use indexmap::IndexMap;
+use path_clean::clean;
 use petgraph::algo::toposort;
 use rowan::ast::AstPtr;
+use tokio_util::sync::CancellationToken;
+use tracing::Level;
 use tracing::debug;
+use tracing::enabled;
 use tracing::info;
 use tracing::warn;
 use wdl_analysis::diagnostics::multiple_type_mismatch;
@@ -22,6 +28,7 @@ use wdl_analysis::document::Task;
 use wdl_analysis::eval::v1::TaskGraphBuilder;
 use wdl_analysis::eval::v1::TaskGraphNode;
 use wdl_analysis::types::Optional;
+use wdl_analysis::types::PrimitiveType;
 use wdl_analysis::types::Type;
 use wdl_analysis::types::v1::task_hint_types;
 use wdl_analysis::types::v1::task_requirement_types;
@@ -39,8 +46,16 @@ use wdl_ast::v1::Decl;
 use wdl_ast::v1::RequirementsSection;
 use wdl_ast::v1::RuntimeSection;
 use wdl_ast::v1::StrippedCommandPart;
+use wdl_ast::v1::TASK_HINT_MAX_CPU;
+use wdl_ast::v1::TASK_HINT_MAX_CPU_ALIAS;
+use wdl_ast::v1::TASK_HINT_MAX_MEMORY;
+use wdl_ast::v1::TASK_HINT_MAX_MEMORY_ALIAS;
+use wdl_ast::v1::TASK_REQUIREMENT_CONTAINER;
+use wdl_ast::v1::TASK_REQUIREMENT_CONTAINER_ALIAS;
+use wdl_ast::v1::TASK_REQUIREMENT_CPU;
 use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES;
 use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES_ALIAS;
+use wdl_ast::v1::TASK_REQUIREMENT_MEMORY;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::TaskHintsSection;
 use wdl_ast::version::V1;
@@ -50,7 +65,6 @@ use super::ProgressKind;
 use crate::Coercible;
 use crate::EvaluationContext;
 use crate::EvaluationResult;
-use crate::MountPoint;
 use crate::Outputs;
 use crate::PathTrie;
 use crate::Scope;
@@ -64,12 +78,15 @@ use crate::TaskValue;
 use crate::Value;
 use crate::config::Config;
 use crate::config::MAX_RETRIES;
+use crate::convert_unit_string;
 use crate::diagnostics::output_evaluation_failed;
 use crate::diagnostics::runtime_type_mismatch;
 use crate::eval::EvaluatedTask;
-use crate::eval::MountPoints;
+use crate::eval::Mounts;
 use crate::v1::ExprEvaluator;
 
+/// The default container requirement.
+pub const DEFAULT_TASK_REQUIREMENT_CONTAINER: &str = "ubuntu:latest";
 /// The default value for the `cpu` requirement.
 pub const DEFAULT_TASK_REQUIREMENT_CPU: f64 = 1.0;
 /// The default value for the `memory` requirement.
@@ -84,6 +101,99 @@ const OUTPUT_SCOPE_INDEX: ScopeIndex = ScopeIndex::new(1);
 /// The index of the evaluation scope where the WDL 1.2 `task` variable is
 /// visible.
 const TASK_SCOPE_INDEX: ScopeIndex = ScopeIndex::new(2);
+
+/// Gets the `container` requirement from a requirements map.
+pub(crate) fn container<'a>(
+    requirements: &HashMap<String, Value>,
+    default: Option<&'a str>,
+) -> Cow<'a, str> {
+    requirements
+        .get(TASK_REQUIREMENT_CONTAINER)
+        .or_else(|| requirements.get(TASK_REQUIREMENT_CONTAINER_ALIAS))
+        .map(|v| {
+            v.coerce(&PrimitiveType::String.into())
+                .expect("type should coerce")
+                .unwrap_string()
+                .as_ref()
+                .clone()
+                .into()
+        })
+        .unwrap_or_else(|| {
+            default
+                .map(Into::into)
+                .unwrap_or(DEFAULT_TASK_REQUIREMENT_CONTAINER.into())
+        })
+}
+
+/// Gets the `cpu` requirement from a requirements map.
+pub(crate) fn cpu(requirements: &HashMap<String, Value>) -> f64 {
+    requirements
+        .get(TASK_REQUIREMENT_CPU)
+        .map(|v| {
+            v.coerce(&PrimitiveType::Float.into())
+                .expect("type should coerce")
+                .unwrap_float()
+        })
+        .unwrap_or(DEFAULT_TASK_REQUIREMENT_CPU)
+}
+
+/// Gets the `max_cpu` hint from a hints map.
+pub(crate) fn max_cpu(hints: &HashMap<String, Value>) -> Option<f64> {
+    hints
+        .get(TASK_HINT_MAX_CPU)
+        .or_else(|| hints.get(TASK_HINT_MAX_CPU_ALIAS))
+        .map(|v| {
+            v.coerce(&PrimitiveType::Float.into())
+                .expect("type should coerce")
+                .unwrap_float()
+        })
+}
+
+/// Gets the `memory` requirement from a requirements map.
+pub(crate) fn memory(requirements: &HashMap<String, Value>) -> Result<i64> {
+    Ok(requirements
+        .get(TASK_REQUIREMENT_MEMORY)
+        .map(|v| {
+            if let Some(v) = v.as_integer() {
+                return Ok(v);
+            }
+
+            if let Some(s) = v.as_string() {
+                return convert_unit_string(s)
+                    .and_then(|v| v.try_into().ok())
+                    .with_context(|| {
+                        format!("task specifies an invalid `memory` requirement `{s}`")
+                    });
+            }
+
+            unreachable!("value should be an integer or string");
+        })
+        .transpose()?
+        .unwrap_or(DEFAULT_TASK_REQUIREMENT_MEMORY))
+}
+
+/// Gets the `max_memory` hint from a hints map.
+pub(crate) fn max_memory(hints: &HashMap<String, Value>) -> Result<Option<i64>> {
+    hints
+        .get(TASK_HINT_MAX_MEMORY)
+        .or_else(|| hints.get(TASK_HINT_MAX_MEMORY_ALIAS))
+        .map(|v| {
+            if let Some(v) = v.as_integer() {
+                return Ok(v);
+            }
+
+            if let Some(s) = v.as_string() {
+                return convert_unit_string(s)
+                    .and_then(|v| v.try_into().ok())
+                    .with_context(|| {
+                        format!("task specifies an invalid `memory` requirement `{s}`")
+                    });
+            }
+
+            unreachable!("value should be an integer or string");
+        })
+        .transpose()
+}
 
 /// Represents a "pointer" to a task evaluation graph node.
 ///
@@ -259,7 +369,7 @@ struct State<'a> {
     /// The environment variables of the task.
     ///
     /// Environment variables do not change between retries.
-    env: HashMap<String, String>,
+    env: IndexMap<String, String>,
 }
 
 impl<'a> State<'a> {
@@ -303,8 +413,8 @@ struct EvaluatedSections {
     requirements: Arc<HashMap<String, Value>>,
     /// The evaluated hints.
     hints: Arc<HashMap<String, Value>>,
-    /// The calculated mount points based on the inputs and declarations.
-    mounts: Arc<MountPoints>,
+    /// The calculated mounts based on the inputs and declarations.
+    mounts: Arc<Mounts>,
 }
 
 /// Represents a WDL V1 task evaluator.
@@ -313,44 +423,54 @@ pub struct TaskEvaluator {
     config: Arc<Config>,
     /// The associated task execution backend.
     backend: Arc<dyn TaskExecutionBackend>,
+    /// The cancellation token for cancelling task evaluation.
+    token: CancellationToken,
 }
 
 impl TaskEvaluator {
     /// Constructs a new task evaluator with the given evaluation
-    /// configuration.
+    /// configuration and cancellation token.
     ///
     /// This method creates a default task execution backend.
     ///
     /// Returns an error if the configuration isn't valid.
-    pub fn new(config: Config) -> Result<Self> {
-        let backend = config.create_backend()?;
-        Self::new_with_backend(config, backend)
+    pub async fn new(config: Config, token: CancellationToken) -> Result<Self> {
+        let backend = config.create_backend().await?;
+        Self::new_with_backend(config, backend, token)
     }
 
     /// Constructs a new task evaluator with the given evaluation
-    /// configuration and task execution backend.
+    /// configuration, task execution backend, and cancellation token.
     ///
     /// Returns an error if the configuration isn't valid.
     pub fn new_with_backend(
         config: Config,
         backend: Arc<dyn TaskExecutionBackend>,
+        token: CancellationToken,
     ) -> Result<Self> {
         config.validate()?;
 
         Ok(Self {
             config: Arc::new(config),
             backend,
+            token,
         })
     }
 
-    /// Creates a new task evaluator with the given configuration and backend.
+    /// Creates a new task evaluator with the given configuration, backend, and
+    /// cancellation token.
     ///
     /// This method does not validate the configuration.
     pub(crate) fn new_unchecked(
         config: Arc<Config>,
         backend: Arc<dyn TaskExecutionBackend>,
+        token: CancellationToken,
     ) -> Self {
-        Self { config, backend }
+        Self {
+            config,
+            backend,
+            token,
+        }
     }
 
     /// Evaluates the given task.
@@ -469,9 +589,10 @@ impl TaskEvaluator {
             }
 
             info!(
-                "evaluating task `{task}` in `{uri}`",
-                task = task.name(),
-                uri = document.uri()
+                task_id = id,
+                task_name = task.name(),
+                document = document.uri().as_str(),
+                "evaluating task"
             );
 
             let mut state = State::new(root, document, task)?;
@@ -480,10 +601,10 @@ impl TaskEvaluator {
             while current < nodes.len() {
                 match graph[nodes[current]].to_node(document) {
                     TaskGraphNode::Input(decl) => {
-                        self.evaluate_input(&mut state, &decl, inputs)?;
+                        self.evaluate_input(id, &mut state, &decl, inputs)?;
                     }
                     TaskGraphNode::Decl(decl) => {
-                        self.evaluate_decl(&mut state, &decl)?;
+                        self.evaluate_decl(id, &mut state, &decl)?;
                     }
                     TaskGraphNode::Output(_) => {
                         // Stop at the first output
@@ -524,7 +645,7 @@ impl TaskEvaluator {
                 requirements,
                 hints,
                 mounts,
-            } = self.evaluate_sections(&mut state, definition.clone(), inputs, id, attempt)?;
+            } = self.evaluate_sections(id, &mut state, definition.clone(), inputs, attempt)?;
 
             // Get the maximum number of retries, either from the task's requirements or
             // from configuration
@@ -543,22 +664,33 @@ impl TaskEvaluator {
                 .into());
             }
 
-            let (request, rx) = TaskSpawnRequest::new(
+            let request = TaskSpawnRequest::new(
                 state.root.clone(),
+                id.to_string(),
                 command,
                 requirements.clone(),
                 hints.clone(),
                 env.clone(),
                 mounts.clone(),
             );
-            let response = self.backend.spawn(request)?;
+
+            let (spawned_rx, completed_rx) = self
+                .backend
+                .spawn(request, self.token.clone())
+                .with_context(|| {
+                    format!(
+                        "failed to spawn task `{name}` in `{path}` (task id `{id}`)",
+                        name = task.name(),
+                        path = document.path(),
+                    )
+                })?;
 
             // Await the spawned notification first
-            rx.await.expect("failed to await spawned notification");
+            spawned_rx.await.ok();
 
             progress(ProgressKind::TaskExecutionStarted { id, attempt });
 
-            let status_code = response
+            let status_code = completed_rx
                 .await
                 .expect("failed to receive response from spawned task");
 
@@ -567,10 +699,16 @@ impl TaskEvaluator {
                 status_code: &status_code,
             });
 
-            let status_code = status_code?;
-            let evaluated = EvaluatedTask::new(&state.root, status_code)?;
+            let status_code = status_code.with_context(|| {
+                format!(
+                    "task execution failed for task `{name}` in `{path}` (task id `{id}`)",
+                    name = task.name(),
+                    path = document.path(),
+                )
+            })?;
 
             // Update the task variable
+            let evaluated = EvaluatedTask::new(&state.root, status_code)?;
             if version >= SupportedVersion::V1(V1::Two) {
                 let task = state.scopes[TASK_SCOPE_INDEX.0]
                     .get_mut(TASK_VAR_NAME)
@@ -589,7 +727,13 @@ impl TaskEvaluator {
 
             if let Err(e) = evaluated.handle_exit(&requirements) {
                 if attempt >= max_retries {
-                    return Err(e.into());
+                    return Err(e
+                        .context(format!(
+                            "task execution failed for task `{name}` in `{path}` (task id `{id}`)",
+                            name = task.name(),
+                            path = document.path(),
+                        ))
+                        .into());
                 }
 
                 attempt += 1;
@@ -611,10 +755,10 @@ impl TaskEvaluator {
         for index in &nodes[current..] {
             match graph[*index].to_node(document) {
                 TaskGraphNode::Decl(decl) => {
-                    self.evaluate_decl(&mut state, &decl)?;
+                    self.evaluate_decl(id, &mut state, &decl)?;
                 }
                 TaskGraphNode::Output(decl) => {
-                    self.evaluate_output(&mut state, &decl, &evaluated, &mounts)?;
+                    self.evaluate_output(id, &mut state, &decl, &evaluated, &mounts)?;
                 }
                 _ => {
                     unreachable!(
@@ -642,6 +786,7 @@ impl TaskEvaluator {
     /// Evaluates a task input.
     fn evaluate_input(
         &self,
+        id: &str,
         state: &mut State<'_>,
         decl: &Decl,
         inputs: &TaskInputs,
@@ -655,10 +800,11 @@ impl TaskEvaluator {
             None => {
                 if let Some(expr) = decl.expr() {
                     debug!(
-                        "evaluating input `{name}` for task `{task}` in `{uri}`",
-                        name = name.as_str(),
-                        task = state.task.name(),
-                        uri = state.document.uri(),
+                        task_id = id,
+                        task_name = state.task.name(),
+                        document = state.document.uri().as_str(),
+                        input_name = name.as_str(),
+                        "evaluating input"
                     );
 
                     let mut evaluator = ExprEvaluator::new(TaskEvaluationContext::new(
@@ -696,13 +842,14 @@ impl TaskEvaluator {
     }
 
     /// Evaluates a task private declaration.
-    fn evaluate_decl(&self, state: &mut State<'_>, decl: &Decl) -> EvaluationResult<()> {
+    fn evaluate_decl(&self, id: &str, state: &mut State<'_>, decl: &Decl) -> EvaluationResult<()> {
         let name = decl.name();
         debug!(
-            "evaluating private declaration `{name}` for task `{task}` in `{uri}`",
-            name = name.as_str(),
-            task = state.task.name(),
-            uri = state.document.uri(),
+            task_id = id,
+            task_name = state.task.name(),
+            document = state.document.uri().as_str(),
+            decl_name = name.as_str(),
+            "evaluating private declaration",
         );
 
         let decl_ty = decl.ty();
@@ -741,14 +888,16 @@ impl TaskEvaluator {
     /// Returns both the task's hints and requirements.
     fn evaluate_runtime_section(
         &self,
+        id: &str,
         state: &State<'_>,
         section: &RuntimeSection,
         inputs: &TaskInputs,
     ) -> EvaluationResult<(HashMap<String, Value>, HashMap<String, Value>)> {
         debug!(
-            "evaluating runtimes section for task `{task}` in `{uri}`",
-            task = state.task.name(),
-            uri = state.document.uri()
+            task_id = id,
+            task_name = state.task.name(),
+            document = state.document.uri().as_str(),
+            "evaluating runtimes section",
         );
 
         let mut requirements = HashMap::new();
@@ -807,14 +956,16 @@ impl TaskEvaluator {
     /// Evaluates the requirements section.
     fn evaluate_requirements_section(
         &self,
+        id: &str,
         state: &State<'_>,
         section: &RequirementsSection,
         inputs: &TaskInputs,
     ) -> EvaluationResult<HashMap<String, Value>> {
         debug!(
-            "evaluating requirements section for task `{task}` in `{uri}`",
-            task = state.task.name(),
-            uri = state.document.uri()
+            task_id = id,
+            task_name = state.task.name(),
+            document = state.document.uri().as_str(),
+            "evaluating requirements",
         );
 
         let mut requirements = HashMap::new();
@@ -858,14 +1009,16 @@ impl TaskEvaluator {
     /// Evaluates the hints section.
     fn evaluate_hints_section(
         &self,
+        id: &str,
         state: &State<'_>,
         section: &TaskHintsSection,
         inputs: &TaskInputs,
     ) -> EvaluationResult<HashMap<String, Value>> {
         debug!(
-            "evaluating hints section for task `{task}` in `{uri}`",
-            task = state.task.name(),
-            uri = state.document.uri()
+            task_id = id,
+            task_name = state.task.name(),
+            document = state.document.uri().as_str(),
+            "evaluating hints section",
         );
 
         let mut hints = HashMap::new();
@@ -891,51 +1044,58 @@ impl TaskEvaluator {
 
     /// Evaluates the command of a task.
     ///
-    /// Returns the evaluated command and a mapping between host paths and guest
-    /// paths.
+    /// Returns the evaluated command and the mounts to use for spawning the
+    /// task.
     fn evaluate_command(
         &self,
+        id: &str,
         state: &State<'_>,
         section: &CommandSection,
-    ) -> EvaluationResult<(String, MountPoints)> {
+    ) -> EvaluationResult<(String, Mounts)> {
         debug!(
-            "evaluating command section for task `{task}` in `{uri}`",
-            task = state.task.name(),
-            uri = state.document.uri()
+            task_id = id,
+            task_name = state.task.name(),
+            document = state.document.uri().as_str(),
+            "evaluating command section",
         );
 
-        // Determine the mount points needed to evaluate the command properly
-        let mounts = if let Some(root) = self.backend.container_root_dir() {
+        // Determine the mounts needed to evaluate the command properly
+        let mounts = if let Some(root_dir) = self.backend.container_root_dir() {
             // For every file or directory value in scope, we need to insert into the tree
             let mut paths = Vec::new();
-            let mut trie = PathTrie::default();
 
             // Discover every path and directory that's visible to the scope
             ScopeRef::new(&state.scopes, TASK_SCOPE_INDEX.0).for_each(|_, v| {
                 v.visit_paths(&mut |p| {
-                    paths.push(p.clone());
+                    paths.push((clean(state.root.work_dir().join(p.as_ref())), true));
                 });
             });
 
+            paths.push((state.root.work_dir().to_owned(), false));
+            paths.push((state.root.command().to_owned(), true));
+
             // Insert the paths into the trie
-            for path in &paths {
-                trie.insert(Path::new(path.as_str()));
+            let mut trie = PathTrie::default();
+            for (path, read_only) in &paths {
+                trie.insert(path, *read_only);
             }
 
-            // Convert the trie into mount points
-            let mut mounts = trie.into_mount_points(root.join("inputs"));
+            // Convert the trie into mounts
+            let mounts = trie.into_mounts(root_dir.join("inputs"));
+            if enabled!(Level::DEBUG) {
+                for mount in mounts.iter() {
+                    debug!(
+                        task_id = id,
+                        task_name = state.task.name(),
+                        document = state.document.uri().as_str(),
+                        "mounting `{host}` as `{guest}`{ro}",
+                        host = mount.host.display(),
+                        guest = mount.guest.display(),
+                        ro = if mount.read_only { " (read-only)" } else { "" }
+                    );
+                }
+            }
 
-            // Mount the working directory and command
-            mounts.insert(MountPoint::new(
-                state.root.work_dir(),
-                root.join("work"),
-                false,
-            ));
-            mounts.insert(MountPoint::new(
-                state.root.command(),
-                root.join("command"),
-                true,
-            ));
             mounts
         } else {
             Default::default()
@@ -1002,27 +1162,27 @@ impl TaskEvaluator {
     ///   * command
     fn evaluate_sections(
         &self,
+        id: &str,
         state: &mut State<'_>,
         definition: AstPtr<TaskDefinition>,
         inputs: &TaskInputs,
-        id: &str,
         attempt: u64,
     ) -> EvaluationResult<EvaluatedSections> {
         let definition = definition.to_node(state.document.node().syntax());
 
         // Start by evaluating requirements and hints
         let (requirements, hints) = if let Some(section) = definition.runtime() {
-            self.evaluate_runtime_section(state, &section, inputs)?
+            self.evaluate_runtime_section(id, state, &section, inputs)?
         } else {
             (
                 definition
                     .requirements()
-                    .map(|s| self.evaluate_requirements_section(state, &s, inputs))
+                    .map(|s| self.evaluate_requirements_section(id, state, &s, inputs))
                     .transpose()?
                     .unwrap_or_default(),
                 definition
                     .hints()
-                    .map(|s| self.evaluate_hints_section(state, &s, inputs))
+                    .map(|s| self.evaluate_hints_section(id, state, &s, inputs))
                     .transpose()?
                     .unwrap_or_default(),
             )
@@ -1065,6 +1225,7 @@ impl TaskEvaluator {
         }
 
         let (command, mounts) = self.evaluate_command(
+            id,
             state,
             &definition.command().expect("must have command section"),
         )?;
@@ -1080,17 +1241,19 @@ impl TaskEvaluator {
     /// Evaluates a task output.
     fn evaluate_output(
         &mut self,
+        id: &str,
         state: &mut State<'_>,
         decl: &Decl,
         evaluated: &EvaluatedTask,
-        mounts: &MountPoints,
+        mounts: &Mounts,
     ) -> EvaluationResult<()> {
         let name = decl.name();
         debug!(
-            "evaluating output `{name}` for task `{task}` in `{uri}`",
-            name = name.as_str(),
-            task = state.task.name(),
-            uri = state.document.uri()
+            task_id = id,
+            task_name = state.task.name(),
+            document = state.document.uri().as_str(),
+            output_name = name.as_str(),
+            "evaluating output",
         );
 
         let decl_ty = decl.ty();
@@ -1119,7 +1282,7 @@ impl TaskEvaluator {
                 if p.is_absolute() && !p.starts_with(state.root.path()) {
                     return Ok(Some(host.ok_or_else(|| {
                         anyhow!(
-                            "guest path `{p}` is not within a container mount point",
+                            "guest path `{p}` is not within a container mount",
                             p = p.display()
                         )
                     })?));

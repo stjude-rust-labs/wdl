@@ -45,6 +45,7 @@ use pretty_assertions::StrComparison;
 use regex::Regex;
 use serde_json::to_string_pretty;
 use tempfile::TempDir;
+use tokio_util::sync::CancellationToken;
 use walkdir::WalkDir;
 use wdl_analysis::AnalysisResult;
 use wdl_analysis::Analyzer;
@@ -56,7 +57,7 @@ use wdl_ast::Severity;
 use wdl_engine::EvaluatedTask;
 use wdl_engine::EvaluationError;
 use wdl_engine::Inputs;
-use wdl_engine::config::Backend;
+use wdl_engine::config::BackendKind;
 use wdl_engine::v1::TaskEvaluator;
 
 /// Regex used to replace temporary file names in task command files with
@@ -157,16 +158,7 @@ fn compare_result(path: &Path, result: &str) -> Result<()> {
 
 /// Runs the test given the provided analysis result.
 async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
-    let cwd = std::env::current_dir().expect("must have a CWD");
-    // Attempt to strip the CWD from the result path
-    let path = result.document().uri().to_file_path();
-    let path: Cow<'_, str> = match &path {
-        // Strip the CWD from the path
-        Ok(path) => path.strip_prefix(&cwd).unwrap_or(path).to_string_lossy(),
-        // Use the id itself if there is no path
-        Err(_) => result.document().uri().as_str().into(),
-    };
-
+    let path = result.document().path();
     let diagnostics: Cow<'_, [Diagnostic]> = match result.error() {
         Some(e) => vec![Diagnostic::error(format!("failed to read `{path}`: {e:#}"))].into(),
         None => result.document().diagnostics().into(),
@@ -203,11 +195,11 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
         .document()
         .task_by_name(&name)
         .ok_or_else(|| anyhow!("document does not contain a task named `{name}`"))?;
-    inputs.join_paths(task, &test_dir);
+    inputs.join_paths(task, &test_dir)?;
 
     let mut config = wdl_engine::config::Config::default();
-    config.backend.default = Backend::Local;
-    let mut evaluator = TaskEvaluator::new(config)?;
+    config.backend.default = BackendKind::Local;
+    let mut evaluator = TaskEvaluator::new(config, CancellationToken::new()).await?;
 
     let dir = TempDir::new().context("failed to create temporary directory")?;
     match evaluator

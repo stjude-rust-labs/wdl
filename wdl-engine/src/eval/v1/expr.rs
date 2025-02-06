@@ -1,10 +1,10 @@
 //! Implementation of an expression evaluator for 1.x WDL documents.
 
+use std::borrow::Cow;
 use std::cmp::Ordering;
 use std::fmt::Write;
 use std::iter::once;
 use std::path::Path;
-use std::path::PathBuf;
 use std::sync::Arc;
 
 use indexmap::IndexMap;
@@ -266,18 +266,18 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
     ///
     /// The `translate` callback is called to translate any path values; this is
     /// primarily used when evaluating a placeholder in a task command section.
-    pub fn evaluate_placeholder(
+    pub fn evaluate_placeholder<'a>(
         &mut self,
         placeholder: &Placeholder,
         buffer: &mut String,
-        translate: impl Fn(&Path) -> Option<PathBuf>,
+        translate: impl Fn(&Path) -> Option<Cow<'a, Path>> + 'a,
     ) -> Result<(), Diagnostic> {
         /// The actual implementation for evaluating placeholders
-        fn imp<C: EvaluationContext>(
+        fn imp<'a, C: EvaluationContext>(
             evaluator: &mut ExprEvaluator<C>,
             placeholder: &Placeholder,
             buffer: &mut String,
-            translate: impl Fn(&Path) -> Option<PathBuf>,
+            translate: impl Fn(&Path) -> Option<Cow<'a, Path>> + 'a,
         ) -> Result<(), Diagnostic> {
             let expr = placeholder.expr();
             match evaluator.evaluate_expr(&expr)? {
