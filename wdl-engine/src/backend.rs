@@ -96,11 +96,11 @@ pub struct TaskExecutionRoot {
 
 impl TaskExecutionRoot {
     /// Creates a task execution root for the given path and execution attempt.
-    pub fn new(path2: &Path, attempt: u64) -> Result<Self> {
-        let root_dir = absolute(path2).with_context(|| {
+    pub fn new(path: &Path, attempt: u64) -> Result<Self> {
+        let root_dir = absolute(path).with_context(|| {
             format!(
                 "failed to determine absolute path of `{path}`",
-                path = path2.display()
+                path = path.display()
             )
         })?;
 

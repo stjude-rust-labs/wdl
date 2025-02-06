@@ -50,6 +50,7 @@ use super::ProgressKind;
 use crate::Coercible;
 use crate::EvaluationContext;
 use crate::EvaluationResult;
+use crate::MountPoint;
 use crate::Outputs;
 use crate::PathTrie;
 use crate::Scope;
@@ -925,8 +926,16 @@ impl TaskEvaluator {
             let mut mounts = trie.into_mount_points(root.join("inputs"));
 
             // Mount the working directory and command
-            mounts.insert(state.root.work_dir(), root.join("work"), false);
-            mounts.insert(state.root.command(), root.join("command"), true);
+            mounts.insert(MountPoint::new(
+                state.root.work_dir(),
+                root.join("work"),
+                false,
+            ));
+            mounts.insert(MountPoint::new(
+                state.root.command(),
+                root.join("command"),
+                true,
+            ));
             mounts
         } else {
             Default::default()

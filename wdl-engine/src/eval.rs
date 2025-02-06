@@ -389,10 +389,33 @@ impl EvaluatedTask {
     }
 }
 
+/// Represents a mount point for use in task execution backends that use
+/// containers.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MountPoint {
+    /// The host path for the mount point.
+    pub host: PathBuf,
+    /// The guest path for the mount point.
+    pub guest: PathBuf,
+    /// Whether or not the mount should be read-only.
+    pub read_only: bool,
+}
+
+impl MountPoint {
+    /// Creates a new mount point with the given host and guest paths.
+    pub fn new(host: impl Into<PathBuf>, guest: impl Into<PathBuf>, read_only: bool) -> Self {
+        Self {
+            host: host.into(),
+            guest: guest.into(),
+            read_only,
+        }
+    }
+}
+
 /// Represents mount points for mapping host and guest paths for task execution
 /// backends that use containers.
 #[derive(Debug, Default)]
-pub struct MountPoints(Vec<(PathBuf, PathBuf, bool)>);
+pub struct MountPoints(Vec<MountPoint>);
 
 impl MountPoints {
     /// Gets the guest path for the given host path.
@@ -401,9 +424,9 @@ impl MountPoints {
     pub fn guest(&self, host: impl AsRef<Path>) -> Option<PathBuf> {
         let host = host.as_ref();
 
-        for (mount_host, mount_guest, _) in &self.0 {
-            if let Ok(stripped) = host.strip_prefix(mount_host) {
-                return Some(Path::new(mount_guest).join(stripped));
+        for mp in &self.0 {
+            if let Ok(stripped) = host.strip_prefix(&mp.host) {
+                return Some(Path::new(&mp.guest).join(stripped));
             }
         }
 
@@ -416,9 +439,9 @@ impl MountPoints {
     pub fn host(&self, guest: impl AsRef<Path>) -> Option<PathBuf> {
         let guest = guest.as_ref();
 
-        for (mount_host, mount_guest, _) in &self.0 {
-            if let Ok(stripped) = guest.strip_prefix(mount_guest) {
-                return Some(Path::new(mount_host).join(stripped));
+        for mp in &self.0 {
+            if let Ok(stripped) = guest.strip_prefix(&mp.guest) {
+                return Some(Path::new(&mp.host).join(stripped));
             }
         }
 
@@ -427,10 +450,8 @@ impl MountPoints {
 
     /// Returns an iterator of mount point host path to mount point guest path
     /// and whether or not the mounting should be read-only.
-    pub fn iter(&self) -> impl Iterator<Item = (&Path, &Path, bool)> {
-        self.0
-            .iter()
-            .map(|(h, g, ro)| (h.as_path(), g.as_path(), *ro))
+    pub fn iter(&self) -> impl Iterator<Item = &MountPoint> {
+        self.0.iter()
     }
 
     /// Returns the number of mount points in the collection.
@@ -444,8 +465,8 @@ impl MountPoints {
     }
 
     /// Inserts a mount point.
-    pub fn insert(&mut self, host: impl Into<PathBuf>, guest: impl Into<PathBuf>, read_only: bool) {
-        self.0.push((host.into(), guest.into(), read_only));
+    pub fn insert(&mut self, mp: impl Into<MountPoint>) {
+        self.0.push(mp.into());
     }
 }
 
@@ -501,9 +522,9 @@ impl<'a> PathTrieNode<'a> {
         // If this node is a mount point, insert it
         if self.is_mount_point() {
             // Use format! for the path so that it always appears unix-style
-            mounts.0.push((
-                host.clone(),
-                format!(
+            mounts.0.push(MountPoint {
+                host: host.clone(),
+                guest: format!(
                     "{root}{sep}{num}",
                     root = root.display(),
                     sep = if root.as_os_str().as_encoded_bytes().last() == Some(&b'/') {
@@ -514,8 +535,8 @@ impl<'a> PathTrieNode<'a> {
                     num = mounts.0.len()
                 )
                 .into(),
-                true,
-            ));
+                read_only: true, // All mounts from the path trie are always read-only
+            });
         } else {
             // Otherwise, traverse into the children
             for child in self.children.values() {
@@ -662,9 +683,9 @@ mod test {
         assert_eq!(
             mapped,
             [
-                (Path::new("/bar/foo"), Path::new("/mnt/0"), true),
-                (Path::new("/baz"), Path::new("/mnt/1"), true),
-                (Path::new("/foo"), Path::new("/mnt/2"), true),
+                &MountPoint::new("/bar/foo", "/mnt/0", true),
+                &MountPoint::new("/baz", "/mnt/1", true),
+                &MountPoint::new("/foo", "/mnt/2", true),
             ]
         );
 
@@ -717,9 +738,9 @@ mod test {
         assert_eq!(
             mapped,
             [
-                (Path::new("C:\\bar\\foo"), Path::new("/mnt/0"), true),
-                (Path::new("C:\\foo"), Path::new("/mnt/1"), true),
-                (Path::new("D:\\baz"), Path::new("/mnt/2"), true),
+                &MountPoint::new("C:\\bar\\foo", "/mnt/0", true),
+                &MountPoint::new("C:\\foo", "/mnt/1", true),
+                &MountPoint::new("D:\\baz", "/mnt/2", true),
             ]
         );
 
