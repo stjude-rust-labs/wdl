@@ -18,6 +18,8 @@ maud.workspace = true
 notify.workspace = true
 pulldown-cmark.workspace = true
 tokio.workspace = true
+tower.workspace = true
+tower-http.workspace = true
 wdl-analysis = { path = "../wdl-analysis", version = "0.6.0" }
 wdl-ast = { path = "../wdl-ast", version = "0.10.0" }
 

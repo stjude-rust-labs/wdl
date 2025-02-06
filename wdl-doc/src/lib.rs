@@ -14,11 +14,13 @@ pub mod task;
 pub mod workflow;
 
 use std::collections::HashMap;
+use std::net::SocketAddr;
 use std::path::Path;
 use std::path::PathBuf;
 
 use anyhow::Result;
 use anyhow::anyhow;
+use axum::Router;
 use maud::DOCTYPE;
 use maud::Markup;
 use maud::PreEscaped;
@@ -27,6 +29,7 @@ use maud::html;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
 use tokio::io::AsyncWriteExt;
+use tower_http::services::ServeDir;
 use wdl_analysis::Analyzer;
 use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::rules;
@@ -66,7 +69,6 @@ pub(crate) fn header(page_title: &str, stylesheet: &Path) -> Markup {
         }
     }
 }
-
 
 /// A full HTML page with a header and body.
 pub(crate) fn full_page(page_title: &str, stylesheet: &Path, body: Markup) -> Markup {
@@ -127,7 +129,8 @@ pub struct Document {
     name: String,
     /// The AST node for the version statement.
     ///
-    /// This is used both to display the WDL version number and to fetch the preamble comments.
+    /// This is used both to display the WDL version number and to fetch the
+    /// preamble comments.
     version: VersionStatement,
 }
 
@@ -166,7 +169,14 @@ impl Document {
 }
 
 /// Generate HTML documentation for a workspace.
-pub async fn document_workspace(workspace: PathBuf) -> Result<()> {
+///
+/// This function will generate HTML documentation for all WDL files in the
+/// workspace directory. The generated documentation will be stored in a
+/// `docs` directory within the workspace.
+///
+/// The contents of `css` (if not empty) will be written to a `style.css` file
+/// in the `docs` directory.
+pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathBuf> {
     if !workspace.is_dir() {
         return Err(anyhow!("Workspace is not a directory"));
     }
@@ -178,6 +188,10 @@ pub async fn document_workspace(workspace: PathBuf) -> Result<()> {
         std::fs::create_dir(&docs_dir)?;
     }
 
+    if !css.is_empty() {
+        let css_path = docs_dir.join("style.css");
+        tokio::fs::write(&css_path, css).await?;
+    }
     let css_path = Path::new("/style.css");
 
     let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
@@ -185,11 +199,13 @@ pub async fn document_workspace(workspace: PathBuf) -> Result<()> {
     let results = analyzer.analyze(()).await?;
 
     for result in results {
-        let cur_path = result
-            .document()
-            .uri()
-            .to_file_path()
-            .expect("URI should have a file path");
+        let cur_path = match result.document().uri().to_file_path() {
+            Ok(path) => path,
+            Err(_) =>{
+                eprintln!("Failed to get file path for document: {:?}", result.document().uri());
+                continue;
+            }
+        };
         let relative_path = match cur_path.strip_prefix(&abs_path) {
             Ok(path) => path,
             Err(_) => &PathBuf::from("external").join(cur_path.strip_prefix("/").unwrap()),
@@ -374,7 +390,42 @@ pub async fn document_workspace(workspace: PathBuf) -> Result<()> {
             }
         }
     }
-    anyhow::Ok(())
+    Ok(docs_dir)
+}
+
+/// Serve the generated documentation.
+pub async fn serve_docs(docs: PathBuf) -> Result<()> {
+    let serve_dir = ServeDir::new(docs);
+    let app = Router::new().nest_service("/docs", serve_dir);
+
+    let addr = SocketAddr::from(([127, 0, 0, 1], 8042));
+    let listener = tokio::net::TcpListener::bind(&addr).await?;
+    axum::serve(listener, app).await.unwrap();
+
+    println!("Serving documentation at http://{}", addr);
+
+    Ok(())
+}
+
+/// Build a stylesheet for the documentation, given the path to the `themes`
+/// directory.
+pub fn build_stylesheet(themes_dir: &Path) -> Result<String> {
+    // Shell out to `npm run dev` to build the stylesheet.
+    // This should be called with `themes_dir` as the working directory.
+    let themes_dir = themes_dir.canonicalize()?;
+    let output = std::process::Command::new("npm")
+        .arg("run")
+        .arg("dev")
+        .current_dir(&themes_dir)
+        .output()?;
+    if !output.status.success() {
+        return Err(anyhow!("Failed to build stylesheet"));
+    }
+    let css_path = themes_dir.join("dist/style.css");
+    if !css_path.exists() {
+        return Err(anyhow!("Failed to find stylesheet"));
+    }
+    Ok(css_path.to_string_lossy().to_string())
 }
 
 #[cfg(test)]

@@ -36,7 +36,9 @@ use wdl::cli::validate_inputs;
 use wdl_analysis::path_to_uri;
 use wdl_ast::Node;
 use wdl_ast::Severity;
+use wdl_doc::build_stylesheet;
 use wdl_doc::document_workspace;
+use wdl_doc::serve_docs;
 use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt as _;
 
@@ -246,6 +248,10 @@ pub struct DocCommand {
     #[clap(value_name = "PATH")]
     pub path: PathBuf,
 
+    /// The path to the `themes` directory.
+    #[clap(long, value_name = "THEMES")]
+    pub themes: Option<PathBuf>,
+
     /// Whether or not to open the generated documentation in the default
     /// browser.
     #[clap(long)]
@@ -255,17 +261,16 @@ pub struct DocCommand {
 impl DocCommand {
     /// Executes the `doc` subcommand.
     async fn exec(self) -> Result<()> {
-        document_workspace(self.path.clone()).await?;
+        let css = if let Some(themes) = self.themes {
+            build_stylesheet(&themes)?
+        } else {
+            "".to_string()
+        };
+
+        let docs_dir = document_workspace(self.path.clone(), css).await?;
 
         if self.open {
-            // find the first `$path/docs/**/index.html` file in the workspace
-            // TODO: once we have a homepage, open that instead.
-            if let Some(index) = find_file_in_directory("index.html", &self.path.join("docs")) {
-                webbrowser::open(&index.as_path().to_string_lossy())
-                    .context("failed to open browser")?;
-            } else {
-                eprintln!("failed to find `index.html` in workspace");
-            }
+            serve_docs(docs_dir).await?;
         }
 
         Ok(())
