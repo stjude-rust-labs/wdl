@@ -255,7 +255,7 @@ pub struct DocCommand {
 impl DocCommand {
     /// Executes the `doc` subcommand.
     async fn exec(self) -> Result<()> {
-        document_workspace(self.path.clone(), PathBuf::from("wdl-doc/theme/")).await?;
+        document_workspace(self.path.clone()).await?;
 
         if self.open {
             // find the first `$path/docs/**/index.html` file in the workspace

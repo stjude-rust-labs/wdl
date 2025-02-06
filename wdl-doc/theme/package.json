@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prod": "npx @tailwindcss/cli -i src/main.css -o dist/styles.css",
-    "dev": "npx @tailwindcss/cli -i src/main.css -o dist/styles.css"
+    "prod": "npx @tailwindcss/cli -i src/main.css -o dist/style.css",
+    "dev": "npx @tailwindcss/cli -i src/main.css -o dist/style.css"
   },
   "keywords": [],
   "author": "",

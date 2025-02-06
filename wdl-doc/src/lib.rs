@@ -52,19 +52,6 @@ impl Render for Css<'_> {
     }
 }
 
-/// A full HTML page with a header and body.
-pub(crate) fn full_page(page_title: &str, stylesheet: &Path, body: Markup) -> Markup {
-    html! {
-        (DOCTYPE)
-        html class="dark size-full" {
-            (header(page_title, stylesheet))
-            body class="size-full dark:bg-slate-950 dark:text-white" {
-                (body)
-           }
-        }
-    }
-}
-
 /// A basic header with a dynamic `page_title` and link to the stylesheet.
 pub(crate) fn header(page_title: &str, stylesheet: &Path) -> Markup {
     html! {
@@ -80,6 +67,19 @@ pub(crate) fn header(page_title: &str, stylesheet: &Path) -> Markup {
     }
 }
 
+
+/// A full HTML page with a header and body.
+pub(crate) fn full_page(page_title: &str, stylesheet: &Path, body: Markup) -> Markup {
+    html! {
+        (DOCTYPE)
+        html class="dark size-full" {
+            (header(page_title, stylesheet))
+            body class="size-full dark:bg-slate-950 dark:text-white" {
+                (body)
+           }
+        }
+    }
+}
 /// Renders a block of Markdown using `pulldown-cmark`.
 pub(crate) struct Markdown<T>(T);
 
@@ -98,6 +98,26 @@ impl<T: AsRef<str>> Render for Markdown<T> {
     }
 }
 
+/// Fetch the preamble comments of a document using the version statement.
+fn fetch_preamble_comments(version: VersionStatement) -> String {
+    let comments = version
+        .keyword()
+        .syntax()
+        .preceding_trivia()
+        .map(|t| match t.kind() {
+            wdl_ast::SyntaxKind::Comment => match t.to_string().strip_prefix("## ") {
+                Some(comment) => comment.to_string(),
+                None => "".to_string(),
+            },
+            wdl_ast::SyntaxKind::Whitespace => "".to_string(),
+            _ => {
+                panic!("Unexpected token kind: {:?}", t.kind())
+            }
+        })
+        .collect::<Vec<_>>();
+    comments.join("\n")
+}
+
 /// A WDL document.
 #[derive(Debug)]
 pub struct Document {
@@ -105,7 +125,9 @@ pub struct Document {
     ///
     /// This is the filename of the document without the extension.
     name: String,
-    /// The version of the document.
+    /// The AST node for the version statement.
+    ///
+    /// This is used both to display the WDL version number and to fetch the preamble comments.
     version: VersionStatement,
 }
 
@@ -143,28 +165,8 @@ impl Document {
     }
 }
 
-/// Fetch the preamble comments from a document.
-fn fetch_preamble_comments(version: VersionStatement) -> String {
-    let comments = version
-        .keyword()
-        .syntax()
-        .preceding_trivia()
-        .map(|t| match t.kind() {
-            wdl_ast::SyntaxKind::Comment => match t.to_string().strip_prefix("## ") {
-                Some(comment) => comment.to_string(),
-                None => "".to_string(),
-            },
-            wdl_ast::SyntaxKind::Whitespace => "".to_string(),
-            _ => {
-                panic!("Unexpected token kind: {:?}", t.kind())
-            }
-        })
-        .collect::<Vec<_>>();
-    comments.join("\n")
-}
-
 /// Generate HTML documentation for a workspace.
-pub async fn document_workspace(workspace: PathBuf, theme: PathBuf) -> Result<()> {
+pub async fn document_workspace(workspace: PathBuf) -> Result<()> {
     if !workspace.is_dir() {
         return Err(anyhow!("Workspace is not a directory"));
     }
@@ -176,7 +178,7 @@ pub async fn document_workspace(workspace: PathBuf, theme: PathBuf) -> Result<()
         std::fs::create_dir(&docs_dir)?;
     }
 
-    let css_path = theme.join("style.css");
+    let css_path = Path::new("/style.css");
 
     let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
     analyzer.add_directory(abs_path.clone()).await?;

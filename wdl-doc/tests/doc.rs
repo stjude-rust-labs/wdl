@@ -11,7 +11,6 @@ use std::env;
 use std::fs;
 use std::io;
 use std::path::Path;
-use std::path::PathBuf;
 use std::process::exit;
 
 use wdl_doc::document_workspace;
@@ -48,7 +47,7 @@ async fn main() {
         fs::remove_dir_all(test_dir.join("docs")).unwrap();
     }
 
-    match document_workspace(test_dir.to_path_buf(), PathBuf::from("wdl-doc/theme/")).await {
+    match document_workspace(test_dir.to_path_buf()).await {
         Ok(_) => {
             println!("Successfully generated docs");
         }
