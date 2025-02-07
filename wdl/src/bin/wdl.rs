@@ -290,13 +290,12 @@ impl DocCommand {
         }
 
         if self.watch {
-            let themes = self
-                .themes
-                .expect("themes directory is required for watching");
             let (tx, rx) = mpsc::channel::<NotifyResult<Event>>();
             let mut watcher = recommended_watcher(tx)?;
 
-            watcher.watch(&self.path, RecursiveMode::Recursive)?;
+            let themes = self
+                .themes
+                .expect("themes directory is required for watching");
             watcher.watch(&themes, RecursiveMode::Recursive)?;
 
             loop {
