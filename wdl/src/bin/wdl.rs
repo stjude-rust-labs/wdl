@@ -38,7 +38,6 @@ use wdl_ast::Node;
 use wdl_ast::Severity;
 use wdl_doc::build_stylesheet;
 use wdl_doc::document_workspace;
-use wdl_doc::serve_docs;
 use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt as _;
 
@@ -270,7 +269,13 @@ impl DocCommand {
         let docs_dir = document_workspace(self.path.clone(), css).await?;
 
         if self.open {
-            serve_docs(docs_dir).await?;
+            // find the first `$path/docs/**/index.html` file in the workspace
+            // TODO: once we have a homepage, open that instead.
+            if let Some(index) = find_file_in_directory("index.html", &docs_dir) {
+                opener::open(index)?;
+            } else {
+                eprintln!("failed to find `index.html` in workspace");
+            }
         }
 
         Ok(())

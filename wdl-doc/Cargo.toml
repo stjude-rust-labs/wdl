@@ -11,15 +11,13 @@ rust-version.workspace = true
 
 [dependencies]
 ammonia.workspace = true
-axum.workspace = true
 anyhow.workspace = true
 indexmap.workspace = true
 maud.workspace = true
 notify.workspace = true
 pulldown-cmark.workspace = true
+pathdiff.workspace = true
 tokio.workspace = true
-tower.workspace = true
-tower-http.workspace = true
 wdl-analysis = { path = "../wdl-analysis", version = "0.6.0" }
 wdl-ast = { path = "../wdl-ast", version = "0.10.0" }
 

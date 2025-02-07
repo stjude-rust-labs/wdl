@@ -14,22 +14,20 @@ pub mod task;
 pub mod workflow;
 
 use std::collections::HashMap;
-use std::net::SocketAddr;
 use std::path::Path;
 use std::path::PathBuf;
 
 use anyhow::Result;
 use anyhow::anyhow;
-use axum::Router;
 use maud::DOCTYPE;
 use maud::Markup;
 use maud::PreEscaped;
 use maud::Render;
 use maud::html;
+use pathdiff::diff_paths;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
 use tokio::io::AsyncWriteExt;
-use tower_http::services::ServeDir;
 use wdl_analysis::Analyzer;
 use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::rules;
@@ -174,41 +172,35 @@ impl Document {
 /// workspace directory. The generated documentation will be stored in a
 /// `docs` directory within the workspace.
 ///
-/// The contents of `css` (if not empty) will be written to a `style.css` file
+/// The contents of `css` will be written to a `style.css` file
 /// in the `docs` directory.
 pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathBuf> {
     if !workspace.is_dir() {
         return Err(anyhow!("Workspace is not a directory"));
     }
 
-    let abs_path = std::path::absolute(&workspace)?;
+    let abs_path = workspace.canonicalize()?;
 
-    let docs_dir = abs_path.clone().join(DOCS_DIR);
+    let docs_dir = abs_path.join(DOCS_DIR);
     if !docs_dir.exists() {
         std::fs::create_dir(&docs_dir)?;
     }
 
-    if !css.is_empty() {
-        let css_path = docs_dir.join("style.css");
-        tokio::fs::write(&css_path, css).await?;
-    }
-    let css_path = Path::new("/style.css");
+    let abs_css_path = docs_dir.join("style.css");
+    tokio::fs::write(&abs_css_path, css).await?;
 
     let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
     analyzer.add_directory(abs_path.clone()).await?;
     let results = analyzer.analyze(()).await?;
 
     for result in results {
-        let cur_path = match result.document().uri().to_file_path() {
-            Ok(path) => path,
-            Err(_) =>{
-                eprintln!("Failed to get file path for document: {:?}", result.document().uri());
-                continue;
-            }
-        };
-        let relative_path = match cur_path.strip_prefix(&abs_path) {
-            Ok(path) => path,
-            Err(_) => &PathBuf::from("external").join(cur_path.strip_prefix("/").unwrap()),
+        let uri = result.document().uri();
+        let relative_path = match uri.to_file_path() {
+            Ok(path) => match path.strip_prefix(&abs_path) {
+                Ok(path) => path.to_path_buf(),
+                Err(_) => PathBuf::from("external").join(path.strip_prefix("/").unwrap()),
+            },
+            Err(_) => PathBuf::from("external").join(uri.path().strip_prefix("/").unwrap()),
         };
         let cur_dir = docs_dir.clone().join(relative_path.with_extension(""));
         if !cur_dir.exists() {
@@ -229,26 +221,28 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
         let index_path = cur_dir.join("index.html");
         let mut index = tokio::fs::File::create(index_path.clone()).await?;
 
+        let rel_css_path = diff_paths(&abs_css_path, &cur_dir).unwrap();
+
         index
-            .write_all(document.render(&css_path).into_string().as_bytes())
+            .write_all(document.render(&rel_css_path).into_string().as_bytes())
             .await?;
 
         for item in ast.items() {
             match item {
                 DocumentItem::Struct(s) => {
                     let struct_name = s.name().as_str().to_owned();
-                    let struct_file = cur_dir.join(format!("{}-struct.html", struct_name));
-                    let mut struct_file = tokio::fs::File::create(struct_file).await?;
+                    let struct_path = cur_dir.join(format!("{}-struct.html", struct_name));
+                    let mut struct_file = tokio::fs::File::create(&struct_path).await?;
 
                     let r#struct = r#struct::Struct::new(s.clone());
                     struct_file
-                        .write_all(r#struct.render(&css_path).into_string().as_bytes())
+                        .write_all(r#struct.render(&rel_css_path).into_string().as_bytes())
                         .await?;
                 }
                 DocumentItem::Task(t) => {
                     let task_name = t.name().as_str().to_owned();
-                    let task_file = cur_dir.join(format!("{}-task.html", task_name));
-                    let mut task_file = tokio::fs::File::create(task_file).await?;
+                    let task_path = cur_dir.join(format!("{}-task.html", task_name));
+                    let mut task_file = tokio::fs::File::create(&task_path).await?;
 
                     let parameter_meta: HashMap<String, MetadataValue> = t
                         .parameter_metadata()
@@ -312,13 +306,13 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                     let task = task::Task::new(task_name, t.metadata(), inputs, outputs);
 
                     task_file
-                        .write_all(task.render(&css_path).into_string().as_bytes())
+                        .write_all(task.render(&rel_css_path).into_string().as_bytes())
                         .await?;
                 }
                 DocumentItem::Workflow(w) => {
                     let workflow_name = w.name().as_str().to_owned();
-                    let workflow_file = cur_dir.join(format!("{}-workflow.html", workflow_name));
-                    let mut workflow_file = tokio::fs::File::create(workflow_file).await?;
+                    let workflow_path = cur_dir.join(format!("{}-workflow.html", workflow_name));
+                    let mut workflow_file = tokio::fs::File::create(&workflow_path).await?;
 
                     let parameter_meta: HashMap<String, MetadataValue> = w
                         .parameter_metadata()
@@ -383,7 +377,7 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                         workflow::Workflow::new(workflow_name, w.metadata(), inputs, outputs);
 
                     workflow_file
-                        .write_all(workflow.render(&css_path).into_string().as_bytes())
+                        .write_all(workflow.render(&rel_css_path).into_string().as_bytes())
                         .await?;
                 }
                 DocumentItem::Import(_) => {}
@@ -391,20 +385,6 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
         }
     }
     Ok(docs_dir)
-}
-
-/// Serve the generated documentation.
-pub async fn serve_docs(docs: PathBuf) -> Result<()> {
-    let serve_dir = ServeDir::new(docs);
-    let app = Router::new().nest_service("/docs", serve_dir);
-
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8042));
-    let listener = tokio::net::TcpListener::bind(&addr).await?;
-    axum::serve(listener, app).await.unwrap();
-
-    println!("Serving documentation at http://{}", addr);
-
-    Ok(())
 }
 
 /// Build a stylesheet for the documentation, given the path to the `themes`
@@ -425,7 +405,8 @@ pub fn build_stylesheet(themes_dir: &Path) -> Result<String> {
     if !css_path.exists() {
         return Err(anyhow!("Failed to find stylesheet"));
     }
-    Ok(css_path.to_string_lossy().to_string())
+
+    Ok(std::fs::read_to_string(css_path)?)
 }
 
 #[cfg(test)]
