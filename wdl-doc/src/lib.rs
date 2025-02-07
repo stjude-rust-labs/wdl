@@ -390,12 +390,13 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
 /// Build a stylesheet for the documentation, given the path to the `themes`
 /// directory.
 pub fn build_stylesheet(themes_dir: &Path) -> Result<String> {
-    // Shell out to `npm run dev` to build the stylesheet.
-    // This should be called with `themes_dir` as the working directory.
     let themes_dir = themes_dir.canonicalize()?;
-    let output = std::process::Command::new("npm")
-        .arg("run")
-        .arg("dev")
+    let output = std::process::Command::new("npx")
+        .arg("@tailwindcss/cli")
+        .arg("-i")
+        .arg("src/main.css")
+        .arg("-o")
+        .arg("dist/style.css")
         .current_dir(&themes_dir)
         .output()?;
     if !output.status.success() {

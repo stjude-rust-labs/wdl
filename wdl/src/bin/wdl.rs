@@ -9,6 +9,7 @@ use std::io::Read;
 use std::io::stderr;
 use std::path::Path;
 use std::path::PathBuf;
+use std::sync::mpsc;
 
 use anyhow::Context;
 use anyhow::Result;
@@ -24,6 +25,11 @@ use codespan_reporting::term::emit;
 use codespan_reporting::term::termcolor::ColorChoice;
 use codespan_reporting::term::termcolor::StandardStream;
 use colored::Colorize;
+use notify::Event;
+use notify::RecursiveMode;
+use notify::Result as NotifyResult;
+use notify::Watcher;
+use notify::recommended_watcher;
 use tracing_log::AsTrace;
 use tracing_subscriber::layer::SubscriberExt;
 use url::Url;
@@ -255,13 +261,18 @@ pub struct DocCommand {
     /// browser.
     #[clap(long)]
     pub open: bool,
+
+    /// Whether to watch the filesystem for changes and regenerate the
+    /// documentation.
+    #[clap(long)]
+    pub watch: bool,
 }
 
 impl DocCommand {
     /// Executes the `doc` subcommand.
     async fn exec(self) -> Result<()> {
-        let css = if let Some(themes) = self.themes {
-            build_stylesheet(&themes)?
+        let css = if let Some(themes) = self.themes.as_ref() {
+            build_stylesheet(themes)?
         } else {
             "".to_string()
         };
@@ -275,6 +286,30 @@ impl DocCommand {
                 opener::open(index)?;
             } else {
                 eprintln!("failed to find `index.html` in workspace");
+            }
+        }
+
+        if self.watch {
+            let themes = self
+                .themes
+                .expect("themes directory is required for watching");
+            let (tx, rx) = mpsc::channel::<NotifyResult<Event>>();
+            let mut watcher = recommended_watcher(tx)?;
+
+            watcher.watch(&self.path, RecursiveMode::Recursive)?;
+            watcher.watch(&themes, RecursiveMode::Recursive)?;
+
+            loop {
+                match rx.recv() {
+                    Ok(Ok(Event { .. })) => {
+                        println!("regenerating documentation...");
+                        let css = build_stylesheet(&themes)?;
+                        document_workspace(self.path.clone(), css).await?;
+                        println!("done");
+                    }
+                    Ok(Err(e)) => eprintln!("watch error: {}", e),
+                    Err(e) => eprintln!("watch error: {}", e),
+                }
             }
         }
 
