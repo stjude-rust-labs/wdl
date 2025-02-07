@@ -289,8 +289,8 @@ pub trait TaskExecutionBackend: Send + Sync {
     ///
     /// Containerized execution uses the following guest paths:
     ///
-    /// * `<root>/inputs` - where inputs are mounted; this is mounted read-only.
-    /// * `<root>/work` - the task working directory; this is mounted
+    /// * `<root>/inputs/` - where inputs are mounted; this is mounted read-only.
+    /// * `<root>/work/` - the task working directory; this is mounted
     ///   read-write.
     /// * `<root>/command` - the command to execute; this is mounted read-only.
     ///
