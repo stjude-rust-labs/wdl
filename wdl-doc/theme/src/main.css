@@ -6,6 +6,7 @@
  * Local imports.
  */
  @import "./headings.css";
+ @import "./toc.css";
 
  /**
   * Dark mode enabled with the `dark` class.

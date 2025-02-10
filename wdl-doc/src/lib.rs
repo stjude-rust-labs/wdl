@@ -98,8 +98,8 @@ impl<T: AsRef<str>> Render for Markdown<T> {
     }
 }
 
-/// Fetch the preamble comments of a document using the version statement.
-fn fetch_preamble_comments(version: VersionStatement) -> String {
+/// Parse the preamble comments of a document using the version statement.
+fn parse_preamble_comments(version: VersionStatement) -> String {
     let comments = version
         .keyword()
         .syntax()
@@ -118,6 +118,22 @@ fn fetch_preamble_comments(version: VersionStatement) -> String {
     comments.join("\n")
 }
 
+/// Render an HTML Table of Contents from a list of paths.
+pub(crate) fn toc(paths: &[PathBuf]) -> Markup {
+    html! {
+        div id="toc_container" {
+            p class="toc_title" { "Table of Contents" }
+            ul class="toc_list" {
+                @for path in paths {
+                    li {
+                        a href=(path.to_str().unwrap()) { (path.file_stem().unwrap().to_string_lossy()) }
+                    }
+                }
+            }
+        }
+    }
+}
+
 /// A WDL document.
 #[derive(Debug)]
 pub struct Document {
@@ -130,12 +146,18 @@ pub struct Document {
     /// This is used both to display the WDL version number and to fetch the
     /// preamble comments.
     version: VersionStatement,
+    /// Paths to be included in a Table of Contents.
+    toc_paths: Vec<PathBuf>,
 }
 
 impl Document {
     /// Create a new document.
-    pub fn new(name: String, version: VersionStatement) -> Self {
-        Self { name, version }
+    pub fn new(name: String, version: VersionStatement, toc_paths: Vec<PathBuf>) -> Self {
+        Self {
+            name,
+            version,
+            toc_paths,
+        }
     }
 
     /// Get the name of the document.
@@ -150,7 +172,7 @@ impl Document {
 
     /// Get the preamble comments of the document.
     pub fn preamble(&self) -> Markup {
-        let preamble = fetch_preamble_comments(self.version.clone());
+        let preamble = parse_preamble_comments(self.version.clone());
         Markdown(&preamble).render()
     }
 
@@ -160,6 +182,7 @@ impl Document {
             h1 { (self.name()) }
             h3 { "WDL Version: " (self.version()) }
             div { (self.preamble()) }
+            (toc(&self.toc_paths))
         };
 
         full_page(self.name(), stylesheet, body)
@@ -216,22 +239,15 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
             .expect("Document should have a version statement");
         let ast = ast_doc.ast().unwrap_v1();
 
-        let document = Document::new(name.to_string(), version);
-
-        let index_path = cur_dir.join("index.html");
-        let mut index = tokio::fs::File::create(index_path.clone()).await?;
-
         let rel_css_path = diff_paths(&abs_css_path, &cur_dir).unwrap();
-
-        index
-            .write_all(document.render(&rel_css_path).into_string().as_bytes())
-            .await?;
+        let mut toc_paths = vec![];
 
         for item in ast.items() {
             match item {
                 DocumentItem::Struct(s) => {
                     let struct_name = s.name().as_str().to_owned();
                     let struct_path = cur_dir.join(format!("{}-struct.html", struct_name));
+                    toc_paths.push(diff_paths(&struct_path, &cur_dir).unwrap());
                     let mut struct_file = tokio::fs::File::create(&struct_path).await?;
 
                     let r#struct = r#struct::Struct::new(s.clone());
@@ -242,6 +258,7 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                 DocumentItem::Task(t) => {
                     let task_name = t.name().as_str().to_owned();
                     let task_path = cur_dir.join(format!("{}-task.html", task_name));
+                    toc_paths.push(diff_paths(&task_path, &cur_dir).unwrap());
                     let mut task_file = tokio::fs::File::create(&task_path).await?;
 
                     let parameter_meta: HashMap<String, MetadataValue> = t
@@ -312,6 +329,7 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                 DocumentItem::Workflow(w) => {
                     let workflow_name = w.name().as_str().to_owned();
                     let workflow_path = cur_dir.join(format!("{}-workflow.html", workflow_name));
+                    toc_paths.push(diff_paths(&workflow_path, &cur_dir).unwrap());
                     let mut workflow_file = tokio::fs::File::create(&workflow_path).await?;
 
                     let parameter_meta: HashMap<String, MetadataValue> = w
@@ -383,6 +401,14 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                 DocumentItem::Import(_) => {}
             }
         }
+        let document = Document::new(name.to_string(), version, toc_paths);
+
+        let index_path = cur_dir.join("index.html");
+        let mut index = tokio::fs::File::create(index_path.clone()).await?;
+
+        index
+            .write_all(document.render(&rel_css_path).into_string().as_bytes())
+            .await?;
     }
     Ok(docs_dir)
 }
@@ -417,7 +443,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_fetch_preamble_comments() {
+    fn test_parse_preamble_comments() {
         let source = r#"
         ## This is a comment
         ## This is also a comment
@@ -436,7 +462,7 @@ mod tests {
         }
         "#;
         let (document, _) = AstDocument::parse(source);
-        let preamble = fetch_preamble_comments(document.version_statement().unwrap());
+        let preamble = parse_preamble_comments(document.version_statement().unwrap());
         assert_eq!(preamble, "This is a comment\nThis is also a comment");
     }
 }
