@@ -249,7 +249,8 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                 DocumentItem::Struct(s) => {
                     let struct_name = s.name().as_str().to_owned();
                     let struct_path = cur_dir.join(format!("{}-struct.html", struct_name));
-                    local_toc_paths.push((diff_paths(&struct_path, &cur_dir).unwrap(), struct_name));
+                    local_toc_paths
+                        .push((diff_paths(&struct_path, &cur_dir).unwrap(), struct_name));
                     let mut struct_file = tokio::fs::File::create(&struct_path).await?;
 
                     let r#struct = r#struct::Struct::new(s.clone());
@@ -260,7 +261,8 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                 DocumentItem::Task(t) => {
                     let task_name = t.name().as_str().to_owned();
                     let task_path = cur_dir.join(format!("{}-task.html", task_name));
-                    local_toc_paths.push((diff_paths(&task_path, &cur_dir).unwrap(), task_name.clone()));
+                    local_toc_paths
+                        .push((diff_paths(&task_path, &cur_dir).unwrap(), task_name.clone()));
                     let mut task_file = tokio::fs::File::create(&task_path).await?;
 
                     let parameter_meta: HashMap<String, MetadataValue> = t
@@ -331,7 +333,10 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                 DocumentItem::Workflow(w) => {
                     let workflow_name = w.name().as_str().to_owned();
                     let workflow_path = cur_dir.join(format!("{}-workflow.html", workflow_name));
-                    local_toc_paths.push((diff_paths(&workflow_path, &cur_dir).unwrap(), workflow_name.clone()));
+                    local_toc_paths.push((
+                        diff_paths(&workflow_path, &cur_dir).unwrap(),
+                        workflow_name.clone(),
+                    ));
                     let mut workflow_file = tokio::fs::File::create(&workflow_path).await?;
 
                     let parameter_meta: HashMap<String, MetadataValue> = w
@@ -406,7 +411,10 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
         let document = Document::new(name.to_string(), version, local_toc_paths);
 
         let index_path = cur_dir.join("index.html");
-        homepage_toc_paths.push((diff_paths(&index_path, &docs_dir).unwrap(), name.into_owned()));
+        homepage_toc_paths.push((
+            diff_paths(&index_path, &docs_dir).unwrap(),
+            name.into_owned(),
+        ));
         let mut index = tokio::fs::File::create(index_path.clone()).await?;
 
         index
@@ -417,12 +425,17 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
     let homepage_path = docs_dir.join("index.html");
     let mut homepage = tokio::fs::File::create(homepage_path.clone()).await?;
 
-    homepage.write_all(
-        full_page("Homepage", &diff_paths(&abs_css_path, &docs_dir).unwrap(), toc(&homepage_toc_paths))
+    homepage
+        .write_all(
+            full_page(
+                "Homepage",
+                &diff_paths(&abs_css_path, &docs_dir).unwrap(),
+                toc(&homepage_toc_paths),
+            )
             .into_string()
             .as_bytes(),
-    )
-    .await?;
+        )
+        .await?;
 
     Ok(docs_dir)
 }
