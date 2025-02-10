@@ -8,7 +8,7 @@ use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::MetadataValue;
 
 /// Render a [`MetadataValue`] as HTML.
-fn render_value(value: &MetadataValue) -> Markup {
+pub(crate) fn render_value(value: &MetadataValue) -> Markup {
     match value {
         MetadataValue::String(s) => html! { (s.syntax().to_string()) },
         MetadataValue::Boolean(b) => html! { (b.syntax().to_string()) },
