@@ -119,14 +119,14 @@ fn parse_preamble_comments(version: VersionStatement) -> String {
 }
 
 /// Render an HTML Table of Contents from a list of paths.
-pub(crate) fn toc(paths: &[PathBuf]) -> Markup {
+pub(crate) fn toc(paths: &[(PathBuf, String)]) -> Markup {
     html! {
         div id="toc_container" {
             p class="toc_title" { "Table of Contents" }
             ul class="toc_list" {
                 @for path in paths {
                     li {
-                        a href=(path.to_str().unwrap()) { (path.file_stem().unwrap().to_string_lossy()) }
+                        a href=(path.0.to_str().unwrap()) { (path.1) }
                     }
                 }
             }
@@ -146,13 +146,13 @@ pub struct Document {
     /// This is used both to display the WDL version number and to fetch the
     /// preamble comments.
     version: VersionStatement,
-    /// Paths to be included in a Table of Contents.
-    toc_paths: Vec<PathBuf>,
+    /// Paths and their display names to be included in a Table of Contents.
+    toc_paths: Vec<(PathBuf, String)>,
 }
 
 impl Document {
     /// Create a new document.
-    pub fn new(name: String, version: VersionStatement, toc_paths: Vec<PathBuf>) -> Self {
+    pub fn new(name: String, version: VersionStatement, toc_paths: Vec<(PathBuf, String)>) -> Self {
         Self {
             name,
             version,
@@ -216,6 +216,8 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
     analyzer.add_directory(abs_path.clone()).await?;
     let results = analyzer.analyze(()).await?;
 
+    let mut homepage_toc_paths = vec![];
+
     for result in results {
         let uri = result.document().uri();
         let relative_path = match uri.to_file_path() {
@@ -240,14 +242,14 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
         let ast = ast_doc.ast().unwrap_v1();
 
         let rel_css_path = diff_paths(&abs_css_path, &cur_dir).unwrap();
-        let mut toc_paths = vec![];
+        let mut local_toc_paths = vec![];
 
         for item in ast.items() {
             match item {
                 DocumentItem::Struct(s) => {
                     let struct_name = s.name().as_str().to_owned();
                     let struct_path = cur_dir.join(format!("{}-struct.html", struct_name));
-                    toc_paths.push(diff_paths(&struct_path, &cur_dir).unwrap());
+                    local_toc_paths.push((diff_paths(&struct_path, &cur_dir).unwrap(), struct_name));
                     let mut struct_file = tokio::fs::File::create(&struct_path).await?;
 
                     let r#struct = r#struct::Struct::new(s.clone());
@@ -258,7 +260,7 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                 DocumentItem::Task(t) => {
                     let task_name = t.name().as_str().to_owned();
                     let task_path = cur_dir.join(format!("{}-task.html", task_name));
-                    toc_paths.push(diff_paths(&task_path, &cur_dir).unwrap());
+                    local_toc_paths.push((diff_paths(&task_path, &cur_dir).unwrap(), task_name.clone()));
                     let mut task_file = tokio::fs::File::create(&task_path).await?;
 
                     let parameter_meta: HashMap<String, MetadataValue> = t
@@ -329,7 +331,7 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                 DocumentItem::Workflow(w) => {
                     let workflow_name = w.name().as_str().to_owned();
                     let workflow_path = cur_dir.join(format!("{}-workflow.html", workflow_name));
-                    toc_paths.push(diff_paths(&workflow_path, &cur_dir).unwrap());
+                    local_toc_paths.push((diff_paths(&workflow_path, &cur_dir).unwrap(), workflow_name.clone()));
                     let mut workflow_file = tokio::fs::File::create(&workflow_path).await?;
 
                     let parameter_meta: HashMap<String, MetadataValue> = w
@@ -401,15 +403,27 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                 DocumentItem::Import(_) => {}
             }
         }
-        let document = Document::new(name.to_string(), version, toc_paths);
+        let document = Document::new(name.to_string(), version, local_toc_paths);
 
         let index_path = cur_dir.join("index.html");
+        homepage_toc_paths.push((diff_paths(&index_path, &docs_dir).unwrap(), name.into_owned()));
         let mut index = tokio::fs::File::create(index_path.clone()).await?;
 
         index
             .write_all(document.render(&rel_css_path).into_string().as_bytes())
             .await?;
     }
+
+    let homepage_path = docs_dir.join("index.html");
+    let mut homepage = tokio::fs::File::create(homepage_path.clone()).await?;
+
+    homepage.write_all(
+        full_page("Homepage", &diff_paths(&abs_css_path, &docs_dir).unwrap(), toc(&homepage_toc_paths))
+            .into_string()
+            .as_bytes(),
+    )
+    .await?;
+
     Ok(docs_dir)
 }
 

@@ -226,25 +226,6 @@ impl FormatCommand {
     }
 }
 
-/// Finds a file matching the given name in the given directory.
-///
-/// This function will return the first match it finds, at any depth.
-fn find_file_in_directory(name: &str, dir: &Path) -> Option<PathBuf> {
-    fs::read_dir(dir)
-        .ok()?
-        .filter_map(|entry| entry.ok())
-        .find_map(|entry| {
-            let path = entry.path();
-            if path.is_dir() {
-                find_file_in_directory(name, &path)
-            } else if path.file_name().map(|f| f == name).unwrap_or(false) {
-                Some(path)
-            } else {
-                None
-            }
-        })
-}
-
 /// Document a workspace.
 #[derive(Args)]
 #[clap(disable_version_flag = true)]
@@ -280,13 +261,7 @@ impl DocCommand {
         let docs_dir = document_workspace(self.path.clone(), css).await?;
 
         if self.open {
-            // find the first `$path/docs/**/index.html` file in the workspace
-            // TODO: once we have a homepage, open that instead.
-            if let Some(index) = find_file_in_directory("index.html", &docs_dir) {
-                opener::open(index)?;
-            } else {
-                eprintln!("failed to find `index.html` in workspace");
-            }
+            opener::open(docs_dir.join("index.html"))?;
         }
 
         if self.watch {
