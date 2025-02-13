@@ -1,15 +1,13 @@
 @import "tailwindcss";
-
 @import "tailwindcss/preflight";
-@tailwind utilities;
-
-/* Local imports */
-@import "./headings.css";
-@import "./toc.css";
 
 /* Dark mode enabled with the `dark` class */
 @custom-variant dark (&:where(.dark, .dark *));
- 
+
+/* Local imports */
+@import "./headings.css";
+/* @import "./toc.css"; */
+
 /* Custom theme variables */
 @theme {
   --font-sans: "DM Sans";

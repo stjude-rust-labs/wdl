@@ -74,7 +74,7 @@ pub(crate) fn full_page(page_title: &str, stylesheet: &Path, body: Markup) -> Ma
         (DOCTYPE)
         html class="dark size-full" {
             (header(page_title, stylesheet))
-            body class="size-full dark:bg-slate-950 dark:text-white" {
+            body class="dark size-full dark:bg-slate-950 dark:text-white" {
                 (body)
            }
         }
@@ -121,9 +121,9 @@ fn parse_preamble_comments(version: VersionStatement) -> String {
 /// Render an HTML Table of Contents from a list of paths.
 pub(crate) fn toc(paths: &[(PathBuf, String)]) -> Markup {
     html! {
-        div id="toc_container" {
-            p class="toc_title" { "Table of Contents" }
-            ul class="toc_list" {
+        div class="object-center border" {
+            p class="object-center" { "Table of Contents" }
+            ul class="border list-inside list-disc" {
                 @for path in paths {
                     li {
                         a href=(path.0.to_str().unwrap()) { (path.1) }
