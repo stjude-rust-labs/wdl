@@ -40,15 +40,11 @@ impl Struct {
     pub fn render(&self, stylesheet: &Path) -> Markup {
         let body = html! {
             h1 { (self.name()) }
-            h3 { "Members" }
+            h2 { "Members" }
             ul {
                 @for (name, ty) in self.members() {
                     li {
-                        b {
-                            (name)
-                            ":"
-                        }
-                        " " (ty)
+                        b { (name) ":" } " " code { (ty) }
                     }
                 }
             }

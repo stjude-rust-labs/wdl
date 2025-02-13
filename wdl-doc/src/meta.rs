@@ -7,10 +7,16 @@ use wdl_ast::AstToken;
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::MetadataValue;
 
+use crate::Markdown;
+use crate::Render;
+
 /// Render a [`MetadataValue`] as HTML.
 pub(crate) fn render_value(value: &MetadataValue) -> Markup {
     match value {
-        MetadataValue::String(s) => html! { (s.syntax().to_string()) },
+        MetadataValue::String(s) => {
+            let md = Markdown(s.text().map(|t| t.as_str().to_string()).unwrap_or_default());
+            html! { (md.render()) }
+        }
         MetadataValue::Boolean(b) => html! { (b.syntax().to_string()) },
         MetadataValue::Integer(i) => html! { (i.syntax().to_string()) },
         MetadataValue::Float(f) => html! { (f.syntax().to_string()) },
@@ -18,9 +24,12 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
         MetadataValue::Array(a) => {
             html! {
                 "["
-                @for item in a.elements() {
-                    (render_value(&item))
-                    ","
+                ul {
+                    @for item in a.elements() {
+                        li {
+                            (render_value(&item)) ","
+                        }
+                    }
                 }
                 "]"
             }
@@ -28,11 +37,12 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
         MetadataValue::Object(o) => {
             html! {
                 "{"
-                @for item in o.items() {
-                    (item.name().syntax().to_string())
-                    ":"
-                    (render_value(&item.value()))
-                    ","
+                ul {
+                    @for item in o.items() {
+                        li {
+                            (item.name().syntax().to_string()) ":" (render_value(&item.value())) ","
+                        }
+                    }
                 }
                 "}"
             }
@@ -65,12 +75,7 @@ impl Meta {
             ul {
                 @for (name, value) in entries {
                     li {
-                        b {
-                            (name)
-                            ":"
-                        }
-                        " "
-                        (render_value(&value))
+                        b { (name) ":" } " " (render_value(&value))
                     }
                 }
             }

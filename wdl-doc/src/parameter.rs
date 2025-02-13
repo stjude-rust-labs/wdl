@@ -5,6 +5,7 @@ use maud::html;
 use wdl_ast::AstToken;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::MetadataValue;
+
 use crate::meta::render_value;
 
 /// A parameter (input or output) in a workflow or task.
@@ -46,11 +47,9 @@ impl Parameter {
     pub fn render(&self) -> Markup {
         html! {
             h3 { (self.name()) }
-            p { "Type: " (self.ty()) }
+            p { "Type: " code { (self.ty()) } }
             @if let Some(expr) = self.expr() {
-                p { "Expr: " (expr) }
-            } @else {
-                p { "Expr: None" }
+                p { "Expr: " code { (expr) } }
             }
             p { "Meta: " (self.meta().map(render_value).unwrap_or_else(|| html! { "None" })) }
         }
