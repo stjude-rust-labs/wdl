@@ -14,13 +14,12 @@ use crate::Render;
 pub(crate) fn render_value(value: &MetadataValue) -> Markup {
     match value {
         MetadataValue::String(s) => {
-            let md = Markdown(s.text().map(|t| t.as_str().to_string()).unwrap_or_default());
-            html! { (md.render()) }
+            html! { (Markdown(s.text().map(|t| t.as_str().to_string()).unwrap_or_default()).render()) }
         }
-        MetadataValue::Boolean(b) => html! { (b.syntax().to_string()) },
-        MetadataValue::Integer(i) => html! { (i.syntax().to_string()) },
-        MetadataValue::Float(f) => html! { (f.syntax().to_string()) },
-        MetadataValue::Null(n) => html! { (n.syntax().to_string()) },
+        MetadataValue::Boolean(b) => html! { code { (b.syntax().to_string()) } },
+        MetadataValue::Integer(i) => html! { code { (i.syntax().to_string()) } },
+        MetadataValue::Float(f) => html! { code { (f.syntax().to_string()) } },
+        MetadataValue::Null(n) => html! { code { (n.syntax().to_string()) } },
         MetadataValue::Array(a) => {
             html! {
                 "["

@@ -271,7 +271,7 @@ impl DocCommand {
             let themes = self
                 .themes
                 .expect("themes directory is required for watching");
-            watcher.watch(&themes, RecursiveMode::Recursive)?;
+            watcher.watch(&themes.join("src"), RecursiveMode::Recursive)?;
 
             loop {
                 match rx.recv() {
