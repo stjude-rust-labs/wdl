@@ -12,3 +12,6 @@
 @theme {
   --font-sans: "DM Sans";
 }
+
+/* Scan Rust source code */
+@source "../../src/";
