@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "tailwindcss" important;
 @import "tailwindcss/preflight";
 
 /* Dark mode enabled with the `dark` class */
