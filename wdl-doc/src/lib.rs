@@ -101,13 +101,13 @@ impl<T: AsRef<str>> Render for Markdown<T> {
 /// Render an HTML Table of Contents from a list of paths.
 pub(crate) fn toc(paths: &[(PathBuf, String)]) -> Markup {
     html! {
-        div class="flex flex-col items-center text-left mx-auto rounded-sm shadow-lg border-6 border-red-600" {
-            h3 class="border-4 border-indigo-600" { "Table of Contents" }
-            div class="border-4 border-indigo-600 list-disc" {
-                ul class="border-4 border-indigo-600 list-disc text-blue-600" {
+        div class="flex flex-col items-center text-left" {
+            h3 class="" { "Table of Contents" }
+            div class="" {
+                ul class="border-2 border-slate mx-auto rounded-sm list-disc list-inside text-blue-600" {
                     @for path in paths {
                         li {
-                            a href=(path.0.to_str().unwrap()) { (path.1) }
+                            a class="" href=(path.0.to_str().unwrap()) { (path.1) }
                         }
                     }
                 }

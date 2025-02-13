@@ -74,7 +74,7 @@ impl Meta {
             ul {
                 @for (name, value) in entries {
                     li {
-                        b { (name) ":" } " " (render_value(&value))
+                        p { b { (name) ":" } " " (render_value(&value)) }
                     }
                 }
             }
