@@ -107,6 +107,29 @@ impl Parameter {
         "".to_string()
     }
 
+    /// Render the remaining metadata as HTML.
+    ///
+    /// This will render any metadata that is not rendered elsewhere.
+    pub fn render_remaining_meta(&self) -> Markup {
+        if let Some(meta) = &self.meta {
+            if let MetadataValue::Object(o) = meta {
+                let filtered_items = o.items().filter(|item| {
+                    item.name().as_str() != "description" && item.name().as_str() != "group"
+                });
+                return html! {
+                    ul {
+                        @for item in filtered_items {
+                            li {
+                                b { (item.name().as_str()) ":" } " " (render_value(&item.value()))
+                            }
+                        }
+                    }
+                };
+            }
+        }
+        html! {}
+    }
+
     /// Render the parameter as HTML.
     pub fn render(&self) -> Markup {
         if self.required() == Some(true) {
@@ -115,6 +138,7 @@ impl Parameter {
                     td class="border" { (self.name()) }
                     td class="border" { code { (self.ty()) } }
                     td class="border" { (Markdown(self.description()).render()) }
+                    td class="border" { (self.render_remaining_meta()) }
                 }
             }
         } else {
@@ -124,6 +148,7 @@ impl Parameter {
                     td class="border" { code { (self.ty()) } }
                     td class="border" { code { (self.expr()) } }
                     td class="border" { (Markdown(self.description()).render()) }
+                    td class="border" { (self.render_remaining_meta()) }
                 }
             }
         }

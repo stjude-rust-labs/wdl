@@ -6,9 +6,11 @@ use std::path::Path;
 use maud::Markup;
 use maud::html;
 use wdl_ast::v1::MetadataSection;
+use wdl_ast::AstToken;
 
 use crate::full_page;
 use crate::meta::Meta;
+use crate::meta::render_value;
 use crate::parameter::Parameter;
 
 /// A task in a WDL document.
@@ -43,6 +45,18 @@ impl Task {
     /// Get the name of the task.
     pub fn name(&self) -> &str {
         &self.name
+    }
+
+    /// Get the desciption of the task as HTML.
+    pub fn description(&self) -> Markup {
+        if let Some(meta_section) = &self.meta_section {
+            for entry in meta_section.items() {
+                if entry.name().as_str() == "description" {
+                    return render_value(&entry.value());
+                }
+            }
+        }
+        html! {}
     }
 
     /// Get the meta section of the task as HTML.
@@ -115,7 +129,7 @@ impl Task {
                         th { "Name" }
                         th { "Type" }
                         th { "Description" }
-                        th { "Meta" }
+                        th { "Additional Meta" }
                     }}
                     tbody class="border" {
                         @for param in iter {
@@ -138,7 +152,7 @@ impl Task {
                         th { "Type" }
                         th { "Default" }
                         th { "Description" }
-                        th { "Meta" }
+                        th { "Additional Meta" }
                     }}
                     tbody class="border" {
                         @for param in iter {
@@ -164,7 +178,7 @@ impl Task {
                             th { "Type" }
                             th { "Default" }
                             th { "Description" }
-                            th { "Meta" }
+                            th { "Additional Meta" }
                         }}
                         tbody class="border" {
                             @for param in self.inputs_in_group(&group) {
@@ -185,7 +199,7 @@ impl Task {
                         th { "Type" }
                         th { "Default" }
                         th { "Description" }
-                        th { "Meta" }
+                        th { "Additional Meta" }
                     }}
                     tbody class="border" {
                         @for param in iter {
@@ -201,6 +215,7 @@ impl Task {
         let body = html! {
             div class="table-auto border-collapse" {
                 h1 { (self.name()) }
+                (self.description())
                 (self.meta_section())
                 h2 { "Inputs" }
                 @if let Some(required_table) = required_table {
@@ -222,7 +237,7 @@ impl Task {
                         th { "Type" }
                         th { "Expression" }
                         th { "Description" }
-                        th { "Meta" }
+                        th { "Additional Meta" }
                     }}
                     tbody class="border" {
                         @for param in self.outputs() {
