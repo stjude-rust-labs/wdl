@@ -128,7 +128,7 @@ impl Task {
             None
         };
 
-        let mut iter = self.inputs_in_group("common").peekable();
+        let mut iter = self.inputs_in_group("Common").peekable();
         let common_table = if iter.peek().is_some() {
             Some(html! {
                 h3 { "Common" }
@@ -154,7 +154,7 @@ impl Task {
         let group_tables = self
             .input_groups()
             .into_iter()
-            .filter(|group| *group != "common")
+            .filter(|group| *group != "Common")
             .map(|group| {
                 html! {
                     h3 { (group) }
