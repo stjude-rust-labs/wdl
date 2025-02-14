@@ -39,7 +39,7 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
                 ul {
                     @for item in o.items() {
                         li {
-                            (item.name().syntax().to_string()) ":" (render_value(&item.value())) ","
+                            p { b { (item.name().as_str()) ":" } " " (render_value(&item.value())) "," }
                         }
                     }
                 }

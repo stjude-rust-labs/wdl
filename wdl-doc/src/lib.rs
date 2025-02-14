@@ -24,6 +24,7 @@ use maud::Markup;
 use maud::PreEscaped;
 use maud::Render;
 use maud::html;
+use parameter::InputOutput;
 use pathdiff::diff_paths;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
@@ -308,7 +309,11 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                         .map(|decl| {
                             let name = decl.name().as_str().to_owned();
                             let meta = parameter_meta.get(&name);
-                            parameter::Parameter::new(decl.clone(), meta.cloned())
+                            parameter::Parameter::new(
+                                decl.clone(),
+                                meta.cloned(),
+                                InputOutput::Input,
+                            )
                         })
                         .collect();
 
@@ -322,6 +327,7 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                             parameter::Parameter::new(
                                 wdl_ast::v1::Decl::Bound(decl.clone()),
                                 meta.cloned(),
+                                InputOutput::Output,
                             )
                         })
                         .collect();
@@ -382,7 +388,11 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                         .map(|decl| {
                             let name = decl.name().as_str().to_owned();
                             let meta = parameter_meta.get(&name);
-                            parameter::Parameter::new(decl.clone(), meta.cloned())
+                            parameter::Parameter::new(
+                                decl.clone(),
+                                meta.cloned(),
+                                InputOutput::Input,
+                            )
                         })
                         .collect();
 
@@ -396,6 +406,7 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                             parameter::Parameter::new(
                                 wdl_ast::v1::Decl::Bound(decl.clone()),
                                 meta.cloned(),
+                                InputOutput::Output,
                             )
                         })
                         .collect();

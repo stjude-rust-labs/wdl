@@ -47,8 +47,7 @@ impl Workflow {
     /// Get the meta section of the workflow as HTML.
     pub fn meta_section(&self) -> Markup {
         if let Some(meta_section) = &self.meta_section {
-            let meta = Meta::new(meta_section.clone());
-            meta.render()
+            Meta::new(meta_section.clone()).render()
         } else {
             html! {}
         }

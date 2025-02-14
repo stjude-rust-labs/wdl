@@ -6,7 +6,18 @@ use wdl_ast::AstToken;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::MetadataValue;
 
+use crate::Markdown;
+use crate::Render;
 use crate::meta::render_value;
+
+/// Whether a parameter is an input or output.
+#[derive(Debug, Clone, Copy)]
+pub enum InputOutput {
+    /// An input parameter.
+    Input,
+    /// An output parameter.
+    Output,
+}
 
 /// A parameter (input or output) in a workflow or task.
 #[derive(Debug)]
@@ -15,12 +26,14 @@ pub struct Parameter {
     decl: Decl,
     /// Any meta entries associated with the parameter.
     meta: Option<MetadataValue>,
+    /// Whether the parameter is an input or output.
+    io: InputOutput,
 }
 
 impl Parameter {
     /// Create a new parameter.
-    pub fn new(decl: Decl, meta: Option<MetadataValue>) -> Self {
-        Self { decl, meta }
+    pub fn new(decl: Decl, meta: Option<MetadataValue>, io: InputOutput) -> Self {
+        Self { decl, meta, io }
     }
 
     /// Get the name of the parameter.
@@ -33,25 +46,86 @@ impl Parameter {
         self.decl.ty().to_string()
     }
 
-    /// Get the Expr value of the parameter.
-    pub fn expr(&self) -> Option<String> {
-        self.decl.expr().map(|expr| expr.syntax().to_string())
+    /// Get whether the parameter is an input or output.
+    pub fn io(&self) -> InputOutput {
+        self.io
     }
 
-    /// Get the meta entries associated with the parameter.
-    pub fn meta(&self) -> Option<&MetadataValue> {
-        self.meta.as_ref()
+    /// Get the Expr value of the parameter as a String.
+    pub fn expr(&self) -> String {
+        self.decl
+            .expr()
+            .map(|expr| expr.syntax().to_string())
+            .unwrap_or("None".to_string())
+    }
+
+    /// Get whether the input parameter is required.
+    ///
+    /// Returns `None` for outputs.
+    pub fn required(&self) -> Option<bool> {
+        match self.io {
+            InputOutput::Input => {
+                if let Some(d) = self.decl.as_unbound_decl() {
+                    Some(!d.ty().is_optional())
+                } else {
+                    Some(false)
+                }
+            }
+            InputOutput::Output => None,
+        }
+    }
+
+    /// Get the "group" of the parameter.
+    pub fn group(&self) -> Option<String> {
+        if let Some(MetadataValue::Object(o)) = &self.meta {
+            for item in o.items() {
+                if item.name().as_str() == "group" {
+                    if let MetadataValue::String(s) = item.value() {
+                        return s.text().map(|t| t.as_str().to_string());
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    /// Get the description of the parameter.
+    pub fn description(&self) -> String {
+        if let Some(meta) = &self.meta {
+            if let MetadataValue::String(s) = meta {
+                return s.text().map(|t| t.as_str().to_string()).unwrap_or_default();
+            } else if let MetadataValue::Object(o) = meta {
+                for item in o.items() {
+                    if item.name().as_str() == "description" {
+                        if let MetadataValue::String(s) = item.value() {
+                            return s.text().map(|t| t.as_str().to_string()).unwrap_or_default();
+                        }
+                    }
+                }
+            }
+        }
+        "".to_string()
     }
 
     /// Render the parameter as HTML.
     pub fn render(&self) -> Markup {
-        html! {
-            h3 { (self.name()) }
-            p { "Type: " code { (self.ty()) } }
-            @if let Some(expr) = self.expr() {
-                p { "Expr: " code { (expr) } }
+        if self.required() == Some(true) {
+            html! {
+                tr class="border" {
+                    td class="border" { (self.name()) }
+                    td class="border" { code { (self.ty()) } }
+                    td class="border" { (Markdown(self.description()).render()) }
+                }
             }
-            p { "Meta: " (self.meta().map(render_value).unwrap_or_else(|| html! { "None" })) }
+        } else {
+            html! {
+                tr class="border" {
+                    td class="border" { (self.name()) }
+                    td class="border" { code { (self.ty()) } }
+                    td class="border" { code { (self.expr()) } }
+                    td class="border" { (Markdown(self.description()).render()) }
+                }
+            }
         }
     }
 }
