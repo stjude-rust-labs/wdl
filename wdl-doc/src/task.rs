@@ -106,7 +106,8 @@ impl Task {
 
     /// Render the task as HTML.
     pub fn render(&self, stylesheet: &Path) -> Markup {
-        let required_table = if self.required_inputs().any(|_| true) {
+        let mut iter = self.required_inputs().peekable();
+        let required_table = if iter.peek().is_some() {
             Some(html! {
                 h3 { "Required Inputs" }
                 table class="border" {
@@ -117,7 +118,7 @@ impl Task {
                         th { "Meta" }
                     }}
                     tbody class="border" {
-                        @for param in self.required_inputs() {
+                        @for param in iter {
                             (param.render())
                         }
                     }
@@ -127,7 +128,8 @@ impl Task {
             None
         };
 
-        let common_table = if self.inputs_in_group("common").any(|_| true) {
+        let mut iter = self.inputs_in_group("common").peekable();
+        let common_table = if iter.peek().is_some() {
             Some(html! {
                 h3 { "Common" }
                 table class="border" {
@@ -139,7 +141,7 @@ impl Task {
                         th { "Meta" }
                     }}
                     tbody class="border" {
-                        @for param in self.inputs_in_group("common") {
+                        @for param in iter {
                             (param.render())
                         }
                     }
@@ -173,7 +175,8 @@ impl Task {
                 }
             });
 
-        let other_table = if self.other_inputs().any(|_| true) {
+        let mut iter = self.other_inputs().peekable();
+        let other_table = if iter.peek().is_some() {
             Some(html! {
                 h3 { "Other Inputs" }
                 table class="border" {
@@ -185,7 +188,7 @@ impl Task {
                         th { "Meta" }
                     }}
                     tbody class="border" {
-                        @for param in self.other_inputs() {
+                        @for param in iter {
                             (param.render())
                         }
                     }
