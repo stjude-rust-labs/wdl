@@ -111,21 +111,19 @@ impl Parameter {
     ///
     /// This will render any metadata that is not rendered elsewhere.
     pub fn render_remaining_meta(&self) -> Markup {
-        if let Some(meta) = &self.meta {
-            if let MetadataValue::Object(o) = meta {
-                let filtered_items = o.items().filter(|item| {
-                    item.name().as_str() != "description" && item.name().as_str() != "group"
-                });
-                return html! {
-                    ul {
-                        @for item in filtered_items {
-                            li {
-                                b { (item.name().as_str()) ":" } " " (render_value(&item.value()))
-                            }
+        if let Some(MetadataValue::Object(o)) = &self.meta {
+            let filtered_items = o.items().filter(|item| {
+                item.name().as_str() != "description" && item.name().as_str() != "group"
+            });
+            return html! {
+                ul {
+                    @for item in filtered_items {
+                        li {
+                            b { (item.name().as_str()) ":" } " " (render_value(&item.value()))
                         }
                     }
-                };
-            }
+                }
+            };
         }
         html! {}
     }

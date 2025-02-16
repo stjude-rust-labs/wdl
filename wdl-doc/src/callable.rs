@@ -1,55 +1,30 @@
-//! Create HTML documentation for WDL tasks.
+//! HTML generation for WDL callables (workflows and tasks).
+
+pub mod task;
+pub mod workflow;
 
 use std::collections::HashSet;
-use std::path::Path;
 
 use maud::Markup;
 use maud::html;
-use wdl_ast::v1::MetadataSection;
 use wdl_ast::AstToken;
+use wdl_ast::v1::MetadataSection;
 
-use crate::full_page;
 use crate::meta::Meta;
 use crate::meta::render_value;
 use crate::parameter::Parameter;
 
-/// A task in a WDL document.
-#[derive(Debug)]
-pub struct Task {
-    /// The name of the task.
-    name: String,
-    /// The meta section of the task.
-    meta_section: Option<MetadataSection>,
-    /// The input parameters of the task.
-    inputs: Vec<Parameter>,
-    /// The output parameters of the task.
-    outputs: Vec<Parameter>,
-}
+/// A callable (workflow or task) in a WDL document.
+pub trait Callable {
+    /// Get the name of the callable.
+    fn name(&self) -> &str;
 
-impl Task {
-    /// Create a new task.
-    pub fn new(
-        name: String,
-        meta_section: Option<MetadataSection>,
-        inputs: Vec<Parameter>,
-        outputs: Vec<Parameter>,
-    ) -> Self {
-        Self {
-            name,
-            meta_section,
-            inputs,
-            outputs,
-        }
-    }
+    /// Get the meta section of the callable.
+    fn meta(&self) -> Option<&MetadataSection>;
 
-    /// Get the name of the task.
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    /// Get the desciption of the task as HTML.
-    pub fn description(&self) -> Markup {
-        if let Some(meta_section) = &self.meta_section {
+    /// Get the description of the callable.
+    fn description(&self) -> Markup {
+        if let Some(meta_section) = self.meta() {
             for entry in meta_section.items() {
                 if entry.name().as_str() == "description" {
                     return render_value(&entry.value());
@@ -59,23 +34,12 @@ impl Task {
         html! {}
     }
 
-    /// Get the meta section of the task as HTML.
-    pub fn meta_section(&self) -> Markup {
-        if let Some(meta_section) = &self.meta_section {
-            Meta::new(meta_section.clone()).render()
-        } else {
-            html! {}
-        }
-    }
+    /// Get the input parameters of the callable.
+    fn inputs(&self) -> &[Parameter];
 
-    /// Get the input parameters of the task.
-    pub fn inputs(&self) -> &[Parameter] {
-        &self.inputs
-    }
-
-    /// Get the required inputs of the task.
-    pub fn required_inputs(&self) -> impl Iterator<Item = &Parameter> {
-        self.inputs.iter().filter(|param| {
+    /// Get the required input parameters of the callable.
+    fn required_inputs(&self) -> impl Iterator<Item = &Parameter> {
+        self.inputs().iter().filter(|param| {
             param
                 .required()
                 .expect("inputs should return Some(required)")
@@ -83,16 +47,16 @@ impl Task {
     }
 
     /// Get the set of unique `group` values of the inputs.
-    pub fn input_groups(&self) -> HashSet<String> {
-        self.inputs
+    fn input_groups(&self) -> HashSet<String> {
+        self.inputs()
             .iter()
             .filter_map(|param| param.group().as_ref().map(|s| s.to_string()))
             .collect()
     }
 
-    /// Get the inputs of the task that are part of `group`.
-    pub fn inputs_in_group<'a>(&'a self, group: &'a str) -> impl Iterator<Item = &'a Parameter> {
-        self.inputs.iter().filter(move |param| {
+    /// Get the inputs of the callable that are part of `group`.
+    fn inputs_in_group<'a>(&'a self, group: &'a str) -> impl Iterator<Item = &'a Parameter> {
+        self.inputs().iter().filter(move |param| {
             if let Some(param_group) = param.group() {
                 if param_group == group {
                     return true;
@@ -102,10 +66,10 @@ impl Task {
         })
     }
 
-    /// Get the inputs of the task that are neither required nor part of a
+    /// Get the inputs of the callable that are neither required nor part of a
     /// group.
-    pub fn other_inputs(&self) -> impl Iterator<Item = &Parameter> {
-        self.inputs.iter().filter(|param| {
+    fn other_inputs(&self) -> impl Iterator<Item = &Parameter> {
+        self.inputs().iter().filter(|param| {
             !param
                 .required()
                 .expect("inputs should return Some(required)")
@@ -113,16 +77,23 @@ impl Task {
         })
     }
 
-    /// Get the output parameters of the task.
-    pub fn outputs(&self) -> &[Parameter] {
-        &self.outputs
+    /// Get the output parameters of the callable.
+    fn outputs(&self) -> &[Parameter];
+
+    /// Render the meta section of the callable.
+    fn render_meta(&self) -> Markup {
+        if let Some(meta_section) = self.meta() {
+            Meta::new(meta_section.clone()).render()
+        } else {
+            html! {}
+        }
     }
 
-    /// Render the task as HTML.
-    pub fn render(&self, stylesheet: &Path) -> Markup {
+    /// Render the required inputs of the callable.
+    fn render_required_inputs(&self) -> Markup {
         let mut iter = self.required_inputs().peekable();
-        let required_table = if iter.peek().is_some() {
-            Some(html! {
+        if iter.peek().is_some() {
+            return html! {
                 h3 { "Required Inputs" }
                 table class="border" {
                     thead class="border" { tr {
@@ -137,14 +108,16 @@ impl Task {
                         }
                     }
                 }
-            })
-        } else {
-            None
+            };
         };
+        html! {}
+    }
 
+    /// Render the common inputs of the callable.
+    fn render_common_inputs(&self) -> Markup {
         let mut iter = self.inputs_in_group("Common").peekable();
-        let common_table = if iter.peek().is_some() {
-            Some(html! {
+        if iter.peek().is_some() {
+            return html! {
                 h3 { "Common" }
                 table class="border" {
                     thead class="border" { tr {
@@ -160,11 +133,13 @@ impl Task {
                         }
                     }
                 }
-            })
-        } else {
-            None
+            };
         };
+        html! {}
+    }
 
+    /// Render the inputs with a group of the callable.
+    fn render_group_inputs(&self) -> Markup {
         let group_tables = self
             .input_groups()
             .into_iter()
@@ -188,10 +163,18 @@ impl Task {
                     }
                 }
             });
+        html! {
+            @for group_table in group_tables {
+                (group_table)
+            }
+        }
+    }
 
+    /// Render the inputs that are neither required nor part of a group.
+    fn render_other_inputs(&self) -> Markup {
         let mut iter = self.other_inputs().peekable();
-        let other_table = if iter.peek().is_some() {
-            Some(html! {
+        if iter.peek().is_some() {
+            return html! {
                 h3 { "Other Inputs" }
                 table class="border" {
                     thead class="border" { tr {
@@ -207,47 +190,40 @@ impl Task {
                         }
                     }
                 }
-            })
-        } else {
-            None
+            };
         };
+        html! {}
+    }
 
-        let body = html! {
-            div class="table-auto border-collapse" {
-                h1 { (self.name()) }
-                (self.description())
-                (self.meta_section())
-                h2 { "Inputs" }
-                @if let Some(required_table) = required_table {
-                    (required_table)
-                }
-                @if let Some(common_table) = common_table {
-                    (common_table)
-                }
-                @for group_table in group_tables {
-                    (group_table)
-                }
-                @if let Some(other_table) = other_table {
-                    (other_table)
-                }
-                h2 { "Outputs" }
-                table  {
-                    thead class="border" { tr {
-                        th { "Name" }
-                        th { "Type" }
-                        th { "Expression" }
-                        th { "Description" }
-                        th { "Additional Meta" }
-                    }}
-                    tbody class="border" {
-                        @for param in self.outputs() {
-                            (param.render())
-                        }
+    /// Render the inputs of the callable.
+    fn render_inputs(&self) -> Markup {
+        html! {
+            h2 { "Inputs" }
+            (self.render_required_inputs())
+            (self.render_common_inputs())
+            (self.render_group_inputs())
+            (self.render_other_inputs())
+        }
+    }
+
+    /// Render the outputs of the callable.
+    fn render_outputs(&self) -> Markup {
+        html! {
+            h2 { "Outputs" }
+            table  {
+                thead class="border" { tr {
+                    th { "Name" }
+                    th { "Type" }
+                    th { "Expression" }
+                    th { "Description" }
+                    th { "Additional Meta" }
+                }}
+                tbody class="border" {
+                    @for param in self.outputs() {
+                        (param.render())
                     }
                 }
             }
-        };
-
-        full_page(self.name(), stylesheet, body)
+        }
     }
 }

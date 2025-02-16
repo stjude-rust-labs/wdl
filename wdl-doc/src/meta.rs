@@ -61,14 +61,18 @@ impl Meta {
 
     /// Render the meta section as HTML.
     pub fn render(&self) -> Markup {
-        let mut entries = self.0.items().filter_map(|entry| {
-            let name = entry.name().as_str().to_string();
-            if name == "outputs" || name == "description" {
-                return None;
-            }
-            let value = entry.value();
-            Some((name, value))
-        }).peekable();
+        let mut entries = self
+            .0
+            .items()
+            .filter_map(|entry| {
+                let name = entry.name().as_str().to_string();
+                if name == "outputs" || name == "description" {
+                    return None;
+                }
+                let value = entry.value();
+                Some((name, value))
+            })
+            .peekable();
         html! {
             @if entries.peek().is_some() {
                 h3 { "Meta" }
