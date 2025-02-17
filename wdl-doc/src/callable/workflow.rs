@@ -1,13 +1,18 @@
 //! Create HTML documentation for WDL workflows.
 
+use std::collections::HashSet;
 use std::path::Path;
 
 use maud::Markup;
 use maud::html;
+use wdl_ast::AstToken;
 use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::MetadataValue;
 
 use super::Callable;
 use crate::full_page;
+use crate::meta::Meta;
+use crate::meta::render_value;
 use crate::parameter::Parameter;
 
 /// A task in a WDL document.
@@ -39,10 +44,44 @@ impl Workflow {
         }
     }
 
+    /// Returns the `name` entry from the meta section, if it exists.
+    pub fn name_override(&self) -> Option<Markup> {
+        if let Some(meta_section) = self.meta_section.as_ref() {
+            for entry in meta_section.items() {
+                if entry.name().as_str() == "name" {
+                    return Some(render_value(&entry.value()));
+                }
+            }
+        }
+        None
+    }
+
+    /// Returns the `category` entry from the meta section, if it exists.
+    pub fn category(&self) -> Option<String> {
+        if let Some(meta_section) = self.meta_section.as_ref() {
+            for entry in meta_section.items() {
+                if entry.name().as_str() == "category" {
+                    match entry.value() {
+                        MetadataValue::String(s) => {
+                            return Some(
+                                s.text().map(|t| t.as_str().to_string()).unwrap_or_default(),
+                            );
+                        }
+                        _ => return None,
+                    }
+                }
+            }
+        }
+        None
+    }
+
     /// Render the workflow as HTML.
     pub fn render(&self, parent_dir: &Path) -> Markup {
         let body = html! {
-            h1 { (self.name()) }
+            h1 { @if let Some(name_override) = self.name_override() { (name_override) } @else { (self.name()) } }
+            @if let Some(category) = self.category() {
+                h2 { "Category: " (category) }
+            }
             (self.description())
             (self.render_meta())
             (self.render_inputs())
@@ -54,23 +93,32 @@ impl Workflow {
 }
 
 impl Callable for Workflow {
-    /// Get the name of the callable.
     fn name(&self) -> &str {
         &self.name
     }
 
-    /// Get the meta section of the callable.
     fn meta(&self) -> Option<&MetadataSection> {
         self.meta_section.as_ref()
     }
 
-    /// Get the input parameters of the callable.
     fn inputs(&self) -> &[Parameter] {
         &self.inputs
     }
 
-    /// Get the output parameters of the callable.
     fn outputs(&self) -> &[Parameter] {
         &self.outputs
+    }
+
+    fn render_meta(&self) -> Markup {
+        if let Some(meta_section) = self.meta() {
+            Meta::new(meta_section.clone()).render(&HashSet::from([
+                "description".to_string(),
+                "outputs".to_string(),
+                "name".to_string(),
+                "category".to_string(),
+            ]))
+        } else {
+            html! {}
+        }
     }
 }

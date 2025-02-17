@@ -1,5 +1,7 @@
 //! Create HTML documentation for WDL meta sections.
 
+use std::collections::HashSet;
+
 use maud::Markup;
 use maud::html;
 use wdl_ast::AstNode;
@@ -60,13 +62,13 @@ impl Meta {
     }
 
     /// Render the meta section as HTML.
-    pub fn render(&self) -> Markup {
+    pub fn render(&self, ignore_keys: &HashSet<String>) -> Markup {
         let mut entries = self
             .0
             .items()
             .filter_map(|entry| {
                 let name = entry.name().as_str().to_string();
-                if name == "outputs" || name == "description" {
+                if ignore_keys.contains(&name) {
                     return None;
                 }
                 let value = entry.value();

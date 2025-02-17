@@ -151,7 +151,7 @@ pub(crate) fn home_toc(entries: &[ToCEntry]) -> Markup {
             h3 class="" { "Table of Contents" }
             table class="border" {
                 thead class="border" { tr {
-                    th class="border" { "Page" }
+                    th class="" { "Page" }
                 }}
                 tbody class="border" {
                     @for entry in entries {
@@ -174,9 +174,9 @@ pub(crate) fn toc(entries: &[ToCEntry]) -> Markup {
             h3 class="" { "Table of Contents" }
             table class="border" {
                 thead class="border" { tr {
-                    th class="border" { "Page" }
-                    th class="border" { "Type" }
-                    th class="border" { "Description" }
+                    th class="" { "Page" }
+                    th class="" { "Type" }
+                    th class="" { "Description" }
                 }}
                 tbody class="border" {
                     @for entry in entries {

@@ -83,7 +83,10 @@ pub trait Callable {
     /// Render the meta section of the callable.
     fn render_meta(&self) -> Markup {
         if let Some(meta_section) = self.meta() {
-            Meta::new(meta_section.clone()).render()
+            Meta::new(meta_section.clone()).render(&HashSet::from([
+                "description".to_string(),
+                "outputs".to_string(),
+            ]))
         } else {
             html! {}
         }
