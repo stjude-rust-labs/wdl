@@ -6,8 +6,6 @@ use wdl_ast::AstToken;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::MetadataValue;
 
-use crate::Markdown;
-use crate::Render;
 use crate::meta::render_value;
 
 /// Whether a parameter is an input or output.
@@ -90,21 +88,21 @@ impl Parameter {
     }
 
     /// Get the description of the parameter.
-    pub fn description(&self) -> String {
+    pub fn description(&self) -> Markup {
         if let Some(meta) = &self.meta {
-            if let MetadataValue::String(s) = meta {
-                return s.text().map(|t| t.as_str().to_string()).unwrap_or_default();
+            if let MetadataValue::String(_) = meta {
+                return render_value(meta);
             } else if let MetadataValue::Object(o) = meta {
                 for item in o.items() {
                     if item.name().as_str() == "description" {
-                        if let MetadataValue::String(s) = item.value() {
-                            return s.text().map(|t| t.as_str().to_string()).unwrap_or_default();
+                        if let MetadataValue::String(_) = item.value() {
+                            return render_value(&item.value());
                         }
                     }
                 }
             }
         }
-        "".to_string()
+        html! {}
     }
 
     /// Render the remaining metadata as HTML.
@@ -135,7 +133,7 @@ impl Parameter {
                 tr class="border" {
                     td class="border" { (self.name()) }
                     td class="border" { code { (self.ty()) } }
-                    td class="border" { (Markdown(self.description()).render()) }
+                    td class="border" { (self.description()) }
                     td class="border" { (self.render_remaining_meta()) }
                 }
             }
@@ -145,7 +143,7 @@ impl Parameter {
                     td class="border" { (self.name()) }
                     td class="border" { code { (self.ty()) } }
                     td class="border" { code { (self.expr()) } }
-                    td class="border" { (Markdown(self.description()).render()) }
+                    td class="border" { (self.description()) }
                     td class="border" { (self.render_remaining_meta()) }
                 }
             }

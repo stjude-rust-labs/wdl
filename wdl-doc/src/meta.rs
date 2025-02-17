@@ -24,7 +24,7 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
         MetadataValue::Null(n) => html! { code { (n.syntax().to_string()) } },
         MetadataValue::Array(a) => {
             html! {
-                "["
+                code { "[" }
                 ul {
                     @for item in a.elements() {
                         li {
@@ -32,12 +32,12 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
                         }
                     }
                 }
-                "]"
+                code { "]" }
             }
         }
         MetadataValue::Object(o) => {
             html! {
-                "{"
+                code { "{" }
                 ul {
                     @for item in o.items() {
                         li {
@@ -45,7 +45,7 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
                         }
                     }
                 }
-                "}"
+                code { "}" }
             }
         }
     }
