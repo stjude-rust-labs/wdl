@@ -104,16 +104,10 @@ impl<T: AsRef<str>> Render for Markdown<T> {
 
 /// The type of a page.
 ///
-/// This enum represents the different types of pages that can be generated
-/// from a WDL document.
 /// Tasks and Workflows have an HTML description associated with them.
+/// Index pages do not have a type.
 #[derive(Debug)]
 pub enum PageType {
-    /// An index page.
-    ///
-    /// This represents an entire WDL document and contains links to all
-    /// structs, tasks, and workflows in the document.
-    Index,
     /// A struct page.
     Struct,
     /// A task page.
@@ -129,13 +123,13 @@ pub struct ToCEntry {
     name: String,
     /// The path to the entry.
     path: PathBuf,
-    /// The type of the page.
-    page_type: PageType,
+    /// The type of the page. Index pages do not have a type.
+    page_type: Option<PageType>,
 }
 
 impl ToCEntry {
     /// Create a new Table of Contents entry.
-    pub fn new(name: String, path: PathBuf, page_type: PageType) -> Self {
+    pub fn new(name: String, path: PathBuf, page_type: Option<PageType>) -> Self {
         Self {
             name,
             path,
@@ -185,16 +179,14 @@ pub(crate) fn toc(entries: &[ToCEntry]) -> Markup {
                                 a href=(entry.path.to_str().unwrap()) { (entry.name) }
                             }
                             td class="border" {
-                                @match &entry.page_type {
-                                    PageType::Index => { "ERROR" },
+                                @match &entry.page_type.as_ref().expect("should have a page type") {
                                     PageType::Struct => { "Struct" }
                                     PageType::Task(_) => { "Task" }
                                     PageType::Workflow(_) => { "Workflow" }
                                 }
                             }
                             td class="border" {
-                                @match &entry.page_type {
-                                    PageType::Index => { "ERROR" },
+                                @match &entry.page_type.as_ref().expect("should have a page type") {
                                     PageType::Struct => {}
                                     PageType::Task(desc) => { (desc) }
                                     PageType::Workflow(desc) => { (desc) }
@@ -346,7 +338,7 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                     local_toc_entries.push(ToCEntry::new(
                         struct_name,
                         diff_paths(&struct_path, &cur_dir).unwrap(),
-                        PageType::Struct,
+                        Some(PageType::Struct),
                     ));
                     let mut struct_file = tokio::fs::File::create(&struct_path).await?;
 
@@ -434,7 +426,7 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                     local_toc_entries.push(ToCEntry::new(
                         task.name().to_string(),
                         diff_paths(&task_path, &cur_dir).unwrap(),
-                        PageType::Task(task.description()),
+                        Some(PageType::Task(task.description())),
                     ));
                 }
                 DocumentItem::Workflow(w) => {
@@ -516,7 +508,7 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                     local_toc_entries.push(ToCEntry::new(
                         workflow.name().to_string(),
                         diff_paths(&workflow_path, &cur_dir).unwrap(),
-                        PageType::Workflow(workflow.description()),
+                        Some(PageType::Workflow(workflow.description())),
                     ));
                 }
                 DocumentItem::Import(_) => {}
@@ -528,7 +520,7 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
         homepage_toc_entries.push(ToCEntry::new(
             name.into_owned(),
             diff_paths(&index_path, &docs_dir).unwrap(),
-            PageType::Index,
+            None,
         ));
         let mut index = tokio::fs::File::create(index_path.clone()).await?;
 
