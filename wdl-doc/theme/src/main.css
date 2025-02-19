@@ -1,0 +1,17 @@
+@import "tailwindcss" important;
+@import "tailwindcss/preflight";
+
+/* Dark mode enabled with the `dark` class */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Local imports */
+@import "./headings.css";
+/* @import "./toc.css"; */
+
+/* Custom theme variables */
+@theme {
+  --font-sans: "DM Sans";
+}
+
+/* Scan Rust source code */
+@source "../../src/";
