@@ -20,7 +20,7 @@ edition = "2021"
 authors = ["The Rust WDL project developers"]
 homepage = "https://github.com/stjude-rust-labs/wdl"
 repository = "https://github.com/stjude-rust-labs/wdl"
-rust-version = "1.82.0"
+rust-version = "1.83.0"
 
 [workspace.dependencies]
 anyhow = "1.0.95"
