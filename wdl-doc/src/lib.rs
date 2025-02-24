@@ -165,16 +165,16 @@ impl<T: AsRef<str>> Render for Markdown<T> {
 // (entry.name()) }                             }
 //                             td class="border" {
 //                                 @match
-// &entry.page_type().as_ref().expect("should have a page type") {              
-// PageType::Struct => { "Struct" }                                     
-// PageType::Task(_) => { "Task" }                                     
+// &entry.page_type().as_ref().expect("should have a page type") {
+// PageType::Struct => { "Struct" }
+// PageType::Task(_) => { "Task" }
 // PageType::Workflow(_) => { "Workflow" }                                 }
 //                             }
 //                             td class="border" {
 //                                 @match
-// &entry.page_type().as_ref().expect("should have a page type") {              
-// PageType::Struct => {}                                     
-// PageType::Task(desc) => { (desc) }                                     
+// &entry.page_type().as_ref().expect("should have a page type") {
+// PageType::Struct => {}
+// PageType::Task(desc) => { (desc) }
 // PageType::Workflow(desc) => { (desc) }                                 }
 //                             }
 //                         }

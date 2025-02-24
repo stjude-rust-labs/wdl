@@ -1,16 +1,15 @@
 //! Create HTML documentation for WDL tasks.
 
-use std::path::Path;
-
 use maud::Markup;
 use maud::html;
 use wdl_ast::AstToken;
+use wdl_ast::v1::InputSection;
 use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::OutputSection;
+use wdl_ast::v1::ParameterMetadataSection;
 use wdl_ast::v1::RuntimeSection;
 
-use super::Callable;
-use crate::DocsTree;
-use crate::full_page;
+use super::*;
 use crate::parameter::Parameter;
 
 /// A task in a WDL document.
@@ -18,14 +17,14 @@ use crate::parameter::Parameter;
 pub struct Task {
     /// The name of the task.
     name: String,
-    /// The meta section of the task.
-    meta_section: Option<MetadataSection>,
-    /// The runtime section of the task.
-    runtime_section: Option<RuntimeSection>,
+    /// The meta of the task.
+    meta: MetaMap,
     /// The input parameters of the task.
     inputs: Vec<Parameter>,
     /// The output parameters of the task.
     outputs: Vec<Parameter>,
+    /// The runtime section of the task.
+    runtime_section: Option<RuntimeSection>,
 }
 
 impl Task {
@@ -33,20 +32,42 @@ impl Task {
     pub fn new(
         name: String,
         meta_section: Option<MetadataSection>,
+        parameter_meta: Option<ParameterMetadataSection>,
+        input_section: Option<InputSection>,
+        output_section: Option<OutputSection>,
         runtime_section: Option<RuntimeSection>,
-        inputs: Vec<Parameter>,
-        outputs: Vec<Parameter>,
     ) -> Self {
+        let meta = if let Some(ref mds) = meta_section {
+            parse_meta(mds)
+        } else {
+            MetaMap::default()
+        };
+        let parameter_meta = if let Some(pmds) = parameter_meta {
+            parse_parameter_meta(&pmds)
+        } else {
+            MetaMap::default()
+        };
+        let inputs = if let Some(is) = input_section {
+            parse_inputs(&is, &parameter_meta)
+        } else {
+            Vec::new()
+        };
+        let outputs = if let Some(os) = output_section {
+            parse_outputs(&os, &meta, &parameter_meta)
+        } else {
+            Vec::new()
+        };
+
         Self {
             name,
-            meta_section,
-            runtime_section,
+            meta,
             inputs,
             outputs,
+            runtime_section,
         }
     }
 
-    /// Get the rutime section of the task as HTML.
+    /// Render the rutime section of the task as HTML.
     pub fn render_runtime_section(&self) -> Markup {
         if let Some(runtime_section) = &self.runtime_section {
             html! {
@@ -71,21 +92,21 @@ impl Task {
         }
     }
 
-    /// Render the task as HTML.
-    pub fn render(&self, docs_tree: &DocsTree, stylesheet: &Path) -> Markup {
-        let body = html! {
-            div class="table-auto border-collapse" {
-                h1 { (self.name()) }
-                (self.description())
-                (self.render_meta())
-                (self.render_inputs())
-                (self.render_outputs())
-                (self.render_runtime_section())
-            }
-        };
+    // / Render the task as HTML.
+    //     pub fn render(&self, docs_tree: &DocsTree, stylesheet: &Path) -> Markup {
+    //         let body = html! {
+    //             div class="table-auto border-collapse" {
+    //                 h1 { (self.name()) }
+    //                 (self.description())
+    //                 // (self.render_meta())
+    //                 (self.render_inputs())
+    //                 (self.render_outputs())
+    //                 (self.render_runtime_section())
+    //             }
+    //         };
 
-        full_page(self.name(), docs_tree, stylesheet, body)
-    }
+    //         full_page(self.name(), docs_tree, stylesheet, body)
+    //     }
 }
 
 impl Callable for Task {
@@ -93,8 +114,8 @@ impl Callable for Task {
         &self.name
     }
 
-    fn meta(&self) -> Option<&MetadataSection> {
-        self.meta_section.as_ref()
+    fn meta(&self) -> &MetaMap {
+        &self.meta
     }
 
     fn inputs(&self) -> &[Parameter] {

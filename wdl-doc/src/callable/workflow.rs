@@ -1,10 +1,6 @@
 //! Create HTML documentation for WDL workflows.
 
-use std::collections::HashSet;
-use std::path::Path;
-
 use maud::Markup;
-use maud::html;
 use wdl_ast::AstToken;
 use wdl_ast::v1::InputSection;
 use wdl_ast::v1::MetadataSection;
@@ -12,31 +8,25 @@ use wdl_ast::v1::MetadataValue;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::ParameterMetadataSection;
 
-use super::Callable;
-use crate::DocsTree;
-use crate::full_page;
-use crate::meta::Meta;
+use super::*;
 use crate::meta::render_value;
-use crate::parameter;
 use crate::parameter::Parameter;
 
 /// A task in a WDL document.
 #[derive(Debug)]
 pub struct Workflow {
-    /// The name of the task.
+    /// The name of the workflow.
     name: String,
-    /// The meta section of the task.
-    meta_section: Option<MetadataSection>,
-    /// The parameter meta section of the task.
-    parameter_meta: Option<ParameterMetadataSection>,
-    /// The input section of the task.
-    input_section: Option<InputSection>,
-    /// The output section of the task.
-    output_section: Option<OutputSection>,
+    /// The meta of the workflow.
+    meta: MetaMap,
+    /// The inputs of the workflow.
+    inputs: Vec<Parameter>,
+    /// The outputs of the workflow.
+    outputs: Vec<Parameter>,
 }
 
 impl Workflow {
-    /// Create a new task.
+    /// Create a new workflow.
     pub fn new(
         name: String,
         meta_section: Option<MetadataSection>,
@@ -44,62 +34,64 @@ impl Workflow {
         input_section: Option<InputSection>,
         output_section: Option<OutputSection>,
     ) -> Self {
+        let meta = if let Some(ref mds) = meta_section {
+            parse_meta(mds)
+        } else {
+            MetaMap::default()
+        };
+        let parameter_meta = if let Some(pmds) = parameter_meta {
+            parse_parameter_meta(&pmds)
+        } else {
+            MetaMap::default()
+        };
+        let inputs = if let Some(is) = input_section {
+            parse_inputs(&is, &parameter_meta)
+        } else {
+            Vec::new()
+        };
+        let outputs = if let Some(os) = output_section {
+            parse_outputs(&os, &meta, &parameter_meta)
+        } else {
+            Vec::new()
+        };
+
         Self {
             name,
-            meta_section,
-            parameter_meta,
-            input_section,
-            output_section,
+            meta,
+            inputs,
+            outputs,
         }
     }
 
     /// Returns the `name` entry from the meta section, if it exists.
     pub fn name_override(&self) -> Option<Markup> {
-        if let Some(meta_section) = self.meta_section.as_ref() {
-            for entry in meta_section.items() {
-                if entry.name().as_str() == "name" {
-                    return Some(render_value(&entry.value()));
-                }
-            }
-        }
-        None
+        self.meta.get("name").map(|v| render_value(v))
     }
 
     /// Returns the `category` entry from the meta section, if it exists.
     pub fn category(&self) -> Option<String> {
-        if let Some(meta_section) = self.meta_section.as_ref() {
-            for entry in meta_section.items() {
-                if entry.name().as_str() == "category" {
-                    match entry.value() {
-                        MetadataValue::String(s) => {
-                            return Some(
-                                s.text().map(|t| t.as_str().to_string()).unwrap_or_default(),
-                            );
-                        }
-                        _ => return None,
-                    }
-                }
-            }
-        }
-        None
+        self.meta.get("category").and_then(|v| match v {
+            MetadataValue::String(s) => Some(s.text().unwrap().as_str().to_string()),
+            _ => None,
+        })
     }
 
-    /// Render the workflow as HTML.
-    pub fn render(&self, docs_tree: &DocsTree, stylesheet: &Path) -> Markup {
-        let body = html! {
-            h1 { @if let Some(name_override) = self.name_override() { (name_override) } @else { (self.name()) } }
-            @if let Some(category) = self.category() {
-                h2 { "Category: " (category) }
-            }
-            (self.description())
-            (self.render_meta())
-            (self.render_inputs())
-            (self.render_outputs())
-        };
+    // /// Render the workflow as HTML.
+    // pub fn render(&self, docs_tree: &DocsTree, stylesheet: &Path) -> Markup {
+    //     let body = html! {
+    //         h1 { @if let Some(name_override) = self.name_override() {
+    // (name_override) } @else { (self.name()) } }         @if let
+    // Some(category) = self.category() {             h2 { "Category: "
+    // (category) }         }
+    //         (self.description())
+    //         (self.render_meta())
+    //         (self.render_inputs())
+    //         (self.render_outputs())
+    //     };
 
-        // TODO
-        body
-    }
+    //     // TODO
+    //     body
+    // }
 }
 
 impl Callable for Workflow {
@@ -107,19 +99,15 @@ impl Callable for Workflow {
         &self.name
     }
 
-    fn metadata_section(&self) -> Option<&MetadataSection> {
-        self.meta_section.as_ref()
+    fn meta(&self) -> &MetaMap {
+        &self.meta
     }
 
-    fn parameter_metadata_section(&self) -> Option<&ParameterMetadataSection> {
-        self.parameter_meta.as_ref()
+    fn inputs(&self) -> &[Parameter] {
+        &self.inputs
     }
 
-    fn input_section(&self) -> Option<&InputSection> {
-        self.input_section.as_ref()
-    }
-
-    fn output_section(&self) -> Option<&OutputSection> {
-        self.output_section.as_ref()
+    fn outputs(&self) -> &[Parameter] {
+        &self.outputs
     }
 }
