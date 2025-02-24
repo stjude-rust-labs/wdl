@@ -25,7 +25,6 @@ pub use docs_tree::DocsTree;
 use docs_tree::HTMLPage;
 pub use docs_tree::Node;
 use docs_tree::PageType;
-use maud::DOCTYPE;
 use maud::Markup;
 use maud::PreEscaped;
 use maud::Render;

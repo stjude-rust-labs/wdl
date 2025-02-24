@@ -1,13 +1,8 @@
 //! Create HTML documentation for WDL structs.
 
-use std::path::Path;
-
-use maud::Markup;
-use maud::html;
 use wdl_ast::AstToken;
 use wdl_ast::v1::StructDefinition;
 
-use crate::DocsTree;
 // use crate::full_page;
 
 /// A struct in a WDL document.

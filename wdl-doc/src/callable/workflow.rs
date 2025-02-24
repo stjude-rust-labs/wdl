@@ -65,7 +65,7 @@ impl Workflow {
 
     /// Returns the `name` entry from the meta section, if it exists.
     pub fn name_override(&self) -> Option<Markup> {
-        self.meta.get("name").map(|v| render_value(v))
+        self.meta.get("name").map(render_value)
     }
 
     /// Returns the `category` entry from the meta section, if it exists.

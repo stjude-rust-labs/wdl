@@ -39,7 +39,7 @@ pub trait Callable {
     fn description(&self) -> Markup {
         self.meta()
             .get("description")
-            .map(|v| render_value(v))
+            .map(render_value)
             .unwrap_or_else(|| html! {})
     }
 
@@ -277,12 +277,10 @@ fn parse_outputs(
             MetadataValue::Object(o) => Some(o),
             _ => None,
         })
-        .and_then(|o| {
-            Some(
-                o.items()
-                    .map(|i| (i.name().as_str().to_owned(), i.value().clone()))
-                    .collect(),
-            )
+        .map(|o| {
+            o.items()
+                .map(|i| (i.name().as_str().to_owned(), i.value().clone()))
+                .collect()
         })
         .unwrap_or_default();
 
