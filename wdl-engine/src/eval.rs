@@ -583,9 +583,11 @@ impl Default for PathTrieNode<'_> {
 ///
 /// This is used to determine container mounts.
 ///
-/// From the root to the terminal node represents a host path.
+/// From the root to a terminal node represents a host path.
 ///
-/// A mount is any terminal node in the tree. However, if terminal nodes are
+/// If a terminal path has descendants that are also terminal, only the ancestor
+/// nearest the root will be added as a mount; its descendants will be mapped as
+/// relative paths.
 ///
 /// Host and guest paths are mapped according to the mounts.
 #[derive(Debug)]

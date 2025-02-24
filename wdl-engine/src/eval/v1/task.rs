@@ -104,19 +104,37 @@ const TASK_SCOPE_INDEX: ScopeIndex = ScopeIndex::new(2);
 
 /// Gets the `container` requirement from a requirements map.
 pub(crate) fn container<'a>(
-    requirements: &HashMap<String, Value>,
+    requirements: &'a HashMap<String, Value>,
     default: Option<&'a str>,
 ) -> Cow<'a, str> {
     requirements
         .get(TASK_REQUIREMENT_CONTAINER)
         .or_else(|| requirements.get(TASK_REQUIREMENT_CONTAINER_ALIAS))
-        .map(|v| {
-            v.coerce(&PrimitiveType::String.into())
-                .expect("type should coerce")
-                .unwrap_string()
-                .as_ref()
-                .clone()
-                .into()
+        .and_then(|v| -> Option<Cow<'_, str>> {
+            // If the value is an array, use the first element or the default
+            // Note: in the future we should be resolving which element in the array is
+            // usable; this will require some work in Crankshaft to enable
+            if let Some(array) = v.as_array() {
+                return array.as_slice().first().map(|v| {
+                    v.as_string()
+                        .expect("type should be string")
+                        .as_ref()
+                        .into()
+                });
+            }
+
+            Some(
+                v.coerce(&PrimitiveType::String.into())
+                    .expect("type should coerce")
+                    .unwrap_string()
+                    .as_ref()
+                    .clone()
+                    .into(),
+            )
+        })
+        .and_then(|v| {
+            // Treat star as the default
+            if v == "*" { None } else { Some(v) }
         })
         .unwrap_or_else(|| {
             default

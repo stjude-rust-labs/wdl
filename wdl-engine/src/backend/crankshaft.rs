@@ -30,6 +30,7 @@ use super::TaskExecutionConstraints;
 use super::TaskManager;
 use super::TaskManagerRequest;
 use super::TaskSpawnRequest;
+use crate::ONE_GIBIBYTE;
 use crate::Value;
 use crate::config::CrankshaftBackendConfig;
 use crate::config::CrankshaftBackendKind;
@@ -167,8 +168,8 @@ impl TaskManagerRequest for CrankshaftTaskRequest {
                 Resources::builder()
                     .cpu(self.cpu)
                     .maybe_cpu_limit(self.max_cpu)
-                    .ram(self.memory as f64 / 1073741824.0)
-                    .maybe_ram_limit(self.max_memory.map(|m| m as f64 / 1073741824.0))
+                    .ram(self.memory as f64 / ONE_GIBIBYTE)
+                    .maybe_ram_limit(self.max_memory.map(|m| m as f64 / ONE_GIBIBYTE))
                     .build(),
             )
             .build();
@@ -297,8 +298,8 @@ impl TaskExecutionBackend for CrankshaftBackend {
         let memory = memory(requirements)?;
         if self.max_memory < memory as u64 {
             // Display the error in GiB, as it is the most common unit for memory
-            let memory = memory as f64 / (1024.0 * 1024.0 * 1024.0);
-            let max_memory = self.max_memory as f64 / (1024.0 * 1024.0 * 1024.0);
+            let memory = memory as f64 / ONE_GIBIBYTE;
+            let max_memory = self.max_memory as f64 / ONE_GIBIBYTE;
 
             bail!(
                 "task requires at least {memory} GiB of memory, but the execution backend has a \

@@ -22,6 +22,7 @@ use super::TaskExecutionConstraints;
 use super::TaskManager;
 use super::TaskManagerRequest;
 use super::TaskSpawnRequest;
+use crate::ONE_GIBIBYTE;
 use crate::SYSTEM;
 use crate::Value;
 use crate::config::DEFAULT_TASK_SHELL;
@@ -230,8 +231,8 @@ impl TaskExecutionBackend for LocalTaskExecutionBackend {
         let memory = memory(requirements)?;
         if self.memory < memory as u64 {
             // Display the error in GiB, as it is the most common unit for memory
-            let memory = memory as f64 / (1024.0 * 1024.0 * 1024.0);
-            let total_memory = self.memory as f64 / (1024.0 * 1024.0 * 1024.0);
+            let memory = memory as f64 / ONE_GIBIBYTE;
+            let total_memory = self.memory as f64 / ONE_GIBIBYTE;
 
             bail!(
                 "task requires at least {memory} GiB of memory, but the host only has \
