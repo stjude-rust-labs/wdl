@@ -7,6 +7,7 @@ use maud::html;
 use wdl_ast::AstToken;
 use wdl_ast::v1::StructDefinition;
 
+use crate::DocsTree;
 use crate::full_page;
 
 /// A struct in a WDL document.
@@ -37,7 +38,7 @@ impl Struct {
     }
 
     /// Render the struct as HTML.
-    pub fn render(&self, stylesheet: &Path) -> Markup {
+    pub fn render(&self, docs_tree: &DocsTree, stylesheet: &Path) -> Markup {
         let body = html! {
             h1 { (self.name()) }
             h2 { "Members" }
@@ -50,6 +51,6 @@ impl Struct {
             }
         };
 
-        full_page(&self.name(), stylesheet, body)
+        full_page(&self.name(), docs_tree, stylesheet, body)
     }
 }

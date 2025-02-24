@@ -10,6 +10,7 @@ use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::MetadataValue;
 
 use super::Callable;
+use crate::DocsTree;
 use crate::full_page;
 use crate::meta::Meta;
 use crate::meta::render_value;
@@ -76,7 +77,7 @@ impl Workflow {
     }
 
     /// Render the workflow as HTML.
-    pub fn render(&self, parent_dir: &Path) -> Markup {
+    pub fn render(&self, docs_tree: &DocsTree, stylesheet: &Path) -> Markup {
         let body = html! {
             h1 { @if let Some(name_override) = self.name_override() { (name_override) } @else { (self.name()) } }
             @if let Some(category) = self.category() {
@@ -88,7 +89,7 @@ impl Workflow {
             (self.render_outputs())
         };
 
-        full_page(self.name(), parent_dir, body)
+        full_page(self.name(), docs_tree, stylesheet, body)
     }
 }
 
