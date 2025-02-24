@@ -12,7 +12,6 @@ use crate::SYSTEM;
 use crate::TaskExecutionBackend;
 use crate::convert_unit_string;
 use crate::crankshaft::CrankshaftBackend;
-// use crate::crankshaft::CrankshaftBackend;
 use crate::local::LocalTaskExecutionBackend;
 
 /// The inclusive maximum number of task retries the engine supports.
