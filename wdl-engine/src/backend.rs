@@ -500,7 +500,7 @@ where
 
         if !state.unlimited() {
             // If the request can't be processed due to resource constraints, park the
-            // request for now When a task completes and resources become available,
+            // request for now. When a task completes and resources become available,
             // we'll unpark the request
             if cpu > state.cpu.into() || memory > state.memory {
                 debug!(
