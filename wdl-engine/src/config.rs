@@ -7,6 +7,7 @@ use anyhow::Result;
 use anyhow::bail;
 use serde::Deserialize;
 use serde::Serialize;
+use tracing::warn;
 
 use crate::SYSTEM;
 use crate::TaskExecutionBackend;
@@ -50,10 +51,17 @@ impl Config {
     /// Creates a new task execution backend based on this configuration.
     pub async fn create_backend(&self) -> Result<Arc<dyn TaskExecutionBackend>> {
         match self.backend.default {
-            BackendKind::Local => Ok(Arc::new(LocalTaskExecutionBackend::new(
-                &self.task,
-                &self.backend.local,
-            )?)),
+            BackendKind::Local => {
+                warn!(
+                    "the engine is configured to use the local backend: tasks will not be run \
+                     inside of a container"
+                );
+
+                Ok(Arc::new(LocalTaskExecutionBackend::new(
+                    &self.task,
+                    &self.backend.local,
+                )?))
+            }
             BackendKind::Crankshaft => Ok(Arc::new(
                 CrankshaftBackend::new(&self.task, &self.backend.crankshaft).await?,
             )),
