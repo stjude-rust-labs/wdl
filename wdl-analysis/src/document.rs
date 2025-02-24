@@ -576,7 +576,8 @@ impl Document {
     /// Gets the path to the document.
     ///
     /// If the scheme of the document's URI is not `file`, this will return the
-    /// URI as a string.
+    /// URI as a string. Otherwise, this will attempt to return the path relative
+    /// to the current working directory, or the absolute path failing that.
     pub fn path(&self) -> Cow<'_, str> {
         if let Ok(path) = self.data.uri.to_file_path() {
             if let Some(path) = std::env::current_dir()
