@@ -548,7 +548,7 @@ where
 
         // This is a fundamentally a two-dimensional 0/1 knapsack problem with the
         // weights being the CPU and memory reservations, but where each item has
-        // an profit value of 1 (i.e. we maximize for the number of items rather
+        // a profit value of 1 (i.e. we maximize for the number of items rather
         // than their collective profit).
         //
         // We start by finding the longest subset of the parked tasks that could run
