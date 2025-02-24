@@ -78,30 +78,25 @@ pub(crate) fn header(page_title: &str, stylesheet: &Path) -> Markup {
 
 pub(crate) fn sidebar(docs_tree: &DocsTree) -> Markup {
     html! {
-        div class="top-0 left-0 h-full w-1/6 dark:bg-slate-950 dark:text-white" {
-            h1 class="text-2xl text-center" { "Table of Contents" }
-            @for node in docs_tree.depth_first_traversal() {
-                @if let Some(page) = node.page() {
-                    p { a href=(page.path().to_str().unwrap()) { (page.name()) } }
-                } @else {
-                    p class="" { (node.name()) }
-                }
-            }
-        }
+        // div class="top-0 left-0 h-full w-1/6 dark:bg-slate-950 dark:text-white" {
+        //     h1 class="text-2xl text-center" { "Table of Contents" }
+        //     @for node in docs_tree.depth_first_traversal() {
+        //         @if let Some(page) = node.page() {
+        //             p { a href=(page.path().to_str().unwrap()) { (page.name()) } }
+        //         } @else {
+        //             p class="" { (node.name()) }
+        //         }
+        //     }
+        // }
     }
 }
 
 /// A full HTML page with a header and body.
-pub(crate) fn full_page(
-    page_title: &str,
-    docs_tree: &DocsTree,
-    stylesheet: &Path,
-    body: Markup,
-) -> Markup {
+pub(crate) fn full_page(page_title: &str, docs_tree: &DocsTree, body: Markup) -> Markup {
     html! {
         (DOCTYPE)
         html class="dark size-full" {
-            (header(page_title, stylesheet))
+            (header(page_title, docs_tree.stylesheet()))
             body class="flex dark size-full dark:bg-slate-950 dark:text-white" {
                 (sidebar(docs_tree))
                 (body)
@@ -128,67 +123,67 @@ impl<T: AsRef<str>> Render for Markdown<T> {
     }
 }
 
-/// Render an HTML Table of Contents for the home page.
-pub(crate) fn home_toc(docs_tree: &DocsTree) -> Markup {
-    html! {
-        div class="flex flex-col items-center text-left" {
-            h3 class="" { "Table of Contents" }
-            table class="border" {
-                thead class="border" { tr {
-                    th class="" { "Page" }
-                }}
-                tbody class="border" {
-                    @for entry in docs_tree.get_index_pages() {
-                        tr class="border" {
-                            td class="border" {
-                                a href=(entry.path().to_str().unwrap()) { (entry.name()) }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+// /// Render an HTML Table of Contents for the home page.
+// pub(crate) fn home_toc(docs_tree: &DocsTree) -> Markup {
+//     html! {
+//         div class="flex flex-col items-center text-left" {
+//             h3 class="" { "Table of Contents" }
+//             table class="border" {
+//                 thead class="border" { tr {
+//                     th class="" { "Page" }
+//                 }}
+//                 tbody class="border" {
+//                     @for entry in docs_tree.get_index_pages() {
+//                         tr class="border" {
+//                             td class="border" {
+//                                 a href=(entry.path().to_str().unwrap()) {
+// (entry.name()) }                             }
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
 
-/// Render an HTML Table of Contents for an index page.
-pub(crate) fn toc(pages: &[&HTMLPage]) -> Markup {
-    html! {
-        div class="flex flex-col items-center text-left" {
-            h3 class="" { "Table of Contents" }
-            table class="border" {
-                thead class="border" { tr {
-                    th class="" { "Page" }
-                    th class="" { "Type" }
-                    th class="" { "Description" }
-                }}
-                tbody class="border" {
-                    @for entry in pages {
-                        tr class="border" {
-                            td class="border" {
-                                a href=(entry.path().to_str().unwrap()) { (entry.name()) }
-                            }
-                            td class="border" {
-                                @match &entry.page_type().as_ref().expect("should have a page type") {
-                                    PageType::Struct => { "Struct" }
-                                    PageType::Task(_) => { "Task" }
-                                    PageType::Workflow(_) => { "Workflow" }
-                                }
-                            }
-                            td class="border" {
-                                @match &entry.page_type().as_ref().expect("should have a page type") {
-                                    PageType::Struct => {}
-                                    PageType::Task(desc) => { (desc) }
-                                    PageType::Workflow(desc) => { (desc) }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+// /// Render an HTML Table of Contents for an index page.
+// pub(crate) fn toc(pages: &[&HTMLPage]) -> Markup {
+//     html! {
+//         div class="flex flex-col items-center text-left" {
+//             h3 class="" { "Table of Contents" }
+//             table class="border" {
+//                 thead class="border" { tr {
+//                     th class="" { "Page" }
+//                     th class="" { "Type" }
+//                     th class="" { "Description" }
+//                 }}
+//                 tbody class="border" {
+//                     @for entry in pages {
+//                         tr class="border" {
+//                             td class="border" {
+//                                 a href=(entry.path().to_str().unwrap()) {
+// (entry.name()) }                             }
+//                             td class="border" {
+//                                 @match
+// &entry.page_type().as_ref().expect("should have a page type") {              
+// PageType::Struct => { "Struct" }                                     
+// PageType::Task(_) => { "Task" }                                     
+// PageType::Workflow(_) => { "Workflow" }                                 }
+//                             }
+//                             td class="border" {
+//                                 @match
+// &entry.page_type().as_ref().expect("should have a page type") {              
+// PageType::Struct => {}                                     
+// PageType::Task(desc) => { (desc) }                                     
+// PageType::Workflow(desc) => { (desc) }                                 }
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
 
 /// Parse the preamble comments of a document using the version statement.
 fn parse_preamble_comments(version: VersionStatement) -> String {
@@ -226,10 +221,10 @@ pub struct Document {
 
 impl Document {
     /// Create a new document.
-    pub fn new(name: String, parent: PathBuf, version: VersionStatement) -> Self {
+    pub fn new<P: Into<PathBuf>>(name: String, parent: P, version: VersionStatement) -> Self {
         Self {
             name,
-            parent,
+            parent: parent.into(),
             version,
         }
     }
@@ -251,15 +246,15 @@ impl Document {
     }
 
     /// Render the document as HTML.
-    pub fn render(&self, docs_tree: &DocsTree, stylesheet: &Path) -> Markup {
+    pub fn render(&self, docs_tree: &DocsTree) -> Markup {
         let body = html! {
             h1 { (self.name()) }
             h3 { "WDL Version: " (self.version()) }
             div { (self.preamble()) }
-            (toc(&docs_tree.get_node(&self.parent).unwrap().get_non_index_pages()))
+            // (toc(&docs_tree.get_node(&self.parent).unwrap().get_non_index_pages()))
         };
 
-        full_page(self.name(), docs_tree, stylesheet, body)
+        full_page(self.name(), docs_tree, body)
     }
 }
 
@@ -271,26 +266,26 @@ impl Document {
 ///
 /// The contents of `css` will be written to a `style.css` file
 /// in the `docs` directory.
-pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathBuf> {
-    if !workspace.is_dir() {
+pub async fn document_workspace<P: AsRef<Path>>(workspace: P, style_sheet: P) -> Result<PathBuf> {
+    let abs_path = workspace.as_ref().canonicalize()?;
+
+    if !abs_path.is_dir() {
         return Err(anyhow!("Workspace is not a directory"));
     }
-
-    let abs_path = workspace.canonicalize()?;
 
     let docs_dir = abs_path.join(DOCS_DIR);
     if !docs_dir.exists() {
         std::fs::create_dir(&docs_dir)?;
     }
 
-    let abs_css_path = docs_dir.join("style.css");
-    tokio::fs::write(&abs_css_path, css).await?;
-
     let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
     analyzer.add_directory(abs_path.clone()).await?;
     let results = analyzer.analyze(()).await?;
 
-    let mut docs_tree = docs_tree::DocsTree::new(Node::new(DOCS_DIR.to_string(), docs_dir.clone()));
+    let mut docs_tree = docs_tree::DocsTree::new(
+        Node::new(DOCS_DIR.to_string(), docs_dir),
+        style_sheet.as_ref(),
+    );
 
     for result in results {
         let uri = result.document().uri();
@@ -301,7 +296,7 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
             },
             Err(_) => PathBuf::from("external").join(uri.path().strip_prefix("/").unwrap()),
         };
-        let cur_dir = docs_dir.clone().join(relative_path.with_extension(""));
+        let cur_dir = docs_dir.join(relative_path.with_extension(""));
         if !cur_dir.exists() {
             std::fs::create_dir_all(&cur_dir)?;
         }
@@ -315,32 +310,17 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
             .expect("Document should have a version statement");
         let ast = ast_doc.ast().unwrap_v1();
 
-        let rel_css_path = diff_paths(&abs_css_path, &cur_dir).unwrap();
-
         for item in ast.items() {
             match item {
                 DocumentItem::Struct(s) => {
                     let struct_name = s.name().as_str().to_owned();
                     let struct_path = cur_dir.join(format!("{}-struct.html", struct_name));
-                    docs_tree.add_path(
-                        struct_path.clone(),
-                        Some(HTMLPage::new(
-                            struct_name.clone(),
-                            struct_path.clone(),
-                            Some(PageType::Struct),
-                        )),
-                    );
                     let mut struct_file = tokio::fs::File::create(&struct_path).await?;
-
                     let r#struct = r#struct::Struct::new(s.clone());
-                    struct_file
-                        .write_all(
-                            r#struct
-                                .render(&docs_tree, &rel_css_path)
-                                .into_string()
-                                .as_bytes(),
-                        )
-                        .await?;
+                    docs_tree.add_page(
+                        struct_path,
+                        HTMLPage::new(struct_name.clone(), PageType::Struct(r#struct)),
+                    );
                 }
                 DocumentItem::Task(t) => {
                     let task_name = t.name().as_str().to_owned();
@@ -419,91 +399,15 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                         outputs,
                     );
 
-                    task_file
-                        .write_all(
-                            task.render(&docs_tree, &rel_css_path)
-                                .into_string()
-                                .as_bytes(),
-                        )
-                        .await?;
-
-                    docs_tree.add_path(
-                        task_path.clone(),
-                        Some(HTMLPage::new(
-                            task_name.clone(),
-                            task_path.clone(),
-                            Some(PageType::Task(task.description())),
-                        )),
+                    docs_tree.add_page(
+                        task_path,
+                        HTMLPage::new(task_name.clone(), PageType::Task(task)),
                     );
                 }
                 DocumentItem::Workflow(w) => {
                     let workflow_name = w.name().as_str().to_owned();
                     let workflow_path = cur_dir.join(format!("{}-workflow.html", workflow_name));
                     let mut workflow_file = tokio::fs::File::create(&workflow_path).await?;
-
-                    let parameter_meta: HashMap<String, MetadataValue> = w
-                        .parameter_metadata()
-                        .into_iter()
-                        .flat_map(|p| p.items())
-                        .map(|p| {
-                            let name = p.name().as_str().to_owned();
-                            let item = p.value();
-                            (name, item)
-                        })
-                        .collect();
-
-                    let meta: HashMap<String, MetadataValue> = w
-                        .metadata()
-                        .into_iter()
-                        .flat_map(|m| m.items())
-                        .map(|m| {
-                            let name = m.name().as_str().to_owned();
-                            let item = m.value();
-                            (name, item)
-                        })
-                        .collect();
-
-                    let output_meta: HashMap<String, MetadataValue> = meta
-                        .get("outputs")
-                        .cloned()
-                        .into_iter()
-                        .flat_map(|v| v.unwrap_object().items())
-                        .map(|m| {
-                            let name = m.name().as_str().to_owned();
-                            let item = m.value();
-                            (name, item)
-                        })
-                        .collect();
-
-                    let inputs = w
-                        .input()
-                        .into_iter()
-                        .flat_map(|i| i.declarations())
-                        .map(|decl| {
-                            let name = decl.name().as_str().to_owned();
-                            let meta = parameter_meta.get(&name);
-                            parameter::Parameter::new(
-                                decl.clone(),
-                                meta.cloned(),
-                                InputOutput::Input,
-                            )
-                        })
-                        .collect();
-
-                    let outputs = w
-                        .output()
-                        .into_iter()
-                        .flat_map(|o| o.declarations())
-                        .map(|decl| {
-                            let name = decl.name().as_str().to_owned();
-                            let meta = output_meta.get(&name);
-                            parameter::Parameter::new(
-                                wdl_ast::v1::Decl::Bound(decl.clone()),
-                                meta.cloned(),
-                                InputOutput::Output,
-                            )
-                        })
-                        .collect();
 
                     let workflow = workflow::Workflow::new(
                         workflow_name.clone(),
@@ -512,22 +416,9 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
                         outputs,
                     );
 
-                    workflow_file
-                        .write_all(
-                            workflow
-                                .render(&docs_tree, &rel_css_path)
-                                .into_string()
-                                .as_bytes(),
-                        )
-                        .await?;
-
-                    docs_tree.add_path(
-                        workflow_path.clone(),
-                        Some(HTMLPage::new(
-                            workflow_name.clone(),
-                            workflow_path.clone(),
-                            Some(PageType::Workflow(workflow.description())),
-                        )),
+                    docs_tree.add_page(
+                        workflow_path,
+                        HTMLPage::new(workflow_name.clone(), PageType::Workflow(workflow)),
                     );
                 }
                 DocumentItem::Import(_) => {}
@@ -536,40 +427,16 @@ pub async fn document_workspace(workspace: PathBuf, css: String) -> Result<PathB
         let document = Document::new(name.to_string(), cur_dir.clone(), version);
 
         let index_path = cur_dir.join("index.html");
-        docs_tree.add_path(
-            index_path.clone(),
-            Some(HTMLPage::new(name.to_string(), index_path.clone(), None)),
-        );
         let mut index = tokio::fs::File::create(index_path.clone()).await?;
 
-        index
-            .write_all(
-                document
-                    .render(&docs_tree, &rel_css_path)
-                    .into_string()
-                    .as_bytes(),
-            )
-            .await?;
+        docs_tree.add_page(
+            index_path,
+            HTMLPage::new(name.to_string(), PageType::Document(document)),
+        );
     }
 
     let homepage_path = docs_dir.join("index.html");
     let mut homepage = tokio::fs::File::create(homepage_path.clone()).await?;
-
-    homepage
-        .write_all(
-            full_page(
-                "Homepage",
-                &docs_tree,
-                &diff_paths(&abs_css_path, &docs_dir).unwrap(),
-                html! {
-                    h1 { "Homepage" }
-                    (home_toc(&docs_tree))
-                },
-            )
-            .into_string()
-            .as_bytes(),
-        )
-        .await?;
 
     Ok(docs_dir)
 }

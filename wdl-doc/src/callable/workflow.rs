@@ -6,14 +6,18 @@ use std::path::Path;
 use maud::Markup;
 use maud::html;
 use wdl_ast::AstToken;
+use wdl_ast::v1::InputSection;
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::MetadataValue;
+use wdl_ast::v1::OutputSection;
+use wdl_ast::v1::ParameterMetadataSection;
 
 use super::Callable;
 use crate::DocsTree;
 use crate::full_page;
 use crate::meta::Meta;
 use crate::meta::render_value;
+use crate::parameter;
 use crate::parameter::Parameter;
 
 /// A task in a WDL document.
@@ -23,10 +27,12 @@ pub struct Workflow {
     name: String,
     /// The meta section of the task.
     meta_section: Option<MetadataSection>,
-    /// The input parameters of the task.
-    inputs: Vec<Parameter>,
-    /// The output parameters of the task.
-    outputs: Vec<Parameter>,
+    /// The parameter meta section of the task.
+    parameter_meta: Option<ParameterMetadataSection>,
+    /// The input section of the task.
+    input_section: Option<InputSection>,
+    /// The output section of the task.
+    output_section: Option<OutputSection>,
 }
 
 impl Workflow {
@@ -34,14 +40,16 @@ impl Workflow {
     pub fn new(
         name: String,
         meta_section: Option<MetadataSection>,
-        inputs: Vec<Parameter>,
-        outputs: Vec<Parameter>,
+        parameter_meta: Option<ParameterMetadataSection>,
+        input_section: Option<InputSection>,
+        output_section: Option<OutputSection>,
     ) -> Self {
         Self {
             name,
             meta_section,
-            inputs,
-            outputs,
+            parameter_meta,
+            input_section,
+            output_section,
         }
     }
 
@@ -89,7 +97,8 @@ impl Workflow {
             (self.render_outputs())
         };
 
-        full_page(self.name(), docs_tree, stylesheet, body)
+        // TODO
+        body
     }
 }
 
@@ -98,28 +107,19 @@ impl Callable for Workflow {
         &self.name
     }
 
-    fn meta(&self) -> Option<&MetadataSection> {
+    fn metadata_section(&self) -> Option<&MetadataSection> {
         self.meta_section.as_ref()
     }
 
-    fn inputs(&self) -> &[Parameter] {
-        &self.inputs
+    fn parameter_metadata_section(&self) -> Option<&ParameterMetadataSection> {
+        self.parameter_meta.as_ref()
     }
 
-    fn outputs(&self) -> &[Parameter] {
-        &self.outputs
+    fn input_section(&self) -> Option<&InputSection> {
+        self.input_section.as_ref()
     }
 
-    fn render_meta(&self) -> Markup {
-        if let Some(meta_section) = self.meta() {
-            Meta::new(meta_section.clone()).render(&HashSet::from([
-                "description".to_string(),
-                "outputs".to_string(),
-                "name".to_string(),
-                "category".to_string(),
-            ]))
-        } else {
-            html! {}
-        }
+    fn output_section(&self) -> Option<&OutputSection> {
+        self.output_section.as_ref()
     }
 }

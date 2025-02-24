@@ -3,15 +3,21 @@
 pub mod task;
 pub mod workflow;
 
+use std::collections::HashMap;
 use std::collections::HashSet;
 
 use maud::Markup;
 use maud::html;
 use wdl_ast::AstToken;
+use wdl_ast::v1::InputSection;
 use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::MetadataValue;
+use wdl_ast::v1::OutputSection;
+use wdl_ast::v1::ParameterMetadataSection;
 
 use crate::meta::Meta;
 use crate::meta::render_value;
+use crate::parameter::InputOutput;
 use crate::parameter::Parameter;
 
 /// A callable (workflow or task) in a WDL document.
@@ -19,12 +25,82 @@ pub trait Callable {
     /// Get the name of the callable.
     fn name(&self) -> &str;
 
-    /// Get the meta section of the callable.
-    fn meta(&self) -> Option<&MetadataSection>;
+    /// Get the metadata section of the callable.
+    fn metadata_section(&self) -> Option<&MetadataSection>;
+
+    /// Get the parameter metadata section of the callable.
+    fn parameter_metadata_section(&self) -> Option<&ParameterMetadataSection>;
+
+    /// Get the input section of the callable.
+    fn input_section(&self) -> Option<&InputSection>;
+
+    /// Get the output section of the callable.
+    fn output_section(&self) -> Option<&OutputSection>;
+
+    fn parse_meta(&self) -> HashMap<String, MetadataValue> {
+        self.metadata_section()
+            .into_iter()
+            .flat_map(|m| m.items())
+            .map(|m| {
+                let name = m.name().as_str().to_owned();
+                let item = m.value();
+                (name, item)
+            })
+            .collect()
+    }
+
+    fn parse_parameter_meta(&self) -> HashMap<String, MetadataValue> {
+        self.parameter_metadata_section()
+            .into_iter()
+            .flat_map(|m| m.items())
+            .map(|m| {
+                let name = m.name().as_str().to_owned();
+                let item = m.value();
+                (name, item)
+            })
+            .collect()
+    }
+
+    fn parse_inputs(&self) -> Vec<Parameter> {
+        let parameter_meta = self.parse_parameter_meta();
+
+        self.input_section()
+            .into_iter()
+            .flat_map(|i| i.declarations())
+            .map(|decl| {
+                let name = decl.name().as_str().to_owned();
+                let meta = parameter_meta.get(&name);
+                Parameter::new(decl.clone(), meta.cloned(), InputOutput::Input)
+            })
+            .collect()
+    }
+
+    fn parse_outputs(&self) -> Vec<Parameter> {
+        let meta = self.parse_meta();
+        let parameter_meta = self.parse_parameter_meta();
+        let output_meta: HashMap<String, MetadataValue> = meta
+            .get("outputs")
+            .and_then(|v| match v {
+                MetadataValue::Object(o) => Some(o),
+                _ => None,
+            })
+            .and_then(|o| Some(o.items().map(|i| (i.name().as_str().to_owned(), i.value().clone())).collect()))
+            .unwrap_or_default();
+
+        self.output_section()
+            .into_iter()
+            .flat_map(|o| o.declarations())
+            .map(|decl| {
+                let name = decl.name().as_str().to_owned();
+                let meta = parameter_meta.get(&name).or_else(|| output_meta.get(&name));
+                Parameter::new(wdl_ast::v1::Decl::Bound(decl.clone()), meta.cloned(), InputOutput::Output)
+            })
+            .collect()
+    }
 
     /// Get the description of the callable.
     fn description(&self) -> Markup {
-        if let Some(meta_section) = self.meta() {
+        if let Some(meta_section) = self.metadata_section() {
             for entry in meta_section.items() {
                 if entry.name().as_str() == "description" {
                     return render_value(&entry.value());
@@ -33,9 +109,6 @@ pub trait Callable {
         }
         html! {}
     }
-
-    /// Get the input parameters of the callable.
-    fn inputs(&self) -> &[Parameter];
 
     /// Get the required input parameters of the callable.
     fn required_inputs(&self) -> impl Iterator<Item = &Parameter> {
@@ -77,12 +150,9 @@ pub trait Callable {
         })
     }
 
-    /// Get the output parameters of the callable.
-    fn outputs(&self) -> &[Parameter];
-
     /// Render the meta section of the callable.
     fn render_meta(&self) -> Markup {
-        if let Some(meta_section) = self.meta() {
+        if let Some(meta_section) = self.metadata_section() {
             Meta::new(meta_section.clone()).render(&HashSet::from([
                 "description".to_string(),
                 "outputs".to_string(),

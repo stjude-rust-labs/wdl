@@ -1,22 +1,28 @@
 //! Implementations for a [`DocsTree`] which represents the DOCS directory.
 
 use std::collections::HashMap;
+use std::fs::canonicalize;
+use std::path::Path;
 use std::path::PathBuf;
 
-use maud::Markup;
+use pathdiff::diff_paths;
+
+use crate::Document;
+use crate::r#struct::Struct;
+use crate::task::Task;
+use crate::workflow::Workflow;
 
 /// The type of a page.
-///
-/// Tasks and Workflows have an HTML description associated with them.
-/// Index pages do not have a type.
 #[derive(Debug)]
 pub enum PageType {
+    /// An index page.
+    Index(Document),
     /// A struct page.
-    Struct,
+    Struct(Struct),
     /// A task page.
-    Task(Markup),
+    Task(Task),
     /// A workflow page.
-    Workflow(Markup),
+    Workflow(Workflow),
 }
 
 /// An HTML page in the DOCS directory.
@@ -24,20 +30,14 @@ pub enum PageType {
 pub struct HTMLPage {
     /// The display name of the page.
     name: String,
-    /// The absoluute path to the entry.
-    abs_path: PathBuf,
     /// The type of the page. Index pages do not have a type.
-    page_type: Option<PageType>,
+    page_type: PageType,
 }
 
 impl HTMLPage {
     /// Create a new Table of Contents entry.
-    pub fn new(name: String, abs_path: PathBuf, page_type: Option<PageType>) -> Self {
-        Self {
-            name,
-            abs_path,
-            page_type,
-        }
+    pub fn new(name: String, page_type: PageType) -> Self {
+        Self { name, page_type }
     }
 
     /// Get the name of the entry.
@@ -46,13 +46,8 @@ impl HTMLPage {
     }
 
     /// Get the type of the entry.
-    pub fn page_type(&self) -> &Option<PageType> {
+    pub fn page_type(&self) -> &PageType {
         &self.page_type
-    }
-
-    /// Get the path to the entry.
-    pub fn path(&self) -> &PathBuf {
-        &self.abs_path
     }
 }
 
@@ -67,10 +62,10 @@ pub struct Node {
 
 impl Node {
     /// Create a new node.
-    pub fn new(name: String, path: PathBuf) -> Self {
+    pub fn new<P: Into<PathBuf>>(name: String, path: P) -> Self {
         Self {
             name,
-            path,
+            path: path.into(),
             page: None,
             children: HashMap::new(),
         }
@@ -94,14 +89,14 @@ impl Node {
     /// Check if the node is an index page.
     fn is_index(&self) -> bool {
         if self.has_page() {
-            return self.page.as_ref().unwrap().page_type().is_none();
+            return matches!(self.page.as_ref().unwrap().page_type(), PageType::Index(_));
         }
         false
     }
 
     /// Get the page associated with the node.
-    pub fn page(&self) -> &Option<HTMLPage> {
-        &self.page
+    pub fn page(&self) -> Option<&HTMLPage> {
+        self.page.as_ref()
     }
 
     /// Get the children of the node.
@@ -138,31 +133,26 @@ impl Node {
 
         non_index_pages
     }
-
-    /// Depth first traversal of the tree.
-    pub fn depth_first_traversal(&self) -> Vec<&Node> {
-        let mut nodes = Vec::new();
-
-        nodes.push(self);
-
-        for child in self.children.values() {
-            nodes.extend(child.depth_first_traversal());
-        }
-
-        nodes
-    }
 }
 
 /// A tree representing the DOCS directory.
 #[derive(Debug)]
 pub struct DocsTree {
+    /// The root of the tree.
+    ///
+    /// `root.path` is the path to the DOCS directory and should be absolute.
     root: Node,
+    /// The absolute path to the stylesheet.
+    stylesheet: PathBuf,
 }
 
 impl DocsTree {
     /// Create a new DOCS tree.
-    pub fn new(root: Node) -> Self {
-        Self { root }
+    pub fn new<P: AsRef<Path>>(root: Node, sheet_to_copy: P) -> Self {
+        let abs_path = canonicalize(root.path()).unwrap();
+        let stylesheet = abs_path.join("style.css");
+        std::fs::copy(sheet_to_copy.as_ref(), &stylesheet).unwrap();
+        Self { root, stylesheet }
     }
 
     /// Get the root of the tree.
@@ -175,8 +165,18 @@ impl DocsTree {
         &mut self.root
     }
 
-    /// Add a path to the tree.
-    pub fn add_path(&mut self, abs_path: PathBuf, page: Option<HTMLPage>) {
+    /// Get the absolute path to the stylesheet.
+    pub fn stylesheet(&self) -> &PathBuf {
+        &self.stylesheet
+    }
+
+    /// Get a relative path to the stylesheet.
+    pub fn stylesheet_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+        diff_paths(&self.stylesheet, path).unwrap()
+    }
+
+    /// Add a page to the tree.
+    pub fn add_page(&mut self, abs_path: PathBuf, page: HTMLPage) {
         let root = self.root_mut();
         let path = abs_path.strip_prefix(&root.path).unwrap();
         let components = path.components().collect::<Vec<_>>();
@@ -195,7 +195,7 @@ impl DocsTree {
             }
         }
 
-        current_node.page = page;
+        current_node.page = Some(page);
     }
 
     /// Get the Node associated with a path.
@@ -235,7 +235,7 @@ impl DocsTree {
             }
         }
 
-        current_node.page().as_ref()
+        current_node.page()
     }
 
     /// Get all index pages in the tree.
@@ -248,17 +248,5 @@ impl DocsTree {
         }
 
         index_pages
-    }
-
-    /// Depth first traversal of the tree. Iterates over all non-root nodes.
-    pub fn depth_first_traversal(&self) -> Vec<&Node> {
-        let mut nodes = Vec::new();
-        let root = self.root();
-
-        for child in root.children().values() {
-            nodes.extend(child.depth_first_traversal());
-        }
-
-        nodes
     }
 }
