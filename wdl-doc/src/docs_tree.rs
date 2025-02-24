@@ -143,15 +143,20 @@ pub struct DocsTree {
     /// `root.path` is the path to the DOCS directory and should be absolute.
     root: Node,
     /// The absolute path to the stylesheet.
-    stylesheet: PathBuf,
+    stylesheet: Option<PathBuf>,
 }
 
 impl DocsTree {
     /// Create a new DOCS tree.
-    pub fn new<P: AsRef<Path>>(root: Node, sheet_to_copy: P) -> Self {
+    pub fn new<P: AsRef<Path>>(root: Node, stylesheet_to_copy: Option<P>) -> Self {
         let abs_path = canonicalize(root.path()).unwrap();
-        let stylesheet = abs_path.join("style.css");
-        std::fs::copy(sheet_to_copy.as_ref(), &stylesheet).unwrap();
+        let stylesheet = if let Some(ss) = stylesheet_to_copy {
+            let stylesheet = abs_path.join("style.css");
+            std::fs::copy(ss.as_ref(), &stylesheet).unwrap();
+            Some(stylesheet)
+        } else {
+            None
+        };
         Self { root, stylesheet }
     }
 
@@ -166,13 +171,19 @@ impl DocsTree {
     }
 
     /// Get the absolute path to the stylesheet.
-    pub fn stylesheet(&self) -> &PathBuf {
-        &self.stylesheet
+    pub fn stylesheet(&self) -> Option<&PathBuf> {
+        self.stylesheet.as_ref()
     }
 
     /// Get a relative path to the stylesheet.
-    pub fn stylesheet_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
-        diff_paths(&self.stylesheet, path).unwrap()
+    pub fn stylesheet_relative_to<P: AsRef<Path>>(&self, path: P) -> Option<PathBuf> {
+        if let Some(stylesheet) = self.stylesheet() {
+            let path = path.as_ref();
+            let stylesheet = diff_paths(stylesheet, path).unwrap();
+            Some(stylesheet)
+        } else {
+            None
+        }
     }
 
     /// Add a page to the tree.

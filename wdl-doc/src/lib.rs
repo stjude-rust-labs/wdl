@@ -13,7 +13,6 @@ pub mod meta;
 pub mod parameter;
 pub mod r#struct;
 
-use std::collections::HashMap;
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -31,11 +30,8 @@ use maud::Markup;
 use maud::PreEscaped;
 use maud::Render;
 use maud::html;
-use parameter::InputOutput;
-use pathdiff::diff_paths;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
-use tokio::io::AsyncWriteExt;
 use wdl_analysis::Analyzer;
 use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::rules;
@@ -43,7 +39,6 @@ use wdl_ast::AstToken;
 use wdl_ast::SyntaxTokenExt;
 use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
-use wdl_ast::v1::MetadataValue;
 
 /// The directory where the generated documentation will be stored.
 ///
@@ -76,34 +71,34 @@ pub(crate) fn header(page_title: &str, stylesheet: &Path) -> Markup {
     }
 }
 
-pub(crate) fn sidebar(docs_tree: &DocsTree) -> Markup {
-    html! {
-        // div class="top-0 left-0 h-full w-1/6 dark:bg-slate-950 dark:text-white" {
-        //     h1 class="text-2xl text-center" { "Table of Contents" }
-        //     @for node in docs_tree.depth_first_traversal() {
-        //         @if let Some(page) = node.page() {
-        //             p { a href=(page.path().to_str().unwrap()) { (page.name()) } }
-        //         } @else {
-        //             p class="" { (node.name()) }
-        //         }
-        //     }
-        // }
-    }
-}
+// pub(crate) fn sidebar(docs_tree: &DocsTree) -> Markup {
+//     html! {
+//         // div class="top-0 left-0 h-full w-1/6 dark:bg-slate-950
+// dark:text-white" {         //     h1 class="text-2xl text-center" { "Table of
+// Contents" }         //     @for node in docs_tree.depth_first_traversal() {
+//         //         @if let Some(page) = node.page() {
+//         //             p { a href=(page.path().to_str().unwrap()) {
+// (page.name()) } }         //         } @else {
+//         //             p class="" { (node.name()) }
+//         //         }
+//         //     }
+//         // }
+//     }
+// }
 
 /// A full HTML page with a header and body.
-pub(crate) fn full_page(page_title: &str, docs_tree: &DocsTree, body: Markup) -> Markup {
-    html! {
-        (DOCTYPE)
-        html class="dark size-full" {
-            (header(page_title, docs_tree.stylesheet()))
-            body class="flex dark size-full dark:bg-slate-950 dark:text-white" {
-                (sidebar(docs_tree))
-                (body)
-           }
-        }
-    }
-}
+// pub(crate) fn full_page(page_title: &str, docs_tree: &DocsTree, body: Markup) -> Markup {
+//     html! {
+//         (DOCTYPE)
+//         html class="dark size-full" {
+//             (header(page_title, docs_tree.stylesheet()))
+//             body class="flex dark size-full dark:bg-slate-950 dark:text-white" {
+//                 (sidebar(docs_tree))
+//                 (body)
+//            }
+//         }
+//     }
+// }
 
 /// Renders a block of Markdown using `pulldown-cmark`.
 pub(crate) struct Markdown<T>(T);
@@ -245,17 +240,18 @@ impl Document {
         Markdown(&preamble).render()
     }
 
-    /// Render the document as HTML.
-    pub fn render(&self, docs_tree: &DocsTree) -> Markup {
-        let body = html! {
-            h1 { (self.name()) }
-            h3 { "WDL Version: " (self.version()) }
-            div { (self.preamble()) }
-            // (toc(&docs_tree.get_node(&self.parent).unwrap().get_non_index_pages()))
-        };
+    // / Render the document as HTML.
+    // pub fn render(&self, docs_tree: &DocsTree) -> Markup {
+    //     let body = html! {
+    //         h1 { (self.name()) }
+    //         h3 { "WDL Version: " (self.version()) }
+    //         div { (self.preamble()) }
+    //         //
+    // (toc(&docs_tree.get_node(&self.parent).unwrap().get_non_index_pages()))
+    //     };
 
-        full_page(self.name(), docs_tree, body)
-    }
+    //     // full_page(self.name(), docs_tree, body)
+    // }
 }
 
 /// Generate HTML documentation for a workspace.
@@ -266,7 +262,10 @@ impl Document {
 ///
 /// The contents of `css` will be written to a `style.css` file
 /// in the `docs` directory.
-pub async fn document_workspace<P: AsRef<Path>>(workspace: P, style_sheet: P) -> Result<PathBuf> {
+pub async fn document_workspace<P: AsRef<Path>>(
+    workspace: P,
+    stylesheet: Option<P>,
+) -> Result<PathBuf> {
     let abs_path = workspace.as_ref().canonicalize()?;
 
     if !abs_path.is_dir() {
@@ -282,10 +281,8 @@ pub async fn document_workspace<P: AsRef<Path>>(workspace: P, style_sheet: P) ->
     analyzer.add_directory(abs_path.clone()).await?;
     let results = analyzer.analyze(()).await?;
 
-    let mut docs_tree = docs_tree::DocsTree::new(
-        Node::new(DOCS_DIR.to_string(), docs_dir),
-        style_sheet.as_ref(),
-    );
+    let mut docs_tree =
+        docs_tree::DocsTree::new(Node::new(DOCS_DIR.to_string(), &docs_dir), stylesheet);
 
     for result in results {
         let uri = result.document().uri();
@@ -315,8 +312,9 @@ pub async fn document_workspace<P: AsRef<Path>>(workspace: P, style_sheet: P) ->
                 DocumentItem::Struct(s) => {
                     let struct_name = s.name().as_str().to_owned();
                     let struct_path = cur_dir.join(format!("{}-struct.html", struct_name));
-                    let mut struct_file = tokio::fs::File::create(&struct_path).await?;
+
                     let r#struct = r#struct::Struct::new(s.clone());
+
                     docs_tree.add_page(
                         struct_path,
                         HTMLPage::new(struct_name.clone(), PageType::Struct(r#struct)),
@@ -325,100 +323,33 @@ pub async fn document_workspace<P: AsRef<Path>>(workspace: P, style_sheet: P) ->
                 DocumentItem::Task(t) => {
                     let task_name = t.name().as_str().to_owned();
                     let task_path = cur_dir.join(format!("{}-task.html", task_name));
-                    let mut task_file = tokio::fs::File::create(&task_path).await?;
-
-                    let parameter_meta: HashMap<String, MetadataValue> = t
-                        .parameter_metadata()
-                        .into_iter()
-                        .flat_map(|p| p.items())
-                        .map(|p| {
-                            let name = p.name().as_str().to_owned();
-                            let item = p.value();
-                            (name, item)
-                        })
-                        .collect();
-
-                    let meta: HashMap<String, MetadataValue> = t
-                        .metadata()
-                        .into_iter()
-                        .flat_map(|m| m.items())
-                        .map(|m| {
-                            let name = m.name().as_str().to_owned();
-                            let item = m.value();
-                            (name, item)
-                        })
-                        .collect();
-
-                    let output_meta: HashMap<String, MetadataValue> = meta
-                        .get("outputs")
-                        .cloned()
-                        .into_iter()
-                        .flat_map(|v| v.unwrap_object().items())
-                        .map(|m| {
-                            let name = m.name().as_str().to_owned();
-                            let item = m.value();
-                            (name, item)
-                        })
-                        .collect();
-
-                    let inputs = t
-                        .input()
-                        .into_iter()
-                        .flat_map(|i| i.declarations())
-                        .map(|decl| {
-                            let name = decl.name().as_str().to_owned();
-                            let meta = parameter_meta.get(&name);
-                            parameter::Parameter::new(
-                                decl.clone(),
-                                meta.cloned(),
-                                InputOutput::Input,
-                            )
-                        })
-                        .collect();
-
-                    let outputs = t
-                        .output()
-                        .into_iter()
-                        .flat_map(|o| o.declarations())
-                        .map(|decl| {
-                            let name = decl.name().as_str().to_owned();
-                            let meta = output_meta.get(&name);
-                            parameter::Parameter::new(
-                                wdl_ast::v1::Decl::Bound(decl.clone()),
-                                meta.cloned(),
-                                InputOutput::Output,
-                            )
-                        })
-                        .collect();
 
                     let task = task::Task::new(
                         task_name.clone(),
                         t.metadata(),
+                        t.parameter_metadata(),
+                        t.input(),
+                        t.output(),
                         t.runtime(),
-                        inputs,
-                        outputs,
                     );
 
-                    docs_tree.add_page(
-                        task_path,
-                        HTMLPage::new(task_name.clone(), PageType::Task(task)),
-                    );
+                    docs_tree.add_page(task_path, HTMLPage::new(task_name, PageType::Task(task)));
                 }
                 DocumentItem::Workflow(w) => {
                     let workflow_name = w.name().as_str().to_owned();
                     let workflow_path = cur_dir.join(format!("{}-workflow.html", workflow_name));
-                    let mut workflow_file = tokio::fs::File::create(&workflow_path).await?;
 
                     let workflow = workflow::Workflow::new(
                         workflow_name.clone(),
                         w.metadata(),
-                        inputs,
-                        outputs,
+                        w.parameter_metadata(),
+                        w.input(),
+                        w.output(),
                     );
 
                     docs_tree.add_page(
                         workflow_path,
-                        HTMLPage::new(workflow_name.clone(), PageType::Workflow(workflow)),
+                        HTMLPage::new(workflow_name, PageType::Workflow(workflow)),
                     );
                 }
                 DocumentItem::Import(_) => {}
@@ -427,41 +358,16 @@ pub async fn document_workspace<P: AsRef<Path>>(workspace: P, style_sheet: P) ->
         let document = Document::new(name.to_string(), cur_dir.clone(), version);
 
         let index_path = cur_dir.join("index.html");
-        let mut index = tokio::fs::File::create(index_path.clone()).await?;
 
         docs_tree.add_page(
             index_path,
-            HTMLPage::new(name.to_string(), PageType::Document(document)),
+            HTMLPage::new(name.to_string(), PageType::Index(document)),
         );
     }
 
     let homepage_path = docs_dir.join("index.html");
-    let mut homepage = tokio::fs::File::create(homepage_path.clone()).await?;
 
     Ok(docs_dir)
-}
-
-/// Build a stylesheet for the documentation, given the path to the `themes`
-/// directory.
-pub fn build_stylesheet(themes_dir: &Path) -> Result<String> {
-    let themes_dir = themes_dir.canonicalize()?;
-    let output = std::process::Command::new("npx")
-        .arg("@tailwindcss/cli")
-        .arg("-i")
-        .arg("src/main.css")
-        .arg("-o")
-        .arg("dist/style.css")
-        .current_dir(&themes_dir)
-        .output()?;
-    if !output.status.success() {
-        return Err(anyhow!("Failed to build stylesheet"));
-    }
-    let css_path = themes_dir.join("dist/style.css");
-    if !css_path.exists() {
-        return Err(anyhow!("Failed to find stylesheet"));
-    }
-
-    Ok(std::fs::read_to_string(css_path)?)
 }
 
 #[cfg(test)]

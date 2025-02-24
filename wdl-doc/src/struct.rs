@@ -8,7 +8,7 @@ use wdl_ast::AstToken;
 use wdl_ast::v1::StructDefinition;
 
 use crate::DocsTree;
-use crate::full_page;
+// use crate::full_page;
 
 /// A struct in a WDL document.
 #[derive(Debug)]
@@ -37,20 +37,20 @@ impl Struct {
         })
     }
 
-    /// Render the struct as HTML.
-    pub fn render(&self, docs_tree: &DocsTree, stylesheet: &Path) -> Markup {
-        let body = html! {
-            h1 { (self.name()) }
-            h2 { "Members" }
-            ul {
-                @for (name, ty) in self.members() {
-                    li {
-                        b { (name) ":" } " " code { (ty) }
-                    }
-                }
-            }
-        };
+    // / Render the struct as HTML.
+    // pub fn render(&self, docs_tree: &DocsTree, stylesheet: &Path) -> Markup {
+    //     let body = html! {
+    //         h1 { (self.name()) }
+    //         h2 { "Members" }
+    //         ul {
+    //             @for (name, ty) in self.members() {
+    //                 li {
+    //                     b { (name) ":" } " " code { (ty) }
+    //                 }
+    //             }
+    //         }
+    //     };
 
-        full_page(&self.name(), docs_tree, stylesheet, body)
-    }
+    //     full_page(&self.name(), docs_tree, stylesheet, body)
+    // }
 }

@@ -42,7 +42,6 @@ use wdl::cli::validate_inputs;
 use wdl_analysis::path_to_uri;
 use wdl_ast::Node;
 use wdl_ast::Severity;
-use wdl_doc::build_stylesheet;
 use wdl_doc::document_workspace;
 use wdl_format::Formatter;
 use wdl_format::element::node::AstNodeFormatExt as _;
@@ -226,6 +225,29 @@ impl FormatCommand {
     }
 }
 
+/// Build a stylesheet for the documentation, given the path to the `themes`
+/// directory.
+pub fn build_stylesheet(themes_dir: &Path) -> Result<PathBuf> {
+    let themes_dir = themes_dir.canonicalize()?;
+    let output = std::process::Command::new("npx")
+        .arg("@tailwindcss/cli")
+        .arg("-i")
+        .arg("src/main.css")
+        .arg("-o")
+        .arg("dist/style.css")
+        .current_dir(&themes_dir)
+        .output()?;
+    if !output.status.success() {
+        return Err(anyhow!("Failed to build stylesheet"));
+    }
+    let css_path = themes_dir.join("dist/style.css");
+    if !css_path.exists() {
+        return Err(anyhow!("Failed to find stylesheet"));
+    }
+
+    Ok(css_path)
+}
+
 /// Document a workspace.
 #[derive(Args)]
 #[clap(disable_version_flag = true)]
@@ -253,9 +275,9 @@ impl DocCommand {
     /// Executes the `doc` subcommand.
     async fn exec(self) -> Result<()> {
         let css = if let Some(themes) = self.themes.as_ref() {
-            build_stylesheet(themes)?
+            Some(build_stylesheet(themes)?)
         } else {
-            "".to_string()
+            None
         };
 
         let docs_dir = document_workspace(self.path.clone(), css).await?;
