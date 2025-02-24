@@ -386,7 +386,7 @@ where
     Req: TaskManagerRequest,
 {
     /// Constructs a new task manager with the given total CPU, maximum CPU per
-    /// request, total memory and maximum memory per request.
+    /// request, total memory, and maximum memory per request.
     fn new(cpu: u64, max_cpu: u64, memory: u64, max_memory: u64) -> Self {
         let (tx, rx) = mpsc::unbounded_channel();
 
@@ -546,75 +546,92 @@ where
             memory = state.memory,
         );
 
-        // This is a fundamentally a two-dimensional 0/1 knapsack problem with the
-        // weights being the CPU and memory reservations, but where each item has
-        // a profit value of 1 (i.e. we maximize for the number of items rather
-        // than their collective profit).
+        // This algorithm is intended to unpark the greatest number of tasks.
         //
-        // We start by finding the longest subset of the parked tasks that could run
-        // based on the remaining available CPUs.
+        // It first finds the greatest subset of tasks that are constrained by CPU and
+        // then by memory.
         //
-        // We then intersect that subset with the subset of the parked tasks that could
-        // run based on the remaining available memory.
+        // Next it finds the greatest subset of tasks that are constrained by memory and
+        // then by CPU.
         //
-        // If the intersection is empty, we fallback to using a naive first-fit. When
-        // the parked tasks have the same reservation values (which is generally the
-        // case with WDL), the fallback should not be spawning many tasks.
+        // It then unparks whichever subset is greater.
         //
-        // Note: consecutive calls to `VecDeque::make_contiguous` are no-ops
+        // The process is repeated until both subsets reach zero length.
+        loop {
+            let cpu_by_memory_len = {
+                // Start by finding the longest range in the parked set that could run based on
+                // CPU reservation
+                let range =
+                    fit_longest_range(state.parked.make_contiguous(), state.cpu, |(r, ..)| {
+                        OrderedFloat(r.cpu())
+                    });
 
-        // Start by finding the longest range in the parked set that could run based on
-        // CPU reservation
-        let range = fit_longest_range(state.parked.make_contiguous(), state.cpu, |(r, ..)| {
-            OrderedFloat(r.cpu())
-        });
+                // Next, find the longest subset of that subset that could run based on memory
+                // reservation
+                fit_longest_range(
+                    &mut state.parked.make_contiguous()[range],
+                    state.memory,
+                    |(r, ..)| r.memory(),
+                )
+                .len()
+            };
 
-        // Next, find the longest subset of that subset that could run based on memory
-        // reservation
-        let range = fit_longest_range(
-            &mut state.parked.make_contiguous()[range],
-            state.memory,
-            |(r, ..)| r.memory(),
-        );
+            // Next, find the longest range in the parked set that could run based on memory
+            // reservation
+            let memory_by_cpu =
+                fit_longest_range(state.parked.make_contiguous(), state.memory, |(r, ..)| {
+                    r.memory()
+                });
 
-        if range.is_empty() {
-            // Fall back to a naive first-fit
-            while let Some(pos) = state
-                .parked
-                .iter()
-                .position(|(r, ..)| r.cpu() <= state.cpu.into() && r.memory() <= state.memory)
-            {
-                let (request, spawned, completed) = state.parked.swap_remove_back(pos).unwrap();
+            // Next, find the longest subset of that subset that could run based on CPU
+            // reservation
+            let memory_by_cpu = fit_longest_range(
+                &mut state.parked.make_contiguous()[memory_by_cpu],
+                state.cpu,
+                |(r, ..)| OrderedFloat(r.cpu()),
+            );
+
+            // If both subsets are empty, break out
+            if cpu_by_memory_len == 0 && memory_by_cpu.is_empty() {
+                break;
+            }
+
+            // Check to see which subset is greater (for equivalence, use the one we don't
+            // need to refit for)
+            let range = if memory_by_cpu.len() >= cpu_by_memory_len {
+                memory_by_cpu
+            } else {
+                // We need to refit because the above calculation of `memory_by_cpu` mutated the
+                // parked list
+                let range =
+                    fit_longest_range(state.parked.make_contiguous(), state.cpu, |(r, ..)| {
+                        OrderedFloat(r.cpu())
+                    });
+
+                fit_longest_range(
+                    &mut state.parked.make_contiguous()[range],
+                    state.memory,
+                    |(r, ..)| r.memory(),
+                )
+            };
+
+            debug!("unparking {len} task(s)", len = range.len());
+
+            assert_eq!(
+                range.start, 0,
+                "expected the fit tasks to be at the front of the queue"
+            );
+            for _ in range {
+                let (request, spawned, completed) = state.parked.pop_front().unwrap();
 
                 debug!(
-                    "naively unparking task with reservation of {cpu} CPU(s) and {memory} bytes \
-                     of memory",
+                    "unparking task with reservation of {cpu} CPU(s) and {memory} bytes of memory",
                     cpu = request.cpu(),
                     memory = request.memory(),
                 );
 
                 Self::handle_spawn_request(state, max_cpu, max_memory, request, spawned, completed);
             }
-
-            return;
-        }
-
-        debug!("unparking {len} task(s)", len = range.len());
-
-        assert_eq!(
-            range.start, 0,
-            "expected the fit tasks to be at the front of the queue"
-        );
-        for _ in range {
-            let (request, spawned, completed) = state.parked.pop_front().unwrap();
-
-            debug!(
-                "unparking task with reservation of {cpu} CPU(s) and {memory} bytes of memory",
-                cpu = request.cpu(),
-                memory = request.memory(),
-            );
-
-            Self::handle_spawn_request(state, max_cpu, max_memory, request, spawned, completed);
         }
     }
 }
