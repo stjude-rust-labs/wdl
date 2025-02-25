@@ -238,11 +238,14 @@ pub fn build_stylesheet(themes_dir: &Path) -> Result<PathBuf> {
         .current_dir(&themes_dir)
         .output()?;
     if !output.status.success() {
-        return Err(anyhow!("Failed to build stylesheet"));
+        bail!(
+            "failed to build stylesheet: {stderr}",
+            stderr = String::from_utf8_lossy(&output.stderr)
+        );
     }
     let css_path = themes_dir.join("dist/style.css");
     if !css_path.exists() {
-        return Err(anyhow!("Failed to find stylesheet"));
+        bail!("failed to build stylesheet: no output file found");
     }
 
     Ok(css_path)
@@ -259,6 +262,10 @@ pub struct DocCommand {
     /// The path to the `themes` directory.
     #[clap(long, value_name = "THEMES")]
     pub themes: Option<PathBuf>,
+
+    /// Whether or not to overwrite the existing documentation.
+    #[clap(long)]
+    pub overwrite: bool,
 
     /// Whether or not to open the generated documentation in the default
     /// browser.
@@ -280,7 +287,7 @@ impl DocCommand {
             None
         };
 
-        let docs_dir = document_workspace(self.path.clone(), css).await?;
+        let docs_dir = document_workspace(self.path.clone(), css.clone(), self.overwrite).await?;
 
         if self.open {
             opener::open(docs_dir.join("index.html"))?;
@@ -299,8 +306,8 @@ impl DocCommand {
                 match rx.recv() {
                     Ok(Ok(Event { .. })) => {
                         println!("regenerating documentation...");
-                        let css = build_stylesheet(&themes)?;
-                        document_workspace(self.path.clone(), css).await?;
+                        build_stylesheet(&themes)?;
+                        document_workspace(self.path.clone(), css.clone(), self.overwrite).await?;
                         println!("done");
                     }
                     Ok(Err(e)) => eprintln!("watch error: {}", e),

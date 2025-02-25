@@ -1,13 +1,17 @@
 //! Implementations for a [`DocsTree`] which represents the DOCS directory.
 
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::fs::canonicalize;
 use std::path::Path;
 use std::path::PathBuf;
+use std::rc::Rc;
 
+use maud::Markup;
+use maud::html;
 use pathdiff::diff_paths;
 
 use crate::Document;
+use crate::full_page;
 use crate::r#struct::Struct;
 use crate::task::Task;
 use crate::workflow::Workflow;
@@ -30,22 +34,22 @@ pub enum PageType {
 pub struct HTMLPage {
     /// The display name of the page.
     name: String,
-    /// The type of the page. Index pages do not have a type.
+    /// The type of the page.
     page_type: PageType,
 }
 
 impl HTMLPage {
-    /// Create a new Table of Contents entry.
+    /// Create a new HTML page.
     pub fn new(name: String, page_type: PageType) -> Self {
         Self { name, page_type }
     }
 
-    /// Get the name of the entry.
+    /// Get the name of the page.
     pub fn name(&self) -> &str {
         &self.name
     }
 
-    /// Get the type of the entry.
+    /// Get the type of the page.
     pub fn page_type(&self) -> &PageType {
         &self.page_type
     }
@@ -53,11 +57,15 @@ impl HTMLPage {
 
 /// A node in the DOCS directory tree.
 #[derive(Debug)]
-pub struct Node {
+struct Node {
+    /// The name of the node.
     name: String,
+    /// The absolute path to the node.
     path: PathBuf,
-    page: Option<HTMLPage>,
-    children: HashMap<String, Node>,
+    /// The page associated with the node.
+    page: Option<Rc<HTMLPage>>,
+    /// The children of the node.
+    children: BTreeMap<String, Node>,
 }
 
 impl Node {
@@ -67,7 +75,7 @@ impl Node {
             name,
             path: path.into(),
             page: None,
-            children: HashMap::new(),
+            children: BTreeMap::new(),
         }
     }
 
@@ -81,57 +89,21 @@ impl Node {
         &self.path
     }
 
-    /// Check if the node has a page associated with it.
-    fn has_page(&self) -> bool {
-        self.page.is_some()
-    }
-
-    /// Check if the node is an index page.
-    fn is_index(&self) -> bool {
-        if self.has_page() {
-            return matches!(self.page.as_ref().unwrap().page_type(), PageType::Index(_));
-        }
-        false
-    }
-
     /// Get the page associated with the node.
-    pub fn page(&self) -> Option<&HTMLPage> {
-        self.page.as_ref()
+    pub fn page(&self) -> Option<Rc<HTMLPage>> {
+        self.page.clone()
     }
 
-    /// Get the children of the node.
-    fn children(&self) -> &HashMap<String, Node> {
-        &self.children
-    }
-
-    /// Get index pages in the node.
-    fn get_index_pages(&self) -> Vec<&HTMLPage> {
-        let mut index_pages = Vec::new();
-
-        if self.is_index() {
-            index_pages.push(self.page.as_ref().unwrap());
-        }
+    /// Iterate over the children of the node in a Depth First Traversal order.
+    pub fn depth_first_traversal(&self) -> Vec<&Node> {
+        let mut nodes = Vec::new();
+        nodes.push(self);
 
         for child in self.children.values() {
-            index_pages.extend(child.get_index_pages());
+            nodes.extend(child.depth_first_traversal());
         }
 
-        index_pages
-    }
-
-    /// Get non-index pages in the node.
-    pub fn get_non_index_pages(&self) -> Vec<&HTMLPage> {
-        let mut non_index_pages = Vec::new();
-
-        if self.has_page() && !self.is_index() {
-            non_index_pages.push(self.page.as_ref().unwrap());
-        }
-
-        for child in self.children.values() {
-            non_index_pages.extend(child.get_non_index_pages());
-        }
-
-        non_index_pages
+        nodes
     }
 }
 
@@ -148,8 +120,8 @@ pub struct DocsTree {
 
 impl DocsTree {
     /// Create a new DOCS tree.
-    pub fn new<P: AsRef<Path>>(root: Node, stylesheet_to_copy: Option<P>) -> Self {
-        let abs_path = canonicalize(root.path()).unwrap();
+    pub fn new<P: AsRef<Path>>(root: P, stylesheet_to_copy: Option<P>) -> Self {
+        let abs_path = canonicalize(root.as_ref()).unwrap();
         let stylesheet = if let Some(ss) = stylesheet_to_copy {
             let stylesheet = abs_path.join("style.css");
             std::fs::copy(ss.as_ref(), &stylesheet).unwrap();
@@ -157,16 +129,23 @@ impl DocsTree {
         } else {
             None
         };
-        Self { root, stylesheet }
+        let node = Node::new(
+            abs_path.file_name().unwrap().to_str().unwrap().to_string(),
+            abs_path.clone(),
+        );
+        Self {
+            root: node,
+            stylesheet,
+        }
     }
 
     /// Get the root of the tree.
-    pub fn root(&self) -> &Node {
+    fn root(&self) -> &Node {
         &self.root
     }
 
     /// Get the root of the tree as mutable.
-    pub fn root_mut(&mut self) -> &mut Node {
+    fn root_mut(&mut self) -> &mut Node {
         &mut self.root
     }
 
@@ -187,22 +166,21 @@ impl DocsTree {
     }
 
     /// Add a page to the tree.
-    pub fn add_page(&mut self, abs_path: PathBuf, page: HTMLPage) {
+    pub fn add_page<P: Into<PathBuf>>(&mut self, abs_path: P, page: Rc<HTMLPage>) {
         let root = self.root_mut();
-        let path = abs_path.strip_prefix(&root.path).unwrap();
-        let components = path.components().collect::<Vec<_>>();
-        let cur_path = root.path.clone();
+        let path = abs_path.into();
+        let rel_path = path.strip_prefix(&root.path).unwrap();
 
         let mut current_node = root;
 
-        for component in components {
-            let component = component.as_os_str().to_str().unwrap().to_string();
-            if current_node.children.contains_key(&component) {
-                current_node = current_node.children.get_mut(&component).unwrap();
+        for component in rel_path.components() {
+            let cur_name = component.as_os_str().to_str().unwrap();
+            if current_node.children.contains_key(cur_name) {
+                current_node = current_node.children.get_mut(cur_name).unwrap();
             } else {
-                let new_node = Node::new(component.clone(), cur_path.join(&component));
-                current_node.children.insert(component.clone(), new_node);
-                current_node = current_node.children.get_mut(&component).unwrap();
+                let new_node = Node::new(cur_name.to_string(), current_node.path().join(component));
+                current_node.children.insert(cur_name.to_string(), new_node);
+                current_node = current_node.children.get_mut(cur_name).unwrap();
             }
         }
 
@@ -210,17 +188,19 @@ impl DocsTree {
     }
 
     /// Get the Node associated with a path.
-    pub fn get_node(&self, abs_path: &PathBuf) -> Option<&Node> {
+    fn get_node<P: AsRef<Path>>(&self, abs_path: P) -> Option<&Node> {
         let root = self.root();
-        let path = abs_path.strip_prefix(&root.path).unwrap();
-        let components = path.components().collect::<Vec<_>>();
+        let path = abs_path.as_ref();
+        let rel_path = path.strip_prefix(&root.path).unwrap();
 
         let mut current_node = root;
 
-        for component in components {
-            let component = component.as_os_str().to_str().unwrap().to_string();
-            if current_node.children.contains_key(&component) {
-                current_node = current_node.children.get(&component).unwrap();
+        for component in rel_path
+            .components()
+            .map(|c| c.as_os_str().to_str().unwrap())
+        {
+            if current_node.children.contains_key(component) {
+                current_node = current_node.children.get(component).unwrap();
             } else {
                 return None;
             }
@@ -230,34 +210,111 @@ impl DocsTree {
     }
 
     /// Get the page associated with a path.
-    pub fn get_page(&self, abs_path: &PathBuf) -> Option<&HTMLPage> {
+    pub fn get_page<P: AsRef<Path>>(&self, abs_path: P) -> Option<Rc<HTMLPage>> {
+        self.get_node(abs_path).and_then(|node| node.page())
+    }
+
+    /// Render a sidebar component given a path.
+    ///
+    /// The sidebar will contain a table of contents for the DOCS directory.
+    /// Every node in the tree will be visited in a Depth First Traversal order.
+    /// If the node has a page associated with it, a link to the page will be
+    /// rendered. If the node does not have a page associated with it, the
+    /// name of the node will be rendered. All links will be relative to the
+    /// given path.
+    pub fn render_sidebar_component<P: AsRef<Path>>(&self, path: P) -> Markup {
         let root = self.root();
-        let path = abs_path.strip_prefix(&root.path).unwrap();
-        let components = path.components().collect::<Vec<_>>();
+        let base = path.as_ref().parent().unwrap();
+        let nodes = root.depth_first_traversal();
 
-        let mut current_node = root;
+        html! {
+            div class="top-0 left-0 h-full w-1/6 dark:bg-slate-950 dark:text-white" {
+                h1 class="text-2xl text-center" { "Sidebar" }
+                @for node in nodes {
+                    @if let Some(page) = node.page() {
+                        p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                    } @else {
+                        p class="" { (node.name()) }
+                    }
+                }
+            }
+        }
+    }
 
-        for component in components {
-            let component = component.as_os_str().to_str().unwrap().to_string();
-            if current_node.children.contains_key(&component) {
-                current_node = current_node.children.get(&component).unwrap();
-            } else {
-                return None;
+    /// Render every page in the tree.
+    pub fn render_all(&self) {
+        let root = self.root();
+
+        for node in root.depth_first_traversal() {
+            if let Some(page) = node.page() {
+                self.write_page(page.as_ref(), node.path());
             }
         }
 
-        current_node.page()
+        self.write_homepage();
     }
 
-    /// Get all index pages in the tree.
-    pub fn get_index_pages(&self) -> Vec<&HTMLPage> {
-        let mut index_pages = Vec::new();
+    /// Write the homepage to disk.
+    fn write_homepage(&self) {
         let root = self.root();
+        let index_path = root.path().join("index.html");
 
-        for child in root.children().values() {
-            index_pages.extend(child.get_index_pages());
-        }
+        let sidebar = self.render_sidebar_component(&index_path);
+        let content = html! {
+            div class="flex flex-col items-center text-left" {
+                h3 class="" { "Home" }
+                table class="border" {
+                    thead class="border" { tr {
+                        th class="" { "Page" }
+                    }}
+                    tbody class="border" {
+                        @for node in root.depth_first_traversal() {
+                            @if node.page().is_some() {
+                                tr class="border" {
+                                    td class="border" {
+                                        a href=(diff_paths(node.path(), root.path()).unwrap().to_str().unwrap()) {(node.name()) }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
 
-        index_pages
+        let html = full_page(
+            "Home",
+            html! {
+                (sidebar)
+                (content)
+            },
+            self.stylesheet_relative_to(root.path()).as_deref(),
+        );
+        std::fs::write(index_path, html.into_string()).unwrap();
+    }
+
+    /// Write a page to disk at the designated path.
+    pub fn write_page<P: AsRef<Path>>(&self, page: &HTMLPage, path: P) {
+        let path = path.as_ref();
+        let stylesheet = self.stylesheet_relative_to(path.parent().unwrap());
+
+        let content = match page.page_type() {
+            PageType::Index(doc) => doc.render(),
+            PageType::Struct(s) => s.render(),
+            PageType::Task(t) => t.render(),
+            PageType::Workflow(w) => w.render(),
+        };
+
+        let sidebar = self.render_sidebar_component(path);
+
+        let html = full_page(
+            page.name(),
+            html! {
+                (sidebar)
+                (content)
+            },
+            stylesheet.as_deref(),
+        );
+        std::fs::write(path, html.into_string()).unwrap();
     }
 }

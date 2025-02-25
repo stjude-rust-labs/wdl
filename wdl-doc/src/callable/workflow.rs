@@ -76,22 +76,34 @@ impl Workflow {
         })
     }
 
-    // /// Render the workflow as HTML.
-    // pub fn render(&self, docs_tree: &DocsTree, stylesheet: &Path) -> Markup {
-    //     let body = html! {
-    //         h1 { @if let Some(name_override) = self.name_override() {
-    // (name_override) } @else { (self.name()) } }         @if let
-    // Some(category) = self.category() {             h2 { "Category: "
-    // (category) }         }
-    //         (self.description())
-    //         (self.render_meta())
-    //         (self.render_inputs())
-    //         (self.render_outputs())
-    //     };
+    /// Renders the meta section as HTML.
+    pub fn render_meta(&self) -> Markup {
+        let kv = self
+            .meta
+            .iter()
+            .filter(|(k, _)| !matches!(k.as_str(), "name" | "category" | "description"));
+        html! {
+            @for (key, value) in kv {
+                p {
+                    b { (key) ":" } " " (render_value(value))
+                }
+            }
+        }
+    }
 
-    //     // TODO
-    //     body
-    // }
+    /// Render the workflow as HTML.
+    pub fn render(&self) -> Markup {
+        html! {
+            h1 { @if let Some(name) = self.name_override() { (name) } else { (self.name) } }
+            @if let Some(category) = self.category() {
+                h2 { "Category: " (category) }
+            }
+            (self.description())
+            (self.render_meta())
+            (self.render_inputs())
+            (self.render_outputs())
+        }
+    }
 }
 
 impl Callable for Workflow {

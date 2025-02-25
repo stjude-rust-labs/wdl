@@ -67,6 +67,21 @@ impl Task {
         }
     }
 
+    /// Render the meta section of the task as HTML.
+    pub fn render_meta(&self) -> Markup {
+        let kv = self
+            .meta
+            .iter()
+            .filter(|(k, _)| !matches!(k.as_str(), "outputs" | "description"));
+        html! {
+            @for (key, value) in kv {
+                p {
+                    b { (key) ":" } " " (render_value(value))
+                }
+            }
+        }
+    }
+
     /// Render the rutime section of the task as HTML.
     pub fn render_runtime_section(&self) -> Markup {
         if let Some(runtime_section) = &self.runtime_section {
@@ -92,21 +107,19 @@ impl Task {
         }
     }
 
-    // / Render the task as HTML.
-    //     pub fn render(&self, docs_tree: &DocsTree, stylesheet: &Path) -> Markup {
-    //         let body = html! {
-    //             div class="table-auto border-collapse" {
-    //                 h1 { (self.name()) }
-    //                 (self.description())
-    //                 // (self.render_meta())
-    //                 (self.render_inputs())
-    //                 (self.render_outputs())
-    //                 (self.render_runtime_section())
-    //             }
-    //         };
-
-    //         full_page(self.name(), docs_tree, stylesheet, body)
-    //     }
+    /// Render the task as HTML.
+    pub fn render(&self) -> Markup {
+        html! {
+            div class="table-auto border-collapse" {
+                h1 { (self.name()) }
+                (self.description())
+                (self.render_meta())
+                (self.render_inputs())
+                (self.render_outputs())
+                (self.render_runtime_section())
+            }
+        }
+    }
 }
 
 impl Callable for Task {

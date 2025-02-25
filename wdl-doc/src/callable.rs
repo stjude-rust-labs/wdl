@@ -3,7 +3,7 @@
 pub mod task;
 pub mod workflow;
 
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::collections::HashSet;
 
 use maud::Markup;
@@ -19,7 +19,8 @@ use crate::meta::render_value;
 use crate::parameter::InputOutput;
 use crate::parameter::Parameter;
 
-type MetaMap = HashMap<String, MetadataValue>;
+/// A map of metadata key-value pairs, sorted by key.
+type MetaMap = BTreeMap<String, MetadataValue>;
 
 /// A callable (workflow or task) in a WDL document.
 pub trait Callable {
@@ -82,18 +83,6 @@ pub trait Callable {
                 && param.group().is_none()
         })
     }
-
-    // /// Render the meta section of the callable.
-    // fn render_meta(&self) -> Markup {
-    //     if let Some(meta_section) = self.metadata_section() {
-    //         Meta::new(meta_section.clone()).render(&HashSet::from([
-    //             "description".to_string(),
-    //             "outputs".to_string(),
-    //         ]))
-    //     } else {
-    //         html! {}
-    //     }
-    // }
 
     /// Render the required inputs of the callable.
     fn render_required_inputs(&self) -> Markup {
@@ -234,6 +223,7 @@ pub trait Callable {
     }
 }
 
+/// Parse a [`MetadataSection`] into a [`MetaMap`].
 fn parse_meta(meta: &MetadataSection) -> MetaMap {
     meta.items()
         .map(|m| {
@@ -244,6 +234,7 @@ fn parse_meta(meta: &MetadataSection) -> MetaMap {
         .collect()
 }
 
+/// Parse a [`ParameterMetadataSection`] into a [`MetaMap`].
 fn parse_parameter_meta(parameter_meta: &ParameterMetadataSection) -> MetaMap {
     parameter_meta
         .items()
@@ -255,6 +246,7 @@ fn parse_parameter_meta(parameter_meta: &ParameterMetadataSection) -> MetaMap {
         .collect()
 }
 
+/// Parse the [`InputSection`] into a vector of [`Parameter`]s.
 fn parse_inputs(input_section: &InputSection, parameter_meta: &MetaMap) -> Vec<Parameter> {
     input_section
         .declarations()
@@ -266,6 +258,7 @@ fn parse_inputs(input_section: &InputSection, parameter_meta: &MetaMap) -> Vec<P
         .collect()
 }
 
+/// Parse the [`OutputSection`] into a vector of [`Parameter`]s.
 fn parse_outputs(
     output_section: &OutputSection,
     meta: &MetaMap,

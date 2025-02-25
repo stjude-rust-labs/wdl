@@ -1,5 +1,7 @@
 //! Create HTML documentation for WDL structs.
 
+use maud::Markup;
+use maud::html;
 use wdl_ast::AstToken;
 use wdl_ast::v1::StructDefinition;
 
@@ -32,20 +34,18 @@ impl Struct {
         })
     }
 
-    // / Render the struct as HTML.
-    // pub fn render(&self, docs_tree: &DocsTree, stylesheet: &Path) -> Markup {
-    //     let body = html! {
-    //         h1 { (self.name()) }
-    //         h2 { "Members" }
-    //         ul {
-    //             @for (name, ty) in self.members() {
-    //                 li {
-    //                     b { (name) ":" } " " code { (ty) }
-    //                 }
-    //             }
-    //         }
-    //     };
-
-    //     full_page(&self.name(), docs_tree, stylesheet, body)
-    // }
+    /// Render the struct as HTML.
+    pub fn render(&self) -> Markup {
+        html! {
+            h1 { (self.name()) }
+            h2 { "Members" }
+            ul {
+                @for (name, ty) in self.members() {
+                    li {
+                        b { (name) ":" } " " code { (ty) }
+                    }
+                }
+            }
+        }
+    }
 }
