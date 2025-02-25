@@ -168,12 +168,13 @@ impl DocsTree {
     /// Add a page to the tree.
     pub fn add_page<P: Into<PathBuf>>(&mut self, abs_path: P, page: Rc<HTMLPage>) {
         let root = self.root_mut();
-        let path = abs_path.into();
+        let path: PathBuf = abs_path.into();
         let rel_path = path.strip_prefix(&root.path).unwrap();
 
         let mut current_node = root;
 
-        for component in rel_path.components() {
+        let mut components = rel_path.components().peekable();
+        while let Some(component) = components.next() {
             let cur_name = component.as_os_str().to_str().unwrap();
             if current_node.children.contains_key(cur_name) {
                 current_node = current_node.children.get_mut(cur_name).unwrap();
@@ -181,6 +182,11 @@ impl DocsTree {
                 let new_node = Node::new(cur_name.to_string(), current_node.path().join(component));
                 current_node.children.insert(cur_name.to_string(), new_node);
                 current_node = current_node.children.get_mut(cur_name).unwrap();
+            }
+            if let Some(next_component) = components.peek() {
+                if next_component.as_os_str().to_str().unwrap() == "index.html" {
+                    break;
+                }
             }
         }
 
@@ -232,7 +238,14 @@ impl DocsTree {
                 h1 class="text-2xl text-center" { "Sidebar" }
                 @for node in nodes {
                     @if let Some(page) = node.page() {
-                        p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                        @match page.page_type() {
+                            PageType::Index(_) => {
+                                p { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
+                            }
+                            _ => {
+                                p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                            }
+                        }
                     } @else {
                         p class="" { (node.name()) }
                     }
@@ -294,18 +307,21 @@ impl DocsTree {
     }
 
     /// Write a page to disk at the designated path.
-    pub fn write_page<P: AsRef<Path>>(&self, page: &HTMLPage, path: P) {
-        let path = path.as_ref();
-        let stylesheet = self.stylesheet_relative_to(path.parent().unwrap());
+    pub fn write_page<P: Into<PathBuf>>(&self, page: &HTMLPage, path: P) {
+        let mut path = path.into();
 
         let content = match page.page_type() {
-            PageType::Index(doc) => doc.render(),
+            PageType::Index(doc) => {
+                path = path.join("index.html");
+                doc.render()
+            }
             PageType::Struct(s) => s.render(),
             PageType::Task(t) => t.render(),
             PageType::Workflow(w) => w.render(),
         };
 
-        let sidebar = self.render_sidebar_component(path);
+        let stylesheet = self.stylesheet_relative_to(path.parent().unwrap());
+        let sidebar = self.render_sidebar_component(&path);
 
         let html = full_page(
             page.name(),
