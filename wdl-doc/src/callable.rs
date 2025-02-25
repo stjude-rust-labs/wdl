@@ -4,7 +4,7 @@ pub mod task;
 pub mod workflow;
 
 use std::collections::BTreeMap;
-use std::collections::HashSet;
+use std::collections::BTreeSet;
 
 use maud::Markup;
 use maud::html;
@@ -53,8 +53,8 @@ pub trait Callable {
         })
     }
 
-    /// Get the set of unique `group` values of the inputs.
-    fn input_groups(&self) -> HashSet<String> {
+    /// Get the sorted set of unique `group` values of the inputs.
+    fn input_groups(&self) -> BTreeSet<String> {
         self.inputs()
             .iter()
             .filter_map(|param| param.group().as_ref().map(|s| s.to_string()))
