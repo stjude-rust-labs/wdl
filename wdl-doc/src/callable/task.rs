@@ -68,15 +68,22 @@ impl Task {
     }
 
     /// Render the meta section of the task as HTML.
+    ///
+    /// This will render all metadata key-value pairs except for `outputs` and
+    /// `description`.
     pub fn render_meta(&self) -> Markup {
-        let kv = self
+        let mut kv = self
             .meta
             .iter()
-            .filter(|(k, _)| !matches!(k.as_str(), "outputs" | "description"));
+            .filter(|(k, _)| !matches!(k.as_str(), "outputs" | "description"))
+            .peekable();
         html! {
-            @for (key, value) in kv {
-                p {
-                    b { (key) ":" } " " (render_value(value))
+            @if kv.peek().is_some() {
+                h2 { "Meta" }
+                @for (key, value) in kv {
+                    p {
+                        b { (key) ":" } " " (render_value(value))
+                    }
                 }
             }
         }

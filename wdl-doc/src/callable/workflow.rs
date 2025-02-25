@@ -76,16 +76,25 @@ impl Workflow {
         })
     }
 
-    /// Renders the meta section as HTML.
+    /// Renders the meta section of the workflow as HTML.
+    ///
+    /// This will render all metadata key-value pairs except for `name`,
+    /// `category`, `description`, and `outputs`.
     pub fn render_meta(&self) -> Markup {
-        let kv = self
+        let mut kv = self
             .meta
             .iter()
-            .filter(|(k, _)| !matches!(k.as_str(), "name" | "category" | "description"));
+            .filter(|(k, _)| !matches!(k.as_str(), "name" | "category" | "description" | "outputs"))
+            .peekable();
         html! {
-            @for (key, value) in kv {
-                p {
-                    b { (key) ":" } " " (render_value(value))
+            @if kv.peek().is_some() {
+                div {
+                    h2 { "Meta" }
+                    @for (key, value) in kv {
+                        p {
+                            b { (key) ":" } " " (render_value(value))
+                        }
+                    }
                 }
             }
         }
@@ -94,14 +103,16 @@ impl Workflow {
     /// Render the workflow as HTML.
     pub fn render(&self) -> Markup {
         html! {
-            h1 { @if let Some(name) = self.name_override() { (name) } else { (self.name) } }
-            @if let Some(category) = self.category() {
-                h2 { "Category: " (category) }
+            div class="table-auto border-collapse" {
+                h1 { @if let Some(name) = self.name_override() { (name) } else { (self.name) } }
+                @if let Some(category) = self.category() {
+                    h2 { "Category: " (category) }
+                }
+                (self.description())
+                (self.render_meta())
+                (self.render_inputs())
+                (self.render_outputs())
             }
-            (self.description())
-            (self.render_meta())
-            (self.render_inputs())
-            (self.render_outputs())
         }
     }
 }

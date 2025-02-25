@@ -261,7 +261,7 @@ impl DocsTree {
 
         let sidebar = self.render_sidebar_component(&index_path);
         let content = html! {
-            div class="flex flex-col items-center text-left" {
+            div class="" {
                 h3 class="" { "Home" }
                 table class="border" {
                     thead class="border" { tr {

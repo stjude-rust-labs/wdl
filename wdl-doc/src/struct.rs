@@ -37,12 +37,14 @@ impl Struct {
     /// Render the struct as HTML.
     pub fn render(&self) -> Markup {
         html! {
-            h1 { (self.name()) }
-            h2 { "Members" }
-            ul {
-                @for (name, ty) in self.members() {
-                    li {
-                        b { (name) ":" } " " code { (ty) }
+            div class="table-auto border-collapse" {
+                h1 { (self.name()) }
+                h2 { "Members" }
+                ul {
+                    @for (name, ty) in self.members() {
+                        li {
+                            b { (name) ":" } " " code { (ty) }
+                        }
                     }
                 }
             }

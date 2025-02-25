@@ -175,37 +175,39 @@ impl Document {
     /// Render the document as HTML.
     pub fn render(&self) -> Markup {
         html! {
-            h1 { (self.name()) }
-            h3 { "WDL Version: " (self.version()) }
-            div { (self.preamble()) }
-            div class="flex flex-col items-center text-left"  {
-                h2 { "Table of Contents" }
-                table class="border" {
-                    thead class="border" { tr {
-                        th class="" { "Page" }
-                        th class="" { "Type" }
-                        th class="" { "Description" }
-                    }}
-                    tbody class="border" {
-                        @for page in &self.local_pages {
-                            tr class="border" {
-                                td class="border" {
-                                    a href=(page.0.to_str().unwrap()) { (page.1.name()) }
-                                }
-                                td class="border" {
-                                    @match page.1.page_type() {
-                                        PageType::Index(_) => { "TODO ERROR" }
-                                        PageType::Struct(_) => { "Struct" }
-                                        PageType::Task(_) => { "Task" }
-                                        PageType::Workflow(_) => { "Workflow" }
+            div {
+                h1 { (self.name()) }
+                h3 { "WDL Version: " (self.version()) }
+                div { (self.preamble()) }
+                div class="flex flex-col items-center text-left"  {
+                    h2 { "Table of Contents" }
+                    table class="border" {
+                        thead class="border" { tr {
+                            th class="" { "Page" }
+                            th class="" { "Type" }
+                            th class="" { "Description" }
+                        }}
+                        tbody class="border" {
+                            @for page in &self.local_pages {
+                                tr class="border" {
+                                    td class="border" {
+                                        a href=(page.0.to_str().unwrap()) { (page.1.name()) }
                                     }
-                                }
-                                td class="border" {
-                                    @match page.1.page_type() {
-                                        PageType::Index(_) => { "TODO ERROR" }
-                                        PageType::Struct(_) => { "N/A" }
-                                        PageType::Task(t) => { (t.description()) }
-                                        PageType::Workflow(w) => { (w.description()) }
+                                    td class="border" {
+                                        @match page.1.page_type() {
+                                            PageType::Index(_) => { "TODO ERROR" }
+                                            PageType::Struct(_) => { "Struct" }
+                                            PageType::Task(_) => { "Task" }
+                                            PageType::Workflow(_) => { "Workflow" }
+                                        }
+                                    }
+                                    td class="border" {
+                                        @match page.1.page_type() {
+                                            PageType::Index(_) => { "TODO ERROR" }
+                                            PageType::Struct(_) => { "N/A" }
+                                            PageType::Task(t) => { (t.description()) }
+                                            PageType::Workflow(w) => { (w.description()) }
+                                        }
                                     }
                                 }
                             }
