@@ -289,8 +289,8 @@ impl TaskExecutionBackend for CrankshaftBackend {
         let cpu = cpu(requirements);
         if (self.max_cpu as f64) < cpu {
             bail!(
-                "task requires at least {cpu} CPU{s}, but the execution backend has a maximum of
-        {max_cpu}",
+                "task requires at least {cpu} CPU{s}, but the execution backend has a maximum of \
+                 {max_cpu}",
                 s = if cpu == 1.0 { "" } else { "s" },
                 max_cpu = self.max_cpu,
             );

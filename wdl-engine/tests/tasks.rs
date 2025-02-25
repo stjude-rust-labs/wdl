@@ -59,7 +59,6 @@ use wdl_engine::EvaluationError;
 use wdl_engine::Inputs;
 use wdl_engine::config;
 use wdl_engine::config::BackendKind;
-use wdl_engine::config::CrankshaftBackendKind;
 use wdl_engine::v1::TaskEvaluator;
 
 /// Regex used to remove both host and guest path prefixes.
@@ -163,19 +162,25 @@ fn compare_result(path: &Path, result: &str) -> Result<()> {
     Ok(())
 }
 
-/// Gets an engine configuration that uses the local backend.
-fn local_config() -> config::Config {
-    let mut config = config::Config::default();
-    config.backend.default = BackendKind::Local;
-    config
-}
-
-/// Gets an engine configuration that uses the Docker backend.
-fn docker_config() -> config::Config {
-    let mut config = config::Config::default();
-    config.backend.crankshaft.default = CrankshaftBackendKind::Docker;
-    config.backend.default = BackendKind::Crankshaft;
-    config
+/// Gets the engine configurations to use for the test.
+fn configs() -> Vec<config::Config> {
+    vec![
+        {
+            let mut config = config::Config::default();
+            config.backend.default = BackendKind::Local;
+            config
+        },
+        // Currently we limit running the Docker backend to Linux as GitHub does not have Docker
+        // installed on macOS hosted runners and the Windows hosted runners are configured to use
+        // Windows containers
+        #[cfg(target_os = "linux")]
+        {
+            let mut config = config::Config::default();
+            config.backend.crankshaft.default = config::CrankshaftBackendKind::Docker;
+            config.backend.default = BackendKind::Crankshaft;
+            config
+        },
+    ]
 }
 
 /// Runs the test given the provided analysis result.
@@ -219,7 +224,7 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
         .ok_or_else(|| anyhow!("document does not contain a task named `{name}`"))?;
     inputs.join_paths(task, &test_dir)?;
 
-    for config in [local_config(), docker_config()] {
+    for config in configs() {
         let mut evaluator = TaskEvaluator::new(config, CancellationToken::new()).await?;
 
         let dir = TempDir::new().context("failed to create temporary directory")?;
