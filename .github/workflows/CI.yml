@@ -45,6 +45,9 @@ jobs:
       - uses: ./.github/actions/install-shellcheck
       - name: Update Rust
         run: rustup update stable && rustup default stable
+      - name: Install Docker
+        uses: docker-practice/actions-setup-docker@master
+        if: ${{ matrix.os == 'macos-latest' }}
       - run: cargo test --all --all-features
       - run: cargo test --all-features --examples
 

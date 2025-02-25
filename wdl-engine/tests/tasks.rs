@@ -170,10 +170,8 @@ fn configs() -> Vec<config::Config> {
             config.backend.default = BackendKind::Local;
             config
         },
-        // Currently we limit running the Docker backend to Linux as GitHub does not have Docker
-        // installed on macOS hosted runners and the Windows hosted runners are configured to use
-        // Windows containers
-        #[cfg(target_os = "linux")]
+        // Currently GitHub actions doesn't support Linux containers on Windows
+        #[cfg(not(windows))]
         {
             let mut config = config::Config::default();
             config.backend.crankshaft.default = config::CrankshaftBackendKind::Docker;
