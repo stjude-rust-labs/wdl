@@ -298,14 +298,6 @@ pub trait TaskExecutionBackend: Send + Sync {
     /// Gets the container (guest) root directory for the backend (e.g.
     /// `/mnt/task`).
     ///
-    /// Containerized execution uses the following guest paths:
-    ///
-    /// * `<root>/inputs/` - where inputs are mounted; this is mounted
-    ///   read-only.
-    /// * `<root>/work/` - the task working directory; this is mounted
-    ///   read-write.
-    /// * `<root>/command` - the command to execute; this is mounted read-only.
-    ///
     /// Returns `None` if the task execution does not use a container.
     fn container_root_dir(&self) -> Option<&Path>;
 

@@ -57,8 +57,15 @@ use wdl_ast::Severity;
 use wdl_engine::EvaluatedTask;
 use wdl_engine::EvaluationError;
 use wdl_engine::Inputs;
+use wdl_engine::config;
 use wdl_engine::config::BackendKind;
+use wdl_engine::config::CrankshaftBackendKind;
 use wdl_engine::v1::TaskEvaluator;
+
+/// Regex used to remove both host and guest path prefixes.
+static PATH_PREFIX_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new("(attempts\\/\\d+\\/|\\/mnt\\/task\\/inputs\\/\\d+\\/)").expect("invalid regex")
+});
 
 /// Regex used to replace temporary file names in task command files with
 /// consistent names for test baselines.
@@ -156,6 +163,21 @@ fn compare_result(path: &Path, result: &str) -> Result<()> {
     Ok(())
 }
 
+/// Gets an engine configuration that uses the local backend.
+fn local_config() -> config::Config {
+    let mut config = config::Config::default();
+    config.backend.default = BackendKind::Local;
+    config
+}
+
+/// Gets an engine configuration that uses the Docker backend.
+fn docker_config() -> config::Config {
+    let mut config = config::Config::default();
+    config.backend.crankshaft.default = CrankshaftBackendKind::Docker;
+    config.backend.default = BackendKind::Crankshaft;
+    config
+}
+
 /// Runs the test given the provided analysis result.
 async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
     let path = result.document().path();
@@ -197,47 +219,47 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
         .ok_or_else(|| anyhow!("document does not contain a task named `{name}`"))?;
     inputs.join_paths(task, &test_dir)?;
 
-    let mut config = wdl_engine::config::Config::default();
-    config.backend.default = BackendKind::Local;
-    let mut evaluator = TaskEvaluator::new(config, CancellationToken::new()).await?;
+    for config in [local_config(), docker_config()] {
+        let mut evaluator = TaskEvaluator::new(config, CancellationToken::new()).await?;
 
-    let dir = TempDir::new().context("failed to create temporary directory")?;
-    match evaluator
-        .evaluate(result.document(), task, &inputs, dir.path(), |_| async {})
-        .await
-    {
-        Ok(evaluated) => {
-            compare_evaluation_results(&test_dir, dir.path(), &evaluated)?;
+        let dir = TempDir::new().context("failed to create temporary directory")?;
+        match evaluator
+            .evaluate(result.document(), task, &inputs, dir.path(), |_| async {})
+            .await
+        {
+            Ok(evaluated) => {
+                compare_evaluation_results(&test_dir, dir.path(), &evaluated)?;
 
-            match evaluated.into_result() {
-                Ok(outputs) => {
-                    let outputs = outputs.with_name(name);
-                    let outputs =
-                        to_string_pretty(&outputs).context("failed to serialize outputs")?;
-                    let outputs = strip_paths(dir.path(), &outputs);
-                    compare_result(&test.join("outputs.json"), &outputs)?;
-                }
-                Err(e) => {
-                    let error = match e {
-                        EvaluationError::Source(diagnostic) => {
-                            diagnostic_to_string(result.document(), &path, &diagnostic)
-                        }
-                        EvaluationError::Other(e) => format!("{e:?}"),
-                    };
-                    let error = strip_paths(dir.path(), &error);
-                    compare_result(&test.join("error.txt"), &error)?;
+                match evaluated.into_result() {
+                    Ok(outputs) => {
+                        let outputs = outputs.with_name(name.clone());
+                        let outputs =
+                            to_string_pretty(&outputs).context("failed to serialize outputs")?;
+                        let outputs = strip_paths(dir.path(), &outputs);
+                        compare_result(&test.join("outputs.json"), &outputs)?;
+                    }
+                    Err(e) => {
+                        let error = match e {
+                            EvaluationError::Source(diagnostic) => {
+                                diagnostic_to_string(result.document(), &path, &diagnostic)
+                            }
+                            EvaluationError::Other(e) => format!("{e:?}"),
+                        };
+                        let error = strip_paths(dir.path(), &error);
+                        compare_result(&test.join("error.txt"), &error)?;
+                    }
                 }
             }
-        }
-        Err(e) => {
-            let error = match e {
-                EvaluationError::Source(diagnostic) => {
-                    diagnostic_to_string(result.document(), &path, &diagnostic)
-                }
-                EvaluationError::Other(e) => format!("{e:?}"),
-            };
-            let error = strip_paths(dir.path(), &error);
-            compare_result(&test.join("error.txt"), &error)?;
+            Err(e) => {
+                let error = match e {
+                    EvaluationError::Source(diagnostic) => {
+                        diagnostic_to_string(result.document(), &path, &diagnostic)
+                    }
+                    EvaluationError::Other(e) => format!("{e:?}"),
+                };
+                let error = strip_paths(dir.path(), &error);
+                compare_result(&test.join("error.txt"), &error)?;
+            }
         }
     }
 
@@ -273,13 +295,14 @@ fn compare_evaluation_results(
 
     // Strip both temp paths and test dir (input file) paths from the outputs
     let command = strip_paths(temp_dir, &command);
-    let mut command = strip_paths(test_dir, &command);
+    let command = strip_paths(test_dir, &command);
+    let mut command = PATH_PREFIX_REGEX.replace_all(&command, "");
 
     // Replace any temporary file names in the command
     for i in 0..usize::MAX {
         match TEMP_FILENAME_REGEX.replace(&command, format!("tmp{i}")) {
             Cow::Borrowed(_) => break,
-            Cow::Owned(s) => command = s,
+            Cow::Owned(s) => command = s.into(),
         }
     }
 

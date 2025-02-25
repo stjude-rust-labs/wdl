@@ -1,5 +1,6 @@
 //! Implementation of evaluation for V1 workflows.
 
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fmt::Write;
@@ -270,6 +271,10 @@ impl EvaluationContext for WorkflowEvaluationContext<'_, '_> {
     }
 
     fn task(&self) -> Option<&Task> {
+        None
+    }
+
+    fn translate_path(&self, _path: &Path) -> Option<Cow<'_, Path>> {
         None
     }
 }

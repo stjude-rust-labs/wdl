@@ -84,6 +84,11 @@ pub trait EvaluationContext {
     ///
     /// This is only `Some` when evaluating task hints sections.
     fn task(&self) -> Option<&Task>;
+
+    /// Translates a host path to a guest path.
+    ///
+    /// Returns `None` if no translation is available.
+    fn translate_path(&self, path: &Path) -> Option<Cow<'_, Path>>;
 }
 
 /// Represents an index of a scope in a collection of scopes.

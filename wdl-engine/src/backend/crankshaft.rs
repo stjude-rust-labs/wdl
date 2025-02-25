@@ -108,6 +108,7 @@ impl TaskManagerRequest for CrankshaftTaskRequest {
             .inner
             .mounts
             .iter()
+            .filter(|m| m.host.exists())
             .map(|m| {
                 Ok(Arc::new(
                     Input::builder()

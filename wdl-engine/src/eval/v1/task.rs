@@ -285,6 +285,8 @@ struct TaskEvaluationContext<'a, 'b> {
     stdout: Option<&'a Value>,
     /// The standard error value to use.
     stderr: Option<&'a Value>,
+    /// The mounts for the evaluation.
+    mounts: Option<&'a Mounts>,
     /// Whether or not the evaluation has associated task information.
     ///
     /// This is `true` when evaluating hints sections.
@@ -301,6 +303,7 @@ impl<'a, 'b> TaskEvaluationContext<'a, 'b> {
             stdout: None,
             temp_dir,
             stderr: None,
+            mounts: None,
             task: false,
         }
     }
@@ -314,6 +317,12 @@ impl<'a, 'b> TaskEvaluationContext<'a, 'b> {
     /// Sets the stderr value to use for the evaluation context.
     pub fn with_stderr(mut self, stderr: &'a Value) -> Self {
         self.stderr = Some(stderr);
+        self
+    }
+
+    /// Sets the mounts associated with the evaluation context.
+    pub fn with_mounts(mut self, mounts: &'a Mounts) -> Self {
+        self.mounts = Some(mounts);
         self
     }
 
@@ -367,6 +376,10 @@ impl EvaluationContext for TaskEvaluationContext<'_, '_> {
         } else {
             None
         }
+    }
+
+    fn translate_path(&self, path: &Path) -> Option<Cow<'_, Path>> {
+        self.mounts.and_then(|m| m.guest(path))
     }
 }
 
@@ -1089,14 +1102,16 @@ impl TaskEvaluator {
                 });
             });
 
-            paths.push((state.root.work_dir().to_owned(), false));
-            paths.push((state.root.command().to_owned(), true));
-
             // Insert the paths into the trie
             let mut trie = PathTrie::default();
             for (path, read_only) in &paths {
                 trie.insert(path, *read_only);
             }
+
+            trie.insert(state.root.work_dir(), false);
+            trie.insert(state.root.temp_dir(), true);
+            trie.insert(state.root.attempt_temp_dir(), true);
+            trie.insert(state.root.command(), true);
 
             // Convert the trie into mounts
             let mounts = trie.into_mounts(root_dir.join("inputs"));
@@ -1121,11 +1136,10 @@ impl TaskEvaluator {
 
         let mut command = String::new();
         if let Some(parts) = section.strip_whitespace() {
-            let mut evaluator = ExprEvaluator::new(TaskEvaluationContext::new(
-                state,
-                state.root.attempt_temp_dir(),
-                TASK_SCOPE_INDEX,
-            ));
+            let mut evaluator = ExprEvaluator::new(
+                TaskEvaluationContext::new(state, state.root.attempt_temp_dir(), TASK_SCOPE_INDEX)
+                    .with_mounts(&mounts),
+            );
 
             for part in parts {
                 match part {
@@ -1133,9 +1147,7 @@ impl TaskEvaluator {
                         command.push_str(t.as_str());
                     }
                     StrippedCommandPart::Placeholder(placeholder) => {
-                        evaluator.evaluate_placeholder(&placeholder, &mut command, |p| {
-                            mounts.guest(p)
-                        })?;
+                        evaluator.evaluate_placeholder(&placeholder, &mut command)?;
                     }
                 }
             }
@@ -1147,11 +1159,10 @@ impl TaskEvaluator {
                 uri = state.document.uri(),
             );
 
-            let mut evaluator = ExprEvaluator::new(TaskEvaluationContext::new(
-                state,
-                state.root.attempt_temp_dir(),
-                TASK_SCOPE_INDEX,
-            ));
+            let mut evaluator = ExprEvaluator::new(
+                TaskEvaluationContext::new(state, state.root.attempt_temp_dir(), TASK_SCOPE_INDEX)
+                    .with_mounts(&mounts),
+            );
 
             let heredoc = section.is_heredoc();
             for part in section.parts() {
@@ -1160,9 +1171,7 @@ impl TaskEvaluator {
                         t.unescape_to(heredoc, &mut command);
                     }
                     CommandPart::Placeholder(placeholder) => {
-                        evaluator.evaluate_placeholder(&placeholder, &mut command, |p| {
-                            mounts.guest(p)
-                        })?;
+                        evaluator.evaluate_placeholder(&placeholder, &mut command)?;
                     }
                 }
             }
