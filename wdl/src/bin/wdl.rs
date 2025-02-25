@@ -274,7 +274,7 @@ pub struct DocCommand {
 
     /// Whether to watch the filesystem for changes and regenerate the
     /// documentation.
-    #[clap(long)]
+    #[clap(long, requires = "themes")]
     pub watch: bool,
 }
 

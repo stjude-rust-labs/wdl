@@ -1,12 +1,9 @@
 //! Create HTML documentation for WDL meta sections.
 
-use std::collections::HashSet;
-
 use maud::Markup;
 use maud::html;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
-use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::MetadataValue;
 
 use crate::Markdown;
@@ -46,45 +43,6 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
                     }
                 }
                 code { "}" }
-            }
-        }
-    }
-}
-
-/// A meta section in a WDL document.
-#[derive(Debug)]
-pub struct Meta(MetadataSection);
-
-impl Meta {
-    /// Create a new meta section.
-    pub fn new(meta: MetadataSection) -> Self {
-        Self(meta)
-    }
-
-    /// Render the meta section as HTML.
-    pub fn render(&self, ignore_keys: &HashSet<String>) -> Markup {
-        let mut entries = self
-            .0
-            .items()
-            .filter_map(|entry| {
-                let name = entry.name().as_str().to_string();
-                if ignore_keys.contains(&name) {
-                    return None;
-                }
-                let value = entry.value();
-                Some((name, value))
-            })
-            .peekable();
-        html! {
-            @if entries.peek().is_some() {
-                h3 { "Meta" }
-                ul {
-                    @for (name, value) in entries {
-                        li {
-                            p { b { (name) ":" } " " (render_value(&value)) }
-                        }
-                    }
-                }
             }
         }
     }

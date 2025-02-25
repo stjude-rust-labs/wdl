@@ -224,9 +224,6 @@ impl Document {
 /// This function will generate HTML documentation for all WDL files in the
 /// workspace directory. The generated documentation will be stored in a
 /// `docs` directory within the workspace.
-///
-/// The contents of `css` will be written to a `style.css` file
-/// in the `docs` directory.
 pub async fn document_workspace<P: AsRef<Path>>(
     workspace: P,
     stylesheet: Option<P>,

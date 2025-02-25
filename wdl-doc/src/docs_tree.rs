@@ -112,9 +112,9 @@ impl Node {
 pub struct DocsTree {
     /// The root of the tree.
     ///
-    /// `root.path` is the path to the DOCS directory and should be absolute.
+    /// `root.path` is the path to the DOCS directory and is absolute.
     root: Node,
-    /// The absolute path to the stylesheet.
+    /// The absolute path to the stylesheet, if it exists.
     stylesheet: Option<PathBuf>,
 }
 

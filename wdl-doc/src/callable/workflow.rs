@@ -12,7 +12,7 @@ use super::*;
 use crate::meta::render_value;
 use crate::parameter::Parameter;
 
-/// A task in a WDL document.
+/// A workflow in a WDL document.
 #[derive(Debug)]
 pub struct Workflow {
     /// The name of the workflow.

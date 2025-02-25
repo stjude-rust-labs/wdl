@@ -5,8 +5,6 @@ use maud::html;
 use wdl_ast::AstToken;
 use wdl_ast::v1::StructDefinition;
 
-// use crate::full_page;
-
 /// A struct in a WDL document.
 #[derive(Debug)]
 pub struct Struct {
