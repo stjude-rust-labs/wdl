@@ -304,7 +304,14 @@ impl DocsTree {
                             @if node.page().is_some() {
                                 tr class="border" {
                                     td class="border" {
-                                        a href=(diff_paths(node.path(), root.path()).unwrap().to_str().unwrap()) {(node.name()) }
+                                        @match node.page().unwrap().page_type() {
+                                            PageType::Index(_) => {
+                                                a href=(diff_paths(node.path().join("index.html"), root.path()).unwrap().to_str().unwrap()) {(node.name()) }
+                                            }
+                                            _ => {
+                                                a href=(diff_paths(node.path(), root.path()).unwrap().to_str().unwrap()) {(node.name()) }
+                                            }
+                                        }
                                     }
                                 }
                             }
