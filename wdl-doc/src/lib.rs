@@ -30,6 +30,7 @@ use maud::Markup;
 use maud::PreEscaped;
 use maud::Render;
 use maud::html;
+use pathdiff::diff_paths;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
 use wdl_analysis::Analyzer;
@@ -292,7 +293,7 @@ pub async fn document_workspace<P: AsRef<Path>>(
 
                     let page = Rc::new(HTMLPage::new(name.clone(), PageType::Struct(r#struct)));
                     docs_tree.add_page(path.clone(), page.clone());
-                    local_pages.push((path, page));
+                    local_pages.push((diff_paths(path, &cur_dir).unwrap(), page));
                 }
                 DocumentItem::Task(t) => {
                     let name = t.name().as_str().to_owned();
@@ -309,7 +310,7 @@ pub async fn document_workspace<P: AsRef<Path>>(
 
                     let page = Rc::new(HTMLPage::new(name, PageType::Task(task)));
                     docs_tree.add_page(path.clone(), page.clone());
-                    local_pages.push((path, page));
+                    local_pages.push((diff_paths(path, &cur_dir).unwrap(), page));
                 }
                 DocumentItem::Workflow(w) => {
                     let name = w.name().as_str().to_owned();
@@ -325,7 +326,7 @@ pub async fn document_workspace<P: AsRef<Path>>(
 
                     let page = Rc::new(HTMLPage::new(name, PageType::Workflow(workflow)));
                     docs_tree.add_page(path.clone(), page.clone());
-                    local_pages.push((path, page));
+                    local_pages.push((diff_paths(path, &cur_dir).unwrap(), page));
                 }
                 DocumentItem::Import(_) => {}
             }
