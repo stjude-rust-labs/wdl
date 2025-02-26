@@ -26,7 +26,14 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
                     ul {
                         @for item in a.elements() {
                             li {
-                                (render_value(&item)) ","
+                                @match item {
+                                    MetadataValue::Array(_) | MetadataValue::Object(_) => {
+                                        (render_value(&item)) ","
+                                    }
+                                    _ => {
+                                        code { (item.syntax().to_string()) } ","
+                                    }
+                                }
                             }
                         }
                     }
