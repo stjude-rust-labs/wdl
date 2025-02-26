@@ -27,7 +27,7 @@ pub trait Callable {
     /// Get the name of the callable.
     fn name(&self) -> &str;
 
-    /// Get the metadata section of the callable.
+    /// Get the [`MetaMap`] of the callable.
     fn meta(&self) -> &MetaMap;
 
     /// Get the inputs of the callable.
