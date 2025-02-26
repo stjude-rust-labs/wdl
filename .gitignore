@@ -11,4 +11,3 @@ rustc-ice*
 **/docs/
 
 node_modules/
-**/dist/
