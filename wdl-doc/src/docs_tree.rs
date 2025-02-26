@@ -94,15 +94,19 @@ impl Node {
         self.page.clone()
     }
 
-    /// Iterate over the children of the node in a Depth First Traversal order.
+    /// Gather the node and its children in a Depth First Traversal order.
     pub fn depth_first_traversal(&self) -> Vec<&Node> {
-        let mut nodes = Vec::new();
-        nodes.push(self);
+        fn recurse_depth_first<'a>(node: &'a Node, nodes: &mut Vec<&'a Node>) {
+            nodes.push(node);
 
-        for child in self.children.values() {
-            nodes.extend(child.depth_first_traversal());
+            for child in node.children.values() {
+                recurse_depth_first(child, nodes);
+            }
         }
-
+    
+        let mut nodes = Vec::new();
+        recurse_depth_first(self, &mut nodes);
+    
         nodes
     }
 }
