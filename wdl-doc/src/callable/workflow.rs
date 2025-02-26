@@ -34,8 +34,8 @@ impl Workflow {
         input_section: Option<InputSection>,
         output_section: Option<OutputSection>,
     ) -> Self {
-        let meta = if let Some(ref mds) = meta_section {
-            parse_meta(mds)
+        let meta = if let Some(mds) = meta_section {
+            parse_meta(&mds)
         } else {
             MetaMap::default()
         };

@@ -37,8 +37,8 @@ impl Task {
         output_section: Option<OutputSection>,
         runtime_section: Option<RuntimeSection>,
     ) -> Self {
-        let meta = if let Some(ref mds) = meta_section {
-            parse_meta(mds)
+        let meta = if let Some(mds) = meta_section {
+            parse_meta(&mds)
         } else {
             MetaMap::default()
         };
