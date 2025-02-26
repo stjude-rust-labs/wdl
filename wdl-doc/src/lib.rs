@@ -104,7 +104,14 @@ impl<T: AsRef<str>> Render for Markdown<T> {
         pulldown_cmark::html::push_html(&mut unsafe_html, parser);
         // Sanitize it with ammonia
         let safe_html = ammonia::clean(&unsafe_html);
-        PreEscaped(safe_html)
+
+        // Remove the outer `<p>` tag that `pulldown_cmark` wraps single lines in
+        let safe_html = if safe_html.starts_with("<p>") && safe_html.ends_with("</p>\n") {
+            &safe_html[3..safe_html.len() - 5]
+        } else {
+            &safe_html
+        };
+        PreEscaped(safe_html.to_string())
     }
 }
 

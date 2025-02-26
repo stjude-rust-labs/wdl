@@ -21,28 +21,32 @@ pub(crate) fn render_value(value: &MetadataValue) -> Markup {
         MetadataValue::Null(n) => html! { code { (n.syntax().to_string()) } },
         MetadataValue::Array(a) => {
             html! {
-                code { "[" }
-                ul {
-                    @for item in a.elements() {
-                        li {
-                            (render_value(&item)) ","
+                div {
+                    code { "[" }
+                    ul {
+                        @for item in a.elements() {
+                            li {
+                                (render_value(&item)) ","
+                            }
                         }
                     }
+                    code { "]" }
                 }
-                code { "]" }
             }
         }
         MetadataValue::Object(o) => {
             html! {
-                code { "{" }
-                ul {
-                    @for item in o.items() {
-                        li {
-                            p { b { (item.name().as_str()) ":" } " " (render_value(&item.value())) "," }
+                div {
+                    code { "{" }
+                    ul {
+                        @for item in o.items() {
+                            li {
+                                b { (item.name().as_str()) ":" } " " (render_value(&item.value())) ","
+                            }
                         }
                     }
+                    code { "}" }
                 }
-                code { "}" }
             }
         }
     }
