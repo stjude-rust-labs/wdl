@@ -103,10 +103,10 @@ impl Node {
                 recurse_depth_first(child, nodes);
             }
         }
-    
+
         let mut nodes = Vec::new();
         recurse_depth_first(self, &mut nodes);
-    
+
         nodes
     }
 }
@@ -124,23 +124,37 @@ pub struct DocsTree {
 
 impl DocsTree {
     /// Create a new DOCS tree.
-    pub fn new<P: AsRef<Path>>(root: P, stylesheet_to_copy: Option<P>) -> Self {
+    pub fn new(root: impl AsRef<Path>) -> Self {
         let abs_path = canonicalize(root.as_ref()).unwrap();
-        let stylesheet = if let Some(ss) = stylesheet_to_copy {
-            let stylesheet = abs_path.join("style.css");
-            std::fs::copy(ss.as_ref(), &stylesheet).unwrap();
-            Some(stylesheet)
-        } else {
-            None
-        };
         let node = Node::new(
             abs_path.file_name().unwrap().to_str().unwrap().to_string(),
             abs_path.clone(),
         );
         Self {
             root: node,
-            stylesheet,
+            stylesheet: None,
         }
+    }
+
+    /// Create a new DOCS tree with a stylesheet.
+    pub fn new_with_stylesheet(
+        root: impl AsRef<Path>,
+        stylesheet: impl AsRef<Path>,
+    ) -> anyhow::Result<Self> {
+        let abs_path = canonicalize(root.as_ref()).unwrap();
+        let in_stylesheet = canonicalize(stylesheet.as_ref()).unwrap();
+        let new_stylesheet = abs_path.join("style.css");
+        std::fs::copy(in_stylesheet, &new_stylesheet)?;
+
+        let node = Node::new(
+            abs_path.file_name().unwrap().to_str().unwrap().to_string(),
+            abs_path.clone(),
+        );
+
+        Ok(Self {
+            root: node,
+            stylesheet: Some(new_stylesheet),
+        })
     }
 
     /// Get the root of the tree.
@@ -259,20 +273,21 @@ impl DocsTree {
     }
 
     /// Render every page in the tree.
-    pub fn render_all(&self) {
+    pub fn render_all(&self) -> anyhow::Result<()> {
         let root = self.root();
 
         for node in root.depth_first_traversal() {
             if let Some(page) = node.page() {
-                self.write_page(page.as_ref(), node.path());
+                self.write_page(page.as_ref(), node.path())?;
             }
         }
 
-        self.write_homepage();
+        self.write_homepage()?;
+        Ok(())
     }
 
     /// Write the homepage to disk.
-    fn write_homepage(&self) {
+    fn write_homepage(&self) -> anyhow::Result<()> {
         let root = self.root();
         let index_path = root.path().join("index.html");
 
@@ -307,11 +322,12 @@ impl DocsTree {
             },
             self.stylesheet_relative_to(root.path()).as_deref(),
         );
-        std::fs::write(index_path, html.into_string()).unwrap();
+        std::fs::write(index_path, html.into_string())?;
+        Ok(())
     }
 
     /// Write a page to disk at the designated path.
-    pub fn write_page<P: Into<PathBuf>>(&self, page: &HTMLPage, path: P) {
+    pub fn write_page<P: Into<PathBuf>>(&self, page: &HTMLPage, path: P) -> anyhow::Result<()> {
         let mut path = path.into();
 
         let content = match page.page_type() {
@@ -324,7 +340,8 @@ impl DocsTree {
             PageType::Workflow(w) => w.render(),
         };
 
-        let stylesheet = self.stylesheet_relative_to(path.parent().unwrap());
+        let stylesheet =
+            self.stylesheet_relative_to(path.parent().expect("path should have a parent"));
         let sidebar = self.render_sidebar_component(&path);
 
         let html = full_page(
@@ -335,6 +352,7 @@ impl DocsTree {
             },
             stylesheet.as_deref(),
         );
-        std::fs::write(path, html.into_string()).unwrap();
+        std::fs::write(path, html.into_string())?;
+        Ok(())
     }
 }

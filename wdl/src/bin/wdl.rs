@@ -277,8 +277,8 @@ pub struct DocCommand {
     #[clap(long, requires = "themes")]
     pub watch: bool,
 
-    /// The path to a compiled stylesheet. Skips compilation of the stylesheet and does
-    /// not require any additional dependencies or installations.
+    /// The path to a compiled stylesheet. Skips compilation of the stylesheet
+    /// and does not require any additional dependencies or installations.
     #[clap(long, value_name = "CSS", conflicts_with = "themes")]
     pub css: Option<PathBuf>,
 }
@@ -288,10 +288,8 @@ impl DocCommand {
     async fn exec(self) -> Result<()> {
         let css = if let Some(themes) = self.themes.as_ref() {
             Some(build_stylesheet(themes)?)
-        } else if let Some(css) = self.css.as_ref() {
-            Some(css.clone())
         } else {
-            None
+            self.css.clone()
         };
 
         let docs_dir = document_workspace(self.path.clone(), css.clone(), self.overwrite).await?;

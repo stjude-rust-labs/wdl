@@ -255,7 +255,11 @@ pub async fn document_workspace<P: AsRef<Path>>(
     analyzer.add_directory(abs_path.clone()).await?;
     let results = analyzer.analyze(()).await?;
 
-    let mut docs_tree = docs_tree::DocsTree::new(docs_dir.clone(), stylesheet);
+    let mut docs_tree = if let Some(ss) = stylesheet {
+        docs_tree::DocsTree::new_with_stylesheet(docs_dir.clone(), ss)?
+    } else {
+        docs_tree::DocsTree::new(docs_dir.clone())
+    };
 
     for result in results {
         let uri = result.document().uri();
@@ -337,7 +341,7 @@ pub async fn document_workspace<P: AsRef<Path>>(
         );
     }
 
-    docs_tree.render_all();
+    docs_tree.render_all()?;
 
     Ok(docs_dir)
 }
