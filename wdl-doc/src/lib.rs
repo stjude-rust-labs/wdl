@@ -232,9 +232,9 @@ impl Document {
 /// This function will generate HTML documentation for all WDL files in the
 /// workspace directory. The generated documentation will be stored in a
 /// `docs` directory within the workspace.
-pub async fn document_workspace<P: AsRef<Path>>(
-    workspace: P,
-    stylesheet: Option<P>,
+pub async fn document_workspace(
+    workspace: impl AsRef<Path>,
+    stylesheet: Option<impl AsRef<Path>>,
     overwrite: bool,
 ) -> Result<PathBuf> {
     let abs_path = workspace.as_ref().canonicalize()?;
