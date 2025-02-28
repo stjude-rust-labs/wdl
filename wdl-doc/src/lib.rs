@@ -267,9 +267,9 @@ pub async fn document_workspace(
         let rel_wdl_path = match uri.to_file_path() {
             Ok(path) => match path.strip_prefix(&abs_path) {
                 Ok(path) => path.to_path_buf(),
-                Err(_) => PathBuf::from("external").join(path.strip_prefix("/").unwrap()),
+                Err(_) => PathBuf::from("external").join(path.components().skip(1).collect::<PathBuf>()),
             },
-            Err(_) => PathBuf::from("external").join(uri.path().strip_prefix("/").unwrap()),
+            Err(_) => PathBuf::from("external").join(uri.path().strip_prefix("/").expect("URI path should start with /")),
         };
         let cur_dir = docs_dir.join(rel_wdl_path.with_extension(""));
         if !cur_dir.exists() {
