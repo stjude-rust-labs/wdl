@@ -15,6 +15,7 @@ pub mod r#struct;
 
 use std::path::Path;
 use std::path::PathBuf;
+use std::path::absolute;
 use std::rc::Rc;
 
 use anyhow::Result;
@@ -237,8 +238,8 @@ pub async fn document_workspace(
     stylesheet: Option<impl AsRef<Path>>,
     overwrite: bool,
 ) -> Result<PathBuf> {
-    let workspace_abs_path = workspace.as_ref().canonicalize()?;
-    let stylesheet = stylesheet.and_then(|p| p.as_ref().canonicalize().ok());
+    let workspace_abs_path = absolute(workspace)?;
+    let stylesheet = stylesheet.and_then(|p| absolute(p.as_ref()).ok());
 
     if !workspace_abs_path.is_dir() {
         return Err(anyhow!("Workspace is not a directory"));

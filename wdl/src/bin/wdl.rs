@@ -9,6 +9,7 @@ use std::io::Read;
 use std::io::stderr;
 use std::path::Path;
 use std::path::PathBuf;
+use std::path::absolute;
 use std::sync::mpsc;
 
 use anyhow::Context;
@@ -228,7 +229,7 @@ impl FormatCommand {
 /// Build a stylesheet for the documentation, given the path to the `themes`
 /// directory.
 pub fn build_stylesheet(themes_dir: &Path) -> Result<PathBuf> {
-    let themes_dir = themes_dir.canonicalize()?;
+    let themes_dir = absolute(themes_dir)?;
     let output = std::process::Command::new("npx")
         .arg("@tailwindcss/cli")
         .arg("-i")

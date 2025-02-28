@@ -1,9 +1,9 @@
 //! Implementations for a [`DocsTree`] which represents the DOCS directory.
 
 use std::collections::BTreeMap;
-use std::fs::canonicalize;
 use std::path::Path;
 use std::path::PathBuf;
+use std::path::absolute;
 use std::rc::Rc;
 
 use maud::Markup;
@@ -125,7 +125,7 @@ pub struct DocsTree {
 impl DocsTree {
     /// Create a new DOCS tree.
     pub fn new(root: impl AsRef<Path>) -> Self {
-        let abs_path = canonicalize(root.as_ref()).unwrap();
+        let abs_path = absolute(root.as_ref()).unwrap();
         let node = Node::new(
             abs_path.file_name().unwrap().to_str().unwrap().to_string(),
             abs_path.clone(),
@@ -141,8 +141,8 @@ impl DocsTree {
         root: impl AsRef<Path>,
         stylesheet: impl AsRef<Path>,
     ) -> anyhow::Result<Self> {
-        let abs_path = canonicalize(root.as_ref()).unwrap();
-        let in_stylesheet = canonicalize(stylesheet.as_ref()).unwrap();
+        let abs_path = absolute(root.as_ref()).unwrap();
+        let in_stylesheet = absolute(stylesheet.as_ref())?;
         let new_stylesheet = abs_path.join("style.css");
         std::fs::copy(in_stylesheet, &new_stylesheet)?;
 
