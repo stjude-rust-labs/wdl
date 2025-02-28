@@ -189,7 +189,7 @@ impl DocsTree {
         let path = abs_path.into();
         dbg!(&path);
         dbg!(&root.path);
-        let rel_path = path.strip_prefix(&root.path).unwrap();
+        let rel_path = path.strip_prefix(&root.path).expect("path should be in the DOCS directory");
 
         let mut current_node = root;
 

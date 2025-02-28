@@ -237,14 +237,14 @@ pub async fn document_workspace(
     stylesheet: Option<impl AsRef<Path>>,
     overwrite: bool,
 ) -> Result<PathBuf> {
-    let abs_path = workspace.as_ref().canonicalize()?;
+    let workspace_abs_path = workspace.as_ref().canonicalize()?;
     let stylesheet = stylesheet.and_then(|p| p.as_ref().canonicalize().ok());
 
-    if !abs_path.is_dir() {
+    if !workspace_abs_path.is_dir() {
         return Err(anyhow!("Workspace is not a directory"));
     }
 
-    let docs_dir = abs_path.join(DOCS_DIR);
+    let docs_dir = workspace_abs_path.join(DOCS_DIR);
     if overwrite && docs_dir.exists() {
         std::fs::remove_dir_all(&docs_dir)?;
     }
@@ -253,7 +253,7 @@ pub async fn document_workspace(
     }
 
     let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_: (), _, _, _| async {});
-    analyzer.add_directory(abs_path.clone()).await?;
+    analyzer.add_directory(workspace_abs_path.clone()).await?;
     let results = analyzer.analyze(()).await?;
 
     let mut docs_tree = if let Some(ss) = stylesheet {
@@ -265,7 +265,7 @@ pub async fn document_workspace(
     for result in results {
         let uri = result.document().uri();
         let rel_wdl_path = match uri.to_file_path() {
-            Ok(path) => match path.strip_prefix(&abs_path) {
+            Ok(path) => match path.strip_prefix(&workspace_abs_path) {
                 Ok(path) => path.to_path_buf(),
                 Err(_) => {
                     PathBuf::from("external").join(path.components().skip(1).collect::<PathBuf>())
@@ -277,10 +277,13 @@ pub async fn document_workspace(
                     .expect("URI path should start with /"),
             ),
         };
+        dbg!(&rel_wdl_path);
+        dbg!(&workspace_abs_path);
         let cur_dir = docs_dir.join(rel_wdl_path.with_extension(""));
         if !cur_dir.exists() {
             std::fs::create_dir_all(&cur_dir)?;
         }
+        dbg!(&cur_dir);
         let ast_doc = result.document().node();
         let version = ast_doc
             .version_statement()
