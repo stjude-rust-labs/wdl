@@ -22,6 +22,34 @@ use crate::parameter::Parameter;
 /// A map of metadata key-value pairs, sorted by key.
 type MetaMap = BTreeMap<String, MetadataValue>;
 
+/// A group of inputs.
+#[derive(Debug, Eq, PartialEq)]
+pub struct Group(pub String);
+
+impl PartialOrd for Group {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Group {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        if self.0 == "Common" {
+            return std::cmp::Ordering::Less;
+        }
+        if other.0 == "Common" {
+            return std::cmp::Ordering::Greater;
+        }
+        if self.0 == "Resources" {
+            return std::cmp::Ordering::Greater;
+        }
+        if other.0 == "Resources" {
+            return std::cmp::Ordering::Less;
+        }
+        self.0.cmp(&other.0)
+    }
+}
+
 /// A callable (workflow or task) in a WDL document.
 pub trait Callable {
     /// Get the name of the callable.
@@ -54,18 +82,23 @@ pub trait Callable {
     }
 
     /// Get the sorted set of unique `group` values of the inputs.
-    fn input_groups(&self) -> BTreeSet<String> {
+    ///
+    /// The `Common` group, if present, will always be first in the set,
+    /// followed by any other groups in alphabetical order, and lastly
+    /// the `Resources` group.
+    fn input_groups(&self) -> BTreeSet<Group> {
         self.inputs()
             .iter()
-            .filter_map(|param| param.group().as_ref().map(|s| s.to_string()))
+            .filter_map(|param| param.group())
+            .map(|arg0: Group| Group(arg0.0.clone()))
             .collect()
     }
 
     /// Get the inputs of the callable that are part of `group`.
-    fn inputs_in_group<'a>(&'a self, group: &'a str) -> impl Iterator<Item = &'a Parameter> {
+    fn inputs_in_group<'a>(&'a self, group: &'a Group) -> impl Iterator<Item = &'a Parameter> {
         self.inputs().iter().filter(move |param| {
             if let Some(param_group) = param.group() {
-                if param_group == group {
+                if param_group == *group {
                     return true;
                 }
             }
@@ -108,12 +141,11 @@ pub trait Callable {
         html! {}
     }
 
-    /// Render the common inputs of the callable.
-    fn render_common_inputs(&self) -> Markup {
-        let mut iter = self.inputs_in_group("Common").peekable();
-        if iter.peek().is_some() {
-            return html! {
-                h3 { "Common" }
+    /// Render the inputs with a group of the callable.
+    fn render_group_inputs(&self) -> Markup {
+        let group_tables = self.input_groups().into_iter().map(|group| {
+            html! {
+                h3 { (group.0) }
                 table class="border" {
                     thead class="border" { tr {
                         th { "Name" }
@@ -123,41 +155,13 @@ pub trait Callable {
                         th { "Additional Meta" }
                     }}
                     tbody class="border" {
-                        @for param in iter {
+                        @for param in self.inputs_in_group(&group) {
                             (param.render())
                         }
                     }
                 }
-            };
-        };
-        html! {}
-    }
-
-    /// Render the inputs with a group of the callable.
-    fn render_group_inputs(&self) -> Markup {
-        let group_tables = self
-            .input_groups()
-            .into_iter()
-            .filter(|group| *group != "Common")
-            .map(|group| {
-                html! {
-                    h3 { (group) }
-                    table class="border" {
-                        thead class="border" { tr {
-                            th { "Name" }
-                            th { "Type" }
-                            th { "Default" }
-                            th { "Description" }
-                            th { "Additional Meta" }
-                        }}
-                        tbody class="border" {
-                            @for param in self.inputs_in_group(&group) {
-                                (param.render())
-                            }
-                        }
-                    }
-                }
-            });
+            }
+        });
         html! {
             @for group_table in group_tables {
                 (group_table)
@@ -195,7 +199,6 @@ pub trait Callable {
         html! {
             h2 { "Inputs" }
             (self.render_required_inputs())
-            (self.render_common_inputs())
             (self.render_group_inputs())
             (self.render_other_inputs())
         }

@@ -265,7 +265,6 @@ pub async fn document_workspace(
 
     for result in results {
         let uri = result.document().uri();
-        dbg!(&uri);
         let rel_wdl_path = match uri.to_file_path() {
             Ok(path) => match path.strip_prefix(&workspace_abs_path) {
                 Ok(path) => path.to_path_buf(),
@@ -279,13 +278,10 @@ pub async fn document_workspace(
                     .expect("URI path should start with /"),
             ),
         };
-        dbg!(&rel_wdl_path);
-        dbg!(&workspace_abs_path);
         let cur_dir = docs_dir.join(rel_wdl_path.with_extension(""));
         if !cur_dir.exists() {
             std::fs::create_dir_all(&cur_dir)?;
         }
-        dbg!(&cur_dir);
         let ast_doc = result.document().node();
         let version = ast_doc
             .version_statement()

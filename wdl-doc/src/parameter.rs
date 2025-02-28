@@ -6,6 +6,7 @@ use wdl_ast::AstToken;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::MetadataValue;
 
+use crate::callable::Group;
 use crate::meta::render_value;
 
 /// Whether a parameter is an input or output.
@@ -74,12 +75,12 @@ impl Parameter {
     }
 
     /// Get the "group" of the parameter.
-    pub fn group(&self) -> Option<String> {
+    pub fn group(&self) -> Option<Group> {
         if let Some(MetadataValue::Object(o)) = &self.meta {
             for item in o.items() {
                 if item.name().as_str() == "group" {
                     if let MetadataValue::String(s) = item.value() {
-                        return s.text().map(|t| t.as_str().to_string());
+                        return s.text().map(|t| t.as_str().to_string()).map(Group);
                     }
                 }
             }

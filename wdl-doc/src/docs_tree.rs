@@ -187,8 +187,6 @@ impl DocsTree {
     pub fn add_page<P: Into<PathBuf>>(&mut self, abs_path: P, page: Rc<HTMLPage>) {
         let root = self.root_mut();
         let path = abs_path.into();
-        dbg!(&path);
-        dbg!(&root.path);
         let rel_path = path
             .strip_prefix(&root.path)
             .expect("path should be in the DOCS directory");
