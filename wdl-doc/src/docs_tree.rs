@@ -186,7 +186,9 @@ impl DocsTree {
     /// Add a page to the tree.
     pub fn add_page<P: Into<PathBuf>>(&mut self, abs_path: P, page: Rc<HTMLPage>) {
         let root = self.root_mut();
-        let path = abs_path.into().canonicalize().unwrap();
+        let path = abs_path.into();
+        dbg!(&path);
+        dbg!(&root.path);
         let rel_path = path.strip_prefix(&root.path).unwrap();
 
         let mut current_node = root;
