@@ -285,7 +285,7 @@ pub async fn document_workspace(
         let ast_doc = result.document().node();
         let version = ast_doc
             .version_statement()
-            .expect("Document should have a version statement");
+            .expect("document should have a version statement");
         let ast = ast_doc.ast().unwrap_v1();
 
         let mut local_pages = Vec::new();

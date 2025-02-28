@@ -146,3 +146,61 @@ impl Callable for Task {
         &self.outputs
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use wdl_ast::Document;
+
+    use super::*;
+
+    #[test]
+    fn test_task() {
+        let (doc, _) = Document::parse(
+            r#"
+            version 1.0
+
+            task my_task {
+                input {
+                    String name
+                }
+                output {
+                    String greeting = "Hello, ${name}!"
+                }
+                runtime {
+                    docker: "ubuntu:latest"
+                }
+                meta {
+                    description: "A simple task"
+                }
+            }
+            "#,
+        );
+
+        let doc_item = doc.ast().into_v1().unwrap().items().next().unwrap();
+        let ast_task = doc_item.into_task_definition().unwrap();
+
+        let task = Task::new(
+            ast_task.name().as_str().to_owned(),
+            ast_task.metadata(),
+            ast_task.parameter_metadata(),
+            ast_task.input(),
+            ast_task.output(),
+            ast_task.runtime(),
+        );
+
+        assert_eq!(task.name(), "my_task");
+        assert_eq!(
+            task.meta()
+                .get("description")
+                .unwrap()
+                .clone()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "A simple task"
+        );
+        assert_eq!(task.inputs().len(), 1);
+        assert_eq!(task.outputs().len(), 1);
+    }
+}

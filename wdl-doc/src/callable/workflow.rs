@@ -134,3 +134,42 @@ impl Callable for Workflow {
         &self.outputs
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use wdl_ast::Document;
+
+    use super::*;
+
+    #[test]
+    fn test_workflow() {
+        let (doc, _) = Document::parse(
+            r#"
+            version 1.0
+            workflow test {
+                input {
+                    String name
+                }
+                output {
+                    String greeting = "Hello, ${name}!"
+                }
+            }
+            "#,
+        );
+
+        let doc_item = doc.ast().into_v1().unwrap().items().next().unwrap();
+        let ast_workflow = doc_item.into_workflow_definition().unwrap();
+
+        let workflow = Workflow::new(
+            ast_workflow.name().as_str().to_string(),
+            ast_workflow.metadata(),
+            ast_workflow.parameter_metadata(),
+            ast_workflow.input(),
+            ast_workflow.output(),
+        );
+
+        assert_eq!(workflow.name(), "test");
+        assert_eq!(workflow.inputs.len(), 1);
+        assert_eq!(workflow.outputs.len(), 1);
+    }
+}

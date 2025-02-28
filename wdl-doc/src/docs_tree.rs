@@ -1,4 +1,4 @@
-//! Implementations for a [`DocsTree`] which represents the DOCS directory.
+//! Implementations for a [`DocsTree`] which represents the docs directory.
 
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -29,7 +29,7 @@ pub enum PageType {
     Workflow(Workflow),
 }
 
-/// An HTML page in the DOCS directory.
+/// An HTML page in the docs directory.
 #[derive(Debug)]
 pub struct HTMLPage {
     /// The display name of the page.
@@ -55,7 +55,7 @@ impl HTMLPage {
     }
 }
 
-/// A node in the DOCS directory tree.
+/// A node in the docs directory tree.
 #[derive(Debug)]
 struct Node {
     /// The name of the node.
@@ -111,19 +111,19 @@ impl Node {
     }
 }
 
-/// A tree representing the DOCS directory.
+/// A tree representing the docs directory.
 #[derive(Debug)]
 pub struct DocsTree {
     /// The root of the tree.
     ///
-    /// `root.path` is the path to the DOCS directory and is absolute.
+    /// `root.path` is the path to the docs directory and is absolute.
     root: Node,
     /// The absolute path to the stylesheet, if it exists.
     stylesheet: Option<PathBuf>,
 }
 
 impl DocsTree {
-    /// Create a new DOCS tree.
+    /// Create a new docs tree.
     pub fn new(root: impl AsRef<Path>) -> Self {
         let abs_path = absolute(root.as_ref()).unwrap();
         let node = Node::new(
@@ -136,7 +136,7 @@ impl DocsTree {
         }
     }
 
-    /// Create a new DOCS tree with a stylesheet.
+    /// Create a new docs tree with a stylesheet.
     pub fn new_with_stylesheet(
         root: impl AsRef<Path>,
         stylesheet: impl AsRef<Path>,
@@ -189,7 +189,7 @@ impl DocsTree {
         let path = abs_path.into();
         let rel_path = path
             .strip_prefix(&root.path)
-            .expect("path should be in the DOCS directory");
+            .expect("path should be in the docs directory");
 
         let mut current_node = root;
 
@@ -242,7 +242,7 @@ impl DocsTree {
 
     /// Render a sidebar component given a path.
     ///
-    /// The sidebar will contain a table of contents for the DOCS directory.
+    /// The sidebar will contain a table of contents for the docs directory.
     /// Every node in the tree will be visited in a Depth First Traversal order.
     /// If the node has a page associated with it, a link to the page will be
     /// rendered. If the node does not have a page associated with it, the

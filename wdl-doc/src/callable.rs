@@ -293,3 +293,222 @@ fn parse_outputs(
         })
         .collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use wdl_ast::Document;
+
+    use super::*;
+
+    #[test]
+    fn test_group_cmp() {
+        let common = Group("Common".to_string());
+        let resources = Group("Resources".to_string());
+        let a = Group("A".to_string());
+        let b = Group("B".to_string());
+        let c = Group("C".to_string());
+
+        let mut groups = vec![c, a, resources, common, b];
+        groups.sort();
+        assert_eq!(
+            groups,
+            vec![
+                Group("Common".to_string()),
+                Group("A".to_string()),
+                Group("B".to_string()),
+                Group("C".to_string()),
+                Group("Resources".to_string()),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_parse_meta() {
+        let wdl = r#"
+        version 1.1
+
+        workflow wf {
+            meta {
+                name: "Workflow"
+                description: "A workflow"
+            }
+        }
+        "#;
+
+        let (doc, _) = Document::parse(wdl);
+        let doc_item = doc.ast().into_v1().unwrap().items().next().unwrap();
+        let meta_map = parse_meta(
+            &doc_item
+                .as_workflow_definition()
+                .unwrap()
+                .metadata()
+                .unwrap(),
+        );
+        assert_eq!(meta_map.len(), 2);
+        assert_eq!(
+            meta_map
+                .get("name")
+                .unwrap()
+                .clone()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "Workflow"
+        );
+        assert_eq!(
+            meta_map
+                .get("description")
+                .unwrap()
+                .clone()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "A workflow"
+        );
+    }
+
+    #[test]
+    fn test_parse_parameter_meta() {
+        let wdl = r#"
+        version 1.1
+
+        workflow wf {
+            input {
+                Int a
+            }
+            parameter_meta {
+                a: {
+                    description: "An integer"
+                }
+            }
+        }
+        "#;
+
+        let (doc, _) = Document::parse(wdl);
+        let doc_item = doc.ast().into_v1().unwrap().items().next().unwrap();
+        let meta_map = parse_parameter_meta(
+            &doc_item
+                .as_workflow_definition()
+                .unwrap()
+                .parameter_metadata()
+                .unwrap(),
+        );
+        assert_eq!(meta_map.len(), 1);
+        assert_eq!(
+            meta_map
+                .get("a")
+                .unwrap()
+                .clone()
+                .unwrap_object()
+                .items()
+                .next()
+                .unwrap()
+                .value()
+                .clone()
+                .unwrap_string()
+                .text()
+                .unwrap()
+                .as_str(),
+            "An integer"
+        );
+    }
+
+    #[test]
+    fn test_parse_inputs() {
+        let wdl = r#"
+        version 1.1
+
+        workflow wf {
+            input {
+                Int a
+                Int b
+                Int c
+            }
+            parameter_meta {
+                a: "An integer"
+                c: {
+                    description: "Another integer"
+                }
+            }
+        }
+        "#;
+
+        let (doc, _) = Document::parse(wdl);
+        let doc_item = doc.ast().into_v1().unwrap().items().next().unwrap();
+        let meta_map = parse_parameter_meta(
+            &doc_item
+                .as_workflow_definition()
+                .unwrap()
+                .parameter_metadata()
+                .unwrap(),
+        );
+        let inputs = parse_inputs(
+            &doc_item.as_workflow_definition().unwrap().input().unwrap(),
+            &meta_map,
+        );
+        assert_eq!(inputs.len(), 3);
+        assert_eq!(inputs[0].name(), "a");
+        assert_eq!(inputs[0].description().into_string(), "An integer");
+        assert_eq!(inputs[1].name(), "b");
+        assert_eq!(inputs[1].description().into_string(), "");
+        assert_eq!(inputs[2].name(), "c");
+        assert_eq!(inputs[2].description().into_string(), "Another integer");
+    }
+
+    #[test]
+    fn test_parse_outputs() {
+        let wdl = r#"
+        version 1.1
+
+        workflow wf {
+            output {
+                Int a = 1
+                Int b = 2
+                Int c = 3
+            }
+            meta {
+                outputs: {
+                    a: "An integer"
+                    c: {
+                        description: "Another integer"
+                    }
+                }
+            }
+            parameter_meta {
+                b: "A different place!"
+            }
+        }
+        "#;
+
+        let (doc, _) = Document::parse(wdl);
+        let doc_item = doc.ast().into_v1().unwrap().items().next().unwrap();
+        let meta_map = parse_meta(
+            &doc_item
+                .as_workflow_definition()
+                .unwrap()
+                .metadata()
+                .unwrap(),
+        );
+        let parameter_meta = parse_parameter_meta(
+            &doc_item
+                .as_workflow_definition()
+                .unwrap()
+                .parameter_metadata()
+                .unwrap(),
+        );
+        let outputs = parse_outputs(
+            &doc_item.as_workflow_definition().unwrap().output().unwrap(),
+            &meta_map,
+            &parameter_meta,
+        );
+        assert_eq!(outputs.len(), 3);
+        assert_eq!(outputs[0].name(), "a");
+        assert_eq!(outputs[0].description().into_string(), "An integer");
+        assert_eq!(outputs[1].name(), "b");
+        assert_eq!(outputs[1].description().into_string(), "A different place!");
+        assert_eq!(outputs[2].name(), "c");
+        assert_eq!(outputs[2].description().into_string(), "Another integer");
+    }
+}
