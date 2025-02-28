@@ -264,6 +264,7 @@ pub async fn document_workspace(
 
     for result in results {
         let uri = result.document().uri();
+        dbg!(&uri);
         let rel_wdl_path = match uri.to_file_path() {
             Ok(path) => match path.strip_prefix(&workspace_abs_path) {
                 Ok(path) => path.to_path_buf(),
