@@ -109,11 +109,19 @@ impl<T: AsRef<str>> Render for Markdown<T> {
 
         // Remove the outer `<p>` tag that `pulldown_cmark` wraps single lines in
         let safe_html = if safe_html.starts_with("<p>") && safe_html.ends_with("</p>\n") {
-            &safe_html[3..safe_html.len() - 5]
+            let trimmed = safe_html[3..safe_html.len() - 5].to_string();
+            if trimmed.contains("<p>") {
+                // If the trimmed string contains another `<p>` tag, it means
+                // that the original string was more complicated than a single-line paragraph,
+                // so we should keep the outer `<p>` tag.
+                safe_html
+            } else {
+                trimmed
+            }
         } else {
-            &safe_html
+            safe_html
         };
-        PreEscaped(safe_html.to_string())
+        PreEscaped(safe_html)
     }
 }
 
@@ -382,5 +390,45 @@ mod tests {
         let (document, _) = AstDocument::parse(source);
         let preamble = parse_preamble_comments(document.version_statement().unwrap());
         assert_eq!(preamble, "This is a comment\nThis is also a comment");
+    }
+
+    #[test]
+    fn test_markdown_render() {
+        let source = r#"
+        ## This is a paragraph.
+        ##
+        ## This is the start of a new paragraph.
+        ## And this is the same paragraph continued.
+        version 1.0
+        workflow test {
+            meta {
+                description: "A simple description should not render with p tags"
+            }
+        }
+        "#;
+        let (document, _) = AstDocument::parse(source);
+        let preamble = parse_preamble_comments(document.version_statement().unwrap());
+        let markdown = Markdown(&preamble).render();
+        assert_eq!(
+            markdown.into_string(),
+            "<p>This is a paragraph.</p>\n<p>This is the start of a new paragraph.\nAnd this is \
+             the same paragraph continued.</p>\n"
+        );
+
+        let doc_item = document.ast().into_v1().unwrap().items().next().unwrap();
+        let ast_workflow = doc_item.into_workflow_definition().unwrap();
+        let workflow = workflow::Workflow::new(
+            ast_workflow.name().as_str().to_string(),
+            ast_workflow.metadata(),
+            ast_workflow.parameter_metadata(),
+            ast_workflow.input(),
+            ast_workflow.output(),
+        );
+
+        let description = workflow.description();
+        assert_eq!(
+            description.into_string(),
+            "A simple description should not render with p tags"
+        );
     }
 }
