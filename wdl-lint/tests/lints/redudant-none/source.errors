@@ -1,0 +1,12 @@
+error: expected multi-line string, but found `<`
+   ┌─ tests/lints/redudant-none/source.wdl:34:13
+   │
+34 │     command <
+   │             ^ unexpected `<`
+
+error: expected declaration name, but found string
+   ┌─ tests/lints/redudant-none/source.wdl:35:14
+   │
+35 │         echo "Testing redundant None detection"
+   │              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unexpected string
+
