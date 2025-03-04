@@ -142,9 +142,29 @@ impl TaskManagerRequest for LocalTaskRequest {
                 bail!("task was cancelled");
             }
             status = child.wait() => {
-                let status = status.with_context(|| {
-                    format!("failed to wait for termination of task child process {id}")
-                })?;
+    let status = status.with_context(|| {
+        format!("failed to wait for termination of task child process {id}")
+    })?;
+
+    // Change ownership of work_dir recursively after task completes
+    #[cfg(unix)]
+    {
+        use std::process::Command;
+      let output = Command::new("icacls")
+    .arg(work_dir)
+    .arg("/grant")
+    .arg("Hp:F") // Full access for user Hp
+    .output()
+    .context("failed to change ownership with icacls")?;
+
+
+        if !output.status.success() {
+            tracing::error!(
+                "chown failed: {}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+        }
+    }
 
                 #[cfg(unix)]
                 {
