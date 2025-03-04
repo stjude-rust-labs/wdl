@@ -150,12 +150,19 @@ impl TaskManagerRequest for LocalTaskRequest {
     #[cfg(unix)]
     {
         use std::process::Command;
-      let output = Command::new("icacls")
+    use std::env;
+use users::{get_current_uid, get_current_gid};
+
+let user = env::var("USER").unwrap_or_else(|_| "root".to_string());
+let group = get_current_gid().to_string(); // Gets the current group ID
+
+let output = Command::new("chown")
+    .arg("-R")
+    .arg(format!("{}:{}", user, group)) // Correct replacement
     .arg(work_dir)
-    .arg("/grant")
-    .arg("Hp:F") // Full access for user Hp
     .output()
-    .context("failed to change ownership with icacls")?;
+    .context("failed to change ownership with chown")?;
+
 
 
         if !output.status.success() {
