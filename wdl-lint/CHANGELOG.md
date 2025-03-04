@@ -158,8 +158,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Import Sorting Rule Enhancements (`import_sort.rs`)**  
-  - `fix` messages suggest the correct order of imports to the user.
-  - Improved handling of inline comments during import sorting to ensure comments remain attached to their respective imports.  
+  - `fix` messages suggest the correct order of imports to the user.  
   - Added validation to detect misplaced inline comments and provide appropriate fix suggestions.  
-  - Enhanced sorting logic to preserve comment alignment while maintaining lexicographical order of imports.  
   - Updated diagnostic messages for better clarity in error reporting.  
