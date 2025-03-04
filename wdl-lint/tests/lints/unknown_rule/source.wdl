@@ -1,6 +1,13 @@
+#@ except: SnackCase
+
 version 1.1
 
-#@ except: ThisIsNotARealRule, MissingMetas
 workflow test {
-  output {}
+  input {
+    String message = "Hello, World!"
+  }
+  
+  output {
+    String out = message
+  }
 }

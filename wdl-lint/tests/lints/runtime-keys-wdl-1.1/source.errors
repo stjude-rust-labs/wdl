@@ -1,3 +1,11 @@
+note[ShellCheck]: running `shellcheck` on command section
+  ┌─ tests/lints/runtime-keys-wdl-1.1/source.wdl:8:5
+  │
+8 │     command <<<>>>
+  │     ^^^^^^^ could not find `shellcheck` executable.
+  │
+  = fix: install shellcheck (https://www.shellcheck.net) or disable this lint.
+
 note[RuntimeSectionKeys]: the following runtime key is recommended by the WDL 1.1 specification: `container`
    ┌─ tests/lints/runtime-keys-wdl-1.1/source.wdl:12:5
    │
