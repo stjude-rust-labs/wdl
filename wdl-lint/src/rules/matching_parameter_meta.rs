@@ -111,7 +111,6 @@ fn check_parameter_meta(
     param_meta: ParameterMetadataSection,
     diagnostics: &mut Diagnostics,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
-    input_span: Option<Span>, 
 ) {
     let expected: HashMap<_, _> = expected.map(|(i, s)| (i.as_str().to_string(), s)).collect();
 
@@ -142,20 +141,6 @@ fn check_parameter_meta(
             );
         }
     }
-
-        
-        if let Some(input_span) = input_span {
-            if param_meta.span().start() < input_span.start() {
-                diagnostics.exceptable_add(
-                    Diagnostic::warning("`parameter_meta` should appear after `inputs`")
-                        .with_rule(ID)
-                        .with_label("Move `parameter_meta` after `inputs`", param_meta.span()),
-                    SyntaxElement::from(param_meta.syntax().clone()),
-                    exceptable_nodes,
-                );
-            }
-        }
-    
 }
 
 impl Visitor for MatchingParameterMetaRule {
@@ -189,24 +174,27 @@ impl Visitor for MatchingParameterMetaRule {
 
         // Note that only the first input and parameter_meta sections are checked as any
         // additional sections is considered a validation error
-        let input_span = task.input().iter().flat_map(|i| i.declarations()).map(|d| d.name().span()).next(); 
-
-match task.parameter_metadata() {
-    Some(param_meta) => {
-        check_parameter_meta(
-            &SectionParent::Task(task.clone()),
-            task.input().iter().flat_map(|i| {
-                i.declarations().map(|d| (d.name(), d.name().span()))
-            }),
-            param_meta,
-            state,
-            &self.exceptable_nodes(),
-            input_span, // ✅ Pass `inputs` position
-        );
-    }
-    None => {}
-}
-
+        match task.parameter_metadata() {
+            Some(param_meta) => {
+                check_parameter_meta(
+                    &SectionParent::Task(task.clone()),
+                    task.input().iter().flat_map(|i| {
+                        i.declarations().map(|d| {
+                            let name = d.name();
+                            let span = name.span();
+                            (name, span)
+                        })
+                    }),
+                    param_meta,
+                    state,
+                    &self.exceptable_nodes(),
+                );
+            }
+            None => {
+                // If there is no parameter_meta section, then let the
+                // MissingMetas rule handle it
+            }
+        }
     }
 
     fn workflow_definition(
@@ -219,24 +207,29 @@ match task.parameter_metadata() {
             return;
         }
 
-        let input_span = workflow.input().iter().flat_map(|i| i.declarations()).map(|d| d.name().span()).next(); 
-
-match workflow.parameter_metadata() {
-    Some(param_meta) => {
-        check_parameter_meta(
-            &SectionParent::Workflow(workflow.clone()),
-            workflow.input().iter().flat_map(|i| {
-                i.declarations().map(|d| (d.name(), d.name().span()))
-            }),
-            param_meta,
-            state,
-            &self.exceptable_nodes(),
-            input_span, 
-        );
-    }
-    None => {}
-}
-
+        // Note that only the first input and parameter_meta sections are checked as any
+        // additional sections is considered a validation error
+        match workflow.parameter_metadata() {
+            Some(param_meta) => {
+                check_parameter_meta(
+                    &SectionParent::Workflow(workflow.clone()),
+                    workflow.input().iter().flat_map(|i| {
+                        i.declarations().map(|d| {
+                            let name = d.name();
+                            let span = name.span();
+                            (name, span)
+                        })
+                    }),
+                    param_meta,
+                    state,
+                    &self.exceptable_nodes(),
+                );
+            }
+            None => {
+                // If there is no parameter_meta section, then let the
+                // MissingMetas rule handle it
+            }
+        }
     }
 
     fn struct_definition(
