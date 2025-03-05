@@ -1,4 +1,5 @@
 //! Module for the lint rules.
+mod redundant_none;
 
 mod blank_lines_between_elements;
 mod call_input_spacing;
@@ -44,6 +45,7 @@ mod version_formatting;
 mod whitespace;
 
 pub use blank_lines_between_elements::*;
+pub use redundant_none::*;
 pub use call_input_spacing::*;
 pub use command_mixed_indentation::*;
 pub use comment_whitespace::*;

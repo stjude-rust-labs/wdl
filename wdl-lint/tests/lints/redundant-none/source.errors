@@ -1,0 +1,5 @@
+warning: Optional inputs do not need to be explicitly assigned to `None`.
+   ┌─ source.wdl:5:32
+   │
+5  │        String? optional_param = None
+   │                                ^ Remove `= None` as it's redundant.
