@@ -14,11 +14,3 @@ note[MissingMetas]: workflow `test` is missing both `meta` and `parameter_meta` 
   │
   = fix: add both the `meta` and `parameter_meta` sections
 
-note[Whitespace]: line contains only whitespace
-  ┌─ tests/lints/unknown_rule/source.wdl:9:1
-  │
-9 │   
-  │ ^^
-  │
-  = fix: remove the whitespace
-

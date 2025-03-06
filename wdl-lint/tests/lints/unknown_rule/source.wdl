@@ -6,7 +6,7 @@ workflow test {
   input {
     String message = "Hello, World!"
   }
-  
+
   output {
     String out = message
   }

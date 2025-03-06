@@ -259,7 +259,7 @@ task foo {  # an in-line comment
         let nearest = find_nearest_rule("SnackCase");
         assert_eq!(nearest, Some("SnakeCase"));
 
-        // Test another close match
+        // Test another exact match
         let nearest = find_nearest_rule("PascalCase");
         assert_eq!(nearest, Some("PascalCase"));
 
@@ -274,12 +274,5 @@ task foo {  # an in-line comment
         // Test a completely different string
         let nearest = find_nearest_rule("CompletelyDifferentRule");
         assert_eq!(nearest, None);
-    }
-
-    #[test]
-    fn test_snackcase_to_snakecase() {
-        // This is the specific test case mentioned in the issue
-        let nearest = find_nearest_rule("SnackCase");
-        assert_eq!(nearest, Some("SnakeCase"));
     }
 }
