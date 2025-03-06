@@ -1,4 +1,4 @@
-#@ except: SnackCase
+#@ except: SnackCase, ThisIsNotARealRule, MissingMetas
 
 version 1.1
 
