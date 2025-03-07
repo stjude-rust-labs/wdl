@@ -7,9 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+
 ### Added
 
 * Added suggestion for similar rule names when encountering unknown lint rules ([#334](https://github.com/stjude-rust-labs/wdl/pull/334)).
+
+### Changed
+
+* `fix` messages suggest the correct order of imports to the user in `ImportSort` rule ([#332](https://github.com/stjude-rust-labs/wdl/pull/332)).
+
 
 ### Fixed
 
@@ -157,3 +163,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Ported the `NoCurlyCommands` rule to `wdl-lint` ([#69](https://github.com/stjude-rust-labs/wdl/pull/69)).
 * Added the `wdl-lint` as the crate implementing linting rules for the future
   ([#68](https://github.com/stjude-rust-labs/wdl/pull/68)).
+
