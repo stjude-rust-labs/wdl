@@ -115,11 +115,8 @@ impl Visitor for ImportSortRule {
         if imports != sorted_imports {
             // Find the first out-of-order import
             let span = imports
-                .iter()
-                .zip(sorted_imports.iter())
-                .find(|(a, b)| a != b)
-                .expect("first out-of-order import")
-                .0
+                .first()
+                .expect("there should be at least one import")
                 .first_token()
                 .expect("node should have a first token")
                 .text_range()
