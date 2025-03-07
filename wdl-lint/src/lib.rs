@@ -41,16 +41,8 @@ mod visitor;
 
 pub use tags::*;
 pub use visitor::*;
+pub use wdl_analysis as analysis;
 pub use wdl_ast as ast;
-
-/// The reserved rule identifiers that are used by analysis.
-pub const RESERVED_RULE_IDS: &[&str] = &[
-    "UnusedImport",
-    "UnusedInput",
-    "UnusedDeclaration",
-    "UnusedCall",
-    "UnnecessaryFunctionCall",
-];
 
 /// A trait implemented by lint rules.
 pub trait Rule: Visitor<State = Diagnostics> {
@@ -134,18 +126,20 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
     {
         use convert_case::Case;
         use convert_case::Casing;
-        let mut set = std::collections::HashSet::new();
+        let mut lint_set = std::collections::HashSet::new();
+        let analysis_set: std::collections::HashSet<&str> =
+            std::collections::HashSet::from_iter(analysis::rules().iter().map(|r| r.id()));
         for r in &rules {
             if r.id().to_case(Case::Pascal) != r.id() {
                 panic!("lint rule id `{id}` is not pascal case", id = r.id());
             }
 
-            if !set.insert(r.id()) {
+            if !lint_set.insert(r.id()) {
                 panic!("duplicate rule id `{id}`", id = r.id());
             }
 
-            if RESERVED_RULE_IDS.contains(&r.id()) {
-                panic!("rule id `{id}` is reserved", id = r.id());
+            if analysis_set.contains(r.id()) {
+                panic!("rule id `{id}` is in use by wdl-analysis", id = r.id());
             }
         }
     }
@@ -164,19 +158,21 @@ pub fn optional_rules() -> Vec<Box<dyn Rule>> {
         use convert_case::Casing;
 
         use crate::rules;
-        let mut set: std::collections::HashSet<&str> =
+        let mut lint_set: std::collections::HashSet<&str> =
             std::collections::HashSet::from_iter(rules().iter().map(|r| r.id()));
+        let analysis_set: std::collections::HashSet<&str> =
+            std::collections::HashSet::from_iter(analysis::rules().iter().map(|r| r.id()));
         for r in opt_rules.iter() {
             if r.id().to_case(Case::Pascal) != r.id() {
                 panic!("lint rule id `{id}` is not pascal case", id = r.id());
             }
 
-            if !set.insert(r.id()) {
+            if !lint_set.insert(r.id()) {
                 panic!("duplicate rule id `{id}`", id = r.id());
             }
 
-            if RESERVED_RULE_IDS.contains(&r.id()) {
-                panic!("rule id `{id}` is reserved", id = r.id());
+            if analysis_set.contains(r.id()) {
+                panic!("rule id `{id}` is in use by wdl-analysis", id = r.id());
             }
         }
     }
