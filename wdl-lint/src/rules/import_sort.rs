@@ -24,7 +24,7 @@ const ID: &str = "ImportSort";
 fn import_not_sorted(span: Span, sorted_imports: String) -> Diagnostic {
     Diagnostic::note("imports are not sorted lexicographically")
         .with_rule(ID)
-        .with_highlight(span)
+        .with_label("imports must be sorted", span)
         .with_fix(format!(
             "sort the imports lexicographically:\n{}",
             sorted_imports
