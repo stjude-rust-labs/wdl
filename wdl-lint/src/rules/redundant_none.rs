@@ -1,5 +1,7 @@
 use std::fmt::Debug;
 use rowan::ast::AstNode;
+use tracing::Instrument;
+use wdl_ast::v1::InputSection;
 use wdl_ast::AstNodeExt;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -25,7 +27,7 @@ fn redundant_none_assignment(span: Span, name: &str) -> Diagnostic {
 }
 
 #[derive(Default, Debug, Clone, Copy)]
-pub struct RedundantNoneAssignment(Option<SupportedVersion>);
+pub struct RedundantNoneAssignment;
 
 impl Rule for RedundantNoneAssignment {
     fn id(&self) -> &'static str {
@@ -42,15 +44,12 @@ impl Rule for RedundantNoneAssignment {
     }
 
     fn tags(&self) -> TagSet {
-        TagSet::new(&[Tag::Style])
+        TagSet::new(&[Tag::Clarity])
     }
 
     fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
         Some(&[
-            wdl_ast::SyntaxKind::VersionStatementNode,
-            wdl_ast::SyntaxKind::WorkflowDefinitionNode,
-            wdl_ast::SyntaxKind::TaskDefinitionNode, 
-            wdl_ast::SyntaxKind::InputSectionNode,
+            wdl_ast::SyntaxKind::VersionStatementNode,wdl_ast::SyntaxKind::InputSectionNode,
             wdl_ast::SyntaxKind::BoundDeclNode,
         ])
     }
@@ -63,44 +62,36 @@ impl Visitor for RedundantNoneAssignment {
         if reason == VisitReason::Exit {
             return;
         }
-        *self = Self(Some(version));
+        *self = Default::default();
     }
 
-    fn bound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &BoundDecl) {
-        if reason == VisitReason::Exit {
-            return;
-        }
-
-        if !is_in_input_section(decl) {
-            return;
-        }
-
-        if let type_token = decl.ty() {
-            let type_text = type_token.to_string();
-            if type_text.ends_with('?') {
-                if let expr = decl.expr() {
-                    if let Some(name_ref) = expr.as_name_ref() {
-                        if name_ref.name().as_str() == "None" {
-                            state.exceptable_add(
-                                redundant_none_assignment(decl.span(), decl.name().as_str()),
-                                SyntaxElement::from(decl.syntax().clone()),
-                                &self.exceptable_nodes(),
-                            );
+    fn input_section(
+            &mut self,
+            state: &mut Self::State,
+            reason: VisitReason,
+            section: &InputSection,
+        ) {
+            if reason == VisitReason::Exit {
+                return;
+            }
+             section.declarations().for_each(|decl| {
+                if let token=decl.ty(){
+                    if token.is_optional() {
+                        if let Some(expr) = decl.expr() {if let Some(name_ref)=expr.as_name_ref(){
+                            if name_ref.name().as_str()=="None"{
+                                let text_range = decl.syntax().text_range();
+                                let span = Span::from(text_range.start().into()..text_range.end().into());
+                                state.exceptable_add(
+                                    redundant_none_assignment(span, decl.name().as_str()),
+                                    SyntaxElement::from(decl.syntax().clone()),
+                                    &self.exceptable_nodes(),
+                                );
+                            }
                         }
                     }
                 }
             }
-        }
-    }
-}
-
-fn is_in_input_section(decl: &BoundDecl) -> bool {
-    let mut current = decl.syntax().parent();
-    while let Some(parent) = current {
-        if parent.kind() == wdl_ast::SyntaxKind::InputSectionNode {
-            return true;
-        }
-        current = parent.parent();
-    }
-    false
+        });
+    }    
+    
 }
