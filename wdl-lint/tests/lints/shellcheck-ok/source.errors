@@ -1,0 +1,22 @@
+note[ShellCheck]: placeholder is referenced but not assigned.
+   ┌─ tests/lints/shellcheck-ok/source.wdl:20:13
+   │
+20 │       echo "$placeholder"
+   │             ^^^^^^^^^^^^
+   │             │
+   │             SC2154[warning]: placeholder is referenced but not assigned.
+   │             more info: https://www.shellcheck.net/wiki/SC2154
+   │
+   = fix: address the diagnostic as recommended in the message
+
+note[ShellCheck]: placeholder is referenced but not assigned.
+   ┌─ tests/lints/shellcheck-ok/source.wdl:44:13
+   │
+44 │       echo "$placeholder"
+   │             ^^^^^^^^^^^^
+   │             │
+   │             SC2154[warning]: placeholder is referenced but not assigned.
+   │             more info: https://www.shellcheck.net/wiki/SC2154
+   │
+   = fix: address the diagnostic as recommended in the message
+

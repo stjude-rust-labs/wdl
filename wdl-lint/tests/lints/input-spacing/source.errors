@@ -16,6 +16,12 @@ note[CallInputSpacing]: call inputs assignments must be surrounded with whitespa
    │
    = fix: surround '=' with whitespace on each side
 
+error: missing required call input `a` for task `bar`
+   ┌─ tests/lints/input-spacing/source.wdl:17:10
+   │
+17 │     call bar as ba
+   │          ^^^
+
 note[CallInputSpacing]: call input keyword not properly spaced
    ┌─ tests/lints/input-spacing/source.wdl:19:22
    │

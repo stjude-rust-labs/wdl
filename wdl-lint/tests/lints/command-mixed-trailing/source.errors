@@ -1,0 +1,22 @@
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
+   ┌─ tests/lints/command-mixed-trailing/source.wdl:14:36
+   │
+14 │         this line is prefixed with ~{"spaces and has tailing mixed indentation"}        
+   │                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │                                    │
+   │                                    SC2086[info]: Double quote to prevent globbing and word splitting.
+   │                                    more info: https://www.shellcheck.net/wiki/SC2086
+   │
+   = fix: address the diagnostic as recommended in the message
+
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
+   ┌─ tests/lints/command-mixed-trailing/source.wdl:29:36
+   │
+29 │         this line is prefixed with ${"spaces and has tailing mixed indentation"}        
+   │                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │                                    │
+   │                                    SC2086[info]: Double quote to prevent globbing and word splitting.
+   │                                    more info: https://www.shellcheck.net/wiki/SC2086
+   │
+   = fix: address the diagnostic as recommended in the message
+

@@ -22,3 +22,12 @@ note[TodoComment]: remaining `TODO` item found
    │
    = fix: remove the `TODO` item once it has been implemented
 
+error: cannot define workflow `test` as only one workflow is allowed per source file
+   ┌─ tests/lints/todo/source.wdl:21:10
+   │
+10 │ workflow test {
+   │          ---- first workflow is defined here
+   ·
+21 │ workflow test {
+   │          ^^^^ consider moving this workflow to a new file
+

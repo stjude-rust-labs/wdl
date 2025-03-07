@@ -1,3 +1,9 @@
+error: unknown task or workflow `bar`
+   ┌─ tests/lints/redundant-input-assignment-wdl-1.1/source.wdl:13:10
+   │
+13 │     call bar { input:
+   │          ^^^
+
 note[ConciseInput]: redundant input assignment
    ┌─ tests/lints/redundant-input-assignment-wdl-1.1/source.wdl:16:10
    │
@@ -5,6 +11,24 @@ note[ConciseInput]: redundant input assignment
    │          ^^^^^^^^^
    │
    = fix: can be shortened to `cam`
+
+error: cannot define workflow `test2` as only one workflow is allowed per source file
+   ┌─ tests/lints/redundant-input-assignment-wdl-1.1/source.wdl:20:10
+   │
+ 6 │ workflow test1 {
+   │          ----- first workflow is defined here
+   ·
+20 │ workflow test2 {
+   │          ^^^^^ consider moving this workflow to a new file
+
+error: cannot define workflow `test3` as only one workflow is allowed per source file
+   ┌─ tests/lints/redundant-input-assignment-wdl-1.1/source.wdl:35:10
+   │
+ 6 │ workflow test1 {
+   │          ----- first workflow is defined here
+   ·
+35 │ workflow test3 {
+   │          ^^^^^ consider moving this workflow to a new file
 
 note[ConciseInput]: redundant input assignment
    ┌─ tests/lints/redundant-input-assignment-wdl-1.1/source.wdl:44:9

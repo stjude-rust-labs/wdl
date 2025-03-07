@@ -62,6 +62,15 @@ note[CommentWhitespace]: comment has too much indentation
    │
    = fix: this comment has 3 levels of indentation. It should have 2 levels of indentation.
 
+error: conflicting input name `foo`
+   ┌─ tests/lints/comment-whitespace/source.wdl:21:16
+   │
+18 │         String foo  # a good comment
+   │                --- the input with the conflicting name is here
+   ·
+21 │         String foo = "bar"       # too much space for an inline comment
+   │                ^^^ this input conflicts with a previously used name
+
 note[CommentWhitespace]: in-line comments should be preceded by two spaces
    ┌─ tests/lints/comment-whitespace/source.wdl:21:34
    │

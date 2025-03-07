@@ -78,6 +78,107 @@ note[ExpressionSpacing]: this space is not allowed
    │
    = fix: remove the space
 
+error: type mismatch: expected type `Boolean`, but found type `String`
+   ┌─ tests/lints/expression-spacing/source.wdl:22:37
+   │  
+22 │           Boolean complicated_logic = (
+   │                   ----------------- this expects type `Boolean`
+   │ ╭─────────────────────────────────────^
+23 │ │             if !(
+24 │ │                 a && b || c && (!d || !e)
+25 │ │                 == (
+   · │
+32 │ │             else "WOWOWOW"
+33 │ │         )
+   │ ╰─────────^ this is type `String`
+
+error: type mismatch: expected `logical and` operand to be type `Boolean`, but found type `Int`
+   ┌─ tests/lints/expression-spacing/source.wdl:24:17
+   │
+24 │                 a && b || c && (!d || !e)
+   │                 ^ this is type `Int`
+
+error: type mismatch: expected `logical and` operand to be type `Boolean`, but found type `Int`
+   ┌─ tests/lints/expression-spacing/source.wdl:24:22
+   │
+24 │                 a && b || c && (!d || !e)
+   │                      ^ this is type `Int`
+
+error: unknown name `c`
+   ┌─ tests/lints/expression-spacing/source.wdl:24:27
+   │
+24 │                 a && b || c && (!d || !e)
+   │                           ^
+
+error: unknown name `d`
+   ┌─ tests/lints/expression-spacing/source.wdl:24:34
+   │
+24 │                 a && b || c && (!d || !e)
+   │                                  ^
+
+error: unknown name `e`
+   ┌─ tests/lints/expression-spacing/source.wdl:24:40
+   │
+24 │                 a && b || c && (!d || !e)
+   │                                        ^
+
+error: unknown name `foobar`
+   ┌─ tests/lints/expression-spacing/source.wdl:26:24
+   │
+26 │                     if foobar
+   │                        ^^^^^^
+
+error: unknown name `gak`
+   ┌─ tests/lints/expression-spacing/source.wdl:27:26
+   │
+27 │                     then gak
+   │                          ^^^
+
+error: unknown name `caz`
+   ┌─ tests/lints/expression-spacing/source.wdl:28:26
+   │
+28 │                     else caz
+   │                          ^^^
+
+error: type mismatch: expected type `Boolean`, but found type `String`
+   ┌─ tests/lints/expression-spacing/source.wdl:35:15
+   │  
+34 │           Boolean complicated_logic2
+   │                   ------------------ this expects type `Boolean`
+35 │               = (
+   │ ╭───────────────^
+36 │ │                 if
+37 │ │                     !(
+38 │ │                         a
+   · │
+57 │ │                     "WOWOWOW"
+58 │ │             )
+   │ ╰─────────────^ this is type `String`
+
+error: type mismatch: expected `logical and` operand to be type `Boolean`, but found type `Int`
+   ┌─ tests/lints/expression-spacing/source.wdl:38:25
+   │
+38 │                         a
+   │                         ^ this is type `Int`
+
+error: type mismatch: expected `logical and` operand to be type `Boolean`, but found type `Int`
+   ┌─ tests/lints/expression-spacing/source.wdl:39:28
+   │
+39 │                         && b
+   │                            ^ this is type `Int`
+
+error: unknown name `c`
+   ┌─ tests/lints/expression-spacing/source.wdl:40:28
+   │
+40 │                         || c
+   │                            ^
+
+error: unknown name `d`
+   ┌─ tests/lints/expression-spacing/source.wdl:42:30
+   │
+42 │                             !d
+   │                              ^
+
 note[ExpressionSpacing]: operators must be followed by whitespace
    ┌─ tests/lints/expression-spacing/source.wdl:43:29
    │
@@ -85,6 +186,30 @@ note[ExpressionSpacing]: operators must be followed by whitespace
    │                             ^^
    │
    = fix: add whitespace after this operator
+
+error: unknown name `e`
+   ┌─ tests/lints/expression-spacing/source.wdl:43:32
+   │
+43 │                             ||!e
+   │                                ^
+
+error: unknown name `foobar`
+   ┌─ tests/lints/expression-spacing/source.wdl:47:33
+   │
+47 │                                 foobar
+   │                                 ^^^^^^
+
+error: unknown name `gak`
+   ┌─ tests/lints/expression-spacing/source.wdl:49:33
+   │
+49 │                                 gak
+   │                                 ^^^
+
+error: unknown name `caz`
+   ┌─ tests/lints/expression-spacing/source.wdl:51:33
+   │
+51 │                                 caz
+   │                                 ^^^
 
 note[ExpressionSpacing]: multi-line if...then...else must have a preceding parenthesis and newline
    ┌─ tests/lints/expression-spacing/source.wdl:59:21
@@ -150,6 +275,42 @@ note[CommentWhitespace]: comment not sufficiently indented
     │
     = fix: this comment has 3 levels of indentation. It should have 4 levels of indentation.
 
+error: conflicting input name `k`
+    ┌─ tests/lints/expression-spacing/source.wdl:109:17
+    │
+ 62 │         Int k = (  # a comment
+    │             - the input with the conflicting name is here
+    ·
+109 │         Boolean k = {"a": 1, "b": 2} == {"b": 2, "a": 1}
+    │                 ^ this input conflicts with a previously used name
+
+error: conflicting input name `l`
+    ┌─ tests/lints/expression-spacing/source.wdl:110:17
+    │
+ 65 │         Boolean l = (  # a comment
+    │                 - the input with the conflicting name is here
+    ·
+110 │         Boolean l = {
+    │                 ^ this input conflicts with a previously used name
+
+error: conflicting input name `m`
+    ┌─ tests/lints/expression-spacing/source.wdl:119:17
+    │
+ 69 │         Boolean m = (
+    │                 - the input with the conflicting name is here
+    ·
+119 │         Boolean m = {
+    │                 ^ this input conflicts with a previously used name
+
+error: conflicting input name `n`
+    ┌─ tests/lints/expression-spacing/source.wdl:129:17
+    │
+ 74 │         Boolean n = (
+    │                 - the input with the conflicting name is here
+    ·
+129 │         Boolean n = {
+    │                 ^ this input conflicts with a previously used name
+
 note[CommentWhitespace]: comment not sufficiently indented
     ┌─ tests/lints/expression-spacing/source.wdl:138:13
     │
@@ -173,6 +334,15 @@ note[ExpressionSpacing]: multi-line array/map/object literals must have a newlin
     │             ^
     │
     = fix: add a newline before the closing brace/bracket/parenthesis
+
+error: conflicting output name `b`
+    ┌─ tests/lints/expression-spacing/source.wdl:157:17
+    │
+ 20 │         Int b = 6
+    │             - the input with the conflicting name is here
+    ·
+157 │         Boolean b = ! a
+    │                 ^ this output conflicts with a previously used name
 
 note[ExpressionSpacing]: prefix operators may not contain whitespace
     ┌─ tests/lints/expression-spacing/source.wdl:157:21
