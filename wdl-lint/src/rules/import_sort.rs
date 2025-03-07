@@ -115,34 +115,24 @@ impl Visitor for ImportSortRule {
         // Check if sorting is needed
         if imports != sorted_imports {
             // Find the first out-of-order import
-            let first_out_of_order = sorted_imports
-                .iter()
-                .find(|sorted_import| {
-                    let original_position = imports.iter().position(|orig| orig == *sorted_import);
-                    let sorted_position = sorted_imports
-                        .iter()
-                        .position(|sorted| sorted == *sorted_import);
-                    original_position != sorted_position
-                })
-                .unwrap();
-
             let span = imports
                 .iter()
-                .find(|orig| **orig == *first_out_of_order)
-                .unwrap()
+                .zip(sorted_imports.iter())
+                .find(|(a, b)| a != b)
+                .expect("first out-of-order import")
+                .0
+                .first_token()
+                .expect("node should have a first token")
                 .text_range()
                 .to_span();
-            let sorted_imports_text = sorted_imports
-                .iter()
-                .map(|import| import.text().to_string())
-                .collect::<Vec<_>>()
-                .join("\n");
-
-            state.exceptable_add(
-                import_not_sorted(span, sorted_imports_text),
-                SyntaxElement::from(imports.first().unwrap().clone()),
-                &self.exceptable_nodes(),
-            );
+            state.add(import_not_sorted(
+                span,
+                sorted_imports
+                    .iter()
+                    .map(|i| i.text().to_string())
+                    .collect::<Vec<_>>()
+                    .join("\n"),
+            ));
         }
     }
 
