@@ -1,6 +1,7 @@
 //! Implementations for a [`DocsTree`] which represents the docs directory.
 
 use std::collections::BTreeMap;
+use std::collections::HashSet;
 use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
@@ -15,6 +16,7 @@ use crate::full_page;
 use crate::r#struct::Struct;
 use crate::task::Task;
 use crate::workflow::Workflow;
+use crate::write_assets;
 
 /// The type of a page.
 #[derive(Debug)]
@@ -84,14 +86,19 @@ impl Node {
         &self.name
     }
 
-    /// Get the path of the node.
+    /// Get the absolute path of the node.
     pub fn path(&self) -> &PathBuf {
         &self.path
     }
 
     /// Get the page associated with the node.
-    pub fn page(&self) -> Option<Rc<HTMLPage>> {
-        self.page.clone()
+    pub fn page(&self) -> Option<&Rc<HTMLPage>> {
+        self.page.as_ref()
+    }
+
+    /// Get the children of the node.
+    pub fn children(&self) -> &BTreeMap<String, Node> {
+        &self.children
     }
 
     /// Gather the node and its children in a Depth First Traversal order.
@@ -99,13 +106,19 @@ impl Node {
         fn recurse_depth_first<'a>(node: &'a Node, nodes: &mut Vec<&'a Node>) {
             nodes.push(node);
 
-            for child in node.children.values() {
+            for child in node.children().values() {
                 recurse_depth_first(child, nodes);
             }
         }
 
         let mut nodes = Vec::new();
-        recurse_depth_first(self, &mut nodes);
+        nodes.push(self);
+        for child in self.children().values().filter(|c| c.name() != "external") {
+            recurse_depth_first(child, &mut nodes);
+        }
+        if let Some(external) = self.children().get("external") {
+            recurse_depth_first(external, &mut nodes);
+        }
 
         nodes
     }
@@ -118,22 +131,29 @@ pub struct DocsTree {
     ///
     /// `root.path` is the path to the docs directory and is absolute.
     root: Node,
-    /// The absolute path to the stylesheet, if it exists.
-    stylesheet: Option<PathBuf>,
+    /// The absolute path to the stylesheet.
+    stylesheet: PathBuf,
+    /// The absolute path to the assets directory.
+    assets: PathBuf,
 }
 
 impl DocsTree {
     /// Create a new docs tree.
-    pub fn new(root: impl AsRef<Path>) -> Self {
+    pub fn new(root: impl AsRef<Path>) -> anyhow::Result<Self> {
         let abs_path = absolute(root.as_ref()).unwrap();
+        write_assets(&abs_path)?;
         let node = Node::new(
             abs_path.file_name().unwrap().to_str().unwrap().to_string(),
             abs_path.clone(),
         );
-        Self {
+
+        let stylesheet = abs_path.join("style.css");
+
+        Ok(Self {
             root: node,
-            stylesheet: None,
-        }
+            stylesheet,
+            assets: abs_path.join("assets"),
+        })
     }
 
     /// Create a new docs tree with a stylesheet.
@@ -142,6 +162,7 @@ impl DocsTree {
         stylesheet: impl AsRef<Path>,
     ) -> anyhow::Result<Self> {
         let abs_path = absolute(root.as_ref()).unwrap();
+        write_assets(&abs_path)?;
         let in_stylesheet = absolute(stylesheet.as_ref())?;
         let new_stylesheet = abs_path.join("style.css");
         std::fs::copy(in_stylesheet, &new_stylesheet)?;
@@ -153,7 +174,8 @@ impl DocsTree {
 
         Ok(Self {
             root: node,
-            stylesheet: Some(new_stylesheet),
+            stylesheet: new_stylesheet,
+            assets: abs_path.join("assets"),
         })
     }
 
@@ -168,19 +190,31 @@ impl DocsTree {
     }
 
     /// Get the absolute path to the stylesheet.
-    pub fn stylesheet(&self) -> Option<&PathBuf> {
-        self.stylesheet.as_ref()
+    pub fn stylesheet(&self) -> &PathBuf {
+        &self.stylesheet
+    }
+
+    /// Get the absolute path to the assets directory.
+    pub fn assets(&self) -> &PathBuf {
+        &self.assets
     }
 
     /// Get a relative path to the stylesheet.
-    pub fn stylesheet_relative_to<P: AsRef<Path>>(&self, path: P) -> Option<PathBuf> {
-        if let Some(stylesheet) = self.stylesheet() {
-            let path = path.as_ref();
-            let stylesheet = diff_paths(stylesheet, path).unwrap();
-            Some(stylesheet)
-        } else {
-            None
-        }
+    pub fn stylesheet_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+        let path = path.as_ref();
+        diff_paths(&self.stylesheet, path).unwrap()
+    }
+
+    /// Get a relative path to the assets directory.
+    pub fn assets_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+        let path = path.as_ref();
+        diff_paths(&self.assets, path).unwrap()
+    }
+
+    /// Get a relative path to the root index page.
+    pub fn root_index_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+        let path = path.as_ref();
+        diff_paths(self.root.path().join("index.html"), path).unwrap()
     }
 
     /// Add a page to the tree.
@@ -214,10 +248,10 @@ impl DocsTree {
     }
 
     /// Get the Node associated with a path.
-    fn get_node<P: AsRef<Path>>(&self, abs_path: P) -> Option<&Node> {
+    fn get_node<P: AsRef<Path>>(&self, path: P) -> Option<&Node> {
         let root = self.root();
-        let path = abs_path.as_ref();
-        let rel_path = path.strip_prefix(&root.path).unwrap();
+        let path = path.as_ref();
+        let rel_path = path.strip_prefix(&root.path).unwrap_or(path);
 
         let mut current_node = root;
 
@@ -236,43 +270,427 @@ impl DocsTree {
     }
 
     /// Get the page associated with a path.
-    pub fn get_page<P: AsRef<Path>>(&self, abs_path: P) -> Option<Rc<HTMLPage>> {
+    pub fn get_page<P: AsRef<Path>>(&self, abs_path: P) -> Option<&Rc<HTMLPage>> {
         self.get_node(abs_path).and_then(|node| node.page())
     }
 
-    /// Render a sidebar component given a path.
-    ///
-    /// The sidebar will contain a table of contents for the docs directory.
-    /// Every node in the tree will be visited in a Depth First Traversal order.
-    /// If the node has a page associated with it, a link to the page will be
-    /// rendered. If the node does not have a page associated with it, the
-    /// name of the node will be rendered. All links will be relative to the
-    /// given path.
-    pub fn render_sidebar_component<P: AsRef<Path>>(&self, path: P) -> Markup {
-        let root = self.root();
-        let base = path.as_ref().parent().unwrap();
-        let nodes = root.depth_first_traversal();
+    /// Get workflows by category.
+    fn get_workflows_by_category(&self) -> Vec<(String, Vec<&Node>)> {
+        let mut workflows_by_category = Vec::new();
+        let mut categories = HashSet::new();
+        let mut nodes = Vec::new();
 
+        for node in self.root().depth_first_traversal() {
+            if let Some(page) = node.page() {
+                if let PageType::Workflow(workflow) = page.page_type() {
+                    if node
+                        .path()
+                        .strip_prefix(self.root().path())
+                        .expect("path should be in the docs directory")
+                        .iter()
+                        .next()
+                        .expect("path should have a next component")
+                        .to_string_lossy()
+                        == "external"
+                    {
+                        categories.insert("External".to_string());
+                    } else if let Some(category) = workflow.category() {
+                        categories.insert(category);
+                    } else {
+                        categories.insert("Other".to_string());
+                    }
+                    nodes.push(node);
+                }
+            }
+        }
+        let sorted_categories = sort_workflow_categories(categories);
+
+        for category in sorted_categories {
+            let workflows = nodes
+                .iter()
+                .filter(|node| {
+                    let page = node.page().map(|p| p.page_type()).unwrap();
+                    if let PageType::Workflow(workflow) = page {
+                        if node
+                            .path()
+                            .strip_prefix(self.root().path())
+                            .expect("path should have a next component")
+                            .iter()
+                            .next()
+                            .expect("path should have a next component")
+                            .to_string_lossy()
+                            == "external"
+                        {
+                            return category == "External";
+                        } else if let Some(cat) = workflow.category() {
+                            return cat == category;
+                        } else {
+                            return category == "Other";
+                        }
+                    }
+                    unreachable!("Expected a workflow page");
+                })
+                .cloned()
+                .collect::<Vec<_>>();
+            workflows_by_category.push((category, workflows));
+        }
+
+        workflows_by_category
+    }
+
+    /// Render a sidebar component in the "workflows view" mode given a path.
+    fn sidebar_workflows_view(&self, destination: &Path) -> Markup {
+        let base = destination.parent().unwrap();
+        let workflows_by_category = self.get_workflows_by_category();
         html! {
-            div class="top-0 left-0 h-full w-1/6 dark:bg-slate-950 dark:text-white" {
-                h1 class="text-2xl text-center" { "Sidebar" }
-                @for node in nodes {
-                    @match node.page() {
-                        Some(page) => {
-                            @match page.page_type() {
-                                PageType::Index(_) => {
-                                    p { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
-                                }
-                                _ => {
-                                    p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+            @for (category, workflows) in workflows_by_category {
+                li class="px-2" {
+                    div class="flex items-center gap-x-1 text-slate-50" {
+                        img src=(self.assets_relative_to(base).join("category.png").to_string_lossy()) class="w-4 h-4" alt="Category icon";
+                        p class="truncate" { (category) }
+                    }
+                    ul class="" {
+                        @for node in workflows {
+                            li class="px-2 border-l border-gray-500 ml-2" {
+                                @if let Some(page) = node.page() {
+                                    @match page.page_type() {
+                                        PageType::Workflow(wf) => {
+                                            div class="flex items-center gap-x-1" {
+                                                @if destination.starts_with(node.path()) {
+                                                    img src=(self.assets_relative_to(base).join("selected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
+                                                    p class="truncate text-slate-50" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
+                                                } @else {
+                                                    img src=(self.assets_relative_to(base).join("unselected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
+                                                    p class="truncate hover:text-slate-300" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
+                                                }
+                                            }
+                                        }
+                                        _ => {
+                                            p { "ERROR: Not a workflow page" }
+                                        }
+                                    }
                                 }
                             }
                         }
-                        None => {
-                            p class="" { (node.name()) }
-                        }
                     }
                 }
+            }
+        }
+    }
+
+    /// Render a left sidebar component given a path.
+    pub fn render_left_sidebar<P: AsRef<Path>>(&self, path: P) -> Markup {
+        let root = self.root();
+        let path = path.as_ref();
+        let base = path.parent().unwrap();
+
+        fn make_key(path: &Path, root: &Path) -> String {
+            path.strip_prefix(root)
+                .expect("path should be in the docs directory")
+                .to_string_lossy()
+                .to_string()
+                .replace("-", "_")
+                .replace(".", "_")
+                .replace("/", "_")
+        }
+
+        struct JsNode {
+            /// The key of the node.
+            key: String,
+            /// The display name of the node.
+            display_name: String,
+            /// The search name of the node.
+            search_name: String,
+            /// The image of the node.
+            img: String,
+            /// The href of the node.
+            href: Option<String>,
+            /// Whether the node is selected.
+            selected: bool,
+            /// The nest level of the node.
+            nest_level: usize,
+            /// The children of the node.
+            children: Vec<String>,
+        }
+
+        impl JsNode {
+            /// Convert the node to a JavaScript object.
+            fn to_js(&self) -> String {
+                format!(
+                    r#"{{
+                        key: '{}',
+                        display_name: '{}',
+                        search_name: '{}',
+                        img: '{}',
+                        href: {},
+                        selected: {},
+                        nest_level: {}
+                    }}"#,
+                    self.key,
+                    self.display_name,
+                    self.search_name,
+                    self.img,
+                    if let Some(href) = &self.href {
+                        format!("'{}'", href)
+                    } else {
+                        "null".to_string()
+                    },
+                    self.selected,
+                    self.nest_level
+                )
+            }
+        }
+
+        let all_nodes = root
+            .depth_first_traversal()
+            .iter()
+            .skip(1) // Skip the root node
+            .map(|node| {
+                let display_name = match node.page() {
+                    Some(page) => page.name().to_string(),
+                    None => node.name().to_string(),
+                };
+                let search_name = if node.page().is_none() {
+                    "".to_string()
+                } else {
+                    node.path()
+                        .strip_prefix(root.path())
+                        .expect("path should be in the docs directory")
+                        .to_string_lossy()
+                        .to_string()
+                };
+                let key = make_key(node.path(), root.path());
+                let href = match node.page() {
+                    Some(page) => match page.page_type() {
+                        PageType::Index(_) => Some(
+                            diff_paths(node.path().join("index.html"), base)
+                                .unwrap()
+                                .to_string_lossy()
+                                .to_string(),
+                        ),
+                        _ => Some(
+                            diff_paths(node.path(), base)
+                                .unwrap()
+                                .to_string_lossy()
+                                .to_string(),
+                        ),
+                    },
+                    None => None,
+                };
+                let selected = path.starts_with(node.path());
+                let img = match node.page() {
+                    Some(page) => match page.page_type() {
+                        PageType::Task(_) => self
+                            .assets_relative_to(base)
+                            .join(if selected {
+                                "selected-task.png"
+                            } else {
+                                "unselected-task.png"
+                            })
+                            .to_string_lossy()
+                            .to_string(),
+                        PageType::Struct(_) => self
+                            .assets_relative_to(base)
+                            .join(if selected {
+                                "selected-struct.png"
+                            } else {
+                                "unselected-struct.png"
+                            })
+                            .to_string_lossy()
+                            .to_string(),
+                        PageType::Workflow(_) => self
+                            .assets_relative_to(base)
+                            .join(if selected {
+                                "selected-workflow.png"
+                            } else {
+                                "unselected-workflow.png"
+                            })
+                            .to_string_lossy()
+                            .to_string(),
+                        PageType::Index(_) => self
+                            .assets_relative_to(base)
+                            .join(if selected {
+                                "selected-dir.png"
+                            } else {
+                                "unselected-dir.png"
+                            })
+                            .to_string_lossy()
+                            .to_string(),
+                    },
+                    None => self
+                        .assets_relative_to(base)
+                        .join(if selected {
+                            "selected-dir.png"
+                        } else {
+                            "unselected-dir.png"
+                        })
+                        .to_string_lossy()
+                        .to_string(),
+                };
+                let nest_level = node
+                    .path()
+                    .strip_prefix(root.path())
+                    .expect("path should be in the docs directory")
+                    .components()
+                    .count();
+                let children = node
+                    .children()
+                    .values()
+                    .map(|child| make_key(child.path(), root.path()))
+                    .collect::<Vec<String>>();
+                JsNode {
+                    key,
+                    display_name,
+                    search_name: search_name.clone(),
+                    img,
+                    href,
+                    selected,
+                    nest_level,
+                    children,
+                }
+            })
+            .collect::<Vec<JsNode>>();
+
+        let js_dag = all_nodes
+            .iter()
+            .map(|node| {
+                let children = node
+                    .children
+                    .iter()
+                    .map(|child| format!("'{}'", child))
+                    .collect::<Vec<String>>()
+                    .join(", ");
+                format!("'{}': [{}]", node.key, children)
+            })
+            .collect::<Vec<String>>()
+            .join(", ");
+
+        let data = format!(
+            r#"{{
+                show_workflows: $persist(true).using(sessionStorage),
+                search: '',
+                chevron: '{}',
+                nodes: [{}],
+                get searchedNodes() {{
+                    if (this.search === '') {{
+                        return [];
+                    }}
+                    return this.nodes.filter(node => node.search_name.toLowerCase().includes(this.search.toLowerCase()));
+                }},
+                get shownNodes() {{
+                    if (this.search !== '') {{
+                        return [];
+                    }}
+                    return this.nodes.filter(node => this.showSelfCache[node.key]);
+                }},
+                dag: {{{}}},
+                showSelfCache: $persist({{{}}}).using(sessionStorage),
+                showChildrenCache: $persist({{{}}}).using(sessionStorage),
+                children(key) {{
+                    return this.dag[key];
+                }},
+                toggleChildren(key) {{
+                    this.nodes.forEach(n => {{
+                        if (n.key === key) {{
+                            this.showChildrenCache[key] = !this.showChildrenCache[key];
+                            this.children(key).forEach(child => {{
+                                this.setShow(child, this.showChildrenCache[key]);
+                            }});
+                        }}
+                    }});
+                }},
+                setShow(key, value) {{
+                    this.nodes.forEach(n => {{
+                        if (n.key === key) {{
+                            this.showSelfCache[key] = value;
+                            this.showChildrenCache[key] = value;
+                            this.children(key).forEach(child => {{
+                                this.setShow(child, value);
+                            }});
+                        }}
+                    }});
+                }},
+                reset() {{
+                    this.nodes.forEach(n => {{
+                        this.showSelfCache[n.key] = true;
+                        this.showChildrenCache[n.key] = true;
+                    }});
+                }}
+            }}"#,
+            self.assets_relative_to(base)
+                .join("chevron-down.png")
+                .to_string_lossy(),
+            all_nodes
+                .iter()
+                .map(|node| node.to_js())
+                .collect::<Vec<String>>()
+                .join(", "),
+            js_dag,
+            all_nodes
+                .iter()
+                .map(|node| format!("'{}': true", node.key))
+                .collect::<Vec<String>>()
+                .join(", "),
+            all_nodes
+                .iter()
+                .map(|node| format!("'{}': true", node.key))
+                .collect::<Vec<String>>()
+                .join(", "),
+        );
+
+        html! {
+            div x-data=(data) class="flex flex-col gap-y-3 top-0 left-0 h-screen min-w-[269px] text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400 overflow-y-scroll overflow-x-clip" {
+                img src=(self.assets_relative_to(base).join("sprocket-logo.png").to_string_lossy()) class="self-center w-2/3 flex-none mb-4" alt="Sprocket logo";
+                form id="searchbar" class="flex items-center gap-x-2 w-9/10 h-md rounded-md border border-slate-700 px-2 mb-4" {
+                    img src=(self.assets_relative_to(base).join("search.png").to_string_lossy()) class="w-4 h-4" alt="Search icon";
+                    input id="searchbox" x-model="search" type="text" placeholder="Search..." class="w-full h-full text-slate-300";
+                }
+                div class="w-full h-full rounded-md flex flex-col gap-2 pl-2" {
+                    div class="flex items-center gap-x-1 pr-4" {
+                        div x-on:click="show_workflows = true" class="flex grow items-center gap-x-1 border-b" x-bind:class="! show_workflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
+                            img src=(self.assets_relative_to(base).join("list-bullet.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
+                            p { "Workflows" }
+                        }
+                        div x-on:click="show_workflows = false" class="flex grow items-center gap-x-1 border-b" x-bind:class="show_workflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
+                            img src=(self.assets_relative_to(base).join("folder.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
+                            p { "Full Directory" }
+                        }
+                    }
+                    ul x-show="! show_workflows || search != ''" class="" {
+                        li class="flex flex-row items-center gap-x-1 text-slate-50" {
+                            img x-show="search === ''" src=(self.assets_relative_to(base).join("selected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
+                            p x-show="search === ''" class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
+                        }
+                        template x-for="node in shownNodes" {
+                            li class="flex flex-row items-center gap-x-1" {
+                                template x-for="i in Array.from({ length: node.nest_level })" {
+                                    div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-500 mr-2" {}
+                                }
+                                img x-show="showSelfCache[node.key]" x-on:click="toggleChildren(node.key)" x-data="{ hover: false }" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" x-bind:src="hover && (children(node.key).length > 0) ? chevron : node.img" class="w-4 h-4" alt="Node icon";
+                                p x-show="showSelfCache[node.key]" class="truncate" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-300'" { a x-bind:href="node.href" x-text="node.display_name" {} }
+                            }
+                        }
+                        template x-for="node in searchedNodes" {
+                            li class="flex flex-row items-center gap-x-1" {
+                                img x-bind:src="node.img" class="w-4 h-4" alt="Node icon";
+                                p class="truncate" x-bind:class="node.selected ? 'text-slate-50' : 'hover:text-slate-300'" { a x-bind:href="node.href" x-text="node.display_name" {} }
+                            }
+                        }
+                    }
+                    ul x-show="show_workflows && search === ''" class="" {
+                        (self.sidebar_workflows_view(path))
+                    }
+                }
+            }
+        }
+    }
+
+    /// Render a right sidebar component.
+    pub fn render_right_sidebar(&self) -> Markup {
+        html! {
+            div class="top-0 right-0 h-screen min-w-[240px] w-[240px] p-4 bg-red-900 text-white" {
+                h1 class="text-2xl text-center" { "Sidebar" }
+                p class="" { "Right Sidebar" }
             }
         }
     }
@@ -296,7 +714,7 @@ impl DocsTree {
         let root = self.root();
         let index_path = root.path().join("index.html");
 
-        let sidebar = self.render_sidebar_component(&index_path);
+        let left_sidebar = self.render_left_sidebar(&index_path);
         let content = html! {
             div class="" {
                 h3 class="" { "Home" }
@@ -329,10 +747,19 @@ impl DocsTree {
         let html = full_page(
             "Home",
             html! {
-                (sidebar)
-                (content)
+                div class="flex flex-row items-start" {
+                    div class="flex sticky top-0 max-w-1/7" {
+                        (left_sidebar)
+                    }
+                    div class="flex grow p-4 ml-4" {
+                        (content)
+                    }
+                    div class="flex top-0 right-0 sticky" {
+                        (self.render_right_sidebar())
+                    }
+                }
             },
-            self.stylesheet_relative_to(root.path()).as_deref(),
+            self.stylesheet_relative_to(root.path()),
         );
         std::fs::write(index_path, html.into_string())?;
         Ok(())
@@ -354,17 +781,45 @@ impl DocsTree {
 
         let stylesheet =
             self.stylesheet_relative_to(path.parent().expect("path should have a parent"));
-        let sidebar = self.render_sidebar_component(&path);
+        let left_sidebar = self.render_left_sidebar(&path);
 
         let html = full_page(
             page.name(),
             html! {
-                (sidebar)
-                (content)
+                div class="flex flex-row items-start" {
+                    div class="flex sticky top-0 max-w-1/7" {
+                        (left_sidebar)
+                    }
+                    div class="flex grow p-4 ml-4" {
+                        (content)
+                    }
+                    div class="flex top-0 right-0 sticky" {
+                        (self.render_right_sidebar())
+                    }
+                }
             },
-            stylesheet.as_deref(),
+            stylesheet,
         );
         std::fs::write(path, html.into_string())?;
         Ok(())
     }
+}
+
+/// Sort workflow categories in a specific order.
+fn sort_workflow_categories(categories: HashSet<String>) -> Vec<String> {
+    let mut sorted_categories: Vec<String> = categories.into_iter().collect();
+    sorted_categories.sort_by(|a, b| {
+        if a == "External" {
+            std::cmp::Ordering::Greater
+        } else if b == "External" {
+            std::cmp::Ordering::Less
+        } else if a == "Other" {
+            std::cmp::Ordering::Greater
+        } else if b == "Other" {
+            std::cmp::Ordering::Less
+        } else {
+            a.cmp(b)
+        }
+    });
+    sorted_categories
 }
