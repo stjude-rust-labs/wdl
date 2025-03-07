@@ -1,0 +1,6 @@
+error: task `foo` does not have an input named `a`
+   ┌─ tests/validation/hints:11:13
+   │
+11 │             a: hints {
+   │             ^
+

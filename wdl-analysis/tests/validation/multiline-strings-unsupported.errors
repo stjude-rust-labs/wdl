@@ -1,0 +1,18 @@
+error: use of multi-line strings requires WDL version 1.2
+   ┌─ tests/validation/multiline-strings-unsupported:11:14
+   │
+11 │         foo: <<< not supported! >>>
+   │              ^^^^^^^^^^^^^^^^^^^^^^
+
+warning[UnusedDeclaration]: unused declaration `x`
+   ┌─ tests/validation/multiline-strings-unsupported:14:12
+   │
+14 │     String x = <<< not supported! >>>
+   │            ^
+
+error: use of multi-line strings requires WDL version 1.2
+   ┌─ tests/validation/multiline-strings-unsupported:14:16
+   │
+14 │     String x = <<< not supported! >>>
+   │                ^^^^^^^^^^^^^^^^^^^^^^
+

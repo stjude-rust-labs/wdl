@@ -1,16 +1,17 @@
 //! Validation of `env` declarations.
 
-use crate::AstNode;
-use crate::AstToken;
-use crate::Diagnostic;
+use wdl_ast::AstNode;
+use wdl_ast::AstToken;
+use wdl_ast::Diagnostic;
+use wdl_ast::Span;
+use wdl_ast::SupportedVersion;
+use wdl_ast::v1;
+use wdl_ast::version::V1;
+
 use crate::Diagnostics;
-use crate::Document;
-use crate::Span;
-use crate::SupportedVersion;
 use crate::VisitReason;
 use crate::Visitor;
-use crate::v1;
-use crate::version::V1;
+use crate::document::Document;
 
 /// Creates an "env type not primitive" diagnostic.
 fn env_type_not_primitive(env_span: Span, ty: &v1::Type, ty_span: Span) -> Diagnostic {
@@ -49,11 +50,9 @@ pub struct EnvVisitor {
 }
 
 impl Visitor for EnvVisitor {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         version: SupportedVersion,
@@ -66,7 +65,12 @@ impl Visitor for EnvVisitor {
         self.version = Some(version);
     }
 
-    fn bound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &v1::BoundDecl) {
+    fn bound_decl(
+        &mut self,
+        diagnostics: &mut Diagnostics,
+        reason: VisitReason,
+        decl: &v1::BoundDecl,
+    ) {
         // Only visit decls for WDL >=1.2
         if self.version.expect("should have a version") < SupportedVersion::V1(V1::Two) {
             return;
@@ -79,14 +83,14 @@ impl Visitor for EnvVisitor {
         if let Some(env_span) = decl.env().map(|t| t.span()) {
             let ty = decl.ty();
             if let Some(span) = check_type(&ty) {
-                state.add(env_type_not_primitive(env_span, &ty, span));
+                diagnostics.add(env_type_not_primitive(env_span, &ty, span));
             }
         }
     }
 
     fn unbound_decl(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         decl: &v1::UnboundDecl,
     ) {
@@ -102,7 +106,7 @@ impl Visitor for EnvVisitor {
         if let Some(env_span) = decl.env().map(|t| t.span()) {
             let ty = decl.ty();
             if let Some(span) = check_type(&ty) {
-                state.add(env_type_not_primitive(env_span, &ty, span));
+                diagnostics.add(env_type_not_primitive(env_span, &ty, span));
             }
         }
     }

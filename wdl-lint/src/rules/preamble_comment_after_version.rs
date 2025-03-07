@@ -1,15 +1,15 @@
 //! A lint rule for flagging preamble comments which are outside the preamble.
 
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
-use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 
 use crate::Rule;
 use crate::Tag;
@@ -66,11 +66,9 @@ impl Rule for PreambleCommentAfterVersionRule {
 }
 
 impl Visitor for PreambleCommentAfterVersionRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: wdl_ast::SupportedVersion,
@@ -85,7 +83,7 @@ impl Visitor for PreambleCommentAfterVersionRule {
 
     fn version_statement(
         &mut self,
-        _state: &mut Self::State,
+        _diagnostics: &mut Diagnostics,
         reason: VisitReason,
         _stmt: &wdl_ast::VersionStatement,
     ) {
@@ -94,7 +92,7 @@ impl Visitor for PreambleCommentAfterVersionRule {
         }
     }
 
-    fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
+    fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &Comment) {
         if !self.exited_preamble {
             return;
         }
@@ -140,7 +138,7 @@ impl Visitor for PreambleCommentAfterVersionRule {
             current = sibling.next_sibling_or_token();
         }
 
-        state.exceptable_add(
+        diagnostics.exceptable_add(
             preamble_comment_outside_preamble(span),
             SyntaxElement::from(comment.inner().clone()),
             &self.exceptable_nodes(),

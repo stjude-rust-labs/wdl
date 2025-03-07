@@ -1,17 +1,17 @@
 //! A lint rule for ensuring no curly commands are used.
 
 use rowan::ast::support;
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
-use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 use wdl_ast::v1::CommandSection;
 
 use crate::Rule;
@@ -67,11 +67,9 @@ impl Rule for NoCurlyCommandsRule {
 }
 
 impl Visitor for NoCurlyCommandsRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -86,7 +84,7 @@ impl Visitor for NoCurlyCommandsRule {
 
     fn command_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &CommandSection,
     ) {
@@ -99,7 +97,7 @@ impl Visitor for NoCurlyCommandsRule {
             let command_keyword = support::token(section.inner(), SyntaxKind::CommandKeyword)
                 .expect("should have a command keyword token");
 
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 curly_commands(name.text(), command_keyword.text_range().into()),
                 SyntaxElement::from(section.inner().clone()),
                 &self.exceptable_nodes(),

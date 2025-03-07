@@ -1,0 +1,6 @@
+warning[UnusedDeclaration]: unused declaration `x`
+  ┌─ tests/validation/directory-type:7:15
+  │
+7 │     Directory x = "foo"
+  │               ^
+

@@ -2,17 +2,17 @@
 
 use std::cmp::Ordering;
 
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
-use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 use wdl_ast::v1;
 use wdl_ast::v1::PrimitiveType;
 
@@ -227,11 +227,9 @@ impl Rule for InputNotSortedRule {
 }
 
 impl Visitor for InputNotSortedRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -246,7 +244,7 @@ impl Visitor for InputNotSortedRule {
 
     fn input_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         input: &v1::InputSection,
     ) {
@@ -281,7 +279,7 @@ impl Visitor for InputNotSortedRule {
                 .expect("input section should have tokens")
                 .text_range()
                 .into();
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 input_not_sorted(span, input_string),
                 SyntaxElement::from(input.inner().clone()),
                 &self.exceptable_nodes(),

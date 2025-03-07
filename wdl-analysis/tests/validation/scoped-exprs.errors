@@ -1,0 +1,314 @@
+error: task `ok` does not have an input named `foo`
+   ┌─ tests/validation/scoped-exprs:16:13
+   │
+16 │             foo: hints {
+   │             ^^^
+
+error: task `ok` does not have an input named `baz`
+   ┌─ tests/validation/scoped-exprs:21:13
+   │
+21 │             baz.bar.qux: hints {
+   │             ^^^
+
+error: task `ok` does not have an output named `foo`
+   ┌─ tests/validation/scoped-exprs:30:13
+   │
+30 │             foo: hints {
+   │             ^^^
+
+error: task `ok` does not have an output named `baz`
+   ┌─ tests/validation/scoped-exprs:35:13
+   │
+35 │             baz.bar.qux: hints {
+   │             ^^^
+
+warning[UnusedDeclaration]: unused declaration `a`
+   ┌─ tests/validation/scoped-exprs:47:9
+   │
+47 │     Int a = hints {
+   │         ^
+
+error: `hints` literals can only be used within a hints section
+   ┌─ tests/validation/scoped-exprs:47:13
+   │
+47 │     Int a = hints {
+   │             ^^^^^
+
+warning[UnusedDeclaration]: unused declaration `b`
+   ┌─ tests/validation/scoped-exprs:51:9
+   │
+51 │     Int b = input {
+   │         ^
+
+error: `input` literals can only be used within a hints section
+   ┌─ tests/validation/scoped-exprs:51:13
+   │
+51 │     Int b = input {
+   │             ^^^^^
+
+warning[UnusedDeclaration]: unused declaration `c`
+   ┌─ tests/validation/scoped-exprs:55:9
+   │
+55 │     Int c = output {
+   │         ^
+
+error: `output` literals can only be used within a hints section
+   ┌─ tests/validation/scoped-exprs:55:13
+   │
+55 │     Int c = output {
+   │             ^^^^^^
+
+error: `hints` literals cannot be nested within `hints` literals
+   ┌─ tests/validation/scoped-exprs:61:18
+   │
+60 │         ok: hints {
+   │             ----- the outer `hints` literal is here
+61 │             bad: hints {
+   │                  ^^^^^ this `hints` literal cannot be nested
+
+error: `input` literals cannot be nested within `hints` literals
+   ┌─ tests/validation/scoped-exprs:62:22
+   │
+61 │             bad: hints {
+   │                  ----- the outer `hints` literal is here
+62 │                 bad: input {
+   │                      ^^^^^ this `input` literal cannot be nested
+
+error: task `bad` does not have an input named `bad`
+   ┌─ tests/validation/scoped-exprs:63:21
+   │
+63 │                     bad: output {
+   │                     ^^^
+
+error: `output` literals cannot be nested within `input` literals
+   ┌─ tests/validation/scoped-exprs:63:26
+   │
+62 │                 bad: input {
+   │                      ----- the outer `input` literal is here
+63 │                     bad: output {
+   │                          ^^^^^^ this `output` literal cannot be nested
+
+error: type mismatch: expected type `hints`, but found type `output`
+   ┌─ tests/validation/scoped-exprs:63:26
+   │  
+63 │                       bad: output {
+   │                       --- this expects type `hints`
+   │ ╭──────────────────────────^
+64 │ │ 
+65 │ │                     }
+   │ ╰─────────────────────^ this is type `output`
+
+error: task `bad` does not have an input named `ok`
+   ┌─ tests/validation/scoped-exprs:70:13
+   │
+70 │             ok: hints {
+   │             ^^
+
+error: `hints` literals cannot be nested within `hints` literals
+   ┌─ tests/validation/scoped-exprs:71:22
+   │
+70 │             ok: hints {
+   │                 ----- the outer `hints` literal is here
+71 │                 bad: hints {
+   │                      ^^^^^ this `hints` literal cannot be nested
+
+error: task `bad` does not have an input named `inputs`
+   ┌─ tests/validation/scoped-exprs:75:13
+   │
+75 │             inputs: input {
+   │             ^^^^^^
+
+error: `input` literals cannot be nested within `input` literals
+   ┌─ tests/validation/scoped-exprs:75:21
+   │
+69 │         inputs: input {
+   │                 ----- the outer `input` literal is here
+   ·
+75 │             inputs: input {
+   │                     ^^^^^ this `input` literal cannot be nested
+
+error: type mismatch: expected type `hints`, but found type `input`
+   ┌─ tests/validation/scoped-exprs:75:21
+   │  
+75 │               inputs: input {
+   │               ------ this expects type `hints`
+   │ ╭─────────────────────^
+76 │ │                 a: input {
+77 │ │ 
+78 │ │                 },
+   · │
+92 │ │                 },
+93 │ │             }
+   │ ╰─────────────^ this is type `input`
+
+error: task `bad` does not have an input named `a`
+   ┌─ tests/validation/scoped-exprs:76:17
+   │
+76 │                 a: input {
+   │                 ^
+
+error: `input` literals cannot be nested within `input` literals
+   ┌─ tests/validation/scoped-exprs:76:20
+   │
+75 │             inputs: input {
+   │                     ----- the outer `input` literal is here
+76 │                 a: input {
+   │                    ^^^^^ this `input` literal cannot be nested
+
+error: type mismatch: expected type `hints`, but found type `input`
+   ┌─ tests/validation/scoped-exprs:76:20
+   │  
+76 │                   a: input {
+   │                   - this expects type `hints`
+   │ ╭────────────────────^
+77 │ │ 
+78 │ │                 },
+   │ ╰─────────────────^ this is type `input`
+
+error: task `bad` does not have an input named `b`
+   ┌─ tests/validation/scoped-exprs:79:17
+   │
+79 │                 b: hints {
+   │                 ^
+
+error: `hints` literals cannot be nested within `input` literals
+   ┌─ tests/validation/scoped-exprs:79:20
+   │
+75 │             inputs: input {
+   │                     ----- the outer `input` literal is here
+   ·
+79 │                 b: hints {
+   │                    ^^^^^ this `hints` literal cannot be nested
+
+error: `input` literals cannot be nested within `hints` literals
+   ┌─ tests/validation/scoped-exprs:80:24
+   │
+79 │                 b: hints {
+   │                    ----- the outer `hints` literal is here
+80 │                     a: input {
+   │                        ^^^^^ this `input` literal cannot be nested
+
+error: `output` literals cannot be nested within `hints` literals
+   ┌─ tests/validation/scoped-exprs:83:24
+   │
+79 │                 b: hints {
+   │                    ----- the outer `hints` literal is here
+   ·
+83 │                     b: output {
+   │                        ^^^^^^ this `output` literal cannot be nested
+
+error: `hints` literals cannot be nested within `hints` literals
+   ┌─ tests/validation/scoped-exprs:86:24
+   │
+79 │                 b: hints {
+   │                    ----- the outer `hints` literal is here
+   ·
+86 │                     c: hints {
+   │                        ^^^^^ this `hints` literal cannot be nested
+
+error: task `bad` does not have an input named `c`
+   ┌─ tests/validation/scoped-exprs:90:17
+   │
+90 │                 c: output {
+   │                 ^
+
+error: `output` literals cannot be nested within `input` literals
+   ┌─ tests/validation/scoped-exprs:90:20
+   │
+75 │             inputs: input {
+   │                     ----- the outer `input` literal is here
+   ·
+90 │                 c: output {
+   │                    ^^^^^^ this `output` literal cannot be nested
+
+error: type mismatch: expected type `hints`, but found type `output`
+   ┌─ tests/validation/scoped-exprs:90:20
+   │  
+90 │                   c: output {
+   │                   - this expects type `hints`
+   │ ╭────────────────────^
+91 │ │ 
+92 │ │                 },
+   │ ╰─────────────────^ this is type `output`
+
+error: task `bad` does not have an output named `a`
+   ┌─ tests/validation/scoped-exprs:96:13
+   │
+96 │             a: input {
+   │             ^
+
+error: `input` literals cannot be nested within `output` literals
+   ┌─ tests/validation/scoped-exprs:96:16
+   │
+95 │         outputs: output {
+   │                  ------ the outer `output` literal is here
+96 │             a: input {
+   │                ^^^^^ this `input` literal cannot be nested
+
+error: type mismatch: expected type `hints`, but found type `input`
+   ┌─ tests/validation/scoped-exprs:96:16
+   │  
+96 │               a: input {
+   │               - this expects type `hints`
+   │ ╭────────────────^
+97 │ │ 
+98 │ │             },
+   │ ╰─────────────^ this is type `input`
+
+error: task `bad` does not have an output named `b`
+   ┌─ tests/validation/scoped-exprs:99:13
+   │
+99 │             b: hints {
+   │             ^
+
+error: `input` literals cannot be nested within `hints` literals
+    ┌─ tests/validation/scoped-exprs:100:20
+    │
+ 99 │             b: hints {
+    │                ----- the outer `hints` literal is here
+100 │                 a: input {
+    │                    ^^^^^ this `input` literal cannot be nested
+
+error: `output` literals cannot be nested within `hints` literals
+    ┌─ tests/validation/scoped-exprs:103:20
+    │
+ 99 │             b: hints {
+    │                ----- the outer `hints` literal is here
+    ·
+103 │                 b: output {
+    │                    ^^^^^^ this `output` literal cannot be nested
+
+error: `hints` literals cannot be nested within `hints` literals
+    ┌─ tests/validation/scoped-exprs:106:20
+    │
+ 99 │             b: hints {
+    │                ----- the outer `hints` literal is here
+    ·
+106 │                 c: hints {
+    │                    ^^^^^ this `hints` literal cannot be nested
+
+error: task `bad` does not have an output named `c`
+    ┌─ tests/validation/scoped-exprs:110:13
+    │
+110 │             c: output {
+    │             ^
+
+error: `output` literals cannot be nested within `output` literals
+    ┌─ tests/validation/scoped-exprs:110:16
+    │
+ 95 │         outputs: output {
+    │                  ------ the outer `output` literal is here
+    ·
+110 │             c: output {
+    │                ^^^^^^ this `output` literal cannot be nested
+
+error: type mismatch: expected type `hints`, but found type `output`
+    ┌─ tests/validation/scoped-exprs:110:16
+    │  
+110 │               c: output {
+    │               - this expects type `hints`
+    │ ╭────────────────^
+111 │ │ 
+112 │ │             }
+    │ ╰─────────────^ this is type `output`
+

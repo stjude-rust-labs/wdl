@@ -4,11 +4,11 @@ use std::process::Command;
 use std::process::Stdio;
 
 use strsim::levenshtein;
+use wdl_analysis::rules as analysis_rules;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::SyntaxKind;
 
-use crate::RESERVED_RULE_IDS;
 use crate::rules::RULE_MAP;
 
 /// Detect if a comment is in-line or not by looking for `\n` in the prior
@@ -112,7 +112,7 @@ pub fn find_nearest_rule(unknown_rule_id: &str) -> Option<&'static str> {
     RULE_MAP
         .keys()
         .copied()
-        .chain(RESERVED_RULE_IDS.iter().copied())
+        .chain(analysis_rules().iter().map(|rule| rule.id()))
         .map(|rule_id| (rule_id, levenshtein(unknown_rule_id, rule_id)))
         .filter(|(_, distance)| *distance <= threshold)
         .min_by_key(|(_, distance)| *distance)

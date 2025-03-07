@@ -4,16 +4,16 @@
 //! This check only occurs if the `container` key exists in the
 //! `runtime`/`requirements` sections.
 
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
-use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 use wdl_ast::v1::RequirementsSection;
 use wdl_ast::v1::RuntimeSection;
 use wdl_ast::v1::common::container::Kind;
@@ -146,15 +146,13 @@ impl Rule for ContainerValue {
 }
 
 impl Visitor for ContainerValue {
-    type State = Diagnostics;
-
-    fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document, _: SupportedVersion) {
+    fn document(&mut self, _: &mut Diagnostics, _: VisitReason, _: &Document, _: SupportedVersion) {
         // This callback is intentionally empty.
     }
 
     fn runtime_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &RuntimeSection,
     ) {
@@ -165,7 +163,7 @@ impl Visitor for ContainerValue {
         if let Some(container) = section.container() {
             if let Ok(value) = container.value() {
                 check_container_value(
-                    state,
+                    diagnostics,
                     value,
                     SyntaxElement::from(section.inner().clone()),
                     &self.exceptable_nodes(),
@@ -176,7 +174,7 @@ impl Visitor for ContainerValue {
 
     fn requirements_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &RequirementsSection,
     ) {
@@ -187,7 +185,7 @@ impl Visitor for ContainerValue {
         if let Some(container) = section.container() {
             if let Ok(value) = container.value() {
                 check_container_value(
-                    state,
+                    diagnostics,
                     value,
                     SyntaxElement::from(section.inner().clone()),
                     &self.exceptable_nodes(),
@@ -200,14 +198,14 @@ impl Visitor for ContainerValue {
 /// Examines the value of the `container` item in both the `runtime` and
 /// `requirements` sections.
 fn check_container_value(
-    state: &mut Diagnostics,
+    diagnostics: &mut Diagnostics,
     value: Value,
     syntax: SyntaxElement,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
     if let Kind::Array(array) = value.kind() {
         if array.is_empty() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 empty_array(value.expr().span()),
                 syntax.clone(),
                 exceptable_nodes,
@@ -216,7 +214,7 @@ fn check_container_value(
             // SAFETY: we just checked to ensure that exactly one element exists in the
             // vec, so this will always unwrap.
             let uri = array.iter().next().unwrap();
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 array_to_string_literal(uri.literal_string().span()),
                 syntax.clone(),
                 exceptable_nodes,
@@ -225,7 +223,7 @@ fn check_container_value(
             let mut anys = array.iter().filter(|uri| uri.kind().is_any()).peekable();
 
             if anys.peek().is_some() {
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     array_containing_anys(anys.map(|any| any.literal_string().span())),
                     syntax.clone(),
                     exceptable_nodes,
@@ -237,13 +235,13 @@ fn check_container_value(
     for uri in value.uris() {
         if let Some(entry) = uri.kind().as_entry() {
             if entry.tag().is_none() {
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     missing_tag(uri.literal_string().span()),
                     syntax.clone(),
                     exceptable_nodes,
                 );
             } else if !entry.immutable() {
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     mutable_tag(uri.literal_string().span()),
                     syntax.clone(),
                     exceptable_nodes,
