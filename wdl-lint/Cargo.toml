@@ -13,6 +13,7 @@ readme = "../README.md"
 
 [dependencies]
 wdl-ast = { path = "../wdl-ast", version = "0.10.0" }
+wdl-analysis = { path = "../wdl-analysis", version = "0.6.0" }
 anyhow = { workspace = true }
 convert_case = { workspace = true }
 ftree = { workspace = true }
