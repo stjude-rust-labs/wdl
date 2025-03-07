@@ -16,7 +16,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * `fix` messages suggest the correct order of imports to the user in `ImportSort` rule ([#332](https://github.com/stjude-rust-labs/wdl/pull/332)).
 
-
 ### Fixed
 
 * Fixed misplacement of highlighted spans for some ShellCheck lints ([#317](https://github.com/stjude-rust-labs/wdl/pull/317)).
