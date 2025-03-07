@@ -111,9 +111,7 @@ impl Visitor for ImportSortRule {
             a_uri.as_str().cmp(b_uri.as_str())
         });
 
-        // Check if sorting is needed
         if imports != sorted_imports {
-            // Find the first out-of-order import
             let span = imports
                 .first()
                 .expect("there should be at least one import")
