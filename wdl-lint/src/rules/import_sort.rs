@@ -1,15 +1,14 @@
-//! A lint rule for ensuring that imports are sorted lexicographically.//!
-
-use std::collections::HashMap;
+//! A lint rule for ensuring that imports are sorted lexicographically.
 
 use wdl_ast::AstNode;
+use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::SyntaxNode;
 use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -23,13 +22,15 @@ use crate::TagSet;
 const ID: &str = "ImportSort";
 
 /// Creates an import not sorted diagnostic.
-fn import_not_sorted(span: Span) -> Diagnostic {
+fn import_not_sorted(span: Span, sorted_imports: String) -> Diagnostic {
     Diagnostic::note("imports are not sorted lexicographically")
         .with_rule(ID)
         .with_highlight(span)
-        .with_fix("sort the imports lexicographically") // TODO: Provide the correct sorting
+        .with_fix(format!(
+            "sort the imports lexicographically:\n{}",
+            sorted_imports
+        ))
 }
-
 /// Creates an improper comment diagnostic.
 fn improper_comment(span: Span) -> Diagnostic {
     Diagnostic::note("comments are not allowed within an import statement")
@@ -38,6 +39,9 @@ fn improper_comment(span: Span) -> Diagnostic {
         .with_fix("remove the comment from the import statement")
 }
 
+fn normalize(s: &str) -> String {
+    s.split_whitespace().collect::<Vec<_>>().join(" ") // Remove extra spaces/tabs
+}
 /// Detects imports that are not sorted lexicographically.
 #[derive(Default, Debug, Clone, Copy)]
 pub struct ImportSortRule;
@@ -59,11 +63,11 @@ impl Rule for ImportSortRule {
     }
 
     fn tags(&self) -> TagSet {
-        TagSet::new(&[Tag::Style, Tag::Clarity])
+        TagSet::new(&[Tag::Style, Tag::Clarity, Tag::Sorting])
     }
 
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
-        Some(&[SyntaxKind::VersionStatementNode])
+        Some(&[SyntaxKind::ImportStatementNode])
     }
 }
 
@@ -81,72 +85,67 @@ impl Visitor for ImportSortRule {
             return;
         }
 
-        // Reset the visitor upon document entry
         *self = Default::default();
 
-        let imports = doc
+        // Collect all import statements
+        let imports: Vec<_> = doc
             .syntax()
             .children_with_tokens()
-            .filter(|c| c.kind() == SyntaxKind::ImportStatementNode)
-            .map(|c| c.into_node().unwrap())
-            .collect::<Vec<_>>();
-        let imports_cmp = imports.clone();
-        let mut prev_import: Option<SyntaxNode> = None;
-        for import in imports {
-            if let Some(prev) = prev_import {
-                if import.text().to_string() < prev.text().to_string() {
-                    let mut import_map: HashMap<String, SyntaxNode> = HashMap::new();
+            .filter_map(|c| c.into_node())
+            .filter(|n| n.kind() == SyntaxKind::ImportStatementNode)
+            .collect();
 
-                    for import_in in imports_cmp {
-                        let import_text = import_in.text().to_string();
-                        let key = import_text.split('"').nth(1).unwrap_or("").to_string();
-                        import_map.insert(key, import_in.clone());
-                    }
-                    let mut keys: Vec<String> = import_map.keys().cloned().collect();
-                    keys.sort();
-                    let sorted_imports: Vec<SyntaxNode> =
-                        keys.iter().map(|k| import_map[k].clone()).collect();
-                    // Since this rule can only be excepted in a document-wide fashion,
-                    // if the rule is running we can directly add the diagnostic
-                    // without checking for the exceptable nodes
-                    let sorted_imports_text: Vec<String> = sorted_imports
-                        .iter()
-                        .map(|i| i.text().to_string())
-                        .collect();
-                    let stripped_sorted_imports_text: Vec<String> = sorted_imports_text
-                        .iter()
-                        .map(|s| {
-                            let mut parts = s.split_whitespace();
-                            let mut stripped = String::new();
-                            if let Some(first) = parts.next() {
-                                stripped.push_str(first);
-                                stripped.push(' '); // Add a whitespace after "import"
-                            }
-                            let mut in_quotes = false;
-                            for part in parts {
-                                if part.starts_with('"') {
-                                    in_quotes = true;
-                                }
-                                if in_quotes {
-                                    stripped.push_str(part);
-                                    stripped.push(' ');
-                                }
-                            }
-                            stripped = stripped.trim_end().to_string();
+        if imports.is_empty() {
+            return;
+        }
 
-                            stripped
-                        })
-                        .collect();
-                    state.add(
-                        import_not_sorted(import.text_range().to_span()).with_fix(format!(
-                            "sort the imports lexicographically:\n{}",
-                            stripped_sorted_imports_text.join("\n")
-                        )),
-                    );
-                    return; // Only report one sorting diagnostic at a time.
-                }
-            }
-            prev_import = Some(import);
+        // Clone imports for comparison
+        let mut sorted_imports = imports.clone();
+        sorted_imports.sort_by(|a, b| {
+            let a_uri = ImportStatement::cast(a.clone())
+                .expect("import statement")
+                .uri()
+                .text()
+                .expect("import uri");
+            let b_uri = ImportStatement::cast(b.clone())
+                .expect("import statement")
+                .uri()
+                .text()
+                .expect("import uri");
+            normalize(&a_uri.as_str());
+            normalize(&b_uri.as_str());
+            a_uri.as_str().cmp(b_uri.as_str())
+        });
+
+        // Check if sorting is needed
+        if imports != sorted_imports {
+            // Find the first out-of-order import
+            let first_out_of_order = sorted_imports
+                .iter()
+                .find(|sorted_import| {
+                    let original_position = imports.iter().position(|orig| orig == *sorted_import);
+                    let sorted_position = sorted_imports.iter().position(|sorted| sorted == *sorted_import);
+                    original_position != sorted_position
+                })
+                .unwrap();
+
+            let span = imports
+                .iter()
+                .find(|orig| **orig == *first_out_of_order)
+                .unwrap()
+                .text_range()
+                .to_span();
+            let sorted_imports_text = sorted_imports
+                .iter()
+                .map(|import| import.text().to_string())
+                .collect::<Vec<_>>()
+                .join("\n");
+
+            state.exceptable_add(
+                import_not_sorted(span, sorted_imports_text),
+                SyntaxElement::from(imports.first().unwrap().clone()),
+                &self.exceptable_nodes(),
+            );
         }
     }
 

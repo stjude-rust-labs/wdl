@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * `fix` messages suggest the correct order of imports to the user in `ImportSort` rule, along with correction of any errors if any ([#332](https://github.com/stjude-rust-labs/wdl/pull/332)).
-* Updated the `source.errors` to show the appropriate errors and the fix that has been changed to give the right import order.
 
 ### Fixed
 
@@ -159,4 +158,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added the `wdl-lint` as the crate implementing linting rules for the future
   ([#68](https://github.com/stjude-rust-labs/wdl/pull/68)).
 
-## [Unreleased]

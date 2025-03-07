@@ -5,13 +5,14 @@ note[ImportSort]: imports are not sorted lexicographically
   │ ^^^^^^^^^^^^^
   │
   = fix: sort the imports lexicographically:
-    import "bar"
-    import "baz"
-    import "chuk" as something
-    import "corge" as grault
+    import  "bar"
+    import	"baz"
+    import "chuk"        as something
+    import  # BAD (comment within statement)
+    "corge" as grault
     import "foo" as foo
-    import "lorem" as ipsum
-    import "qux" alias jabber as quux
+    import "lorem" as 	ipsum
+    import   "qux"  alias   jabber    as    quux
 
 note[ImportWhitespace]: improper whitespace in import statement
   ┌─ tests/lints/within-import-whitespace/source.wdl:9:7
