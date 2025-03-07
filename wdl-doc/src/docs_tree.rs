@@ -282,21 +282,15 @@ impl DocsTree {
         html! {
             div class="top-0 border left-0 h-full w-1/6 p-4 dark:bg-slate-900 dark:text-white" {
                 h1 class="text-2xl text-center" { "Sidebar" }
-                @for node in nodes {
-                    @match node.page() {
-                        Some(page) => {
-                            @match page.page_type() {
-                                PageType::Index(_) => {
-                                    p { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
-                                }
-                                _ => {
-                                    p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
-                                }
-                            }
+                p class="" { (root.name()) }
+                ul class="" {
+                    @for node in root.children().values() {
+                        @if node.name() != "external" {
+                            li class="px-2" { (sidebar_recurse(node, base)) }
                         }
-                        None => {
-                            p class="" { (node.name()) }
-                        }
+                    }
+                    @if let Some(external) = root.children().get("external") {
+                        li class="px-2" { (sidebar_recurse(external, base)) }
                     }
                 }
             }
