@@ -107,27 +107,19 @@ pub fn strip_newline(s: &str) -> Option<&str> {
 /// Finds the nearest rule ID to the given unknown rule ID,
 /// or `None` if no rule ID is close enough.
 pub fn find_nearest_rule(unknown_rule_id: &str) -> Option<&'static str> {
-    // Collect all known rule IDs
-    let all_rule_ids: Vec<&'static str> = RULE_MAP
+    let threshold = calculate_threshold(unknown_rule_id.len());
+
+    RULE_MAP
         .keys()
         .copied()
         .chain(RESERVED_RULE_IDS.iter().copied())
-        .collect();
-
-    // Calculate threshold based on input length
-    let threshold = calculate_threshold(unknown_rule_id.len());
-
-    // Find rule with smallest Levenshtein distance
-    all_rule_ids
-        .into_iter()
         .map(|rule_id| (rule_id, levenshtein(unknown_rule_id, rule_id)))
         .filter(|(_, distance)| *distance <= threshold)
         .min_by_key(|(_, distance)| *distance)
         .map(|(rule_id, _)| rule_id)
 }
 
-/// Calculates a reasonable threshold for string similarity based on the input
-/// length.
+/// Calculates a threshold for string similarity based on input length.
 fn calculate_threshold(input_len: usize) -> usize {
     if input_len <= 3 {
         return 1;
