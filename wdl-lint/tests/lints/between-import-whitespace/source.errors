@@ -28,6 +28,12 @@ note[ImportWhitespace]: blank lines are not allowed between imports
    │  
    = fix: remove blank lines between imports
 
+error: failed to import `vom.wdl`: No such file or directory (os error 2)
+   ┌─ tests/lints/between-import-whitespace/source.wdl:12:8
+   │
+12 │ import "vom.wdl"  # OK
+   │        ^^^^^^^^^
+
 note[ImportWhitespace]: blank lines are not allowed between imports
    ┌─ tests/lints/between-import-whitespace/source.wdl:12:23
    │  
