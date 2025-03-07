@@ -38,11 +38,6 @@ fn improper_comment(span: Span) -> Diagnostic {
         .with_fix("remove the comment from the import statement")
 }
 
-/// Removes extra whitespace from a string by replacing multiple spaces with a
-/// single space.
-fn normalize(s: &str) -> String {
-    s.split_whitespace().collect::<Vec<_>>().join(" ")
-}
 /// Detects imports that are not sorted lexicographically.
 #[derive(Default, Debug, Clone, Copy)]
 pub struct ImportSortRule;
@@ -68,7 +63,7 @@ impl Rule for ImportSortRule {
     }
 
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
-        Some(&[SyntaxKind::ImportStatementNode])
+        Some(&[SyntaxKind::VersionStatementNode])
     }
 }
 
@@ -92,8 +87,8 @@ impl Visitor for ImportSortRule {
         let imports: Vec<_> = doc
             .syntax()
             .children_with_tokens()
-            .filter_map(|c| c.into_node())
             .filter(|n| n.kind() == SyntaxKind::ImportStatementNode)
+            .filter_map(|c| c.into_node())
             .collect();
 
         if imports.is_empty() {
@@ -113,8 +108,6 @@ impl Visitor for ImportSortRule {
                 .uri()
                 .text()
                 .expect("import uri");
-            normalize(a_uri.as_str());
-            normalize(b_uri.as_str());
             a_uri.as_str().cmp(b_uri.as_str())
         });
 
