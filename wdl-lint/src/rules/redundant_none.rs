@@ -25,7 +25,7 @@ fn redundant_none_assignment(span: Span, name: &str) -> Diagnostic {
 }
 
 #[derive(Default, Debug, Clone, Copy)]
-pub struct RedundantNoneAssignment(Option<SupportedVersion>);
+pub struct RedundantNoneAssignment;
 
 impl Rule for RedundantNoneAssignment {
     fn id(&self) -> &'static str {
