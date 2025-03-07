@@ -7,6 +7,7 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
@@ -54,7 +55,7 @@ impl Rule for ImportSortRule {
     fn explanation(&self) -> &'static str {
         "Imports should be sorted lexicographically to make it easier to find specific imports. \
          This rule ensures that imports are sorted in a consistent manner. Specifically, the \
-         desired sort can be achieved with a GNU compliant `sort` and `LC_COLLATE=C`. No comments \
+         desired sort can be acheived with a GNU compliant `sort` and `LC_COLLATE=C`. No comments \
          are permitted within an import statement."
     }
 
@@ -137,7 +138,11 @@ impl Visitor for ImportSortRule {
                 .collect::<Vec<_>>()
                 .join("\n");
 
-            state.add(import_not_sorted(span, sorted_imports_text));
+            state.exceptable_add(
+                import_not_sorted(span, sorted_imports_text),
+                SyntaxElement::from(imports.first().unwrap().clone()),
+                &self.exceptable_nodes(),
+            );
         }
     }
 

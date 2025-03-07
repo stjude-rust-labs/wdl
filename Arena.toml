@@ -182,46 +182,6 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:35:12: warning: missing required call input `base_file_name` for task `FastqToUnmappedBam`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L35"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:35:12: warning: missing required call input `docker` for task `FastqToUnmappedBam`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L35"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:35:12: warning: missing required call input `flowcell_name` for task `FastqToUnmappedBam`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L35"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:35:12: warning: missing required call input `library_name` for task `FastqToUnmappedBam`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L35"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:35:12: warning: missing required call input `r1_fastq` for task `FastqToUnmappedBam`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L35"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:35:12: warning: missing required call input `r2_fastq` for task `FastqToUnmappedBam`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L35"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:35:12: warning: missing required call input `sample_name` for task `FastqToUnmappedBam`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L35"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:35:12: warning: missing required call input `sequencing_center` for task `FastqToUnmappedBam`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L35"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "ww-fastq-to-cram.wdl:35:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L35"
 
@@ -242,26 +202,6 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:48:10: warning: missing required call input `bams_to_merge` for task `MergeBamsToCram`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L48"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:48:10: warning: missing required call input `base_file_name` for task `MergeBamsToCram`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L48"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:48:10: warning: missing required call input `docker` for task `MergeBamsToCram`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L48"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:48:10: warning: missing required call input `threads` for task `MergeBamsToCram`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L48"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "ww-fastq-to-cram.wdl:48:116: note[CallInputSpacing]: call input not properly spaced"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L48"
 
@@ -279,21 +219,6 @@ permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
 message = "ww-fastq-to-cram.wdl:53:19: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L53"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:56:10: warning: missing required call input `base_file_name` for task `ValidateCram`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L56"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:56:10: warning: missing required call input `docker` for task `ValidateCram`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L56"
-
-[[diagnostics]]
-document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
-message = "ww-fastq-to-cram.wdl:56:10: warning: missing required call input `unmapped_cram` for task `ValidateCram`"
-permalink = "https://github.com/getwilds/ww-fastq-to-cram/blob/2d1e1989a57402642c06d15f4b623ac66fd9ed7d/ww-fastq-to-cram.wdl/#L56"
 
 [[diagnostics]]
 document = "getwilds/ww-fastq-to-cram:/ww-fastq-to-cram.wdl"
@@ -467,53 +392,13 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:27:8: warning: missing required call input `reference_gtf` for task `CollapseGTF`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L27"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
 message = "ww-star-deseq2.wdl:32:24: note[CallInputSpacing]: call input not properly spaced"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L32"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:32:8: warning: missing required call input `reference_fasta` for task `BuildSTARIndex`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L32"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:32:8: warning: missing required call input `reference_gtf` for task `BuildSTARIndex`"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L32"
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
 message = "ww-star-deseq2.wdl:35:40: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L35"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:39:10: warning: missing required call input `base_file_name` for task `STARalignTwoPass`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L39"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:39:10: warning: missing required call input `r1fastq` for task `STARalignTwoPass`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L39"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:39:10: warning: missing required call input `r2fastq` for task `STARalignTwoPass`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L39"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:39:10: warning: missing required call input `ref_genome_name` for task `STARalignTwoPass`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L39"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:39:10: warning: missing required call input `star_genome_tar` for task `STARalignTwoPass`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L39"
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
@@ -524,26 +409,6 @@ permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
 message = "ww-star-deseq2.wdl:45:44: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L45"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:48:10: warning: missing required call input `bam_file` for task `RNASeQC`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L48"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:48:10: warning: missing required call input `bam_index` for task `RNASeQC`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L48"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:48:10: warning: missing required call input `base_file_name` for task `RNASeQC`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L48"
-
-[[diagnostics]]
-document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
-message = "ww-star-deseq2.wdl:48:10: warning: missing required call input `ref_gtf` for task `RNASeQC`"
-permalink = "https://github.com/getwilds/ww-star-deseq2/blob/eb2efc50a94fd9e9579775acbf776d20ea2da0d1/ww-star-deseq2.wdl/#L48"
 
 [[diagnostics]]
 document = "getwilds/ww-star-deseq2:/ww-star-deseq2.wdl"
@@ -677,26 +542,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:110:10: warning: missing required call input `docker` for task `MarkDuplicates`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L110"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:110:10: warning: missing required call input `input_bam` for task `MarkDuplicates`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L110"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:110:10: warning: missing required call input `metrics_filename` for task `MarkDuplicates`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L110"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:110:10: warning: missing required call input `output_bam_basename` for task `MarkDuplicates`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L110"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:110:26: note[CallInputSpacing]: call input not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L110"
 
@@ -712,66 +557,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:10: warning: missing required call input `base_file_name` for task `ApplyBaseRecalibrator`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L119"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:10: warning: missing required call input `dbSNP_vcf_index` for task `ApplyBaseRecalibrator`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L119"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:10: warning: missing required call input `dbSNP_vcf` for task `ApplyBaseRecalibrator`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L119"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:10: warning: missing required call input `docker` for task `ApplyBaseRecalibrator`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L119"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:10: warning: missing required call input `input_bam_index` for task `ApplyBaseRecalibrator`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L119"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:10: warning: missing required call input `input_bam` for task `ApplyBaseRecalibrator`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L119"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:10: warning: missing required call input `intervals` for task `ApplyBaseRecalibrator`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L119"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:10: warning: missing required call input `known_indels_sites_VCFs` for task `ApplyBaseRecalibrator`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L119"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:10: warning: missing required call input `known_indels_sites_indices` for task `ApplyBaseRecalibrator`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L119"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:10: warning: missing required call input `ref_dict` for task `ApplyBaseRecalibrator`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L119"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:10: warning: missing required call input `ref_fasta_index` for task `ApplyBaseRecalibrator`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L119"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:119:10: warning: missing required call input `ref_fasta` for task `ApplyBaseRecalibrator`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L119"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:119:33: note[CallInputSpacing]: call input not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L119"
 
@@ -779,31 +564,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:132:18: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L132"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:135:10: warning: missing required call input `base_file_name` for task `bedToolsQC`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L135"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:135:10: warning: missing required call input `bed_file` for task `bedToolsQC`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L135"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:135:10: warning: missing required call input `docker` for task `bedToolsQC`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L135"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:135:10: warning: missing required call input `genome_sort_order` for task `bedToolsQC`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L135"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:135:10: warning: missing required call input `input_bam` for task `bedToolsQC`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L135"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
@@ -819,36 +579,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:141:18: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L141"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:144:10: warning: missing required call input `base_file_name` for task `CollectHsMetrics`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L144"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:144:10: warning: missing required call input `docker` for task `CollectHsMetrics`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L144"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:144:10: warning: missing required call input `input_bam` for task `CollectHsMetrics`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L144"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:144:10: warning: missing required call input `intervals` for task `CollectHsMetrics`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L144"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:144:10: warning: missing required call input `ref_fasta_index` for task `CollectHsMetrics`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L144"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:144:10: warning: missing required call input `ref_fasta` for task `CollectHsMetrics`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L144"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
@@ -872,56 +602,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:155:10: warning: missing required call input `base_file_name` for task `HaplotypeCaller`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L155"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:155:10: warning: missing required call input `dbSNP_index` for task `HaplotypeCaller`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L155"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:155:10: warning: missing required call input `dbSNP_vcf` for task `HaplotypeCaller`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L155"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:155:10: warning: missing required call input `docker` for task `HaplotypeCaller`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L155"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:155:10: warning: missing required call input `input_bam_index` for task `HaplotypeCaller`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L155"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:155:10: warning: missing required call input `input_bam` for task `HaplotypeCaller`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L155"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:155:10: warning: missing required call input `intervals` for task `HaplotypeCaller`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L155"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:155:10: warning: missing required call input `ref_dict` for task `HaplotypeCaller`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L155"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:155:10: warning: missing required call input `ref_fasta_index` for task `HaplotypeCaller`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L155"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:155:10: warning: missing required call input `ref_fasta` for task `HaplotypeCaller`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L155"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:155:27: note[CallInputSpacing]: call input not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L155"
 
@@ -939,56 +619,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:16:3: note[Whitespace]: line contains trailing whitespace"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L16"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:170:10: warning: missing required call input `base_file_name` for task `Mutect2TumorOnly`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L170"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:170:10: warning: missing required call input `docker` for task `Mutect2TumorOnly`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L170"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:170:10: warning: missing required call input `genomeReferenceIndex` for task `Mutect2TumorOnly`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L170"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:170:10: warning: missing required call input `genomeReference` for task `Mutect2TumorOnly`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L170"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:170:10: warning: missing required call input `input_bam_index` for task `Mutect2TumorOnly`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L170"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:170:10: warning: missing required call input `input_bam` for task `Mutect2TumorOnly`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L170"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:170:10: warning: missing required call input `intervals` for task `Mutect2TumorOnly`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L170"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:170:10: warning: missing required call input `ref_dict` for task `Mutect2TumorOnly`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L170"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:170:10: warning: missing required call input `ref_fasta_index` for task `Mutect2TumorOnly`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L170"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:170:10: warning: missing required call input `ref_fasta` for task `Mutect2TumorOnly`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L170"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
@@ -1012,51 +642,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:185:10: warning: missing required call input `base_file_name` for task `bcftoolsMpileup`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L185"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:185:10: warning: missing required call input `dbSNP_vcf` for task `bcftoolsMpileup`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L185"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:185:10: warning: missing required call input `docker` for task `bcftoolsMpileup`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L185"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:185:10: warning: missing required call input `input_bam_index` for task `bcftoolsMpileup`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L185"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:185:10: warning: missing required call input `input_bam` for task `bcftoolsMpileup`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L185"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:185:10: warning: missing required call input `ref_dict` for task `bcftoolsMpileup`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L185"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:185:10: warning: missing required call input `ref_fasta_index` for task `bcftoolsMpileup`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L185"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:185:10: warning: missing required call input `ref_fasta` for task `bcftoolsMpileup`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L185"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:185:10: warning: missing required call input `sorted_bed` for task `bcftoolsMpileup`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L185"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:185:27: note[CallInputSpacing]: call input not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L185"
 
@@ -1074,31 +659,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:198:5: note[CommentWhitespace]: comment not sufficiently indented"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L198"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:199:10: warning: missing required call input `annovar_operation` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L199"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:199:10: warning: missing required call input `annovar_protocols` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L199"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:199:10: warning: missing required call input `docker` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L199"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:199:10: warning: missing required call input `input_vcf` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L199"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:199:10: warning: missing required call input `ref_name` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L199"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
@@ -1132,31 +692,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:209:10: warning: missing required call input `annovar_operation` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L209"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:209:10: warning: missing required call input `annovar_protocols` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L209"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:209:10: warning: missing required call input `docker` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L209"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:209:10: warning: missing required call input `input_vcf` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L209"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:209:10: warning: missing required call input `ref_name` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L209"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:209:37: note[CallInputSpacing]: call input not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L209"
 
@@ -1182,31 +717,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:219:10: warning: missing required call input `annovar_operation` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L219"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:219:10: warning: missing required call input `annovar_protocols` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L219"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:219:10: warning: missing required call input `docker` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L219"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:219:10: warning: missing required call input `input_vcf` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L219"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:219:10: warning: missing required call input `ref_name` for task `annovar`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L219"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:219:40: note[CallInputSpacing]: call input not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L219"
 
@@ -1214,31 +724,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:225:18: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L225"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:228:10: warning: missing required call input `GATKVars` for task `consensusProcessingR`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L228"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:228:10: warning: missing required call input `MutectVars` for task `consensusProcessingR`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L228"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:228:10: warning: missing required call input `SAMVars` for task `consensusProcessingR`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L228"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:228:10: warning: missing required call input `base_file_name` for task `consensusProcessingR`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L228"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:228:10: warning: missing required call input `docker` for task `consensusProcessingR`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L228"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
@@ -1747,21 +1232,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:57:8: warning: missing required call input `docker` for task `SortBed`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L57"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:57:8: warning: missing required call input `ref_dict` for task `SortBed`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L57"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:57:8: warning: missing required call input `unsorted_bed` for task `SortBed`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L57"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:585:10: note[DisallowedOutputName]: declaration identifier starts with 'output'"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L585"
 
@@ -1922,21 +1392,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:72:10: warning: missing required call input `base_file_name` for task `SamToFastq`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L72"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:72:10: warning: missing required call input `docker` for task `SamToFastq`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L72"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:72:10: warning: missing required call input `input_bam` for task `SamToFastq`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L72"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:72:22: note[CallInputSpacing]: call input not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L72"
 
@@ -1997,66 +1452,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:10: warning: missing required call input `base_file_name` for task `BwaMem`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L80"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:10: warning: missing required call input `docker` for task `BwaMem`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L80"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:10: warning: missing required call input `input_fastq` for task `BwaMem`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L80"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:10: warning: missing required call input `ref_amb` for task `BwaMem`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L80"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:10: warning: missing required call input `ref_ann` for task `BwaMem`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L80"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:10: warning: missing required call input `ref_bwt` for task `BwaMem`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L80"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:10: warning: missing required call input `ref_dict` for task `BwaMem`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L80"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:10: warning: missing required call input `ref_fasta_index` for task `BwaMem`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L80"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:10: warning: missing required call input `ref_fasta` for task `BwaMem`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L80"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:10: warning: missing required call input `ref_pac` for task `BwaMem`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L80"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:10: warning: missing required call input `ref_sa` for task `BwaMem`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L80"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:80:10: warning: missing required call input `threads` for task `BwaMem`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L80"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:80:18: note[CallInputSpacing]: call input not properly spaced"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L80"
 
@@ -2074,41 +1469,6 @@ permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f87
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
 message = "ww-vc-trio.wdl:97:5: note[CommentWhitespace]: comment not sufficiently indented"
 permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L97"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:98:10: warning: missing required call input `aligned_bam` for task `MergeBamAlignment`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L98"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:98:10: warning: missing required call input `base_file_name` for task `MergeBamAlignment`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L98"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:98:10: warning: missing required call input `docker` for task `MergeBamAlignment`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L98"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:98:10: warning: missing required call input `ref_dict` for task `MergeBamAlignment`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L98"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:98:10: warning: missing required call input `ref_fasta_index` for task `MergeBamAlignment`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L98"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:98:10: warning: missing required call input `ref_fasta` for task `MergeBamAlignment`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L98"
-
-[[diagnostics]]
-document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
-message = "ww-vc-trio.wdl:98:10: warning: missing required call input `unmapped_bam` for task `MergeBamAlignment`"
-permalink = "https://github.com/getwilds/ww-vc-trio/blob/c2c13e85efda8ac7aca7f8765fbaa7c2cacb08b2/ww-vc-trio.wdl/#L98"
 
 [[diagnostics]]
 document = "getwilds/ww-vc-trio:/ww-vc-trio.wdl"
@@ -2696,184 +2056,9 @@ message = "util.wdl:825:20: note[ContainerValue]: container URI uses a mutable t
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/util.wdl/#L825"
 
 [[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:104:19: warning: missing required call input `additional_header` for task `add_to_bam_header`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L104"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:104:19: warning: missing required call input `bam` for task `add_to_bam_header`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L104"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:110:23: warning: missing required call input `bam` for task `addreplacerg`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L110"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:118:21: warning: missing required call input `bam` for task `clean_sam`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L118"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:123:17: warning: missing required call input `bams` for task `merge_sam_files`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L123"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:123:17: warning: missing required call input `prefix` for task `merge_sam_files`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L123"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:128:26: warning: missing required call input `bamfile` for task `markdup`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L128"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:132:19: warning: missing required call input `bam` for task `index`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L132"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:137:17: warning: missing required call input `bam` for task `validate_bam`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L137"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:139:17: warning: missing required call input `file` for task `compute_checksum`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L139"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:143:20: warning: missing required call input `bam_index` for task `bam_coverage`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L143"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:143:20: warning: missing required call input `bam` for task `bam_coverage`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L143"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:52:21: warning: missing required call input `bam` for task `validate_bam`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L52"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:58:23: warning: missing required call input `bam` for task `subsample`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L58"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:58:23: warning: missing required call input `desired_reads` for task `subsample`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L58"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:66:15: warning: missing required call input `bam` for task `get_read_groups`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L66"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:71:15: warning: missing required call input `bam` for workflow `bam_to_fastqs`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L71"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:77:19: warning: missing required call input `bam` for task `index`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L77"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:82:20: warning: missing required call input `bam_index` for task `read_length`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L82"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:82:20: warning: missing required call input `bam` for task `read_length`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L82"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:88:26: warning: missing required call input `fastqfile` for task `basicfastqstats`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L88"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:91:25: warning: missing required call input `fastqfile` for workflow `mapping`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L91"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/chipseq/chipseq-standard.wdl"
-message = "chipseq-standard.wdl:91:25: warning: missing required call input `index_files` for workflow `mapping`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/chipseq/chipseq-standard.wdl/#L91"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:112:26: warning: missing required call input `bwa_db_tar_gz` for task `bwa_aln_pe`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L112"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:112:26: warning: missing required call input `read_one_fastq_gz` for task `bwa_aln_pe`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L112"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:112:26: warning: missing required call input `read_two_fastq_gz` for task `bwa_aln_pe`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L112"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:128:25: warning: missing required call input `bam` for task `sort`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L128"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:133:28: warning: missing required call input `bams` for workflow `samtools_merge`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L133"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:133:28: warning: missing required call input `prefix` for workflow `samtools_merge`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L133"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:139:19: warning: missing required call input `bam` for task `index`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L139"
-
-[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
 message = "dnaseq-core.wdl:34:21: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L34"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:77:25: warning: missing required call input `read_group` for task `read_group_to_string`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L77"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:83:19: warning: missing required call input `fastq` for task `split_fastq`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L83"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:88:19: warning: missing required call input `fastq` for task `split_fastq`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L88"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:95:26: warning: missing required call input `bwa_db_tar_gz` for task `bwa_mem`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L95"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:95:26: warning: missing required call input `read_one_fastq_gz` for task `bwa_mem`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L95"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
@@ -2891,51 +2076,6 @@ message = "dnaseq-standard-fastq.wdl:35:21: note[TrailingComma]: item missing tr
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L35"
 
 [[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:57:10: warning: missing required call input `aligner` for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L57"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:57:10: warning: missing required call input `array_lengths` for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L57"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:68:21: warning: missing required call input `read_one_fastq` for task `fqlint`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L68"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:78:21: warning: missing required call input `read_one_fastq` for task `subsample`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L78"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:96:25: warning: missing required call input `bwa_db` for workflow `dnaseq_core_experimental`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L96"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:96:25: warning: missing required call input `prefix` for workflow `dnaseq_core_experimental`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L96"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:96:25: warning: missing required call input `read_groups` for workflow `dnaseq_core_experimental`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L96"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:96:25: warning: missing required call input `read_one_fastqs_gz` for workflow `dnaseq_core_experimental`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L96"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:96:25: warning: missing required call input `read_two_fastqs_gz` for workflow `dnaseq_core_experimental`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L96"
-
-[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
 message = "dnaseq-standard.wdl:113:21: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard.wdl/#L113"
@@ -2951,159 +2091,9 @@ message = "dnaseq-standard.wdl:32:21: note[TrailingComma]: item missing trailing
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard.wdl/#L32"
 
 [[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:53:10: warning: missing required call input `aligner` for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard.wdl/#L53"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:58:21: warning: missing required call input `bam` for task `validate_bam`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard.wdl/#L58"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:64:23: warning: missing required call input `bam` for task `subsample`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard.wdl/#L64"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:64:23: warning: missing required call input `desired_reads` for task `subsample`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard.wdl/#L64"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:72:21: warning: missing required call input `bam` for task `get_read_groups`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard.wdl/#L72"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:76:27: warning: missing required call input `bam` for workflow `bam_to_fastqs`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard.wdl/#L76"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:82:25: warning: missing required call input `bwa_db` for workflow `dnaseq_core_experimental`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard.wdl/#L82"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:82:25: warning: missing required call input `prefix` for workflow `dnaseq_core_experimental`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard.wdl/#L82"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:82:25: warning: missing required call input `read_groups` for workflow `dnaseq_core_experimental`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard.wdl/#L82"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:82:25: warning: missing required call input `read_one_fastqs_gz` for workflow `dnaseq_core_experimental`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard.wdl/#L82"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard.wdl"
-message = "dnaseq-standard.wdl:82:25: warning: missing required call input `read_two_fastqs_gz` for workflow `dnaseq_core_experimental`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard.wdl/#L82"
-
-[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
 message = "alignment-post.wdl:30:22: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/alignment-post.wdl/#L30"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:46:17: warning: missing required call input `bam` for task `sort`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/alignment-post.wdl/#L46"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:49:23: warning: missing required call input `bam` for task `index`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/alignment-post.wdl/#L49"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:54:24: warning: missing required call input `input_bai` for workflow `xenocp`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/alignment-post.wdl/#L54"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:54:24: warning: missing required call input `input_bam` for workflow `xenocp`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/alignment-post.wdl/#L54"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:54:24: warning: missing required call input `reference_tar_gz` for workflow `xenocp`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/alignment-post.wdl/#L54"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:63:21: warning: missing required call input `bam` for task `mark_duplicates`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/alignment-post.wdl/#L63"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:74:19: warning: missing required call input `bam` for task `index`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/alignment-post.wdl/#L74"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:79:17: warning: missing required call input `bam` for task `validate_bam`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/alignment-post.wdl/#L79"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/alignment-post.wdl"
-message = "alignment-post.wdl:81:17: warning: missing required call input `file` for task `compute_checksum`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/alignment-post.wdl/#L81"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:31:19: warning: missing required call input `bam` for task `quickcheck`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/bam-to-fastqs.wdl/#L31"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:32:19: warning: missing required call input `bam` for task `split`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/bam-to-fastqs.wdl/#L32"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:37:23: warning: missing required call input `bam` for task `bam_to_fastq`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/bam-to-fastqs.wdl/#L37"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/bam-to-fastqs.wdl"
-message = "bam-to-fastqs.wdl:48:17: warning: missing required call input `read_one_fastq` for task `fqlint`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/bam-to-fastqs.wdl/#L48"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:49:27: warning: missing required call input `bams` for task `merge`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/samtools-merge.wdl/#L49"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:49:27: warning: missing required call input `prefix` for task `merge`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/samtools-merge.wdl/#L49"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:57:23: warning: missing required call input `bams` for task `merge`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/samtools-merge.wdl/#L57"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:57:23: warning: missing required call input `prefix` for task `merge`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/samtools-merge.wdl/#L57"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:68:23: warning: missing required call input `bams` for task `merge`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/samtools-merge.wdl/#L68"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:68:23: warning: missing required call input `prefix` for task `merge`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/samtools-merge.wdl/#L68"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/methylation/methylation-cohort.wdl"
@@ -3131,449 +2121,9 @@ message = "methylation-preprocess.wdl:56:20: note[ContainerValue]: container URI
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/methylation/methylation-preprocess.wdl/#L56"
 
 [[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:47:17: warning: missing required call input `bam` for task `collect_insert_size_metrics`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/markdups-post.wdl/#L47"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:51:19: warning: missing required call input `bam` for task `flagstat`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/markdups-post.wdl/#L51"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:56:19: warning: missing required call input `bam_index` for task `coverage`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/markdups-post.wdl/#L56"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:56:19: warning: missing required call input `bam` for task `coverage`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/markdups-post.wdl/#L56"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:62:23: warning: missing required call input `bam_index` for task `coverage`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/markdups-post.wdl/#L62"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/markdups-post.wdl"
-message = "markdups-post.wdl:62:23: warning: missing required call input `bam` for task `coverage`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/markdups-post.wdl/#L62"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:142:10: warning: missing required call input `coverage_beds_len` for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L142"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:142:10: warning: missing required call input `coverage_labels` for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L142"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:142:10: warning: missing required call input `gtf_provided` for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L142"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:142:10: warning: missing required call input `rna` for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L142"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:148:22: warning: missing required call input `flags` for workflow `validate_flag_filter`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L148"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:152:26: warning: missing required call input `flags` for workflow `validate_flag_filter`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L152"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:159:17: warning: missing required call input `file` for task `compute_checksum`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L159"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:161:19: warning: missing required call input `bam` for task `quickcheck`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L161"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:163:15: warning: missing required call input `bgzipped_file` for task `compression_integrity`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L163"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:166:23: warning: missing required call input `bam` for task `subsample`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L166"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:166:23: warning: missing required call input `desired_reads` for task `subsample`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L166"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:173:27: warning: missing required call input `bam` for task `index`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L173"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:195:17: warning: missing required call input `bam` for task `validate_bam`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L195"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:203:17: warning: missing required call input `bam` for task `collect_alignment_summary_metrics`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L203"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:207:17: warning: missing required call input `bam` for task `quality_score_distribution`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L207"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:211:23: warning: missing required call input `bam` for task `fastqc`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L211"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:216:20: warning: missing required call input `bam` for task `instrument`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L216"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:220:20: warning: missing required call input `bam_index` for task `read_length`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L220"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:220:20: warning: missing required call input `bam` for task `read_length`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L220"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:225:20: warning: missing required call input `ngs_files` for task `encoding`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L225"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:225:20: warning: missing required call input `outfile_name` for task `encoding`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L225"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:230:20: warning: missing required call input `bam` for task `endedness`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L230"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:235:15: warning: missing required call input `bam` for task `global_phred_scores`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L235"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:240:19: warning: missing required call input `bam` for task `bam_to_fastq`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L240"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:258:13: warning: missing required call input `read_one_fastq` for task `fqlint`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L258"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:262:18: warning: missing required call input `db` for task `kraken`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L262"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:262:18: warning: missing required call input `read_one_fastq_gz` for task `kraken`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L262"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:262:18: warning: missing required call input `read_two_fastq_gz` for task `kraken`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L262"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:273:29: warning: missing required call input `read_one_fastq` for task `librarian`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L273"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:279:23: warning: missing required call input `bam` for task `bam_to_fastq`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L279"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:298:17: warning: missing required call input `read_one_fastq` for task `fqlint`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L298"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:304:22: warning: missing required call input `db` for task `kraken`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L304"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:304:22: warning: missing required call input `read_one_fastq_gz` for task `kraken`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L304"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:304:22: warning: missing required call input `read_two_fastq_gz` for task `kraken`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L304"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:316:19: warning: missing required call input `bam_index` for task `coverage`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L316"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:316:19: warning: missing required call input `bam` for task `coverage`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L316"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:322:23: warning: missing required call input `bam_index` for task `coverage`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L322"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:322:23: warning: missing required call input `bam` for task `coverage`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L322"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:331:24: warning: missing required call input `bam_index` for task `junction_annotation`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L331"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:331:24: warning: missing required call input `bam` for task `junction_annotation`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L331"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:331:24: warning: missing required call input `gene_model` for task `junction_annotation`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L331"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:337:24: warning: missing required call input `bam_index` for task `strandedness`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L337"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:337:24: warning: missing required call input `bam` for task `strandedness`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L337"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:337:24: warning: missing required call input `gene_model` for task `strandedness`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L337"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:343:23: warning: missing required call input `bam` for task `rnaseq`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L343"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:343:23: warning: missing required call input `gtf` for task `rnaseq`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L343"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:352:21: warning: missing required call input `bam` for task `mark_duplicates`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L352"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:361:31: warning: missing required call input `markdups_bam_index` for workflow `markdups_post`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L361"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:361:31: warning: missing required call input `markdups_bam` for workflow `markdups_post`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L361"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:378:21: warning: missing required call input `bam` for task `collect_insert_size_metrics`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L378"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:382:23: warning: missing required call input `bam` for task `flagstat`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L382"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:388:24: warning: missing required call input `files` for task `multiqc`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L388"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:388:24: warning: missing required call input `prefix` for task `multiqc`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L388"
-
-[[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
 message = "quality-check-standard.wdl:560:20: note[ContainerValue]: container URI uses a mutable tag"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L560"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/bwa-db-build.wdl"
-message = "bwa-db-build.wdl:32:15: warning: missing required call input `disk_size_gb` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/bwa-db-build.wdl/#L32"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/bwa-db-build.wdl"
-message = "bwa-db-build.wdl:32:15: warning: missing required call input `outfile_name` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/bwa-db-build.wdl/#L32"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/bwa-db-build.wdl"
-message = "bwa-db-build.wdl:32:15: warning: missing required call input `url` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/bwa-db-build.wdl/#L32"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/bwa-db-build.wdl"
-message = "bwa-db-build.wdl:38:14: warning: missing required call input `reference_fasta` for task `build_bwa_db`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/bwa-db-build.wdl/#L38"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:106:19: warning: missing required call input `disk_size_gb` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L106"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:106:19: warning: missing required call input `outfile_name` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L106"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:106:19: warning: missing required call input `url` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L106"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:68:15: warning: missing required call input `disk_size_gb` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L68"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:68:15: warning: missing required call input `outfile_name` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L68"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:68:15: warning: missing required call input `url` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L68"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:75:19: warning: missing required call input `fasta` for task `faidx`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L75"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:79:17: warning: missing required call input `fasta` for task `create_sequence_dictionary`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L79"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:83:15: warning: missing required call input `disk_size_gb` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L83"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:83:15: warning: missing required call input `outfile_name` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L83"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:83:15: warning: missing required call input `url` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L83"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:90:19: warning: missing required call input `disk_size_gb` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L90"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:90:19: warning: missing required call input `outfile_name` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L90"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:90:19: warning: missing required call input `url` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L90"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:98:19: warning: missing required call input `disk_size_gb` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L98"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:98:19: warning: missing required call input `outfile_name` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L98"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/gatk-reference.wdl"
-message = "gatk-reference.wdl:98:19: warning: missing required call input `url` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/gatk-reference.wdl/#L98"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:104:19: warning: missing required call input `feature_type` for task `make_coverage_regions_bed`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L104"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:104:19: warning: missing required call input `gtf` for task `make_coverage_regions_bed`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L104"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:111:19: warning: missing required call input `disk_size_gb` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L111"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:111:19: warning: missing required call input `outfile_name` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L111"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:111:19: warning: missing required call input `url` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L111"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:121:22: warning: missing required call input `library_name` for task `download_library`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L121"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:129:22: warning: missing required call input `fastas_gz` for task `create_library_from_fastas`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L129"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:135:18: warning: missing required call input `tarballs` for task `build_db`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L135"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
@@ -3584,141 +2134,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
 message = "qc-reference.wdl:51:32: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L51"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:92:15: warning: missing required call input `disk_size_gb` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L92"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:92:15: warning: missing required call input `outfile_name` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L92"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:92:15: warning: missing required call input `url` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L92"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:97:15: warning: missing required call input `disk_size_gb` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L97"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:97:15: warning: missing required call input `outfile_name` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L97"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:97:15: warning: missing required call input `url` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L97"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:41:15: warning: missing required call input `disk_size_gb` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/star-db-build.wdl/#L41"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:41:15: warning: missing required call input `outfile_name` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/star-db-build.wdl/#L41"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:41:15: warning: missing required call input `url` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/star-db-build.wdl/#L41"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:47:15: warning: missing required call input `disk_size_gb` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/star-db-build.wdl/#L47"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:47:15: warning: missing required call input `outfile_name` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/star-db-build.wdl/#L47"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:47:15: warning: missing required call input `url` for task `download`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/star-db-build.wdl/#L47"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:53:15: warning: missing required call input `gtf` for task `build_star_db`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/star-db-build.wdl/#L53"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/reference/star-db-build.wdl"
-message = "star-db-build.wdl:53:15: warning: missing required call input `reference_fasta` for task `build_star_db`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/star-db-build.wdl/#L53"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:157:15: warning: missing required call input `prefix` for task `alignment`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L157"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:157:15: warning: missing required call input `read_one_fastqs_gz` for task `alignment`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L157"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:157:15: warning: missing required call input `star_db_tar_gz` for task `alignment`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L157"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:176:28: warning: missing required call input `bam` for workflow `alignment_post`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L176"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:176:28: warning: missing required call input `mark_duplicates` for workflow `alignment_post`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L176"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:185:20: warning: missing required call input `bam_index` for task `bam_coverage`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L185"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:185:20: warning: missing required call input `bam` for task `bam_coverage`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L185"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:191:20: warning: missing required call input `bam_index` for task `strandedness`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L191"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:191:20: warning: missing required call input `bam` for task `strandedness`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L191"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:191:20: warning: missing required call input `gene_model` for task `strandedness`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L191"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:203:16: warning: missing required call input `bam` for task `count`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L203"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:203:16: warning: missing required call input `gtf` for task `count`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L203"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:203:16: warning: missing required call input `strandedness` for task `count`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L203"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
@@ -3732,66 +2147,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:111:26: warning: missing required call input `cleanse_xenograft` for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L111"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:111:26: warning: missing required call input `contaminant_db` for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L111"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:111:26: warning: missing required call input `strand` for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L111"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:118:25: warning: missing required call input `read_group` for task `read_group_to_string`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L118"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:126:21: warning: missing required call input `read_one_fastq` for task `fqlint`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L126"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:136:21: warning: missing required call input `read_one_fastq` for task `subsample`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L136"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:154:25: warning: missing required call input `gtf` for workflow `rnaseq_core`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L154"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:154:25: warning: missing required call input `prefix` for workflow `rnaseq_core`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L154"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:154:25: warning: missing required call input `read_groups` for workflow `rnaseq_core`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L154"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:154:25: warning: missing required call input `read_one_fastqs_gz` for workflow `rnaseq_core`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L154"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:154:25: warning: missing required call input `read_two_fastqs_gz` for workflow `rnaseq_core`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L154"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
-message = "rnaseq-standard-fastq.wdl:154:25: warning: missing required call input `star_db` for workflow `rnaseq_core`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L154"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
 message = "rnaseq-standard-fastq.wdl:75:22: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L75"
 
@@ -3799,36 +2154,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard-fastq.wdl"
 message = "rnaseq-standard-fastq.wdl:84:28: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard-fastq.wdl/#L84"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:103:25: warning: missing required call input `gtf` for workflow `rnaseq_core`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L103"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:103:25: warning: missing required call input `prefix` for workflow `rnaseq_core`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L103"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:103:25: warning: missing required call input `read_groups` for workflow `rnaseq_core`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L103"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:103:25: warning: missing required call input `read_one_fastqs_gz` for workflow `rnaseq_core`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L103"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:103:25: warning: missing required call input `read_two_fastqs_gz` for workflow `rnaseq_core`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L103"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:103:25: warning: missing required call input `star_db` for workflow `rnaseq_core`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L103"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
@@ -3849,43 +2174,3 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
 message = "rnaseq-standard.wdl:47:28: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L47"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:72:10: warning: missing required call input `cleanse_xenograft` for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L72"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:72:10: warning: missing required call input `contaminant_db` for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L72"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:72:10: warning: missing required call input `strand` for task `parse_input`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L72"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:79:21: warning: missing required call input `bam` for task `validate_bam`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L79"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:85:23: warning: missing required call input `bam` for task `subsample`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L85"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:85:23: warning: missing required call input `desired_reads` for task `subsample`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L85"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:93:15: warning: missing required call input `bam` for task `get_read_groups`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L93"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:97:27: warning: missing required call input `bam` for workflow `bam_to_fastqs`"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L97"
