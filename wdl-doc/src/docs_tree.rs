@@ -270,7 +270,7 @@ impl DocsTree {
                 }
                 ul class="" {
                     @for child in node.children().values() {
-                        li class="p-2" { (sidebar_recurse(child, base)) }
+                        li class="px-2" { (sidebar_recurse(child, base)) }
                     }
                 }
             }
