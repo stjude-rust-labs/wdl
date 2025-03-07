@@ -39,8 +39,10 @@ fn improper_comment(span: Span) -> Diagnostic {
         .with_fix("remove the comment from the import statement")
 }
 
+/// Removes extra whitespace from a string by replacing multiple spaces with a
+/// single space.
 fn normalize(s: &str) -> String {
-    s.split_whitespace().collect::<Vec<_>>().join(" ") // Remove extra spaces/tabs
+    s.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 /// Detects imports that are not sorted lexicographically.
 #[derive(Default, Debug, Clone, Copy)]
@@ -112,8 +114,8 @@ impl Visitor for ImportSortRule {
                 .uri()
                 .text()
                 .expect("import uri");
-            normalize(&a_uri.as_str());
-            normalize(&b_uri.as_str());
+            normalize(a_uri.as_str());
+            normalize(b_uri.as_str());
             a_uri.as_str().cmp(b_uri.as_str())
         });
 
@@ -124,7 +126,9 @@ impl Visitor for ImportSortRule {
                 .iter()
                 .find(|sorted_import| {
                     let original_position = imports.iter().position(|orig| orig == *sorted_import);
-                    let sorted_position = sorted_imports.iter().position(|sorted| sorted == *sorted_import);
+                    let sorted_position = sorted_imports
+                        .iter()
+                        .position(|sorted| sorted == *sorted_import);
                     original_position != sorted_position
                 })
                 .unwrap();
