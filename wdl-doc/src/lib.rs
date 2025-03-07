@@ -13,6 +13,7 @@ pub mod meta;
 pub mod parameter;
 pub mod r#struct;
 
+use std::fs::canonicalize;
 use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
@@ -85,7 +86,7 @@ pub(crate) fn full_page<P: AsRef<Path>>(
         (DOCTYPE)
         html class="dark size-full" {
             (header(page_title, stylesheet))
-            body class="flex dark size-full dark:bg-slate-950 dark:text-white" {
+            body class="flex dark size-full dark:bg-slate-950 dark:text-white p-4" {
                 (body)
             }
         }
@@ -246,7 +247,7 @@ pub async fn document_workspace(
     stylesheet: Option<impl AsRef<Path>>,
     overwrite: bool,
 ) -> Result<PathBuf> {
-    let workspace_abs_path = absolute(workspace)?;
+    let workspace_abs_path = canonicalize(workspace)?;
     let stylesheet = stylesheet.and_then(|p| absolute(p.as_ref()).ok());
 
     if !workspace_abs_path.is_dir() {
