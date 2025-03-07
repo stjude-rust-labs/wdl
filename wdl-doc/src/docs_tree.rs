@@ -285,7 +285,12 @@ impl DocsTree {
                 p class="" { (root.name()) }
                 ul class="" {
                     @for node in root.children().values() {
-                        li class="px-2" { (sidebar_recurse(node, base)) }
+                        @if node.name() != "external" {
+                            li class="px-2" { (sidebar_recurse(node, base)) }
+                        }
+                    }
+                    @if let Some(external) = root.children().get("external") {
+                        li class="px-2" { (sidebar_recurse(external, base)) }
                     }
                 }
             }
