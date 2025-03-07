@@ -31,7 +31,7 @@ task test_task {
         File? opt_file = None  # should not flag due to except directive
     }
     
-    command <
+    command <<<
         echo "Testing redundant None detection"
     >>>
     
