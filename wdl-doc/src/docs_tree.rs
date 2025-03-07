@@ -94,6 +94,11 @@ impl Node {
         self.page.clone()
     }
 
+    /// Get the children of the node.
+    pub fn children(&self) -> &BTreeMap<String, Node> {
+        &self.children
+    }
+
     /// Gather the node and its children in a Depth First Traversal order.
     pub fn depth_first_traversal(&self) -> Vec<&Node> {
         fn recurse_depth_first<'a>(node: &'a Node, nodes: &mut Vec<&'a Node>) {
@@ -249,25 +254,43 @@ impl DocsTree {
     /// name of the node will be rendered. All links will be relative to the
     /// given path.
     pub fn render_sidebar_component<P: AsRef<Path>>(&self, path: P) -> Markup {
+        fn sidebar_recurse(node: &Node, base: &Path) -> Markup {
+            html! {
+                @if let Some(page) = node.page() {
+                    @match page.page_type() {
+                        PageType::Index(_) => {
+                            p { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
+                        }
+                        _ => {
+                            p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                        }
+                    }
+                } @else {
+                    p class="" { (node.name()) }
+                }
+                ul class="" {
+                    @for child in node.children().values() {
+                        li class="px-2" { (sidebar_recurse(child, base)) }
+                    }
+                }
+            }
+        }
+
         let root = self.root();
         let base = path.as_ref().parent().unwrap();
-        let nodes = root.depth_first_traversal();
 
         html! {
-            div class="top-0 left-0 h-full w-1/6 dark:bg-slate-950 dark:text-white" {
+            div class="top-0 border left-0 h-full w-1/6 p-4 dark:bg-slate-900 dark:text-white" {
                 h1 class="text-2xl text-center" { "Sidebar" }
-                @for node in nodes {
-                    @if let Some(page) = node.page() {
-                        @match page.page_type() {
-                            PageType::Index(_) => {
-                                p { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
-                            }
-                            _ => {
-                                p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
-                            }
+                p class="" { (root.name()) }
+                ul class="" {
+                    @for node in root.children().values() {
+                        @if node.name() != "external" {
+                            li class="px-2" { (sidebar_recurse(node, base)) }
                         }
-                    } @else {
-                        p class="" { (node.name()) }
+                    }
+                    @if let Some(external) = root.children().get("external") {
+                        li class="px-2" { (sidebar_recurse(external, base)) }
                     }
                 }
             }
@@ -327,7 +350,9 @@ impl DocsTree {
             "Home",
             html! {
                 (sidebar)
-                (content)
+                div class="p-4 items-center" {
+                    (content)
+                }
             },
             self.stylesheet_relative_to(root.path()).as_deref(),
         );
@@ -357,7 +382,9 @@ impl DocsTree {
             page.name(),
             html! {
                 (sidebar)
-                (content)
+                div class="p-4" {
+                    (content)
+                }
             },
             stylesheet.as_deref(),
         );
