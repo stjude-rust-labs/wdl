@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* `missing_call_input` now gives a warning for missing inputs when `allowNestedInputs:true`.
+* `missing_call_input` now gives a warning for missing inputs when `allowNestedInputs:true` ([#344]https://github.com/stjude-rust-labs/wdl/pull/344).
 
 ### Added
 
