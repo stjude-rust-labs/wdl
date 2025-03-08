@@ -657,30 +657,38 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
     /// Checks a placeholder expression.
     pub(crate) fn check_placeholder<N: TreeNode>(&mut self, placeholder: &Placeholder<N>) {
         self.placeholders += 1;
-
-        // Evaluate the placeholder expression and check that the resulting type is
-        // coercible to string for interpolation
+    
         let expr = placeholder.expr();
         if let Some(ty) = self.evaluate_expr(&expr) {
             match ty {
                 Type::Primitive(..) | Type::Union | Type::None => {
-                    // OK
                 }
                 ty => {
-                    // Check for a sep option is specified; if so, accept `Array[P]` where `P` is
-                    // primitive.
                     let mut coercible = false;
                     if let Some(PlaceholderOption::Sep(_)) = placeholder.option() {
                         if let Type::Compound(CompoundType::Array(ty), _) = &ty {
-                            if !ty.element_type().is_optional()
-                                && ty.element_type().as_primitive().is_some()
-                            {
-                                // OK
+                            if let Type::Primitive(_, is_optional) = ty.element_type() {
+                                if !is_optional {
+                                    coercible = true;
+                                }
+                            }
+                        }
+                    }
+    
+                    if let Some(PlaceholderOption::Default(_)) = placeholder.option() {
+                        if let Type::Primitive(_, is_optional) = ty {
+                            if is_optional {
                                 coercible = true;
                             }
                         }
                     }
-
+    
+                    if let Some(PlaceholderOption::TrueFalse(_)) = placeholder.option() {
+                        if let Type::Primitive(PrimitiveType::Boolean, _) = ty {
+                            coercible = true;
+                        }
+                    }
+    
                     if !coercible {
                         self.context
                             .add_diagnostic(cannot_coerce_to_string(&ty, expr.span()));
@@ -688,9 +696,9 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 }
             }
         }
-
+    
         self.placeholders -= 1;
-    }
+    }    
 
     /// Evaluates the type of a literal array expression.
     fn evaluate_literal_array<N: TreeNode>(&mut self, expr: &LiteralArray<N>) -> Type {
