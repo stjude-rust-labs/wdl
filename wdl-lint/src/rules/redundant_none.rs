@@ -1,8 +1,7 @@
+use crate::Rule;
+use crate::Tag;
+use crate::TagSet;
 use std::fmt::Debug;
-use rowan::ast::AstNode;
-use tracing::Instrument;
-use wdl_ast::v1::InputSection;
-use wdl_ast::AstNodeExt;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -12,10 +11,7 @@ use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
-use wdl_ast::v1::BoundDecl;
-use crate::Rule;
-use crate::Tag;
-use crate::TagSet;
+use wdl_ast::v1::InputSection;
 
 const ID: &str = "RedundantNoneAssignment";
 
@@ -49,7 +45,8 @@ impl Rule for RedundantNoneAssignment {
 
     fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
         Some(&[
-            wdl_ast::SyntaxKind::VersionStatementNode,wdl_ast::SyntaxKind::InputSectionNode,
+            wdl_ast::SyntaxKind::VersionStatementNode,
+            wdl_ast::SyntaxKind::InputSectionNode,
             wdl_ast::SyntaxKind::BoundDeclNode,
         ])
     }
@@ -58,7 +55,13 @@ impl Rule for RedundantNoneAssignment {
 impl Visitor for RedundantNoneAssignment {
     type State = Diagnostics;
 
-    fn document(&mut self, _: &mut Self::State, reason: VisitReason, _: &Document, version: SupportedVersion) {
+    fn document(
+        &mut self,
+        _: &mut Self::State,
+        reason: VisitReason,
+        _: &Document,
+        version: SupportedVersion,
+    ) {
         if reason == VisitReason::Exit {
             return;
         }
@@ -66,32 +69,31 @@ impl Visitor for RedundantNoneAssignment {
     }
 
     fn input_section(
-            &mut self,
-            state: &mut Self::State,
-            reason: VisitReason,
-            section: &InputSection,
-        ) {
-            if reason == VisitReason::Exit {
-                return;
-            }
-             section.declarations().for_each(|decl| {
-                if let token=decl.ty(){
-                    if token.is_optional() {
-                        if let Some(expr) = decl.expr() {if let Some(name_ref)=expr.as_name_ref(){
-                            if name_ref.name().as_str()=="None"{
-                                let text_range = decl.syntax().text_range();
-                                let span = Span::from(text_range.start().into()..text_range.end().into());
-                                state.exceptable_add(
-                                    redundant_none_assignment(span, decl.name().as_str()),
-                                    SyntaxElement::from(decl.syntax().clone()),
-                                    &self.exceptable_nodes(),
-                                );
-                            }
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        section: &InputSection,
+    ) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+        section.declarations().for_each(|decl| {
+            if let token = decl.ty() {
+                if token.is_optional() {
+                    if let Some(expr) = decl.expr() {
+                        if let Some(name_ref) = expr.as_literal().unwrap().as_none() {
+                            let text_range = decl.syntax().text_range();
+                            let span =
+                                Span::from(text_range.start().into()..text_range.end().into());
+                            state.exceptable_add(
+                                redundant_none_assignment(span, decl.name().as_str()),
+                                SyntaxElement::from(decl.syntax().clone()),
+                                &self.exceptable_nodes(),
+                            );
                         }
                     }
                 }
             }
         });
-    }    
-    
+    }
 }

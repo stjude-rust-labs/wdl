@@ -1,12 +1,42 @@
-error: expected multi-line string, but found `<`
-   ┌─ tests/lints/redudant-none/source.wdl:34:13
-   │
-34 │     command <
-   │             ^ unexpected `<`
+note[CallInputSpacing]: call input not properly spaced
+   ┌─ tests/lints/redudant-none/source.wdl:16:21
+   │  
+16 │       call test_task {
+   │ ╭────────────────────^
+17 │ │         input:
+   │ ╰────────^
+   │  
+   = fix: change this whitespace to a single space
 
-error: expected declaration name, but found string
-   ┌─ tests/lints/redudant-none/source.wdl:35:14
+warning[MissingRuntime]: task `test_task` is missing a `runtime` section
+   ┌─ tests/lints/redudant-none/source.wdl:23:6
    │
-35 │         echo "Testing redundant None detection"
-   │              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unexpected string
+23 │ task test_task {
+   │      ^^^^^^^^^ this task is missing a `runtime` section
+   │
+   = fix: add a `runtime` section
+
+note[Whitespace]: line contains only whitespace
+   ┌─ tests/lints/redudant-none/source.wdl:31:1
+   │
+31 │     
+   │ ^^^^
+   │
+   = fix: remove the whitespace
+
+note[Whitespace]: line contains only whitespace
+   ┌─ tests/lints/redudant-none/source.wdl:35:1
+   │
+35 │     
+   │ ^^^^
+   │
+   = fix: remove the whitespace
+
+note[EndingNewline]: missing newline at the end of the file
+   ┌─ tests/lints/redudant-none/source.wdl:39:1
+   │
+39 │ }
+   │ ^ expected a newline to follow this
+   │
+   = fix: add a newline at the end of the file
 
