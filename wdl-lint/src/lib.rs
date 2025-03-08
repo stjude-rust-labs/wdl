@@ -85,6 +85,9 @@ pub trait Rule: Visitor<State = Diagnostics> {
 /// Gets the default rule set.
 pub fn rules() -> Vec<Box<dyn Rule>> {
     let rules: Vec<Box<dyn Rule>> = vec![
+        Box::<rules::DisallowedInputNameRule>::default(),
+        Box::<rules::DisallowedOutputNameRule>::default(),
+        Box::<rules::DisallowedDeclarationNameRule>::default(),
         Box::<rules::DoubleQuotesRule>::default(),
         Box::<rules::NoCurlyCommandsRule>::default(),
         Box::<rules::SnakeCaseRule>::default(),
@@ -95,29 +98,27 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::WhitespaceRule>::default(),
         Box::<rules::CommandSectionMixedIndentationRule>::default(),
         Box::<rules::ImportPlacementRule>::default(),
-        Box::<rules::PascalCaseRule>::default(),
-        Box::<rules::ImportWhitespaceRule>::default(),
-        Box::<rules::MissingMetasRule>::default(),
-        Box::<rules::MissingOutputRule>::default(),
         Box::<rules::ImportSortRule>::default(),
-        Box::<rules::InputNotSortedRule>::default(),
-        Box::<rules::LineWidthRule>::default(),
+        Box::<rules::ImportWhitespaceRule>::default(),
         Box::<rules::InconsistentNewlinesRule>::default(),
-        Box::<rules::CallInputSpacingRule>::default(),
-        Box::<rules::SectionOrderingRule>::default(),
-        Box::<rules::DeprecatedObjectRule>::default(),
+        Box::<rules::MissingOutputRule>::default(),
+        Box::<rules::MissingMetasRule>::default(),
         Box::<rules::DescriptionMissingRule>::default(),
-        Box::<rules::DeprecatedPlaceholderOptionRule>::default(),
+        Box::<rules::NonmatchingOutputRule>::default(),
+        Box::<rules::PascalCaseRule>::default(),
+        Box::<rules::SectionOrderingRule>::default(),
         Box::<rules::RuntimeSectionKeysRule>::default(),
-        Box::<rules::TodoRule>::default(),
-        Box::<rules::NonmatchingOutputRule<'_>>::default(),
         Box::<rules::CommentWhitespaceRule>::default(),
-        Box::<rules::TrailingCommaRule>::default(),
+        Box::<rules::LineWidthRule>::default(),
         Box::<rules::BlankLinesBetweenElementsRule>::default(),
+        Box::<rules::CallInputSpacingRule>::default(),
+        Box::<rules::DeprecatedObjectRule>::default(),
+        Box::<rules::DeprecatedPlaceholderOptionRule>::default(),
+        Box::<rules::TodoRule>::default(),
+        Box::<rules::TrailingCommaRule>::default(),
+        Box::<rules::InputNotSortedRule>::default(),
         Box::<rules::KeyValuePairsRule>::default(),
         Box::<rules::ExpressionSpacingRule>::default(),
-        Box::<rules::DisallowedInputNameRule>::default(),
-        Box::<rules::DisallowedOutputNameRule>::default(),
         Box::<rules::ContainerValue>::default(),
         Box::<rules::MissingRequirementsRule>::default(),
         Box::<rules::UnknownRule>::default(),
@@ -126,7 +127,8 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::PreambleCommentAfterVersionRule>::default(),
         Box::<rules::MalformedLintDirectiveRule>::default(),
         Box::<rules::RedundantInputAssignment>::default(),
-    ];
+    ]; 
+    
 
     // Ensure all the rule ids are unique and pascal case
     #[cfg(debug_assertions)]
@@ -134,7 +136,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         use convert_case::Case;
         use convert_case::Casing;
         let mut set = std::collections::HashSet::new();
-        for r in rules.iter() {
+        for r in &rules {
             if r.id().to_case(Case::Pascal) != r.id() {
                 panic!("lint rule id `{id}` is not pascal case", id = r.id());
             }
@@ -150,7 +152,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
     }
 
     rules
-}
+}  
 
 /// Gets the optional rule set.
 pub fn optional_rules() -> Vec<Box<dyn Rule>> {
