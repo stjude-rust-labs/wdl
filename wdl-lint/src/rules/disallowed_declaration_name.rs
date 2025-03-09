@@ -12,6 +12,7 @@ use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::v1::BoundDecl;
 use wdl_ast::v1::Decl;
+use wdl_ast::v1::PrimitiveTypeKind;
 use wdl_ast::v1::UnboundDecl;
 
 use crate::Rule;
@@ -103,33 +104,82 @@ fn check_decl_name(
 ) {
     let name = decl.name();
     let name_str = name.as_str();
-    let type_str = decl.ty().to_string();
-    
-    // Extract the base type (remove Array[] and optional ? modifiers)
-    let base_type = if type_str.starts_with("Array[") {
-        // Extract the inner type from Array[Type]
-        let inner_type = type_str
-            .trim_start_matches("Array[")
-            .trim_end_matches(']')
-            .trim_end_matches('?');
-        inner_type
-    } else {
-        type_str.trim_end_matches('?')
-    };
-    
-    // Check if the declaration name contains the type name (case insensitive)
     let name_lower = name_str.to_lowercase();
-    let type_lower = base_type.to_lowercase();
     
-    // Check for type name at beginning or end or anywhere in the name
-    if name_lower.starts_with(&type_lower) || 
-       name_lower.ends_with(&type_lower) || 
-       name_lower.contains(&type_lower) {
-        state.exceptable_add(
-            decl_identifier_with_type(decl.name().span(), name_str, base_type),
-            SyntaxElement::from(decl.syntax().clone()),
-            exceptable_nodes,
-        );
+    // Get the declaration type
+    let ty = decl.ty();
+    
+    // Extract base type name(s) using AST methods
+    let mut type_names = Vec::new();
+    
+    // Add the full type name
+    type_names.push(ty.to_string());
+    
+    // If it's an array, add the element type
+    if let Some(array_type) = ty.as_array_type() {
+        // Add the element type 
+        type_names.push(array_type.element_type().to_string());
+    }
+    
+    // If it's a map, add the key and value types
+    if let Some(map_type) = ty.as_map_type() {
+        let (key, value) = map_type.types();
+        type_names.push(key.to_string());
+        type_names.push(value.to_string());
+    }
+    
+    // If it's a pair, add the left and right types
+    if let Some(pair_type) = ty.as_pair_type() {
+        let (left, right) = pair_type.types();
+        type_names.push(left.to_string());
+        type_names.push(right.to_string());
+    }
+    
+    // If it's a primitive type, use that directly
+    if let Some(primitive_type) = ty.as_primitive_type() {
+        // Convert the PrimitiveTypeKind to a string
+        let kind_str = match primitive_type.kind() {
+            PrimitiveTypeKind::Boolean => "Boolean",
+            PrimitiveTypeKind::Integer => "Int",
+            PrimitiveTypeKind::Float => "Float",
+            PrimitiveTypeKind::String => "String",
+            PrimitiveTypeKind::File => "File", 
+            PrimitiveTypeKind::Directory => "Directory",
+        };
+        type_names.push(kind_str.to_string());
+    }
+    
+    // If it's a type reference, add the reference name
+    if let Some(type_ref) = ty.as_type_ref() {
+        type_names.push(type_ref.name().as_str().to_string());
+    }
+    
+    // Remove optional markers (?) from type names
+    let type_names: Vec<String> = type_names
+        .into_iter()
+        .map(|t| t.trim_end_matches('?').to_string())
+        .collect();
+    
+    // Check each type name against the declaration name
+    for type_name in &type_names {
+        let type_lower = type_name.to_lowercase();
+        
+        // Skip if the type name is too short (to avoid false positives)
+        if type_lower.len() < 2 {
+            continue;
+        }
+        
+        // Check if the declaration name contains the type name
+        if name_lower.starts_with(&type_lower) || 
+           name_lower.ends_with(&type_lower) || 
+           name_lower.contains(&type_lower) {
+            state.exceptable_add(
+                decl_identifier_with_type(decl.name().span(), name_str, type_name),
+                SyntaxElement::from(decl.syntax().clone()),
+                exceptable_nodes,
+            );
+            return;
+        }
     }
 }
 
