@@ -1,4 +1,6 @@
 //! A lint rule that disallows declaration names with type prefixes or suffixes.
+//! 
+//! FIXING PUSH ISSUE - THIS COMMENT SHOULD BE VISIBLE IN THE PR
 
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
