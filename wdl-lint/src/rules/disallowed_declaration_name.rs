@@ -1,6 +1,4 @@
 //! A lint rule that disallows declaration names with type prefixes or suffixes.
-//! 
-//! FIXING PUSH ISSUE - THIS COMMENT SHOULD BE VISIBLE IN THE PR
 
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -123,37 +121,15 @@ fn check_decl_name(
     let name_lower = name_str.to_lowercase();
     let type_lower = base_type.to_lowercase();
     
-    // Check for type name at beginning or end
-    if name_lower.starts_with(&type_lower) || name_lower.ends_with(&type_lower) ||
-       name_lower.contains(&type_lower) {  // Also check for type name anywhere in the identifier
+    // Check for type name at beginning or end or anywhere in the name
+    if name_lower.starts_with(&type_lower) || 
+       name_lower.ends_with(&type_lower) || 
+       name_lower.contains(&type_lower) {
         state.exceptable_add(
             decl_identifier_with_type(decl.name().span(), name_str, base_type),
             SyntaxElement::from(decl.syntax().clone()),
             exceptable_nodes,
         );
-        return;
-    }
-    
-    // Check for common WDL types that might be embedded in the name
-    let common_types = [
-        "Int", "Float", "Boolean", "String", "File", "Directory",
-        "Map", "Pair", "Array", "Struct"
-    ];
-    
-    for &type_name in &common_types {
-        let type_lower = type_name.to_lowercase();
-        
-        // Only check if this type matches the actual type of the declaration
-        if base_type.to_lowercase().contains(&type_lower) {
-            if name_lower.contains(&type_lower) {
-                state.exceptable_add(
-                    decl_identifier_with_type(decl.name().span(), name_str, type_name),
-                    SyntaxElement::from(decl.syntax().clone()),
-                    exceptable_nodes,
-                );
-                return;
-            }
-        }
     }
 }
 
