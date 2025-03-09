@@ -82,14 +82,11 @@ impl Visitor for RedundantNoneAssignment {
                 if token.is_optional() {
                     if let Some(expr) = decl.expr() {
                         if let Some(_) = expr.as_literal().and_then(|lit| lit.as_none()) {
-                            let text_range = decl.syntax().text_range();
-                            let span =
-                                Span::from(text_range.start().into()..text_range.end().into());
-                            state.exceptable_add(
-                                redundant_none_assignment(span, decl.name().as_str()),
-                                SyntaxElement::from(decl.syntax().clone()),
-                                &self.exceptable_nodes(),
-                            );
+                        state.exceptable_add(
+                            redundant_none_assignment(decl.syntax().text_range().to_span(), decl.name().as_str()),
+                            SyntaxElement::from(decl.syntax().clone()),
+                            &self.exceptable_nodes(),
+                        );
                         }
                     }
                 }
