@@ -81,7 +81,7 @@ impl Visitor for RedundantNoneAssignment {
             if let token = decl.ty() {
                 if token.is_optional() {
                     if let Some(expr) = decl.expr() {
-                        if let Some(name_ref) = expr.as_literal().unwrap().as_none() {
+                        if let Some(_) = expr.as_literal().and_then(|lit| lit.as_none()) {
                             let text_range = decl.syntax().text_range();
                             let span =
                                 Span::from(text_range.start().into()..text_range.end().into());
