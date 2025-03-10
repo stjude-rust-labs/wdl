@@ -657,7 +657,6 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
     /// Checks a placeholder expression.
     pub(crate) fn check_placeholder<N: TreeNode>(&mut self, placeholder: &Placeholder<N>) {
         self.placeholders += 1;
-    
         let expr = placeholder.expr();
         if let Some(ty) = self.evaluate_expr(&expr) {
             match ty {
@@ -674,7 +673,6 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                             }
                         }
                     }
-    
                     if let Some(PlaceholderOption::Default(_)) = placeholder.option() {
                         if let Type::Primitive(_, is_optional) = ty {
                             if is_optional {
@@ -682,13 +680,11 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                             }
                         }
                     }
-    
                     if let Some(PlaceholderOption::TrueFalse(_)) = placeholder.option() {
                         if let Type::Primitive(PrimitiveType::Boolean, _) = ty {
                             coercible = true;
                         }
                     }
-    
                     if !coercible {
                         self.context
                             .add_diagnostic(cannot_coerce_to_string(&ty, expr.span()));
