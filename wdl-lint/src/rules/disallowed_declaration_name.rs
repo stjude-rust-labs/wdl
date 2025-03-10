@@ -81,7 +81,7 @@ impl Rule for DisallowedDeclarationNameRule {
     fn explanation(&self) -> &'static str {
         "Declaration names should not include their type as a prefix or suffix. \
         This makes the code more verbose and often redundant. For example, use \
-        'input_file' instead of 'file_input' or 'myFile'."
+        'data' instead of 'fileData' or 'input_string' instead of 'stringInput'."
     }
 
     fn tags(&self) -> TagSet {
@@ -96,49 +96,6 @@ impl Rule for DisallowedDeclarationNameRule {
             SyntaxKind::InputSectionNode,
             SyntaxKind::OutputSectionNode,
         ])
-    }
-}
-
-/// Extracts all type names from a type, recursively handling nested types
-fn extract_type_names(ty: &wdl_ast::v1::Type, type_names: &mut Vec<String>) {
-    // Handle different type variants
-    match ty {
-        wdl_ast::v1::Type::Array(array_type) => {
-            // Add "Array" as a type name
-            type_names.push("Array".to_string());
-            
-            // Recursively extract from the element type
-            extract_type_names(&array_type.element_type(), type_names);
-        },
-        wdl_ast::v1::Type::Map(map_type) => {
-            // Add "Map" as a type name
-            type_names.push("Map".to_string());
-            
-            // Recursively extract from key and value types
-            let (key, value) = map_type.types();
-            extract_type_names(&wdl_ast::v1::Type::Primitive(key), type_names);
-            extract_type_names(&value, type_names);
-        },
-        wdl_ast::v1::Type::Pair(pair_type) => {
-            // Add "Pair" as a type name
-            type_names.push("Pair".to_string());
-            
-            // Recursively extract from left and right types
-            let (left, right) = pair_type.types();
-            extract_type_names(&left, type_names);
-            extract_type_names(&right, type_names);
-        },
-        wdl_ast::v1::Type::Primitive(primitive_type) => {
-            // Add the primitive type name using to_string()
-            type_names.push(primitive_type.to_string().trim_end_matches('?').to_string());
-        },
-        wdl_ast::v1::Type::Ref(type_ref) => {
-            // Add the reference name
-            type_names.push(type_ref.name().as_str().to_string());
-        },
-        _ => {
-            // Handle other cases (Object, etc.)
-        }
     }
 }
 
@@ -158,8 +115,47 @@ fn check_decl_name(
     // Extract base type name(s) using AST methods
     let mut type_names = Vec::new();
     
-    // Recursively extract all type names from the type
-    extract_type_names(&ty, &mut type_names);
+    // Add the full type name
+    type_names.push(ty.to_string());
+    
+    // If it's an array, add the element type
+    if let Some(array_type) = ty.as_array_type() {
+        // Add the element type 
+        type_names.push(array_type.element_type().to_string());
+    }
+    
+    // If it's a map, add the key and value types
+    if let Some(map_type) = ty.as_map_type() {
+        let (key, value) = map_type.types();
+        type_names.push(key.to_string());
+        type_names.push(value.to_string());
+    }
+    
+    // If it's a pair, add the left and right types
+    if let Some(pair_type) = ty.as_pair_type() {
+        let (left, right) = pair_type.types();
+        type_names.push(left.to_string());
+        type_names.push(right.to_string());
+    }
+    
+    // If it's a primitive type, use that directly
+    if let Some(primitive_type) = ty.as_primitive_type() {
+        // Convert the PrimitiveTypeKind to a string
+        let kind_str = match primitive_type.kind() {
+            PrimitiveTypeKind::Boolean => "Boolean",
+            PrimitiveTypeKind::Integer => "Int",
+            PrimitiveTypeKind::Float => "Float",
+            PrimitiveTypeKind::String => "String",
+            PrimitiveTypeKind::File => "File", 
+            PrimitiveTypeKind::Directory => "Directory",
+        };
+        type_names.push(kind_str.to_string());
+    }
+    
+    // If it's a type reference, add the reference name
+    if let Some(type_ref) = ty.as_type_ref() {
+        type_names.push(type_ref.name().as_str().to_string());
+    }
     
     // Remove optional markers (?) from type names
     let type_names: Vec<String> = type_names
