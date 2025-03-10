@@ -655,45 +655,34 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
     }
 
     /// Checks a placeholder expression.
-    pub(crate) fn check_placeholder<N: TreeNode>(&mut self, placeholder: &Placeholder<N>) {
-        self.placeholders += 1;
-        let expr = placeholder.expr();
-        if let Some(ty) = self.evaluate_expr(&expr) {
-            match ty {
-                Type::Primitive(..) | Type::Union | Type::None => {
-                }
-                ty => {
-                    let mut coercible = false;
-                    if let Some(PlaceholderOption::Sep(_)) = placeholder.option() {
-                        if let Type::Compound(CompoundType::Array(ty), _) = &ty {
-                            if let Type::Primitive(_, is_optional) = ty.element_type() {
-                                if !is_optional {
-                                    coercible = true;
-                                }
-                            }
-                        }
-                    }
-                    if let Some(PlaceholderOption::Default(_)) = placeholder.option() {
-                        if let Type::Primitive(_, is_optional) = ty {
-                            if is_optional {
-                                coercible = true;
-                            }
-                        }
-                    }
-                    if let Some(PlaceholderOption::TrueFalse(_)) = placeholder.option() {
-                        if let Type::Primitive(PrimitiveType::Boolean, _) = ty {
-                            coercible = true;
-                        }
-                    }
-                    if !coercible {
-                        self.context
-                            .add_diagnostic(cannot_coerce_to_string(&ty, expr.span()));
-                    }
+  pub(crate) fn check_placeholder(&mut self, placeholder: &Placeholder) {
+    self.placeholders += 1;
+    let expr = placeholder.expr();
+     /// Evaluate the placeholder expression and check that the resulting type is
+    /// coercible to string for interpolation
+    if let Some(ty) = self.evaluate_expr(&expr) {
+        match ty {
+            Type::Primitive(..) | Type::Union | Type::None => { /* Already coercible */ }
+            _ => {
+                let coercible = match placeholder.option() {
+                    Some(PlaceholderOption::Sep(_)) => matches!(ty, Type::Compound(CompoundType::Array(element_type), _) 
+                        if matches!(element_type.as_ref(), Type::Primitive(_, false))),
+                    
+                    Some(PlaceholderOption::Default(_)) => matches!(ty, Type::Primitive(_, true)),
+
+                    Some(PlaceholderOption::TrueFalse(_)) => matches!(ty, Type::Primitive(PrimitiveType::Boolean, _)),
+
+                    None => true, // Default case: Always coercible
+                };
+                if !coercible {
+                    self.context
+                        .add_diagnostic(cannot_coerce_to_string(&ty, expr.span()));
                 }
             }
         }
-        self.placeholders -= 1;
-    }    
+    }
+    self.placeholders -= 1;
+}
     /// Evaluates the type of a literal array expression.
     fn evaluate_literal_array<N: TreeNode>(&mut self, expr: &LiteralArray<N>) -> Type {
         // Look at the first array element to determine the element type
