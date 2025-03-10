@@ -10,9 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * `missing_call_input` now generates a warning for missing inputs when nested inputs are allowed, without changing the existing error behavior ([#344]https://github.com/stjude-rust-labs/wdl/pull/344).
-
-### Added
-
 * Added `path` method to `Document` ([#327](https://github.com/stjude-rust-labs/wdl/pull/327)).
 
 ### Changed
