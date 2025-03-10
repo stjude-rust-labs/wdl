@@ -75,13 +75,13 @@ impl Rule for DisallowedDeclarationNameRule {
     }
 
     fn description(&self) -> &'static str {
-        "Declaration names should not include their type"
+        "Declaration names should not end with their type"
     }
 
     fn explanation(&self) -> &'static str {
-        "Declaration names should not include their type as a prefix or suffix. \
+        "Declaration names should not include their type as a suffix. \
         This makes the code more verbose and often redundant. For example, use \
-        'data' instead of 'fileData' or 'input_string' instead of 'stringInput'."
+        'counter' instead of 'counterInt', or 'is_active' instead of 'activeBool'."
     }
 
     fn tags(&self) -> TagSet {
@@ -99,7 +99,7 @@ impl Rule for DisallowedDeclarationNameRule {
     }
 }
 
-/// Check declaration name for type prefixes or suffixes
+/// Check declaration name for type suffixes only
 fn check_decl_name(
     state: &mut Diagnostics,
     decl: &Decl,
@@ -112,84 +112,73 @@ fn check_decl_name(
     // Get the declaration type
     let ty = decl.ty();
     
-    // Extract base type name(s) using AST methods
+    // Skip type reference types (user-defined structs)
+    if ty.as_type_ref().is_some() {
+        return;
+    }
+    
+    // Extract type names to check
     let mut type_names = Vec::new();
     
-    // Add the full type name
-    type_names.push(ty.to_string());
-    
-    // If it's an array, add the element type
-    if let Some(array_type) = ty.as_array_type() {
-        // Add the element type 
-        type_names.push(array_type.element_type().to_string());
-    }
-    
-    // If it's a map, add the key and value types
-    if let Some(map_type) = ty.as_map_type() {
-        let (key, value) = map_type.types();
-        type_names.push(key.to_string());
-        type_names.push(value.to_string());
-    }
-    
-    // If it's a pair, add the left and right types
-    if let Some(pair_type) = ty.as_pair_type() {
-        let (left, right) = pair_type.types();
-        type_names.push(left.to_string());
-        type_names.push(right.to_string());
-    }
-    
-    // If it's a primitive type, use that directly
+    // Add primitive type if present
     if let Some(primitive_type) = ty.as_primitive_type() {
-        // Convert the PrimitiveTypeKind to a string
-        let kind_str = match primitive_type.kind() {
-            PrimitiveTypeKind::Boolean => "Boolean",
-            PrimitiveTypeKind::Integer => "Int",
-            PrimitiveTypeKind::Float => "Float",
-            PrimitiveTypeKind::String => "String",
-            PrimitiveTypeKind::File => "File", 
-            PrimitiveTypeKind::Directory => "Directory",
-        };
-        type_names.push(kind_str.to_string());
+        // Skip File and String types as they cause too many false positives
+        match primitive_type.kind() {
+            PrimitiveTypeKind::File | PrimitiveTypeKind::String => {},
+            PrimitiveTypeKind::Boolean => {
+                // For Boolean, check both "Boolean" and "Bool"
+                type_names.push("Boolean".to_string());
+                type_names.push("Bool".to_string());
+            },
+            _ => type_names.push(primitive_type.to_string()),
+        }
     }
     
-    // If it's a type reference, add the reference name
-    if let Some(type_ref) = ty.as_type_ref() {
-        type_names.push(type_ref.name().as_str().to_string());
+    // Add compound types
+    if ty.as_array_type().is_some() {
+        type_names.push("Array".to_string());
+    } else if ty.as_map_type().is_some() {
+        type_names.push("Map".to_string());
+    } else if ty.as_pair_type().is_some() {
+        type_names.push("Pair".to_string());
     }
     
-    // Remove optional markers (?) from type names
-    let type_names: Vec<String> = type_names
-        .into_iter()
-        .map(|t| t.trim_end_matches('?').to_string())
-        .collect();
-    
-    // Check each type name against the declaration name
+    // Check each type name against the declaration name (only as a suffix)
     for type_name in &type_names {
         let type_lower = type_name.to_lowercase();
         
-        // Skip if the type name is too short (to avoid false positives)
+        // Skip if the type name is too short
         if type_lower.len() < 3 {
             continue;
         }
         
-        // More precise checks for type names in declaration identifiers
-        // Only check prefix and suffix to avoid common false positives
-        if name_lower.starts_with(&type_lower) || name_lower.ends_with(&type_lower) {
-            // Special cases for short types like "Int" that might appear in legitimate words
-            if type_lower == "int" {
-                // Skip prefixes like "inter-" or "intra-" or common words containing "int"
-                let common_false_positives = ["inter", "intra", "integ", "winter", "point"];
-                if common_false_positives.iter().any(|&prefix| name_lower.starts_with(prefix)) {
+        // Special handling for Int - check only as a full suffix
+        if type_lower == "int" {
+            // Only check if it appears as a complete suffix
+            if name_lower.ends_with(&type_lower) {
+                // Skip common false positive suffixes
+                let common_false_positives = ["point", "print", "hint", "lint", "mint", "tint", "stint"];
+                if common_false_positives.iter().any(|&suffix| name_lower.ends_with(suffix)) {
                     continue;
                 }
+                
+                state.exceptable_add(
+                    decl_identifier_with_type(decl.name().span(), name_str, type_name),
+                    SyntaxElement::from(decl.syntax().clone()),
+                    exceptable_nodes,
+                );
+                return;
             }
-            
-            state.exceptable_add(
-                decl_identifier_with_type(decl.name().span(), name_str, type_name),
-                SyntaxElement::from(decl.syntax().clone()),
-                exceptable_nodes,
-            );
-            return;
+        } else {
+            // For all other types, check only as a suffix
+            if name_lower.ends_with(&type_lower) {
+                state.exceptable_add(
+                    decl_identifier_with_type(decl.name().span(), name_str, type_name),
+                    SyntaxElement::from(decl.syntax().clone()),
+                    exceptable_nodes,
+                );
+                return;
+            }
         }
     }
 }
@@ -207,10 +196,13 @@ version 1.0
 
 workflow test {
     input {
-        File fileInput
-        Int my_int
-        Array[String] stringArray
-        String good_name
+        Int counterInt
+        Boolean isActiveBoolean
+        Boolean flagBool
+        Array[Int] valuesArray
+        Map[String, Int] resultsMap
+        Pair[Int, Float] dataPair
+        Float measureFloat
     }
 }
 "#;
@@ -223,8 +215,8 @@ workflow test {
         assert!(result.is_err());
         let diagnostics = result.err().unwrap();
         
-        // We expect 3 errors: for fileInput, my_int, and stringArray
-        assert_eq!(diagnostics.len(), 3);
+        // We expect 7 errors for the suffixes
+        assert_eq!(diagnostics.len(), 7);
         
         // Check that the correct identifiers are flagged
         let diagnostic_texts: Vec<_> = diagnostics
@@ -234,15 +226,31 @@ workflow test {
             
         assert!(diagnostic_texts
             .iter()
-            .any(|msg| msg.contains("fileInput") && msg.contains("File")));
+            .any(|msg| msg.contains("counterInt") && msg.contains("Int")));
             
         assert!(diagnostic_texts
             .iter()
-            .any(|msg| msg.contains("my_int") && msg.contains("Int")));
+            .any(|msg| msg.contains("isActiveBoolean") && msg.contains("Boolean")));
             
         assert!(diagnostic_texts
             .iter()
-            .any(|msg| msg.contains("stringArray") && msg.contains("String")));
+            .any(|msg| msg.contains("flagBool") && msg.contains("Bool")));
+            
+        assert!(diagnostic_texts
+            .iter()
+            .any(|msg| msg.contains("valuesArray") && msg.contains("Array")));
+
+        assert!(diagnostic_texts
+            .iter()
+            .any(|msg| msg.contains("resultsMap") && msg.contains("Map")));
+
+        assert!(diagnostic_texts
+            .iter()
+            .any(|msg| msg.contains("dataPair") && msg.contains("Pair")));
+
+        assert!(diagnostic_texts
+            .iter()
+            .any(|msg| msg.contains("measureFloat") && msg.contains("Float")));
     }
 
     #[test]
@@ -252,10 +260,27 @@ version 1.0
 
 workflow test {
     input {
-        File data
-        Int count
-        Array[String] words
-        Map[String, Int] counts
+        # File and String types are allowed with any naming pattern
+        File fileInput
+        File input_file
+        String stringValue
+        String value_string
+        
+        # These don't end with the type name
+        Int counter
+        Boolean is_active
+        Array[String] word_list
+        Map[String, Int] count_values
+        
+        # Special cases for Int that should be allowed
+        Int checkpoint
+        Int footprint
+        Int mint_token
+        
+        # Using type name as prefix is allowed
+        Int intValue
+        Boolean boolFlag
+        Float floatResult
     }
 }
 "#;
