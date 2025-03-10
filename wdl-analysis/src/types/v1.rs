@@ -681,10 +681,8 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 }
             }
         }
-    
         self.placeholders -= 1;
     }    
-
     /// Evaluates the type of a literal array expression.
     fn evaluate_literal_array(&mut self, expr: &LiteralArray) -> Type {
         // Look at the first array element to determine the element type
