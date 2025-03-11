@@ -128,72 +128,28 @@ pub async fn analyze(
 
 /// Parses the inputs for a task or workflow.
 ///
-/// Returns the absolute path to the inputs file (if a path was provided), the
+/// Returns the absolute path to the inputs file, the
 /// name of the workflow or task referenced by the inputs, and the inputs to the
-/// workflow or task. If no `inputs` file is provided, the resulting [`Inputs`]
-/// will be empty.
-pub fn parse_inputs(
+/// workflow or task
+pub fn parse_json_path(
     document: &Document,
-    name: Option<&str>,
-    inputs: Option<&Path>,
+    inputs: &Path,
 ) -> Result<(Option<PathBuf>, String, Inputs)> {
-    if let Some(path) = inputs {
-        // If a inputs file path was provided, parse the inputs from the file
-        match Inputs::parse(document, path)? {
-            Some((name, inputs)) => {
-                // Make the inputs file path absolute so that we treat any file/directory inputs
-                // in the file as relative to the inputs file itself
-                let path = absolute(path).with_context(|| {
-                    format!(
-                        "failed to determine the absolute path of `{path}`",
-                        path = path.display()
-                    )
-                })?;
-                Ok((Some(path), name, inputs))
-            }
-            None => bail!("inputs file `{path}` is empty", path = path.display()),
-        }
-    } else if let Some(name) = name {
-        // Otherwise, if a name was provided, look for a task or workflow with that
-        // name
-        if document.task_by_name(name).is_some() {
-            Ok((None, name.to_string(), Inputs::Task(Default::default())))
-        } else if document.workflow().is_some() {
-            if name != document.workflow().unwrap().name() {
-                bail!("document does not contain a workflow named `{name}`");
-            }
-            Ok((None, name.to_string(), Inputs::Workflow(Default::default())))
-        } else {
-            bail!("document does not contain a task or workflow named `{name}`");
-        }
-    } else {
-        // Neither an inputs file or name was provided, look for a workflow in the
-        // document; failing that, find at most one task in the document
-        let (name, inputs) = document
-            .workflow()
-            .map(|w| Ok((w.name().to_string(), Inputs::Workflow(Default::default()))))
-            .unwrap_or_else(|| {
-                let mut iter = document.tasks();
-                let (name, inputs) = iter
-                    .next()
-                    .map(|t| (t.name().to_string(), Inputs::Task(Default::default())))
-                    .context(
-                        "inputs file is empty and the document contains no workflow or task",
-                    )?;
+    let path = absolute(inputs).with_context(|| {
+        format!(
+            "failed to determine the absolute path of `{path}`",
+            path = path.display()
+        )
+    })?;
 
-                if iter.next().is_some() {
-                    bail!("inputs file is empty and the document contains more than one task");
-                }
-
-                Ok((name, inputs))
-            })?;
-
-        Ok((None, name, inputs))
+    match Inputs::parse(document, &path)? {
+        Some((name, inputs)) => Ok((Some(path), name, inputs)),
+        None => bail!("inputs file `{path}` is empty", path = path.display()),
     }
 }
 
 /// Validates the inputs for a task or workflow.
-pub async fn validate_inputs(document: &str, inputs: &Path) -> Result<Option<Diagnostic>> {
+pub async fn validate_json_file(document: &str, inputs: &Path) -> Result<Option<Diagnostic>> {
     let results = analyze(document, vec![], false, false).await?;
 
     let uri = Url::parse(document)
@@ -205,7 +161,7 @@ pub async fn validate_inputs(document: &str, inputs: &Path) -> Result<Option<Dia
         .context("failed to find document in analysis results")?;
     let document = result.document();
 
-    let (_path, name, inputs) = parse_inputs(document, None, Some(inputs))?;
+    let (_path, name, inputs) = parse_json_path(document, None, Some(inputs))?;
 
     match inputs {
         Inputs::Task(inputs) => {
