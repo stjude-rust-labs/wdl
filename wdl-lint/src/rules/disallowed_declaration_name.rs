@@ -1,16 +1,30 @@
 //! A lint rule that disallows declaration names with type suffixes.
 
-use convert_case::{Case, Casing};
 use std::collections::HashSet;
-use wdl_ast::v1::{BoundDecl, Decl, PrimitiveTypeKind, UnboundDecl};
-use wdl_ast::{
-    AstToken, Diagnostic, Diagnostics, Document, Span, SupportedVersion, SyntaxElement, SyntaxKind,
-    VisitReason, Visitor,
-};
 
-use crate::{Rule, Tag, TagSet};
+use convert_case::Case;
+use convert_case::Casing;
+use wdl_ast::AstToken;
+use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
+use wdl_ast::Document;
+use wdl_ast::Span;
+use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
+use wdl_ast::SyntaxKind;
+use wdl_ast::VisitReason;
+use wdl_ast::Visitor;
+use wdl_ast::v1::BoundDecl;
+use wdl_ast::v1::Decl;
+use wdl_ast::v1::PrimitiveTypeKind;
+use wdl_ast::v1::UnboundDecl;
 
-/// A rule that identifies declaration names that include their type names as a suffix.
+use crate::Rule;
+use crate::Tag;
+use crate::TagSet;
+
+/// A rule that identifies declaration names that include their type names as a
+/// suffix.
 #[derive(Debug, Default)]
 pub struct DisallowedDeclarationNameRule;
 
@@ -34,9 +48,9 @@ impl Rule for DisallowedDeclarationNameRule {
     }
 
     fn explanation(&self) -> &'static str {
-        "Declaration names should not include their type as a suffix. \
-        This makes the code more verbose and often redundant. For example, use \
-        'counter' instead of 'counterInt' or 'is_active' instead of 'isActiveBoolean'."
+        "Declaration names should not include their type as a suffix. This makes the code more \
+         verbose and often redundant. For example, use 'counter' instead of 'counterInt' or \
+         'is_active' instead of 'isActiveBoolean'."
     }
 
     fn tags(&self) -> TagSet {
@@ -101,72 +115,62 @@ fn check_decl_name(
     // Get the declaration type
     let ty = decl.ty();
 
-    // Skip type reference types (user-defined structs)
-    if ty.as_type_ref().is_some() {
-        return;
-    }
-
-    // Skip File and String types as they cause too many false positives
-    if let Some(primitive_type) = ty.as_primitive_type() {
-        match primitive_type.kind() {
-            PrimitiveTypeKind::File | PrimitiveTypeKind::String => return,
-            _ => {}
-        }
-    }
-
-    // Extract type names to check
+    // Extract type names to check based on the type
     let mut type_names = HashSet::new();
 
-    // Add primitive type names
-    if let Some(primitive_type) = ty.as_primitive_type() {
-        // Use the type's string representation
-        type_names.insert(primitive_type.to_string());
+    // Handle different type variants
+    match ty {
+        // Skip type reference types (user-defined structs)
+        ty if ty.as_type_ref().is_some() => return,
 
-        // For Boolean type, also check for "Bool"
-        if primitive_type.kind() == PrimitiveTypeKind::Boolean {
-            type_names.insert("Bool".to_string());
-        }
-    }
+        // Handle primitive types
+        ty if ty.as_primitive_type().is_some() => {
+            let primitive_type = ty.as_primitive_type().unwrap();
 
-    // Add compound type names
-    if let Some(array_type) = ty.as_array_type() {
-        // Add "Array" for the compound type
-        type_names.insert("Array".to_string());
-
-        // Extract inner type names but handle plurals differently
-        if let Some(primitive) = array_type.element_type().as_primitive_type() {
-            // Skip File and String types
-            match primitive.kind() {
-                PrimitiveTypeKind::File | PrimitiveTypeKind::String => {}
+            // Skip File and String types as they cause too many false positives
+            match primitive_type.kind() {
+                PrimitiveTypeKind::File | PrimitiveTypeKind::String => return,
                 _ => {
-                    // Don't check for inner primitive type suffixes in arrays
-                    // since the plural form is often appropriate
-                    // (e.g., Array[Int] integers is fine)
+                    // Add the primitive type name
+                    type_names.insert(primitive_type.to_string());
+
+                    // For Boolean type, also check for "Bool"
+                    if primitive_type.kind() == PrimitiveTypeKind::Boolean {
+                        type_names.insert("Bool".to_string());
+                    }
                 }
             }
         }
-    } else if let Some(_map_type) = ty.as_map_type() {
-        type_names.insert("Map".to_string());
 
-        // Skip checking inner types of maps
-    } else if let Some(_pair_type) = ty.as_pair_type() {
-        type_names.insert("Pair".to_string());
+        // Handle Array types
+        ty if ty.as_array_type().is_some() => {
+            // Add "Array" for the compound type
+            type_names.insert("Array".to_string());
+        }
 
-        // Skip checking inner types of pairs
+        // Handle Map types
+        ty if ty.as_map_type().is_some() => {
+            // Add "Map" for the compound type
+            type_names.insert("Map".to_string());
+        }
+
+        // Handle Pair types
+        ty if ty.as_pair_type().is_some() => {
+            // Add "Pair" for the compound type
+            type_names.insert("Pair".to_string());
+        }
+
+        // Any other type
+        _ => {}
     }
 
     // Check if the declaration name ends with one of the type names
     for type_name in &type_names {
         let type_lower = type_name.to_lowercase();
 
-        // Skip if the type name is too short
-        if type_lower.len() < 3 {
-            continue;
-        }
-
         // Special handling for Int
         if type_lower == "int" {
-            // Split the identifier into words to check if "int" is used as a standalone suffix
+            // Split the identifier into words using convert_case
             let words = split_to_words(name_str);
 
             // Check if "int" appears as the last word
@@ -197,55 +201,18 @@ fn check_decl_name(
 
 /// Split an identifier into words using convert_case
 fn split_to_words(identifier: &str) -> Vec<String> {
-    // Try to detect the case style
-    let detected_case = detect_case_style(identifier);
-
-    // Split the identifier into words based on the case style
-    match detected_case {
-        Case::Camel | Case::Pascal => {
-            // For camelCase or PascalCase, convert to snake_case first to split words
-            identifier
-                .to_case(Case::Snake)
-                .split('_')
-                .map(|s| s.to_string())
-                .collect()
-        }
-        Case::Snake | Case::Kebab => {
-            // For snake_case or kebab-case, split by separator
-            let separator = if detected_case == Case::Snake {
-                '_'
-            } else {
-                '-'
-            };
-            identifier.split(separator).map(|s| s.to_string()).collect()
-        }
-        _ => {
-            // For other cases or mixed cases, just return the identifier as is
-            vec![identifier.to_string()]
-        }
-    }
-}
-
-/// Detect the case style of an identifier
-fn detect_case_style(identifier: &str) -> Case {
-    if identifier.contains('_') {
-        Case::Snake
-    } else if identifier.contains('-') {
-        Case::Kebab
-    } else if identifier
-        .chars()
-        .next()
-        .map_or(false, |c| c.is_uppercase())
-    {
-        Case::Pascal
-    } else {
-        Case::Camel
-    }
+    // Convert to snake case and split by underscore based on detected case style
+    identifier
+        .to_case(Case::Snake)
+        .split('_')
+        .map(|s| s.to_string())
+        .collect()
 }
 
 #[cfg(test)]
 mod tests {
-    use wdl_ast::{Document, Validator};
+    use wdl_ast::Document;
+    use wdl_ast::Validator;
 
     use super::*;
 
