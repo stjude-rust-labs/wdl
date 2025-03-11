@@ -201,10 +201,9 @@ fn check_decl_name(
 
 /// Split an identifier into words using convert_case
 fn split_to_words(identifier: &str) -> Vec<String> {
-    // Convert to snake case and split by underscore based on detected case style
-    identifier
-        .to_case(Case::Snake)
-        .split('_')
+    // Use convert_case's built-in split functionality with default boundaries
+    convert_case::split(&identifier, &convert_case::Boundary::defaults())
+        .into_iter()
         .map(|s| s.to_string())
         .collect()
 }
