@@ -641,31 +641,38 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
 
     /// Checks a placeholder expression.
     pub(crate) fn check_placeholder(&mut self, placeholder: &Placeholder) {
-        self.placeholders += 1;
-
+        self.placeholders += 1;  // Track placeholder processing count
+    
+        let expr = placeholder.expr(); // Extract expression inside placeholder
+    
         // Evaluate the placeholder expression and check that the resulting type is
         // coercible to string for interpolation
-        let expr = placeholder.expr();
         if let Some(ty) = self.evaluate_expr(&expr) {
             match ty {
-                Type::Primitive(..) | Type::Union | Type::None => {
-                    // OK
-                }
-                ty => {
-                    // Check for a sep option is specified; if so, accept `Array[P]` where `P` is
-                    // primitive.
-                    let mut coercible = false;
-                    if let Some(PlaceholderOption::Sep(_)) = placeholder.option() {
-                        if let Type::Compound(CompoundType::Array(ty), _) = &ty {
-                            if !ty.element_type().is_optional()
-                                && ty.element_type().as_primitive().is_some()
-                            {
-                                // OK
-                                coercible = true;
-                            }
-                        }
-                    }
-
+                // If the type is already coercible, do nothing
+                Type::Primitive(..) | Type::Union | Type::None => {}
+    
+                // Otherwise, check placeholder options
+                _ => {
+                    let coercible = match placeholder.option() {
+                        // `Sep` option: Only `Array[P]` where `P` is a non-optional primitive is valid
+                        Some(PlaceholderOption::Sep(_)) => matches!(ty, 
+                            Type::Compound(CompoundType::Array(ref element_type), _) 
+                            if matches!(element_type.element_type(), Type::Primitive(_, false))),
+    
+                        // `Default` option: Only optional primitive types are valid
+                        Some(PlaceholderOption::Default(_)) => matches!(ty, 
+                            Type::Primitive(_, true)),
+    
+                        // `TrueFalse` option: Only Boolean type is valid
+                        Some(PlaceholderOption::TrueFalse(_)) => matches!(ty, 
+                            Type::Primitive(PrimitiveType::Boolean, _)),
+    
+                        // If no option is specified, allow all types
+                        None => true, 
+                    };
+    
+                    // If coercion is not possible, add a diagnostic error
                     if !coercible {
                         self.context
                             .add_diagnostic(cannot_coerce_to_string(&ty, expr.span()));
@@ -673,9 +680,10 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 }
             }
         }
-
-        self.placeholders -= 1;
+    
+        self.placeholders -= 1; // Decrement placeholder tracking
     }
+    
 
     /// Evaluates the type of a literal array expression.
     fn evaluate_literal_array(&mut self, expr: &LiteralArray) -> Type {

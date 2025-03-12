@@ -1,0 +1,6 @@
+error: call to task `write_file_task` in `tests/workflows/primitive-literals/source.wdl` failed: failed to evaluate output `x` for task `write_file_task`: file `calls/write_file_task/attempts/0/work/testdir/hello.txt` does not exist
+   ┌─ tests/workflows/primitive-literals/source.wdl:16:8
+   │
+16 │   call write_file_task
+   │        ^^^^^^^^^^^^^^^
+
