@@ -2,8 +2,6 @@
 
 use std::collections::HashSet;
 
-use convert_case::Case;
-use convert_case::Casing;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -17,6 +15,7 @@ use wdl_ast::Visitor;
 use wdl_ast::v1::BoundDecl;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::PrimitiveTypeKind;
+use wdl_ast::v1::Type;
 use wdl_ast::v1::UnboundDecl;
 
 use crate::Rule;
@@ -120,48 +119,53 @@ fn check_decl_name(
 
     // Handle different type variants
     match ty {
-        // Skip type reference types (user-defined structs)
-        ty if ty.as_type_ref().is_some() => return,
+        Type::Ref(_) => return, // Skip type reference types (user-defined structs)
 
-        // Handle primitive types
-        ty if ty.as_primitive_type().is_some() => {
-            let primitive_type = ty.as_primitive_type().unwrap();
-
-            // Skip File and String types as they cause too many false positives
+        Type::Primitive(primitive_type) => {
             match primitive_type.kind() {
+                // Skip File and String types as they cause too many false positives
                 PrimitiveTypeKind::File | PrimitiveTypeKind::String => return,
-                _ => {
+                
+                PrimitiveTypeKind::Boolean => {
                     // Add the primitive type name
                     type_names.insert(primitive_type.to_string());
-
-                    // For Boolean type, also check for "Bool"
-                    if primitive_type.kind() == PrimitiveTypeKind::Boolean {
-                        type_names.insert("Bool".to_string());
-                    }
+                    // Also check for "Bool"
+                    type_names.insert("Bool".to_string());
+                }
+                
+                PrimitiveTypeKind::Integer => {
+                    type_names.insert(primitive_type.to_string());
+                }
+                
+                PrimitiveTypeKind::Float => {
+                    type_names.insert(primitive_type.to_string());
+                }
+                
+                PrimitiveTypeKind::Directory => {
+                    type_names.insert(primitive_type.to_string());
                 }
             }
         }
 
-        // Handle Array types
-        ty if ty.as_array_type().is_some() => {
+        Type::Array(_) => {
             // Add "Array" for the compound type
             type_names.insert("Array".to_string());
         }
 
-        // Handle Map types
-        ty if ty.as_map_type().is_some() => {
+        Type::Map(_) => {
             // Add "Map" for the compound type
             type_names.insert("Map".to_string());
         }
 
-        // Handle Pair types
-        ty if ty.as_pair_type().is_some() => {
+        Type::Pair(_) => {
             // Add "Pair" for the compound type
             type_names.insert("Pair".to_string());
         }
 
-        // Any other type
-        _ => {}
+        Type::Object(_) => {
+            // Add "Object" for the object type
+            type_names.insert("Object".to_string());
+        }
     }
 
     // Check if the declaration name ends with one of the type names
