@@ -125,22 +125,22 @@ fn check_decl_name(
             match primitive_type.kind() {
                 // Skip File and String types as they cause too many false positives
                 PrimitiveTypeKind::File | PrimitiveTypeKind::String => return,
-                
+
                 PrimitiveTypeKind::Boolean => {
                     // Add the primitive type name
                     type_names.insert(primitive_type.to_string());
                     // Also check for "Bool"
                     type_names.insert("Bool".to_string());
                 }
-                
+
                 PrimitiveTypeKind::Integer => {
                     type_names.insert(primitive_type.to_string());
                 }
-                
+
                 PrimitiveTypeKind::Float => {
                     type_names.insert(primitive_type.to_string());
                 }
-                
+
                 PrimitiveTypeKind::Directory => {
                     type_names.insert(primitive_type.to_string());
                 }
