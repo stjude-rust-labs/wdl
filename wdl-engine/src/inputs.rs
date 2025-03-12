@@ -11,6 +11,7 @@ use anyhow::Context;
 use anyhow::Result;
 use anyhow::bail;
 use serde_json::Value as JsonValue;
+use serde_yaml::Value as YamlValue;
 use wdl_analysis::document::Document;
 use wdl_analysis::document::Task;
 use wdl_analysis::document::Workflow;
@@ -26,6 +27,90 @@ use crate::Value;
 
 /// A type alias to a JSON map (object).
 type JsonMap = serde_json::Map<String, JsonValue>;
+
+/// Trait for parsing different input formats (JSON, YAML, etc.)
+///
+/// This trait defines an interface for parsing different file formats into a common
+/// representation (JsonMap) that can be used by the inputs system.
+pub(crate) trait InputFormat {
+    /// Parse a file into a JsonMap that can be used by the inputs system
+    /// 
+    /// # Parameters
+    /// - `path`: Path to the input file
+    ///
+    /// # Returns
+    /// - A JsonMap containing the parsed input data
+    ///
+    /// # Errors
+    /// - If the file cannot be opened or read
+    /// - If the file's content cannot be parsed
+    /// - If the parsed content is not a valid object/mapping
+    fn parse_file(path: &Path) -> Result<JsonMap>;
+}
+
+/// JSON input format implementation
+///
+/// Parses JSON files into the common JsonMap format.
+pub(crate) struct JsonInputFormat;
+
+impl InputFormat for JsonInputFormat {
+    fn parse_file(path: &Path) -> Result<JsonMap> {
+        let file = File::open(path)
+            .with_context(|| format!("failed to open input file `{path}`", path = path.display()))?;
+        
+        // Parse the JSON (should be an object)
+        let reader = BufReader::new(file);
+        let object = mem::take(
+            serde_json::from_reader::<_, JsonValue>(reader)
+                .with_context(|| {
+                    format!("failed to parse input file `{path}`", path = path.display())
+                })?
+                .as_object_mut()
+                .with_context(|| {
+                    format!(
+                        "expected input file `{path}` to contain a JSON object",
+                        path = path.display()
+                    )
+                })?,
+        );
+        
+        Ok(object)
+    }
+}
+
+/// YAML input format implementation
+///
+/// Parses YAML files into the common JsonMap format.
+pub(crate) struct YamlInputFormat;
+
+impl InputFormat for YamlInputFormat {
+    fn parse_file(path: &Path) -> Result<JsonMap> {
+        let file = File::open(path)
+            .with_context(|| format!("failed to open input file `{path}`", path = path.display()))?;
+        
+        // Parse the YAML
+        let reader = BufReader::new(file);
+        let yaml: YamlValue = serde_yaml::from_reader(reader)
+            .with_context(|| format!("failed to parse input file `{path}`", path = path.display()))?;
+        
+        // Convert YAML to JSON format
+        let mut json = serde_json::to_value(yaml)
+            .with_context(|| format!("failed to convert YAML to JSON for processing"))?;
+        
+        // Extract as object
+        let object = mem::take(
+            json.as_object_mut()
+                .with_context(|| {
+                    format!(
+                        "expected input file `{path}` to contain a YAML mapping",
+                        path = path.display()
+                    )
+                })?,
+        );
+        
+        Ok(object)
+    }
+}
 
 /// Helper for replacing input paths with a path derived from joining the
 /// specified path with the input path.
@@ -597,7 +682,11 @@ pub enum Inputs {
 }
 
 impl Inputs {
-    /// Parses a JSON inputs file from the given file path.
+    /// Parses an inputs file from the given file path.
+    ///
+    /// The format (JSON or YAML) is determined by the file extension:
+    /// - `.json` for JSON format
+    /// - `.yml` or `.yaml` for YAML format
     ///
     /// The parse uses the provided document to validate the input keys within
     /// the file.
@@ -607,26 +696,46 @@ impl Inputs {
     /// Returns `Ok(None)` if the file contains an empty input.
     pub fn parse(document: &Document, path: impl AsRef<Path>) -> Result<Option<(String, Self)>> {
         let path = path.as_ref();
-        let file = File::open(path).with_context(|| {
-            format!("failed to open input file `{path}`", path = path.display())
-        })?;
+        
+        // Determine the format based on file extension
+        let object = match path.extension().and_then(|ext| ext.to_str()) {
+            Some("json") => JsonInputFormat::parse_file(path)?,
+            Some("yml") | Some("yaml") => YamlInputFormat::parse_file(path)?,
+            _ => bail!("Unsupported input file format. Supported formats: .json, .yml, .yaml"),
+        };
 
-        // Parse the JSON (should be an object)
-        let reader = BufReader::new(file);
-        let object = mem::take(
-            serde_json::from_reader::<_, JsonValue>(reader)
-                .with_context(|| {
-                    format!("failed to parse input file `{path}`", path = path.display())
-                })?
-                .as_object_mut()
-                .with_context(|| {
-                    format!(
-                        "expected input file `{path}` to contain a JSON object",
-                        path = path.display()
-                    )
-                })?,
-        );
+        Self::parse_object(document, object)
+            .with_context(|| format!("failed to parse input file `{path}`", path = path.display()))
+    }
 
+    /// Parses a JSON inputs file from the given file path.
+    ///
+    /// The parse uses the provided document to validate the input keys within
+    /// the file.
+    ///
+    /// Returns `Ok(Some(_))` if the file is a non-empty inputs.
+    ///
+    /// Returns `Ok(None)` if the file contains an empty input.
+    pub fn parse_json(document: &Document, path: impl AsRef<Path>) -> Result<Option<(String, Self)>> {
+        let path = path.as_ref();
+        let object = JsonInputFormat::parse_file(path)?;
+        
+        Self::parse_object(document, object)
+            .with_context(|| format!("failed to parse input file `{path}`", path = path.display()))
+    }
+
+    /// Parses a YAML inputs file from the given file path.
+    ///
+    /// The parse uses the provided document to validate the input keys within
+    /// the file.
+    ///
+    /// Returns `Ok(Some(_))` if the file is a non-empty inputs.
+    ///
+    /// Returns `Ok(None)` if the file contains an empty input.
+    pub fn parse_yaml(document: &Document, path: impl AsRef<Path>) -> Result<Option<(String, Self)>> {
+        let path = path.as_ref();
+        let object = YamlInputFormat::parse_file(path)?;
+        
         Self::parse_object(document, object)
             .with_context(|| format!("failed to parse input file `{path}`", path = path.display()))
     }
