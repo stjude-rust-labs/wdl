@@ -1,0 +1,36 @@
+error: expected `=`, but found `Int` keyword
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:42:5
+   │
+42 │     Int count_int
+   │     ^^^ unexpected `Int` keyword
+
+error: expected `=`, but found `String` keyword
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:43:5
+   │
+43 │     String nameString
+   │     ^^^^^^ unexpected `String` keyword
+
+error: expected `=`, but found `command` keyword
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:45:5
+   │
+45 │     command <<< >>>
+   │     ^^^^^^^ unexpected `command` keyword
+
+error: expected `=`, but found `Int` keyword
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:50:9
+   │
+50 │         Int result_int
+   │         ^^^ unexpected `Int` keyword
+
+error: expected `=`, but found `String` keyword
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:51:9
+   │
+51 │         String resultString
+   │         ^^^^^^ unexpected `String` keyword
+
+error: expected `=`, but found `}`
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:52:5
+   │
+52 │     }
+   │     ^ unexpected `}`
+

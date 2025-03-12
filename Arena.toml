@@ -2137,6 +2137,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
+message = "rnaseq-core.wdl:147:25: warning[DisallowedDeclarationName]: declaration identifier 'htseq_strandedness_map' ends with type name 'Map'"
+permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L147"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
 message = "rnaseq-core.wdl:49:22: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L49"
 
