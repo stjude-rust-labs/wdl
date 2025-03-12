@@ -627,8 +627,37 @@ impl Inputs {
                 })?,
         );
 
+        // ? should we call parse_json here after turning our Path to a  JSON value?
+
         Self::parse_object(document, object)
             .with_context(|| format!("failed to parse input file `{path}`", path = path.display()))
+    }
+
+    /// Parses a JSON inputs file from the given JSON.
+    ///
+    /// The parse uses the provided document to validate the input keys within
+    /// the file.
+    ///
+    /// Returns `Ok(Some(_))` if the file is a non-empty inputs.
+    ///
+    /// Returns `Ok(None)` if the file contains an empty input.
+    pub fn parse_json(
+        document: &Document,
+        json: serde_json::Value,
+    ) -> Result<Option<(String, Self)>> {
+        // Convert the JSON value into a JSON map (object)
+        let object = json
+            .as_object()
+            .map(|obj| {
+                let mut map = serde_json::Map::new();
+                for (k, v) in obj {
+                    map.insert(k.clone(), v.clone());
+                }
+                map
+            })
+            .with_context(|| "expected input JSON to be an object")?;
+
+        Self::parse_object(document, object).with_context(|| "failed to parse input JSON object")
     }
 
     /// Gets an input value.
