@@ -30,3 +30,11 @@ note[DisallowedInputName]: declaration identifier starts with 'in'
    │
    = fix: rename the identifier to not start with 'in'
 
+warning[DisallowedDeclarationName]: declaration identifier 'int' ends with type name 'Int'
+   ┌─ tests/lints/disallowed-input-name/source.wdl:24:13
+   │
+24 │         Int int = 1  # This is OK
+   │             ^^^
+   │
+   = fix: rename the identifier to not include the type name
+

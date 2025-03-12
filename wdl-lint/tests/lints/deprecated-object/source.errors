@@ -6,6 +6,14 @@ note[DeprecatedObject]: use of a deprecated `Object` type
    │
    = fix: replace the `Object` with a `Map` or a `Struct`
 
+warning[DisallowedDeclarationName]: declaration identifier 'an_unbound_literal_object' ends with type name 'Object'
+   ┌─ tests/lints/deprecated-object/source.wdl:11:16
+   │
+11 │         Object an_unbound_literal_object
+   │                ^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
 note[DeprecatedObject]: use of a deprecated `Object` type
    ┌─ tests/lints/deprecated-object/source.wdl:14:5
    │
@@ -14,6 +22,14 @@ note[DeprecatedObject]: use of a deprecated `Object` type
    │
    = fix: replace the `Object` with a `Map` or a `Struct`
 
+warning[DisallowedDeclarationName]: declaration identifier 'a_bound_literal_object' ends with type name 'Object'
+   ┌─ tests/lints/deprecated-object/source.wdl:14:12
+   │
+14 │     Object a_bound_literal_object = object {
+   │            ^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
 note[DeprecatedObject]: use of a deprecated `Object` type
    ┌─ tests/lints/deprecated-object/source.wdl:20:9
    │
@@ -21,4 +37,12 @@ note[DeprecatedObject]: use of a deprecated `Object` type
    │         ^^^^^^
    │
    = fix: replace the `Object` with a `Map` or a `Struct`
+
+warning[DisallowedDeclarationName]: declaration identifier 'another_bound_literal_object' ends with type name 'Object'
+   ┌─ tests/lints/deprecated-object/source.wdl:20:16
+   │
+20 │         Object another_bound_literal_object = object {
+   │                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
 
