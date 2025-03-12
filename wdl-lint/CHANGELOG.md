@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * `fix` messages suggest the correct order of imports to the user in `ImportSort` rule ([#332](https://github.com/stjude-rust-labs/wdl/pull/332)).
+* `explanation(&self)` in `missing_metas` rule now explains required description and output tag. ([#349](https://github.com/stjude-rust-labs/wdl/pull/349)).
 
 ### Fixed
 
