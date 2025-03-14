@@ -1,5 +1,5 @@
-failed to parse input file `tests/inputs/unknown-requirement/inputs.json`
+failed to parse input file
 
 Caused by:
-    0: invalid input key `test.requirements.foo`
+    0: invalid input key
     1: unsupported requirements key `foo`

@@ -1,37 +1,33 @@
 test.foo:
   foo: 100
-  bar: hello
+  bar: "hello"
   baz:
-    foo: world
+    foo: "world"
     bar: "!"
     baz:
-      foo: false
+      foo: False
       bar: 100.5
-
 test.bar:
-  foo: jam
-  bar: cakes
+  foo: "jam"
+  bar: "cakes"
   baz:
-    foo: true
+    foo: True
     bar: 0.5
-
 test.baz:
-  foo: false
+  foo: False
   bar: 1234.1234
-
 test.my_call.foo:
   foo: -1
-  bar: dogs
+  bar: "dogs"
   baz:
-    foo: are
-    bar: good
+    foo: "are"
+    bar: "good"
     baz:
-      foo: true
+      foo: True
       bar: -1234.1234
-
 test.x: null
 test.y:
   - 1
   - 2.3
   - 2.5
-  - 3 
+  - 3

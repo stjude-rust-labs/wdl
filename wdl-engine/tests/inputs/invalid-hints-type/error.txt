@@ -1,5 +1,5 @@
-failed to parse input file `tests/inputs/invalid-hints-type/inputs.json`
+failed to parse input file
 
 Caused by:
-    0: invalid input key `test.hints.maxCpu`
+    0: invalid input key
     1: expected type `Int` or type `Float` for hints key `maxCpu`, but found type `String`
