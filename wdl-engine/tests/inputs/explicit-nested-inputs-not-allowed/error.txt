@@ -1,5 +1,5 @@
-failed to parse input file `tests/inputs/explicit-nested-inputs-not-allowed/inputs.json`
+failed to parse input file
 
 Caused by:
-    0: invalid input key `test.foo.bar`
+    0: invalid input key
     1: cannot specify a nested call input for workflow `test` as it does not allow nested inputs
