@@ -1,5 +1,0 @@
-Failed to parse input file `tests/inputs/yaml-only/inputs.yaml`: failed to parse input file `tests/inputs/yaml-only/inputs.yaml`
-
-Caused by:
-    0: invalid input key `test.simple_task.flag`
-    1: cannot specify a nested call input for workflow `test` as it does not allow nested inputs
