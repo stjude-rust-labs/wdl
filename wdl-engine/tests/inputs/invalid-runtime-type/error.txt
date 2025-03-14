@@ -1,5 +1,5 @@
-failed to parse input file `tests/inputs/invalid-runtime-type/inputs.json`
+failed to parse input file
 
 Caused by:
-    0: invalid input key `test.runtime.returnCodes`
+    0: invalid input key
     1: expected type `Int`, type `String`, or type `Array[Int]` for runtime key `returnCodes`, but found type `None`

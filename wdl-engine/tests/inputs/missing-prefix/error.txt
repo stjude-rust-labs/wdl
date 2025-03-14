@@ -1,4 +1,4 @@
-failed to parse input file `tests/inputs/missing-prefix/inputs.json`
+failed to parse input file
 
 Caused by:
     invalid input key `y`: expected key to be prefixed with `test`

@@ -1,9 +1,0 @@
-test.message: "Hello, YAML World!"
-test.number: 42
-test.flag: true
-test.value: 3.14159
-
-test.simple_task.message: "Hello from task!"
-test.simple_task.number: 100
-test.simple_task.flag: false
-test.simple_task.value: 2.71828 

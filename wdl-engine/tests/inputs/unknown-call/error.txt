@@ -1,5 +1,5 @@
-failed to parse input file `tests/inputs/unknown-call/inputs.json`
+failed to parse input file
 
 Caused by:
-    0: invalid input key `test.foo.bar`
+    0: invalid input key
     1: workflow `test` does not have a call named `foo`
