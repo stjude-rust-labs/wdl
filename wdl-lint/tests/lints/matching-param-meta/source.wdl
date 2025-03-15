@@ -1,7 +1,8 @@
 #@ except: DescriptionMissing, RuntimeSectionKeys
 
 ## This is a test for checking for missing and extraneous entries
-## in a `parameter_meta` section.
+## in a `parameter_meta` section, and for ensuring that
+## the order is the same as `input` section.
 
 version 1.1
 
@@ -21,6 +22,7 @@ task t {
     }
 
     input {
+        # This should warn about missing parameter metadata but not the order
         String matching
         String does_not_exist
     }
@@ -48,8 +50,9 @@ workflow w {
     }
 
     input {
-        String matching
+        # This should warn about extra parameter metadata
         String does_not_exist
+        String matching
     }
 
     output {}
