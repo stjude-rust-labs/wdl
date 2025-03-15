@@ -298,7 +298,7 @@ impl Visitor for MatchingParameterMetaRule {
             Some(param_meta) => {
                 check_parameter_meta(
                     &SectionParent::Struct(def.clone()),
-                    def.members().map(|d| Decl::Unbound(d)).collect(),
+                    def.members().map(Decl::Unbound).collect(),
                     param_meta,
                     state,
                     &self.exceptable_nodes(),

@@ -62,14 +62,14 @@ workflow test {
     meta {}
 
     parameter_meta {
-        a: "first"
-        b: "second"
+        one: "first"
+        two: "second"
     }
 
     input {
         # This should warn about incorrect ordering
-        String b
-        String a
+        String two
+        String one
     }
 
     output {}

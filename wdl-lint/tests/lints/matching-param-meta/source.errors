@@ -30,41 +30,13 @@ warning[MatchingParameterMeta]: workflow `w` is missing a parameter metadata key
    │
    = fix: add a `does_not_exist` key to the `parameter_meta` section with a detailed description of the input.
 
-note[MissingMetas]: workflow `test` is missing a `meta` section
-   ┌─ tests/lints/matching-param-meta/source.wdl:61:10
-   │
-61 │ workflow test {
-   │          ^^^^ this workflow is missing a `meta` section
-   │
-   = fix: add the missing section
-
-warning[MissingOutput]: workflow `test` is missing an output section
-   ┌─ tests/lints/matching-param-meta/source.wdl:61:10
-   │
-61 │ workflow test {
-   │          ^^^^ this workflow is missing an output section
-   │
-   = fix: add an output section to the workflow to enable call-caching
-
 warning[MatchingParameterMeta]: parameter metadata in workflow `test` is out of order
-   ┌─ tests/lints/matching-param-meta/source.wdl:62:5
+   ┌─ tests/lints/matching-param-meta/source.wdl:64:5
    │
-62 │     parameter_meta  {
+64 │     parameter_meta {
    │     ^^^^^^^^^^^^^^ parameter metadata must be in the same order as inputs
    │
    = fix: order the parameter metadata as:
-     bam
-     bam_index
-     fasta
-     fasta_index
-     dict
-     dbSNP_vcf
-     dbSNP_vcf_index
-     known_indels_sites_vcfs
-     known_indels_sites_indices
-     outfile_name
-     use_original_quality_scores
-     memory_gb
-     modify_disk_size_gb
-     ncpu
+     two
+     one
 
