@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+* Fixed the `MatchingParameterMeta` rule to also check if the order of inputs matches parameter metadata ([#354](https://github.com/stjude-rust-labs/wdl/pull/354))
 
 ### Added
 

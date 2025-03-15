@@ -1,5 +1,6 @@
 ## This is a test for checking for missing and extraneous entries
-## in a `parameter_meta` section for a struct.
+## in a `parameter_meta` section, and for ensuring that
+## the order is the same as `input` section.
 
 version 1.2
 
