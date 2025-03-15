@@ -57,3 +57,20 @@ workflow w {
 
     output {}
 }
+
+workflow test {
+    meta {}
+
+    parameter_meta {
+        a: "first"
+        b: "second"
+    }
+
+    input {
+        # This should warn about incorrect ordering
+        String b
+        String a
+    }
+
+    output {}
+}

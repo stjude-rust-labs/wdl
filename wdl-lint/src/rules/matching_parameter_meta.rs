@@ -149,13 +149,16 @@ fn check_parameter_meta(
         })
         .collect();
 
+    // We only consider the intersection of the expected and actual keys
     let expected_order: Vec<_> = expected
         .iter()
         .map(|decl| decl.name().as_str().to_string())
+        .filter(|name| actual_map.contains_key(name))
         .collect();
     let actual_order: Vec<_> = param_meta
         .items()
         .map(|m| m.name().as_str().to_string())
+        .filter(|name| expected_map.contains_key(name))
         .collect();
 
     for (name, span) in &expected_map {

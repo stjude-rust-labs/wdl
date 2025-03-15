@@ -6,16 +6,6 @@ warning[MatchingParameterMeta]: struct `Text` is missing a parameter metadata ke
   │
   = fix: add a `does_not_exist` key to the `parameter_meta` section with a detailed description of the input.
 
-warning[MatchingParameterMeta]: parameter metadata in struct `Text` is out of order
-   ┌─ tests/lints/struct-matching-param-meta/source.wdl:15:5
-   │
-15 │     parameter_meta {
-   │     ^^^^^^^^^^^^^^ parameter metadata must be in the same order as inputs
-   │
-   = fix: order the parameter metadata as:
-     matching
-     does_not_exist
-
 note[MatchingParameterMeta]: struct `Text` has an extraneous parameter metadata key named `extra`
    ┌─ tests/lints/struct-matching-param-meta/source.wdl:24:9
    │
