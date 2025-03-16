@@ -241,7 +241,7 @@ impl Visitor for PreambleFormattingRule {
                         return;
                     }
                     (_, _, false, false) => {
-                        // anything followed by invalid comment
+                        // Anything followed by invalid comment
                         // Handled by comment visitor
                         return;
                     }
