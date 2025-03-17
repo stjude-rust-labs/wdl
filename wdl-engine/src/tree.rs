@@ -313,7 +313,7 @@ impl From<SyntaxNode> for SyntaxElement {
     }
 }
 
-/// Represents a syntax token that is `Send`+`Sync`.
+/// Represents a syntax token that is `Send + Sync`.
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct SyntaxToken(Arc<ElementData>);
 
