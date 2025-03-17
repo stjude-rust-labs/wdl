@@ -557,7 +557,7 @@ impl Document {
     ///
     /// # Panics
     ///
-    /// Panics if the document was not be parsed.
+    /// Panics if the document was not parsed.
     pub fn root(&self) -> wdl_ast::Document {
         wdl_ast::Document::cast(SyntaxNode::new_root(
             self.data.root.clone().expect("should have a root"),
