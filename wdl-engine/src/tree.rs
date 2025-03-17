@@ -68,7 +68,7 @@ impl ElementData {
 /// Represents an element in a syntax tree.
 pub type SyntaxElement = NodeOrToken<SyntaxNode, SyntaxToken>;
 
-/// Represents a syntax node that is `Send`+`Sync`.
+/// Represents a syntax node that is `Send + Sync`.
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct SyntaxNode(Arc<ElementData>);
 
