@@ -11,7 +11,6 @@ use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::v1::Decl;
@@ -81,7 +80,7 @@ fn mismatched_param_order(parent: &SectionParent, span: Span, expected_order: &s
 
     Diagnostic::warning(format!(
         "parameter metadata in {context} `{parent}` is out of order",
-        parent = parent.as_str(),
+        parent = parent.text(),
     ))
     .with_rule(ID)
     .with_label(
@@ -139,7 +138,7 @@ fn check_parameter_meta(
 ) {
     let expected_map: HashMap<_, _> = expected
         .iter()
-        .map(|decl| (decl.name().as_str().to_string(), decl.name().span()))
+        .map(|decl| (decl.name().text().to_string(), decl.name().span()))
         .collect();
     let actual_map: HashMap<_, _> = param_meta
         .items()
@@ -152,12 +151,12 @@ fn check_parameter_meta(
     // We only consider the intersection of the expected and actual keys
     let expected_order: Vec<_> = expected
         .iter()
-        .map(|decl| decl.name().as_str().to_string())
+        .map(|decl| decl.name().text().to_string())
         .filter(|name| actual_map.contains_key(name))
         .collect();
     let actual_order: Vec<_> = param_meta
         .items()
-        .map(|m| m.name().as_str().to_string())
+        .map(|m| m.name().text().to_string())
         .filter(|name| expected_map.contains_key(name))
         .collect();
 
@@ -183,14 +182,14 @@ fn check_parameter_meta(
 
     if expected_order != actual_order {
         let span = param_meta
-            .syntax()
+            .inner()
             .first_token()
             .expect("Must have parameter meta token")
             .text_range()
-            .to_span();
+            .into();
         diagnostics.exceptable_add(
             mismatched_param_order(parent, span, &expected_order.join("\n")),
-            SyntaxElement::from(param_meta.syntax().clone()),
+            SyntaxElement::from(param_meta.inner().clone()),
             exceptable_nodes,
         );
     }
