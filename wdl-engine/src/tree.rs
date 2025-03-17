@@ -1,4 +1,4 @@
-//! Implementation of syntax tree elements that are `Send`+`Sync`.
+//! Implementation of syntax tree elements that are `Send + Sync`.
 //!
 //! This is used by the engine instead of the corresponding types from `rowan`
 //! because that implementation is inherently not `Send`.
