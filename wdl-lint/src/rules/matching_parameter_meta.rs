@@ -184,7 +184,7 @@ fn check_parameter_meta(
         let span = param_meta
             .inner()
             .first_token()
-            .expect("Must have parameter meta token")
+            .expect("must have parameter meta token")
             .text_range()
             .into();
         diagnostics.exceptable_add(
