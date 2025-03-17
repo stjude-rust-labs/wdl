@@ -226,7 +226,7 @@ impl TreeNode for SyntaxNode {
     }
 
     fn last_token(&self) -> Option<Self::Token> {
-        // Unfortunately `rowan` does not expose the relative offset of each green child
+        // Unfortunately `rowan` does not expose the relative offset of each green child.
         // If it did, we could easily just look at the last child here instead of
         // iterating to find the last child's start
         let mut last: Option<(usize, NodeOrToken<&GreenNodeData, &GreenTokenData>)> = None;
