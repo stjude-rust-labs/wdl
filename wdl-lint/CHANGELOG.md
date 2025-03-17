@@ -6,7 +6,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
-
 ### Fixed
 
 * Fixed the `MatchingParameterMeta` rule to also check if the order of inputs matches parameter metadata ([#354](https://github.com/stjude-rust-labs/wdl/pull/354))
@@ -17,15 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Updated to use new `wdl-ast` API ([#355](https://github.com/stjude-rust-labs/wdl/pull/355)).
+* Updated to Rust 2024 edition ([#353](https://github.com/stjude-rust-labs/wdl/pull/353)).
+* Relaxed `CommentWhitespace` rule so that it doesn't fire when a comment has extra spaces before it ([#314](https://github.com/stjude-rust-labs/wdl/pull/314)).
 * `fix` messages suggest the correct order of imports to the user in `ImportSort` rule ([#332](https://github.com/stjude-rust-labs/wdl/pull/332)).
 
 ### Fixed
 
 * Fixed misplacement of highlighted spans for some ShellCheck lints ([#317](https://github.com/stjude-rust-labs/wdl/pull/317)).
-
-### Changed
-
-* Relaxed `CommentWhitespace` rule so that it doesn't fire when a comment has extra spaces before it ([#314](https://github.com/stjude-rust-labs/wdl/pull/314)).
 
 ## 0.9.0 - 01-17-2025
 
