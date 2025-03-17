@@ -818,7 +818,7 @@ impl<N: TreeNode> Decl<N> {
         kind == SyntaxKind::BoundDeclNode || kind == SyntaxKind::UnboundDeclNode
     }
 
-    /// Casts the given node to [`StructItem`].
+    /// Casts the given node to [`Decl`].
     ///
     /// Returns `None` if the node cannot be cast.
     pub fn cast(inner: N) -> Option<Self> {

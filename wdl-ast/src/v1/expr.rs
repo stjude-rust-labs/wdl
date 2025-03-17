@@ -100,7 +100,7 @@ impl<N: TreeNode> Expr<N> {
         )
     }
 
-    /// Casts the given node to [`StructItem`].
+    /// Casts the given node to [`Expr`].
     ///
     /// Returns `None` if the node cannot be cast.
     pub fn cast(inner: N) -> Option<Self> {
@@ -1192,7 +1192,7 @@ pub enum LiteralExpr<N: TreeNode = SyntaxNode> {
 
 impl<N: TreeNode> LiteralExpr<N> {
     /// Returns whether or not the given syntax kind can be cast to
-    /// [`StructItem`].
+    /// [`LiteralExpr`].
     pub fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
             kind,
@@ -1212,7 +1212,7 @@ impl<N: TreeNode> LiteralExpr<N> {
         )
     }
 
-    /// Casts the given node to [`StructItem`].
+    /// Casts the given node to [`LiteralExpr`].
     ///
     /// Returns `None` if the node cannot be cast.
     pub fn cast(inner: N) -> Option<Self> {

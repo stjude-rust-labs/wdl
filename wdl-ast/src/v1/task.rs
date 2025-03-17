@@ -251,7 +251,7 @@ impl<N: TreeNode> TaskItem<N> {
         )
     }
 
-    /// Casts the given node to [`StructItem`].
+    /// Casts the given node to [`TaskItem`].
     ///
     /// Returns `None` if the node cannot be cast.
     pub fn cast(inner: N) -> Option<Self> {
@@ -555,7 +555,7 @@ impl<N: TreeNode> SectionParent<N> {
         )
     }
 
-    /// Casts the given node to [`StructItem`].
+    /// Casts the given node to [`SectionParent`].
     ///
     /// Returns `None` if the node cannot be cast.
     pub fn cast(inner: N) -> Option<Self> {
