@@ -322,9 +322,9 @@ impl SyntaxToken {
     ///
     /// Returns `None` if there is no next sibling node or token.
     pub fn next_sibling_or_token(&self) -> Option<SyntaxElement> {
-        // This should also be a constant-time access rather than having to iterate
+        // This should also be a constant-time access rather than having to iterate.
         // We need the offset relative to the start of the parent from the green node to
-        // do that
+        // do that.
 
         let parent = self.parent();
         let mut children = parent.children_with_tokens();
