@@ -134,7 +134,7 @@ impl SyntaxNode {
     pub fn next_sibling_or_token(&self) -> Option<SyntaxElement> {
         // This should also be a constant-time access rather than having to iterate.
         // We need the offset relative to the start of the parent from the green node to
-        // do that; currently that information is private in `rowan`
+        // do that; currently that information is private in `rowan`.
 
         let parent = self.parent()?;
         let mut children = parent.children_with_tokens();
