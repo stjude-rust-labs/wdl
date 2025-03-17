@@ -23,8 +23,8 @@ macro_rules! ast_element_impl {
         $name:ident,
         // The improper name of the impl to be displayed (e.g., `node`).
         $display:ident,
-        // The abstract trait name (either `AbstractNode` or `AbstractToken`).
-        $abstract:ty,
+        // The implementation trait name (either `TreeNode` or `TreeToken`).
+        $trait_name:ty,
         // A mapping of all of the elements to map from syntax elements to ast
         // elements.
         //
@@ -32,7 +32,7 @@ macro_rules! ast_element_impl {
         [$($suffix:ident(): $syntax_kind:ty => $inner:ty => $variant:ty),*]
     ) => {
         paste::paste! {
-            impl<T: $abstract> $name<T> {
+            impl<T: $trait_name> $name<T> {
                 #[doc = "Attempts to cast an element to a [`" $name "`]."]
                 pub fn cast(element: T) -> Option<Self> {
                     match element.kind() {
@@ -118,7 +118,7 @@ macro_rules! ast_element_impl {
 
 /// An abstract syntax tree node.
 ///
-/// This enum has a variant for each node type.
+/// This enum has a variant for each struct implementing the [`AstNode`] trait.
 #[derive(Clone, Debug)]
 pub enum Node<N: TreeNode = SyntaxNode> {
     /// An access expression.
@@ -394,7 +394,7 @@ ast_element_impl!(
 
 /// An abstract syntax tree token.
 ///
-/// This enum has a variant for each token type.
+/// This enum has a variant for each struct implementing the [`AstToken`] trait.
 #[derive(Clone, Debug)]
 pub enum Token<T: TreeToken = SyntaxToken> {
     /// The `after` keyword.

@@ -739,7 +739,7 @@ impl<T: TreeToken> AstToken<T> for Ident<T> {
 /// but different positions in the tree will compare and hash differently.
 ///
 /// With this hash implementation, two tokens compare and hash identically if
-/// their text is the identical.
+/// their text is identical.
 #[derive(Debug, Clone)]
 pub struct TokenText<T: TreeToken = SyntaxToken>(T);
 

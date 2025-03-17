@@ -131,6 +131,16 @@ impl<N: TreeNode> DocumentItem<N> {
         }
     }
 
+    /// Gets a reference to the inner node.
+    pub fn inner(&self) -> &N {
+        match self {
+            Self::Import(e) => e.inner(),
+            Self::Struct(e) => e.inner(),
+            Self::Task(e) => e.inner(),
+            Self::Workflow(e) => e.inner(),
+        }
+    }
+
     /// Attempts to get a reference to the inner [`ImportStatement`].
     ///
     /// * If `self` is a [`DocumentItem::Import`], then a reference to the inner

@@ -1062,16 +1062,6 @@ pub enum CommandPart<N: TreeNode = SyntaxNode> {
 }
 
 impl<N: TreeNode> CommandPart<N> {
-    /// Casts the given [`NodeOrToken`] to [`CommandPart`].
-    ///
-    /// Returns `None` if it cannot case cannot be cast.
-    pub fn cast(element: NodeOrToken<N, N::Token>) -> Option<Self> {
-        match element {
-            NodeOrToken::Node(n) => Some(Self::Placeholder(Placeholder::cast(n)?)),
-            NodeOrToken::Token(t) => Some(Self::Text(CommandText::cast(t)?)),
-        }
-    }
-
     /// Unwraps the command part into text.
     ///
     /// # Panics
@@ -1093,6 +1083,16 @@ impl<N: TreeNode> CommandPart<N> {
         match self {
             Self::Placeholder(p) => p,
             _ => panic!("not a placeholder"),
+        }
+    }
+
+    /// Casts the given [`NodeOrToken`] to [`CommandPart`].
+    ///
+    /// Returns `None` if it cannot case cannot be cast.
+    fn cast(element: NodeOrToken<N, N::Token>) -> Option<Self> {
+        match element {
+            NodeOrToken::Node(n) => Some(Self::Placeholder(Placeholder::cast(n)?)),
+            NodeOrToken::Token(t) => Some(Self::Text(CommandText::cast(t)?)),
         }
     }
 }
