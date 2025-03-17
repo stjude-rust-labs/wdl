@@ -1,10 +1,9 @@
-//! Implementation of a syntax tree elements that are `Send`+`Sync`.
+//! Implementation of syntax tree elements that are `Send`+`Sync`.
 //!
 //! This is used by the engine instead of the corresponding types from `rowan`
-//! because their implementation is inherently not `Send`.
+//! because that implementation is inherently not `Send`.
 //!
-//! The engine performs evaluation in an asynchronous fashion, so the AST nodes
-//! need to be `Send`.
+//! As evaluation is required to be asynchronous, AST elements must be `Send`.
 
 use std::fmt;
 use std::hash::Hash;
