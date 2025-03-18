@@ -11,6 +11,7 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::CompoundValue;
@@ -190,14 +191,14 @@ pub const fn descriptor() -> Function {
     Function::new(
         const {
             &[
-                Signature::new("(None, <String>) -> Float", size),
-                Signature::new("(File?, <String>) -> Float", size),
-                Signature::new("(String?, <String>) -> Float", size),
-                Signature::new("(Directory?, <String>) -> Float", size),
+                Signature::new("(None, <String>) -> Float", Callback::Sync(size)),
+                Signature::new("(File?, <String>) -> Float", Callback::Sync(size)),
+                Signature::new("(String?, <String>) -> Float", Callback::Sync(size)),
+                Signature::new("(Directory?, <String>) -> Float", Callback::Sync(size)),
                 Signature::new(
                     "(X, <String>) -> Float where `X`: any compound type that recursively \
                      contains a `File` or `Directory`",
-                    size,
+                    Callback::Sync(size),
                 ),
             ]
         },
