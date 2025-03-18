@@ -30,13 +30,23 @@ warning[MatchingParameterMeta]: workflow `w` is missing a parameter metadata key
    │
    = fix: add a `does_not_exist` key to the `parameter_meta` section with a detailed description of the input.
 
-warning[MatchingParameterMeta]: parameter metadata in workflow `test` is out of order
-   ┌─ tests/lints/matching-param-meta/source.wdl:64:5
+warning[MatchingParameterMeta]: parameter metadata in task `new_test` is out of order
+   ┌─ tests/lints/matching-param-meta/source.wdl:65:5
    │
-64 │     parameter_meta {
+65 │     parameter_meta {
    │     ^^^^^^^^^^^^^^ parameter metadata must be in the same order as inputs
    │
    = fix: order the parameter metadata as:
-     two
-     one
+     second
+     first
+
+warning[MatchingParameterMeta]: parameter metadata in struct `Bar` is out of order
+   ┌─ tests/lints/matching-param-meta/source.wdl:86:5
+   │
+86 │     parameter_meta {
+   │     ^^^^^^^^^^^^^^ parameter metadata must be in the same order as inputs
+   │
+   = fix: order the parameter metadata as:
+     param_a
+     param_b
 

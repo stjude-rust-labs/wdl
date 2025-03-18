@@ -4,7 +4,7 @@
 ## in a `parameter_meta` section, and for ensuring that
 ## the order is the same as `input` section.
 
-version 1.1
+version 1.2
 
 task t {
     meta {}
@@ -22,7 +22,7 @@ task t {
     }
 
     input {
-        # This should warn about missing parameter metadata but not the order
+        # This should warn about missing parameter metadata
         String matching
         String does_not_exist
     }
@@ -31,7 +31,7 @@ task t {
 
     output {}
 
-    runtime {}
+    requirements {}
 }
 
 workflow w {
@@ -58,19 +58,36 @@ workflow w {
     output {}
 }
 
-workflow test {
+# Task with out-of-order parameter_meta
+task new_test {
     meta {}
 
     parameter_meta {
-        one: "first"
-        two: "second"
+        first: "This should be second"
+        second: "This should be first"
     }
 
     input {
         # This should warn about incorrect ordering
-        String two
-        String one
+        String second
+        String first
     }
 
+    command <<<>>>
+
     output {}
+
+    requirements {}
+}
+
+struct Bar {
+    meta {}
+
+    parameter_meta {
+        param_b: "This should be after param_a"
+        param_a: "This should be first"
+    }
+
+    String param_a
+    String param_b
 }
