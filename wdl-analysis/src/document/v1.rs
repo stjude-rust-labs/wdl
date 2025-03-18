@@ -850,7 +850,8 @@ fn populate_workflow(
     )];
     let mut output_scope = None;
 
-    // For static analysis, we don't need to provide inputs to the workflow graph builder
+    // For static analysis, we don't need to provide inputs to the workflow graph
+    // builder
     let graph =
         WorkflowGraphBuilder::default().build(workflow, &mut document.diagnostics, |_| false);
 
