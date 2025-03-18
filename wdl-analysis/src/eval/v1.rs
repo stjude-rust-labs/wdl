@@ -565,6 +565,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
         mut self,
         workflow: &WorkflowDefinition<N>,
         diagnostics: &mut Vec<Diagnostic>,
+        input_present: impl Fn(&str) -> bool,
     ) -> DiGraph<WorkflowGraphNode<N>, ()> {
         // Populate the declaration types and build a name reference graph
         let mut graph = DiGraph::new();
@@ -623,7 +624,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
         }
 
         // Add name reference edges before adding the outputs
-        self.add_reference_edges(None, &mut graph, diagnostics);
+        self.add_reference_edges(None, &mut graph, diagnostics, &input_present);
 
         let count = graph.node_count();
         if let Some(section) = outputs {
@@ -638,7 +639,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
         }
 
         // Add reference edges again, but only for the output declaration nodes
-        self.add_reference_edges(Some(count), &mut graph, diagnostics);
+        self.add_reference_edges(Some(count), &mut graph, diagnostics, &input_present);
         graph
     }
 
@@ -814,13 +815,21 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
         skip: Option<usize>,
         graph: &mut DiGraph<WorkflowGraphNode<N>, ()>,
         diagnostics: &mut Vec<Diagnostic>,
+        input_present: impl Fn(&str) -> bool,
     ) {
         // Populate edges for any nodes that reference other nodes by name
         for from in graph.node_indices().skip(skip.unwrap_or(0)) {
             match graph[from].clone() {
-                WorkflowGraphNode::Input(decl)
-                | WorkflowGraphNode::Decl(decl)
-                | WorkflowGraphNode::Output(decl) => {
+                WorkflowGraphNode::Input(decl) => {
+                    // Only add edges for default expressions if the input wasn't provided
+                    if !input_present(decl.name().text()) {
+                        if let Some(expr) = decl.expr() {
+                            self.add_expr_edges(from, expr, graph, diagnostics);
+                        }
+                    }
+                }
+
+                WorkflowGraphNode::Decl(decl) | WorkflowGraphNode::Output(decl) => {
                     if let Some(expr) = decl.expr() {
                         self.add_expr_edges(from, expr, graph, diagnostics);
                     }
