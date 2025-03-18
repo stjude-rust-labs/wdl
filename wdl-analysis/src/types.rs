@@ -432,17 +432,6 @@ impl Coercible for Type {
             // None is coercible to an optional type
             (Self::None, ty) if ty.is_optional() => true,
 
-            // None to opt
-            (Self::None, ty) => {
-                match ty {
-                    Self::Primitive(_, y) | Self::Compound(_, y) => {
-                        println!("None to opt");
-                        true
-                    },
-                    _ => false,
-                }
-            },
-
             // Not coercible
             _ => false,
         }
