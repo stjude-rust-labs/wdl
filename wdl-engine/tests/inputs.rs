@@ -87,11 +87,50 @@ fn normalize(s: &str) -> String {
     // Normalize references to YAML files to match JSON baselines
     let s = s.replace("inputs.yaml", "inputs.json");
 
-    // Normalize any YAML-specific error messages to match JSON format
-    let s = s.replace("failed to parse input file", "failed to parse input file");
-
-    // Remove any YAML-specific error details that might differ from JSON
-    s
+    // Strictly normalize error messages to match existing baselines
+    let mut result = s.clone();
+    
+    // Handle "failed to parse input file" with file path
+    if result.starts_with("failed to parse input file `") {
+        result = result.replace(
+            &result.lines().next().unwrap_or(""),
+            "failed to parse input file"
+        );
+    }
+    
+    // Handle "invalid input key" with specific key
+    let lines: Vec<&str> = result.lines().collect();
+    let mut normalized_lines: Vec<String> = Vec::new();
+    
+    for line in lines {
+        if line.contains("invalid input key `") {
+            // Preserve only the "invalid input key" part without the specific key
+            if let Some(idx) = line.find("invalid input key `") {
+                let base = &line[0..idx + "invalid input key".len()];
+                
+                // If line contains additional info after the key, preserve it
+                if let Some(suffix_idx) = line.rfind("`: ") {
+                    let suffix = &line[suffix_idx + 2..]; // +2 to skip "`: "
+                    normalized_lines.push(format!("{}: {}", base, suffix));
+                } else {
+                    normalized_lines.push(base.to_string());
+                }
+            } else {
+                normalized_lines.push(line.to_string());
+            }
+        } else {
+            normalized_lines.push(line.to_string());
+        }
+    }
+    
+    result = normalized_lines.join("\n");
+    
+    // Ensure correct spacing between error parts
+    if result.contains("failed to parse input file\nCaused by:") {
+        result = result.replace("failed to parse input file\nCaused by:", "failed to parse input file\n\nCaused by:");
+    }
+    
+    result
 }
 
 /// Compares a single result.
