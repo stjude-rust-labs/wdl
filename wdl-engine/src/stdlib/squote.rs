@@ -4,6 +4,7 @@ use wdl_analysis::stdlib::STDLIB as ANALYSIS_STDLIB;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Array;
@@ -44,7 +45,7 @@ pub const fn descriptor() -> Function {
         const {
             &[Signature::new(
                 "(Array[P]) -> Array[String] where `P`: any primitive type",
-                squote,
+                Callback::Sync(squote),
             )]
         },
     )
@@ -58,10 +59,12 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn squote() {
-        let mut env = TestEnv::default();
-        let value = eval_v1_expr(&mut env, V1::One, "squote([1, 2, 3])").unwrap();
+    #[tokio::test]
+    async fn squote() {
+        let env = TestEnv::default();
+        let value = eval_v1_expr(&env, V1::One, "squote([1, 2, 3])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -71,7 +74,9 @@ mod test {
             .collect();
         assert_eq!(elements, ["'1'", "'2'", "'3'"]);
 
-        let value = eval_v1_expr(&mut env, V1::One, "squote([1.0, 1.1, 1.2])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "squote([1.0, 1.1, 1.2])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -81,7 +86,9 @@ mod test {
             .collect();
         assert_eq!(elements, ["'1.000000'", "'1.100000'", "'1.200000'"]);
 
-        let value = eval_v1_expr(&mut env, V1::One, "squote(['bar', 'baz', 'qux'])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "squote(['bar', 'baz', 'qux'])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -91,7 +98,9 @@ mod test {
             .collect();
         assert_eq!(elements, ["'bar'", "'baz'", "'qux'"]);
 
-        let value = eval_v1_expr(&mut env, V1::One, "squote(['bar', None, 'qux'])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "squote(['bar', None, 'qux'])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -101,7 +110,7 @@ mod test {
             .collect();
         assert_eq!(elements, ["'bar'", "''", "'qux'"]);
 
-        let value = eval_v1_expr(&mut env, V1::One, "squote([])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "squote([])").await.unwrap();
         assert!(value.unwrap_array().is_empty());
     }
 }

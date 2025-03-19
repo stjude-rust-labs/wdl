@@ -3,6 +3,7 @@
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Array;
@@ -38,7 +39,14 @@ fn select_all(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
 /// Gets the function describing `select_all`.
 pub const fn descriptor() -> Function {
-    Function::new(const { &[Signature::new("(Array[X]) -> Array[X]", select_all)] })
+    Function::new(
+        const {
+            &[Signature::new(
+                "(Array[X]) -> Array[X]",
+                Callback::Sync(select_all),
+            )]
+        },
+    )
 }
 
 #[cfg(test)]
@@ -49,17 +57,21 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn select_all() {
-        let mut env = TestEnv::default();
+    #[tokio::test]
+    async fn select_all() {
+        let env = TestEnv::default();
 
-        let value = eval_v1_expr(&mut env, V1::One, "select_all([])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "select_all([])").await.unwrap();
         assert_eq!(value.unwrap_array().len(), 0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "select_all([None, None, None])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "select_all([None, None, None])")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_array().len(), 0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "select_all([None, 2, None])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "select_all([None, 2, None])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -69,7 +81,9 @@ mod test {
             .collect();
         assert_eq!(elements, [2]);
 
-        let value = eval_v1_expr(&mut env, V1::One, "select_all([1, 2, None])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "select_all([1, 2, None])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -79,7 +93,9 @@ mod test {
             .collect();
         assert_eq!(elements, [1, 2]);
 
-        let value = eval_v1_expr(&mut env, V1::One, "select_all([1, 2, 3, None])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "select_all([1, 2, 3, None])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -89,7 +105,9 @@ mod test {
             .collect();
         assert_eq!(elements, [1, 2, 3]);
 
-        let value = eval_v1_expr(&mut env, V1::One, "select_all([1, 2, 3])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "select_all([1, 2, 3])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()

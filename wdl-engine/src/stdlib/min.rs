@@ -4,6 +4,7 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Value;
@@ -45,10 +46,10 @@ pub const fn descriptor() -> Function {
     Function::new(
         const {
             &[
-                Signature::new("(Int, Int) -> Int", int_min),
-                Signature::new("(Int, Float) -> Float", float_min),
-                Signature::new("(Float, Int) -> Float", float_min),
-                Signature::new("(Float, Float) -> Float", float_min),
+                Signature::new("(Int, Int) -> Int", Callback::Sync(int_min)),
+                Signature::new("(Int, Float) -> Float", Callback::Sync(float_min)),
+                Signature::new("(Float, Int) -> Float", Callback::Sync(float_min)),
+                Signature::new("(Float, Float) -> Float", Callback::Sync(float_min)),
             ]
         },
     )
@@ -62,74 +63,79 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn min() {
-        let mut env = TestEnv::default();
-        let value = eval_v1_expr(&mut env, V1::One, "min(7, 42)").unwrap();
+    #[tokio::test]
+    async fn min() {
+        let env = TestEnv::default();
+        let value = eval_v1_expr(&env, V1::One, "min(7, 42)").await.unwrap();
         assert_eq!(value.unwrap_integer(), 7);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(42, 7)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(42, 7)").await.unwrap();
         assert_eq!(value.unwrap_integer(), 7);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(-42, 7)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(-42, 7)").await.unwrap();
         assert_eq!(value.unwrap_integer(), -42);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(0, -42)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(0, -42)").await.unwrap();
         assert_eq!(value.unwrap_integer(), -42);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(0, 42)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(0, 42)").await.unwrap();
         assert_eq!(value.unwrap_integer(), 0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(7.0, 42)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(7.0, 42)").await.unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(42.0, 7)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(42.0, 7)").await.unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(-42.0, 7)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(-42.0, 7)").await.unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -42.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(0.0, -42)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(0.0, -42)").await.unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -42.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(0.0, 42)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(0.0, 42)").await.unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -0.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(7, 42.0)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(7, 42.0)").await.unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(42, 7.0)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(42, 7.0)").await.unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(-42, 7.0)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(-42, 7.0)").await.unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -42.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(0, -42.0)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(0, -42.0)").await.unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -42.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(0, 42.0)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(0, 42.0)").await.unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -0.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(7.0, 42.0)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(7.0, 42.0)").await.unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(42.0, 7.0)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(42.0, 7.0)").await.unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 7.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(-42.0, 7.0)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(-42.0, 7.0)")
+            .await
+            .unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -42.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(0.0, -42.0)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(0.0, -42.0)")
+            .await
+            .unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -42.0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "min(0.0, 42.0)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "min(0.0, 42.0)").await.unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -0.0);
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::One,
             "min(12345, min(-100, min(54321, 1234.5678)))",
         )
+        .await
         .unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), -100.0);
     }

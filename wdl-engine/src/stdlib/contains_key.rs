@@ -8,6 +8,7 @@ use wdl_analysis::types::Type;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::CompoundValue;
@@ -115,18 +116,24 @@ pub const fn descriptor() -> Function {
             &[
                 Signature::new(
                     "(Map[K, V], K) -> Boolean where `K`: any primitive type",
-                    contains_key_map,
+                    Callback::Sync(contains_key_map),
                 ),
-                Signature::new("(Object, String) -> Boolean", contains_key_object),
+                Signature::new(
+                    "(Object, String) -> Boolean",
+                    Callback::Sync(contains_key_object),
+                ),
                 Signature::new(
                     "(Map[String, V], Array[String]) -> Boolean",
-                    contains_key_recursive,
+                    Callback::Sync(contains_key_recursive),
                 ),
                 Signature::new(
                     "(S, Array[String]) -> Boolean where `S`: any structure",
-                    contains_key_recursive,
+                    Callback::Sync(contains_key_recursive),
                 ),
-                Signature::new("(Object, Array[String]) -> Boolean", contains_key_recursive),
+                Signature::new(
+                    "(Object, Array[String]) -> Boolean",
+                    Callback::Sync(contains_key_recursive),
+                ),
             ]
         },
     )
@@ -142,8 +149,8 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn contains_key() {
+    #[tokio::test]
+    async fn contains_key() {
         let mut env = TestEnv::default();
 
         let bar_ty: Type = StructType::new("Bar", [("baz", PrimitiveType::String)]).into();
@@ -152,192 +159,219 @@ mod test {
         let foo_ty = StructType::new("Foo", [("bar", bar_ty)]);
         env.insert_struct("Foo", foo_ty);
 
-        let value = eval_v1_expr(&mut env, V1::Two, "contains_key({}, 1)").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "contains_key({}, 1)")
+            .await
+            .unwrap();
         assert!(!value.unwrap_boolean());
 
-        let value =
-            eval_v1_expr(&mut env, V1::Two, "contains_key({ 1: 2, None: 3}, None)").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "contains_key({ 1: 2, None: 3}, None)")
+            .await
+            .unwrap();
         assert!(value.unwrap_boolean());
 
-        let value = eval_v1_expr(&mut env, V1::Two, "contains_key({ 1: 2 }, 1)").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "contains_key({ 1: 2 }, 1)")
+            .await
+            .unwrap();
         assert!(value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key({ 'foo': 1, 'bar': 2, 'baz': 3 }, 'qux')",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key({ 'foo': 1, 'bar': 2, 'baz': 3 }, 'baz')",
         )
+        .await
         .unwrap();
         assert!(value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(object { foo: 1, bar: 2, baz: 3 }, 'qux')",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(object { foo: 1, bar: 2, baz: 3 }, 'baz')",
         )
+        .await
         .unwrap();
         assert!(value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key({ 'foo': 1, 'bar': 2, 'baz': 3 }, ['qux'])",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key({ 'foo': 1, 'bar': 2, 'baz': 3 }, ['baz'])",
         )
+        .await
         .unwrap();
         assert!(value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(object { foo: 1, bar: 2, baz: 3 }, ['qux'])",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(object { foo: 1, bar: 2, baz: 3 }, ['baz'])",
         )
+        .await
         .unwrap();
         assert!(value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(Foo { bar: Bar { baz: 'qux' } }, ['qux'])",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(Foo { bar: Bar { baz: 'qux' } }, ['bar'])",
         )
+        .await
         .unwrap();
         assert!(value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key({ 'foo': 1, 'bar': 2, 'baz': 3 }, ['qux', 'nope'])",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key({ 'foo': 1, 'bar': 2, 'baz': 3 }, ['baz', 'nope'])",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(object { foo: 1, bar: 2, baz: 3 }, ['qux', 'nope'])",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(object { foo: 1, bar: 2, baz: 3 }, ['baz', 'nope'])",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(Foo { bar: Bar { baz: 'qux' } }, ['qux', 'nope'])",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(Foo { bar: Bar { baz: 'qux' } }, ['bar', 'nope'])",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key({ 'foo': { 'qux': 1 }, 'bar': { 'qux': 2 }, 'baz': { 'qux': 3 } }, \
              ['baz', 'qux'])",
         )
+        .await
         .unwrap();
         assert!(value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key({ 'foo': { 'qux': 1 }, 'bar': { 'qux': 2 }, 'baz': { 'qux': 3 } }, \
              ['baz', 'qux', 'nope'])",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(object { foo: 1, bar: 2, baz: object { qux: 3 } }, ['baz', 'qux'])",
         )
+        .await
         .unwrap();
         assert!(value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(object { foo: 1, bar: 2, baz: object { qux: 3 } }, ['baz', 'qux', \
              'nope'])",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(Foo { bar: Bar { baz: 'qux' } }, ['bar', 'baz'])",
         )
+        .await
         .unwrap();
         assert!(value.unwrap_boolean());
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "contains_key(Foo { bar: Bar { baz: 'qux' } }, ['bar', 'baz', 'nope'])",
         )
+        .await
         .unwrap();
         assert!(!value.unwrap_boolean());
     }
