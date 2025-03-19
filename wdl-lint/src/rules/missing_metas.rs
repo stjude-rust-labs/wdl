@@ -110,7 +110,7 @@ impl Rule for MissingMetasRule {
          both a meta and parameter_meta section. Tasks without an `input` section are permitted to \
          skip the `parameter_meta` section. meta sections should include a `description` key along \
          with an outputs key where each member matches the corresponding named output in the \
-         output section."
+         `output` section."
     }
 
     fn tags(&self) -> TagSet {
