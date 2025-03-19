@@ -9,10 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* `missing_call_input` now generates a warning for missing inputs when nested inputs are allowed, without changing the existing error behavior ([#344]https://github.com/stjude-rust-labs/wdl/pull/344).
 * Added `path` method to `Document` ([#327](https://github.com/stjude-rust-labs/wdl/pull/327)).
 
 ### Changed
 
+* Refactored analysis API to support different syntax tree element
+  representations ([#355](https://github.com/stjude-rust-labs/wdl/pull/355)).
+* Updated to Rust 2024 edition ([#353](https://github.com/stjude-rust-labs/wdl/pull/353)).
 * `Document` is now trivially cloned ([#320](https://github.com/stjude-rust-labs/wdl/pull/320)).
 * The task evaluation graph now forms implicit edges between the command and
   other nodes in the graph; the command now always depends on an input even if

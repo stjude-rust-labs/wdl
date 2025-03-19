@@ -28,6 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Make stdlib file functions asynchronous ([#359](https://github.com/stjude-rust-labs/wdl/pull/359)).
+* Refactored expression evaluation to make it async ([#357](https://github.com/stjude-rust-labs/wdl/pull/357)).
+* Updated for refactored `wdl-ast` API so that evaluation can now operate
+  directly on AST nodes in `async` context ([#355](https://github.com/stjude-rust-labs/wdl/pull/355)).
+* Updated to Rust 2024 edition ([#353](https://github.com/stjude-rust-labs/wdl/pull/353)).
 * Docker backend is now the default backend (#[327](https://github.com/stjude-rust-labs/wdl/pull/327)).
 * Refactored a common task management implementation to use in task execution
   backends (#[327](https://github.com/stjude-rust-labs/wdl/pull/327)).

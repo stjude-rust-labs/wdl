@@ -31,7 +31,7 @@ pub const TAB: &str = "\t";
 /// [`Vec`]).
 #[macro_export]
 macro_rules! exactly_one {
-    ($entities:expr, $name:expr) => {
+    ($entities:expr_2021, $name:expr_2021) => {
         match $entities.len() {
             0 => unreachable!("we should never have zero {}", $name),
             // SAFETY: we just checked to ensure that exactly
@@ -123,7 +123,7 @@ impl Writable for &FormatElement {
                 AstNode::MultiplicationExpr(_) => {
                     v1::expr::format_multiplication_expr(self, stream)
                 }
-                AstNode::NameRef(_) => v1::expr::format_name_ref(self, stream),
+                AstNode::NameRefExpr(_) => v1::expr::format_name_ref_expr(self, stream),
                 AstNode::NegationExpr(_) => v1::expr::format_negation_expr(self, stream),
                 AstNode::OutputSection(_) => v1::format_output_section(self, stream),
                 AstNode::PairType(_) => v1::decl::format_pair_type(self, stream),
