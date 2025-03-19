@@ -9,7 +9,7 @@ use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
-use wdl_ast::ToSpan;
+use wdl_ast::TreeNode;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::v1::InputSection;
@@ -23,8 +23,10 @@ fn redundant_none_assignment(span: Span, name: &str) -> Diagnostic {
         .with_fix(format!("can be shortened to {}", name))
 }
 
-#[derive(Default, Debug, Clone, Copy)]
-pub struct RedundantNoneAssignment;
+#[derive(Default, Debug, Clone)]
+pub struct RedundantNoneAssignment {
+    version: Option<SupportedVersion>,
+}
 
 impl Rule for RedundantNoneAssignment {
     fn id(&self) -> &'static str {
@@ -67,6 +69,7 @@ impl Visitor for RedundantNoneAssignment {
             return;
         }
         *self = Default::default();
+        self.version = Some(version);
     }
 
     fn input_section(
@@ -79,18 +82,18 @@ impl Visitor for RedundantNoneAssignment {
             return;
         }
         section.declarations().for_each(|decl| {
-            if let token = decl.ty() {
-                if token.is_optional() {
-                    if let Some(expr) = decl.expr() {
-                        if let Some(_) = expr.as_literal().and_then(|lit| lit.as_none()) {
+            let token = decl.ty();
+            if token.is_optional() {
+                if let Some(expr) = decl.expr() {
+                    if expr.as_literal().and_then(|lit| lit.as_none()).is_some() {
                         state.exceptable_add(
-                            redundant_none_assignment(decl.syntax().text_range().to_span(), decl.name().as_str()),
-                            SyntaxElement::from(decl.syntax().clone()),
+                            redundant_none_assignment(decl.inner().span(), decl.name().text()),
+                            SyntaxElement::from(decl.inner().clone()),
                             &self.exceptable_nodes(),
                         );
-                        }
                     }
                 }
+
             }
         });
     }
