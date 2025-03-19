@@ -6,6 +6,7 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::PrimitiveValue;
@@ -53,9 +54,9 @@ pub const fn descriptor() -> Function {
     Function::new(
         const {
             &[
-                Signature::new("(File, <String>) -> String", basename),
-                Signature::new("(String, <String>) -> String", basename),
-                Signature::new("(Directory, <String>) -> String", basename),
+                Signature::new("(File, <String>) -> String", Callback::Sync(basename)),
+                Signature::new("(String, <String>) -> String", Callback::Sync(basename)),
+                Signature::new("(Directory, <String>) -> String", Callback::Sync(basename)),
             ]
         },
     )
@@ -69,23 +70,32 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn basename() {
-        let mut env = TestEnv::default();
-        let value = eval_v1_expr(&mut env, V1::Two, "basename('/path/to/file.txt')").unwrap();
+    #[tokio::test]
+    async fn basename() {
+        let env = TestEnv::default();
+        let value = eval_v1_expr(&env, V1::Two, "basename('/path/to/file.txt')")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "file.txt");
 
-        let value =
-            eval_v1_expr(&mut env, V1::Two, "basename('/path/to/file.txt', '.txt')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "basename('/path/to/file.txt', '.txt')")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "file");
 
-        let value = eval_v1_expr(&mut env, V1::Two, "basename('/path/to/dir')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "basename('/path/to/dir')")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "dir");
 
-        let value = eval_v1_expr(&mut env, V1::Two, "basename('file.txt')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "basename('file.txt')")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "file.txt");
 
-        let value = eval_v1_expr(&mut env, V1::Two, "basename('file.txt', '.txt')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "basename('file.txt', '.txt')")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "file");
     }
 }

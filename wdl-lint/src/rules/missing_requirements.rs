@@ -9,7 +9,6 @@ use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::v1::TaskDefinition;
@@ -104,28 +103,33 @@ impl Visitor for MissingRequirementsRule {
         // version, the `runtime` section was recommended.
         if let SupportedVersion::V1(minor_version) = self.0.expect("version should exist here") {
             if minor_version >= V1::Two {
-                if let Some(runtime) = task.runtime() {
-                    let name = task.name();
-                    state.exceptable_add(
-                        deprecated_runtime_section(
-                            name.as_str(),
-                            runtime
-                                .syntax()
-                                .first_token()
-                                .expect("runtime section should have tokens")
-                                .text_range()
-                                .to_span(),
-                        ),
-                        SyntaxElement::from(runtime.syntax().clone()),
-                        &self.exceptable_nodes(),
-                    );
-                } else if task.requirements().is_none() {
-                    let name = task.name();
-                    state.exceptable_add(
-                        missing_requirements_section(name.as_str(), name.span()),
-                        SyntaxElement::from(task.syntax().clone()),
-                        &self.exceptable_nodes(),
-                    );
+                match task.runtime() {
+                    Some(runtime) => {
+                        let name = task.name();
+                        state.exceptable_add(
+                            deprecated_runtime_section(
+                                name.text(),
+                                runtime
+                                    .inner()
+                                    .first_token()
+                                    .expect("runtime section should have tokens")
+                                    .text_range()
+                                    .into(),
+                            ),
+                            SyntaxElement::from(runtime.inner().clone()),
+                            &self.exceptable_nodes(),
+                        );
+                    }
+                    _ => {
+                        if task.requirements().is_none() {
+                            let name = task.name();
+                            state.exceptable_add(
+                                missing_requirements_section(name.text(), name.span()),
+                                SyntaxElement::from(task.inner().clone()),
+                                &self.exceptable_nodes(),
+                            );
+                        }
+                    }
                 }
             }
         }

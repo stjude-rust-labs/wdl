@@ -4,6 +4,7 @@ use wdl_analysis::types::Type;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Array;
@@ -77,7 +78,7 @@ pub const fn descriptor() -> Function {
         const {
             &[Signature::new(
                 "(Array[Array[X]]) -> Array[Array[X]]",
-                transpose,
+                Callback::Sync(transpose),
             )]
         },
     )
@@ -91,17 +92,21 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn transpose() {
-        let mut env = TestEnv::default();
+    #[tokio::test]
+    async fn transpose() {
+        let env = TestEnv::default();
 
-        let value = eval_v1_expr(&mut env, V1::One, "transpose([])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "transpose([])").await.unwrap();
         assert_eq!(value.as_array().unwrap().len(), 0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "transpose([[], [], []])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "transpose([[], [], []])")
+            .await
+            .unwrap();
         assert_eq!(value.as_array().unwrap().len(), 0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "transpose([[0, 1, 2], [3, 4, 5]])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "transpose([[0, 1, 2], [3, 4, 5]])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -119,10 +124,11 @@ mod test {
         assert_eq!(elements, [[0, 3], [1, 4], [2, 5]]);
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::One,
             "transpose([['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i']])",
         )
+        .await
         .unwrap();
         let elements: Vec<_> = value
             .as_array()
@@ -143,8 +149,9 @@ mod test {
             [["a", "d", "g"], ["b", "e", "h"], ["c", "f", "i"]]
         );
 
-        let diagnostic =
-            eval_v1_expr(&mut env, V1::One, "transpose([['foo', 'bar'], ['baz']])").unwrap_err();
+        let diagnostic = eval_v1_expr(&env, V1::One, "transpose([['foo', 'bar'], ['baz']])")
+            .await
+            .unwrap_err();
         assert_eq!(
             diagnostic.message(),
             "call to function `transpose` failed: expected array at index 1 to have a length of 2"

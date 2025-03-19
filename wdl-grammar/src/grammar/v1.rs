@@ -351,7 +351,7 @@ const ANY_IDENT: TokenSet = TokenSet::new(&[
 /// Parses matching braces given a callback to parse the interior delimited
 /// items.
 macro_rules! braced_items {
-    ($parser:ident, $marker:ident, $delimiter:expr, $recovery:expr, $cb:expr) => {
+    ($parser:ident, $marker:ident, $delimiter:expr_2021, $recovery:expr_2021, $cb:expr_2021) => {
         if let Err(e) = $parser.matching_delimited(
             Token::OpenBrace,
             Token::CloseBrace,
@@ -367,7 +367,7 @@ macro_rules! braced_items {
 /// Parses matching brackets given a callback to parse the interior delimited
 /// items.
 macro_rules! bracketed_items {
-    ($parser:ident, $marker:ident, $delimiter:expr, $recovery:expr, $cb:expr) => {
+    ($parser:ident, $marker:ident, $delimiter:expr_2021, $recovery:expr_2021, $cb:expr_2021) => {
         if let Err(e) = $parser.matching_delimited(
             Token::OpenBracket,
             Token::CloseBracket,
@@ -383,7 +383,7 @@ macro_rules! bracketed_items {
 /// Parses matching parens given a callback to parse the interior delimited
 /// items.
 macro_rules! paren_items {
-    ($parser:ident, $marker:ident, $delimiter:expr, $recovery:expr, $cb:expr) => {
+    ($parser:ident, $marker:ident, $delimiter:expr_2021, $recovery:expr_2021, $cb:expr_2021) => {
         if let Err(e) = $parser.matching_delimited(
             Token::OpenParen,
             Token::CloseParen,
@@ -398,7 +398,7 @@ macro_rules! paren_items {
 
 /// Parses matching brackets given a callback to parse the interior.
 macro_rules! bracketed {
-    ($parser:ident, $marker:ident, $cb:expr) => {
+    ($parser:ident, $marker:ident, $cb:expr_2021) => {
         if let Err(e) = $parser.matching(Token::OpenBracket, Token::CloseBracket, false, $cb) {
             return Err(($marker, e));
         }
@@ -407,7 +407,7 @@ macro_rules! bracketed {
 
 /// Parses matching parenthesis given a callback to parse the interior.
 macro_rules! paren {
-    ($parser:ident, $marker:ident, $cb:expr) => {
+    ($parser:ident, $marker:ident, $cb:expr_2021) => {
         if let Err(e) = $parser.matching(Token::OpenParen, Token::CloseParen, false, $cb) {
             return Err(($marker, e));
         }
@@ -2002,7 +2002,7 @@ fn atom_expr(
         Token::HintsKeyword => literal_hints(parser, marker),
         Token::InputKeyword => literal_input(parser, marker),
         Token::OutputKeyword => literal_output(parser, marker),
-        t if ANY_IDENT.contains(t.into_raw()) => name_ref(parser, marker),
+        t if ANY_IDENT.contains(t.into_raw()) => name_ref_expr(parser, marker),
         _ => unreachable!(),
     }
 }
@@ -2102,8 +2102,9 @@ fn object_item(parser: &mut Parser<'_>, marker: Marker) -> Result<(), (Marker, D
     Ok(())
 }
 
-/// Parses a name reference, literal struct expression, or call expression.
-fn name_ref(
+/// Parses a name reference expression, literal struct expression, or call
+/// expression.
+fn name_ref_expr(
     parser: &mut Parser<'_>,
     marker: Marker,
 ) -> Result<CompletedMarker, (Marker, Diagnostic)> {
@@ -2129,7 +2130,7 @@ fn name_ref(
     }
 
     // This is a name reference.
-    Ok(marker.complete(parser, SyntaxKind::NameRefNode))
+    Ok(marker.complete(parser, SyntaxKind::NameRefExprNode))
 }
 
 /// Parses a single item in a literal struct.

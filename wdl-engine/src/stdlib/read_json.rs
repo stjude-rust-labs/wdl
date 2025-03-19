@@ -4,12 +4,15 @@ use std::fs;
 use std::io::BufReader;
 
 use anyhow::Context;
+use futures::FutureExt;
+use futures::future::BoxFuture;
 use serde::Deserialize;
 use wdl_analysis::types::PrimitiveType;
 use wdl_analysis::types::Type;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Value;
@@ -19,36 +22,49 @@ use crate::diagnostics::function_call_failed;
 /// contents.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_json
-fn read_json(context: CallContext<'_>) -> Result<Value, Diagnostic> {
-    debug_assert!(context.arguments.len() == 1);
-    debug_assert!(context.return_type_eq(Type::Union));
+fn read_json(context: CallContext<'_>) -> BoxFuture<'_, Result<Value, Diagnostic>> {
+    async move {
+        debug_assert!(context.arguments.len() == 1);
+        debug_assert!(context.return_type_eq(Type::Union));
 
-    let path = context.work_dir().join(
-        context
-            .coerce_argument(0, PrimitiveType::File)
-            .unwrap_file()
-            .as_str(),
-    );
-    let file = fs::File::open(&path)
-        .with_context(|| format!("failed to open file `{path}`", path = path.display()))
-        .map_err(|e| function_call_failed("read_json", format!("{e:?}"), context.call_site))?;
+        let path = context.work_dir().join(
+            context
+                .coerce_argument(0, PrimitiveType::File)
+                .unwrap_file()
+                .as_str(),
+        );
 
-    let mut deserializer = serde_json::Deserializer::from_reader(BufReader::new(file));
-    Value::deserialize(&mut deserializer).map_err(|e| {
-        function_call_failed(
-            "read_json",
-            format!(
-                "failed to read JSON file `{path}`: {e}",
-                path = path.display()
-            ),
-            context.call_site,
-        )
-    })
+        // Note: `serde-json` does not support asynchronous readers, so we are
+        // performing a synchronous read here
+        let file = fs::File::open(&path)
+            .with_context(|| format!("failed to open file `{path}`", path = path.display()))
+            .map_err(|e| function_call_failed("read_json", format!("{e:?}"), context.call_site))?;
+
+        let mut deserializer = serde_json::Deserializer::from_reader(BufReader::new(file));
+        Value::deserialize(&mut deserializer).map_err(|e| {
+            function_call_failed(
+                "read_json",
+                format!(
+                    "failed to read JSON file `{path}`: {e}",
+                    path = path.display()
+                ),
+                context.call_site,
+            )
+        })
+    }
+    .boxed()
 }
 
 /// Gets the function describing `read_json`.
 pub const fn descriptor() -> Function {
-    Function::new(const { &[Signature::new("(File) -> Union", read_json)] })
+    Function::new(
+        const {
+            &[Signature::new(
+                "(File) -> Union",
+                Callback::Async(read_json),
+            )]
+        },
+    )
 }
 
 #[cfg(test)]
@@ -60,9 +76,9 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn read_json() {
-        let mut env = TestEnv::default();
+    #[tokio::test]
+    async fn read_json() {
+        let env = TestEnv::default();
         env.write_file("empty.json", "");
         env.write_file("not-json.json", "not json!");
         env.write_file("null.json", "null");
@@ -82,7 +98,9 @@ mod test {
             r#"{ "foo": "bar", "bar!": 12345, "baz": [1, 2, 3] }"#,
         );
 
-        let diagnostic = eval_v1_expr(&mut env, V1::One, "read_json('empty.json')").unwrap_err();
+        let diagnostic = eval_v1_expr(&env, V1::One, "read_json('empty.json')")
+            .await
+            .unwrap_err();
         assert!(
             diagnostic
                 .message()
@@ -94,7 +112,9 @@ mod test {
                 .contains("EOF while parsing a value at line 1 column 0")
         );
 
-        let diagnostic = eval_v1_expr(&mut env, V1::One, "read_json('not-json.json')").unwrap_err();
+        let diagnostic = eval_v1_expr(&env, V1::One, "read_json('not-json.json')")
+            .await
+            .unwrap_err();
         assert!(
             diagnostic
                 .message()
@@ -106,22 +126,34 @@ mod test {
                 .contains("expected ident at line 1 column 2")
         );
 
-        let value = eval_v1_expr(&mut env, V1::One, "read_json('true.json')").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "read_json('true.json')")
+            .await
+            .unwrap();
         assert!(value.unwrap_boolean());
 
-        let value = eval_v1_expr(&mut env, V1::One, "read_json('false.json')").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "read_json('false.json')")
+            .await
+            .unwrap();
         assert!(!value.unwrap_boolean());
 
-        let value = eval_v1_expr(&mut env, V1::One, "read_json('string.json')").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "read_json('string.json')")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "hello\nworld!");
 
-        let value = eval_v1_expr(&mut env, V1::One, "read_json('int.json')").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "read_json('int.json')")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_integer(), 12345);
 
-        let value = eval_v1_expr(&mut env, V1::One, "read_json('float.json')").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "read_json('float.json')")
+            .await
+            .unwrap();
         approx::assert_relative_eq!(value.unwrap_float(), 12345.6789);
 
-        let value = eval_v1_expr(&mut env, V1::One, "read_json('array.json')").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "read_json('array.json')")
+            .await
+            .unwrap();
         assert_eq!(
             value
                 .unwrap_array()
@@ -133,8 +165,9 @@ mod test {
             [1, 2, 3]
         );
 
-        let diagnostic =
-            eval_v1_expr(&mut env, V1::One, "read_json('bad_array.json')").unwrap_err();
+        let diagnostic = eval_v1_expr(&env, V1::One, "read_json('bad_array.json')")
+            .await
+            .unwrap_err();
         assert!(
             diagnostic
                 .message()
@@ -146,7 +179,8 @@ mod test {
                 .contains("a common element type does not exist between `Int` and `String`")
         );
 
-        let value = eval_v1_expr(&mut env, V1::One, "read_json('object.json')")
+        let value = eval_v1_expr(&env, V1::One, "read_json('object.json')")
+            .await
             .unwrap()
             .unwrap_object();
         assert_eq!(
@@ -168,8 +202,9 @@ mod test {
             [1, 2, 3]
         );
 
-        let diagnostic =
-            eval_v1_expr(&mut env, V1::One, "read_json('bad_object.json')").unwrap_err();
+        let diagnostic = eval_v1_expr(&env, V1::One, "read_json('bad_object.json')")
+            .await
+            .unwrap_err();
         assert!(
             diagnostic
                 .message()

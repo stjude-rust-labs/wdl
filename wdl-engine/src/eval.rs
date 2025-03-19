@@ -16,7 +16,7 @@ use indexmap::IndexMap;
 use wdl_analysis::document::Task;
 use wdl_analysis::types::Type;
 use wdl_ast::Diagnostic;
-use wdl_ast::Ident;
+use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES;
 use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES_ALIAS;
@@ -54,15 +54,15 @@ impl From<anyhow::Error> for EvaluationError {
 pub type EvaluationResult<T> = Result<T, EvaluationError>;
 
 /// Represents context to an expression evaluator.
-pub trait EvaluationContext {
+pub trait EvaluationContext: Send + Sync {
     /// Gets the supported version of the document being evaluated.
     fn version(&self) -> SupportedVersion;
 
     /// Gets the value of the given name in scope.
-    fn resolve_name(&self, name: &Ident) -> Result<Value, Diagnostic>;
+    fn resolve_name(&self, name: &str, span: Span) -> Result<Value, Diagnostic>;
 
     /// Resolves a type name to a type.
-    fn resolve_type_name(&mut self, name: &Ident) -> Result<Type, Diagnostic>;
+    fn resolve_type_name(&self, name: &str, span: Span) -> Result<Type, Diagnostic>;
 
     /// Gets the working directory for the evaluation.
     fn work_dir(&self) -> &Path;

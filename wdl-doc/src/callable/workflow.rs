@@ -34,25 +34,21 @@ impl Workflow {
         input_section: Option<InputSection>,
         output_section: Option<OutputSection>,
     ) -> Self {
-        let meta = if let Some(mds) = meta_section {
-            parse_meta(&mds)
-        } else {
-            MetaMap::default()
+        let meta = match meta_section {
+            Some(mds) => parse_meta(&mds),
+            _ => MetaMap::default(),
         };
-        let parameter_meta = if let Some(pmds) = parameter_meta {
-            parse_parameter_meta(&pmds)
-        } else {
-            MetaMap::default()
+        let parameter_meta = match parameter_meta {
+            Some(pmds) => parse_parameter_meta(&pmds),
+            _ => MetaMap::default(),
         };
-        let inputs = if let Some(is) = input_section {
-            parse_inputs(&is, &parameter_meta)
-        } else {
-            Vec::new()
+        let inputs = match input_section {
+            Some(is) => parse_inputs(&is, &parameter_meta),
+            _ => Vec::new(),
         };
-        let outputs = if let Some(os) = output_section {
-            parse_outputs(&os, &meta, &parameter_meta)
-        } else {
-            Vec::new()
+        let outputs = match output_section {
+            Some(os) => parse_outputs(&os, &meta, &parameter_meta),
+            _ => Vec::new(),
         };
 
         Self {
@@ -71,7 +67,7 @@ impl Workflow {
     /// Returns the `category` entry from the meta section, if it exists.
     pub fn category(&self) -> Option<String> {
         self.meta.get("category").and_then(|v| match v {
-            MetadataValue::String(s) => Some(s.text().unwrap().as_str().to_string()),
+            MetadataValue::String(s) => Some(s.text().unwrap().text().to_string()),
             _ => None,
         })
     }
@@ -161,7 +157,7 @@ mod tests {
         let ast_workflow = doc_item.into_workflow_definition().unwrap();
 
         let workflow = Workflow::new(
-            ast_workflow.name().as_str().to_string(),
+            ast_workflow.name().text().to_string(),
             ast_workflow.metadata(),
             ast_workflow.parameter_metadata(),
             ast_workflow.input(),

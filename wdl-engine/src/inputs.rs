@@ -35,10 +35,11 @@ fn join_paths(
     ty: impl Fn(&str) -> Option<Type>,
 ) -> Result<()> {
     for (name, value) in inputs.iter_mut() {
-        let ty = if let Some(ty) = ty(name) {
-            ty
-        } else {
-            continue;
+        let ty = match ty(name) {
+            Some(ty) => ty,
+            _ => {
+                continue;
+            }
         };
 
         // Replace the value with `None` temporarily
@@ -327,6 +328,13 @@ impl WorkflowInputs {
     /// Returns the previous value, if any.
     pub fn set(&mut self, name: impl Into<String>, value: impl Into<Value>) -> Option<Value> {
         self.inputs.insert(name.into(), value.into())
+    }
+
+    /// Checks if the inputs contain a value with the specified name.
+    ///
+    /// This does not check nested call inputs.
+    pub fn contains(&self, name: &str) -> bool {
+        self.inputs.contains_key(name)
     }
 
     /// Replaces any `File` or `Directory` input values with joining the

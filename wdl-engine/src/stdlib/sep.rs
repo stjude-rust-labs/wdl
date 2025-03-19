@@ -6,6 +6,7 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::PrimitiveValue;
@@ -64,7 +65,7 @@ pub const fn descriptor() -> Function {
         const {
             &[Signature::new(
                 "(String, Array[P]) -> String where `P`: any primitive type",
-                sep,
+                Callback::Sync(sep),
             )]
         },
     )
@@ -78,30 +79,37 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn sep() {
-        let mut env = TestEnv::default();
+    #[tokio::test]
+    async fn sep() {
+        let env = TestEnv::default();
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::One,
             "sep(' ', prefix('-i ', ['file_1', 'file_2']))",
         )
+        .await
         .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "-i file_1 -i file_2");
 
-        let value = eval_v1_expr(&mut env, V1::One, "sep('', ['a', 'b', 'c'])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "sep('', ['a', 'b', 'c'])")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "abc");
 
-        let value = eval_v1_expr(&mut env, V1::One, "sep(' ', ['a', 'b', 'c'])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "sep(' ', ['a', 'b', 'c'])")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "a b c");
 
-        let value = eval_v1_expr(&mut env, V1::One, "sep(' ', ['a', None, 'c'])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "sep(' ', ['a', None, 'c'])")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "a  c");
 
-        let value = eval_v1_expr(&mut env, V1::One, "sep(',', [1])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "sep(',', [1])").await.unwrap();
         assert_eq!(value.unwrap_string().as_str(), "1");
 
-        let value = eval_v1_expr(&mut env, V1::One, "sep(',', [])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "sep(',', [])").await.unwrap();
         assert_eq!(value.unwrap_string().as_str(), "");
     }
 }

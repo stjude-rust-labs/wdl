@@ -8,7 +8,6 @@ use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
-use wdl_ast::ToSpan;
 use wdl_ast::VersionStatement;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -118,44 +117,47 @@ impl Visitor for VersionFormattingRule {
         // If there's a previous sibling or token, it must be whitespace
         // because only comments and whitespace may precede the version statement
         // and whitespace must come between the last comment and the version statement.
-        if let Some(prev_ws) = stmt.syntax().prev_sibling_or_token() {
+        if let Some(prev_ws) = stmt.inner().prev_sibling_or_token() {
             let ws = prev_ws.as_token().expect("expected a token").text();
             // If there's a previous sibling or token, it must be a comment
-            if let Some(_prev_comment) = prev_ws.prev_sibling_or_token() {
-                if ws != "\n\n" && ws != "\r\n\r\n" {
-                    // There's a special case where the blank line has extra whitespace
-                    // but that doesn't appear in the printed diagnostic.
-                    let mut diagnostic =
-                        expected_blank_line_before_version(prev_ws.text_range().to_span());
+            match prev_ws.prev_sibling_or_token() {
+                Some(_prev_comment) => {
+                    if ws != "\n\n" && ws != "\r\n\r\n" {
+                        // There's a special case where the blank line has extra whitespace
+                        // but that doesn't appear in the printed diagnostic.
+                        let mut diagnostic =
+                            expected_blank_line_before_version(prev_ws.text_range().into());
 
-                    if ws.chars().filter(|&c| c == '\n').count() == 2 {
-                        for (line, start, end) in lines_with_offset(ws) {
-                            if !line.is_empty() {
-                                let end_offset = if ws.ends_with("\r\n") {
-                                    2
-                                } else if ws.ends_with('\n') {
-                                    1
-                                } else {
-                                    0
-                                };
+                        if ws.chars().filter(|&c| c == '\n').count() == 2 {
+                            for (line, start, end) in lines_with_offset(ws) {
+                                if !line.is_empty() {
+                                    let end_offset = if ws.ends_with("\r\n") {
+                                        2
+                                    } else if ws.ends_with('\n') {
+                                        1
+                                    } else {
+                                        0
+                                    };
 
-                                diagnostic = diagnostic.with_highlight(Span::new(
-                                    prev_ws.text_range().to_span().start() + start,
-                                    end - start - end_offset,
-                                ));
+                                    diagnostic = diagnostic.with_highlight(Span::new(
+                                        usize::from(prev_ws.text_range().start()) + start,
+                                        end - start - end_offset,
+                                    ));
+                                }
                             }
                         }
+                        state.add(diagnostic);
                     }
-                    state.add(diagnostic);
                 }
-            } else {
-                state.add(whitespace_before_version(prev_ws.text_range().to_span()));
+                _ => {
+                    state.add(whitespace_before_version(prev_ws.text_range().into()));
+                }
             }
         }
 
         // 2. Handle internal whitespace and comments
         for child in stmt
-            .syntax()
+            .inner()
             .children_with_tokens()
             .filter(|c| c.kind() == SyntaxKind::Whitespace || c.kind() == SyntaxKind::Comment)
         {
@@ -163,21 +165,21 @@ impl Visitor for VersionFormattingRule {
                 SyntaxKind::Whitespace => {
                     if child.as_token().expect("expected a token").text() != " " {
                         state.add(unexpected_whitespace_inside_version(
-                            child.text_range().to_span(),
+                            child.text_range().into(),
                         ));
                     }
                 }
                 SyntaxKind::Comment => {
-                    state.add(comment_inside_version(child.text_range().to_span()));
+                    state.add(comment_inside_version(child.text_range().into()));
                 }
                 _ => unreachable!(),
             }
         }
 
         // 3. Handle whitespace after the version statement
-        if let Some(next) = stmt.syntax().next_sibling_or_token() {
+        if let Some(next) = stmt.inner().next_sibling_or_token() {
             if let Some(ws) = next.as_token().and_then(|s| Whitespace::cast(s.clone())) {
-                let s = ws.as_str();
+                let s = ws.text();
                 // Don't add diagnostic if there's nothing but whitespace after the version
                 // statement
                 if s != "\n\n" && s != "\r\n\r\n" && next.next_sibling_or_token().is_some() {

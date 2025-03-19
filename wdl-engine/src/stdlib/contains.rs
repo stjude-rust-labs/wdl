@@ -4,6 +4,7 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Value;
@@ -36,7 +37,7 @@ pub const fn descriptor() -> Function {
         const {
             &[Signature::new(
                 "(Array[P], P) -> Boolean where `P`: any primitive type",
-                contains,
+                Callback::Sync(contains),
             )]
         },
     )
@@ -49,57 +50,67 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn contains() {
-        let mut env = TestEnv::default();
+    #[tokio::test]
+    async fn contains() {
+        let env = TestEnv::default();
 
         assert!(
-            !eval_v1_expr(&mut env, V1::Two, "contains([], 1)")
+            !eval_v1_expr(&env, V1::Two, "contains([], 1)")
+                .await
                 .unwrap()
                 .unwrap_boolean()
         );
         assert!(
-            !eval_v1_expr(&mut env, V1::Two, "contains([], None)")
+            !eval_v1_expr(&env, V1::Two, "contains([], None)")
+                .await
                 .unwrap()
                 .unwrap_boolean()
         );
         assert!(
-            eval_v1_expr(&mut env, V1::Two, "contains([1, None, 3], None)")
+            eval_v1_expr(&env, V1::Two, "contains([1, None, 3], None)")
+                .await
                 .unwrap()
                 .unwrap_boolean()
         );
         assert!(
-            eval_v1_expr(&mut env, V1::Two, "contains([None], None)")
+            eval_v1_expr(&env, V1::Two, "contains([None], None)")
+                .await
                 .unwrap()
                 .unwrap_boolean()
         );
         assert!(
-            eval_v1_expr(&mut env, V1::Two, "contains([1, 2, 3, 4, 5], 2)")
+            eval_v1_expr(&env, V1::Two, "contains([1, 2, 3, 4, 5], 2)")
+                .await
                 .unwrap()
                 .unwrap_boolean()
         );
         assert!(
-            !eval_v1_expr(&mut env, V1::Two, "contains([1, 2, 3, 4, 5], 100)")
+            !eval_v1_expr(&env, V1::Two, "contains([1, 2, 3, 4, 5], 100)")
+                .await
                 .unwrap()
                 .unwrap_boolean()
         );
         assert!(
-            eval_v1_expr(&mut env, V1::Two, "contains(['foo', 'bar', 'baz'], 'foo')")
+            eval_v1_expr(&env, V1::Two, "contains(['foo', 'bar', 'baz'], 'foo')")
+                .await
                 .unwrap()
                 .unwrap_boolean()
         );
         assert!(
-            !eval_v1_expr(&mut env, V1::Two, "contains(['foo', 'bar', 'baz'], 'qux')")
+            !eval_v1_expr(&env, V1::Two, "contains(['foo', 'bar', 'baz'], 'qux')")
+                .await
                 .unwrap()
                 .unwrap_boolean()
         );
         assert!(
-            !eval_v1_expr(&mut env, V1::Two, "contains(['foo', None, 'baz'], 'bar')")
+            !eval_v1_expr(&env, V1::Two, "contains(['foo', None, 'baz'], 'bar')")
+                .await
                 .unwrap()
                 .unwrap_boolean()
         );
         assert!(
-            eval_v1_expr(&mut env, V1::Two, "contains(['foo', None, 'baz'], None)")
+            eval_v1_expr(&env, V1::Two, "contains(['foo', None, 'baz'], None)")
+                .await
                 .unwrap()
                 .unwrap_boolean()
         );

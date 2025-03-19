@@ -8,7 +8,6 @@ use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::ToSpan;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::v1::CallStatement;
@@ -111,38 +110,41 @@ impl Visitor for TrailingCommaRule {
         }
 
         // Check if object is multi-line
-        if item.syntax().to_string().contains('\n') && item.items().count() > 1 {
+        if item.inner().to_string().contains('\n') && item.items().count() > 1 {
             let last_child = item.items().last();
             if let Some(last_child) = last_child {
-                let (next_comma, comma_is_next) = find_next_comma(last_child.syntax());
-                if let Some(comma) = next_comma {
-                    if !comma_is_next {
-                        // Comma found, but not next, extraneous trivia
+                let (next_comma, comma_is_next) = find_next_comma(last_child.inner());
+                match next_comma {
+                    Some(comma) => {
+                        if !comma_is_next {
+                            // Comma found, but not next, extraneous trivia
+                            state.exceptable_add(
+                                extraneous_content(Span::new(
+                                    last_child.inner().text_range().end().into(),
+                                    (comma.text_range().start()
+                                        - last_child.inner().text_range().end())
+                                    .into(),
+                                )),
+                                SyntaxElement::from(item.inner().clone()),
+                                &self.exceptable_nodes(),
+                            );
+                        }
+                    }
+                    _ => {
+                        // No comma found, report missing
                         state.exceptable_add(
-                            extraneous_content(Span::new(
-                                last_child.syntax().text_range().end().into(),
-                                (comma.text_range().start()
-                                    - last_child.syntax().text_range().end())
-                                .into(),
-                            )),
-                            SyntaxElement::from(item.syntax().clone()),
+                            missing_trailing_comma(
+                                last_child
+                                    .inner()
+                                    .last_token()
+                                    .expect("object should have tokens")
+                                    .text_range()
+                                    .into(),
+                            ),
+                            SyntaxElement::from(item.inner().clone()),
                             &self.exceptable_nodes(),
                         );
                     }
-                } else {
-                    // No comma found, report missing
-                    state.exceptable_add(
-                        missing_trailing_comma(
-                            last_child
-                                .syntax()
-                                .last_token()
-                                .expect("object should have tokens")
-                                .text_range()
-                                .to_span(),
-                        ),
-                        SyntaxElement::from(item.syntax().clone()),
-                        &self.exceptable_nodes(),
-                    );
                 }
             }
         }
@@ -159,38 +161,41 @@ impl Visitor for TrailingCommaRule {
         }
 
         // Check if array is multi-line
-        if item.syntax().to_string().contains('\n') && item.elements().count() > 1 {
+        if item.inner().to_string().contains('\n') && item.elements().count() > 1 {
             let last_child = item.elements().last();
             if let Some(last_child) = last_child {
-                let (next_comma, comma_is_next) = find_next_comma(last_child.syntax());
-                if let Some(comma) = next_comma {
-                    if !comma_is_next {
-                        // Comma found, but not next, extraneous trivia
+                let (next_comma, comma_is_next) = find_next_comma(last_child.inner());
+                match next_comma {
+                    Some(comma) => {
+                        if !comma_is_next {
+                            // Comma found, but not next, extraneous trivia
+                            state.exceptable_add(
+                                extraneous_content(Span::new(
+                                    last_child.inner().text_range().end().into(),
+                                    (comma.text_range().start()
+                                        - last_child.inner().text_range().end())
+                                    .into(),
+                                )),
+                                SyntaxElement::from(item.inner().clone()),
+                                &self.exceptable_nodes(),
+                            );
+                        }
+                    }
+                    _ => {
+                        // No comma found, report missing
                         state.exceptable_add(
-                            extraneous_content(Span::new(
-                                last_child.syntax().text_range().end().into(),
-                                (comma.text_range().start()
-                                    - last_child.syntax().text_range().end())
-                                .into(),
-                            )),
-                            SyntaxElement::from(item.syntax().clone()),
+                            missing_trailing_comma(
+                                last_child
+                                    .inner()
+                                    .last_token()
+                                    .expect("array should have tokens")
+                                    .text_range()
+                                    .into(),
+                            ),
+                            SyntaxElement::from(item.inner().clone()),
                             &self.exceptable_nodes(),
                         );
                     }
-                } else {
-                    // No comma found, report missing
-                    state.exceptable_add(
-                        missing_trailing_comma(
-                            last_child
-                                .syntax()
-                                .last_token()
-                                .expect("array should have tokens")
-                                .text_range()
-                                .to_span(),
-                        ),
-                        SyntaxElement::from(item.syntax().clone()),
-                        &self.exceptable_nodes(),
-                    );
                 }
             }
         }
@@ -214,31 +219,34 @@ impl Visitor for TrailingCommaRule {
 
         call.inputs().for_each(|input| {
             // check each input for trailing comma
-            let (next_comma, comma_is_next) = find_next_comma(input.syntax());
-            if let Some(nc) = next_comma {
-                if !comma_is_next {
+            let (next_comma, comma_is_next) = find_next_comma(input.inner());
+            match next_comma {
+                Some(nc) => {
+                    if !comma_is_next {
+                        state.exceptable_add(
+                            extraneous_content(Span::new(
+                                input.inner().text_range().end().into(),
+                                (nc.text_range().start() - input.inner().text_range().end()).into(),
+                            )),
+                            SyntaxElement::from(call.inner().clone()),
+                            &self.exceptable_nodes(),
+                        );
+                    }
+                }
+                _ => {
                     state.exceptable_add(
-                        extraneous_content(Span::new(
-                            input.syntax().text_range().end().into(),
-                            (nc.text_range().start() - input.syntax().text_range().end()).into(),
-                        )),
-                        SyntaxElement::from(call.syntax().clone()),
+                        missing_trailing_comma(
+                            input
+                                .inner()
+                                .last_token()
+                                .expect("input should have tokens")
+                                .text_range()
+                                .into(),
+                        ),
+                        SyntaxElement::from(call.inner().clone()),
                         &self.exceptable_nodes(),
                     );
                 }
-            } else {
-                state.exceptable_add(
-                    missing_trailing_comma(
-                        input
-                            .syntax()
-                            .last_token()
-                            .expect("input should have tokens")
-                            .text_range()
-                            .to_span(),
-                    ),
-                    SyntaxElement::from(call.syntax().clone()),
-                    &self.exceptable_nodes(),
-                );
             }
         });
     }
@@ -256,37 +264,40 @@ impl Visitor for TrailingCommaRule {
                 | LiteralExpr::Object(_)
                 | LiteralExpr::Struct(_) => {
                     // Check if array is multi-line
-                    if l.syntax().to_string().contains('\n') && l.syntax().children().count() > 1 {
-                        let last_child = l.syntax().children().last();
+                    if l.inner().to_string().contains('\n') && l.inner().children().count() > 1 {
+                        let last_child = l.inner().children().last();
                         if let Some(last_child) = last_child {
                             let (next_comma, comma_is_next) = find_next_comma(&last_child);
-                            if let Some(comma) = next_comma {
-                                if !comma_is_next {
-                                    // Comma found, but not next, extraneous trivia
+                            match next_comma {
+                                Some(comma) => {
+                                    if !comma_is_next {
+                                        // Comma found, but not next, extraneous trivia
+                                        state.exceptable_add(
+                                            extraneous_content(Span::new(
+                                                last_child.text_range().end().into(),
+                                                (comma.text_range().start()
+                                                    - last_child.text_range().end())
+                                                .into(),
+                                            )),
+                                            SyntaxElement::from(l.inner().clone()),
+                                            &self.exceptable_nodes(),
+                                        );
+                                    }
+                                }
+                                _ => {
+                                    // No comma found, report missing
                                     state.exceptable_add(
-                                        extraneous_content(Span::new(
-                                            last_child.text_range().end().into(),
-                                            (comma.text_range().start()
-                                                - last_child.text_range().end())
-                                            .into(),
-                                        )),
-                                        SyntaxElement::from(l.syntax().clone()),
+                                        missing_trailing_comma(
+                                            last_child
+                                                .last_token()
+                                                .expect("item should have tokens")
+                                                .text_range()
+                                                .into(),
+                                        ),
+                                        SyntaxElement::from(l.inner().clone()),
                                         &self.exceptable_nodes(),
                                     );
                                 }
-                            } else {
-                                // No comma found, report missing
-                                state.exceptable_add(
-                                    missing_trailing_comma(
-                                        last_child
-                                            .last_token()
-                                            .expect("item should have tokens")
-                                            .text_range()
-                                            .to_span(),
-                                    ),
-                                    SyntaxElement::from(l.syntax().clone()),
-                                    &self.exceptable_nodes(),
-                                );
                             }
                         }
                     }

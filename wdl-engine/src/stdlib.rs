@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::path::Path;
 use std::sync::LazyLock;
 
+use futures::future::BoxFuture;
 use wdl_analysis::stdlib::Binding;
 use wdl_analysis::types::Type;
 use wdl_ast::Diagnostic;
@@ -93,7 +94,7 @@ impl CallArgument {
 /// Represents function call context.
 pub struct CallContext<'a> {
     /// The evaluation context for the call.
-    context: &'a mut dyn EvaluationContext,
+    context: &'a dyn EvaluationContext,
     /// The call site span.
     call_site: Span,
     /// The arguments to the call.
@@ -105,7 +106,7 @@ pub struct CallContext<'a> {
 impl<'a> CallContext<'a> {
     /// Constructs a new call context given the call arguments.
     pub fn new(
-        context: &'a mut dyn EvaluationContext,
+        context: &'a dyn EvaluationContext,
         call_site: Span,
         arguments: &'a [CallArgument],
         return_type: Type,
@@ -162,7 +163,13 @@ impl<'a> CallContext<'a> {
 }
 
 /// Represents a WDL function implementation callback.
-type Callback = fn(context: CallContext<'_>) -> Result<Value, Diagnostic>;
+#[derive(Debug, Clone, Copy)]
+enum Callback {
+    /// The callback is synchronous.
+    Sync(fn(context: CallContext<'_>) -> Result<Value, Diagnostic>),
+    /// The callback is asynchronous.
+    Async(for<'a> fn(context: CallContext<'a>) -> BoxFuture<'a, Result<Value, Diagnostic>>),
+}
 
 /// Represents an implementation signature for a WDL standard library function.
 #[derive(Debug, Clone, Copy)]
@@ -198,12 +205,15 @@ impl Function {
 
     /// Calls the function given the binding and call context.
     #[inline]
-    pub fn call(
+    pub async fn call(
         &self,
         binding: Binding<'_>,
         context: CallContext<'_>,
     ) -> Result<Value, Diagnostic> {
-        (self.signatures[binding.index()].callback)(context)
+        match self.signatures[binding.index()].callback {
+            Callback::Sync(cb) => cb(context),
+            Callback::Async(cb) => cb(context).await,
+        }
     }
 }
 
@@ -314,10 +324,9 @@ mod test {
                             1,
                             "signature count mismatch for function `{name}`"
                         );
+                        let params = TypeParameters::new(f.signature().type_parameters());
                         assert_eq!(
-                            f.signature()
-                                .display(&TypeParameters::new(f.signature().type_parameters()))
-                                .to_string(),
+                            f.signature().display(&params).to_string(),
                             imp.signatures[0].display,
                             "signature mismatch for function `{name}`"
                         );
@@ -329,9 +338,9 @@ mod test {
                             "signature count mismatch for function `{name}`"
                         );
                         for (i, sig) in f.signatures().iter().enumerate() {
+                            let params = TypeParameters::new(sig.type_parameters());
                             assert_eq!(
-                                sig.display(&TypeParameters::new(sig.type_parameters()))
-                                    .to_string(),
+                                sig.display(&params).to_string(),
                                 imp.signatures[i].display,
                                 "signature mismatch for function `{name}` (index {i})"
                             );

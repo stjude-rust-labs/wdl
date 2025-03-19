@@ -4,6 +4,7 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Value;
@@ -24,7 +25,7 @@ fn round(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
 /// Gets the function describing `round`.
 pub const fn descriptor() -> Function {
-    Function::new(const { &[Signature::new("(Float) -> Int", round)] })
+    Function::new(const { &[Signature::new("(Float) -> Int", Callback::Sync(round))] })
 }
 
 #[cfg(test)]
@@ -35,31 +36,33 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn round() {
-        let mut env = TestEnv::default();
-        let value = eval_v1_expr(&mut env, V1::Zero, "round(10.5)").unwrap();
+    #[tokio::test]
+    async fn round() {
+        let env = TestEnv::default();
+        let value = eval_v1_expr(&env, V1::Zero, "round(10.5)").await.unwrap();
         assert_eq!(value.unwrap_integer(), 11);
 
-        let value = eval_v1_expr(&mut env, V1::Zero, "round(10.3)").unwrap();
+        let value = eval_v1_expr(&env, V1::Zero, "round(10.3)").await.unwrap();
         assert_eq!(value.unwrap_integer(), 10);
 
-        let value = eval_v1_expr(&mut env, V1::Zero, "round(10)").unwrap();
+        let value = eval_v1_expr(&env, V1::Zero, "round(10)").await.unwrap();
         assert_eq!(value.unwrap_integer(), 10);
 
-        let value = eval_v1_expr(&mut env, V1::Zero, "round(9.9999)").unwrap();
+        let value = eval_v1_expr(&env, V1::Zero, "round(9.9999)").await.unwrap();
         assert_eq!(value.unwrap_integer(), 10);
 
-        let value = eval_v1_expr(&mut env, V1::Zero, "round(9.12345)").unwrap();
+        let value = eval_v1_expr(&env, V1::Zero, "round(9.12345)")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_integer(), 9);
 
-        let value = eval_v1_expr(&mut env, V1::Zero, "round(0)").unwrap();
+        let value = eval_v1_expr(&env, V1::Zero, "round(0)").await.unwrap();
         assert_eq!(value.unwrap_integer(), 0);
 
-        let value = eval_v1_expr(&mut env, V1::Zero, "round(-5.1)").unwrap();
+        let value = eval_v1_expr(&env, V1::Zero, "round(-5.1)").await.unwrap();
         assert_eq!(value.unwrap_integer(), -5);
 
-        let value = eval_v1_expr(&mut env, V1::Zero, "round(-5.5)").unwrap();
+        let value = eval_v1_expr(&env, V1::Zero, "round(-5.5)").await.unwrap();
         assert_eq!(value.unwrap_integer(), -6);
     }
 }
