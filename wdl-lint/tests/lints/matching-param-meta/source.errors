@@ -1,39 +1,39 @@
 note[MatchingParameterMeta]: task `t` has an extraneous parameter metadata key named `extra`
-   ┌─ tests/lints/matching-param-meta/source.wdl:21:9
+   ┌─ tests/lints/matching-param-meta/source.wdl:22:9
    │
-21 │         extra: "this should not be here"
+22 │         extra: "this should not be here"
    │         ^^^^^ this key does not correspond to any input declaration
    │
    = fix: remove the extraneous key from the `parameter_meta` section
 
 warning[MatchingParameterMeta]: task `t` is missing a parameter metadata key for input `does_not_exist`
-   ┌─ tests/lints/matching-param-meta/source.wdl:27:16
+   ┌─ tests/lints/matching-param-meta/source.wdl:28:16
    │
-27 │         String does_not_exist
+28 │         String does_not_exist
    │                ^^^^^^^^^^^^^^ this input does not have an entry in the parameter metadata section
    │
    = fix: add a `does_not_exist` key to the `parameter_meta` section with a detailed description of the input.
 
 note[MatchingParameterMeta]: workflow `w` has an extraneous parameter metadata key named `extra`
-   ┌─ tests/lints/matching-param-meta/source.wdl:49:9
+   ┌─ tests/lints/matching-param-meta/source.wdl:48:9
    │
-49 │         extra: "this should not be here"
+48 │         extra: "this should not be here"
    │         ^^^^^ this key does not correspond to any input declaration
    │
    = fix: remove the extraneous key from the `parameter_meta` section
 
 warning[MatchingParameterMeta]: workflow `w` is missing a parameter metadata key for input `does_not_exist`
-   ┌─ tests/lints/matching-param-meta/source.wdl:54:16
+   ┌─ tests/lints/matching-param-meta/source.wdl:53:16
    │
-54 │         String does_not_exist
+53 │         String does_not_exist
    │                ^^^^^^^^^^^^^^ this input does not have an entry in the parameter metadata section
    │
    = fix: add a `does_not_exist` key to the `parameter_meta` section with a detailed description of the input.
 
 warning[MatchingParameterMeta]: parameter metadata in task `new_test` is out of order
-   ┌─ tests/lints/matching-param-meta/source.wdl:65:5
+   ┌─ tests/lints/matching-param-meta/source.wdl:64:5
    │
-65 │     parameter_meta {
+64 │     parameter_meta {
    │     ^^^^^^^^^^^^^^ parameter metadata must be in the same order as inputs
    │
    = fix: order the parameter metadata as:
@@ -41,12 +41,51 @@ warning[MatchingParameterMeta]: parameter metadata in task `new_test` is out of 
      first
 
 warning[MatchingParameterMeta]: parameter metadata in struct `Bar` is out of order
-   ┌─ tests/lints/matching-param-meta/source.wdl:86:5
+   ┌─ tests/lints/matching-param-meta/source.wdl:83:5
    │
-86 │     parameter_meta {
+83 │     parameter_meta {
    │     ^^^^^^^^^^^^^^ parameter metadata must be in the same order as inputs
    │
    = fix: order the parameter metadata as:
      param_a
      param_b
+
+note[InputSorting]: input not sorted
+    ┌─ tests/lints/matching-param-meta/source.wdl:104:5
+    │
+104 │     input {
+    │     ^^^^^ input section must be sorted
+    │
+    = fix: sort input statements as: 
+      File b
+      File t
+      Directory w
+      Array[String]+ p
+      Array[String]+ q
+
+warning[MatchingParameterMeta]: parameter metadata in task `input_sorting_test_2` is out of order
+    ┌─ tests/lints/matching-param-meta/source.wdl:122:5
+    │
+122 │     parameter_meta {
+    │     ^^^^^^^^^^^^^^ parameter metadata must be in the same order as inputs
+    │
+    = fix: order the parameter metadata as:
+      w
+      p
+      t
+      q
+      b
+
+note[InputSorting]: input not sorted
+    ┌─ tests/lints/matching-param-meta/source.wdl:130:5
+    │
+130 │     input {
+    │     ^^^^^ input section must be sorted
+    │
+    = fix: sort input statements as: 
+      File t
+      File b
+      Directory w
+      Array[String]+ p
+      Array[String]+ q
 

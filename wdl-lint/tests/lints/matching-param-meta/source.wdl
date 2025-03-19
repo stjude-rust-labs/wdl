@@ -1,4 +1,5 @@
 #@ except: DescriptionMissing, RuntimeSectionKeys
+#@ except: DisallowedInputName, MissingRequirements
 
 ## This is a test for checking for missing and extraneous entries
 ## in a `parameter_meta` section, and for ensuring that
@@ -30,8 +31,6 @@ task t {
     command <<<>>>
 
     output {}
-
-    requirements {}
 }
 
 workflow w {
@@ -76,8 +75,6 @@ task new_test {
     command <<<>>>
 
     output {}
-
-    requirements {}
 }
 
 struct Bar {
@@ -90,4 +87,56 @@ struct Bar {
 
     String param_a
     String param_b
+}
+
+# This should trigger a InputSorting diagnostic
+task input_sorting_test_1 {
+    meta {}
+
+    parameter_meta {
+        b: "Another file input"
+        p: "Array of non-optional strings"
+        q: "Another array of non-optional strings"
+        t: "File input"
+        w: "Directory input"
+    }
+
+    input {
+        # This order is incorrect compared to parameter_meta (should trigger InputSorting)
+        File b
+        Array[String]+ p
+        Array[String]+ q
+        File t
+        Directory w
+    }
+
+    command <<<>>>
+
+    output {}
+}
+
+# This should trigger a InputSorting diagnostic
+task input_sorting_test_2 {
+    meta {}
+
+    parameter_meta {
+        p: "Array of non-optional strings"
+        w: "Directory input"
+        b: "Another file input"
+        q: "Another array of non-optional strings"
+        t: "File input"
+    }
+
+    input {
+        # Incorrect order for both input order and parameter_meta
+        Directory w
+        Array[String]+ p
+        File t
+        Array[String]+ q
+        File b
+    }
+
+    command <<<>>>
+
+    output {}
 }
