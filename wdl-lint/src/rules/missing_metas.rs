@@ -108,7 +108,7 @@ impl Rule for MissingMetasRule {
     fn explanation(&self) -> &'static str {
         "It is important that WDL code is well-documented. Every task and workflow should have \
          both a `meta` and `parameter_meta` section. Tasks without an `input` section are permitted to \
-         skip the `parameter_meta` section. meta sections should include a `description` key along \
+         skip the `parameter_meta` section. `meta` and `parameter_meta` sections should include a `description` key along \
          with an outputs key where each member matches the corresponding named output in the \
          `output` section."
     }
