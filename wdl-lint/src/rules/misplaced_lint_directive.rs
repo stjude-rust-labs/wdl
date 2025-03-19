@@ -22,7 +22,7 @@ use crate::TagSet;
 use crate::optional_rules;
 use crate::rules;
 
-/// The identifier for the unknown rule rule.
+/// The identifier for the misplaced lint directive rule.
 const ID: &str = "MisplacedLintDirective";
 
 /// Creates an "unknown rule" diagnostic.
