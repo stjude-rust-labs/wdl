@@ -9,6 +9,7 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::PrimitiveValue;
@@ -128,9 +129,9 @@ pub const fn descriptor() -> Function {
     Function::new(
         const {
             &[
-                Signature::new("(File, String) -> File", join_paths_simple),
-                Signature::new("(File, Array[String]+) -> File", join_paths),
-                Signature::new("(Array[String]+) -> File", join_paths),
+                Signature::new("(File, String) -> File", Callback::Sync(join_paths_simple)),
+                Signature::new("(File, Array[String]+) -> File", Callback::Sync(join_paths)),
+                Signature::new("(Array[String]+) -> File", Callback::Sync(join_paths)),
             ]
         },
     )
@@ -144,28 +145,36 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn join_paths() {
-        let mut env = TestEnv::default();
-        let value = eval_v1_expr(&mut env, V1::Two, "join_paths('/usr', ['bin', 'echo'])").unwrap();
+    #[tokio::test]
+    async fn join_paths() {
+        let env = TestEnv::default();
+        let value = eval_v1_expr(&env, V1::Two, "join_paths('/usr', ['bin', 'echo'])")
+            .await
+            .unwrap();
         assert_eq!(
             value.unwrap_file().as_str().replace('\\', "/"),
             "/usr/bin/echo"
         );
 
-        let value = eval_v1_expr(&mut env, V1::Two, "join_paths(['/usr', 'bin', 'echo'])").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "join_paths(['/usr', 'bin', 'echo'])")
+            .await
+            .unwrap();
         assert_eq!(
             value.unwrap_file().as_str().replace('\\', "/"),
             "/usr/bin/echo"
         );
 
-        let value = eval_v1_expr(&mut env, V1::Two, "join_paths('mydir', 'mydata.txt')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "join_paths('mydir', 'mydata.txt')")
+            .await
+            .unwrap();
         assert_eq!(
             value.unwrap_file().as_str().replace('\\', "/"),
             "mydir/mydata.txt"
         );
 
-        let value = eval_v1_expr(&mut env, V1::Two, "join_paths('/usr', 'bin/echo')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "join_paths('/usr', 'bin/echo')")
+            .await
+            .unwrap();
         assert_eq!(
             value.unwrap_file().as_str().replace('\\', "/"),
             "/usr/bin/echo"
@@ -173,31 +182,28 @@ mod test {
 
         #[cfg(unix)]
         {
-            let diagnostic =
-                eval_v1_expr(&mut env, V1::Two, "join_paths('/usr', '/bin/echo')").unwrap_err();
+            let diagnostic = eval_v1_expr(&env, V1::Two, "join_paths('/usr', '/bin/echo')")
+                .await
+                .unwrap_err();
             assert_eq!(
                 diagnostic.message(),
                 "path is required to be a relative path, but an absolute path was provided"
             );
 
-            let diagnostic = eval_v1_expr(
-                &mut env,
-                V1::Two,
-                "join_paths('/usr', ['foo', '/bin/echo'])",
-            )
-            .unwrap_err();
+            let diagnostic =
+                eval_v1_expr(&env, V1::Two, "join_paths('/usr', ['foo', '/bin/echo'])")
+                    .await
+                    .unwrap_err();
             assert_eq!(
                 diagnostic.message(),
                 "index 1 of the array is required to be a relative path, but an absolute path was \
                  provided"
             );
 
-            let diagnostic = eval_v1_expr(
-                &mut env,
-                V1::Two,
-                "join_paths(['/usr', 'foo', '/bin/echo'])",
-            )
-            .unwrap_err();
+            let diagnostic =
+                eval_v1_expr(&env, V1::Two, "join_paths(['/usr', 'foo', '/bin/echo'])")
+                    .await
+                    .unwrap_err();
             assert_eq!(
                 diagnostic.message(),
                 "index 2 of the array is required to be a relative path, but an absolute path was \
@@ -207,19 +213,20 @@ mod test {
 
         #[cfg(windows)]
         {
-            let diagnostic =
-                eval_v1_expr(&mut env, V1::Two, "join_paths('C:\\usr', 'C:\\bin\\echo')")
-                    .unwrap_err();
+            let diagnostic = eval_v1_expr(&env, V1::Two, "join_paths('C:\\usr', 'C:\\bin\\echo')")
+                .await
+                .unwrap_err();
             assert_eq!(
                 diagnostic.message(),
                 "path is required to be a relative path, but an absolute path was provided"
             );
 
             let diagnostic = eval_v1_expr(
-                &mut env,
+                &env,
                 V1::Two,
                 "join_paths('C:\\usr', ['foo', 'C:\\bin\\echo'])",
             )
+            .await
             .unwrap_err();
             assert_eq!(
                 diagnostic.message(),
@@ -228,10 +235,11 @@ mod test {
             );
 
             let diagnostic = eval_v1_expr(
-                &mut env,
+                &env,
                 V1::Two,
                 "join_paths(['C:\\usr', 'foo', 'C:\\bin\\echo'])",
             )
+            .await
             .unwrap_err();
             assert_eq!(
                 diagnostic.message(),

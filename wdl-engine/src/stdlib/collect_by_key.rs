@@ -4,6 +4,7 @@ use indexmap::IndexMap;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Array;
@@ -75,7 +76,7 @@ pub const fn descriptor() -> Function {
         const {
             &[Signature::new(
                 "(Array[Pair[K, V]]) -> Map[K, Array[V]] where `K`: any primitive type",
-                collect_by_key,
+                Callback::Sync(collect_by_key),
             )]
         },
     )
@@ -89,27 +90,31 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn collect_by_key() {
-        let mut env = TestEnv::default();
+    #[tokio::test]
+    async fn collect_by_key() {
+        let env = TestEnv::default();
 
-        let value = eval_v1_expr(&mut env, V1::Two, "collect_by_key([])").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "collect_by_key([])")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_map().len(), 0);
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "collect_by_key([('a', 1), ('b', 2), ('a', 3)])",
         )
+        .await
         .unwrap();
         assert_eq!(value.to_string(), r#"{"a": [1, 3], "b": [2]}"#);
 
         let value = eval_v1_expr(
-            &mut env,
+            &env,
             V1::Two,
             "collect_by_key([('a', 1), (None, 2), ('a', 3), (None, 4), ('b', 5), ('c', 6), ('b', \
              7)])",
         )
+        .await
         .unwrap();
         assert_eq!(
             value.to_string(),

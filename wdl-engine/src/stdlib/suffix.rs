@@ -5,6 +5,7 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Array;
@@ -51,7 +52,7 @@ pub const fn descriptor() -> Function {
         const {
             &[Signature::new(
                 "(String, Array[P]) -> Array[String] where `P`: any primitive type",
-                suffix,
+                Callback::Sync(suffix),
             )]
         },
     )
@@ -65,10 +66,12 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn suffix() {
-        let mut env = TestEnv::default();
-        let value = eval_v1_expr(&mut env, V1::One, "suffix('foo', [1, 2, 3])").unwrap();
+    #[tokio::test]
+    async fn suffix() {
+        let env = TestEnv::default();
+        let value = eval_v1_expr(&env, V1::One, "suffix('foo', [1, 2, 3])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -78,7 +81,9 @@ mod test {
             .collect();
         assert_eq!(elements, ["1foo", "2foo", "3foo"]);
 
-        let value = eval_v1_expr(&mut env, V1::One, "suffix('foo', [1.0, 1.1, 1.2])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "suffix('foo', [1.0, 1.1, 1.2])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -88,8 +93,9 @@ mod test {
             .collect();
         assert_eq!(elements, ["1.000000foo", "1.100000foo", "1.200000foo"]);
 
-        let value =
-            eval_v1_expr(&mut env, V1::One, "suffix('foo', ['bar', 'baz', 'qux'])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "suffix('foo', ['bar', 'baz', 'qux'])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -99,7 +105,9 @@ mod test {
             .collect();
         assert_eq!(elements, ["barfoo", "bazfoo", "quxfoo"]);
 
-        let value = eval_v1_expr(&mut env, V1::One, "suffix('foo', ['bar', None, 'qux'])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "suffix('foo', ['bar', None, 'qux'])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -109,7 +117,9 @@ mod test {
             .collect();
         assert_eq!(elements, ["barfoo", "foo", "quxfoo"]);
 
-        let value = eval_v1_expr(&mut env, V1::One, "suffix('foo', [])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "suffix('foo', [])")
+            .await
+            .unwrap();
         assert!(value.unwrap_array().is_empty());
     }
 }

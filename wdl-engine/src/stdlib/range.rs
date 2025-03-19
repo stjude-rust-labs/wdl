@@ -5,6 +5,7 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Array;
@@ -38,7 +39,7 @@ fn range(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
 /// Gets the function describing `range`.
 pub const fn descriptor() -> Function {
-    Function::new(const { &[Signature::new("(Int) -> Array[Int]", range)] })
+    Function::new(const { &[Signature::new("(Int) -> Array[Int]", Callback::Sync(range))] })
 }
 
 #[cfg(test)]
@@ -49,13 +50,13 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn range() {
-        let mut env = TestEnv::default();
-        let value = eval_v1_expr(&mut env, V1::One, "range(0)").unwrap();
+    #[tokio::test]
+    async fn range() {
+        let env = TestEnv::default();
+        let value = eval_v1_expr(&env, V1::One, "range(0)").await.unwrap();
         assert_eq!(value.unwrap_array().len(), 0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "range(10)").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "range(10)").await.unwrap();
         assert_eq!(
             value
                 .unwrap_array()
@@ -67,7 +68,7 @@ mod test {
             [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         );
 
-        let diagnostic = eval_v1_expr(&mut env, V1::One, "range(-10)").unwrap_err();
+        let diagnostic = eval_v1_expr(&env, V1::One, "range(-10)").await.unwrap_err();
         assert_eq!(
             diagnostic.message(),
             "call to function `range` failed: array length cannot be negative"

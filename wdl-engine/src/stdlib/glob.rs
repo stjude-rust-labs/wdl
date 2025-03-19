@@ -7,6 +7,7 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Array;
@@ -79,7 +80,14 @@ fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
 /// Gets the function describing `glob`.
 pub const fn descriptor() -> Function {
-    Function::new(const { &[Signature::new("(String) -> Array[File]", glob)] })
+    Function::new(
+        const {
+            &[Signature::new(
+                "(String) -> Array[File]",
+                Callback::Sync(glob),
+            )]
+        },
+    )
 }
 
 #[cfg(test)]
@@ -92,10 +100,12 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn glob() {
-        let mut env = TestEnv::default();
-        let diagnostic = eval_v1_expr(&mut env, V1::Two, "glob('invalid***')").unwrap_err();
+    #[tokio::test]
+    async fn glob() {
+        let env = TestEnv::default();
+        let diagnostic = eval_v1_expr(&env, V1::Two, "glob('invalid***')")
+            .await
+            .unwrap_err();
         assert_eq!(
             diagnostic.message(),
             "invalid glob pattern specified: wildcards are either regular `*` or recursive `**`"
@@ -109,7 +119,7 @@ mod test {
         env.write_file("nested/bar", "bar");
         env.write_file("nested/baz", "baz");
 
-        let value = eval_v1_expr(&mut env, V1::Two, "glob('jam')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "glob('jam')").await.unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -119,7 +129,7 @@ mod test {
             .collect();
         assert!(elements.is_empty());
 
-        let value = eval_v1_expr(&mut env, V1::Two, "glob('*')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "glob('*')").await.unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -129,7 +139,7 @@ mod test {
             .collect();
         assert_eq!(elements, ["bar", "baz", "foo", "qux"]);
 
-        let value = eval_v1_expr(&mut env, V1::Two, "glob('ba?')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "glob('ba?')").await.unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -139,7 +149,7 @@ mod test {
             .collect();
         assert_eq!(elements, ["bar", "baz"]);
 
-        let value = eval_v1_expr(&mut env, V1::Two, "glob('b*')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "glob('b*')").await.unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -149,7 +159,7 @@ mod test {
             .collect();
         assert_eq!(elements, ["bar", "baz"]);
 
-        let value = eval_v1_expr(&mut env, V1::Two, "glob('**/b*')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "glob('**/b*')").await.unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()

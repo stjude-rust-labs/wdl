@@ -7,6 +7,7 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::PrimitiveValue;
@@ -48,7 +49,14 @@ fn sub(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
 /// Gets the function describing `sub`.
 pub const fn descriptor() -> Function {
-    Function::new(const { &[Signature::new("(String, String, String) -> String", sub)] })
+    Function::new(
+        const {
+            &[Signature::new(
+                "(String, String, String) -> String",
+                Callback::Sync(sub),
+            )]
+        },
+    )
 }
 
 #[cfg(test)]
@@ -59,25 +67,30 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn sub() {
-        let mut env = TestEnv::default();
-        let diagnostic =
-            eval_v1_expr(&mut env, V1::Two, "sub('foo bar baz', '?', 'nope')").unwrap_err();
+    #[tokio::test]
+    async fn sub() {
+        let env = TestEnv::default();
+        let diagnostic = eval_v1_expr(&env, V1::Two, "sub('foo bar baz', '?', 'nope')")
+            .await
+            .unwrap_err();
         assert_eq!(
             diagnostic.message(),
             "regex parse error:\n    ?\n    ^\nerror: repetition operator missing expression"
         );
 
-        let value =
-            eval_v1_expr(&mut env, V1::Two, "sub('hello world', 'e..o', 'ey there')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "sub('hello world', 'e..o', 'ey there')")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "hey there world");
 
-        let value =
-            eval_v1_expr(&mut env, V1::Two, "sub('hello world', 'goodbye', 'nope')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "sub('hello world', 'goodbye', 'nope')")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "hello world");
 
-        let value = eval_v1_expr(&mut env, V1::Two, "sub('hello\tBob', '\\t', ' ')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "sub('hello\tBob', '\\t', ' ')")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "hello Bob");
     }
 }

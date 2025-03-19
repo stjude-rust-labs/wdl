@@ -1,13 +1,15 @@
 //! Implements the `read_int` function from the WDL standard library.
 
-use std::fs;
-use std::io::BufRead;
-use std::io::BufReader;
-
+use futures::FutureExt;
+use futures::future::BoxFuture;
+use tokio::fs;
+use tokio::io::AsyncBufReadExt;
+use tokio::io::BufReader;
 use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Value;
@@ -20,56 +22,60 @@ use crate::diagnostics::function_call_failed;
 /// the file is empty or does not contain a single integer, an error is raised.
 ///
 /// https://github.com/openwdl/wdl/blob/wdl-1.2/SPEC.md#read_int
-fn read_int(context: CallContext<'_>) -> Result<Value, Diagnostic> {
-    debug_assert!(context.arguments.len() == 1);
-    debug_assert!(context.return_type_eq(PrimitiveType::Integer));
+fn read_int(context: CallContext<'_>) -> BoxFuture<'_, Result<Value, Diagnostic>> {
+    async move {
+        debug_assert!(context.arguments.len() == 1);
+        debug_assert!(context.return_type_eq(PrimitiveType::Integer));
 
-    let path = context.work_dir().join(
-        context
-            .coerce_argument(0, PrimitiveType::File)
-            .unwrap_file()
-            .as_str(),
-    );
+        let path = context.work_dir().join(
+            context
+                .coerce_argument(0, PrimitiveType::File)
+                .unwrap_file()
+                .as_str(),
+        );
 
-    let read_error = |e: std::io::Error| {
-        function_call_failed(
-            "read_int",
-            format!("failed to read file `{path}`: {e}", path = path.display()),
-            context.call_site,
-        )
-    };
+        let read_error = |e: std::io::Error| {
+            function_call_failed(
+                "read_int",
+                format!("failed to read file `{path}`: {e}", path = path.display()),
+                context.call_site,
+            )
+        };
 
-    let invalid_contents = || {
-        function_call_failed(
-            "read_int",
-            format!(
-                "file `{path}` does not contain an integer value on a single line",
-                path = path.display()
-            ),
-            context.call_site,
-        )
-    };
+        let invalid_contents = || {
+            function_call_failed(
+                "read_int",
+                format!(
+                    "file `{path}` does not contain an integer value on a single line",
+                    path = path.display()
+                ),
+                context.call_site,
+            )
+        };
 
-    let mut lines = BufReader::new(fs::File::open(&path).map_err(read_error)?).lines();
-    let line = lines
-        .next()
-        .ok_or_else(invalid_contents)?
-        .map_err(read_error)?;
+        let mut lines = BufReader::new(fs::File::open(&path).await.map_err(read_error)?).lines();
+        let line = lines
+            .next_line()
+            .await
+            .map_err(read_error)?
+            .ok_or_else(invalid_contents)?;
 
-    if lines.next().is_some() {
-        return Err(invalid_contents());
+        if lines.next_line().await.map_err(read_error)?.is_some() {
+            return Err(invalid_contents());
+        }
+
+        Ok(line
+            .trim()
+            .parse::<i64>()
+            .map_err(|_| invalid_contents())?
+            .into())
     }
-
-    Ok(line
-        .trim()
-        .parse::<i64>()
-        .map_err(|_| invalid_contents())?
-        .into())
+    .boxed()
 }
 
 /// Gets the function describing `read_int`.
 pub const fn descriptor() -> Function {
-    Function::new(const { &[Signature::new("(File) -> Int", read_int)] })
+    Function::new(const { &[Signature::new("(File) -> Int", Callback::Async(read_int))] })
 }
 
 #[cfg(test)]
@@ -81,31 +87,37 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn read_int() {
+    #[tokio::test]
+    async fn read_int() {
         let mut env = TestEnv::default();
         env.write_file("foo", "12345 hello world!");
         env.write_file("bar", "     \t   \t12345   \n");
         env.insert_name("file", PrimitiveValue::new_file("bar"));
 
-        let diagnostic = eval_v1_expr(&mut env, V1::Two, "read_int('does-not-exist')").unwrap_err();
+        let diagnostic = eval_v1_expr(&env, V1::Two, "read_int('does-not-exist')")
+            .await
+            .unwrap_err();
         assert!(
             diagnostic
                 .message()
                 .starts_with("call to function `read_int` failed: failed to read file")
         );
 
-        let diagnostic = eval_v1_expr(&mut env, V1::Two, "read_int('foo')").unwrap_err();
+        let diagnostic = eval_v1_expr(&env, V1::Two, "read_int('foo')")
+            .await
+            .unwrap_err();
         assert!(
             diagnostic
                 .message()
                 .contains("does not contain an integer value on a single line")
         );
 
-        let value = eval_v1_expr(&mut env, V1::Two, "read_int('bar')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "read_int('bar')")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_integer(), 12345);
 
-        let value = eval_v1_expr(&mut env, V1::Two, "read_int(file)").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "read_int(file)").await.unwrap();
         assert_eq!(value.unwrap_integer(), 12345);
     }
 }
