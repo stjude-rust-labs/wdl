@@ -132,8 +132,8 @@ fn check_decl_name(
                 PrimitiveTypeKind::Integer => {
                     // Integer is shortened to Int in WDL
                     type_names.insert(primitive_type.to_string());
-                    // Also check for "Int"
-                    type_names.insert("Int".to_string());
+                    // Also check for "Integer" explicitly
+                    type_names.insert("Integer".to_string());
                 }
                 PrimitiveTypeKind::Float => {
                     type_names.insert(primitive_type.to_string());
@@ -171,14 +171,15 @@ fn check_decl_name(
     for type_name in &type_names {
         let type_lower = type_name.to_lowercase();
 
-        // Special handling for Int
-        if type_lower == "int" {
-            // Split the identifier into words using convert_case
+        // Special handling for short type names (3 characters or less)
+        // These require word-based checks to avoid false positives
+        if type_lower.len() <= 3 {
+            // Split the identifier into words
             let words = split_to_words(name_str);
 
-            // Check if "int" appears as the last word
+            // Check if the short type name appears as the last word
             if let Some(last_word) = words.last() {
-                if last_word.to_lowercase() == "int" {
+                if last_word.to_lowercase() == type_lower {
                     state.exceptable_add(
                         decl_identifier_with_type(decl.name().span(), name_str, type_name),
                         SyntaxElement::from(decl.syntax().clone()),
@@ -188,7 +189,7 @@ fn check_decl_name(
                 }
             }
         } else {
-            // For other types, check if the identifier ends with the type name
+            // For longer types, check if the identifier ends with the type name
             let name_lower = name_str.to_lowercase();
             if name_lower.ends_with(&type_lower) {
                 state.exceptable_add(
