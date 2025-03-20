@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added support for cloud storage URIs (#[367](https://github.com/stjude-rust-labs/wdl/pull/367)).
 * Added support reading of remote files from the stdlib file functions (#[364](https://github.com/stjude-rust-labs/wdl/pull/364))
 * Added support for YAML input files (.yml and .yaml) alongside JSON ([#352](https://github.com/stjude-rust-labs/wdl/pull/352)).
+* Added functionality to allow `None` values for call inputs where input has a default value ([#363](https://github.com/stjude-rust-labs/wdl/pull/363))
 * Added support for graceful cancellation of evaluation (#[327](https://github.com/stjude-rust-labs/wdl/pull/327)).
 * Added support for `max_cpu` and `max_memory` hints in task evaluation (#[327](https://github.com/stjude-rust-labs/wdl/pull/327)).
 * Added a Crankshaft backend with initial support for Docker (#[327](https://github.com/stjude-rust-labs/wdl/pull/327)).
