@@ -439,31 +439,13 @@ impl LanguageServer for Server {
         debug!("received `textDocument/didOpen` request: {params:#?}");
 
         if let Ok(path) = params.text_document.uri.to_file_path() {
-            if path.is_file() {
-                // Handle individual files
-                if let Err(e) = self
-                    .analyzer
-                    .add_document(path_to_uri(&path).expect("should convert to uri"))
-                    .await
-                {
-                    error!(
-                        "failed to add document {uri}: {e}",
-                        uri = params.text_document.uri
-                    );
-                    return;
-                }
-            } else if path.is_dir() {
-                // Handle individual directory
-                if let Err(e) = self.analyzer.add_directory(path).await {
-                    error!(
-                        "failed to add directory {uri}: {e}",
-                        uri = params.text_document.uri
-                    );
-                    return;
-                }
-            } else {
+            if let Err(e) = self
+                .analyzer
+                .add_document(path_to_uri(&path).expect("should convert to uri"))
+                .await
+            {
                 error!(
-                    "document {uri} is not a file or directory",
+                    "failed to add document {uri}: {e}",
                     uri = params.text_document.uri
                 );
                 return;
