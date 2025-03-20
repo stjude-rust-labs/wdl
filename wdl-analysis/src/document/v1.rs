@@ -27,6 +27,7 @@ use wdl_ast::v1::Decl;
 use wdl_ast::v1::DocumentItem;
 use wdl_ast::v1::Expr;
 use wdl_ast::v1::ImportStatement;
+use wdl_ast::v1::LiteralExpr;
 use wdl_ast::v1::ScatterStatement;
 use wdl_ast::v1::StructDefinition;
 use wdl_ast::v1::TaskDefinition;
@@ -1158,14 +1159,20 @@ fn add_call_statement(
 
                 match input.expr() {
                     Some(expr) => {
-                        type_check_expr(
-                            config,
-                            document,
-                            scope.as_scope_ref(),
-                            &expr,
-                            &expected_ty,
-                            input_name.span(),
-                        );
+                        let document_version = document.version.expect("document version must be read by now");
+
+                        // Skip type checking if expr is None and document version is at least 1.2
+                        if !(matches!(expr, Expr::Literal(LiteralExpr::None(_))) 
+                            && document_version >= SupportedVersion::V1(V1::Two)) {
+                            type_check_expr(
+                                config,
+                                document,
+                                scope.as_scope_ref(),
+                                &expr,
+                                &expected_ty,
+                                input_name.span(),
+                            );
+                        }
                     }
                     None => match scope.lookup(input_name.text()) {
                         Some(name) => {
