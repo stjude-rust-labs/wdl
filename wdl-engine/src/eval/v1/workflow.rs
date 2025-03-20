@@ -1587,10 +1587,13 @@ impl WorkflowEvaluator {
             },
         };
 
-        let document_version = document.version().expect("document version must be read by now");
+        let document_version = document
+            .version()
+            .expect("document version must be read by now");
 
         // Evaluate the inputs
-        let scatter_index = Self::evaluate_call_inputs(&state, stmt, scope, &mut inputs, document_version).await?;
+        let scatter_index =
+            Self::evaluate_call_inputs(&state, stmt, scope, &mut inputs, document_version).await?;
 
         let dir = format!(
             "{alias}{sep}{scatter_index}",
@@ -1685,8 +1688,8 @@ impl WorkflowEvaluator {
 
             // Skip type checking if expr is None and document version is at least 1.2
             if !(matches!(expr, Some(Expr::Literal(LiteralExpr::None(_))))
-                && document_version >= SupportedVersion::V1(V1::Two)) {
-
+                && document_version >= SupportedVersion::V1(V1::Two))
+            {
                 let name = input.name();
                 let value = match expr {
                     Some(expr) => {
@@ -1696,7 +1699,7 @@ impl WorkflowEvaluator {
                             &state.work_dir,
                             &state.temp_dir,
                         ));
-    
+
                         evaluator.evaluate_expr(&expr).await?
                     }
                     None => scopes
@@ -1705,7 +1708,7 @@ impl WorkflowEvaluator {
                         .cloned()
                         .ok_or_else(|| unknown_name(name.text(), name.span()))?,
                 };
-                
+
                 let prev = inputs.set(input.name().text(), value);
                 assert!(
                     prev.is_none(),
