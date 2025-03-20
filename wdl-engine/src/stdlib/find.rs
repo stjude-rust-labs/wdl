@@ -7,6 +7,7 @@ use wdl_analysis::types::Type;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::PrimitiveValue;
@@ -40,7 +41,14 @@ fn find(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
 /// Gets the function describing `find`.
 pub const fn descriptor() -> Function {
-    Function::new(const { &[Signature::new("(String, String) -> String?", find)] })
+    Function::new(
+        const {
+            &[Signature::new(
+                "(String, String) -> String?",
+                Callback::Sync(find),
+            )]
+        },
+    )
 }
 
 #[cfg(test)]
@@ -51,22 +59,30 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn find() {
-        let mut env = TestEnv::default();
-        let diagnostic = eval_v1_expr(&mut env, V1::Two, "find('foo bar baz', '?')").unwrap_err();
+    #[tokio::test]
+    async fn find() {
+        let env = TestEnv::default();
+        let diagnostic = eval_v1_expr(&env, V1::Two, "find('foo bar baz', '?')")
+            .await
+            .unwrap_err();
         assert_eq!(
             diagnostic.message(),
             "regex parse error:\n    ?\n    ^\nerror: repetition operator missing expression"
         );
 
-        let value = eval_v1_expr(&mut env, V1::Two, "find('hello world', 'e..o')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "find('hello world', 'e..o')")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "ello");
 
-        let value = eval_v1_expr(&mut env, V1::Two, "find('hello world', 'goodbye')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "find('hello world', 'goodbye')")
+            .await
+            .unwrap();
         assert!(value.is_none());
 
-        let value = eval_v1_expr(&mut env, V1::Two, "find('hello\tBob', '\\t')").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "find('hello\tBob', '\\t')")
+            .await
+            .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "\t");
     }
 }

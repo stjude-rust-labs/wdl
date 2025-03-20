@@ -738,7 +738,11 @@ impl WorkflowEvaluator {
 
         // Build an evaluation graph for the workflow
         let mut diagnostics = Vec::new();
-        let graph = WorkflowGraphBuilder::default().build(&definition, &mut diagnostics);
+
+        // We need to provide inputs to the workflow graph builder to avoid adding
+        // dependency edges from the default expressions if a value was provided
+        let graph = WorkflowGraphBuilder::default()
+            .build(&definition, &mut diagnostics, |name| inputs.contains(name));
         if let Some(diagnostic) = diagnostics.pop() {
             return Err(diagnostic.into());
         }
@@ -1660,7 +1664,7 @@ impl WorkflowEvaluator {
             &state.work_dir,
             &state.temp_dir,
         ));
-        Ok(evaluator.evaluate_expr(expr)?)
+        Ok(evaluator.evaluate_expr(expr).await?)
     }
 
     /// Evaluates the call inputs of a call statement.
@@ -1693,7 +1697,7 @@ impl WorkflowEvaluator {
                             &state.temp_dir,
                         ));
     
-                        evaluator.evaluate_expr(&expr)?
+                        evaluator.evaluate_expr(&expr).await?
                     }
                     None => scopes
                         .reference(scope)
