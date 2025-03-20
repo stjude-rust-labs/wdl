@@ -6,6 +6,14 @@ note[DisallowedInputName]: declaration identifier must be at least 3 characters
    │
    = fix: rename the identifier to be at least 3 characters long
 
+warning[DisallowedDeclarationName]: declaration identifier 'inString' ends with type name 'String'
+   ┌─ tests/lints/disallowed-input-name/source.wdl:19:16
+   │
+19 │         String inString  # This is not OK
+   │                ^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
 note[DisallowedInputName]: declaration identifier starts with 'in'
    ┌─ tests/lints/disallowed-input-name/source.wdl:19:16
    │
@@ -14,6 +22,14 @@ note[DisallowedInputName]: declaration identifier starts with 'in'
    │
    = fix: rename the identifier to not start with 'in'
 
+warning[DisallowedDeclarationName]: declaration identifier 'input_string' ends with type name 'String'
+   ┌─ tests/lints/disallowed-input-name/source.wdl:20:16
+   │
+20 │         String input_string  # This is not OK
+   │                ^^^^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
 note[DisallowedInputName]: declaration identifier starts with 'input'
    ┌─ tests/lints/disallowed-input-name/source.wdl:20:16
    │
@@ -21,6 +37,14 @@ note[DisallowedInputName]: declaration identifier starts with 'input'
    │                ^^^^^^^^^^^^
    │
    = fix: rename the identifier to not start with 'input'
+
+warning[DisallowedDeclarationName]: declaration identifier 'in_string' ends with type name 'String'
+   ┌─ tests/lints/disallowed-input-name/source.wdl:21:16
+   │
+21 │         String in_string  # This is not OK
+   │                ^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
 
 note[DisallowedInputName]: declaration identifier starts with 'in'
    ┌─ tests/lints/disallowed-input-name/source.wdl:21:16

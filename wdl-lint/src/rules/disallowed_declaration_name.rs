@@ -26,7 +26,10 @@ use crate::TagSet;
 /// A rule that identifies declaration names that include their type names as a
 /// suffix.
 #[derive(Debug, Default)]
-pub struct DisallowedDeclarationNameRule;
+pub struct DisallowedDeclarationNameRule {
+    /// Tracks whether we're currently within an input or output declaration section
+    in_declaration_section: bool,
+}
 
 /// Create a diagnostic for a declaration identifier that contains its type name
 fn decl_identifier_with_type(span: Span, decl_name: &str, type_name: &str) -> Diagnostic {
@@ -64,6 +67,8 @@ impl Rule for DisallowedDeclarationNameRule {
             SyntaxKind::OutputSectionNode,
             SyntaxKind::BoundDeclNode,
             SyntaxKind::UnboundDeclNode,
+            SyntaxKind::TaskDefinitionNode,
+            SyntaxKind::WorkflowDefinitionNode,
         ])
     }
 }
@@ -84,6 +89,24 @@ impl Visitor for DisallowedDeclarationNameRule {
 
         // Reset the visitor upon document entry
         *self = Default::default();
+    }
+
+    fn input_section(
+        &mut self,
+        _: &mut Self::State,
+        reason: VisitReason,
+        _: &wdl_ast::v1::InputSection,
+    ) {
+        self.in_declaration_section = reason == VisitReason::Enter;
+    }
+
+    fn output_section(
+        &mut self,
+        _: &mut Self::State,
+        reason: VisitReason,
+        _: &wdl_ast::v1::OutputSection,
+    ) {
+        self.in_declaration_section = reason == VisitReason::Enter;
     }
 
     fn bound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &BoundDecl) {
@@ -109,11 +132,8 @@ fn check_decl_name(
     decl: &Decl,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
-    // Get the declaration name
     let binding = decl.name();
     let name = binding.text();
-
-    // Get the declaration type
     let ty = decl.ty();
 
     // Extract type names to check based on the type
@@ -124,18 +144,13 @@ fn check_decl_name(
         Type::Ref(_) => return, // Skip type reference types (user-defined structs)
         Type::Primitive(primitive_type) => {
             match primitive_type.kind() {
-                // Skip File and String types as they cause too many false positives
-                PrimitiveTypeKind::File | PrimitiveTypeKind::String => return,
                 PrimitiveTypeKind::Boolean => {
-                    // Add the primitive type name
                     type_names.insert(primitive_type.to_string());
-                    // Also check for "Bool"
                     type_names.insert("Bool".to_string());
                 }
                 PrimitiveTypeKind::Integer => {
                     // Integer is shortened to Int in WDL
                     type_names.insert(primitive_type.to_string());
-                    // Also check for "Integer" explicitly
                     type_names.insert("Integer".to_string());
                 }
                 PrimitiveTypeKind::Float => {
@@ -143,30 +158,31 @@ fn check_decl_name(
                 }
                 PrimitiveTypeKind::Directory => {
                     type_names.insert(primitive_type.to_string());
-                    // Also check for "Dir"
                     type_names.insert("Dir".to_string());
+                }
+                // Add File and String types
+                PrimitiveTypeKind::File => {
+                    type_names.insert(primitive_type.to_string());
+                }
+                PrimitiveTypeKind::String => {
+                    type_names.insert(primitive_type.to_string());
                 }
             }
         }
         Type::Array(_) => {
-            // Add "Array" for the compound type
             type_names.insert("Array".to_string());
         }
         Type::Map(_) => {
-            // Add "Map" for the compound type
             type_names.insert("Map".to_string());
         }
         Type::Pair(_) => {
-            // Add "Pair" for the compound type
             type_names.insert("Pair".to_string());
         }
         Type::Object(_) => {
-            // Add "Object" for the object type
             type_names.insert("Object".to_string());
         }
     }
 
-    // Get the element for diagnostic reporting
     let element = match decl {
         Decl::Bound(d) => SyntaxElement::from(d.inner().clone()),
         Decl::Unbound(d) => SyntaxElement::from(d.inner().clone()),
@@ -179,13 +195,11 @@ fn check_decl_name(
         // Special handling for short type names (3 characters or less)
         // These require word-based checks to avoid false positives
         if type_lower.len() <= 3 {
-            // Split the identifier into words
             let words = split_to_words(name);
 
-            // Check if the short type name appears as the last word
             if let Some(last_word) = words.last() {
                 if last_word.to_lowercase() == type_lower {
-                    let diagnostic = decl_identifier_with_type(decl.name().span(), name, type_name);
+                    let diagnostic = decl_identifier_with_type(binding.span(), name, type_name);
                     state.exceptable_add(diagnostic, element.clone(), exceptable_nodes);
                     return;
                 }
@@ -193,7 +207,7 @@ fn check_decl_name(
         } else {
             // For longer types, check if the identifier ends with the type name
             if name.to_lowercase().ends_with(&type_lower) {
-                let diagnostic = decl_identifier_with_type(decl.name().span(), name, type_name);
+                let diagnostic = decl_identifier_with_type(binding.span(), name, type_name);
                 state.exceptable_add(diagnostic, element.clone(), exceptable_nodes);
                 return;
             }
