@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added functionality to allow `None` values for call inputs where input has a default value ([#363](https://github.com/stjude-rust-labs/wdl/pull/363))
 * Added support for graceful cancellation of evaluation (#[327](https://github.com/stjude-rust-labs/wdl/pull/327)).
 * Added support for `max_cpu` and `max_memory` hints in task evaluation (#[327](https://github.com/stjude-rust-labs/wdl/pull/327)).
 * Added a Crankshaft backend with initial support for Docker (#[327](https://github.com/stjude-rust-labs/wdl/pull/327)).
