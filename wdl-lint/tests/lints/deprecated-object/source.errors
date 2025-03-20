@@ -1,3 +1,19 @@
+note[MisplacedLintDirective]: lint directive `DisallowedDeclarationName` has no effect above workflow definition
+   ┌─ tests/lints/deprecated-object/source.wdl:5:45
+   │  
+ 5 │   #@ except: MissingMetas, NonmatchingOutput, DisallowedDeclarationName
+   │                                               ^^^^^^^^^^^^^^^^^^^^^^^^^ cannot make an exception for this rule
+ 6 │ ╭ workflow test {
+ 7 │ │     #@ except: DescriptionMissing
+ 8 │ │     meta {}
+ 9 │ │ 
+   · │
+27 │ │     }
+28 │ │ }
+   │ ╰─' invalid element for this lint directive
+   │  
+   = fix: valid locations for this directive are above: version statement, input section, output section, declaration with assignment, declaration without assignment
+
 note[DeprecatedObject]: use of a deprecated `Object` type
    ┌─ tests/lints/deprecated-object/source.wdl:11:9
    │

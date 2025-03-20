@@ -2,6 +2,7 @@
 
 use std::collections::HashSet;
 
+use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
@@ -63,8 +64,6 @@ impl Rule for DisallowedDeclarationNameRule {
             SyntaxKind::OutputSectionNode,
             SyntaxKind::BoundDeclNode,
             SyntaxKind::UnboundDeclNode,
-            SyntaxKind::TaskNode,
-            SyntaxKind::WorkflowNode,
         ])
     }
 }
@@ -110,6 +109,10 @@ fn check_decl_name(
     decl: &Decl,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
+    // Get the declaration name
+    let binding = decl.name();
+    let name = binding.text();
+
     // Get the declaration type
     let ty = decl.ty();
 
@@ -163,7 +166,11 @@ fn check_decl_name(
         }
     }
 
-    let name_str = decl.name().as_str();
+    // Get the element for diagnostic reporting
+    let element = match decl {
+        Decl::Bound(d) => SyntaxElement::from(d.inner().clone()),
+        Decl::Unbound(d) => SyntaxElement::from(d.inner().clone()),
+    };
 
     // Check if the declaration name ends with one of the type names
     for type_name in &type_names {
@@ -173,27 +180,21 @@ fn check_decl_name(
         // These require word-based checks to avoid false positives
         if type_lower.len() <= 3 {
             // Split the identifier into words
-            let words = split_to_words(name_str);
+            let words = split_to_words(name);
 
             // Check if the short type name appears as the last word
             if let Some(last_word) = words.last() {
                 if last_word.to_lowercase() == type_lower {
-                    state.exceptable_add(
-                        decl_identifier_with_type(decl.name().span(), name_str, type_name),
-                        SyntaxElement::from(decl.syntax().clone()),
-                        exceptable_nodes,
-                    );
+                    let diagnostic = decl_identifier_with_type(decl.name().span(), name, type_name);
+                    state.exceptable_add(diagnostic, element.clone(), exceptable_nodes);
                     return;
                 }
             }
         } else {
             // For longer types, check if the identifier ends with the type name
-            if name_str.to_lowercase().ends_with(&type_lower) {
-                state.exceptable_add(
-                    decl_identifier_with_type(decl.name().span(), name_str, type_name),
-                    SyntaxElement::from(decl.syntax().clone()),
-                    exceptable_nodes,
-                );
+            if name.to_lowercase().ends_with(&type_lower) {
+                let diagnostic = decl_identifier_with_type(decl.name().span(), name, type_name);
+                state.exceptable_add(diagnostic, element.clone(), exceptable_nodes);
                 return;
             }
         }
