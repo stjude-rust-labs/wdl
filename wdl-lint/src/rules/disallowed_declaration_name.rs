@@ -63,6 +63,8 @@ impl Rule for DisallowedDeclarationNameRule {
             SyntaxKind::OutputSectionNode,
             SyntaxKind::BoundDeclNode,
             SyntaxKind::UnboundDeclNode,
+            SyntaxKind::TaskNode,
+            SyntaxKind::WorkflowNode,
         ])
     }
 }
@@ -108,9 +110,6 @@ fn check_decl_name(
     decl: &Decl,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
-    let name = decl.name();
-    let name_str = name.as_str();
-
     // Get the declaration type
     let ty = decl.ty();
 
@@ -120,53 +119,53 @@ fn check_decl_name(
     // Handle different type variants
     match ty {
         Type::Ref(_) => return, // Skip type reference types (user-defined structs)
-
         Type::Primitive(primitive_type) => {
             match primitive_type.kind() {
                 // Skip File and String types as they cause too many false positives
                 PrimitiveTypeKind::File | PrimitiveTypeKind::String => return,
-
                 PrimitiveTypeKind::Boolean => {
                     // Add the primitive type name
                     type_names.insert(primitive_type.to_string());
                     // Also check for "Bool"
                     type_names.insert("Bool".to_string());
                 }
-
                 PrimitiveTypeKind::Integer => {
+                    // Integer is shortened to Int in WDL
                     type_names.insert(primitive_type.to_string());
+                    // Also check for "Int"
+                    type_names.insert("Int".to_string());
                 }
-
                 PrimitiveTypeKind::Float => {
                     type_names.insert(primitive_type.to_string());
                 }
-
                 PrimitiveTypeKind::Directory => {
                     type_names.insert(primitive_type.to_string());
+                    // Also check for "Dir"
+                    type_names.insert("Dir".to_string());
                 }
             }
         }
-
         Type::Array(_) => {
             // Add "Array" for the compound type
             type_names.insert("Array".to_string());
         }
-
         Type::Map(_) => {
             // Add "Map" for the compound type
             type_names.insert("Map".to_string());
         }
-
         Type::Pair(_) => {
             // Add "Pair" for the compound type
             type_names.insert("Pair".to_string());
         }
-
         Type::Object(_) => {
             // Add "Object" for the object type
             type_names.insert("Object".to_string());
         }
     }
+
+    // Get declaration name after type checking (moving closer to usage)
+    let name = decl.name();
+    let name_str = name.as_str();
 
     // Check if the declaration name ends with one of the type names
     for type_name in &type_names {
