@@ -26,10 +26,7 @@ use crate::TagSet;
 /// A rule that identifies declaration names that include their type names as a
 /// suffix.
 #[derive(Debug, Default)]
-pub struct DisallowedDeclarationNameRule {
-    /// Tracks whether we're currently within an input or output declaration section
-    in_declaration_section: bool,
-}
+pub struct DisallowedDeclarationNameRule;
 
 /// Create a diagnostic for a declaration identifier that contains its type name
 fn decl_identifier_with_type(span: Span, decl_name: &str, type_name: &str) -> Diagnostic {
@@ -91,24 +88,6 @@ impl Visitor for DisallowedDeclarationNameRule {
         *self = Default::default();
     }
 
-    fn input_section(
-        &mut self,
-        _: &mut Self::State,
-        reason: VisitReason,
-        _: &wdl_ast::v1::InputSection,
-    ) {
-        self.in_declaration_section = reason == VisitReason::Enter;
-    }
-
-    fn output_section(
-        &mut self,
-        _: &mut Self::State,
-        reason: VisitReason,
-        _: &wdl_ast::v1::OutputSection,
-    ) {
-        self.in_declaration_section = reason == VisitReason::Enter;
-    }
-
     fn bound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &BoundDecl) {
         if reason == VisitReason::Enter {
             check_decl_name(state, &Decl::Bound(decl.clone()), &self.exceptable_nodes());
@@ -160,7 +139,7 @@ fn check_decl_name(
                     type_names.insert(primitive_type.to_string());
                     type_names.insert("Dir".to_string());
                 }
-                // Add File and String types
+                // Include File and String types
                 PrimitiveTypeKind::File => {
                     type_names.insert(primitive_type.to_string());
                 }
