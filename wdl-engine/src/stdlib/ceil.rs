@@ -4,6 +4,7 @@ use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Value;
@@ -23,7 +24,7 @@ fn ceil(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
 /// Gets the function describing `ceil`.
 pub const fn descriptor() -> Function {
-    Function::new(const { &[Signature::new("(Float) -> Int", ceil)] })
+    Function::new(const { &[Signature::new("(Float) -> Int", Callback::Sync(ceil))] })
 }
 
 #[cfg(test)]
@@ -34,22 +35,22 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn ceil() {
-        let mut env = TestEnv::default();
-        let value = eval_v1_expr(&mut env, V1::Zero, "ceil(10.5)").unwrap();
+    #[tokio::test]
+    async fn ceil() {
+        let env = TestEnv::default();
+        let value = eval_v1_expr(&env, V1::Zero, "ceil(10.5)").await.unwrap();
         assert_eq!(value.unwrap_integer(), 11);
 
-        let value = eval_v1_expr(&mut env, V1::Zero, "ceil(10)").unwrap();
+        let value = eval_v1_expr(&env, V1::Zero, "ceil(10)").await.unwrap();
         assert_eq!(value.unwrap_integer(), 10);
 
-        let value = eval_v1_expr(&mut env, V1::Zero, "ceil(9.9999)").unwrap();
+        let value = eval_v1_expr(&env, V1::Zero, "ceil(9.9999)").await.unwrap();
         assert_eq!(value.unwrap_integer(), 10);
 
-        let value = eval_v1_expr(&mut env, V1::Zero, "ceil(0)").unwrap();
+        let value = eval_v1_expr(&env, V1::Zero, "ceil(0)").await.unwrap();
         assert_eq!(value.unwrap_integer(), 0);
 
-        let value = eval_v1_expr(&mut env, V1::Zero, "ceil(-5.1)").unwrap();
+        let value = eval_v1_expr(&env, V1::Zero, "ceil(-5.1)").await.unwrap();
         assert_eq!(value.unwrap_integer(), -5);
     }
 }

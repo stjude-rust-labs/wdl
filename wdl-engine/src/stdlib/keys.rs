@@ -3,6 +3,7 @@
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Array;
@@ -53,10 +54,13 @@ pub const fn descriptor() -> Function {
             &[
                 Signature::new(
                     "(Map[K, V]) -> Array[K] where `K`: any primitive type",
-                    keys,
+                    Callback::Sync(keys),
                 ),
-                Signature::new("(S) -> Array[String] where `S`: any structure", keys),
-                Signature::new("(Object) -> Array[String]", keys),
+                Signature::new(
+                    "(S) -> Array[String] where `S`: any structure",
+                    Callback::Sync(keys),
+                ),
+                Signature::new("(Object) -> Array[String]", Callback::Sync(keys)),
             ]
         },
     )
@@ -73,8 +77,8 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn keys() {
+    #[tokio::test]
+    async fn keys() {
         let mut env = TestEnv::default();
 
         let ty = StructType::new(
@@ -88,11 +92,12 @@ mod test {
 
         env.insert_struct("Foo", ty);
 
-        let value = eval_v1_expr(&mut env, V1::One, "keys({})").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "keys({})").await.unwrap();
         assert_eq!(value.unwrap_array().len(), 0);
 
-        let value =
-            eval_v1_expr(&mut env, V1::One, "keys({'foo': 1, 'bar': 2, 'baz': 3})").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "keys({'foo': 1, 'bar': 2, 'baz': 3})")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -102,7 +107,9 @@ mod test {
             .collect();
         assert_eq!(elements, ["foo", "bar", "baz"]);
 
-        let value = eval_v1_expr(&mut env, V1::One, "keys({'foo': 1, None: 2, 'baz': 3})").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "keys({'foo': 1, None: 2, 'baz': 3})")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -116,8 +123,9 @@ mod test {
             .collect();
         assert_eq!(elements, [Some("foo"), None, Some("baz")]);
 
-        let value =
-            eval_v1_expr(&mut env, V1::Two, "keys(object { foo: 1, bar: 2, baz: 3})").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "keys(object { foo: 1, bar: 2, baz: 3})")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
@@ -127,8 +135,9 @@ mod test {
             .collect();
         assert_eq!(elements, ["foo", "bar", "baz"]);
 
-        let value =
-            eval_v1_expr(&mut env, V1::Two, "keys(Foo { foo: 1.0, bar: '2', baz: 3})").unwrap();
+        let value = eval_v1_expr(&env, V1::Two, "keys(Foo { foo: 1.0, bar: '2', baz: 3})")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()

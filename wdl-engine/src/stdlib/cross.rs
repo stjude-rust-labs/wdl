@@ -4,6 +4,7 @@ use itertools::Itertools;
 use wdl_ast::Diagnostic;
 
 use super::CallContext;
+use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Array;
@@ -55,7 +56,7 @@ pub const fn descriptor() -> Function {
         const {
             &[Signature::new(
                 "(Array[X], Array[Y]) -> Array[Pair[X, Y]]",
-                cross,
+                Callback::Sync(cross),
             )]
         },
     )
@@ -69,20 +70,22 @@ mod test {
     use crate::v1::test::TestEnv;
     use crate::v1::test::eval_v1_expr;
 
-    #[test]
-    fn cross() {
-        let mut env = TestEnv::default();
+    #[tokio::test]
+    async fn cross() {
+        let env = TestEnv::default();
 
-        let value = eval_v1_expr(&mut env, V1::One, "cross([], [])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "cross([], [])").await.unwrap();
         assert_eq!(value.as_array().unwrap().len(), 0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "cross([1], [])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "cross([1], [])").await.unwrap();
         assert_eq!(value.as_array().unwrap().len(), 0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "cross([], [1])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "cross([], [1])").await.unwrap();
         assert_eq!(value.as_array().unwrap().len(), 0);
 
-        let value = eval_v1_expr(&mut env, V1::One, "cross([1, 2, 3], ['a', 'b'])").unwrap();
+        let value = eval_v1_expr(&env, V1::One, "cross([1, 2, 3], ['a', 'b'])")
+            .await
+            .unwrap();
         let elements: Vec<_> = value
             .as_array()
             .unwrap()
