@@ -48,8 +48,8 @@ impl Rule for DisallowedDeclarationNameRule {
 
     fn explanation(&self) -> &'static str {
         "Declaration names should not include their type as a suffix. This makes the code more \
-         verbose and often redundant. For example, use 'counter' instead of 'counterInt' or \
-         'is_active' instead of 'isActiveBoolean'."
+         verbose and often redundant. For example, use 'counter' instead of 'counter_int' or \
+         'is_active' instead of 'is_active_boolean'."
     }
 
     fn tags(&self) -> TagSet {
@@ -163,9 +163,7 @@ fn check_decl_name(
         }
     }
 
-    // Get declaration name after type checking (moving closer to usage)
-    let name = decl.name();
-    let name_str = name.as_str();
+    let name_str = decl.name().as_str();
 
     // Check if the declaration name ends with one of the type names
     for type_name in &type_names {
@@ -190,8 +188,7 @@ fn check_decl_name(
             }
         } else {
             // For longer types, check if the identifier ends with the type name
-            let name_lower = name_str.to_lowercase();
-            if name_lower.ends_with(&type_lower) {
+            if name_str.to_lowercase().ends_with(&type_lower) {
                 state.exceptable_add(
                     decl_identifier_with_type(decl.name().span(), name_str, type_name),
                     SyntaxElement::from(decl.syntax().clone()),
@@ -210,136 +207,4 @@ fn split_to_words(identifier: &str) -> Vec<String> {
         .into_iter()
         .map(|s| s.to_string())
         .collect()
-}
-
-#[cfg(test)]
-mod tests {
-    use wdl_ast::Document;
-    use wdl_ast::Validator;
-
-    use super::*;
-
-    #[test]
-    fn test_disallowed_declaration_name() {
-        let source = r#"
-            version 1.0
-
-            workflow test {
-                input {
-                    Int counterInt
-                    Boolean isActiveBoolean
-                    Boolean flagBool
-                    Float measureFloat
-                    Array[Int] valuesArray
-                    Map[String, Int] resultsMap
-                    Pair[Int, Int] dataPair
-                }
-            }
-        "#;
-
-        let (document, _) = Document::parse(source);
-        let mut validator = Validator::default();
-        validator.add_visitor(DisallowedDeclarationNameRule::default());
-
-        let result = validator.validate(&document);
-        assert!(result.is_err());
-        let diagnostics = result.err().unwrap();
-
-        // Should flag all declarations with type suffixes
-        assert_eq!(diagnostics.len(), 7);
-
-        // Verify each diagnostic
-        let diagnostic_texts: Vec<_> = diagnostics
-            .iter()
-            .map(|d| d.message().to_string())
-            .collect();
-
-        assert!(
-            diagnostic_texts
-                .iter()
-                .any(|msg| msg.contains("'counterInt'") && msg.contains("'Int'"))
-        );
-
-        assert!(
-            diagnostic_texts
-                .iter()
-                .any(|msg| msg.contains("'isActiveBoolean'") && msg.contains("'Boolean'"))
-        );
-
-        assert!(
-            diagnostic_texts
-                .iter()
-                .any(|msg| msg.contains("'flagBool'") && msg.contains("'Bool'"))
-        );
-
-        assert!(
-            diagnostic_texts
-                .iter()
-                .any(|msg| msg.contains("'measureFloat'") && msg.contains("'Float'"))
-        );
-
-        assert!(
-            diagnostic_texts
-                .iter()
-                .any(|msg| msg.contains("'valuesArray'") && msg.contains("'Array'"))
-        );
-
-        assert!(
-            diagnostic_texts
-                .iter()
-                .any(|msg| msg.contains("'resultsMap'") && msg.contains("'Map'"))
-        );
-
-        assert!(
-            diagnostic_texts
-                .iter()
-                .any(|msg| msg.contains("'dataPair'") && msg.contains("'Pair'"))
-        );
-    }
-
-    #[test]
-    fn test_allows_valid_names() {
-        let source = r#"
-            version 1.0
-
-            workflow test {
-                input {
-                    # These should be allowed (File and String types)
-                    File fileInput
-                    String stringValue
-                    File input_file
-                    String value_string
-                    
-                    # These should be allowed (no type suffix)
-                    Int counter
-                    Boolean is_active
-                    Float measure
-                    Array[Int] values
-                    Map[String, Int] results
-                    Pair[Int, Int] coordinates
-                    
-                    # Special Int cases that should be allowed
-                    Int checkpoint
-                    Int footprint
-                    Int fingerprint
-                    
-                    # Type prefixes (allowed)
-                    Int intValue
-                    Boolean boolFlag
-                    Float floatMeasure
-                    
-                    # Arrays with pluralized inner type (allowed)
-                    Array[Int] integers
-                    Array[Float] floats
-                }
-            }
-        "#;
-
-        let (document, _) = Document::parse(source);
-        let mut validator = Validator::default();
-        validator.add_visitor(DisallowedDeclarationNameRule::default());
-
-        let result = validator.validate(&document);
-        assert!(result.is_ok());
-    }
 }

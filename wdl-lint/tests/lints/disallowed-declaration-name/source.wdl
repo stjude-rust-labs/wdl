@@ -38,17 +38,17 @@ task test_declaration_names {
     }
 
     # Private declarations with type prefixes/suffixes
-    File privateFile
-    Int count_int
-    String nameString
+    File privateFile = "sample.txt"
+    Int count_int = 42
+    String nameString = "test"
 
     command <<< >>>
 
     output {
         # Output declarations with type prefixes/suffixes
-        File outputFile
-        Int result_int
-        String resultString
+        File outputFile = "output.txt"
+        Int result_int = 42
+        String resultString = "result"
     }
 
     runtime {}
