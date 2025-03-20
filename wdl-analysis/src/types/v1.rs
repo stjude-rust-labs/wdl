@@ -676,7 +676,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                         .add_diagnostic(Self::invalid_placeholder_option(
                             &ty,
                             expr.span(),
-                            Some(option),
+                            Some(option.map(|n| n.into())),
                         ));
                 }
             } else {
