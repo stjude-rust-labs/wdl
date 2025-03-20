@@ -93,7 +93,6 @@ impl Visitor for RedundantNoneAssignment {
                         );
                     }
                 }
-
             }
         });
     }
