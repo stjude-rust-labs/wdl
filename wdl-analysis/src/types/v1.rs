@@ -662,50 +662,63 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         if let Some(ty) = self.evaluate_expr(&expr) {
             if let Some(option) = placeholder.option() {
                 let valid = match option {
-                    PlaceholderOption::Sep(_) => matches!(ty, 
+                    PlaceholderOption::Sep(_) => matches!(ty,
                         Type::Compound(CompoundType::Array(ref element_type), false)
                         if matches!(element_type.element_type(), Type::Primitive(_, false) | Type::Union)),
                     PlaceholderOption::Default(_) => matches!(ty, Type::Primitive(_, true)),
-                    PlaceholderOption::TrueFalse(_) => matches!(ty, Type::Primitive(PrimitiveType::Boolean, _)),
+                    PlaceholderOption::TrueFalse(_) => {
+                        matches!(ty, Type::Primitive(PrimitiveType::Boolean, _))
+                    }
                 };
                 if !valid {
-                    self.context.add_diagnostic(
-                        Self::invalid_placeholder_option(&ty, expr.span(), Some(option))
-                    );
+                    self.context
+                        .add_diagnostic(Self::invalid_placeholder_option(
+                            &ty,
+                            expr.span(),
+                            Some(option),
+                        ));
                 }
             } else {
                 match ty {
                     Type::Primitive(..) | Type::Union | Type::None => {}
                     _ => {
-                        self.context.add_diagnostic(cannot_coerce_to_string(&ty, expr.span()));
+                        self.context
+                            .add_diagnostic(cannot_coerce_to_string(&ty, expr.span()));
                     }
                 }
             }
         }
-    
+
         self.placeholders -= 1;
     }
-    
-    fn invalid_placeholder_option(ty: &Type, _span: Span, option: Option<PlaceholderOption>) -> Diagnostic {
+
+    fn invalid_placeholder_option(
+        ty: &Type,
+        _span: Span,
+        option: Option<PlaceholderOption>,
+    ) -> Diagnostic {
         let message = match option {
             Some(PlaceholderOption::Sep(_)) => format!(
-                "type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type or Union, but found `{}`", ty
+                "type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type or Union, but found `{}`",
+                ty
             ),
             Some(PlaceholderOption::Default(_)) => format!(
-                "type mismatch for placeholder option `default`: expected an optional primitive type, but found `{}`", ty
+                "type mismatch for placeholder option `default`: expected an optional primitive type, but found `{}`",
+                ty
             ),
             Some(PlaceholderOption::TrueFalse(_)) => format!(
-                "type mismatch for placeholder option `truefalse`: expected type `Boolean`, but found `{}`", ty
+                "type mismatch for placeholder option `truefalse`: expected type `Boolean`, but found `{}`",
+                ty
             ),
             None => format!("cannot coerce type `{}` to `String`", ty),
         };
         Diagnostic::error(message) // No span here
     }
-    
+
     fn cannot_coerce_to_string(ty: &Type, _span: Span) -> Diagnostic {
         Diagnostic::error(format!("cannot coerce type `{}` to `String`", ty)) // No span here
     }
-    
+
     /// Evaluates the type of a literal array expression.
     fn evaluate_literal_array<N: TreeNode>(&mut self, expr: &LiteralArray<N>) -> Type {
         // Look at the first array element to determine the element type
