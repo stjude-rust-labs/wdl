@@ -87,50 +87,7 @@ fn normalize(s: &str) -> String {
     // Normalize references to YAML files to match JSON baselines
     let s = s.replace("inputs.yaml", "inputs.json");
 
-    // Strictly normalize error messages to match existing baselines
-    let mut result = s.clone();
-    
-    // Handle "failed to parse input file" with file path
-    if result.starts_with("failed to parse input file `") {
-        result = result.replace(
-            &result.lines().next().unwrap_or(""),
-            "failed to parse input file"
-        );
-    }
-    
-    // Handle "invalid input key" with specific key
-    let lines: Vec<&str> = result.lines().collect();
-    let mut normalized_lines: Vec<String> = Vec::new();
-    
-    for line in lines {
-        if line.contains("invalid input key `") {
-            // Preserve only the "invalid input key" part without the specific key
-            if let Some(idx) = line.find("invalid input key `") {
-                let base = &line[0..idx + "invalid input key".len()];
-                
-                // If line contains additional info after the key, preserve it
-                if let Some(suffix_idx) = line.rfind("`: ") {
-                    let suffix = &line[suffix_idx + 2..]; // +2 to skip "`: "
-                    normalized_lines.push(format!("{}: {}", base, suffix));
-                } else {
-                    normalized_lines.push(base.to_string());
-                }
-            } else {
-                normalized_lines.push(line.to_string());
-            }
-        } else {
-            normalized_lines.push(line.to_string());
-        }
-    }
-    
-    result = normalized_lines.join("\n");
-    
-    // Ensure correct spacing between error parts
-    if result.contains("failed to parse input file\nCaused by:") {
-        result = result.replace("failed to parse input file\nCaused by:", "failed to parse input file\n\nCaused by:");
-    }
-    
-    result
+    s
 }
 
 /// Compares a single result.
@@ -189,58 +146,54 @@ fn run_test(test: &Path, result: AnalysisResult, ntests: &AtomicUsize) -> Result
 
     let document = result.document();
 
-    // Prioritize JSON files for tests (for compatibility with existing error.txt
-    // files)
     let json_path = test.join("inputs.json");
     let yaml_path = test.join("inputs.yaml");
 
-    let input_path = if json_path.exists() {
-        json_path
-    } else if yaml_path.exists() {
-        yaml_path
-    } else {
-        // If no input file exists, we'll still validate the document
-        // This handles cases where we just want to verify the document parses correctly
-        ntests.fetch_add(1, Ordering::SeqCst);
-        return Ok(());
-    };
+    // Check if at least one of the input files exists
+    if !json_path.exists() && !yaml_path.exists() {
+        bail!("neither inputs.json nor inputs.yaml exist for test");
+    }
 
-    let result = match Inputs::parse(document, &input_path) {
-        Ok(Some((name, inputs))) => match inputs {
-            Inputs::Task(inputs) => {
-                match inputs
-                    .validate(
-                        document,
-                        document
-                            .task_by_name(&name)
-                            .expect("task should be present"),
-                        None,
-                    )
-                    .with_context(|| format!("failed to validate the inputs to task `{name}`"))
-                {
-                    Ok(()) => String::new(),
-                    Err(e) => format!("{e:?}"),
+    // Test for each input file that exists
+    for input_path in [json_path, yaml_path].iter().filter(|p| p.exists()) {
+        let result = match Inputs::parse(document, input_path) {
+            Ok(Some((name, inputs))) => match inputs {
+                Inputs::Task(inputs) => {
+                    match inputs
+                        .validate(
+                            document,
+                            document
+                                .task_by_name(&name)
+                                .expect("task should be present"),
+                            None,
+                        )
+                        .with_context(|| format!("failed to validate the inputs to task `{name}`"))
+                    {
+                        Ok(()) => String::new(),
+                        Err(e) => format!("{e:?}"),
+                    }
                 }
-            }
-            Inputs::Workflow(inputs) => {
-                let workflow = document.workflow().expect("workflow should be present");
-                match inputs.validate(document, workflow, None).with_context(|| {
-                    format!(
-                        "failed to validate the inputs to workflow `{workflow}`",
-                        workflow = workflow.name()
-                    )
-                }) {
-                    Ok(()) => String::new(),
-                    Err(e) => format!("{e:?}"),
+                Inputs::Workflow(inputs) => {
+                    let workflow = document.workflow().expect("workflow should be present");
+                    match inputs.validate(document, workflow, None).with_context(|| {
+                        format!(
+                            "failed to validate the inputs to workflow `{workflow}`",
+                            workflow = workflow.name()
+                        )
+                    }) {
+                        Ok(()) => String::new(),
+                        Err(e) => format!("{e:?}"),
+                    }
                 }
-            }
-        },
-        Ok(None) => String::new(),
-        Err(e) => format!("{e:?}"),
-    };
+            },
+            Ok(None) => String::new(),
+            Err(e) => format!("{e:?}"),
+        };
 
-    let output = test.join("error.txt");
-    compare_result(&output, &result)?;
+        let output = test.join("error.txt");
+        compare_result(&output, &result)?;
+    }
+    
     ntests.fetch_add(1, Ordering::SeqCst);
     Ok(())
 }
