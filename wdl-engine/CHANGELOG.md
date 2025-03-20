@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Added functionality to allow `None` values for call inputs where input has a default value ([#363](https://github.com/stjude-rust-labs/wdl/pull/363))
 * Added support for cloud storage URIs (#[367](https://github.com/stjude-rust-labs/wdl/pull/367)).
 * Added support reading of remote files from the stdlib file functions (#[364](https://github.com/stjude-rust-labs/wdl/pull/364))
 * Added support for YAML input files (.yml and .yaml) alongside JSON ([#352](https://github.com/stjude-rust-labs/wdl/pull/352)).

@@ -1608,10 +1608,13 @@ impl WorkflowEvaluator {
             },
         };
 
-        let document_version = document.version().expect("document version must be read by now");
+        let document_version = document
+            .version()
+            .expect("document version must be read by now");
 
         // Evaluate the inputs
-        let scatter_index = Self::evaluate_call_inputs(&state, stmt, scope, &mut inputs, document_version).await?;
+        let scatter_index =
+            Self::evaluate_call_inputs(&state, stmt, scope, &mut inputs, document_version).await?;
 
         let dir = format!(
             "{alias}{sep}{scatter_index}",

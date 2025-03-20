@@ -1163,11 +1163,14 @@ fn add_call_statement(
 
                 match input.expr() {
                     Some(expr) => {
-                        let document_version = document.version.expect("document version must be read by now");
+                        let document_version = document
+                            .version
+                            .expect("document version must be read by now");
 
                         // Skip type checking if expr is None and document version is at least 1.2
-                        if !(matches!(expr, Expr::Literal(LiteralExpr::None(_))) 
-                            && document_version >= SupportedVersion::V1(V1::Two)) {
+                        if !(matches!(expr, Expr::Literal(LiteralExpr::None(_)))
+                            && document_version >= SupportedVersion::V1(V1::Two))
+                        {
                             type_check_expr(
                                 config,
                                 document,
