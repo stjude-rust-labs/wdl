@@ -4,6 +4,7 @@ use std::collections::HashSet;
 
 use indexmap::IndexMap;
 use wdl_analysis::document::Document as AnalysisDocument;
+use wdl_analysis::Analyzer;
 use wdl_ast::AstNode;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
@@ -63,20 +64,21 @@ impl LintState {
 /// Otherwise, `#@ except` comments disable the rule for the immediately
 /// following AST node.
 #[allow(missing_debug_implementations)]
-pub struct Linter {
+pub struct Linter<Context> {
     /// The map of rule name to rule.
     rules: IndexMap<&'static str, Box<dyn Rule>>,
     /// The analyzer.
-    analyzer: wdl_analysis::Analyzer<_>,
+    analyzer: wdl_analysis::Analyzer<Context>,
     /// The set of rule ids that are disabled for the current document.
     document_exceptions: HashSet<String>,
 }
 
-impl Linter {
-    /// Creates a new linting visitor with the given rules.
-    pub fn new(rules: impl IntoIterator<Item = Box<dyn Rule>>) -> Self {
+impl Linter<Context> {
+    /// Creates a new linting visitor with the given rules and analyzer.
+    pub fn new<Context>(rules: impl IntoIterator<Item = Box<dyn Rule>>, analyzer: Analyzer<Context>) -> Self {
         Self {
             rules: rules.into_iter().map(|r| (r.id(), r)).collect(),
+            analyzer,
             document_exceptions: HashSet::default(),
         }
     }
