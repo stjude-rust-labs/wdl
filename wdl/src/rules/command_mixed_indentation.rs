@@ -1,26 +1,12 @@
-//! A lint rule for checking mixed indentation in command text.
-
 use std::fmt;
 
 use rowan::ast::support;
-use wdl_ast::AstNode;
-use wdl_ast::AstToken;
-use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
-use wdl_ast::Document;
-use wdl_ast::Span;
-use wdl_ast::SupportedVersion;
-use wdl_ast::SyntaxElement;
-use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
-use wdl_ast::v1::CommandPart;
-use wdl_ast::v1::CommandSection;
+use wdl_ast::{
+    AstNode, AstToken, Diagnostic, Diagnostics, Document, Span, SupportedVersion, SyntaxElement,
+    SyntaxKind, VisitReason, Visitor, v1::CommandPart, v1::CommandSection,
+};
 
-use crate::Rule;
-use crate::Tag;
-use crate::TagSet;
-use crate::util::lines_with_offset;
+use crate::{Rule, Tag, TagSet, util::lines_with_offset};
 
 /// The identifier for the command section mixed indentation rule.
 const ID: &str = "CommandSectionMixedIndentation";
@@ -28,9 +14,7 @@ const ID: &str = "CommandSectionMixedIndentation";
 /// Represents the indentation kind.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 enum IndentationKind {
-    /// Spaces are used for the indentation.
     Spaces,
-    /// Tabs are used for the indentation.
     Tabs,
 }
 
@@ -53,9 +37,15 @@ impl From<u8> for IndentationKind {
     }
 }
 
-/// Creates a "mixed indentation" diagnostic.
-fn mixed_indentation(command: Span, span: Span, kind: IndentationKind) -> Diagnostic {
-    Diagnostic::warning("mixed indentation within a command")
+/// Creates a "mixed indentation" diagnostic with different severity levels.
+fn mixed_indentation(command: Span, span: Span, kind: IndentationKind, severity: &str) -> Diagnostic {
+    let message = match severity {
+        "warning" => "mixed indentation (warning)",
+        "note" => "mixed indentation (note)",
+        _ => "mixed indentation",
+    };
+
+    Diagnostic::new(severity, message)
         .with_rule(ID)
         .with_label(
             format!(
@@ -68,13 +58,13 @@ fn mixed_indentation(command: Span, span: Span, kind: IndentationKind) -> Diagno
             span,
         )
         .with_label(
-            "this command section uses both tabs and spaces in leading whitespace",
+            "this section uses both tabs and spaces in leading whitespace",
             command,
         )
         .with_fix("use either tabs or spaces exclusively for indentation")
 }
 
-/// Detects mixed indentation in a command section.
+/// Detects mixed indentation in the entire WDL document and command sections.
 #[derive(Default, Debug, Clone, Copy)]
 pub struct CommandSectionMixedIndentationRule;
 
@@ -84,13 +74,13 @@ impl Rule for CommandSectionMixedIndentationRule {
     }
 
     fn description(&self) -> &'static str {
-        "Ensures that lines within a command do not mix spaces and tabs."
+        "Ensures that lines within a command and document do not mix spaces and tabs."
     }
 
     fn explanation(&self) -> &'static str {
-        "Mixing indentation (tab and space) characters within the command line causes leading \
-         whitespace stripping to be skipped. Commands may be whitespace sensitive, and skipping \
-         the whitespace stripping step may cause unexpected behavior."
+        "Mixing indentation (tab and space) characters within the document or command section \
+         causes leading whitespace stripping to be skipped. Commands may be whitespace sensitive, \
+         and skipping the whitespace stripping step may cause unexpected behavior."
     }
 
     fn tags(&self) -> TagSet {
@@ -109,21 +99,43 @@ impl Rule for CommandSectionMixedIndentationRule {
 impl Visitor for CommandSectionMixedIndentationRule {
     type State = Diagnostics;
 
+    /// Check entire document for mixed indentation.
     fn document(
         &mut self,
-        _: &mut Self::State,
+        state: &mut Self::State,
         reason: VisitReason,
-        _: &Document,
-        _: SupportedVersion,
+        document: &Document,
+        version: SupportedVersion,
     ) {
         if reason == VisitReason::Exit {
             return;
         }
 
-        // Reset the visitor upon document entry
-        *self = Default::default();
+        let severity = match version {
+            SupportedVersion::V1_0 | SupportedVersion::V1_1 => "warning",
+            SupportedVersion::V1_2 => "note",
+        };
+
+        for line in document.text().lines() {
+            if line.contains('\t') && line.contains(' ') {
+                let start = document.text().find(line).unwrap_or(0);
+                let span = Span::new(start, line.len());
+
+                let kind = if line.find('\t').unwrap_or(0) < line.find(' ').unwrap_or(0) {
+                    IndentationKind::Tabs
+                } else {
+                    IndentationKind::Spaces
+                };
+
+                state.add(
+                    mixed_indentation(span, span, kind, severity),
+                    SyntaxElement::from(document.syntax().clone()),
+                );
+            }
+        }
     }
 
+    /// Check mixed indentation in the command section.
     fn command_section(
         &mut self,
         state: &mut Self::State,
@@ -137,28 +149,24 @@ impl Visitor for CommandSectionMixedIndentationRule {
         let mut kind = None;
         let mut mixed_span = None;
         let mut skip_next_line = false;
+
         'outer: for part in section.parts() {
             match part {
                 CommandPart::Text(text) => {
                     for (line, start, _) in lines_with_offset(text.text()) {
-                        // Check to see if we should skip the next line
-                        // This happens after we encounter a placeholder
                         if skip_next_line {
                             skip_next_line = false;
                             continue;
                         }
 
-                        // Otherwise, check the leading whitespace
                         for (i, b) in line.as_bytes().iter().enumerate() {
                             match b {
                                 b' ' | b'\t' => {
                                     let current = IndentationKind::from(*b);
                                     let kind = kind.get_or_insert(current);
+
                                     if current != *kind {
-                                        // Mixed indentation, store the span of the first mixed
-                                        // character
-                                        mixed_span =
-                                            Some(Span::new(text.span().start() + start + i, 1));
+                                        mixed_span = Some(Span::new(text.span().start() + start + i, 1));
                                         break 'outer;
                                     }
                                 }
@@ -168,8 +176,6 @@ impl Visitor for CommandSectionMixedIndentationRule {
                     }
                 }
                 CommandPart::Placeholder(_) => {
-                    // Encountered a placeholder, skip the next line of text as it's
-                    // really a part of the same line
                     skip_next_line = true;
                 }
             }
@@ -184,6 +190,7 @@ impl Visitor for CommandSectionMixedIndentationRule {
                     command_keyword.text_range().into(),
                     span,
                     kind.expect("an indentation kind should be present"),
+                    "warning",
                 ),
                 SyntaxElement::from(section.inner().clone()),
                 &self.exceptable_nodes(),
