@@ -161,3 +161,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added the `wdl-lint` as the crate implementing linting rules for the future
   ([#68](https://github.com/stjude-rust-labs/wdl/pull/68)).
 
+
+## [Unreleased]
+### Added
+ ## 21-03-2025
+- Added `CommandSectionMixedIndentation` lint rule to enforce consistent indentation for command sections.
+
