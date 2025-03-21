@@ -3,7 +3,7 @@
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::EXCEPT_COMMENT_PREFIX;
 use wdl_ast::Span;
@@ -159,7 +159,7 @@ impl Rule for PreambleFormattingRule {
 }
 
 impl Visitor for PreambleFormattingRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,

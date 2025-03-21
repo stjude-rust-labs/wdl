@@ -2,7 +2,7 @@
 
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -85,7 +85,7 @@ impl Rule for DisallowedOutputNameRule {
 }
 
 impl Visitor for DisallowedOutputNameRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,
@@ -125,7 +125,7 @@ impl Visitor for DisallowedOutputNameRule {
 
 /// Check declaration name
 fn check_decl_name(
-    state: &mut Diagnostics,
+    state: &mut LintState,
     decl: &Decl,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {

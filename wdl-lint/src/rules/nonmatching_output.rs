@@ -4,7 +4,7 @@ use indexmap::IndexMap;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -141,7 +141,7 @@ impl Rule for NonmatchingOutputRule<'_> {
 
 /// Check each output key exists in the `outputs` key within the `meta` section.
 fn check_matching(
-    state: &mut Diagnostics,
+    state: &mut LintState,
     rule: &mut NonmatchingOutputRule<'_>,
     element: SyntaxElement,
 ) {
@@ -203,7 +203,7 @@ fn check_matching(
 
 /// Handle missing `meta.outputs` and reset the visitor.
 fn handle_meta_outputs_and_reset(
-    state: &mut Diagnostics,
+    state: &mut LintState,
     rule: &mut NonmatchingOutputRule<'_>,
     element: SyntaxElement,
 ) {
@@ -233,7 +233,7 @@ fn handle_meta_outputs_and_reset(
 }
 
 impl Visitor for NonmatchingOutputRule<'_> {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,

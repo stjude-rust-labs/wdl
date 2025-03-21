@@ -3,7 +3,7 @@
 use rowan::Direction;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -205,7 +205,7 @@ impl Rule for ExpressionSpacingRule {
 }
 
 impl Visitor for ExpressionSpacingRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,
@@ -792,7 +792,7 @@ impl Visitor for ExpressionSpacingRule {
 
 /// Checks to ensure a token is surrounded by whitespace.
 fn check_required_surrounding_ws(
-    state: &mut Diagnostics,
+    state: &mut LintState,
     op: &SyntaxElement,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {

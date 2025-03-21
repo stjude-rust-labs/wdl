@@ -2,7 +2,7 @@
 
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
@@ -66,7 +66,7 @@ impl Rule for InconsistentNewlinesRule {
 }
 
 impl Visitor for InconsistentNewlinesRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,
