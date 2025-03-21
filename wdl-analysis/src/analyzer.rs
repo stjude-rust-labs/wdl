@@ -313,6 +313,18 @@ pub struct DiagnosticsConfig {
     pub unnecessary_function_call: Option<Severity>,
 }
 
+impl Default for DiagnosticsConfig {
+    fn default() -> Self {
+        Self {
+            unused_import: Some(Severity::Warning),
+            unused_input: Some(Severity::Warning),
+            unused_declaration: Some(Severity::Warning),
+            unused_call: Some(Severity::Warning),
+            unnecessary_function_call: Some(Severity::Warning),
+        }
+    }
+}
+
 impl DiagnosticsConfig {
     /// Creates a new diagnostics configuration from a rule set.
     pub fn new<T: AsRef<dyn Rule>>(rules: impl IntoIterator<Item = T>) -> Self {

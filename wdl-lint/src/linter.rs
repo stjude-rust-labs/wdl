@@ -75,7 +75,7 @@ pub struct Linter<Context> {
 }
 
 impl Linter<()> {
-    /// Creates a new linting visitor with the given rules and analyzer.
+    /// Creates a new linter with the given rules and analyzer.
     pub fn new(rules: impl IntoIterator<Item = Box<dyn Rule>>, analyzer: Analyzer<()>) -> Self {
         Self {
             rules: rules.into_iter().map(|r| (r.id(), r)).collect(),
@@ -102,7 +102,7 @@ impl Default for Linter<()> {
     fn default() -> Self {
         Self {
             rules: rules().into_iter().map(|r| (r.id(), r)).collect(),
-            analyzer: Analyzer::new(DiagnosticsConfig::except_all(), async |_, _, _, _| ()),
+            analyzer: Analyzer::new(DiagnosticsConfig::default(), async |_, _, _, _| ()),
             document_exceptions: HashSet::default(),
         }
     }
