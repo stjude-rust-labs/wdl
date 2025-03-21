@@ -660,13 +660,15 @@ impl Inputs {
                 })?
                 .as_object_mut()
                 .with_context(|| {
-                    format!("expected input file `{path}` to contain a JSON object", path = path.display())
+                    format!(
+                        "expected input file `{path}` to contain a JSON object",
+                        path = path.display()
+                    )
                 })?,
         );
 
-        Self::parse_object(document, object).with_context(|| {
-            format!("failed to parse input file `{path}`", path = path.display())
-        })
+        Self::parse_object(document, object)
+            .with_context(|| format!("failed to parse input file `{path}`", path = path.display()))
     }
 
     /// Parses a YAML inputs file from the given file path.
@@ -694,10 +696,12 @@ impl Inputs {
         })?;
 
         // Convert YAML to JSON format
-        let mut json =
-            serde_json::to_value(yaml).with_context(|| {
-                format!("failed to convert YAML to JSON for processing `{path}`", path = path.display())
-            })?;
+        let mut json = serde_json::to_value(yaml).with_context(|| {
+            format!(
+                "failed to convert YAML to JSON for processing `{path}`",
+                path = path.display()
+            )
+        })?;
 
         // Extract as object
         let object = mem::take(json.as_object_mut().with_context(|| {
@@ -707,9 +711,8 @@ impl Inputs {
             )
         })?);
 
-        Self::parse_object(document, object).with_context(|| {
-            format!("failed to parse input file `{path}`", path = path.display())
-        })
+        Self::parse_object(document, object)
+            .with_context(|| format!("failed to parse input file `{path}`", path = path.display()))
     }
 
     /// Gets an input value.
@@ -861,10 +864,12 @@ impl Inputs {
     ) -> Result<(String, Self)> {
         let mut inputs = WorkflowInputs::default();
         for (key, value) in object {
-            let value = serde_json::from_value(value).with_context(|| format!("invalid input key `{key}`"))?;
+            let value = serde_json::from_value(value)
+                .with_context(|| format!("invalid input key `{key}`"))?;
             match key.split_once(".") {
                 Some((prefix, remainder)) if prefix == workflow.name() => {
-                    inputs.set_path_value(document, workflow, remainder, value)
+                    inputs
+                        .set_path_value(document, workflow, remainder, value)
                         .with_context(|| format!("invalid input key `{key}`"))?;
                 }
                 _ => {
