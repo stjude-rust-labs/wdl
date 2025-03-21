@@ -110,7 +110,7 @@ impl FileDownloader {
         ))
     }
 
-    /// Constructs a new downloaded with the given cache directory.
+    /// Constructs a new downloader with the given cache directory.
     pub fn new_with_cache(cache_dir: impl Into<PathBuf>) -> Self {
         let cache_dir = cache_dir.into();
 
