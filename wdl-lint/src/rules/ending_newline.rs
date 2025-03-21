@@ -3,7 +3,7 @@
 use wdl_ast::Ast;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -69,7 +69,7 @@ impl Rule for EndingNewlineRule {
 }
 
 impl Visitor for EndingNewlineRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,

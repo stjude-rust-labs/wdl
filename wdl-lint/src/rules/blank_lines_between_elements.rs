@@ -3,7 +3,7 @@
 use rowan::NodeOrToken;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -124,7 +124,7 @@ impl Rule for BlankLinesBetweenElementsRule {
 }
 
 impl Visitor for BlankLinesBetweenElementsRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,
@@ -517,7 +517,7 @@ fn is_first_element(syntax: &SyntaxNode) -> bool {
 /// Some sections do not allow blank lines, so detect and flag them.
 fn flag_all_blank_lines_within(
     syntax: &SyntaxNode,
-    state: &mut Diagnostics,
+    state: &mut LintState,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
     syntax.descendants_with_tokens().for_each(|c| {
@@ -546,7 +546,7 @@ fn flag_all_blank_lines_within(
 /// (`false`).
 fn check_prior_spacing(
     syntax: &NodeOrToken<SyntaxNode, SyntaxToken>,
-    state: &mut Diagnostics,
+    state: &mut LintState,
     element_spacing_required: bool,
     first: bool,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
@@ -622,7 +622,7 @@ fn check_prior_spacing(
 /// Check that the node's last token does not have a blank before it.
 fn check_last_token(
     syntax: &SyntaxNode,
-    state: &mut Diagnostics,
+    state: &mut LintState,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
     let prev = syntax

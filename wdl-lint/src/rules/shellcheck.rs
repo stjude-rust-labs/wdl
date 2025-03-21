@@ -25,7 +25,7 @@ use wdl_analysis::types::v1::ExprTypeEvaluator;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -527,7 +527,7 @@ fn calculate_span(diagnostic: &ShellCheckDiagnostic, line_map: &HashMap<usize, S
 }
 
 impl Visitor for ShellCheckRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,
@@ -586,7 +586,10 @@ impl Visitor for ShellCheckRule {
         let mut decls = gather_task_declarations(&parent_task);
 
         // Replace all placeholders in the command with dummy bash variables
-        let context = CommandContext::new();
+        let mut context = CommandContext::new(
+            state.document.clone(),
+            state.document.find_scope_by_position(section.inner().text_range().start().into()).expect("should have a scope"),
+        );
         let Some((sanitized_command, cmd_decls, amount_stripped)) =
             sanitize_command(section, &mut context)
         else {

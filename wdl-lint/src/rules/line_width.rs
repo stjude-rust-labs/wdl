@@ -2,7 +2,7 @@
 
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -50,7 +50,7 @@ impl LineWidthRule {
     /// Detects lines that exceed a certain width.
     fn detect_line_too_long(
         &mut self,
-        state: &mut Diagnostics,
+        state: &mut LintState,
         text: &str,
         start: usize,
         element: SyntaxElement,
@@ -116,7 +116,7 @@ impl Rule for LineWidthRule {
 }
 
 impl Visitor for LineWidthRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,

@@ -6,7 +6,7 @@ use convert_case::Converter;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -66,7 +66,7 @@ impl Rule for PascalCaseRule {
 fn check_name(
     name: &str,
     span: Span,
-    diagnostics: &mut Diagnostics,
+    state: &mut LintState,
     element: SyntaxElement,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
@@ -75,7 +75,7 @@ fn check_name(
         .to_case(Case::Pascal);
     let properly_cased_name = converter.convert(name);
     if name != properly_cased_name {
-        diagnostics.exceptable_add(
+        state.exceptable_add(
             use_pascal_case(name, &properly_cased_name, span),
             element,
             exceptable_nodes,
@@ -84,7 +84,7 @@ fn check_name(
 }
 
 impl Visitor for PascalCaseRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,

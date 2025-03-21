@@ -29,7 +29,6 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
-use wdl_ast::Diagnostics;
 use wdl_ast::SyntaxKind;
 use wdl_ast::Visitor;
 
@@ -37,15 +36,15 @@ pub(crate) mod fix;
 pub mod rules;
 mod tags;
 pub(crate) mod util;
-mod visitor;
+mod linter;
 
 pub use tags::*;
-pub use visitor::*;
+pub use linter::*;
 pub use wdl_analysis as analysis;
 pub use wdl_ast as ast;
 
 /// A trait implemented by lint rules.
-pub trait Rule: Visitor<State = Diagnostics> {
+pub trait Rule: Visitor<State = LintState> {
     /// The unique identifier for the lint rule.
     ///
     /// The identifier is required to be pascal case.

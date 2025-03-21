@@ -32,7 +32,7 @@ use wdl_analysis::SourcePositionEncoding;
 use wdl_analysis::path_to_uri;
 use wdl_analysis::rules;
 use wdl_ast::Validator;
-use wdl_lint::LintVisitor;
+use wdl_lint::Linter;
 
 use crate::proto;
 
@@ -266,12 +266,7 @@ impl Server {
                         }
                     },
                     move || {
-                        let mut validator = Validator::default();
-                        if lint {
-                            validator.add_visitor(LintVisitor::default());
-                        }
-
-                        validator
+                        Validator::default()
                     },
                 ),
                 client_support: Default::default(),
