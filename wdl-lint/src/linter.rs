@@ -4,8 +4,6 @@ use std::collections::HashSet;
 
 use indexmap::IndexMap;
 use wdl_analysis::document::Document as AnalysisDocument;
-use wdl_analysis::Analyzer;
-use wdl_analysis::DiagnosticsConfig;
 use wdl_ast::AstNode;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
@@ -65,21 +63,18 @@ impl LintState {
 /// Otherwise, `#@ except` comments disable the rule for the immediately
 /// following AST node.
 #[allow(missing_debug_implementations)]
-pub struct Linter<Context> {
+pub struct Linter {
     /// The map of rule name to rule.
     rules: IndexMap<&'static str, Box<dyn Rule>>,
-    /// The analyzer.
-    analyzer: Analyzer<Context>,
     /// The set of rule ids that are disabled for the current document.
     document_exceptions: HashSet<String>,
 }
 
-impl Linter<()> {
+impl Linter {
     /// Creates a new linter with the given rules and analyzer.
-    pub fn new(rules: impl IntoIterator<Item = Box<dyn Rule>>, analyzer: Analyzer<()>) -> Self {
+    pub fn new(rules: impl IntoIterator<Item = Box<dyn Rule>>) -> Self {
         Self {
             rules: rules.into_iter().map(|r| (r.id(), r)).collect(),
-            analyzer,
             document_exceptions: HashSet::default(),
         }
     }
@@ -98,17 +93,16 @@ impl Linter<()> {
     }
 }
 
-impl Default for Linter<()> {
+impl Default for Linter {
     fn default() -> Self {
         Self {
             rules: rules().into_iter().map(|r| (r.id(), r)).collect(),
-            analyzer: Analyzer::new(DiagnosticsConfig::default(), async |_, _, _, _| ()),
             document_exceptions: HashSet::default(),
         }
     }
 }
 
-impl Visitor for Linter<()> {
+impl Visitor for Linter {
     type State = LintState;
 
     fn document(
