@@ -68,7 +68,7 @@ pub async fn analyze(
     );
 
     let start = Instant::now();
-    let analyzer = Analyzer::new_with_validator(
+    let analyzer = Analyzer::new(
         rules_config,
         move |_: (), kind, completed, total| {
             let pb = pb.clone();
@@ -85,30 +85,6 @@ pub async fn analyze(
 
                 pb.pb_set_position(completed.try_into().unwrap());
             }
-        },
-        move || {
-            let mut validator = wdl_ast::Validator::default();
-
-            if lint {
-                let visitor =
-                    wdl_lint::LintVisitor::new(lint_rules().into_iter().filter_map(|rule| {
-                        if exceptions.iter().any(|e| e == rule.id()) {
-                            None
-                        } else {
-                            Some(rule)
-                        }
-                    }));
-                validator.add_visitor(visitor);
-
-                if shellcheck {
-                    let rule: Vec<Box<dyn wdl_lint::Rule>> =
-                        vec![Box::<wdl_lint::rules::ShellCheckRule>::default()];
-                    let visitor = wdl_lint::LintVisitor::new(rule);
-                    validator.add_visitor(visitor);
-                }
-            }
-
-            validator
         },
     );
 
