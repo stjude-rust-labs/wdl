@@ -91,7 +91,7 @@ pub trait EvaluationContext: Send + Sync {
     /// Returns `None` if no translation is available.
     fn translate_path(&self, path: &Path) -> Option<Cow<'_, Path>>;
 
-    /// Gets the file downloader to use for evaluating expressions.
+    /// Gets the downloader to use for evaluating expressions.
     fn downloader(&self) -> &dyn Downloader;
 }
 

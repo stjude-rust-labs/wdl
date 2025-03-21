@@ -81,7 +81,7 @@ use crate::diagnostics::runtime_type_mismatch;
 use crate::eval::EvaluatedTask;
 use crate::eval::Mounts;
 use crate::http::Downloader;
-use crate::http::FileDownloader;
+use crate::http::HttpDownloader;
 use crate::tree::SyntaxNode;
 use crate::v1::ExprEvaluator;
 
@@ -217,8 +217,8 @@ pub(crate) fn max_memory(hints: &HashMap<String, Value>) -> Result<Option<i64>> 
 struct TaskEvaluationContext<'a, 'b> {
     /// The associated evaluation state.
     state: &'a State<'b>,
-    /// The file downloader to use for expression evaluation.
-    downloader: &'a FileDownloader,
+    /// The downloader to use for expression evaluation.
+    downloader: &'a HttpDownloader,
     /// The current evaluation scope.
     scope: ScopeIndex,
     /// The working directory to use for evaluation.
@@ -241,7 +241,7 @@ impl<'a, 'b> TaskEvaluationContext<'a, 'b> {
     /// Constructs a new expression evaluation context.
     pub fn new(
         state: &'a State<'b>,
-        downloader: &'a FileDownloader,
+        downloader: &'a HttpDownloader,
         temp_dir: &'a Path,
         scope: ScopeIndex,
     ) -> Self {
@@ -410,8 +410,8 @@ pub struct TaskEvaluator {
     backend: Arc<dyn TaskExecutionBackend>,
     /// The cancellation token for cancelling task evaluation.
     token: CancellationToken,
-    /// The file downloader to use for expression evaluation.
-    downloader: FileDownloader,
+    /// The downloader to use for expression evaluation.
+    downloader: HttpDownloader,
 }
 
 impl TaskEvaluator {
@@ -438,8 +438,8 @@ impl TaskEvaluator {
         config.validate()?;
 
         let downloader = match &config.http.cache {
-            Some(cache) => FileDownloader::new_with_cache(cache),
-            None => FileDownloader::new()?,
+            Some(cache) => HttpDownloader::new_with_cache(cache),
+            None => HttpDownloader::new()?,
         };
 
         Ok(Self {
@@ -451,14 +451,14 @@ impl TaskEvaluator {
     }
 
     /// Creates a new task evaluator with the given configuration, backend,
-    /// cancellation token, and file downloader.
+    /// cancellation token, and downloader.
     ///
     /// This method does not validate the configuration.
     pub(crate) fn new_unchecked(
         config: Arc<Config>,
         backend: Arc<dyn TaskExecutionBackend>,
         token: CancellationToken,
-        downloader: FileDownloader,
+        downloader: HttpDownloader,
     ) -> Self {
         Self {
             config,

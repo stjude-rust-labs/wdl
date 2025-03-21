@@ -91,7 +91,7 @@ pub enum Status {
 ///
 /// The downloader can be cheaply cloned.
 #[derive(Clone)]
-pub struct FileDownloader {
+pub struct HttpDownloader {
     /// The underlying HTTP client.
     client: ClientWithMiddleware,
     /// The HTTP cache shared with the client.
@@ -100,8 +100,8 @@ pub struct FileDownloader {
     downloads: Arc<Mutex<HashMap<Url, Status>>>,
 }
 
-impl FileDownloader {
-    /// Constructs a new file downloader using the system cache directory.
+impl HttpDownloader {
+    /// Constructs a new HTTP downloader using the system cache directory.
     pub fn new() -> Result<Self> {
         Ok(Self::new_with_cache(
             dirs::cache_dir()
@@ -200,7 +200,7 @@ impl FileDownloader {
     }
 }
 
-impl Downloader for FileDownloader {
+impl Downloader for HttpDownloader {
     fn download<'a, 'b, 'c>(
         &'a self,
         url: &'b str,

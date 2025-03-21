@@ -79,7 +79,7 @@ use crate::diagnostics::if_conditional_mismatch;
 use crate::diagnostics::output_evaluation_failed;
 use crate::diagnostics::runtime_type_mismatch;
 use crate::http::Downloader;
-use crate::http::FileDownloader;
+use crate::http::HttpDownloader;
 use crate::tree::SyntaxNode;
 use crate::v1::ExprEvaluator;
 use crate::v1::TaskEvaluator;
@@ -137,8 +137,8 @@ struct WorkflowEvaluationContext<'a, 'b> {
     work_dir: &'a Path,
     /// The workflow's temporary directory.
     temp_dir: &'a Path,
-    /// The file downloader for expression evaluation.
-    downloader: &'a FileDownloader,
+    /// The downloader for expression evaluation.
+    downloader: &'a HttpDownloader,
 }
 
 impl<'a, 'b> WorkflowEvaluationContext<'a, 'b> {
@@ -148,7 +148,7 @@ impl<'a, 'b> WorkflowEvaluationContext<'a, 'b> {
         scope: ScopeRef<'b>,
         work_dir: &'a Path,
         temp_dir: &'a Path,
-        downloader: &'a FileDownloader,
+        downloader: &'a HttpDownloader,
     ) -> Self {
         Self {
             document,
@@ -585,8 +585,8 @@ struct State {
     temp_dir: PathBuf,
     /// The calls directory path.
     calls_dir: PathBuf,
-    /// The file downloader for expression evaluation.
-    downloader: FileDownloader,
+    /// The downloader for expression evaluation.
+    downloader: HttpDownloader,
 }
 
 /// Represents a WDL V1 workflow evaluator.
@@ -600,8 +600,8 @@ pub struct WorkflowEvaluator {
     backend: Arc<dyn TaskExecutionBackend>,
     /// The cancellation token for cancelling workflow evaluation.
     token: CancellationToken,
-    /// The file downloader for expression evaluation.
-    downloader: FileDownloader,
+    /// The downloader for expression evaluation.
+    downloader: HttpDownloader,
 }
 
 impl WorkflowEvaluator {
@@ -628,8 +628,8 @@ impl WorkflowEvaluator {
         config.validate()?;
 
         let downloader = match &config.http.cache {
-            Some(cache) => FileDownloader::new_with_cache(cache),
-            None => FileDownloader::new()?,
+            Some(cache) => HttpDownloader::new_with_cache(cache),
+            None => HttpDownloader::new()?,
         };
 
         Ok(Self {
