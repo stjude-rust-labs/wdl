@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Ident;
 use wdl_ast::Span;
@@ -109,7 +109,7 @@ fn check_parameter_meta(
     parent: &SectionParent,
     expected: impl Iterator<Item = (Ident, Span)>,
     param_meta: ParameterMetadataSection,
-    diagnostics: &mut Diagnostics,
+    state: &mut LintState,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
     let expected: HashMap<_, _> = expected.map(|(i, s)| (i.text().to_string(), s)).collect();
@@ -124,7 +124,7 @@ fn check_parameter_meta(
 
     for (name, span) in &expected {
         if !actual.contains_key(name) {
-            diagnostics.exceptable_add(
+            state.exceptable_add(
                 missing_param_meta(parent, name, *span),
                 SyntaxElement::from(param_meta.inner().clone()),
                 exceptable_nodes,
@@ -134,7 +134,7 @@ fn check_parameter_meta(
 
     for (name, span) in &actual {
         if !expected.contains_key(name) {
-            diagnostics.exceptable_add(
+            state.exceptable_add(
                 extra_param_meta(parent, name, *span),
                 SyntaxElement::from(param_meta.inner().clone()),
                 exceptable_nodes,
@@ -144,7 +144,7 @@ fn check_parameter_meta(
 }
 
 impl Visitor for MatchingParameterMetaRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,

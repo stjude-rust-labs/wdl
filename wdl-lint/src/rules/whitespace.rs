@@ -2,7 +2,7 @@
 
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -79,7 +79,7 @@ impl Rule for WhitespaceRule {
 }
 
 impl Visitor for WhitespaceRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn comment(&mut self, state: &mut Self::State, comment: &wdl_ast::Comment) {
         let comment_str = comment.text();

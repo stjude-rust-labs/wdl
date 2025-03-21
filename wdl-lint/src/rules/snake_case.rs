@@ -9,7 +9,7 @@ use convert_case::Converter;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -76,7 +76,7 @@ fn check_name(
     context: Context,
     name: &str,
     span: Span,
-    diagnostics: &mut Diagnostics,
+    state: &mut LintState,
     element: SyntaxElement,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
@@ -86,7 +86,7 @@ fn check_name(
     let properly_cased_name = converter.convert(name);
     if name != properly_cased_name {
         let warning = snake_case(context, name, &properly_cased_name, span);
-        diagnostics.exceptable_add(warning, element, exceptable_nodes);
+        state.exceptable_add(warning, element, exceptable_nodes);
     }
 }
 
@@ -149,7 +149,7 @@ impl Rule for SnakeCaseRule {
 }
 
 impl Visitor for SnakeCaseRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,

@@ -6,7 +6,7 @@
 
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -142,7 +142,7 @@ impl Rule for ContainerValue {
 }
 
 impl Visitor for ContainerValue {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document, _: SupportedVersion) {
         // This callback is intentionally empty.
@@ -196,7 +196,7 @@ impl Visitor for ContainerValue {
 /// Examines the value of the `container` item in both the `runtime` and
 /// `requirements` sections.
 fn check_container_value(
-    state: &mut Diagnostics,
+    state: &mut LintState,
     value: Value,
     syntax: SyntaxElement,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,

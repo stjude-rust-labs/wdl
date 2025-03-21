@@ -2,7 +2,7 @@
 
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -88,7 +88,7 @@ impl Rule for CallInputSpacingRule {
 }
 
 impl Visitor for CallInputSpacingRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,

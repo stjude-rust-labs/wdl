@@ -11,7 +11,7 @@ use std::sync::OnceLock;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use crate::LintState;
 use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -355,7 +355,7 @@ fn recommended_keys<'a, 'k>(
 }
 
 impl Visitor for RuntimeSectionKeysRule {
-    type State = Diagnostics;
+    type State = LintState;
 
     fn document(
         &mut self,

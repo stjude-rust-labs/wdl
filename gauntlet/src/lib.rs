@@ -44,7 +44,7 @@ use wdl::analysis::DiagnosticsConfig;
 use wdl::analysis::rules;
 use wdl::ast::AstNode;
 use wdl::ast::Diagnostic;
-use wdl::lint::LintVisitor;
+use wdl::lint::Linter;
 use wdl::lint::ast::Validator;
 use wdl::lint::rules::ShellCheckRule;
 
@@ -184,17 +184,11 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             DiagnosticsConfig::new(if args.arena { Vec::new() } else { rules() }),
             move |_: (), _, _, _| async move {},
             move || {
-                let mut validator = if !args.arena {
+                let validator = if !args.arena {
                     Validator::default()
                 } else {
                     Validator::empty()
                 };
-                if args.arena {
-                    validator.add_visitor(LintVisitor::default());
-                    if args.shellcheck {
-                        validator.add_visitor(ShellCheckRule);
-                    }
-                }
 
                 validator
             },
