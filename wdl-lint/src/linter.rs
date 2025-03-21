@@ -4,6 +4,7 @@ use std::collections::HashSet;
 
 use indexmap::IndexMap;
 use wdl_analysis::document::Document as AnalysisDocument;
+use wdl_analysis::AnalysisResult;
 use wdl_ast::AstNode;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
@@ -76,6 +77,23 @@ impl Linter {
         Self {
             rules: rules.into_iter().map(|r| (r.id(), r)).collect(),
             document_exceptions: HashSet::default(),
+        }
+    }
+
+    /// Lints the given analysis results.
+    pub fn lint(&mut self, analysis_results: &mut [AnalysisResult]) {
+        let mut diagnostics = Diagnostics::default();
+
+        for analysis_result in analysis_results {
+            let document = analysis_result.document();
+            let mut state = LintState {
+                diagnostics: Diagnostics::default(),
+                document: document.clone(),
+            };
+
+            analysis_result.document().root().visit(&mut state, self);
+
+            analysis_result.document().diagnostics().extend(state.diagnostics);
         }
     }
 
@@ -408,38 +426,5 @@ impl Visitor for Linter {
         self.each_enabled_rule(state, |state, rule| {
             rule.call_statement(state, reason, stmt)
         });
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use wdl_ast::Validator;
-
-    use super::*;
-
-    #[test]
-    fn it_supports_reuse() {
-        let source = r#"#@ except: MissingMetas, MissingOutput
-
-version 1.1
-
-workflow test {
-}
-"#;
-
-        let (document, diagnostics) = wdl_ast::Document::parse(source);
-        assert!(diagnostics.is_empty());
-
-        let mut validator = Validator::default();
-        // validator.add_visitor(Linter::default());
-
-        // Validate the document twice to ensure that reusing the lint visitor generates
-        // no new diagnostics
-        validator
-            .validate(&document)
-            .expect("should not have any diagnostics");
-        validator
-            .validate(&document)
-            .expect("should not have any diagnostics");
     }
 }

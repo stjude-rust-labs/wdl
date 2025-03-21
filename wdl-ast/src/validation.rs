@@ -66,6 +66,21 @@ impl Diagnostics {
 
         self.add(diagnostic);
     }
+
+    /// Extends the diagnostics collection with the given diagnostics.
+    pub fn extend(&mut self, diagnostics: &[Diagnostic]) {
+        self.0.extend(diagnostics.iter().cloned());
+    }
+
+    /// Returns the diagnostics as a slice.
+    pub fn as_slice(&self) -> &[Diagnostic] {
+        &self.0
+    }
+
+    /// Sorts the diagnostics in the collection.
+    pub fn sort(&mut self) {
+        self.0.sort();
+    }
 }
 
 /// Implements an AST validator.
