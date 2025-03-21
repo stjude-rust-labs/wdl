@@ -123,6 +123,8 @@ fn check_decl_name(
         Type::Ref(_) => return, // Skip type reference types (user-defined structs)
         Type::Primitive(primitive_type) => {
             match primitive_type.kind() {
+                // Skip File and String types as they cause too many false positives
+                PrimitiveTypeKind::File | PrimitiveTypeKind::String => return,
                 PrimitiveTypeKind::Boolean => {
                     type_names.insert(primitive_type.to_string());
                     type_names.insert("Bool".to_string());
@@ -138,13 +140,6 @@ fn check_decl_name(
                 PrimitiveTypeKind::Directory => {
                     type_names.insert(primitive_type.to_string());
                     type_names.insert("Dir".to_string());
-                }
-                // Include File and String types
-                PrimitiveTypeKind::File => {
-                    type_names.insert(primitive_type.to_string());
-                }
-                PrimitiveTypeKind::String => {
-                    type_names.insert(primitive_type.to_string());
                 }
             }
         }

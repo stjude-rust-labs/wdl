@@ -25,14 +25,6 @@ note[InputSorting]: input not sorted
      Int my_int
      Int count
 
-warning[DisallowedDeclarationName]: declaration identifier 'gtfFile' ends with type name 'File'
-   ┌─ tests/lints/disallowed-declaration-name/source.wdl:26:14
-   │
-26 │         File gtfFile
-   │              ^^^^^^^
-   │
-   = fix: rename the identifier to not include the type name
-
 warning[DisallowedDeclarationName]: declaration identifier 'my_int' ends with type name 'Int'
    ┌─ tests/lints/disallowed-declaration-name/source.wdl:27:13
    │
@@ -41,35 +33,11 @@ warning[DisallowedDeclarationName]: declaration identifier 'my_int' ends with ty
    │
    = fix: rename the identifier to not include the type name
 
-warning[DisallowedDeclarationName]: declaration identifier 'privateFile' ends with type name 'File'
-   ┌─ tests/lints/disallowed-declaration-name/source.wdl:41:10
-   │
-41 │     File privateFile = "sample.txt"
-   │          ^^^^^^^^^^^
-   │
-   = fix: rename the identifier to not include the type name
-
 warning[DisallowedDeclarationName]: declaration identifier 'count_int' ends with type name 'Int'
    ┌─ tests/lints/disallowed-declaration-name/source.wdl:42:9
    │
 42 │     Int count_int = 42
    │         ^^^^^^^^^
-   │
-   = fix: rename the identifier to not include the type name
-
-warning[DisallowedDeclarationName]: declaration identifier 'nameString' ends with type name 'String'
-   ┌─ tests/lints/disallowed-declaration-name/source.wdl:43:12
-   │
-43 │     String nameString = "test"
-   │            ^^^^^^^^^^
-   │
-   = fix: rename the identifier to not include the type name
-
-warning[DisallowedDeclarationName]: declaration identifier 'outputFile' ends with type name 'File'
-   ┌─ tests/lints/disallowed-declaration-name/source.wdl:49:14
-   │
-49 │         File outputFile = "output.txt"
-   │              ^^^^^^^^^^
    │
    = fix: rename the identifier to not include the type name
 
@@ -86,14 +54,6 @@ warning[DisallowedDeclarationName]: declaration identifier 'result_int' ends wit
    │
 50 │         Int result_int = 42
    │             ^^^^^^^^^^
-   │
-   = fix: rename the identifier to not include the type name
-
-warning[DisallowedDeclarationName]: declaration identifier 'resultString' ends with type name 'String'
-   ┌─ tests/lints/disallowed-declaration-name/source.wdl:51:16
-   │
-51 │         String resultString = "result"
-   │                ^^^^^^^^^^^^
    │
    = fix: rename the identifier to not include the type name
 
