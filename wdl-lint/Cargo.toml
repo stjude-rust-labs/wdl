@@ -24,6 +24,7 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
 strsim = { workspace = true }
+url = { workspace = true }
 
 [dev-dependencies]
 codespan-reporting = { workspace = true }
