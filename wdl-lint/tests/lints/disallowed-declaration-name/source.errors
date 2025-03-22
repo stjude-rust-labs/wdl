@@ -1,0 +1,2 @@
+
+warning[DisallowedDeclarationName]: declaration identifier 'my_int' ends with type name 'Int'
