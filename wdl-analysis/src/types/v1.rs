@@ -702,8 +702,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 "type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `{ty}`"
             ),
             Some(PlaceholderOption::Default(_)) => format!(
-                "type mismatch for placeholder option `default`: expected an optional primitive type, but found `{}`",
-                ty
+                "type mismatch for placeholder option `default`: expected an optional primitive type, but found `{ty}`"
             ),
             Some(PlaceholderOption::TrueFalse(_)) => format!(
                 "type mismatch for placeholder option `truefalse`: expected type `Boolean`, but found `{}`",
