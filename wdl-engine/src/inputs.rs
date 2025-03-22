@@ -712,6 +712,50 @@ impl Inputs {
         })
     }
 
+    /// Parses a YAML inputs file from the given file path.
+    ///
+    /// The parse uses the provided document to validate the input keys within
+    /// the file.
+    ///
+    /// Returns `Ok(Some(_))` if the file is a non-empty inputs.
+    ///
+    /// Returns `Ok(None)` if the file contains an empty input.
+    pub fn parse_yaml(
+        document: &Document,
+        path: impl AsRef<Path>,
+    ) -> Result<Option<(String, Self)>> {
+        let path = path.as_ref();
+
+        let file = File::open(path).with_context(|| {
+            format!("failed to open input file `{path}`", path = path.display())
+        })?;
+
+        // Parse the YAML
+        let reader = BufReader::new(file);
+        let yaml: YamlValue = serde_yaml_ng::from_reader(reader).with_context(|| {
+            format!("failed to parse input file `{path}`", path = path.display())
+        })?;
+
+        // Convert YAML to JSON format
+        let mut json = serde_json::to_value(yaml).with_context(|| {
+            format!(
+                "failed to convert YAML to JSON for processing `{path}`",
+                path = path.display()
+            )
+        })?;
+
+        // Extract as object
+        let object = mem::take(json.as_object_mut().with_context(|| {
+            format!(
+                "expected input file `{path}` to contain a YAML mapping",
+                path = path.display()
+            )
+        })?);
+
+        Self::parse_object(document, object)
+            .with_context(|| format!("failed to parse input file `{path}`", path = path.display()))
+    }
+
     /// Gets an input value.
     pub fn get(&self, name: &str) -> Option<&Value> {
         match self {
