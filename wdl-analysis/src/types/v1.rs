@@ -124,6 +124,8 @@ use crate::stdlib::FunctionBindError;
 use crate::stdlib::MAX_PARAMETERS;
 use crate::stdlib::STDLIB;
 use crate::types::Coercible;
+use crate::diagnostics;
+
 
 /// Gets the type of a `task` variable member type.
 ///
@@ -655,9 +657,11 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
     }
 
     /// Checks a placeholder expression.
-    pub(crate) fn check_placeholder(&mut self, placeholder: &Placeholder) {
-        self.placeholders += 1; // Track placeholder processing count
-    
+    pub(crate) fn check_placeholder<N: TreeNode>(&mut self, placeholder: &Placeholder<N>) {
+        self.placeholders += 1;
+        
+        // Evaluate the placeholder expression and check that the resulting type is
+        // coercible to string for interpolation
         let expr = placeholder.expr();
         if let Some(ty) = self.evaluate_expr(&expr) {
             if let Some(option) = placeholder.option() {
@@ -666,35 +670,31 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                         Type::Compound(CompoundType::Array(ref element_type), false)
                         if matches!(element_type.element_type(), Type::Primitive(_, false) | Type::Union)),
                     PlaceholderOption::Default(_) => matches!(ty, Type::Primitive(_, true) | Type::Union | Type::None),
-                    PlaceholderOption::TrueFalse(_) => {
-                        matches!(ty, Type::Primitive(PrimitiveType::Boolean, false) | Type::Union)
-                    }
+                    PlaceholderOption::TrueFalse(_) => matches!(ty, Type::Primitive(PrimitiveType::Boolean, false) | Type::Union),
                 };
+                
                 if !valid {
                     self.context
-                        .add_diagnostic(Self::invalid_placeholder_option(
-                            &ty,
-                            expr.span(),
-                            Some(option.map(|n| n.into())),
-                        ));
+                        .add_diagnostic(diagnostics::invalid_placeholder_option(&ty, expr.span(), option));
                 }
             } else {
                 match ty {
                     Type::Primitive(..) | Type::Union | Type::None => {}
                     _ => {
                         self.context
-                            .add_diagnostic(cannot_coerce_to_string(&ty, expr.span()));
+                            .add_diagnostic(diagnostics::cannot_coerce_to_string(&ty, expr.span()));
                     }
                 }
             }
         }
-
+    
         self.placeholders -= 1;
     }
+    
 
-    fn invalid_placeholder_option(
+    pub fn invalid_placeholder_option(
         ty: &Type,
-        _span: Span,
+        span: Span,
         option: Option<PlaceholderOption>,
     ) -> Diagnostic {
         let message = match option {
@@ -707,14 +707,17 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
             Some(PlaceholderOption::TrueFalse(_)) => format!(
                 "type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `{ty}`"
             ),
-            None => format!("cannot coerce type `{}` to `String`", ty),
+            None => format!("cannot coerce type `{ty}` to `String`"),
         };
-        Diagnostic::error(message).with_label(format!("this is type `{ty}`"), span)
+        
+        Diagnostic::error(message)
+            .with_label(format!("this is type `{ty}`"), span)
     }
-
-    fn cannot_coerce_to_string(ty: &Type, _span: Span) -> Diagnostic {
-        Diagnostic::error(format!("cannot coerce type `{}` to `String`", ty)) // No span here
-    }
+    
+    pub fn cannot_coerce_to_string(ty: &Type, span: Span) -> Diagnostic {
+        Diagnostic::error(format!("cannot coerce type `{ty}` to `String`"))
+            .with_label(format!("this is type `{ty}`"), span)
+    }    
 
     /// Evaluates the type of a literal array expression.
     fn evaluate_literal_array<N: TreeNode>(&mut self, expr: &LiteralArray<N>) -> Type {

@@ -1,6 +1,0 @@
-error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type or Union, but found `Boolean`
-   ┌─ tests/analysis/placeholder-options/source.wdl:13:1
-   │
-13 │ 
-   │  
-
