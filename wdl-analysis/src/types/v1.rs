@@ -665,7 +665,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     PlaceholderOption::Sep(_) => matches!(ty,
                         Type::Compound(CompoundType::Array(ref element_type), false)
                         if matches!(element_type.element_type(), Type::Primitive(_, false) | Type::Union)),
-                    PlaceholderOption::Default(_) => matches!(ty, Type::Primitive(_, true)),
+                    PlaceholderOption::Default(_) => matches!(ty, Type::Primitive(_, true) | Type::Union | Type::None),
                     PlaceholderOption::TrueFalse(_) => {
                         matches!(ty, Type::Primitive(PrimitiveType::Boolean, _))
                     }
