@@ -714,16 +714,4 @@ impl Document {
 
         None
     }
-
-    pub fn extend_diagnostics(&self, mut diagnostics: Vec<Diagnostic>) -> Self {
-        let mut data = self.data.clone();
-        
-        Self { data: DocumentData {
-            diagnostics: {
-                diagnostics.extend(data.diagnostics.iter());
-                diagnostics
-            },
-            ..data
-        }.into()}
-    }
 }

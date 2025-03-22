@@ -32,6 +32,7 @@ use wdl_ast::SyntaxNode;
 use wdl_ast::SyntaxNodeExt;
 use wdl_ast::Validator;
 
+use crate::rules;
 use crate::Rule;
 use crate::UNNECESSARY_FUNCTION_CALL;
 use crate::UNUSED_CALL_RULE_ID;
@@ -315,12 +316,32 @@ pub struct DiagnosticsConfig {
 
 impl Default for DiagnosticsConfig {
     fn default() -> Self {
+        let mut unused_import = None;
+        let mut unused_input = None;
+        let mut unused_declaration = None;
+        let mut unused_call = None;
+        let mut unnecessary_function_call = None;
+
+        for rule in rules() {
+            let rule = rule.as_ref();
+            match rule.id() {
+                UNUSED_IMPORT_RULE_ID => unused_import = Some(rule.severity()),
+                UNUSED_INPUT_RULE_ID => unused_input = Some(rule.severity()),
+                UNUSED_DECL_RULE_ID => unused_declaration = Some(rule.severity()),
+                UNUSED_CALL_RULE_ID => unused_call = Some(rule.severity()),
+                UNNECESSARY_FUNCTION_CALL => unnecessary_function_call = Some(rule.severity()),
+                _ => {
+                    unreachable!("unknown rule ID: {}", rule.id());
+                }
+            }
+        }
+
         Self {
-            unused_import: Some(Severity::Warning),
-            unused_input: Some(Severity::Warning),
-            unused_declaration: Some(Severity::Warning),
-            unused_call: Some(Severity::Warning),
-            unnecessary_function_call: Some(Severity::Warning),
+            unused_import,
+            unused_input,
+            unused_declaration,
+            unused_call,
+            unnecessary_function_call,
         }
     }
 }

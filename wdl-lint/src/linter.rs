@@ -4,7 +4,6 @@ use std::collections::HashSet;
 
 use indexmap::IndexMap;
 use wdl_analysis::document::Document as AnalysisDocument;
-use wdl_analysis::AnalysisResult;
 use wdl_ast::AstNode;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
@@ -77,23 +76,6 @@ impl Linter {
         Self {
             rules: rules.into_iter().map(|r| (r.id(), r)).collect(),
             document_exceptions: HashSet::default(),
-        }
-    }
-
-    /// Lints the given analysis results.
-    pub fn lint(&mut self, analysis_results: &mut [AnalysisResult]) {
-        let mut diagnostics = Diagnostics::default();
-
-        for analysis_result in analysis_results {
-            let document = analysis_result.document();
-            let mut state = LintState {
-                diagnostics: Diagnostics::default(),
-                document: document.clone(),
-            };
-
-            analysis_result.document().root().visit(&mut state, self);
-
-            analysis_result.document().diagnostics().extend(state.diagnostics);
         }
     }
 
