@@ -699,8 +699,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
     ) -> Diagnostic {
         let message = match option {
             Some(PlaceholderOption::Sep(_)) => format!(
-                "type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type or Union, but found `{}`",
-                ty
+                "type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `{ty}`"
             ),
             Some(PlaceholderOption::Default(_)) => format!(
                 "type mismatch for placeholder option `default`: expected an optional primitive type, but found `{}`",
