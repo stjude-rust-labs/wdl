@@ -709,7 +709,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
             ),
             None => format!("cannot coerce type `{}` to `String`", ty),
         };
-        Diagnostic::error(message) // No span here
+        Diagnostic::error(message).with_label(format!("this is type `{ty}`"), span)
     }
 
     fn cannot_coerce_to_string(ty: &Type, _span: Span) -> Diagnostic {
