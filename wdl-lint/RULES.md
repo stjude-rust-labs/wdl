@@ -42,6 +42,7 @@ be out of sync with released packages.
 | `PreambleFormatting`             | Spacing, Style, Clarity       | Ensures that documents have correct whitespace in the preamble.                                   |
 | `RuntimeSectionKeys`             | Completeness, Deprecated      | Ensures that runtime sections have the appropriate keys.                                          |
 | `RedundantInputAssignment`       | Style                         | Ensures that redundant input assignments are shortened                                            |
+| `RedundantNone`                  | Style, Clarity                | Ensures that none is not redundantly specified for optional inputs                                |
 | `SectionOrdering`                | Sorting, Style                | Ensures that sections within tasks and workflows are sorted.                                      |
 | `ShellCheck`                     | Correctness, Portability      | (BETA) Ensures that command sections are free of shellcheck diagnostics.                          |
 | `SnakeCase`                      | Clarity, Naming, Style        | Ensures that tasks, workflows, and variables are defined with snake_case names.                   |
