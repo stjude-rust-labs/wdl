@@ -147,7 +147,7 @@ where
     Progress: Fn(Context, ProgressKind, usize, usize) -> Return + Send + 'static,
     Context: Send + Clone,
     Return: Future<Output = ()>,
-    Validator: Fn() -> wdl_ast::Validator + Send + Sync + 'static,
+    Validator: Fn() -> crate::Validator + Send + Sync + 'static,
 {
     /// Constructs a new analysis queue.
     pub fn new(
@@ -574,7 +574,7 @@ where
         let validator = self.validator.clone();
         RayonHandle::spawn(move || {
             thread_local! {
-                static VALIDATOR: RefCell<Option<wdl_ast::Validator>> = const { RefCell::new(None) };
+                static VALIDATOR: RefCell<Option<crate::Validator>> = const { RefCell::new(None) };
             }
 
             VALIDATOR.with_borrow_mut(|v| {

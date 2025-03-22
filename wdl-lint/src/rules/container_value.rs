@@ -6,7 +6,6 @@
 
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
-use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -20,6 +19,7 @@ use wdl_ast::v1::common::container::Kind;
 use wdl_ast::v1::common::container::value::Value;
 use wdl_ast::v1::common::container::value::uri::ANY_CONTAINER_VALUE;
 
+use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;

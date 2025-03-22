@@ -5,7 +5,6 @@ use std::cmp::Ordering;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
-use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -15,6 +14,7 @@ use wdl_ast::SyntaxNode;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
+use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;

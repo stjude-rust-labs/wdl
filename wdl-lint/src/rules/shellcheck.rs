@@ -25,7 +25,6 @@ use wdl_analysis::types::v1::ExprTypeEvaluator;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -39,6 +38,7 @@ use wdl_ast::v1::Placeholder;
 use wdl_ast::v1::StrippedCommandPart;
 use wdl_ast::v1::TaskDefinition;
 
+use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -588,7 +588,10 @@ impl Visitor for ShellCheckRule {
         // Replace all placeholders in the command with dummy bash variables
         let mut context = CommandContext::new(
             state.document.clone(),
-            state.document.find_scope_by_position(section.inner().text_range().start().into()).expect("should have a scope"),
+            state
+                .document
+                .find_scope_by_position(section.inner().text_range().start().into())
+                .expect("should have a scope"),
         );
         let Some((sanitized_command, cmd_decls, amount_stripped)) =
             sanitize_command(section, &mut context)

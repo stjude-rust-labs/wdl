@@ -30,9 +30,7 @@ use walkdir::WalkDir;
 use wdl_ast::Severity;
 use wdl_ast::SyntaxNode;
 use wdl_ast::SyntaxNodeExt;
-use wdl_ast::Validator;
 
-use crate::rules;
 use crate::Rule;
 use crate::UNNECESSARY_FUNCTION_CALL;
 use crate::UNUSED_CALL_RULE_ID;
@@ -51,6 +49,7 @@ use crate::queue::NotifyIncrementalChangeRequest;
 use crate::queue::RemoveRequest;
 use crate::queue::Request;
 use crate::rayon::RayonHandle;
+use crate::rules;
 
 /// Represents the kind of analysis progress being reported.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -453,7 +452,7 @@ where
         Progress: Fn(Context, ProgressKind, usize, usize) -> Return + Send + 'static,
         Return: Future<Output = ()>,
     {
-        Self::new_with_validator(config, progress, Validator::default)
+        Self::new_with_validator(config, progress, crate::Validator::default)
     }
 
     /// Constructs a new analyzer with the given diagnostics config and
@@ -473,7 +472,7 @@ where
     where
         Progress: Fn(Context, ProgressKind, usize, usize) -> Return + Send + 'static,
         Return: Future<Output = ()>,
-        Validator: Fn() -> wdl_ast::Validator + Send + Sync + 'static,
+        Validator: Fn() -> crate::Validator + Send + Sync + 'static,
     {
         let (tx, rx) = mpsc::unbounded_channel();
         let tokio = Handle::current();

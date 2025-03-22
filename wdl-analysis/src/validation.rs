@@ -1,18 +1,17 @@
 //! Validator for WDL documents.
 
-use wdl_grammar::SyntaxElement;
-use wdl_grammar::SyntaxKind;
-
-use super::Comment;
-use super::Diagnostic;
-use super::VisitReason;
-use super::Whitespace;
-use super::v1;
-use crate::Document;
-use crate::SupportedVersion;
-use crate::SyntaxNodeExt;
-use crate::VersionStatement;
-use crate::Visitor;
+use wdl_ast::Comment;
+use wdl_ast::Diagnostic;
+use wdl_ast::Document;
+use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
+use wdl_ast::SyntaxKind;
+use wdl_ast::SyntaxNodeExt;
+use wdl_ast::VersionStatement;
+use wdl_ast::VisitReason;
+use wdl_ast::Visitor;
+use wdl_ast::Whitespace;
+use wdl_ast::v1;
 
 mod counts;
 mod env;
@@ -23,9 +22,6 @@ mod numbers;
 mod requirements;
 mod strings;
 mod version;
-
-/// The prefix of `except` comments.
-pub const EXCEPT_COMMENT_PREFIX: &str = "#@ except:";
 
 /// Represents a collection of validation diagnostics.
 ///

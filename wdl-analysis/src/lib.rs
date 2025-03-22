@@ -19,6 +19,8 @@ mod rayon;
 mod rules;
 pub mod stdlib;
 pub mod types;
+mod validation;
 
 pub use analyzer::*;
 pub use rules::*;
+pub use validation::*;

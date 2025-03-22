@@ -33,13 +33,13 @@ use wdl_ast::SyntaxKind;
 use wdl_ast::Visitor;
 
 pub(crate) mod fix;
+mod linter;
 pub mod rules;
 mod tags;
 pub(crate) mod util;
-mod linter;
 
-pub use tags::*;
 pub use linter::*;
+pub use tags::*;
 pub use wdl_analysis as analysis;
 pub use wdl_ast as ast;
 

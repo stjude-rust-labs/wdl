@@ -3,7 +3,6 @@
 use rowan::NodeOrToken;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
-use crate::LintState;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -31,6 +30,7 @@ use wdl_ast::v1::UnboundDecl;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::v1::WorkflowHintsSection;
 
+use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;

@@ -3,39 +3,40 @@
 use std::collections::HashSet;
 use std::fmt;
 
-use crate::Ast;
-use crate::AstNode;
-use crate::AstToken;
-use crate::Diagnostic;
+use wdl_ast::Ast;
+use wdl_ast::AstNode;
+use wdl_ast::AstToken;
+use wdl_ast::Diagnostic;
+use wdl_ast::Document;
+use wdl_ast::Ident;
+use wdl_ast::Span;
+use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxNode;
+use wdl_ast::TokenText;
+use wdl_ast::VisitReason;
+use wdl_ast::Visitor;
+use wdl_ast::v1::CommandKeyword;
+use wdl_ast::v1::CommandSection;
+use wdl_ast::v1::HintsKeyword;
+use wdl_ast::v1::InputKeyword;
+use wdl_ast::v1::InputSection;
+use wdl_ast::v1::MetaKeyword;
+use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::OutputKeyword;
+use wdl_ast::v1::OutputSection;
+use wdl_ast::v1::ParameterMetaKeyword;
+use wdl_ast::v1::ParameterMetadataSection;
+use wdl_ast::v1::RequirementsKeyword;
+use wdl_ast::v1::RequirementsSection;
+use wdl_ast::v1::RuntimeKeyword;
+use wdl_ast::v1::RuntimeSection;
+use wdl_ast::v1::SectionParent;
+use wdl_ast::v1::StructDefinition;
+use wdl_ast::v1::TaskDefinition;
+use wdl_ast::v1::TaskHintsSection;
+use wdl_ast::v1::WorkflowDefinition;
+
 use crate::Diagnostics;
-use crate::Document;
-use crate::Ident;
-use crate::Span;
-use crate::SupportedVersion;
-use crate::SyntaxNode;
-use crate::TokenText;
-use crate::VisitReason;
-use crate::Visitor;
-use crate::v1::CommandKeyword;
-use crate::v1::CommandSection;
-use crate::v1::HintsKeyword;
-use crate::v1::InputKeyword;
-use crate::v1::InputSection;
-use crate::v1::MetaKeyword;
-use crate::v1::MetadataSection;
-use crate::v1::OutputKeyword;
-use crate::v1::OutputSection;
-use crate::v1::ParameterMetaKeyword;
-use crate::v1::ParameterMetadataSection;
-use crate::v1::RequirementsKeyword;
-use crate::v1::RequirementsSection;
-use crate::v1::RuntimeKeyword;
-use crate::v1::RuntimeSection;
-use crate::v1::SectionParent;
-use crate::v1::StructDefinition;
-use crate::v1::TaskDefinition;
-use crate::v1::TaskHintsSection;
-use crate::v1::WorkflowDefinition;
 
 /// Represents section context of an error.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -464,7 +465,7 @@ impl Visitor for CountingVisitor {
         &mut self,
         state: &mut Self::State,
         reason: VisitReason,
-        section: &crate::v1::WorkflowHintsSection,
+        section: &wdl_ast::v1::WorkflowHintsSection,
     ) {
         if self.ignore_current || reason == VisitReason::Exit {
             return;

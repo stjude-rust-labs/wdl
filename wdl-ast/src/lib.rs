@@ -22,11 +22,6 @@
 //! if !diagnostics.is_empty() {
 //!     // Handle the failure to parse
 //! }
-//!
-//! let mut validator = Validator::default();
-//! if let Err(diagnostics) = validator.validate(&document) {
-//!     // Handle the failure to validate
-//! }
 //! ```
 
 #![warn(missing_docs)]
@@ -58,17 +53,19 @@ pub use wdl_grammar::SyntaxToken;
 pub use wdl_grammar::SyntaxTokenExt;
 pub use wdl_grammar::SyntaxTree;
 pub use wdl_grammar::WorkflowDescriptionLanguage;
+pub use wdl_grammar::lexer;
 pub use wdl_grammar::version;
 
 pub mod v1;
 
 mod element;
-mod validation;
 mod visitor;
 
 pub use element::*;
-pub use validation::*;
 pub use visitor::*;
+
+/// The prefix of `except` comments.
+pub const EXCEPT_COMMENT_PREFIX: &str = "#@ except:";
 
 /// A trait that abstracts the underlying representation of a syntax tree node.
 ///

@@ -29,9 +29,9 @@ use wdl_analysis::IncrementalChange;
 use wdl_analysis::SourceEdit;
 use wdl_analysis::SourcePosition;
 use wdl_analysis::SourcePositionEncoding;
+use wdl_analysis::Validator;
 use wdl_analysis::path_to_uri;
 use wdl_analysis::rules;
-use wdl_ast::Validator;
 use wdl_lint::Linter;
 
 use crate::proto;
@@ -265,9 +265,7 @@ impl Server {
                             token.update(&client, message, percentage).await
                         }
                     },
-                    move || {
-                        Validator::default()
-                    },
+                    move || Validator::default(),
                 ),
                 client_support: Default::default(),
                 folders: Default::default(),

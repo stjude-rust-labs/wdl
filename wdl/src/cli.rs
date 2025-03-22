@@ -68,25 +68,22 @@ pub async fn analyze(
     );
 
     let start = Instant::now();
-    let analyzer = Analyzer::new(
-        rules_config,
-        move |_: (), kind, completed, total| {
-            let pb = pb.clone();
-            async move {
-                if start.elapsed() < PROGRESS_BAR_DELAY_BEFORE_RENDER {
-                    return;
-                }
-
-                if completed == 0 {
-                    pb.pb_start();
-                    pb.pb_set_length(total.try_into().unwrap());
-                    pb.pb_set_message(&format!("{kind}"));
-                }
-
-                pb.pb_set_position(completed.try_into().unwrap());
+    let analyzer = Analyzer::new(rules_config, move |_: (), kind, completed, total| {
+        let pb = pb.clone();
+        async move {
+            if start.elapsed() < PROGRESS_BAR_DELAY_BEFORE_RENDER {
+                return;
             }
-        },
-    );
+
+            if completed == 0 {
+                pb.pb_start();
+                pb.pb_set_length(total.try_into().unwrap());
+                pb.pb_set_message(&format!("{kind}"));
+            }
+
+            pb.pb_set_position(completed.try_into().unwrap());
+        }
+    });
 
     if let Ok(url) = Url::parse(file) {
         analyzer.add_document(url).await?;

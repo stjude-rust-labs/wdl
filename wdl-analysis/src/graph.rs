@@ -29,9 +29,9 @@ use url::Url;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::SyntaxNode;
-use wdl_ast::Validator;
 
 use crate::IncrementalChange;
+use crate::Validator;
 use crate::document::Document;
 
 /// Represents space for a DFS search of a document graph.
