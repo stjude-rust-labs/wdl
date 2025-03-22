@@ -50,7 +50,8 @@ impl Rule for DisallowedDeclarationNameRule {
     fn explanation(&self) -> &'static str {
         "Declaration names should not include their type as a suffix. This makes the code more \
          verbose and often redundant. For example, use 'counter' instead of 'counter_int' or \
-         'is_active' instead of 'is_active_boolean'."
+         'is_active' instead of 'is_active_boolean'. Exceptions are made for String, File, and \
+         user-defined struct types, which are not flagged by this rule."
     }
 
     fn tags(&self) -> TagSet {
