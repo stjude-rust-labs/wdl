@@ -667,7 +667,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                         if matches!(element_type.element_type(), Type::Primitive(_, false) | Type::Union)),
                     PlaceholderOption::Default(_) => matches!(ty, Type::Primitive(_, true) | Type::Union | Type::None),
                     PlaceholderOption::TrueFalse(_) => {
-                        matches!(ty, Type::Primitive(PrimitiveType::Boolean, _))
+                        matches!(ty, Type::Primitive(PrimitiveType::Boolean, false) | Type::Union)
                     }
                 };
                 if !valid {
