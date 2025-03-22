@@ -705,8 +705,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 "type mismatch for placeholder option `default`: expected an optional primitive type, but found `{ty}`"
             ),
             Some(PlaceholderOption::TrueFalse(_)) => format!(
-                "type mismatch for placeholder option `truefalse`: expected type `Boolean`, but found `{}`",
-                ty
+                "type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `{ty}`"
             ),
             None => format!("cannot coerce type `{}` to `String`", ty),
         };
