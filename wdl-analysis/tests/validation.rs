@@ -29,7 +29,7 @@ use pretty_assertions::StrComparison;
 use rayon::prelude::*;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
-use wdl_ast::Validator;
+use wdl_analysis::Validator;
 
 /// Finds tests for grammar validation.
 fn find_tests() -> Vec<PathBuf> {
