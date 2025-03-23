@@ -503,7 +503,7 @@ impl Document {
                         node.uri().clone(),
                         Some(root.inner().green().into()),
                         None,
-                        diagnostics,
+                        diagnostics.into(),
                     )),
                 };
             }
@@ -513,7 +513,7 @@ impl Document {
             node.uri().clone(),
             Some(root.inner().green().into()),
             SupportedVersion::from_str(version.text()).ok(),
-            diagnostics,
+            diagnostics.into(),
         );
         match root.ast() {
             Ast::Unsupported => {}
@@ -528,13 +528,13 @@ impl Document {
                 ..
             } = &mut data;
 
-            let new_diagnostics: Diagnostics = namespaces
-                .iter()
-                .filter(|(_, ns)| !ns.used && !ns.excepted)
-                .map(|(name, ns)| unused_import(name, ns.span()).with_severity(severity))
-                .collect();
-
-            diagnostics.extend(new_diagnostics);
+            diagnostics.extend(
+                namespaces
+                    .iter()
+                    .filter(|(_, ns)| !ns.used && !ns.excepted)
+                    .map(|(name, ns)| unused_import(name, ns.span()).with_severity(severity))
+                    .collect(),
+            );
         }
 
         // Sort the diagnostics by start

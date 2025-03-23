@@ -283,9 +283,11 @@ where
                                         // If there are any diagnostics that are
                                         // errors, we shouldn't attempt to format the
                                         // document.
-                                        if diagnostics.as_ref().iter().any(|diagnostic| {
-                                            diagnostic.severity() == Severity::Error
-                                        }) {
+                                        if diagnostics
+                                            .as_ref()
+                                            .iter()
+                                            .any(|d| d.severity() == Severity::Error)
+                                        {
                                             return None;
                                         }
 

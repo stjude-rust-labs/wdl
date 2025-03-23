@@ -21,6 +21,8 @@
 //! visiting a V2 document; the hope is that enables some visitors to be
 //! "shared" across different WDL versions.
 
+use std::sync::Arc;
+
 use rowan::WalkEvent;
 use wdl_grammar::SyntaxElement;
 
@@ -130,6 +132,28 @@ impl Diagnostics {
 impl FromIterator<Diagnostic> for Diagnostics {
     fn from_iter<T: IntoIterator<Item = Diagnostic>>(iter: T) -> Self {
         Self(iter.into_iter().collect())
+    }
+}
+
+impl From<Arc<Diagnostics>> for Diagnostics {
+    fn from(diagnostics: Arc<Diagnostics>) -> Self {
+        Self(diagnostics.0.clone())
+    }
+}
+
+impl Iterator for Diagnostics {
+    type Item = Diagnostic;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.pop()
+    }
+}
+
+impl Iterator for &Diagnostics {
+    type Item = &Diagnostic;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.last()
     }
 }
 
