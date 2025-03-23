@@ -1,5 +1,6 @@
 //! Ensures that lines do not exceed a certain width.
 
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
@@ -11,7 +12,6 @@ use wdl_ast::Visitor;
 use wdl_ast::Whitespace;
 use wdl_ast::v1;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -50,7 +50,7 @@ impl LineWidthRule {
     /// Detects lines that exceed a certain width.
     fn detect_line_too_long(
         &mut self,
-        state: &mut LintState,
+        diagnostics: &mut Diagnostics,
         text: &str,
         start: usize,
         element: SyntaxElement,

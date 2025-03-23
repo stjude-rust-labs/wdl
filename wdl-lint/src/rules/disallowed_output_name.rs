@@ -1,5 +1,6 @@
 //! A lint rule that disallows redundant output names.
 
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
@@ -14,7 +15,6 @@ use wdl_ast::v1::Decl;
 use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::UnboundDecl;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -132,7 +132,7 @@ impl Visitor for DisallowedOutputNameRule {
 
 /// Check declaration name
 fn check_decl_name(
-    state: &mut LintState,
+    diagnostics: &mut Diagnostics,
     decl: &Decl,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {

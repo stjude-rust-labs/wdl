@@ -1,5 +1,6 @@
 //! A lint rule for newlines at the end of the document.
 
+use wdl_analysis::Diagnostics;
 use wdl_ast::Ast;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
@@ -10,7 +11,6 @@ use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;

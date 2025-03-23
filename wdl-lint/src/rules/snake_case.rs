@@ -6,6 +6,7 @@ use std::fmt;
 use convert_case::Boundary;
 use convert_case::Case;
 use convert_case::Converter;
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -24,7 +25,6 @@ use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::UnboundDecl;
 use wdl_ast::v1::WorkflowDefinition;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -76,7 +76,7 @@ fn check_name(
     context: Context,
     name: &str,
     span: Span,
-    state: &mut LintState,
+    diagnostics: &mut Diagnostics,
     element: SyntaxElement,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
@@ -166,7 +166,7 @@ impl Visitor for SnakeCaseRule {
 
     fn struct_definition(
         &mut self,
-        _state: &mut Self::State,
+        _diagnostics: &mut Diagnostics,
         reason: VisitReason,
         _def: &StructDefinition,
     ) {
@@ -182,7 +182,7 @@ impl Visitor for SnakeCaseRule {
 
     fn input_section(
         &mut self,
-        _state: &mut Self::State,
+        _diagnostics: &mut Diagnostics,
         reason: VisitReason,
         _section: &InputSection,
     ) {
@@ -198,7 +198,7 @@ impl Visitor for SnakeCaseRule {
 
     fn output_section(
         &mut self,
-        _state: &mut Self::State,
+        _diagnostics: &mut Diagnostics,
         reason: VisitReason,
         _section: &OutputSection,
     ) {

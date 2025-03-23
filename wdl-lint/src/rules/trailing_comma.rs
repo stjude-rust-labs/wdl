@@ -1,5 +1,6 @@
 //! A lint rule for trailing commas in lists/objects.
 
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
@@ -14,7 +15,6 @@ use wdl_ast::v1::Expr;
 use wdl_ast::v1::LiteralExpr;
 use wdl_ast::v1::MetadataArray;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;

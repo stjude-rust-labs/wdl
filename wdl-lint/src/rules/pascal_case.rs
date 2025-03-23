@@ -3,6 +3,7 @@
 use convert_case::Boundary;
 use convert_case::Case;
 use convert_case::Converter;
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -15,7 +16,6 @@ use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::v1::StructDefinition;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -66,7 +66,7 @@ impl Rule for PascalCaseRule {
 fn check_name(
     name: &str,
     span: Span,
-    state: &mut LintState,
+    diagnostics: &mut Diagnostics,
     element: SyntaxElement,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {

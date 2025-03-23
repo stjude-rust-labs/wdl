@@ -1,5 +1,6 @@
 //! A lint rule for flagging placeholder options as deprecated.
 
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
@@ -13,7 +14,6 @@ use wdl_ast::v1::Placeholder;
 use wdl_ast::v1::PlaceholderOption;
 use wdl_ast::version::V1;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;

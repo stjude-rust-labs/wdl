@@ -3,6 +3,7 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use wdl_analysis::Diagnostics;
 use wdl_analysis::rules as analysis_rules;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
@@ -15,7 +16,6 @@ use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;

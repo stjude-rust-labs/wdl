@@ -1,5 +1,6 @@
 //! A lint rule for flagging preamble comments which are outside the preamble.
 
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
@@ -10,7 +11,6 @@ use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -78,7 +78,7 @@ impl Visitor for PreambleCommentAfterVersionRule {
 
     fn version_statement(
         &mut self,
-        _state: &mut Self::State,
+        _diagnostics: &mut Diagnostics,
         reason: VisitReason,
         _stmt: &wdl_ast::VersionStatement,
     ) {

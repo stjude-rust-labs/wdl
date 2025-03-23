@@ -1,6 +1,7 @@
 //! A lint rule for spacing of expressions.
 
 use rowan::Direction;
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
@@ -13,7 +14,6 @@ use wdl_ast::Visitor;
 use wdl_ast::v1::Expr;
 use wdl_ast::v1::LiteralExpr;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -790,7 +790,7 @@ impl Visitor for ExpressionSpacingRule {
 
 /// Checks to ensure a token is surrounded by whitespace.
 fn check_required_surrounding_ws(
-    state: &mut LintState,
+    diagnostics: &mut Diagnostics,
     op: &SyntaxElement,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {

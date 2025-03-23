@@ -4,6 +4,7 @@
 //! This check only occurs if the `container` key exists in the
 //! `runtime`/`requirements` sections.
 
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
@@ -19,7 +20,6 @@ use wdl_ast::v1::common::container::Kind;
 use wdl_ast::v1::common::container::value::Value;
 use wdl_ast::v1::common::container::value::uri::ANY_CONTAINER_VALUE;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -194,7 +194,7 @@ impl Visitor for ContainerValue {
 /// Examines the value of the `container` item in both the `runtime` and
 /// `requirements` sections.
 fn check_container_value(
-    state: &mut LintState,
+    diagnostics: &mut Diagnostics,
     value: Value,
     syntax: SyntaxElement,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,

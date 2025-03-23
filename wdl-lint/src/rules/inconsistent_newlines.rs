@@ -1,5 +1,6 @@
 //! A lint rule for ensuring that newlines are consistent.
 
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Span;
@@ -9,7 +10,6 @@ use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::Whitespace;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -88,7 +88,7 @@ impl Visitor for InconsistentNewlinesRule {
         }
     }
 
-    fn whitespace(&mut self, _state: &mut Self::State, whitespace: &Whitespace) {
+    fn whitespace(&mut self, _diagnostics: &mut Diagnostics, whitespace: &Whitespace) {
         if let Some(pos) = whitespace.text().find("\r\n") {
             self.carriage_return += 1;
             if self.newline > 0 && self.first_inconsistent.is_none() {

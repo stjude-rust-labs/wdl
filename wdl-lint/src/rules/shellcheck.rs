@@ -16,6 +16,7 @@ use rowan::ast::support;
 use serde::Deserialize;
 use serde_json;
 use tracing::debug;
+use wdl_analysis::Diagnostics;
 use wdl_analysis::document::Document as AnalysisDocument;
 use wdl_analysis::document::ScopeRef;
 use wdl_analysis::types::PrimitiveType;
@@ -38,7 +39,6 @@ use wdl_ast::v1::Placeholder;
 use wdl_ast::v1::StrippedCommandPart;
 use wdl_ast::v1::TaskDefinition;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;

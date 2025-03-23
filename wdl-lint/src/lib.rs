@@ -44,7 +44,7 @@ pub use wdl_analysis as analysis;
 pub use wdl_ast as ast;
 
 /// A trait implemented by lint rules.
-pub trait Rule: Visitor<State = LintState> {
+pub trait Rule: Visitor {
     /// The unique identifier for the lint rule.
     ///
     /// The identifier is required to be pascal case.

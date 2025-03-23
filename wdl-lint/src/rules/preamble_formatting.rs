@@ -1,5 +1,6 @@
 //! A lint rule that checks the formatting of the preamble.
 
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
@@ -13,7 +14,6 @@ use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::Whitespace;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -425,7 +425,7 @@ impl Visitor for PreambleFormattingRule {
 
     fn version_statement(
         &mut self,
-        _state: &mut Self::State,
+        _diagnostics: &mut Diagnostics,
         reason: VisitReason,
         _stmt: &VersionStatement,
     ) {

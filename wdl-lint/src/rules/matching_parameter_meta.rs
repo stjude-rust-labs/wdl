@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -19,7 +20,6 @@ use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::version::V1;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -109,7 +109,7 @@ fn check_parameter_meta(
     parent: &SectionParent,
     expected: impl Iterator<Item = (Ident, Span)>,
     param_meta: ParameterMetadataSection,
-    state: &mut LintState,
+    diagnostics: &mut Diagnostics,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
     let expected: HashMap<_, _> = expected.map(|(i, s)| (i.text().to_string(), s)).collect();

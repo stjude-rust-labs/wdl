@@ -1,5 +1,6 @@
 //! A lint rule for key-value pairs to ensure each element is on a newline.
 
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
@@ -12,7 +13,6 @@ use wdl_ast::Visitor;
 use wdl_ast::v1::MetadataArray;
 use wdl_ast::v1::MetadataObject;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;

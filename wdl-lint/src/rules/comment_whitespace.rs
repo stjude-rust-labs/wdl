@@ -2,6 +2,7 @@
 
 use std::cmp::Ordering;
 
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
@@ -14,7 +15,6 @@ use wdl_ast::SyntaxNode;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;

@@ -1,5 +1,6 @@
 //! A lint rule for missing `requirements` sections.
 
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -13,7 +14,6 @@ use wdl_ast::Visitor;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::version::V1;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;

@@ -1,6 +1,7 @@
 //! A lint rule to ensure each output is documented in `meta`.
 
 use indexmap::IndexMap;
+use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -17,7 +18,6 @@ use wdl_ast::v1::OutputSection;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::WorkflowDefinition;
 
-use crate::LintState;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
@@ -141,7 +141,7 @@ impl Rule for NonmatchingOutputRule<'_> {
 
 /// Check each output key exists in the `outputs` key within the `meta` section.
 fn check_matching(
-    state: &mut LintState,
+    diagnostics: &mut Diagnostics,
     rule: &mut NonmatchingOutputRule<'_>,
     element: SyntaxElement,
 ) {
@@ -203,7 +203,7 @@ fn check_matching(
 
 /// Handle missing `meta.outputs` and reset the visitor.
 fn handle_meta_outputs_and_reset(
-    state: &mut LintState,
+    diagnostics: &mut Diagnostics,
     rule: &mut NonmatchingOutputRule<'_>,
     element: SyntaxElement,
 ) {
@@ -292,7 +292,7 @@ impl Visitor for NonmatchingOutputRule<'_> {
 
     fn metadata_section(
         &mut self,
-        _state: &mut Self::State,
+        _diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &MetadataSection,
     ) {
@@ -316,7 +316,7 @@ impl Visitor for NonmatchingOutputRule<'_> {
 
     fn output_section(
         &mut self,
-        _state: &mut Self::State,
+        _diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &OutputSection,
     ) {
@@ -340,7 +340,7 @@ impl Visitor for NonmatchingOutputRule<'_> {
 
     fn bound_decl(
         &mut self,
-        _state: &mut Self::State,
+        _diagnostics: &mut Diagnostics,
         reason: VisitReason,
         decl: &wdl_ast::v1::BoundDecl,
     ) {
