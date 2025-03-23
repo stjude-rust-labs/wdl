@@ -876,7 +876,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
             /// The expression evaluation context.
             context: &'a C,
             /// The diagnostics from evaluating the type of an expression.
-            diagnostics: Vec<Diagnostic>,
+            diagnostics: Diagnostics,
         }
 
         impl<C: EvaluationContext> wdl_analysis::types::v1::EvaluationContext for TypeContext<'_, C> {

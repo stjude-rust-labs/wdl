@@ -550,11 +550,11 @@ impl Document {
     ///     Ast::Unsupported => panic!("should be a V1 AST"),
     /// }
     /// ```
-    pub fn parse(source: &str) -> (Self, Vec<Diagnostic>) {
+    pub fn parse(source: &str) -> (Self, Diagnostics) {
         let (tree, diagnostics) = SyntaxTree::parse(source);
         (
             Document::cast(tree.into_syntax()).expect("document should cast"),
-            diagnostics,
+            visitor::Diagnostics(diagnostics),
         )
     }
 }

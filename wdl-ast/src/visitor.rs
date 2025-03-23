@@ -66,9 +66,8 @@ use crate::v1::WorkflowHintsSection;
 ///
 /// Validation visitors receive a diagnostics collection during
 /// visitation of the AST.
-#[allow(missing_debug_implementations)]
-#[derive(Default)]
-pub struct Diagnostics(Vec<Diagnostic>);
+#[derive(Debug, Default)]
+pub struct Diagnostics(pub(crate) Vec<Diagnostic>);
 
 impl Diagnostics {
     /// Adds a diagnostic to the collection.
@@ -102,6 +101,16 @@ impl Diagnostics {
         self.add(diagnostic);
     }
 
+    /// Returns the number of diagnostics in the collection.
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    /// Extends the collection with another collection of diagnostics.
+    pub fn extend(&mut self, diagnostics: Diagnostics) {
+        self.0.extend(diagnostics.0);
+    }
+
     /// Returns whether the collection is empty.
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
@@ -110,6 +119,17 @@ impl Diagnostics {
     /// Sorts the diagnostics in the collection.
     pub fn sort(&mut self) {
         self.0.sort();
+    }
+
+    /// Returns the first diagnostic in the collection if it exists.
+    pub fn first(&self) -> Option<&Diagnostic> {
+        self.0.first()
+    }
+}
+
+impl FromIterator<Diagnostic> for Diagnostics {
+    fn from_iter<T: IntoIterator<Item = Diagnostic>>(iter: T) -> Self {
+        Self(iter.into_iter().collect())
     }
 }
 

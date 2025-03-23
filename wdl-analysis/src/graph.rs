@@ -27,7 +27,6 @@ use tracing::debug;
 use tracing::info;
 use url::Url;
 use wdl_ast::AstNode;
-use wdl_ast::Diagnostic;
 use wdl_ast::SyntaxNode;
 
 use crate::IncrementalChange;
@@ -42,15 +41,15 @@ pub type DfsSpace =
 #[derive(Debug, Clone)]
 pub enum Diagnostics {
     /// The diagnostics are from the parse.
-    Parse(Arc<[Diagnostic]>),
+    Parse(Arc<wdl_ast::Diagnostics>),
     /// The diagnostics are from validation.
     ///
     /// This implies there were no parse diagnostics.
-    Validation(Arc<[Diagnostic]>),
+    Validation(Arc<wdl_ast::Diagnostics>),
 }
 
-impl AsRef<Arc<[Diagnostic]>> for Diagnostics {
-    fn as_ref(&self) -> &Arc<[Diagnostic]> {
+impl AsRef<Arc<wdl_ast::Diagnostics>> for Diagnostics {
+    fn as_ref(&self) -> &Arc<wdl_ast::Diagnostics> {
         match self {
             Self::Parse(d) => d,
             Self::Validation(d) => d,
@@ -345,15 +344,14 @@ impl DocumentGraphNode {
         );
 
         let diagnostics = if diagnostics.is_empty() {
-            Diagnostics::Validation(
+            Diagnostics::Validation(Arc::new(
                 validator
                     .validate(&document)
                     .err()
                     .unwrap_or_default()
-                    .into(),
-            )
+            ))
         } else {
-            Diagnostics::Parse(diagnostics.into())
+            Diagnostics::Parse(Arc::new(diagnostics))
         };
 
         Ok(ParseState::Parsed {

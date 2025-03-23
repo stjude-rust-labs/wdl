@@ -1,7 +1,6 @@
 //! Representation of analyzed WDL documents.
 
 use std::borrow::Cow;
-use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::path::Path;
 use std::str::FromStr;
@@ -15,7 +14,7 @@ use uuid::Uuid;
 use wdl_ast::Ast;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
-use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxNode;
@@ -436,7 +435,7 @@ struct DocumentData {
     /// The structs in the document.
     structs: IndexMap<String, Struct>,
     /// The diagnostics for the document.
-    diagnostics: Vec<Diagnostic>,
+    diagnostics: Diagnostics,
 }
 
 impl DocumentData {
@@ -445,7 +444,7 @@ impl DocumentData {
         uri: Arc<Url>,
         root: Option<GreenNode>,
         version: Option<SupportedVersion>,
-        diagnostics: Vec<Diagnostic>,
+        diagnostics: Diagnostics,
     ) -> Self {
         Self {
             root,
@@ -491,9 +490,7 @@ impl Document {
                     )),
                 };
             }
-            ParseState::Parsed { diagnostics, .. } => {
-                Vec::from_iter(diagnostics.as_ref().iter().cloned())
-            }
+            ParseState::Parsed { diagnostics, .. } => diagnostics.as_ref().clone(),
         };
 
         let root = node.root().expect("node should have been parsed");
@@ -531,22 +528,17 @@ impl Document {
                 ..
             } = &mut data;
 
-            diagnostics.extend(
-                namespaces
-                    .iter()
-                    .filter(|(_, ns)| !ns.used && !ns.excepted)
-                    .map(|(name, ns)| unused_import(name, ns.span()).with_severity(severity)),
-            );
+            let new_diagnostics: Diagnostics = namespaces
+                .iter()
+                .filter(|(_, ns)| !ns.used && !ns.excepted)
+                .map(|(name, ns)| unused_import(name, ns.span()).with_severity(severity))
+                .collect();
+
+            diagnostics.extend(new_diagnostics);
         }
 
         // Sort the diagnostics by start
-        data.diagnostics
-            .sort_by(|a, b| match (a.labels().next(), b.labels().next()) {
-                (None, None) => Ordering::Equal,
-                (None, Some(_)) => Ordering::Less,
-                (Some(_), None) => Ordering::Greater,
-                (Some(a), Some(b)) => a.span().start().cmp(&b.span().start()),
-            });
+        data.diagnostics.sort();
 
         Self {
             data: Arc::new(data),
@@ -646,7 +638,7 @@ impl Document {
     }
 
     /// Gets the analysis diagnostics for the document.
-    pub fn diagnostics(&self) -> &[Diagnostic] {
+    pub fn diagnostics(&self) -> &Diagnostics {
         &self.data.diagnostics
     }
 

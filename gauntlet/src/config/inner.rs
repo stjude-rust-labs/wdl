@@ -78,7 +78,7 @@ pub struct Inner {
 
     /// The expected diagnostics across all repositories.
     #[serde(default)]
-    diagnostics: Vec<Diagnostic>,
+    diagnostics: Diagnostics,
 }
 
 impl Inner {
@@ -88,12 +88,12 @@ impl Inner {
     }
 
     /// Gets the list of expected diagnostics.
-    pub fn diagnostics(&self) -> &[Diagnostic] {
+    pub fn diagnostics(&self) -> &Diagnostics {
         &self.diagnostics
     }
 
     /// Sets the list of expected diagnostics.
-    pub fn set_diagnostics(&mut self, diagnostics: Vec<Diagnostic>) {
+    pub fn set_diagnostics(&mut self, diagnostics: Diagnostics) {
         self.diagnostics = diagnostics;
     }
 
