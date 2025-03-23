@@ -2,10 +2,10 @@
 
 use std::collections::HashMap;
 
-use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Ident;
 use wdl_ast::Span;
@@ -184,7 +184,7 @@ impl Visitor for MatchingParameterMetaRule {
                         })
                     }),
                     param_meta,
-                    state,
+                    diagnostics,
                     &self.exceptable_nodes(),
                 );
             }
@@ -219,7 +219,7 @@ impl Visitor for MatchingParameterMetaRule {
                         })
                     }),
                     param_meta,
-                    state,
+                    diagnostics,
                     &self.exceptable_nodes(),
                 );
             }
@@ -257,7 +257,7 @@ impl Visitor for MatchingParameterMetaRule {
                         (name, span)
                     }),
                     param_meta,
-                    state,
+                    diagnostics,
                     &self.exceptable_nodes(),
                 );
             }

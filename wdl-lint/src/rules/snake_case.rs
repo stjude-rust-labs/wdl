@@ -6,10 +6,10 @@ use std::fmt;
 use convert_case::Boundary;
 use convert_case::Case;
 use convert_case::Converter;
-use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -227,7 +227,7 @@ impl Visitor for SnakeCaseRule {
             Context::Task,
             name.text(),
             name.span(),
-            state,
+            diagnostics,
             SyntaxElement::from(task.inner().clone()),
             &self.exceptable_nodes(),
         );
@@ -248,7 +248,7 @@ impl Visitor for SnakeCaseRule {
             Context::Workflow,
             name.text(),
             name.span(),
-            state,
+            diagnostics,
             SyntaxElement::from(workflow.inner().clone()),
             &self.exceptable_nodes(),
         );
@@ -265,7 +265,7 @@ impl Visitor for SnakeCaseRule {
             context,
             name.text(),
             name.span(),
-            state,
+            diagnostics,
             SyntaxElement::from(decl.inner().clone()),
             &self.exceptable_nodes(),
         );
@@ -287,7 +287,7 @@ impl Visitor for SnakeCaseRule {
             context,
             name.text(),
             name.span(),
-            state,
+            diagnostics,
             SyntaxElement::from(decl.inner().clone()),
             &self.exceptable_nodes(),
         );

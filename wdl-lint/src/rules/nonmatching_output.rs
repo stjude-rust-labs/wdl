@@ -1,10 +1,10 @@
 //! A lint rule to ensure each output is documented in `meta`.
 
 use indexmap::IndexMap;
-use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -261,7 +261,7 @@ impl Visitor for NonmatchingOutputRule<'_> {
             }
             VisitReason::Exit => {
                 handle_meta_outputs_and_reset(
-                    state,
+                    diagnostics,
                     self,
                     SyntaxElement::from(workflow.inner().clone()),
                 );
@@ -282,7 +282,7 @@ impl Visitor for NonmatchingOutputRule<'_> {
             }
             VisitReason::Exit => {
                 handle_meta_outputs_and_reset(
-                    state,
+                    diagnostics,
                     self,
                     SyntaxElement::from(task.inner().clone()),
                 );

@@ -1,8 +1,8 @@
 //! A lint rule for ensuring that newlines are consistent.
 
-use wdl_analysis::Diagnostics;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;

@@ -149,11 +149,12 @@ impl Iterator for Diagnostics {
     }
 }
 
-impl Iterator for &Diagnostics {
-    type Item = &Diagnostic;
+impl<'a> IntoIterator for &'a Diagnostics {
+    type IntoIter = std::slice::Iter<'a, Diagnostic>;
+    type Item = &'a Diagnostic;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        self.0.last()
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.iter()
     }
 }
 

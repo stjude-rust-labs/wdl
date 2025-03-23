@@ -1,10 +1,10 @@
 //! A lint rule for ensuring no curly commands are used.
 
 use rowan::ast::support;
-use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;

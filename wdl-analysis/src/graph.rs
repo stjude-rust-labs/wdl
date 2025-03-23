@@ -57,6 +57,14 @@ impl AsRef<Arc<wdl_ast::Diagnostics>> for Diagnostics {
     }
 }
 
+impl Iterator for Diagnostics {
+    type Item = wdl_ast::Diagnostic;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        Arc::as_ref(self.as_ref()).into_iter().next().cloned()
+    }
+}
+
 /// Represents the parse state of a document graph node.
 #[derive(Debug, Clone)]
 pub enum ParseState {

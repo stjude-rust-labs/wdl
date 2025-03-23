@@ -1,8 +1,8 @@
 //! A lint rule that disallows redundant input names.
 
-use wdl_analysis::Diagnostics;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -123,7 +123,7 @@ impl Visitor for DisallowedInputNameRule {
     ) {
         if reason == VisitReason::Enter && self.input_section {
             check_decl_name(
-                state,
+                diagnostics,
                 &Decl::Unbound(decl.clone()),
                 &self.exceptable_nodes(),
             );

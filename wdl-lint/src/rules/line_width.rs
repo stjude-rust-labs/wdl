@@ -1,8 +1,8 @@
 //! Ensures that lines do not exceed a certain width.
 
-use wdl_analysis::Diagnostics;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -136,7 +136,7 @@ impl Visitor for LineWidthRule {
 
     fn whitespace(&mut self, diagnostics: &mut Diagnostics, whitespace: &Whitespace) {
         self.detect_line_too_long(
-            state,
+            diagnostics,
             whitespace.text(),
             whitespace.span().start(),
             whitespace
@@ -149,7 +149,7 @@ impl Visitor for LineWidthRule {
 
     fn command_text(&mut self, diagnostics: &mut Diagnostics, text: &v1::CommandText) {
         self.detect_line_too_long(
-            state,
+            diagnostics,
             text.text(),
             text.span().start(),
             SyntaxElement::from(text.inner().clone()),

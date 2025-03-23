@@ -1,8 +1,8 @@
 //! A lint rule for whitespace.
 
-use wdl_analysis::Diagnostics;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;

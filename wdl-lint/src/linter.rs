@@ -3,16 +3,12 @@
 use std::collections::HashSet;
 
 use indexmap::IndexMap;
-use wdl_analysis::Diagnostics;
-use wdl_analysis::document::Document as AnalysisDocument;
+// use wdl_analysis::document::Document as AnalysisDocument;
 use wdl_ast::AstNode;
 use wdl_ast::Comment;
-use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::SupportedVersion;
-use wdl_ast::SyntaxElement;
-use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNodeExt;
 use wdl_ast::VersionStatement;
 use wdl_ast::VisitReason;

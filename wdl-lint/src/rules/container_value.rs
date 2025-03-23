@@ -4,9 +4,9 @@
 //! This check only occurs if the `container` key exists in the
 //! `runtime`/`requirements` sections.
 
-use wdl_analysis::Diagnostics;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -159,7 +159,7 @@ impl Visitor for ContainerValue {
         if let Some(container) = section.container() {
             if let Ok(value) = container.value() {
                 check_container_value(
-                    state,
+                    diagnostics,
                     value,
                     SyntaxElement::from(section.inner().clone()),
                     &self.exceptable_nodes(),
@@ -181,7 +181,7 @@ impl Visitor for ContainerValue {
         if let Some(container) = section.container() {
             if let Ok(value) = container.value() {
                 check_container_value(
-                    state,
+                    diagnostics,
                     value,
                     SyntaxElement::from(section.inner().clone()),
                     &self.exceptable_nodes(),

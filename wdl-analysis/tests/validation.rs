@@ -28,7 +28,7 @@ use colored::Colorize;
 use pretty_assertions::StrComparison;
 use rayon::prelude::*;
 use wdl_analysis::Validator;
-use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 
 /// Finds tests for grammar validation.
