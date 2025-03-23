@@ -63,7 +63,7 @@ impl Visitor for MissingRuntimeRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         version: SupportedVersion,
@@ -78,7 +78,7 @@ impl Visitor for MissingRuntimeRule {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
@@ -91,7 +91,7 @@ impl Visitor for MissingRuntimeRule {
         if let SupportedVersion::V1(minor_version) = self.0.expect("version should exist here") {
             if minor_version <= V1::One && task.runtime().is_none() {
                 let name = task.name();
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     missing_runtime_section(name.text(), name.span()),
                     SyntaxElement::from(task.inner().clone()),
                     &self.exceptable_nodes(),

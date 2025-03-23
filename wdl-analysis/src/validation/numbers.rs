@@ -3,6 +3,7 @@
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -11,8 +12,6 @@ use wdl_ast::Visitor;
 use wdl_ast::v1::Expr;
 use wdl_ast::v1::LiteralExpr;
 use wdl_ast::v1::Minus;
-
-use crate::Diagnostics;
 
 /// Creates an "integer not in range" diagnostic
 fn integer_not_in_range(span: Span) -> Diagnostic {
@@ -44,11 +43,9 @@ pub struct NumberVisitor {
 }
 
 impl Visitor for NumberVisitor {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -61,7 +58,7 @@ impl Visitor for NumberVisitor {
         *self = Default::default();
     }
 
-    fn expr(&mut self, state: &mut Self::State, reason: VisitReason, expr: &Expr) {
+    fn expr(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
         if reason == VisitReason::Exit {
             self.negation_start = None;
             return;
@@ -99,7 +96,7 @@ impl Visitor for NumberVisitor {
                     None => span,
                 };
 
-                state.add(integer_not_in_range(span));
+                diagnostics.add(integer_not_in_range(span));
             }
             Expr::Literal(LiteralExpr::Float(f)) => {
                 if f.value().is_some() {
@@ -116,7 +113,7 @@ impl Visitor for NumberVisitor {
                     None => span,
                 };
 
-                state.add(float_not_in_range(span));
+                diagnostics.add(float_not_in_range(span));
             }
             Expr::Negation(negation) => {
                 // Check to see if the very next expression is a literal integer or float

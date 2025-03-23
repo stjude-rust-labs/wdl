@@ -1654,6 +1654,7 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use super::*;
+    use crate::Diagnostics;
     use crate::Document;
     use crate::SupportedVersion;
     use crate::VisitReason;
@@ -1875,11 +1876,9 @@ task test {
         }
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
@@ -1888,7 +1887,7 @@ task test {
 
             fn task_definition(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &TaskDefinition,
             ) {
@@ -1899,7 +1898,7 @@ task test {
 
             fn input_section(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &InputSection,
             ) {
@@ -1910,7 +1909,7 @@ task test {
 
             fn output_section(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &OutputSection,
             ) {
@@ -1921,7 +1920,7 @@ task test {
 
             fn command_section(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &CommandSection,
             ) {
@@ -1932,7 +1931,7 @@ task test {
 
             fn requirements_section(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &RequirementsSection,
             ) {
@@ -1943,7 +1942,7 @@ task test {
 
             fn task_hints_section(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &TaskHintsSection,
             ) {
@@ -1954,7 +1953,7 @@ task test {
 
             fn runtime_section(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &RuntimeSection,
             ) {
@@ -1965,7 +1964,7 @@ task test {
 
             fn metadata_section(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &MetadataSection,
             ) {
@@ -1976,7 +1975,7 @@ task test {
 
             fn parameter_metadata_section(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &ParameterMetadataSection,
             ) {
@@ -1985,13 +1984,13 @@ task test {
                 }
             }
 
-            fn bound_decl(&mut self, _: &mut Self::State, reason: VisitReason, _: &BoundDecl) {
+            fn bound_decl(&mut self, _: &mut Diagnostics, reason: VisitReason, _: &BoundDecl) {
                 if reason == VisitReason::Enter {
                     self.bound_decls += 1;
                 }
             }
 
-            fn unbound_decl(&mut self, _: &mut Self::State, reason: VisitReason, _: &UnboundDecl) {
+            fn unbound_decl(&mut self, _: &mut Diagnostics, reason: VisitReason, _: &UnboundDecl) {
                 if reason == VisitReason::Enter {
                     self.unbound_decls += 1;
                 }
@@ -1999,7 +1998,8 @@ task test {
         }
 
         let mut visitor = MyVisitor::default();
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.tasks, 1);
         assert_eq!(visitor.inputs, 1);
         assert_eq!(visitor.outputs, 1);

@@ -90,7 +90,7 @@ impl Visitor for DisallowedInputNameRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -103,17 +103,26 @@ impl Visitor for DisallowedInputNameRule {
         *self = Default::default();
     }
 
-    fn input_section(&mut self, _: &mut Self::State, reason: VisitReason, _: &InputSection) {
+    fn input_section(&mut self, _: &mut Diagnostics, reason: VisitReason, _: &InputSection) {
         self.input_section = reason == VisitReason::Enter;
     }
 
-    fn bound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &BoundDecl) {
+    fn bound_decl(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, decl: &BoundDecl) {
         if reason == VisitReason::Enter && self.input_section {
-            check_decl_name(state, &Decl::Bound(decl.clone()), &self.exceptable_nodes());
+            check_decl_name(
+                diagnostics,
+                &Decl::Bound(decl.clone()),
+                &self.exceptable_nodes(),
+            );
         }
     }
 
-    fn unbound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &UnboundDecl) {
+    fn unbound_decl(
+        &mut self,
+        diagnostics: &mut Diagnostics,
+        reason: VisitReason,
+        decl: &UnboundDecl,
+    ) {
         if reason == VisitReason::Enter && self.input_section {
             check_decl_name(
                 state,
@@ -136,7 +145,7 @@ fn check_decl_name(
     let length = name.len();
     if length < 3 {
         // name is too short
-        state.exceptable_add(
+        diagnostics.exceptable_add(
             decl_identifier_too_short(decl.name().span()),
             SyntaxElement::from(decl.inner().clone()),
             exceptable_nodes,
@@ -151,7 +160,7 @@ fn check_decl_name(
                 if let Some(c) = name.peek() {
                     if c.is_ascii_uppercase() || c == &'_' {
                         // name starts with "in"
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             decl_identifier_starts_with_in(decl.name().span()),
                             SyntaxElement::from(decl.inner().clone()),
                             exceptable_nodes,
@@ -160,7 +169,7 @@ fn check_decl_name(
                         let s: String = name.take(3).collect();
                         if s == "put" {
                             // name starts with "input"
-                            state.exceptable_add(
+                            diagnostics.exceptable_add(
                                 decl_identifier_starts_with_input(decl.name().span()),
                                 SyntaxElement::from(decl.inner().clone()),
                                 exceptable_nodes,

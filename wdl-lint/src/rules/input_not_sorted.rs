@@ -227,7 +227,7 @@ impl Visitor for InputNotSortedRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -242,7 +242,7 @@ impl Visitor for InputNotSortedRule {
 
     fn input_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         input: &v1::InputSection,
     ) {
@@ -277,7 +277,7 @@ impl Visitor for InputNotSortedRule {
                 .expect("input section should have tokens")
                 .text_range()
                 .into();
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 input_not_sorted(span, input_string),
                 SyntaxElement::from(input.inner().clone()),
                 &self.exceptable_nodes(),

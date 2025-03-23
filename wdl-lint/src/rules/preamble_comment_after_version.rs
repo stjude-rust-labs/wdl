@@ -65,7 +65,7 @@ impl Visitor for PreambleCommentAfterVersionRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: wdl_ast::SupportedVersion,
@@ -89,7 +89,7 @@ impl Visitor for PreambleCommentAfterVersionRule {
         }
     }
 
-    fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
+    fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &Comment) {
         if !self.exited_preamble {
             return;
         }
@@ -135,7 +135,7 @@ impl Visitor for PreambleCommentAfterVersionRule {
             current = sibling.next_sibling_or_token();
         }
 
-        state.exceptable_add(
+        diagnostics.exceptable_add(
             preamble_comment_outside_preamble(span),
             SyntaxElement::from(comment.inner().clone()),
             &self.exceptable_nodes(),

@@ -70,7 +70,7 @@ impl Visitor for InconsistentNewlinesRule {
 
     fn document(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         _doc: &wdl_ast::Document,
         _: SupportedVersion,
@@ -86,7 +86,7 @@ impl Visitor for InconsistentNewlinesRule {
             // Since this rule can only be excepted in a document-wide fashion,
             // if the rule is running we can directly add the diagnostic
             // without checking for the exceptable nodes
-            state.add(inconsistent_newlines(self.first_inconsistent.unwrap()));
+            diagnostics.add(inconsistent_newlines(self.first_inconsistent.unwrap()));
         }
     }
 

@@ -93,11 +93,11 @@ impl Rule for MisplacedLintDirectiveRule {
 impl Visitor for MisplacedLintDirectiveRule {
     type State = LintState;
 
-    fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document, _: SupportedVersion) {
+    fn document(&mut self, _: &mut Diagnostics, _: VisitReason, _: &Document, _: SupportedVersion) {
         // This is intentionally empty, as this rule has no state.
     }
 
-    fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
+    fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &Comment) {
         if let Some(ids) = comment.text().strip_prefix(EXCEPT_COMMENT_PREFIX) {
             let start: usize = comment.span().start();
             let mut offset = EXCEPT_COMMENT_PREFIX.len();
@@ -125,7 +125,7 @@ impl Visitor for MisplacedLintDirectiveRule {
                 if let Some(elem) = &excepted_element {
                     if let Some(Some(exceptable_nodes)) = RULE_MAP.get(trimmed) {
                         if !exceptable_nodes.contains(&elem.kind()) {
-                            state.add(misplaced_lint_directive(
+                            diagnostics.add(misplaced_lint_directive(
                                 trimmed,
                                 Span::new(start + offset, trimmed.len()),
                                 elem,

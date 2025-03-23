@@ -128,7 +128,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -143,7 +143,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
@@ -159,7 +159,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn workflow_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         workflow: &WorkflowDefinition,
     ) {
@@ -175,7 +175,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn metadata_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &MetadataSection,
     ) {
@@ -195,7 +195,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn parameter_metadata_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &ParameterMetadataSection,
     ) {
@@ -215,7 +215,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn input_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &InputSection,
     ) {
@@ -234,7 +234,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn command_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &CommandSection,
     ) {
@@ -250,7 +250,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn output_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &OutputSection,
     ) {
@@ -268,7 +268,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn runtime_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &RuntimeSection,
     ) {
@@ -289,7 +289,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
     // call statement internal spacing is handled by the CallInputSpacing rule
     fn call_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &CallStatement,
     ) {
@@ -311,7 +311,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn scatter_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &ScatterStatement,
     ) {
@@ -331,7 +331,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn struct_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         def: &StructDefinition,
     ) {
@@ -347,7 +347,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn requirements_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &RequirementsSection,
     ) {
@@ -364,7 +364,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn task_hints_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &TaskHintsSection,
     ) {
@@ -381,7 +381,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn workflow_hints_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &WorkflowHintsSection,
     ) {
@@ -396,7 +396,12 @@ impl Visitor for BlankLinesBetweenElementsRule {
         // flag_all_blank_lines_within() covers check_last_token()
     }
 
-    fn unbound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &UnboundDecl) {
+    fn unbound_decl(
+        &mut self,
+        diagnostics: &mut Diagnostics,
+        reason: VisitReason,
+        decl: &UnboundDecl,
+    ) {
         if reason == VisitReason::Exit {
             return;
         }
@@ -412,7 +417,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
                 // one `\n` is allowed.
                 if self.state == State::InputSection || self.state == State::OutputSection {
                     if count > 1 {
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             excess_blank_line(p.text_range().into()),
                             SyntaxElement::from(decl.inner().clone()),
                             &self.exceptable_nodes(),
@@ -431,7 +436,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
         }
     }
 
-    fn bound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &BoundDecl) {
+    fn bound_decl(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, decl: &BoundDecl) {
         if reason == VisitReason::Exit {
             return;
         }
@@ -448,7 +453,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
                 // one `\n` is allowed.
                 if self.state == State::InputSection || self.state == State::OutputSection {
                     if count > 1 {
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             excess_blank_line(p.text_range().into()),
                             SyntaxElement::from(decl.inner().clone()),
                             &self.exceptable_nodes(),
@@ -469,7 +474,7 @@ impl Visitor for BlankLinesBetweenElementsRule {
 
     fn conditional_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &ConditionalStatement,
     ) {
@@ -530,7 +535,7 @@ fn flag_all_blank_lines_within(
                 .filter(|c| *c == '\n')
                 .count();
             if count > 1 {
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     excess_blank_line(c.text_range().into()),
                     SyntaxElement::from(syntax.clone()),
                     exceptable_nodes,
@@ -589,14 +594,14 @@ fn check_prior_spacing(
                             .prev_sibling_or_token()
                             .is_some_and(|p| p.kind() != SyntaxKind::VersionStatementNode)
                     {
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             excess_blank_line(prior.text_range().into()),
                             SyntaxElement::from(syntax.clone()),
                             exceptable_nodes,
                         );
                     }
                 } else if count < 2 && element_spacing_required {
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         missing_blank_line(span),
                         SyntaxElement::from(syntax.clone()),
                         exceptable_nodes,
@@ -608,7 +613,7 @@ fn check_prior_spacing(
                 // If we require between element spacing and are not the first element,
                 // we're missing a blank line.
                 if element_spacing_required && !first {
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         missing_blank_line(span),
                         SyntaxElement::from(syntax.clone()),
                         exceptable_nodes,
@@ -633,7 +638,7 @@ fn check_last_token(
         if prev.kind() == SyntaxKind::Whitespace {
             let count = prev.text().chars().filter(|c| *c == '\n').count();
             if count > 1 {
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     excess_blank_line(prev.text_range().into()),
                     SyntaxElement::from(syntax.clone()),
                     exceptable_nodes,

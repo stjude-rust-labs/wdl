@@ -75,7 +75,7 @@ fn check_name(
         .to_case(Case::Pascal);
     let properly_cased_name = converter.convert(name);
     if name != properly_cased_name {
-        state.exceptable_add(
+        diagnostics.exceptable_add(
             use_pascal_case(name, &properly_cased_name, span),
             element,
             exceptable_nodes,
@@ -88,7 +88,7 @@ impl Visitor for PascalCaseRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -103,7 +103,7 @@ impl Visitor for PascalCaseRule {
 
     fn struct_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         def: &StructDefinition,
     ) {

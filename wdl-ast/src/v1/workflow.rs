@@ -1217,6 +1217,7 @@ impl<N: TreeNode> AstNode<N> for WorkflowHintsArray<N> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::Diagnostics;
     use crate::Document;
     use crate::SupportedVersion;
     use crate::VisitReason;
@@ -1560,11 +1561,9 @@ workflow test {
         }
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
@@ -1573,7 +1572,7 @@ workflow test {
 
             fn workflow_definition(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &WorkflowDefinition,
             ) {
@@ -1584,7 +1583,7 @@ workflow test {
 
             fn input_section(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &InputSection,
             ) {
@@ -1595,7 +1594,7 @@ workflow test {
 
             fn output_section(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &OutputSection,
             ) {
@@ -1606,7 +1605,7 @@ workflow test {
 
             fn conditional_statement(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &ConditionalStatement,
             ) {
@@ -1617,7 +1616,7 @@ workflow test {
 
             fn scatter_statement(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &ScatterStatement,
             ) {
@@ -1628,7 +1627,7 @@ workflow test {
 
             fn call_statement(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &CallStatement,
             ) {
@@ -1639,7 +1638,7 @@ workflow test {
 
             fn metadata_section(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &MetadataSection,
             ) {
@@ -1650,7 +1649,7 @@ workflow test {
 
             fn parameter_metadata_section(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &ParameterMetadataSection,
             ) {
@@ -1659,13 +1658,13 @@ workflow test {
                 }
             }
 
-            fn bound_decl(&mut self, _: &mut Self::State, reason: VisitReason, _: &BoundDecl) {
+            fn bound_decl(&mut self, _: &mut Diagnostics, reason: VisitReason, _: &BoundDecl) {
                 if reason == VisitReason::Enter {
                     self.bound_decls += 1;
                 }
             }
 
-            fn unbound_decl(&mut self, _: &mut Self::State, reason: VisitReason, _: &UnboundDecl) {
+            fn unbound_decl(&mut self, _: &mut Diagnostics, reason: VisitReason, _: &UnboundDecl) {
                 if reason == VisitReason::Enter {
                     self.unbound_decls += 1;
                 }
@@ -1673,7 +1672,8 @@ workflow test {
         }
 
         let mut visitor = MyVisitor::default();
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.workflows, 1);
         assert_eq!(visitor.inputs, 1);
         assert_eq!(visitor.outputs, 1);

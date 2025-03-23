@@ -67,7 +67,7 @@ impl Visitor for NoCurlyCommandsRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -82,7 +82,7 @@ impl Visitor for NoCurlyCommandsRule {
 
     fn command_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &CommandSection,
     ) {
@@ -95,7 +95,7 @@ impl Visitor for NoCurlyCommandsRule {
             let command_keyword = support::token(section.inner(), SyntaxKind::CommandKeyword)
                 .expect("should have a command keyword token");
 
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 curly_commands(name.text(), command_keyword.text_range().into()),
                 SyntaxElement::from(section.inner().clone()),
                 &self.exceptable_nodes(),

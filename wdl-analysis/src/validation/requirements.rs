@@ -2,6 +2,7 @@
 
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Ident;
 use wdl_ast::SupportedVersion;
@@ -20,8 +21,6 @@ use wdl_ast::v1::TASK_REQUIREMENT_MEMORY;
 use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES;
 use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES_ALIAS;
 
-use crate::Diagnostics;
-
 /// Creates an "unsupported requirements key" diagnostic.
 fn unsupported_requirements_key(name: &Ident) -> Diagnostic {
     Diagnostic::error(format!(
@@ -37,11 +36,9 @@ fn unsupported_requirements_key(name: &Ident) -> Diagnostic {
 pub struct RequirementsVisitor;
 
 impl Visitor for RequirementsVisitor {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -56,7 +53,7 @@ impl Visitor for RequirementsVisitor {
 
     fn requirements_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &v1::RequirementsSection,
     ) {
@@ -82,7 +79,7 @@ impl Visitor for RequirementsVisitor {
         for item in section.items() {
             let name = item.name();
             if !SUPPORTED_KEYS.contains(&name.text()) {
-                state.add(unsupported_requirements_key(&name))
+                diagnostics.add(unsupported_requirements_key(&name))
             }
         }
     }

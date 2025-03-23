@@ -68,7 +68,7 @@ impl LineWidthRule {
             if !self.ignored_section && length > self.max_width {
                 let span = Span::new(previous_offset, length);
 
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     line_too_long(span, self.max_width),
                     element.clone(),
                     exceptable_nodes,
@@ -120,7 +120,7 @@ impl Visitor for LineWidthRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -136,7 +136,7 @@ impl Visitor for LineWidthRule {
         };
     }
 
-    fn whitespace(&mut self, state: &mut Self::State, whitespace: &Whitespace) {
+    fn whitespace(&mut self, diagnostics: &mut Diagnostics, whitespace: &Whitespace) {
         self.detect_line_too_long(
             state,
             whitespace.text(),
@@ -149,7 +149,7 @@ impl Visitor for LineWidthRule {
         );
     }
 
-    fn command_text(&mut self, state: &mut Self::State, text: &v1::CommandText) {
+    fn command_text(&mut self, diagnostics: &mut Diagnostics, text: &v1::CommandText) {
         self.detect_line_too_long(
             state,
             text.text(),
@@ -161,7 +161,7 @@ impl Visitor for LineWidthRule {
 
     fn metadata_section(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &v1::MetadataSection,
     ) {
@@ -170,7 +170,7 @@ impl Visitor for LineWidthRule {
 
     fn parameter_metadata_section(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &v1::ParameterMetadataSection,
     ) {

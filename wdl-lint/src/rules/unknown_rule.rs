@@ -81,11 +81,11 @@ impl Rule for UnknownRule {
 impl Visitor for UnknownRule {
     type State = LintState;
 
-    fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document, _: SupportedVersion) {
+    fn document(&mut self, _: &mut Diagnostics, _: VisitReason, _: &Document, _: SupportedVersion) {
         // This is intentionally empty, as this rule has no state.
     }
 
-    fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
+    fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &Comment) {
         if let Some(ids) = comment.text().strip_prefix(EXCEPT_COMMENT_PREFIX) {
             let start: usize = comment.span().start();
             let mut offset = EXCEPT_COMMENT_PREFIX.len();
@@ -103,7 +103,7 @@ impl Visitor for UnknownRule {
                     // Since this rule can only be excepted in a document-wide fashion,
                     // if the rule is running we can directly add the diagnostic
                     // without checking for the exceptable nodes
-                    state.add(unknown_rule(
+                    diagnostics.add(unknown_rule(
                         trimmed,
                         Span::new(start + offset, trimmed.len()),
                     ));

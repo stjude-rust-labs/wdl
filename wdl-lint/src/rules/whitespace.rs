@@ -81,13 +81,13 @@ impl Rule for WhitespaceRule {
 impl Visitor for WhitespaceRule {
     type State = LintState;
 
-    fn comment(&mut self, state: &mut Self::State, comment: &wdl_ast::Comment) {
+    fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &wdl_ast::Comment) {
         let comment_str = comment.text();
         let span = comment.span();
         let trimmed_end = comment_str.trim_end();
         if comment_str != trimmed_end {
             // Trailing whitespace
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 trailing_whitespace(Span::new(
                     span.start() + trimmed_end.len(),
                     comment_str.len() - trimmed_end.len(),
@@ -100,7 +100,7 @@ impl Visitor for WhitespaceRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -115,7 +115,7 @@ impl Visitor for WhitespaceRule {
 
     fn version_statement(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &VersionStatement,
     ) {
@@ -126,7 +126,7 @@ impl Visitor for WhitespaceRule {
         self.has_version = true;
     }
 
-    fn whitespace(&mut self, state: &mut Self::State, whitespace: &Whitespace) {
+    fn whitespace(&mut self, diagnostics: &mut Diagnostics, whitespace: &Whitespace) {
         // Only process whitespace after the version statement as
         // the preamble whitespace rule will otherwise validate it
         if !self.has_version {
@@ -155,13 +155,13 @@ impl Visitor for WhitespaceRule {
                 // If it's the first line, it's considered trailing
                 // The remaining lines will be treated as "blank".
                 if i == 0 {
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         trailing_whitespace(Span::new(span.start() + start, line.len())),
                         SyntaxElement::from(whitespace.inner().clone()),
                         &self.exceptable_nodes(),
                     );
                 } else {
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         only_whitespace(Span::new(span.start() + start, line.len())),
                         SyntaxElement::from(whitespace.inner().clone()),
                         &self.exceptable_nodes(),
@@ -179,7 +179,7 @@ impl Visitor for WhitespaceRule {
         // Only report on multiple blank lines if not at the end of the file
         // The "ending newline" rule will catch blank lines at the end of the file
         if !is_last && blank_start.is_some() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 more_than_one_blank_line(span),
                 SyntaxElement::from(whitespace.inner().clone()),
                 &self.exceptable_nodes(),

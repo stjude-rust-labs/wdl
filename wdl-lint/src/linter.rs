@@ -89,7 +89,7 @@ impl Linter {
             if self.document_exceptions.contains(id.to_owned()) {
                 continue;
             }
-            cb(state, rule.as_mut());
+            cb(diagnostics, rule.as_mut());
         }
     }
 }
@@ -108,7 +108,7 @@ impl Visitor for Linter {
 
     fn document(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         doc: &Document,
         version: SupportedVersion,
@@ -125,289 +125,302 @@ impl Visitor for Linter {
             );
         }
 
-        self.each_enabled_rule(state, |state, rule| {
-            rule.document(state, reason, doc, version);
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.document(diagnostics, reason, doc, version);
         });
     }
 
-    fn whitespace(&mut self, state: &mut Self::State, whitespace: &Whitespace) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.whitespace(state, whitespace);
+    fn whitespace(&mut self, diagnostics: &mut Diagnostics, whitespace: &Whitespace) {
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.whitespace(diagnostics, whitespace);
         });
     }
 
-    fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.comment(state, comment);
+    fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &Comment) {
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.comment(diagnostics, comment);
         });
     }
 
     fn version_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &VersionStatement,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.version_statement(state, reason, stmt);
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.version_statement(diagnostics, reason, stmt);
         });
     }
 
     fn import_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &v1::ImportStatement,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.import_statement(state, reason, stmt)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.import_statement(diagnostics, reason, stmt)
         });
     }
 
     fn struct_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         def: &v1::StructDefinition,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.struct_definition(state, reason, def)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.struct_definition(diagnostics, reason, def)
         });
     }
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &v1::TaskDefinition,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.task_definition(state, reason, task)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.task_definition(diagnostics, reason, task)
         });
     }
 
     fn workflow_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         workflow: &v1::WorkflowDefinition,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.workflow_definition(state, reason, workflow)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.workflow_definition(diagnostics, reason, workflow)
         });
     }
 
     fn input_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &v1::InputSection,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.input_section(state, reason, section)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.input_section(diagnostics, reason, section)
         });
     }
 
     fn output_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &v1::OutputSection,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.output_section(state, reason, section)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.output_section(diagnostics, reason, section)
         });
     }
 
     fn command_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &v1::CommandSection,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.command_section(state, reason, section)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.command_section(diagnostics, reason, section)
         });
     }
 
-    fn command_text(&mut self, state: &mut Self::State, text: &v1::CommandText) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.command_text(state, text);
+    fn command_text(&mut self, diagnostics: &mut Diagnostics, text: &v1::CommandText) {
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.command_text(diagnostics, text);
         });
     }
 
     fn requirements_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &v1::RequirementsSection,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.requirements_section(state, reason, section)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.requirements_section(diagnostics, reason, section)
         });
     }
 
     fn task_hints_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &v1::TaskHintsSection,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.task_hints_section(state, reason, section)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.task_hints_section(diagnostics, reason, section)
         });
     }
 
     fn workflow_hints_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &v1::WorkflowHintsSection,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.workflow_hints_section(state, reason, section)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.workflow_hints_section(diagnostics, reason, section)
         });
     }
 
     fn runtime_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &v1::RuntimeSection,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.runtime_section(state, reason, section)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.runtime_section(diagnostics, reason, section)
         });
     }
 
     fn runtime_item(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         item: &v1::RuntimeItem,
     ) {
-        self.each_enabled_rule(state, |state, rule| rule.runtime_item(state, reason, item));
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.runtime_item(diagnostics, reason, item)
+        });
     }
 
     fn metadata_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &v1::MetadataSection,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.metadata_section(state, reason, section)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.metadata_section(diagnostics, reason, section)
         });
     }
 
     fn parameter_metadata_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &v1::ParameterMetadataSection,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.parameter_metadata_section(state, reason, section)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.parameter_metadata_section(diagnostics, reason, section)
         });
     }
 
     fn metadata_object(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         object: &v1::MetadataObject,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.metadata_object(state, reason, object)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.metadata_object(diagnostics, reason, object)
         });
     }
 
     fn metadata_object_item(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         item: &v1::MetadataObjectItem,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.metadata_object_item(state, reason, item)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.metadata_object_item(diagnostics, reason, item)
         });
     }
 
     fn metadata_array(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         item: &v1::MetadataArray,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.metadata_array(state, reason, item)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.metadata_array(diagnostics, reason, item)
         });
     }
 
     fn unbound_decl(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         decl: &v1::UnboundDecl,
     ) {
-        self.each_enabled_rule(state, |state, rule| rule.unbound_decl(state, reason, decl));
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.unbound_decl(diagnostics, reason, decl)
+        });
     }
 
-    fn bound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &v1::BoundDecl) {
-        self.each_enabled_rule(state, |state, rule| rule.bound_decl(state, reason, decl));
+    fn bound_decl(
+        &mut self,
+        diagnostics: &mut Diagnostics,
+        reason: VisitReason,
+        decl: &v1::BoundDecl,
+    ) {
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.bound_decl(diagnostics, reason, decl)
+        });
     }
 
-    fn expr(&mut self, state: &mut Self::State, reason: VisitReason, expr: &v1::Expr) {
-        self.each_enabled_rule(state, |state, rule| rule.expr(state, reason, expr));
+    fn expr(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, expr: &v1::Expr) {
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.expr(diagnostics, reason, expr)
+        });
     }
 
-    fn string_text(&mut self, state: &mut Self::State, text: &v1::StringText) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.string_text(state, text);
+    fn string_text(&mut self, diagnostics: &mut Diagnostics, text: &v1::StringText) {
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.string_text(diagnostics, text);
         });
     }
 
     fn placeholder(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         placeholder: &v1::Placeholder,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.placeholder(state, reason, placeholder)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.placeholder(diagnostics, reason, placeholder)
         });
     }
 
     fn conditional_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &v1::ConditionalStatement,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.conditional_statement(state, reason, stmt)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.conditional_statement(diagnostics, reason, stmt)
         });
     }
 
     fn scatter_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &v1::ScatterStatement,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.scatter_statement(state, reason, stmt)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.scatter_statement(diagnostics, reason, stmt)
         });
     }
 
     fn call_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &v1::CallStatement,
     ) {
-        self.each_enabled_rule(state, |state, rule| {
-            rule.call_statement(state, reason, stmt)
+        self.each_enabled_rule(diagnostics, |state, rule| {
+            rule.call_statement(diagnostics, reason, stmt)
         });
     }
 }

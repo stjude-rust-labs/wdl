@@ -151,7 +151,7 @@ fn check_matching(
         if !rule.meta_outputs_keys.contains_key(name) {
             exact_match = false;
             if rule.current_meta_span.is_some() {
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     nonmatching_output(
                         *span,
                         name,
@@ -170,7 +170,7 @@ fn check_matching(
         if !rule.output_keys.contains_key(name) {
             exact_match = false;
             if rule.current_output_span.is_some() {
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     extra_output_in_meta(
                         *span,
                         name,
@@ -186,7 +186,7 @@ fn check_matching(
 
     // Check for out-of-order entries.
     if exact_match && !rule.meta_outputs_keys.keys().eq(rule.output_keys.keys()) {
-        state.exceptable_add(
+        diagnostics.exceptable_add(
             out_of_order(
                 rule.current_meta_outputs_span
                     .expect("should have a `meta.outputs` span"),
@@ -211,7 +211,7 @@ fn handle_meta_outputs_and_reset(
         && rule.current_meta_outputs_span.is_none()
         && !rule.output_keys.is_empty()
     {
-        state.exceptable_add(
+        diagnostics.exceptable_add(
             missing_outputs_in_meta(
                 rule.current_meta_span.expect("should have a `meta` span"),
                 rule.name.as_deref().expect("should have a name"),
@@ -221,7 +221,7 @@ fn handle_meta_outputs_and_reset(
             &rule.exceptable_nodes(),
         );
     } else {
-        check_matching(state, rule, element);
+        check_matching(diagnostics, rule, element);
     }
 
     rule.name = None;
@@ -237,7 +237,7 @@ impl Visitor for NonmatchingOutputRule<'_> {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -252,7 +252,7 @@ impl Visitor for NonmatchingOutputRule<'_> {
 
     fn workflow_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         workflow: &WorkflowDefinition,
     ) {
@@ -273,7 +273,7 @@ impl Visitor for NonmatchingOutputRule<'_> {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
@@ -354,7 +354,7 @@ impl Visitor for NonmatchingOutputRule<'_> {
 
     fn metadata_object_item(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         item: &wdl_ast::v1::MetadataObjectItem,
     ) {
@@ -375,7 +375,7 @@ impl Visitor for NonmatchingOutputRule<'_> {
                         match item.value() {
                             MetadataValue::Object(_) => {}
                             _ => {
-                                state.exceptable_add(
+                                diagnostics.exceptable_add(
                                     non_object_meta_outputs(
                                         item.span(),
                                         self.name.as_deref().expect("should have a name"),

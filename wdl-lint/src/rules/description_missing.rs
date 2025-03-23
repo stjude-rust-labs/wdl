@@ -81,7 +81,7 @@ impl Visitor for DescriptionMissingRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         version: SupportedVersion,
@@ -97,7 +97,7 @@ impl Visitor for DescriptionMissingRule {
 
     fn struct_definition(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &wdl_ast::v1::StructDefinition,
     ) {
@@ -106,7 +106,7 @@ impl Visitor for DescriptionMissingRule {
 
     fn metadata_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &MetadataSection,
     ) {
@@ -126,7 +126,7 @@ impl Visitor for DescriptionMissingRule {
             .find(|entry| entry.name().inner().to_string() == "description");
 
         if description.is_none() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 description_missing(
                     section
                         .inner()

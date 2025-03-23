@@ -66,7 +66,7 @@ impl Visitor for RedundantInputAssignment {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         version: SupportedVersion,
@@ -81,7 +81,7 @@ impl Visitor for RedundantInputAssignment {
 
     fn call_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &CallStatement,
     ) {
@@ -97,7 +97,7 @@ impl Visitor for RedundantInputAssignment {
                 if let Some(expr) = input.expr() {
                     if let Some(expr_name) = expr.as_name_ref() {
                         if expr_name.name().text() == input.name().text() {
-                            state.exceptable_add(
+                            diagnostics.exceptable_add(
                                 redundant_input_assignment(input.span(), input.name().text()),
                                 SyntaxElement::from(input.inner().clone()),
                                 &self.exceptable_nodes(),

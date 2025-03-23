@@ -71,7 +71,7 @@ impl Visitor for DoubleQuotesRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -84,14 +84,14 @@ impl Visitor for DoubleQuotesRule {
         *self = Default::default();
     }
 
-    fn expr(&mut self, state: &mut Self::State, reason: VisitReason, expr: &Expr) {
+    fn expr(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
         if reason == VisitReason::Exit {
             return;
         }
 
         if let Expr::Literal(LiteralExpr::String(s)) = expr {
             if s.kind() == LiteralStringKind::SingleQuoted {
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     use_double_quotes(s.span()),
                     SyntaxElement::from(expr.inner().clone()),
                     &self.exceptable_nodes(),

@@ -111,7 +111,7 @@ impl Visitor for CommandSectionMixedIndentationRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -126,7 +126,7 @@ impl Visitor for CommandSectionMixedIndentationRule {
 
     fn command_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &CommandSection,
     ) {
@@ -179,7 +179,7 @@ impl Visitor for CommandSectionMixedIndentationRule {
             let command_keyword = support::token(section.inner(), SyntaxKind::CommandKeyword)
                 .expect("should have a command keyword token");
 
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 mixed_indentation(
                     command_keyword.text_range().into(),
                     span,

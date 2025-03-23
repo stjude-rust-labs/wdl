@@ -86,7 +86,7 @@ fn check_name(
     let properly_cased_name = converter.convert(name);
     if name != properly_cased_name {
         let warning = snake_case(context, name, &properly_cased_name, span);
-        state.exceptable_add(warning, element, exceptable_nodes);
+        diagnostics.exceptable_add(warning, element, exceptable_nodes);
     }
 }
 
@@ -153,7 +153,7 @@ impl Visitor for SnakeCaseRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -216,7 +216,7 @@ impl Visitor for SnakeCaseRule {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
@@ -237,7 +237,7 @@ impl Visitor for SnakeCaseRule {
 
     fn workflow_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         workflow: &WorkflowDefinition,
     ) {
@@ -256,7 +256,7 @@ impl Visitor for SnakeCaseRule {
         );
     }
 
-    fn bound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &BoundDecl) {
+    fn bound_decl(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, decl: &BoundDecl) {
         if reason == VisitReason::Exit {
             return;
         }
@@ -273,7 +273,12 @@ impl Visitor for SnakeCaseRule {
         );
     }
 
-    fn unbound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &UnboundDecl) {
+    fn unbound_decl(
+        &mut self,
+        diagnostics: &mut Diagnostics,
+        reason: VisitReason,
+        decl: &UnboundDecl,
+    ) {
         if reason == VisitReason::Exit {
             return;
         }

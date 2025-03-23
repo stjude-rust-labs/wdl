@@ -592,8 +592,8 @@ impl<N: TreeNode> Document<N> {
 impl Document<SyntaxNode> {
     /// Visits the document with a pre-order traversal using the provided
     /// visitor to visit each element in the document.
-    pub fn visit<V: Visitor>(&self, state: &mut V::State, visitor: &mut V) {
-        visit(&self.0, state, visitor)
+    pub fn visit<V: Visitor>(&self, diagnostics: &mut Diagnostics, visitor: &mut V) {
+        visit(&self.0, diagnostics, visitor)
     }
 }
 

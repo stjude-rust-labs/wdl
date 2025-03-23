@@ -964,6 +964,7 @@ impl<N: TreeNode> Decl<N> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::Diagnostics;
     use crate::Document;
     use crate::SupportedVersion;
     use crate::VisitReason;
@@ -1107,24 +1108,22 @@ task test {
         }
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn bound_decl(&mut self, _: &mut Self::State, reason: VisitReason, _: &BoundDecl) {
+            fn bound_decl(&mut self, _: &mut Diagnostics, reason: VisitReason, _: &BoundDecl) {
                 if reason == VisitReason::Enter {
                     self.bound += 1;
                 }
             }
 
-            fn unbound_decl(&mut self, _: &mut Self::State, reason: VisitReason, _: &UnboundDecl) {
+            fn unbound_decl(&mut self, _: &mut Diagnostics, reason: VisitReason, _: &UnboundDecl) {
                 if reason == VisitReason::Enter {
                     self.unbound += 1;
                 }
@@ -1132,7 +1131,8 @@ task test {
         }
 
         let mut visitor = MyVisitor::default();
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.bound, 6);
         assert_eq!(visitor.unbound, 5);
     }

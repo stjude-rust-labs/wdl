@@ -159,6 +159,7 @@ mod test {
 
     use super::*;
     use crate::Ast;
+    use crate::Diagnostics;
     use crate::Document;
     use crate::SupportedVersion;
     use crate::VisitReason;
@@ -228,11 +229,9 @@ import "qux.wdl" as x alias A as B alias C as D
                 struct MyVisitor(usize);
 
                 impl Visitor for MyVisitor {
-                    type State = ();
-
                     fn document(
                         &mut self,
-                        _: &mut Self::State,
+                        _: &mut Diagnostics,
                         _: VisitReason,
                         _: &Document,
                         _: SupportedVersion,
@@ -241,7 +240,7 @@ import "qux.wdl" as x alias A as B alias C as D
 
                     fn import_statement(
                         &mut self,
-                        _: &mut Self::State,
+                        _: &mut Diagnostics,
                         reason: VisitReason,
                         stmt: &ImportStatement,
                     ) {
@@ -263,7 +262,8 @@ import "qux.wdl" as x alias A as B alias C as D
                 }
 
                 let mut visitor = MyVisitor(0);
-                document.visit(&mut (), &mut visitor);
+                let mut diagnostics = Diagnostics::default();
+                document.visit(&mut diagnostics, &mut visitor);
                 assert_eq!(visitor.0, 4);
             }
             _ => panic!("expected a V1 AST"),

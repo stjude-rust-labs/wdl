@@ -76,7 +76,7 @@ impl Visitor for MissingRequirementsRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         version: SupportedVersion,
@@ -91,7 +91,7 @@ impl Visitor for MissingRequirementsRule {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
@@ -106,7 +106,7 @@ impl Visitor for MissingRequirementsRule {
                 match task.runtime() {
                     Some(runtime) => {
                         let name = task.name();
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             deprecated_runtime_section(
                                 name.text(),
                                 runtime
@@ -123,7 +123,7 @@ impl Visitor for MissingRequirementsRule {
                     _ => {
                         if task.requirements().is_none() {
                             let name = task.name();
-                            state.exceptable_add(
+                            diagnostics.exceptable_add(
                                 missing_requirements_section(name.text(), name.span()),
                                 SyntaxElement::from(task.inner().clone()),
                                 &self.exceptable_nodes(),

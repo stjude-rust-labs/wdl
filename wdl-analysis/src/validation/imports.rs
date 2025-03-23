@@ -2,6 +2,7 @@
 
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
+use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -9,8 +10,6 @@ use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 use wdl_ast::v1;
 use wdl_ast::v1::StringPart;
-
-use crate::Diagnostics;
 
 /// Creates an "empty import" diagnostic
 fn empty_import(span: Span) -> Diagnostic {
@@ -36,11 +35,9 @@ fn invalid_import_namespace(span: Span) -> Diagnostic {
 pub struct ImportsVisitor;
 
 impl Visitor for ImportsVisitor {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -54,7 +51,7 @@ impl Visitor for ImportsVisitor {
 
     fn import_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &v1::ImportStatement,
     ) {
@@ -64,7 +61,7 @@ impl Visitor for ImportsVisitor {
 
         let uri = stmt.uri();
         if uri.is_empty() {
-            state.add(empty_import(uri.span()));
+            diagnostics.add(empty_import(uri.span()));
             return;
         }
 
@@ -77,12 +74,12 @@ impl Visitor for ImportsVisitor {
                 })
                 .expect("should have a placeholder span");
 
-            state.add(placeholder_in_import(span));
+            diagnostics.add(placeholder_in_import(span));
             return;
         }
 
         if stmt.namespace().is_none() {
-            state.add(invalid_import_namespace(uri.span()));
+            diagnostics.add(invalid_import_namespace(uri.span()));
         }
     }
 }

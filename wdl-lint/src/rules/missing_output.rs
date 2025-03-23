@@ -88,7 +88,7 @@ impl Visitor for MissingOutputRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -103,7 +103,7 @@ impl Visitor for MissingOutputRule {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
@@ -113,7 +113,7 @@ impl Visitor for MissingOutputRule {
 
         if task.output().is_none() {
             let name = task.name();
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 missing_output_section(name.text(), Context::Task, name.span()),
                 SyntaxElement::from(task.inner().clone()),
                 &self.exceptable_nodes(),
@@ -123,7 +123,7 @@ impl Visitor for MissingOutputRule {
 
     fn workflow_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         workflow: &WorkflowDefinition,
     ) {
@@ -133,7 +133,7 @@ impl Visitor for MissingOutputRule {
 
         if workflow.output().is_none() {
             let name = workflow.name();
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 missing_output_section(name.text(), Context::Workflow, name.span()),
                 SyntaxElement::from(workflow.inner().clone()),
                 &self.exceptable_nodes(),

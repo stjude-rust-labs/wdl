@@ -71,7 +71,7 @@ impl Visitor for ImportSortRule {
 
     fn document(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         doc: &Document,
         _: SupportedVersion,
@@ -118,7 +118,7 @@ impl Visitor for ImportSortRule {
                 .expect("node should have a first token")
                 .text_range()
                 .into();
-            state.add(import_not_sorted(
+            diagnostics.add(import_not_sorted(
                 span,
                 sorted_imports
                     .iter()
@@ -131,7 +131,7 @@ impl Visitor for ImportSortRule {
 
     fn import_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &ImportStatement,
     ) {
@@ -150,7 +150,7 @@ impl Visitor for ImportSortRule {
             // Since this rule can only be excepted in a document-wide fashion,
             // if the rule is running we can directly add the diagnostic
             // without checking for the exceptable nodes
-            state.add(improper_comment(comment.text_range().into()));
+            diagnostics.add(improper_comment(comment.text_range().into()));
         }
     }
 }

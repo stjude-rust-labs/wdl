@@ -205,6 +205,7 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use crate::AstToken;
+    use crate::Diagnostics;
     use crate::Document;
     use crate::SupportedVersion;
     use crate::VisitReason;
@@ -407,11 +408,9 @@ struct ComplexTypes {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
@@ -420,7 +419,7 @@ struct ComplexTypes {
 
             fn struct_definition(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 reason: VisitReason,
                 _: &StructDefinition,
             ) {
@@ -431,7 +430,8 @@ struct ComplexTypes {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 3);
     }
 }

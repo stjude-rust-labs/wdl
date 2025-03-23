@@ -27,9 +27,9 @@ use codespan_reporting::term::termcolor::Buffer;
 use colored::Colorize;
 use pretty_assertions::StrComparison;
 use rayon::prelude::*;
+use wdl_analysis::Validator;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
-use wdl_analysis::Validator;
 
 /// Finds tests for grammar validation.
 fn find_tests() -> Vec<PathBuf> {

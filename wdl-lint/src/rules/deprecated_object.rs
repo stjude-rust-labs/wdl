@@ -71,7 +71,7 @@ impl Visitor for DeprecatedObjectRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -86,7 +86,7 @@ impl Visitor for DeprecatedObjectRule {
 
     fn bound_decl(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: wdl_ast::VisitReason,
         decl: &wdl_ast::v1::BoundDecl,
     ) {
@@ -95,7 +95,7 @@ impl Visitor for DeprecatedObjectRule {
         }
 
         if let Type::Object(ty) = decl.ty() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 deprecated_object_use(ty.span()),
                 SyntaxElement::from(decl.inner().clone()),
                 &self.exceptable_nodes(),
@@ -105,7 +105,7 @@ impl Visitor for DeprecatedObjectRule {
 
     fn unbound_decl(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: wdl_ast::VisitReason,
         decl: &wdl_ast::v1::UnboundDecl,
     ) {
@@ -114,7 +114,7 @@ impl Visitor for DeprecatedObjectRule {
         }
 
         if let Type::Object(ty) = decl.ty() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 deprecated_object_use(ty.span()),
                 SyntaxElement::from(decl.inner().clone()),
                 &self.exceptable_nodes(),

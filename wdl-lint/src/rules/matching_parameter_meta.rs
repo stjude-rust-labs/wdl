@@ -124,7 +124,7 @@ fn check_parameter_meta(
 
     for (name, span) in &expected {
         if !actual.contains_key(name) {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 missing_param_meta(parent, name, *span),
                 SyntaxElement::from(param_meta.inner().clone()),
                 exceptable_nodes,
@@ -134,7 +134,7 @@ fn check_parameter_meta(
 
     for (name, span) in &actual {
         if !expected.contains_key(name) {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 extra_param_meta(parent, name, *span),
                 SyntaxElement::from(param_meta.inner().clone()),
                 exceptable_nodes,
@@ -148,7 +148,7 @@ impl Visitor for MatchingParameterMetaRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         version: SupportedVersion,
@@ -164,7 +164,7 @@ impl Visitor for MatchingParameterMetaRule {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
@@ -199,7 +199,7 @@ impl Visitor for MatchingParameterMetaRule {
 
     fn workflow_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         workflow: &WorkflowDefinition,
     ) {
@@ -234,7 +234,7 @@ impl Visitor for MatchingParameterMetaRule {
 
     fn struct_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         def: &wdl_ast::v1::StructDefinition,
     ) {

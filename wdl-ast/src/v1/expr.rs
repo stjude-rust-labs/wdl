@@ -3531,6 +3531,7 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use super::*;
+    use crate::Diagnostics;
     use crate::Document;
     use crate::SupportedVersion;
     use crate::VisitReason;
@@ -3574,18 +3575,16 @@ task test {
         struct MyVisitor(Vec<bool>);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
                     return;
                 }
@@ -3597,7 +3596,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(Vec::new());
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, [true, false]);
     }
 
@@ -3737,18 +3737,16 @@ task test {
         struct MyVisitor(Vec<Option<i64>>);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
                     return;
                 }
@@ -3760,7 +3758,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(Vec::new());
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(
             visitor.0,
             [
@@ -3913,18 +3912,16 @@ task test {
         struct MyVisitor(Vec<f64>);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
                     return;
                 }
@@ -3938,7 +3935,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(Vec::new());
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_relative_eq!(
             visitor.0.as_slice(),
             [0.0, 0.0, 1234.1234, 123e123, 0.1234, 10.0, 0.2].as_slice()
@@ -4050,18 +4048,16 @@ task test {
         struct MyVisitor(Vec<String>);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
                     return;
                 }
@@ -4076,7 +4072,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(Vec::new());
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, ["hello", "world", "ception"]);
     }
 
@@ -4290,18 +4287,16 @@ task test {
         struct MyVisitor(Vec<Vec<String>>);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
                     return;
                 }
@@ -4337,7 +4332,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(Vec::new());
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0.len(), 6);
         assert_eq!(visitor.0[0], ["1", "2", "3"]);
         assert_eq!(visitor.0[1], ["hello", "world", "!"]);
@@ -4490,18 +4486,16 @@ task test {
         struct MyVisitor(Vec<(String, String)>);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
                     return;
                 }
@@ -4531,7 +4525,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(Vec::new());
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(
             visitor
                 .0
@@ -4618,18 +4613,16 @@ task test {
         struct MyVisitor(Vec<HashMap<String, String>>);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
                     return;
                 }
@@ -4661,7 +4654,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(Vec::new());
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0.len(), 2);
         assert_eq!(visitor.0[0].len(), 0);
         assert_eq!(visitor.0[1].len(), 2);
@@ -4756,18 +4750,16 @@ task test {
         struct MyVisitor(Vec<HashMap<String, String>>);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
                     return;
                 }
@@ -4815,7 +4807,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(Vec::new());
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0.len(), 2);
         assert_eq!(visitor.0[0].len(), 0);
         assert_eq!(visitor.0[1].len(), 3);
@@ -4913,18 +4906,16 @@ task test {
         struct MyVisitor(Vec<HashMap<String, String>>);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
                     return;
                 }
@@ -4972,7 +4963,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(Vec::new());
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0.len(), 2);
         assert_eq!(visitor.0[0].len(), 1);
         assert_eq!(visitor.0[0]["foo"], "bar");
@@ -5021,18 +5013,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Literal(LiteralExpr::None(_)) = expr {
                         self.0 += 1;
@@ -5042,7 +5032,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 2);
     }
 
@@ -5179,18 +5170,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Literal(LiteralExpr::Hints(_)) = expr {
                         self.0 += 1;
@@ -5200,7 +5189,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 2);
     }
 
@@ -5301,18 +5291,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Literal(LiteralExpr::Input(_)) = expr {
                         self.0 += 1;
@@ -5322,7 +5310,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -5423,18 +5412,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Literal(LiteralExpr::Output(_)) = expr {
                         self.0 += 1;
@@ -5444,7 +5431,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -5494,18 +5482,16 @@ task test {
         struct MyVisitor(Vec<String>);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Exit {
                     return;
                 }
@@ -5517,7 +5503,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(Vec::new());
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, ["a"]);
     }
 
@@ -5582,18 +5569,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Parenthesized(_) = expr {
                         self.0 += 1;
@@ -5603,7 +5588,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 3);
     }
 
@@ -5659,18 +5645,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::If(_) = expr {
                         self.0 += 1;
@@ -5680,7 +5664,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 2);
     }
 
@@ -5743,18 +5728,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::LogicalNot(_) = expr {
                         self.0 += 1;
@@ -5764,7 +5747,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 4);
     }
 
@@ -5829,18 +5813,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Negation(_) = expr {
                         self.0 += 1;
@@ -5850,7 +5832,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 4);
     }
 
@@ -5900,18 +5883,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::LogicalOr(_) = expr {
                         self.0 += 1;
@@ -5921,7 +5902,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -5971,18 +5953,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::LogicalAnd(_) = expr {
                         self.0 += 1;
@@ -5992,7 +5972,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -6042,18 +6023,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Equality(_) = expr {
                         self.0 += 1;
@@ -6063,7 +6042,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -6113,18 +6093,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Inequality(_) = expr {
                         self.0 += 1;
@@ -6134,7 +6112,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -6200,18 +6179,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Less(_) = expr {
                         self.0 += 1;
@@ -6221,7 +6198,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -6287,18 +6265,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::LessEqual(_) = expr {
                         self.0 += 1;
@@ -6308,7 +6284,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -6374,18 +6351,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Greater(_) = expr {
                         self.0 += 1;
@@ -6395,7 +6370,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -6461,18 +6437,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::GreaterEqual(_) = expr {
                         self.0 += 1;
@@ -6482,7 +6456,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -6548,18 +6523,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Addition(_) = expr {
                         self.0 += 1;
@@ -6569,7 +6542,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -6635,18 +6609,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Subtraction(_) = expr {
                         self.0 += 1;
@@ -6656,7 +6628,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -6722,18 +6695,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Multiplication(_) = expr {
                         self.0 += 1;
@@ -6743,7 +6714,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -6809,18 +6781,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Division(_) = expr {
                         self.0 += 1;
@@ -6830,7 +6800,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -6896,18 +6867,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Modulo(_) = expr {
                         self.0 += 1;
@@ -6917,7 +6886,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -6983,18 +6953,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Exponentiation(_) = expr {
                         self.0 += 1;
@@ -7004,7 +6972,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -7093,18 +7062,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Call(_) = expr {
                         self.0 += 1;
@@ -7114,7 +7081,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -7191,18 +7159,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Index(_) = expr {
                         self.0 += 1;
@@ -7212,7 +7178,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 
@@ -7273,18 +7240,16 @@ task test {
         struct MyVisitor(usize);
 
         impl Visitor for MyVisitor {
-            type State = ();
-
             fn document(
                 &mut self,
-                _: &mut Self::State,
+                _: &mut Diagnostics,
                 _: VisitReason,
                 _: &Document,
                 _: SupportedVersion,
             ) {
             }
 
-            fn expr(&mut self, _: &mut Self::State, reason: VisitReason, expr: &Expr) {
+            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
                 if reason == VisitReason::Enter {
                     if let Expr::Access(_) = expr {
                         self.0 += 1;
@@ -7294,7 +7259,8 @@ task test {
         }
 
         let mut visitor = MyVisitor(0);
-        document.visit(&mut (), &mut visitor);
+        let mut diagnostics = Diagnostics::default();
+        document.visit(&mut diagnostics, &mut visitor);
         assert_eq!(visitor.0, 1);
     }
 

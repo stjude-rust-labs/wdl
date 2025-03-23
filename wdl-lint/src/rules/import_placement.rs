@@ -71,7 +71,7 @@ impl Visitor for ImportPlacementRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -86,7 +86,7 @@ impl Visitor for ImportPlacementRule {
 
     fn import_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &ImportStatement,
     ) {
@@ -95,7 +95,7 @@ impl Visitor for ImportPlacementRule {
         }
 
         if self.invalid {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 misplaced_import(stmt.span()),
                 SyntaxElement::from(stmt.inner().clone()),
                 &self.exceptable_nodes(),
@@ -105,7 +105,7 @@ impl Visitor for ImportPlacementRule {
 
     fn struct_definition(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &StructDefinition,
     ) {
@@ -117,7 +117,7 @@ impl Visitor for ImportPlacementRule {
         self.invalid = true;
     }
 
-    fn task_definition(&mut self, _: &mut Self::State, reason: VisitReason, _: &TaskDefinition) {
+    fn task_definition(&mut self, _: &mut Diagnostics, reason: VisitReason, _: &TaskDefinition) {
         if reason == VisitReason::Exit {
             return;
         }
@@ -128,7 +128,7 @@ impl Visitor for ImportPlacementRule {
 
     fn workflow_definition(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &WorkflowDefinition,
     ) {

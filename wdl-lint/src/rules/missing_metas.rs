@@ -130,7 +130,7 @@ impl Visitor for MissingMetasRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         version: SupportedVersion,
@@ -146,7 +146,7 @@ impl Visitor for MissingMetasRule {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
@@ -157,19 +157,19 @@ impl Visitor for MissingMetasRule {
         let inputs_present = task.input().is_some();
 
         if inputs_present && task.metadata().is_none() && task.parameter_metadata().is_none() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 missing_sections(task.name(), Context::Task),
                 SyntaxElement::from(task.inner().clone()),
                 &self.exceptable_nodes(),
             );
         } else if task.metadata().is_none() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 missing_section(task.name(), Section::Meta, Context::Task),
                 SyntaxElement::from(task.inner().clone()),
                 &self.exceptable_nodes(),
             );
         } else if inputs_present && task.parameter_metadata().is_none() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 missing_section(task.name(), Section::ParameterMeta, Context::Task),
                 SyntaxElement::from(task.inner().clone()),
                 &self.exceptable_nodes(),
@@ -179,7 +179,7 @@ impl Visitor for MissingMetasRule {
 
     fn workflow_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         workflow: &WorkflowDefinition,
     ) {
@@ -193,19 +193,19 @@ impl Visitor for MissingMetasRule {
             && workflow.metadata().is_none()
             && workflow.parameter_metadata().is_none()
         {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 missing_sections(workflow.name(), Context::Workflow),
                 SyntaxElement::from(workflow.inner().clone()),
                 &self.exceptable_nodes(),
             );
         } else if workflow.metadata().is_none() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 missing_section(workflow.name(), Section::Meta, Context::Workflow),
                 SyntaxElement::from(workflow.inner().clone()),
                 &self.exceptable_nodes(),
             );
         } else if inputs_present && workflow.parameter_metadata().is_none() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 missing_section(workflow.name(), Section::ParameterMeta, Context::Workflow),
                 SyntaxElement::from(workflow.inner().clone()),
                 &self.exceptable_nodes(),
@@ -215,7 +215,7 @@ impl Visitor for MissingMetasRule {
 
     fn struct_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         def: &wdl_ast::v1::StructDefinition,
     ) {
@@ -229,19 +229,19 @@ impl Visitor for MissingMetasRule {
         }
 
         if def.metadata().next().is_none() && def.parameter_metadata().next().is_none() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 missing_sections(def.name(), Context::Struct),
                 SyntaxElement::from(def.inner().clone()),
                 &self.exceptable_nodes(),
             );
         } else if def.metadata().next().is_none() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 missing_section(def.name(), Section::Meta, Context::Struct),
                 SyntaxElement::from(def.inner().clone()),
                 &self.exceptable_nodes(),
             );
         } else if def.parameter_metadata().next().is_none() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 missing_section(def.name(), Section::ParameterMeta, Context::Struct),
                 SyntaxElement::from(def.inner().clone()),
                 &self.exceptable_nodes(),

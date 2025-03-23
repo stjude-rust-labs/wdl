@@ -531,7 +531,7 @@ impl Visitor for ShellCheckRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -546,7 +546,7 @@ impl Visitor for ShellCheckRule {
 
     fn command_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &CommandSection,
     ) {
@@ -561,7 +561,7 @@ impl Visitor for ShellCheckRule {
                         "should have a
                 command keyword token",
                     );
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     Diagnostic::note("running `shellcheck` on command section")
                         .with_label(
                             "could not find `shellcheck` executable.",
@@ -624,7 +624,7 @@ impl Visitor for ShellCheckRule {
                     {
                         continue;
                     }
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         shellcheck_lint(&diagnostic, &sanitized_command, &line_map, &shift_tree),
                         SyntaxElement::from(section.inner().clone()),
                         &self.exceptable_nodes(),
@@ -634,7 +634,7 @@ impl Visitor for ShellCheckRule {
             Err(e) => {
                 let command_keyword = support::token(section.inner(), SyntaxKind::CommandKeyword)
                     .expect("should have a command keyword token");
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     Diagnostic::error("running `shellcheck` on command section")
                         .with_label(e.to_string(), command_keyword.text_range())
                         .with_rule(ID)
