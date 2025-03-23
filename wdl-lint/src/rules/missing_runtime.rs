@@ -59,8 +59,6 @@ impl Rule for MissingRuntimeRule {
 }
 
 impl Visitor for MissingRuntimeRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

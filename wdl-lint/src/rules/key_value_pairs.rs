@@ -103,8 +103,6 @@ impl Rule for KeyValuePairsRule {
 }
 
 impl Visitor for KeyValuePairsRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

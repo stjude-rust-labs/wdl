@@ -67,8 +67,6 @@ impl Rule for ImportPlacementRule {
 }
 
 impl Visitor for ImportPlacementRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

@@ -62,8 +62,6 @@ impl Rule for RedundantInputAssignment {
 }
 
 impl Visitor for RedundantInputAssignment {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

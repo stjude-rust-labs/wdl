@@ -79,8 +79,6 @@ impl Rule for WhitespaceRule {
 }
 
 impl Visitor for WhitespaceRule {
-    type State = LintState;
-
     fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &wdl_ast::Comment) {
         let comment_str = comment.text();
         let span = comment.span();

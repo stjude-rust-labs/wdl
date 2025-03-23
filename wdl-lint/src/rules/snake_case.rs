@@ -149,8 +149,6 @@ impl Rule for SnakeCaseRule {
 }
 
 impl Visitor for SnakeCaseRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

@@ -159,8 +159,6 @@ impl Rule for PreambleFormattingRule {
 }
 
 impl Visitor for PreambleFormattingRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

@@ -233,8 +233,6 @@ fn handle_meta_outputs_and_reset(
 }
 
 impl Visitor for NonmatchingOutputRule<'_> {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

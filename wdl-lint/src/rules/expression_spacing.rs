@@ -205,8 +205,6 @@ impl Rule for ExpressionSpacingRule {
 }
 
 impl Visitor for ExpressionSpacingRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

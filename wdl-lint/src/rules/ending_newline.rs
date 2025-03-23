@@ -69,8 +69,6 @@ impl Rule for EndingNewlineRule {
 }
 
 impl Visitor for EndingNewlineRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         diagnostics: &mut Diagnostics,

@@ -107,8 +107,6 @@ impl Rule for CommandSectionMixedIndentationRule {
 }
 
 impl Visitor for CommandSectionMixedIndentationRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

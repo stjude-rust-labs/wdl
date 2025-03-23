@@ -82,8 +82,6 @@ impl Rule for TrailingCommaRule {
 }
 
 impl Visitor for TrailingCommaRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

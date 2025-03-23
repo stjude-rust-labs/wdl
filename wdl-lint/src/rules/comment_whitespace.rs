@@ -98,8 +98,6 @@ impl Rule for CommentWhitespaceRule {
 }
 
 impl Visitor for CommentWhitespaceRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

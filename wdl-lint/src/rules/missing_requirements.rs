@@ -72,8 +72,6 @@ impl Rule for MissingRequirementsRule {
 }
 
 impl Visitor for MissingRequirementsRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

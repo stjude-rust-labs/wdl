@@ -63,8 +63,6 @@ impl Rule for NoCurlyCommandsRule {
 }
 
 impl Visitor for NoCurlyCommandsRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

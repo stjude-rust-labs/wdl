@@ -142,8 +142,6 @@ impl Rule for ContainerValue {
 }
 
 impl Visitor for ContainerValue {
-    type State = LintState;
-
     fn document(&mut self, _: &mut Diagnostics, _: VisitReason, _: &Document, _: SupportedVersion) {
         // This callback is intentionally empty.
     }

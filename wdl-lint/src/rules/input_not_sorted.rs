@@ -223,8 +223,6 @@ impl Rule for InputNotSortedRule {
 }
 
 impl Visitor for InputNotSortedRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

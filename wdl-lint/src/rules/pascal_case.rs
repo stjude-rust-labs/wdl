@@ -84,8 +84,6 @@ fn check_name(
 }
 
 impl Visitor for PascalCaseRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

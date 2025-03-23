@@ -91,8 +91,6 @@ impl Rule for MisplacedLintDirectiveRule {
 }
 
 impl Visitor for MisplacedLintDirectiveRule {
-    type State = LintState;
-
     fn document(&mut self, _: &mut Diagnostics, _: VisitReason, _: &Document, _: SupportedVersion) {
         // This is intentionally empty, as this rule has no state.
     }

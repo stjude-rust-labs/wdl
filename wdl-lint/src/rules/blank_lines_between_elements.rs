@@ -124,8 +124,6 @@ impl Rule for BlankLinesBetweenElementsRule {
 }
 
 impl Visitor for BlankLinesBetweenElementsRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

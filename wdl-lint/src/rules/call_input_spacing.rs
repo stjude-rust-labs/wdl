@@ -88,8 +88,6 @@ impl Rule for CallInputSpacingRule {
 }
 
 impl Visitor for CallInputSpacingRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

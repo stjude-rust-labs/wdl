@@ -67,8 +67,6 @@ impl Rule for DeprecatedObjectRule {
 }
 
 impl Visitor for DeprecatedObjectRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

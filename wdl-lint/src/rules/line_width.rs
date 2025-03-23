@@ -116,8 +116,6 @@ impl Rule for LineWidthRule {
 }
 
 impl Visitor for LineWidthRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

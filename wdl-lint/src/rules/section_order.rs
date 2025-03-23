@@ -111,8 +111,6 @@ enum State {
 }
 
 impl Visitor for SectionOrderingRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

@@ -102,8 +102,6 @@ impl Rule for DeprecatedPlaceholderOptionRule {
 }
 
 impl Visitor for DeprecatedPlaceholderOptionRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

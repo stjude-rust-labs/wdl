@@ -66,8 +66,6 @@ impl Rule for InconsistentNewlinesRule {
 }
 
 impl Visitor for InconsistentNewlinesRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         diagnostics: &mut Diagnostics,

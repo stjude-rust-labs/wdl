@@ -61,8 +61,6 @@ impl Rule for PreambleCommentAfterVersionRule {
 }
 
 impl Visitor for PreambleCommentAfterVersionRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

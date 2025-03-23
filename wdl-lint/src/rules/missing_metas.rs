@@ -126,8 +126,6 @@ impl Rule for MissingMetasRule {
 }
 
 impl Visitor for MissingMetasRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

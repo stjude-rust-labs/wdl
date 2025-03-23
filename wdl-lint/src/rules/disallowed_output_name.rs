@@ -85,8 +85,6 @@ impl Rule for DisallowedOutputNameRule {
 }
 
 impl Visitor for DisallowedOutputNameRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

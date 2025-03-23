@@ -84,8 +84,6 @@ impl Rule for MissingOutputRule {
 }
 
 impl Visitor for MissingOutputRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

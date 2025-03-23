@@ -355,8 +355,6 @@ fn recommended_keys<'a, 'k>(
 }
 
 impl Visitor for RuntimeSectionKeysRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

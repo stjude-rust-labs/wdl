@@ -77,8 +77,6 @@ impl Rule for DescriptionMissingRule {
 }
 
 impl Visitor for DescriptionMissingRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

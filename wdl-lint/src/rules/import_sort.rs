@@ -67,8 +67,6 @@ impl Rule for ImportSortRule {
 }
 
 impl Visitor for ImportSortRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         diagnostics: &mut Diagnostics,

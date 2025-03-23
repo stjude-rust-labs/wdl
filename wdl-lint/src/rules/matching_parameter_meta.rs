@@ -144,8 +144,6 @@ fn check_parameter_meta(
 }
 
 impl Visitor for MatchingParameterMetaRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

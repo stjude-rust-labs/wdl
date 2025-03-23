@@ -84,8 +84,6 @@ impl Rule for ImportWhitespaceRule {
 }
 
 impl Visitor for ImportWhitespaceRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,

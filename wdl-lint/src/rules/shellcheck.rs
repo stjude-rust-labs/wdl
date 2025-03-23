@@ -527,8 +527,6 @@ fn calculate_span(diagnostic: &ShellCheckDiagnostic, line_map: &HashMap<usize, S
 }
 
 impl Visitor for ShellCheckRule {
-    type State = LintState;
-
     fn document(
         &mut self,
         _: &mut Diagnostics,
