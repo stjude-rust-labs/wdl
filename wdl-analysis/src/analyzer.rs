@@ -773,9 +773,17 @@ workflow test {
         let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].document.diagnostics().len(), 1);
-        assert_eq!(results[0].document.diagnostics().first().unwrap().rule(), None);
         assert_eq!(
-            results[0].document.diagnostics().first().unwrap().severity(),
+            results[0].document.diagnostics().first().unwrap().rule(),
+            None
+        );
+        assert_eq!(
+            results[0]
+                .document
+                .diagnostics()
+                .first()
+                .unwrap()
+                .severity(),
             Severity::Error
         );
         assert_eq!(
@@ -789,9 +797,17 @@ workflow test {
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].document.id().as_ref(), id.as_ref());
         assert_eq!(results[0].document.diagnostics().len(), 1);
-        assert_eq!(results[0].document.diagnostics().first().unwrap().rule(), None);
         assert_eq!(
-            results[0].document.diagnostics().first().unwrap().severity(),
+            results[0].document.diagnostics().first().unwrap().rule(),
+            None
+        );
+        assert_eq!(
+            results[0]
+                .document
+                .diagnostics()
+                .first()
+                .unwrap()
+                .severity(),
             Severity::Error
         );
         assert_eq!(
@@ -828,9 +844,17 @@ workflow test {
         let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].document.diagnostics().len(), 1);
-        assert_eq!(results[0].document.diagnostics().first().unwrap().rule(), None);
         assert_eq!(
-            results[0].document.diagnostics().first().unwrap().severity(),
+            results[0].document.diagnostics().first().unwrap().rule(),
+            None
+        );
+        assert_eq!(
+            results[0]
+                .document
+                .diagnostics()
+                .first()
+                .unwrap()
+                .severity(),
             Severity::Error
         );
         assert_eq!(
@@ -900,9 +924,17 @@ workflow test {
         let results = analyzer.analyze(()).await.unwrap();
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].document.diagnostics().len(), 1);
-        assert_eq!(results[0].document.diagnostics().first().unwrap().rule(), None);
         assert_eq!(
-            results[0].document.diagnostics().first().unwrap().severity(),
+            results[0].document.diagnostics().first().unwrap().rule(),
+            None
+        );
+        assert_eq!(
+            results[0]
+                .document
+                .diagnostics()
+                .first()
+                .unwrap()
+                .severity(),
             Severity::Error
         );
         assert_eq!(

@@ -345,10 +345,7 @@ impl DocumentGraphNode {
 
         let diagnostics = if diagnostics.is_empty() {
             Diagnostics::Validation(Arc::new(
-                validator
-                    .validate(&document)
-                    .err()
-                    .unwrap_or_default()
+                validator.validate(&document).err().unwrap_or_default(),
             ))
         } else {
             Diagnostics::Parse(Arc::new(diagnostics))
