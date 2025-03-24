@@ -1766,12 +1766,7 @@ version 1.1
 import "other.wdl"
 
 task t {
-  command {
-    #[cfg(windows)]
-    cmd /c echo test
-    #[cfg(not(windows))]
-    echo "test"
-  }
+  command <<<>>>
 }
 
 workflow w {
@@ -1813,9 +1808,6 @@ workflow w {
         // Use a progress callback that simply increments the appropriate counter
         let mut config = Config::default();
         config.backend.default = BackendKind::Local;
-        if cfg!(windows) {
-            config.task.shell = Some("cmd.exe".to_string());
-        }
 
         let state = Arc::<State>::default();
         let state_cloned = state.clone();
