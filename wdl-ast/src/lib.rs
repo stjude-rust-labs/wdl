@@ -16,7 +16,6 @@
 //! ```rust
 //! # let source = "version 1.1\nworkflow test {}";
 //! use wdl_ast::Document;
-//! use wdl_ast::Validator;
 //!
 //! let (document, diagnostics) = Document::parse(source);
 //! if !diagnostics.is_empty() {
@@ -31,7 +30,6 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
-use std::collections::HashSet;
 use std::fmt;
 
 pub use rowan::Direction;
@@ -59,13 +57,8 @@ pub use wdl_grammar::version;
 pub mod v1;
 
 mod element;
-mod visitor;
 
 pub use element::*;
-pub use visitor::*;
-
-/// The prefix of `except` comments.
-pub const EXCEPT_COMMENT_PREFIX: &str = "#@ except:";
 
 /// A trait that abstracts the underlying representation of a syntax tree node.
 ///
@@ -104,9 +97,6 @@ pub trait TreeNode: Clone + fmt::Debug + PartialEq + Eq + std::hash::Hash {
 
     /// Gets the ancestors of the node.
     fn ancestors(&self) -> impl Iterator<Item = Self>;
-
-    /// Determines if a given rule id is excepted for the node.
-    fn is_rule_excepted(&self, id: &str) -> bool;
 }
 
 /// A trait that abstracts the underlying representation of a syntax token.
@@ -361,10 +351,6 @@ impl TreeNode for SyntaxNode {
     fn ancestors(&self) -> impl Iterator<Item = Self> {
         self.ancestors()
     }
-
-    fn is_rule_excepted(&self, id: &str) -> bool {
-        <Self as SyntaxNodeExt>::is_rule_excepted(self, id)
-    }
 }
 
 impl TreeToken for SyntaxToken {
@@ -386,74 +372,6 @@ impl TreeToken for SyntaxToken {
         let range = self.text_range();
         let start = usize::from(range.start());
         Span::new(start, usize::from(range.end()) - start)
-    }
-}
-
-/// Represents the reason an AST node has been visited.
-///
-/// Each node is visited exactly once, but the visitor will receive
-/// a call for entering the node and a call for exiting the node.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum VisitReason {
-    /// The visit has entered the node.
-    Enter,
-    /// The visit has exited the node.
-    Exit,
-}
-
-/// An extension trait for syntax nodes.
-pub trait SyntaxNodeExt {
-    /// Gets an iterator over the `@except` comments for a syntax node.
-    fn except_comments(&self) -> impl Iterator<Item = SyntaxToken> + '_;
-
-    /// Gets the AST node's rule exceptions set.
-    ///
-    /// The set is the comma-delimited list of rule identifiers that follows a
-    /// `#@ except:` comment.
-    fn rule_exceptions(&self) -> HashSet<String>;
-
-    /// Determines if a given rule id is excepted for the syntax node.
-    fn is_rule_excepted(&self, id: &str) -> bool;
-}
-
-impl SyntaxNodeExt for SyntaxNode {
-    fn except_comments(&self) -> impl Iterator<Item = SyntaxToken> + '_ {
-        self.siblings_with_tokens(Direction::Prev)
-            .skip(1)
-            .map_while(|s| {
-                if s.kind() == SyntaxKind::Whitespace || s.kind() == SyntaxKind::Comment {
-                    s.into_token()
-                } else {
-                    None
-                }
-            })
-            .filter(|t| t.kind() == SyntaxKind::Comment)
-    }
-
-    fn rule_exceptions(&self) -> HashSet<String> {
-        let mut set = HashSet::default();
-        for comment in self.except_comments() {
-            if let Some(ids) = comment.text().strip_prefix(EXCEPT_COMMENT_PREFIX) {
-                for id in ids.split(',') {
-                    let id = id.trim();
-                    set.insert(id.to_string());
-                }
-            }
-        }
-
-        set
-    }
-
-    fn is_rule_excepted(&self, id: &str) -> bool {
-        for comment in self.except_comments() {
-            if let Some(ids) = comment.text().strip_prefix(EXCEPT_COMMENT_PREFIX) {
-                if ids.split(',').any(|i| i.trim() == id) {
-                    return true;
-                }
-            }
-        }
-
-        false
     }
 }
 
@@ -550,11 +468,11 @@ impl Document {
     ///     Ast::Unsupported => panic!("should be a V1 AST"),
     /// }
     /// ```
-    pub fn parse(source: &str) -> (Self, Diagnostics) {
+    pub fn parse(source: &str) -> (Self, Vec<Diagnostic>) {
         let (tree, diagnostics) = SyntaxTree::parse(source);
         (
             Document::cast(tree.into_syntax()).expect("document should cast"),
-            visitor::Diagnostics(diagnostics),
+            diagnostics,
         )
     }
 }
@@ -586,14 +504,6 @@ impl<N: TreeNode> Document<N> {
     /// type.
     pub fn morph<U: TreeNode + NewRoot<N>>(self) -> Document<U> {
         Document(U::new_root(self.0))
-    }
-}
-
-impl Document<SyntaxNode> {
-    /// Visits the document with a pre-order traversal using the provided
-    /// visitor to visit each element in the document.
-    pub fn visit<V: Visitor>(&self, diagnostics: &mut Diagnostics, visitor: &mut V) {
-        visit(&self.0, diagnostics, visitor)
     }
 }
 

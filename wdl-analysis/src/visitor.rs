@@ -24,45 +24,56 @@
 use std::sync::Arc;
 
 use rowan::WalkEvent;
-use wdl_grammar::SyntaxElement;
+use wdl_ast::SyntaxElement;
 
-use crate::AstToken;
-use crate::Comment;
-use crate::Diagnostic;
-use crate::Document;
-use crate::SupportedVersion;
-use crate::SyntaxKind;
-use crate::SyntaxNode;
+use wdl_ast::AstToken;
+use wdl_ast::Comment;
+use wdl_ast::Diagnostic;
+use wdl_ast::Document;
+use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxKind;
+use wdl_ast::SyntaxNode;
 use crate::SyntaxNodeExt;
-use crate::VersionStatement;
-use crate::VisitReason;
-use crate::Whitespace;
-use crate::v1::BoundDecl;
-use crate::v1::CallStatement;
-use crate::v1::CommandSection;
-use crate::v1::CommandText;
-use crate::v1::ConditionalStatement;
-use crate::v1::Expr;
-use crate::v1::ImportStatement;
-use crate::v1::InputSection;
-use crate::v1::MetadataArray;
-use crate::v1::MetadataObject;
-use crate::v1::MetadataObjectItem;
-use crate::v1::MetadataSection;
-use crate::v1::OutputSection;
-use crate::v1::ParameterMetadataSection;
-use crate::v1::Placeholder;
-use crate::v1::RequirementsSection;
-use crate::v1::RuntimeItem;
-use crate::v1::RuntimeSection;
-use crate::v1::ScatterStatement;
-use crate::v1::StringText;
-use crate::v1::StructDefinition;
-use crate::v1::TaskDefinition;
-use crate::v1::TaskHintsSection;
-use crate::v1::UnboundDecl;
-use crate::v1::WorkflowDefinition;
-use crate::v1::WorkflowHintsSection;
+use wdl_ast::VersionStatement;
+use wdl_ast::Whitespace;
+use wdl_ast::v1::BoundDecl;
+use wdl_ast::v1::CallStatement;
+use wdl_ast::v1::CommandSection;
+use wdl_ast::v1::CommandText;
+use wdl_ast::v1::ConditionalStatement;
+use wdl_ast::v1::Expr;
+use wdl_ast::v1::ImportStatement;
+use wdl_ast::v1::InputSection;
+use wdl_ast::v1::MetadataArray;
+use wdl_ast::v1::MetadataObject;
+use wdl_ast::v1::MetadataObjectItem;
+use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::OutputSection;
+use wdl_ast::v1::ParameterMetadataSection;
+use wdl_ast::v1::Placeholder;
+use wdl_ast::v1::RequirementsSection;
+use wdl_ast::v1::RuntimeItem;
+use wdl_ast::v1::RuntimeSection;
+use wdl_ast::v1::ScatterStatement;
+use wdl_ast::v1::StringText;
+use wdl_ast::v1::StructDefinition;
+use wdl_ast::v1::TaskDefinition;
+use wdl_ast::v1::TaskHintsSection;
+use wdl_ast::v1::UnboundDecl;
+use wdl_ast::v1::WorkflowDefinition;
+use wdl_ast::v1::WorkflowHintsSection;
+
+/// Represents the reason an AST node has been visited.
+///
+/// Each node is visited exactly once, but the visitor will receive
+/// a call for entering the node and a call for exiting the node.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum VisitReason {
+    /// The visit has entered the node.
+    Enter,
+    /// The visit has exited the node.
+    Exit,
+}
 
 /// Represents a collection of validation diagnostics.
 ///
@@ -650,5 +661,13 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, diagnostics: &mut Diagnostics
                 // Skip remaining tokens
             }
         }
+    }
+}
+
+impl Document<SyntaxNode> {
+    /// Visits the document with a pre-order traversal using the provided
+    /// visitor to visit each element in the document.
+    pub fn visit<V: Visitor>(&self, diagnostics: &mut Diagnostics, visitor: &mut V) {
+        visit(&self.0, diagnostics, visitor)
     }
 }

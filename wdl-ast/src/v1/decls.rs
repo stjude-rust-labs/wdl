@@ -964,11 +964,7 @@ impl<N: TreeNode> Decl<N> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::Diagnostics;
     use crate::Document;
-    use crate::SupportedVersion;
-    use crate::VisitReason;
-    use crate::Visitor;
 
     #[test]
     fn decls() {
@@ -1099,41 +1095,5 @@ task test {
                 .text(),
             "foo"
         );
-
-        // Use a visitor to count the number of declarations
-        #[derive(Default)]
-        struct MyVisitor {
-            bound: usize,
-            unbound: usize,
-        }
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn bound_decl(&mut self, _: &mut Diagnostics, reason: VisitReason, _: &BoundDecl) {
-                if reason == VisitReason::Enter {
-                    self.bound += 1;
-                }
-            }
-
-            fn unbound_decl(&mut self, _: &mut Diagnostics, reason: VisitReason, _: &UnboundDecl) {
-                if reason == VisitReason::Enter {
-                    self.unbound += 1;
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor::default();
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.bound, 6);
-        assert_eq!(visitor.unbound, 5);
     }
 }

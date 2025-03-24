@@ -3524,18 +3524,11 @@ impl<N: TreeNode> AstNode<N> for AccessExpr<N> {
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashMap;
-    use std::fmt::Write;
-
     use approx::assert_relative_eq;
     use pretty_assertions::assert_eq;
 
     use super::*;
-    use crate::Diagnostics;
     use crate::Document;
-    use crate::SupportedVersion;
-    use crate::VisitReason;
-    use crate::Visitor;
 
     #[test]
     fn literal_booleans() {
@@ -3570,35 +3563,6 @@ task test {
         assert_eq!(decls[1].ty().to_string(), "Boolean");
         assert_eq!(decls[1].name().text(), "b");
         assert!(!decls[1].expr().unwrap_literal().unwrap_boolean().value());
-
-        // Visit the literal boolean values in the tree
-        struct MyVisitor(Vec<bool>);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Exit {
-                    return;
-                }
-
-                if let Expr::Literal(LiteralExpr::Boolean(b)) = expr {
-                    self.0.push(b.value());
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(Vec::new());
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, [true, false]);
     }
 
     #[test]
@@ -3731,47 +3695,6 @@ task test {
                 .unwrap_integer()
                 .value()
                 .is_none()
-        );
-
-        // Use a visitor to visit the in-bound literal integers in the tree
-        struct MyVisitor(Vec<Option<i64>>);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Exit {
-                    return;
-                }
-
-                if let Expr::Literal(LiteralExpr::Integer(i)) = expr {
-                    self.0.push(i.value());
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(Vec::new());
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(
-            visitor.0,
-            [
-                Some(0),
-                Some(1234),
-                Some(668),
-                Some(4660),
-                Some(15),
-                Some(9223372036854775807),
-                None,
-                None,
-            ]
         );
     }
 
@@ -3907,40 +3830,6 @@ task test {
                 .value()
                 .is_none()
         );
-
-        // Use a visitor to visit all the literal floats in the tree
-        struct MyVisitor(Vec<f64>);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Exit {
-                    return;
-                }
-
-                if let Expr::Literal(LiteralExpr::Float(f)) = expr {
-                    if let Some(f) = f.value() {
-                        self.0.push(f);
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(Vec::new());
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_relative_eq!(
-            visitor.0.as_slice(),
-            [0.0, 0.0, 1234.1234, 123e123, 0.1234, 10.0, 0.2].as_slice()
-        );
     }
 
     #[test]
@@ -4043,38 +3932,6 @@ task test {
         assert!(!placeholder.has_tilde());
         assert_eq!(placeholder.expr().unwrap_name_ref().name().text(), "second");
         assert_eq!(parts[4].clone().unwrap_text().text(), "\n    ");
-
-        // Use a visitor to visit all the string literals without placeholders
-        struct MyVisitor(Vec<String>);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Exit {
-                    return;
-                }
-
-                // Collect only the non-interpolated strings in the source
-                if let Expr::Literal(LiteralExpr::String(s)) = expr {
-                    if let Some(s) = s.text() {
-                        self.0.push(s.text().to_string());
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(Vec::new());
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, ["hello", "world", "ception"]);
     }
 
     #[test]
@@ -4281,66 +4138,6 @@ task test {
                 .unwrap(),
             9
         );
-
-        // Use a visitor to visit all the literal arrays in the tree,
-        // flattening as needed
-        struct MyVisitor(Vec<Vec<String>>);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Exit {
-                    return;
-                }
-
-                if let Expr::Literal(LiteralExpr::Array(a)) = expr {
-                    let mut elements = Vec::new();
-                    for element in a.elements() {
-                        match element {
-                            Expr::Literal(LiteralExpr::Integer(i)) => {
-                                elements.push(i.value().unwrap().to_string())
-                            }
-                            Expr::Literal(LiteralExpr::String(s)) => {
-                                elements.push(s.text().unwrap().text().to_string())
-                            }
-                            Expr::Literal(LiteralExpr::Array(a)) => {
-                                for element in a.elements().map(|e| {
-                                    e.unwrap_literal()
-                                        .unwrap_integer()
-                                        .value()
-                                        .unwrap()
-                                        .to_string()
-                                }) {
-                                    elements.push(element);
-                                }
-                            }
-                            _ => panic!("unexpected element"),
-                        }
-                    }
-
-                    self.0.push(elements);
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(Vec::new());
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0.len(), 6);
-        assert_eq!(visitor.0[0], ["1", "2", "3"]);
-        assert_eq!(visitor.0[1], ["hello", "world", "!"]);
-        assert_eq!(visitor.0[2], ["1", "2", "3", "4", "5", "6", "7", "8", "9"]); // flattened
-        assert_eq!(visitor.0[3], ["1", "2", "3"]); // first inner
-        assert_eq!(visitor.0[4], ["4", "5", "6"]); // second inner
-        assert_eq!(visitor.0[5], ["7", "8", "9"]); // third inner
     }
 
     #[test]
@@ -4481,66 +4278,6 @@ task test {
                 .text(),
             "!"
         );
-
-        // Use a visitor to visit all the literal pairs in the tree
-        struct MyVisitor(Vec<(String, String)>);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Exit {
-                    return;
-                }
-
-                if let Expr::Literal(LiteralExpr::Pair(p)) = expr {
-                    let (left, right) = p.exprs();
-
-                    let left = match left {
-                        Expr::Literal(LiteralExpr::String(s)) => {
-                            s.text().unwrap().text().to_string()
-                        }
-                        Expr::Literal(LiteralExpr::Integer(i)) => i.value().unwrap().to_string(),
-                        _ => panic!("expected a string or integer"),
-                    };
-
-                    let right = match right {
-                        Expr::Literal(LiteralExpr::String(s)) => {
-                            s.text().unwrap().text().to_string()
-                        }
-                        Expr::Literal(LiteralExpr::Integer(i)) => i.value().unwrap().to_string(),
-                        _ => panic!("expected a string or integer"),
-                    };
-
-                    self.0.push((left, right));
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(Vec::new());
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(
-            visitor
-                .0
-                .iter()
-                .map(|(f, s)| (f.as_str(), s.as_str()))
-                .collect::<Vec<_>>(),
-            [
-                ("1000", "4096"),
-                ("0x1000", "1000"),
-                ("1", "hello"),
-                ("2", "world"),
-                ("3", "!")
-            ]
-        );
     }
 
     #[test]
@@ -4608,59 +4345,6 @@ task test {
                 .text(),
             "baz"
         );
-
-        // Use a visitor to visit every literal map in the tree
-        struct MyVisitor(Vec<HashMap<String, String>>);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Exit {
-                    return;
-                }
-
-                if let Expr::Literal(LiteralExpr::Map(m)) = expr {
-                    let mut items = HashMap::new();
-                    for item in m.items() {
-                        let (key, value) = item.key_value();
-                        items.insert(
-                            key.unwrap_literal()
-                                .unwrap_string()
-                                .text()
-                                .unwrap()
-                                .text()
-                                .to_string(),
-                            value
-                                .unwrap_literal()
-                                .unwrap_string()
-                                .text()
-                                .unwrap()
-                                .text()
-                                .to_string(),
-                        );
-                    }
-
-                    self.0.push(items);
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(Vec::new());
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0.len(), 2);
-        assert_eq!(visitor.0[0].len(), 0);
-        assert_eq!(visitor.0[1].len(), 2);
-        assert_eq!(visitor.0[1]["foo"], "bar");
-        assert_eq!(visitor.0[1]["bar"], "baz");
     }
 
     #[test]
@@ -4745,76 +4429,6 @@ task test {
                 .unwrap(),
             3
         );
-
-        // Use a visitor to visit every literal object in the tree
-        struct MyVisitor(Vec<HashMap<String, String>>);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Exit {
-                    return;
-                }
-
-                if let Expr::Literal(LiteralExpr::Object(o)) = expr {
-                    let mut items = HashMap::new();
-                    for item in o.items() {
-                        let (name, value) = item.name_value();
-                        match value {
-                            Expr::Literal(LiteralExpr::Integer(i)) => {
-                                items.insert(
-                                    name.text().to_string(),
-                                    i.value().unwrap().to_string(),
-                                );
-                            }
-                            Expr::Literal(LiteralExpr::String(s)) => {
-                                items.insert(
-                                    name.text().to_string(),
-                                    s.text().unwrap().text().to_string(),
-                                );
-                            }
-                            Expr::Literal(LiteralExpr::Array(a)) => {
-                                items.insert(
-                                    name.text().to_string(),
-                                    a.elements()
-                                        .map(|e| {
-                                            e.unwrap_literal().unwrap_integer().value().unwrap()
-                                        })
-                                        .fold(String::new(), |mut v, i| {
-                                            if !v.is_empty() {
-                                                v.push_str(", ");
-                                            }
-                                            write!(&mut v, "{i}").unwrap();
-                                            v
-                                        }),
-                                );
-                            }
-                            _ => panic!("unexpected element"),
-                        }
-                    }
-
-                    self.0.push(items);
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(Vec::new());
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0.len(), 2);
-        assert_eq!(visitor.0[0].len(), 0);
-        assert_eq!(visitor.0[1].len(), 3);
-        assert_eq!(visitor.0[1]["foo"], "bar");
-        assert_eq!(visitor.0[1]["bar"], "1");
-        assert_eq!(visitor.0[1]["baz"], "1, 2, 3");
     }
 
     #[test]
@@ -4901,76 +4515,6 @@ task test {
                 .unwrap(),
             3
         );
-
-        // Use a visitor to visit every literal struct in the tree
-        struct MyVisitor(Vec<HashMap<String, String>>);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Exit {
-                    return;
-                }
-
-                if let Expr::Literal(LiteralExpr::Struct(s)) = expr {
-                    let mut items = HashMap::new();
-                    for item in s.items() {
-                        let (name, value) = item.name_value();
-                        match value {
-                            Expr::Literal(LiteralExpr::Integer(i)) => {
-                                items.insert(
-                                    name.text().to_string(),
-                                    i.value().unwrap().to_string(),
-                                );
-                            }
-                            Expr::Literal(LiteralExpr::String(s)) => {
-                                items.insert(
-                                    name.text().to_string(),
-                                    s.text().unwrap().text().to_string(),
-                                );
-                            }
-                            Expr::Literal(LiteralExpr::Array(a)) => {
-                                items.insert(
-                                    name.text().to_string(),
-                                    a.elements()
-                                        .map(|e| {
-                                            e.unwrap_literal().unwrap_integer().value().unwrap()
-                                        })
-                                        .fold(String::new(), |mut v, i| {
-                                            if !v.is_empty() {
-                                                v.push_str(", ");
-                                            }
-                                            write!(&mut v, "{i}").unwrap();
-                                            v
-                                        }),
-                                );
-                            }
-                            _ => panic!("unexpected element"),
-                        }
-                    }
-
-                    self.0.push(items);
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(Vec::new());
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0.len(), 2);
-        assert_eq!(visitor.0[0].len(), 1);
-        assert_eq!(visitor.0[0]["foo"], "bar");
-        assert_eq!(visitor.0[1].len(), 2);
-        assert_eq!(visitor.0[1]["bar"], "1");
-        assert_eq!(visitor.0[1]["baz"], "1, 2, 3");
     }
 
     #[test]
@@ -5008,33 +4552,6 @@ task test {
         let (lhs, rhs) = decls[1].expr().unwrap_equality().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         rhs.unwrap_literal().unwrap_none();
-
-        // Use a visitor to count the number of literal `None` in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Literal(LiteralExpr::None(_)) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 2);
     }
 
     #[test]
@@ -5165,33 +4682,6 @@ task test {
             v.unwrap_literal().unwrap_string().text().unwrap().text(),
             "bar"
         );
-
-        // Use a visitor to count the number of literal `hints` in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Literal(LiteralExpr::Hints(_)) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 2);
     }
 
     #[test]
@@ -5286,33 +4776,6 @@ task test {
                 .text(),
             "baz"
         );
-
-        // Use a visitor to count the number of literal `hints` in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Literal(LiteralExpr::Input(_)) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -5407,33 +4870,6 @@ task test {
                 .text(),
             "baz"
         );
-
-        // Use a visitor to count the number of literal `hints` in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Literal(LiteralExpr::Output(_)) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -5477,35 +4913,6 @@ task test {
         assert_eq!(decls[1].ty().to_string(), "Int");
         assert_eq!(decls[1].name().text(), "b");
         assert_eq!(decls[1].expr().unwrap_name_ref().name().text(), "a");
-
-        // Use a visitor to visit every name reference in the tree
-        struct MyVisitor(Vec<String>);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Exit {
-                    return;
-                }
-
-                if let Expr::NameRef(n) = expr {
-                    self.0.push(n.name().text().to_string());
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(Vec::new());
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, ["a"]);
     }
 
     #[test]
@@ -5564,33 +4971,6 @@ task test {
             .operands();
         assert_eq!(lhs.unwrap_literal().unwrap_integer().value().unwrap(), 5);
         assert_eq!(rhs.unwrap_literal().unwrap_integer().value().unwrap(), 5);
-
-        // Use a visitor to count the number of parenthesized expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Parenthesized(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 3);
     }
 
     #[test]
@@ -5640,33 +5020,6 @@ task test {
             f.unwrap_literal().unwrap_string().text().unwrap().text(),
             "no"
         );
-
-        // Use a visitor to count the number of `if` expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::If(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 2);
     }
 
     #[test]
@@ -5723,33 +5076,6 @@ task test {
                 .text(),
             "a"
         );
-
-        // Use a visitor to count the number of logical not expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::LogicalNot(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 4);
     }
 
     #[test]
@@ -5808,33 +5134,6 @@ task test {
                 .text(),
             "a"
         );
-
-        // Use a visitor to count the number of negation expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Negation(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 4);
     }
 
     #[test]
@@ -5878,33 +5177,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_logical_or().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to count the number of logical `or` expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::LogicalOr(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -5948,33 +5220,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_logical_and().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to count the number of logical `and` expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::LogicalAnd(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -6018,33 +5263,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_equality().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to count the number of equality expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Equality(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -6088,33 +5306,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_inequality().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to count the number of inequality expressions in the tree.
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Inequality(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -6174,33 +5365,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_less().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to visit the number of `<` expressions in the tree.
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Less(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -6260,33 +5424,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_less_equal().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to count the number of `<=` expressions in the tree.
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::LessEqual(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -6346,33 +5483,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_greater().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to count the number of `>` expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Greater(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -6432,33 +5542,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_greater_equal().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to count the number of `>=` expressions in the tree.
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::GreaterEqual(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -6518,33 +5601,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_addition().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to count the number of addition expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Addition(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -6604,33 +5660,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_subtraction().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to count the number of subtraction expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Subtraction(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -6690,33 +5719,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_multiplication().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to count the number of multiplication expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Multiplication(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -6776,33 +5778,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_division().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to count the number of division expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Division(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -6862,33 +5837,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_modulo().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to count the number of modulo expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Modulo(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -6948,33 +5896,6 @@ task test {
         let (lhs, rhs) = decls[2].expr().unwrap_exponentiation().operands();
         assert_eq!(lhs.unwrap_name_ref().name().text(), "a");
         assert_eq!(rhs.unwrap_name_ref().name().text(), "b");
-
-        // Use a visitor to count the number of exponentiation expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Exponentiation(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -7057,33 +5978,6 @@ task test {
             " "
         );
         assert_eq!(args[1].clone().unwrap_name_ref().name().text(), "a");
-
-        // Use a visitor to count the number of call expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Call(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -7154,33 +6048,6 @@ task test {
         let (expr, index) = decls[1].expr().unwrap_index().operands();
         assert_eq!(expr.unwrap_name_ref().name().text(), "a");
         assert_eq!(index.unwrap_literal().unwrap_integer().value().unwrap(), 1);
-
-        // Use a visitor to count the number of index expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Index(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]
@@ -7235,33 +6102,6 @@ task test {
         let (expr, index) = decls[1].expr().unwrap_access().operands();
         assert_eq!(expr.unwrap_name_ref().name().text(), "a");
         assert_eq!(index.text(), "foo");
-
-        // Use a visitor to count the number of access expressions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn expr(&mut self, _: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
-                if reason == VisitReason::Enter {
-                    if let Expr::Access(_) = expr {
-                        self.0 += 1;
-                    }
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 1);
     }
 
     #[test]

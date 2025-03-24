@@ -205,12 +205,7 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use crate::AstToken;
-    use crate::Diagnostics;
     use crate::Document;
-    use crate::SupportedVersion;
-    use crate::VisitReason;
-    use crate::Visitor;
-    use crate::v1::StructDefinition;
 
     #[test]
     fn struct_definitions() {
@@ -403,35 +398,5 @@ struct ComplexTypes {
         assert_eq!(members[10].name().text(), "k");
         assert_eq!(members[10].ty().to_string(), "Array[Directory]");
         assert!(!members[10].ty().is_optional());
-
-        // Use a visitor to count the number of struct definitions in the tree
-        struct MyVisitor(usize);
-
-        impl Visitor for MyVisitor {
-            fn document(
-                &mut self,
-                _: &mut Diagnostics,
-                _: VisitReason,
-                _: &Document,
-                _: SupportedVersion,
-            ) {
-            }
-
-            fn struct_definition(
-                &mut self,
-                _: &mut Diagnostics,
-                reason: VisitReason,
-                _: &StructDefinition,
-            ) {
-                if reason == VisitReason::Enter {
-                    self.0 += 1;
-                }
-            }
-        }
-
-        let mut visitor = MyVisitor(0);
-        let mut diagnostics = Diagnostics::default();
-        document.visit(&mut diagnostics, &mut visitor);
-        assert_eq!(visitor.0, 3);
     }
 }

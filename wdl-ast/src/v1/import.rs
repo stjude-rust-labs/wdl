@@ -159,11 +159,7 @@ mod test {
 
     use super::*;
     use crate::Ast;
-    use crate::Diagnostics;
     use crate::Document;
-    use crate::SupportedVersion;
-    use crate::VisitReason;
-    use crate::Visitor;
 
     #[test]
     fn import_statements() {
@@ -224,47 +220,6 @@ import "qux.wdl" as x alias A as B alias C as D
                 assert_eq!(imports[3].explicit_namespace().unwrap().text(), "x");
                 assert_eq!(imports[3].namespace().map(|(n, _)| n).as_deref(), Some("x"));
                 assert_aliases(imports[3].aliases());
-
-                // Use a visitor to visit the import statements in the tree
-                struct MyVisitor(usize);
-
-                impl Visitor for MyVisitor {
-                    fn document(
-                        &mut self,
-                        _: &mut Diagnostics,
-                        _: VisitReason,
-                        _: &Document,
-                        _: SupportedVersion,
-                    ) {
-                    }
-
-                    fn import_statement(
-                        &mut self,
-                        _: &mut Diagnostics,
-                        reason: VisitReason,
-                        stmt: &ImportStatement,
-                    ) {
-                        if reason == VisitReason::Exit {
-                            return;
-                        }
-
-                        let uri = stmt.uri().text().unwrap();
-                        match self.0 {
-                            0 => assert_eq!(uri.text(), "foo.wdl"),
-                            1 => assert_eq!(uri.text(), "bar.wdl"),
-                            2 => assert_eq!(uri.text(), "baz.wdl"),
-                            3 => assert_eq!(uri.text(), "qux.wdl"),
-                            _ => panic!("too many imports"),
-                        }
-
-                        self.0 += 1;
-                    }
-                }
-
-                let mut visitor = MyVisitor(0);
-                let mut diagnostics = Diagnostics::default();
-                document.visit(&mut diagnostics, &mut visitor);
-                assert_eq!(visitor.0, 4);
             }
             _ => panic!("expected a V1 AST"),
         }
