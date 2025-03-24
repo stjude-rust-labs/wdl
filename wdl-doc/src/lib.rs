@@ -13,7 +13,7 @@ pub mod meta;
 pub mod parameter;
 pub mod r#struct;
 
-use std::fs::canonicalize;
+use path_clean::clean;
 use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
@@ -247,7 +247,7 @@ pub async fn document_workspace(
     stylesheet: Option<impl AsRef<Path>>,
     overwrite: bool,
 ) -> Result<PathBuf> {
-    let workspace_abs_path = canonicalize(workspace)?;
+    let workspace_abs_path = clean(absolute(workspace.as_ref())?);
     let stylesheet = stylesheet.and_then(|p| absolute(p.as_ref()).ok());
 
     if !workspace_abs_path.is_dir() {
