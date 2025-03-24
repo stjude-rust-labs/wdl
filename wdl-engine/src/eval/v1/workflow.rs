@@ -1721,7 +1721,7 @@ impl WorkflowEvaluator {
                             &state.work_dir,
                             &state.temp_dir,
                             &state.downloader,
-                    ));
+                        ));
 
                         evaluator.evaluate_expr(&expr).await?
                     }
