@@ -727,8 +727,7 @@ impl TaskEvaluator {
                 state.set_root(root, attempt)?;
                 // Write input JSON for this retry attempt if enabled
                 if self.config.task.write_inputs {
-                    if let Err(err) =
-                        write_task_inputs_json(state.root.path(), task.name(), inputs)
+                    if let Err(err) = write_task_inputs_json(state.root.path(), task.name(), inputs)
                     {
                         tracing::info!(
                             "Failed to write task inputs JSON for retry attempt {}: {:#}",
