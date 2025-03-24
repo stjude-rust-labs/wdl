@@ -619,7 +619,7 @@ impl TaskEvaluator {
 
         // Write input JSON if enabled in configuration
         if self.config.task.write_inputs {
-            if let Err(err) = write_task_inputs_json(&state.root.path(), task.name(), inputs) {
+            if let Err(err) = write_task_inputs_json(state.root.path(), task.name(), inputs) {
                 // Log the error but continue - this is a non-critical debug feature
                 tracing::info!("Failed to write task inputs JSON: {:#}", err);
             }
@@ -730,7 +730,7 @@ impl TaskEvaluator {
                 // Write input JSON for this retry attempt if enabled
                 if self.config.task.write_inputs {
                     if let Err(err) =
-                        write_task_inputs_json(&state.root.path(), task.name(), inputs)
+                        write_task_inputs_json(state.root.path(), task.name(), inputs)
                     {
                         tracing::info!(
                             "Failed to write task inputs JSON for retry attempt {}: {:#}",
@@ -1443,6 +1443,6 @@ fn value_to_json(value: &Value) -> Result<serde_json::Value> {
         }
         Ok(JsonValue::Object(json_map))
     } else {
-        Err(anyhow!("unsupported value type").into())
+        Err(anyhow!("unsupported value type"))
     }
 }
