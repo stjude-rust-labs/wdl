@@ -1,6 +1,7 @@
 version 1.2
 
-#@ except: MissingRequirements, SnakeCase
+#@ except: MissingRequirements, SnakeCase, NonmatchingOutput, InputSorting, VersionFormatting, Whitespace, EndingNewline
+
 task test_declaration_names {
     meta {
         description: "This is a test of disallowed declaration names"
@@ -52,4 +53,4 @@ task test_declaration_names {
     }
 
     runtime {}
-} 
+}
