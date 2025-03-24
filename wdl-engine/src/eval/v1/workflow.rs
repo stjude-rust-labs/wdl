@@ -1706,16 +1706,22 @@ impl WorkflowEvaluator {
     ) -> EvaluationResult<String> {
         let scopes = state.scopes.read().await;
         for input in stmt.inputs() {
-            let name = input.name();
-            let value = match input.expr() {
-                Some(expr) => {
-                    let mut evaluator = ExprEvaluator::new(WorkflowEvaluationContext::new(
-                        &state.document,
-                        scopes.reference(scope),
-                        &state.work_dir,
-                        &state.temp_dir,
-                        &state.downloader,
-                    ));
+            let expr = input.expr();
+
+            // Skip type checking if expr is None and document version is at least 1.2
+            if !(matches!(expr, Some(Expr::Literal(LiteralExpr::None(_))))
+                && document_version >= SupportedVersion::V1(V1::Two))
+            {
+                let name = input.name();
+                let value = match expr {
+                    Some(expr) => {
+                        let mut evaluator = ExprEvaluator::new(WorkflowEvaluationContext::new(
+                            &state.document,
+                            scopes.reference(scope),
+                            &state.work_dir,
+                            &state.temp_dir,
+                            &state.downloader,
+                        ));
 
                     evaluator.evaluate_expr(&expr).await?
                 }
