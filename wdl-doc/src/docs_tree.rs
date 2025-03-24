@@ -90,8 +90,8 @@ impl Node {
     }
 
     /// Get the page associated with the node.
-    pub fn page(&self) -> Option<Rc<HTMLPage>> {
-        self.page.clone()
+    pub fn page(&self) -> Option<&Rc<HTMLPage>> {
+        self.page.as_ref()
     }
 
     /// Get the children of the node.
@@ -241,7 +241,7 @@ impl DocsTree {
     }
 
     /// Get the page associated with a path.
-    pub fn get_page<P: AsRef<Path>>(&self, abs_path: P) -> Option<Rc<HTMLPage>> {
+    pub fn get_page<P: AsRef<Path>>(&self, abs_path: P) -> Option<&Rc<HTMLPage>> {
         self.get_node(abs_path).and_then(|node| node.page())
     }
 
