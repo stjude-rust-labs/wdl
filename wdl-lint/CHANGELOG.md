@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Added lint rule for mixed indentation in command sections.
+- Fixed missing variant errors and added wildcard patterns.
+- Enabled `codespan` feature to run the `lints` test suite.
+
 ### Added
 
 * Added suggestion for similar rule names when encountering unknown lint rules ([#334](https://github.com/stjude-rust-labs/wdl/pull/334)).

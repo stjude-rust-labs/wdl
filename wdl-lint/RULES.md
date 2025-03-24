@@ -50,3 +50,6 @@ be out of sync with released packages.
 | `UnknownRule`                    | Clarity                       | Ensures there are no unknown rules present in lint directives.                                    |
 | `VersionFormatting`              | Style                         | Ensures correct formatting of the version statement                                               |
 | `Whitespace`                     | Spacing, Style                | Ensures that a document does not contain undesired whitespace.                                    |
+
+## Command Mixed Indentation Rule
+- Detects and reports mixed indentation issues in command sections.
