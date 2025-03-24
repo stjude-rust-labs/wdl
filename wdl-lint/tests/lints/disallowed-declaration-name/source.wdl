@@ -1,6 +1,6 @@
 version 1.2
 
-#@ except: MissingRequirements, SnakeCase, NonmatchingOutput, InputSorting, VersionFormatting, Whitespace, EndingNewline
+#@ except: MissingRequirements, SnakeCase, InputSorting, NonmatchingOutput
 
 task test_declaration_names {
     meta {
