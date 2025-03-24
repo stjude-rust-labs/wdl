@@ -1,6 +1,6 @@
 version 1.2
 
-#@ except: MissingRequirements, SnakeCase, InputSorting, NonmatchingOutput
+#@ except: MissingRequirements, SnakeCase, NonmatchingOutput
 
 task test_declaration_names {
     meta {
@@ -22,6 +22,7 @@ task test_declaration_names {
     }
 
     input {
+        #@ except: InputSorting
         # Invalid declarations with type prefixes/suffixes
         File fileInput
         File gtfFile
