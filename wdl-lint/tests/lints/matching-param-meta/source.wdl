@@ -62,14 +62,14 @@ task new_test {
     meta {}
 
     parameter_meta {
-        first: "This should be second"
-        second: "This should be first"
+        second: "This should be second"
+        first: "This should be first"
     }
 
     input {
         # This should warn about incorrect ordering
-        String second
         String first
+        String second
     }
 
     command <<<>>>
