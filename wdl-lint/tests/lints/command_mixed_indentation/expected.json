@@ -1,0 +1,23 @@
+[{
+    "level": "warning",
+    "message": "mixed indentation within a command",
+    "rule": "CommandSectionMixedIndentation",
+    "labels": [{
+            "text": "indented with spaces until this tab",
+            "span": {
+                "start": 87,
+                "end": 91
+            }
+        },
+        {
+            "text": "this command section uses both tabs and spaces in leading whitespace",
+            "span": {
+                "start": 65,
+                "end": 115
+            }
+        }
+    ],
+    "fixes": [{
+        "message": "use either tabs or spaces exclusively for indentation"
+    }]
+}]
