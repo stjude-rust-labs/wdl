@@ -140,7 +140,10 @@ impl Visitor for KeyValuePairsRule {
             .into_token()
             .expect("should have a token")
             .to_string();
-        let parent_ws = tmp.split('\n').next_back().expect("should have indentation");
+        let parent_ws = tmp
+            .split('\n')
+            .next_back()
+            .expect("should have indentation");
 
         if !item.inner().to_string().contains('\n') {
             state.exceptable_add(
@@ -193,7 +196,10 @@ impl Visitor for KeyValuePairsRule {
                 {
                     // If there was no newline, that is already reported
                     let ws = prior_ws.to_string();
-                    let ws = ws.split('\n').next_back().expect("should have a last element");
+                    let ws = ws
+                        .split('\n')
+                        .next_back()
+                        .expect("should have a last element");
                     let expected_ws = parent_ws.to_owned() + INDENT;
 
                     if ws != expected_ws {
@@ -255,7 +261,10 @@ impl Visitor for KeyValuePairsRule {
             .into_token()
             .expect("should have a token")
             .to_string();
-        let parent_ws = tmp.split('\n').next_back().expect("should have indentation");
+        let parent_ws = tmp
+            .split('\n')
+            .next_back()
+            .expect("should have indentation");
 
         // If the array is all on one line, report that
         if !item.inner().to_string().contains('\n') {

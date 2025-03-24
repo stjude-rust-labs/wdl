@@ -183,14 +183,14 @@ impl ScatterConfig {
 }
 
 /// Returns `true` if the given value equals the default value for its type.
-/// 
+///
 /// This helper function is used with `serde`'s `skip_serializing_if` attribute
 /// to avoid serializing default values in configuration structs.
 fn is_default<T: Default + PartialEq>(value: &T) -> bool {
     value == &T::default()
 }
 
-/// Represents task evaluation configuration. 
+/// Represents task evaluation configuration.
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub struct TaskConfig {
