@@ -182,7 +182,11 @@ impl ScatterConfig {
     }
 }
 
-/// Represents task evaluation configuration.
+// Helper for default values
+fn is_default<T: Default + PartialEq>(value: &T) -> bool {
+    value == &T::default()
+}
+
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub struct TaskConfig {
@@ -208,6 +212,13 @@ pub struct TaskConfig {
     /// not be portable to other execution engines.</div>
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub shell: Option<String>,
+
+    /// Whether to write input JSON files for debugging.
+    ///
+    /// When enabled, an inputs.json file will be written to each task attempt
+    /// directory containing the full set of inputs provided to the task.
+    #[serde(default, skip_serializing_if = "is_default")]
+    pub write_inputs: bool,
 }
 
 impl TaskConfig {
@@ -269,11 +280,6 @@ impl BackendConfig {
 }
 
 /// Represents configuration for the local task execution backend.
-///
-/// <div class="warning">
-/// Warning: the local task execution backend spawns processes on the host
-/// directly without the use of a container; only use this backend on trusted
-/// WDL. </div>
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub struct LocalBackendConfig {
