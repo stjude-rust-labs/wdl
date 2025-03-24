@@ -1,2 +1,103 @@
-
 warning[DisallowedDeclarationName]: declaration identifier 'my_int' ends with type name 'Int'
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:27:13
+   │
+27 │         Int my_int
+   │             ^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
+warning[DisallowedDeclarationName]: declaration identifier 'stringValue' ends with type name 'String'
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:28:16
+   │
+28 │         String stringValue
+   │                ^^^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
+warning[DisallowedDeclarationName]: declaration identifier 'booleanFlag' ends with type name 'Boolean'
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:29:17
+   │
+29 │         Boolean booleanFlag
+   │                 ^^^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
+warning[DisallowedDeclarationName]: declaration identifier 'floatNumber' ends with type name 'Float'
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:30:15
+   │
+30 │         Float floatNumber
+   │               ^^^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
+warning[DisallowedDeclarationName]: declaration identifier 'arrayData' ends with type name 'Array'
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:31:19
+   │
+31 │         Array[Int] arrayData
+   │                   ^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
+warning[DisallowedDeclarationName]: declaration identifier 'fileInput' ends with type name 'File'
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:25:14
+   │
+25 │         File fileInput
+   │              ^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
+warning[DisallowedDeclarationName]: declaration identifier 'gtfFile' starts with type name 'File'
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:26:14
+   │
+26 │         File gtfFile
+   │              ^^^^^^^
+   │
+   = fix: rename the identifier to not start with the type name
+
+warning[DisallowedDeclarationName]: declaration identifier 'count_int' ends with type name 'Int'
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:42:9
+   │
+42 │     Int count_int = 42
+   │         ^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
+warning[DisallowedDeclarationName]: declaration identifier 'nameString' ends with type name 'String'
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:43:12
+   │
+43 │     String nameString = "test"
+   │            ^^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
+warning[DisallowedDeclarationName]: declaration identifier 'privateFile' ends with type name 'File'
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:41:10
+   │
+41 │     File privateFile = "sample.txt"
+   │          ^^^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
+warning[DisallowedDeclarationName]: declaration identifier 'result_int' ends with type name 'Int'
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:50:13
+   │
+50 │         Int result_int = 42
+   │             ^^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
+warning[DisallowedDeclarationName]: declaration identifier 'resultString' ends with type name 'String'
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:51:16
+   │
+51 │         String resultString = "result"
+   │                ^^^^^^^^^^^^
+   │
+   = fix: rename the identifier to not include the type name
+
+warning[DisallowedOutputName]: declaration identifier 'outputFile' starts with 'output'
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:49:14
+   │
+49 │         File outputFile = "output.txt"
+   │              ^^^^^^^^^^
+   │
+   = fix: rename the identifier to not start with 'output'
