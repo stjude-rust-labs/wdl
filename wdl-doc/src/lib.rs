@@ -13,7 +13,6 @@ pub mod meta;
 pub mod parameter;
 pub mod r#struct;
 
-use path_clean::clean;
 use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
@@ -32,6 +31,7 @@ use maud::Markup;
 use maud::PreEscaped;
 use maud::Render;
 use maud::html;
+use path_clean::clean;
 use pathdiff::diff_paths;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
