@@ -289,6 +289,7 @@ fn is_default<T: Default + PartialEq>(value: &T) -> bool {
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
+/// Represents task evaluation configuration.
 pub struct TaskConfig {
     /// The default maximum number of retries to attempt if a task fails.
     ///
