@@ -57,6 +57,7 @@ use wdl_ast::v1::ConditionalStatement;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::Expr;
 use wdl_ast::v1::ScatterStatement;
+use wdl_grammar::version::V1;
 
 use super::ProgressKind;
 use crate::Array;
@@ -1606,8 +1607,13 @@ impl WorkflowEvaluator {
             },
         };
 
+        let document_version = document
+            .version()
+            .expect("document version must be read by now");
+
         // Evaluate the inputs
-        let scatter_index = Self::evaluate_call_inputs(&state, stmt, scope, &mut inputs).await?;
+        let scatter_index =
+            Self::evaluate_call_inputs(&state, stmt, scope, &mut inputs, document_version).await?;
 
         let dir = format!(
             "{alias}{sep}{scatter_index}",
@@ -1695,11 +1701,14 @@ impl WorkflowEvaluator {
         stmt: &CallStatement<SyntaxNode>,
         scope: ScopeIndex,
         inputs: &mut Inputs,
+        document_version: SupportedVersion,
     ) -> EvaluationResult<String> {
         let scopes = state.scopes.read().await;
         for input in stmt.inputs() {
+            let expr = input.expr();
+
             let name = input.name();
-            let value = match input.expr() {
+            let value = match expr {
                 Some(expr) => {
                     let mut evaluator = ExprEvaluator::new(WorkflowEvaluationContext::new(
                         &state.document,
@@ -1718,11 +1727,19 @@ impl WorkflowEvaluator {
                     .ok_or_else(|| unknown_name(name.text(), name.span()))?,
             };
 
-            let prev = inputs.set(input.name().text(), value);
-            assert!(
-                prev.is_none(),
-                "attempted to override a specified call input"
-            );
+            // Skip type checking if expr is None and document version is at least 1.2
+            if document_version >= SupportedVersion::V1(V1::Two)
+                && matches!(value, Value::None)
+                && !value.ty().is_optional()
+            {
+                continue;
+            } else {
+                let prev = inputs.set(input.name().text(), value);
+                assert!(
+                    prev.is_none(),
+                    "attempted to override a specified call input"
+                );
+            }
         }
 
         Ok(scopes.scatter_index(scope))
