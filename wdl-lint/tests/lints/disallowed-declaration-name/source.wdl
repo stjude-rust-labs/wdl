@@ -1,4 +1,4 @@
-#@ except: MissingRequirements, SnakeCase, InputSorting, NonmatchingOutput, MissingMetas
+#@ except: MissingRequirements, InputSorting, NonmatchingOutput, MissingMetas
 
 version 1.2
 
@@ -7,6 +7,7 @@ task test_declaration_names {
         description: "This is a test of disallowed declaration names"
     }
 
+    #@ except: SnakeCase
     input {
         # BAD
         Array[Int] arrayData
@@ -21,7 +22,7 @@ task test_declaration_names {
         File Interval
         String name
         String name_str
-        String name_string
+        String nameString
         Directory direct_descendant
     }
 
@@ -30,10 +31,15 @@ task test_declaration_names {
     Int result_integer = 42
 
     # GOOD
-    String nameString = "test"
+    String name_string = "test"
+    Int foo_bar_InT = 42  # Split by convert-case to [foo, bar, In, T]
+    # Split by convert-case to [foo, bar, INT]
+    # and INT will not flag as we don't call `to_lowercase()` on the split words.
+    Int foo_bar_INT = 42
 
     command <<<>>>
 
+    #@ except: SnakeCase
     output {
         # BAD
         Int result_int = 42
