@@ -7,7 +7,6 @@ task test_declaration_names {
         description: "This is a test of disallowed declaration names"
     }
 
-    #@ except: InputSorting
     input {
         # BAD
         Array[Int] arrayData
