@@ -1,7 +1,6 @@
 version 1.2
 
 #@ except: MissingRequirements, SnakeCase, NonmatchingOutput
-
 task test_declaration_names {
     meta {
         description: "This is a test of disallowed declaration names"
@@ -21,8 +20,10 @@ task test_declaration_names {
         count: "OK"
     }
 
+    # Move the directive here to disable InputSorting
+    #@ except: InputSorting
     input {
-        # Sort the input declarations
+        # Sort the input declarations to match parameter_meta order
         File fileInput
         File gtfFile
         File validName
