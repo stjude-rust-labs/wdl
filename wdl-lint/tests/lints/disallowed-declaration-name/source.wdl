@@ -22,17 +22,14 @@ task test_declaration_names {
     }
 
     input {
-        #@ except: InputSorting
         # Invalid declarations with type prefixes/suffixes
         File fileInput
         File gtfFile
-        Int my_int
-        String stringValue
+        Array[Int] arrayData
         Boolean booleanFlag
         Float floatNumber
-        Array[Int] arrayData
-
-        # Valid declarations
+        Int my_int
+        String stringValue
         File validName
         File reference
         String genome
