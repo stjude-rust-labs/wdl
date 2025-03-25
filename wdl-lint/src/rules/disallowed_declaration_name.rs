@@ -2,14 +2,12 @@
 
 use std::collections::HashSet;
 
-use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
-use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -151,11 +149,6 @@ fn check_decl_name(
         }
     }
 
-    let element = match decl {
-        Decl::Bound(d) => SyntaxElement::from(d.inner().clone()),
-        Decl::Unbound(d) => SyntaxElement::from(d.inner().clone()),
-    };
-
     let ident = decl.name();
     let name = ident.text();
     for type_name in &type_names {
@@ -168,12 +161,20 @@ fn check_decl_name(
 
             if words.contains(&type_lower) {
                 let diagnostic = decl_identifier_with_type(ident.span(), name, type_name);
-                state.exceptable_add(diagnostic, element.clone(), exceptable_nodes);
+                state.exceptable_add(
+                    diagnostic,
+                    rowan::NodeOrToken::Node(decl.inner().to_owned()),
+                    exceptable_nodes,
+                );
                 return;
             }
         } else if name.to_lowercase().contains(&type_lower) {
             let diagnostic = decl_identifier_with_type(ident.span(), name, type_name);
-            state.exceptable_add(diagnostic, element.clone(), exceptable_nodes);
+            state.exceptable_add(
+                diagnostic,
+                rowan::NodeOrToken::Node(decl.inner().to_owned()),
+                exceptable_nodes,
+            );
             return;
         }
     }
