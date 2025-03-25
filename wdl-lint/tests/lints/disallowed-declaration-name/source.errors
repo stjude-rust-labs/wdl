@@ -1,26 +1,7 @@
-note[InputSorting]: input not sorted
-   ┌─ tests/lints/disallowed-declaration-name/source.wdl:24:5
-   │
-24 │     input {
-   │     ^^^^^ input section must be sorted
-   │
-   = fix: sort input statements as: 
-     File fileInput
-     File gtfFile
-     File validName
-     File reference
-     Array[Int] arrayData
-     String stringValue
-     String genome
-     Boolean booleanFlag
-     Float floatNumber
-     Int my_int
-     Int count
-
 warning[DisallowedDeclarationName]: declaration identifier 'my_int' ends with type name 'Int'
-   ┌─ tests/lints/disallowed-declaration-name/source.wdl:31:13
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:35:13
    │
-31 │         Int my_int
+35 │         Int my_int
    │             ^^^^^^
    │
    = fix: rename the identifier to not include the type name
