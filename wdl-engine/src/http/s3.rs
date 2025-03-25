@@ -174,13 +174,13 @@ mod test {
         assert_eq!(url.as_str(), "https://example.com/bar/baz");
 
         // Not using HTTPS
-        let mut url = "http://foo.s3.us-west-1.amazonaws.com/bar/baz"
+        let mut url = "http://s3.us-east-1.amazonaws.com/bucket1/bar"
             .parse()
             .unwrap();
         assert!(!apply_auth(&config, &mut url));
         assert_eq!(
             url.as_str(),
-            "http://foo.s3.us-west-1.amazonaws.com/bar/baz"
+            "http://s3.us-east-1.amazonaws.com/bucket1/bar"
         );
 
         // Unknown bucket (path without region)

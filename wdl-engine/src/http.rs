@@ -35,7 +35,7 @@ use url::Url;
 use crate::config::Config;
 
 mod azure;
-mod gs;
+mod google;
 mod s3;
 
 /// The default cache subdirectory that is appended to the system cache
@@ -240,7 +240,7 @@ impl HttpDownloader {
         }
 
         // Finally, attempt to apply auth for Google Cloud Storage
-        gs::apply_auth(&self.config.storage.google, url);
+        google::apply_auth(&self.config.storage.google, url);
     }
 }
 
@@ -272,7 +272,7 @@ impl Downloader for HttpDownloader {
                 "http" | "https" => url,
                 "az" => azure::rewrite_url(&url)?,
                 "s3" => s3::rewrite_url(&self.config.storage.s3, &url)?,
-                "gs" => gs::rewrite_url(&url)?,
+                "gs" => google::rewrite_url(&url)?,
                 _ => return Ok(None),
             };
 

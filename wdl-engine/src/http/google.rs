@@ -151,9 +151,14 @@ mod test {
         assert_eq!(url.as_str(), "https://example.com/bar/baz");
 
         // Not using HTTPS
-        let mut url = "http://foo.storage.googleapis.com/bar/baz".parse().unwrap();
+        let mut url = "http://storage.googleapis.com/bucket1/foo/bar"
+            .parse()
+            .unwrap();
         assert!(!apply_auth(&config, &mut url));
-        assert_eq!(url.as_str(), "http://foo.storage.googleapis.com/bar/baz");
+        assert_eq!(
+            url.as_str(),
+            "http://storage.googleapis.com/bucket1/foo/bar"
+        );
 
         // Unknown bucket (path)
         let mut url = "https://storage.googleapis.com/foo/bar/baz"

@@ -9,6 +9,9 @@ use crate::config::AzureStorageConfig;
 /// The Azure Blob Storage domain suffix.
 const AZURE_STORAGE_DOMAIN_SUFFIX: &str = ".blob.core.windows.net";
 
+/// The name of the special root container in Azure Blob Storage.
+const ROOT_CONTAINER_NAME: &str = "$root";
+
 /// Rewrites an Azure Blob Storage URL (az://) into a HTTPS URL.
 pub(crate) fn rewrite_url(url: &Url) -> Result<Url> {
     assert_eq!(url.scheme(), "az");
@@ -61,9 +64,9 @@ pub(crate) fn apply_auth(config: &AzureStorageConfig, url: &mut Url) -> bool {
 
             if let Some(mut segments) = url.path_segments() {
                 // Determine the container name; if there's only one path segment, then use the
-                // `$root` container
+                // root container name
                 let container = match (segments.next(), segments.next()) {
-                    (Some(_), None) => "$root",
+                    (Some(_), None) => ROOT_CONTAINER_NAME,
                     (Some(container), Some(_)) => container,
                     _ => return true,
                 };
@@ -124,7 +127,7 @@ mod test {
             HashMap::from_iter([
                 ("container1".to_string(), "token1=foo".to_string()),
                 ("container2".to_string(), "?token2=bar".to_string()),
-                ("$root".to_string(), "token3=qux".to_string()),
+                (ROOT_CONTAINER_NAME.to_string(), "token3=qux".to_string()),
             ]),
         );
 
@@ -134,9 +137,14 @@ mod test {
         assert_eq!(url.as_str(), "https://example.com/bar/baz");
 
         // Not using HTTPS
-        let mut url = "http://foo.blob.core.windows.net/bar/baz".parse().unwrap();
+        let mut url = "http://account.blob.core.windows.net/container1/foo"
+            .parse()
+            .unwrap();
         assert!(!apply_auth(&config, &mut url));
-        assert_eq!(url.as_str(), "http://foo.blob.core.windows.net/bar/baz");
+        assert_eq!(
+            url.as_str(),
+            "http://account.blob.core.windows.net/container1/foo"
+        );
 
         // Azure URL but unknown account
         let mut url = "https://foo.blob.core.windows.net/bar/baz".parse().unwrap();
