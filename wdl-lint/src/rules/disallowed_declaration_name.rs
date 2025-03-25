@@ -23,15 +23,15 @@ use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
 
-/// A rule that identifies declaration names that include their type names as a
-/// suffix.
+/// A rule that identifies declaration names that include their type names.
 #[derive(Debug, Default)]
 pub struct DisallowedDeclarationNameRule;
 
-/// Create a diagnostic for a declaration identifier that contains its type name
+/// Create a diagnostic for a declaration identifier that contains its type
+/// name.
 fn decl_identifier_with_type(span: Span, decl_name: &str, type_name: &str) -> Diagnostic {
-    Diagnostic::warning(format!(
-        "declaration identifier '{decl_name}' ends with type name '{type_name}'",
+    Diagnostic::note(format!(
+        "declaration identifier '{decl_name}' contains type name '{type_name}'",
     ))
     .with_rule("DisallowedDeclarationName")
     .with_highlight(span)
@@ -44,14 +44,14 @@ impl Rule for DisallowedDeclarationNameRule {
     }
 
     fn description(&self) -> &'static str {
-        "Disallows declaration names that end with their type name"
+        "Disallows declaration names that include their type name."
     }
 
     fn explanation(&self) -> &'static str {
-        "Declaration names should not include their type as a suffix. This makes the code more \
-         verbose and often redundant. For example, use 'counter' instead of 'counter_int' or \
-         'is_active' instead of 'is_active_boolean'. Exceptions are made for String, File, and \
-         user-defined struct types, which are not flagged by this rule."
+        "Declaration names should not include their type. This makes the code more verbose and \
+         often redundant. For example, use 'counter' instead of 'counter_int' or 'is_active' \
+         instead of 'is_active_bool'. Exceptions are made for String, File, and user-defined \
+         struct types, which are not flagged by this rule."
     }
 
     fn tags(&self) -> TagSet {
@@ -106,21 +106,14 @@ impl Visitor for DisallowedDeclarationNameRule {
     }
 }
 
-/// Check declaration name for type suffixes
+/// Check declaration name for type suffixes.
 fn check_decl_name(
     state: &mut Diagnostics,
     decl: &Decl,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
-    let binding = decl.name();
-    let name = binding.text();
-    let ty = decl.ty();
-
-    // Extract type names to check based on the type
     let mut type_names = HashSet::new();
-
-    // Handle different type variants
-    match ty {
+    match decl.ty() {
         Type::Ref(_) => return, // Skip type reference types (user-defined structs)
         Type::Primitive(primitive_type) => {
             match primitive_type.kind() {
@@ -163,35 +156,31 @@ fn check_decl_name(
         Decl::Unbound(d) => SyntaxElement::from(d.inner().clone()),
     };
 
-    // Check if the declaration name ends with one of the type names
+    let ident = decl.name();
+    let name = ident.text();
     for type_name in &type_names {
         let type_lower = type_name.to_lowercase();
 
-        // Special handling for short type names (3 characters or less)
-        // These require word-based checks to avoid false positives
+        // Special handling for short type names (3 characters or less).
+        // These require word-based checks to avoid false positives.
         if type_lower.len() <= 3 {
             let words = split_to_words(name);
 
-            if let Some(last_word) = words.last() {
-                if last_word.to_lowercase() == type_lower {
-                    let diagnostic = decl_identifier_with_type(binding.span(), name, type_name);
-                    state.exceptable_add(diagnostic, element.clone(), exceptable_nodes);
-                    return;
-                }
-            }
-        } else {
-            // For longer types, check if the identifier ends with the type name
-            if name.to_lowercase().ends_with(&type_lower) {
-                let diagnostic = decl_identifier_with_type(binding.span(), name, type_name);
+            if words.contains(&type_lower) {
+                let diagnostic = decl_identifier_with_type(ident.span(), name, type_name);
                 state.exceptable_add(diagnostic, element.clone(), exceptable_nodes);
                 return;
             }
+        } else if name.to_lowercase().contains(&type_lower) {
+            let diagnostic = decl_identifier_with_type(ident.span(), name, type_name);
+            state.exceptable_add(diagnostic, element.clone(), exceptable_nodes);
+            return;
         }
     }
 }
 
 /// Split an identifier into words using convert_case
-fn split_to_words(identifier: &str) -> Vec<String> {
+fn split_to_words(identifier: &str) -> HashSet<String> {
     // Use convert_case's built-in split functionality with default boundaries
     convert_case::split(&identifier, &convert_case::Boundary::defaults())
         .into_iter()

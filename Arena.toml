@@ -2067,6 +2067,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
+message = "dnaseq-standard-fastq.wdl:133:20: note[DisallowedDeclarationName]: declaration identifier 'array_lengths' contains type name 'Array'"
+permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L133"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
 message = "dnaseq-standard-fastq.wdl:162:20: note[ContainerValue]: container URI uses a mutable tag"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L162"
 
@@ -2137,7 +2142,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:147:25: warning[DisallowedDeclarationName]: declaration identifier 'htseq_strandedness_map' ends with type name 'Map'"
+message = "rnaseq-core.wdl:147:25: note[DisallowedDeclarationName]: declaration identifier 'htseq_strandedness_map' contains type name 'Map'"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L147"
 
 [[diagnostics]]
