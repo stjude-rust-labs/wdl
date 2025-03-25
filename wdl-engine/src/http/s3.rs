@@ -2,6 +2,7 @@
 
 use anyhow::Context;
 use anyhow::Result;
+use tracing::warn;
 use url::Url;
 
 use crate::config::S3StorageConfig;
@@ -54,11 +55,6 @@ pub(crate) fn rewrite_url(config: &S3StorageConfig, url: &Url) -> Result<Url> {
 ///
 /// Returns `true` if the URL was for S3 or `false` if it was not.
 pub(crate) fn apply_auth(config: &S3StorageConfig, url: &mut Url) -> bool {
-    // Only apply auth for HTTPS URLs
-    if url.scheme() != "https" {
-        return false;
-    }
-
     if let Some(url::Host::Domain(domain)) = url.host() {
         if let Some(domain) = domain.strip_suffix(S3_STORAGE_DOMAIN_SUFFIX) {
             // If the URL already has a query string, don't modify it
@@ -103,6 +99,12 @@ pub(crate) fn apply_auth(config: &S3StorageConfig, url: &mut Url) -> bool {
             };
 
             if let Some(sig) = config.auth.get(bucket) {
+                // Warn if the scheme isn't https, as we won't be applying the auth.
+                if url.scheme() != "https" {
+                    warn!("S3 URL `{url}` is not using HTTPS: authentication will not be used");
+                    return true;
+                }
+
                 let sig = sig.strip_prefix('?').unwrap_or(sig);
                 url.set_query(Some(sig));
             }
@@ -177,7 +179,7 @@ mod test {
         let mut url = "http://s3.us-east-1.amazonaws.com/bucket1/bar"
             .parse()
             .unwrap();
-        assert!(!apply_auth(&config, &mut url));
+        assert!(apply_auth(&config, &mut url));
         assert_eq!(
             url.as_str(),
             "http://s3.us-east-1.amazonaws.com/bucket1/bar"

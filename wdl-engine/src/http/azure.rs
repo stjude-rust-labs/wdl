@@ -2,6 +2,7 @@
 
 use anyhow::Context;
 use anyhow::Result;
+use tracing::warn;
 use url::Url;
 
 use crate::config::AzureStorageConfig;
@@ -50,11 +51,6 @@ pub(crate) fn rewrite_url(url: &Url) -> Result<Url> {
 ///
 /// Returns `true` if the URL was for Azure or `false` if it was not.
 pub(crate) fn apply_auth(config: &AzureStorageConfig, url: &mut Url) -> bool {
-    // Only apply auth for HTTPS URLs
-    if url.scheme() != "https" {
-        return false;
-    }
-
     if let Some(url::Host::Domain(domain)) = url.host() {
         if let Some(account) = domain.strip_suffix(AZURE_STORAGE_DOMAIN_SUFFIX) {
             // If the URL already has a query string, don't modify it
@@ -73,6 +69,15 @@ pub(crate) fn apply_auth(config: &AzureStorageConfig, url: &mut Url) -> bool {
 
                 if let Some(containers) = config.auth.get(account) {
                     if let Some(token) = containers.get(container) {
+                        // Warn if the scheme isn't https, as we won't be applying the auth.
+                        if url.scheme() != "https" {
+                            warn!(
+                                "Azure Blob Storage URL `{url}` is not using HTTPS: \
+                                 authentication will not be used"
+                            );
+                            return true;
+                        }
+
                         let token = token.strip_prefix('?').unwrap_or(token);
                         url.set_query(Some(token));
                     }
@@ -140,7 +145,7 @@ mod test {
         let mut url = "http://account.blob.core.windows.net/container1/foo"
             .parse()
             .unwrap();
-        assert!(!apply_auth(&config, &mut url));
+        assert!(apply_auth(&config, &mut url));
         assert_eq!(
             url.as_str(),
             "http://account.blob.core.windows.net/container1/foo"

@@ -2,6 +2,7 @@
 
 use anyhow::Context;
 use anyhow::Result;
+use tracing::warn;
 use url::Url;
 
 use crate::config::GoogleStorageConfig;
@@ -48,11 +49,6 @@ pub(crate) fn rewrite_url(url: &Url) -> Result<Url> {
 /// Returns `true` if the URL was for Google Cloud Storage or `false` if it was
 /// not.
 pub(crate) fn apply_auth(config: &GoogleStorageConfig, url: &mut Url) -> bool {
-    // Only apply auth for HTTPS URLs
-    if url.scheme() != "https" {
-        return false;
-    }
-
     if let Some(url::Host::Domain(domain)) = url.host() {
         if let Some(domain) = domain.strip_suffix(GOOGLE_STORAGE_DOMAIN) {
             // If the URL already has a query string, don't modify it
@@ -92,6 +88,15 @@ pub(crate) fn apply_auth(config: &GoogleStorageConfig, url: &mut Url) -> bool {
             };
 
             if let Some(sig) = config.auth.get(bucket) {
+                // Warn if the scheme isn't https, as we won't be applying the auth.
+                if url.scheme() != "https" {
+                    warn!(
+                        "Google Cloud Storage URL `{url}` is not using HTTPS: authentication will \
+                         not be used"
+                    );
+                    return true;
+                }
+
                 let sig = sig.strip_prefix('?').unwrap_or(sig);
                 url.set_query(Some(sig));
             }
@@ -154,7 +159,7 @@ mod test {
         let mut url = "http://storage.googleapis.com/bucket1/foo/bar"
             .parse()
             .unwrap();
-        assert!(!apply_auth(&config, &mut url));
+        assert!(apply_auth(&config, &mut url));
         assert_eq!(
             url.as_str(),
             "http://storage.googleapis.com/bucket1/foo/bar"
