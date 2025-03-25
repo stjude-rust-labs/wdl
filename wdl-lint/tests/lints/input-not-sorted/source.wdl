@@ -1,5 +1,5 @@
 #@ except: DescriptionMissing, DisallowedInputName, MissingRequirements
-#@ except: RuntimeSectionKeys, MatchingParameterMeta
+#@ except: RuntimeSectionKeys
 
 version 1.2
 
@@ -40,31 +40,31 @@ workflow foo {
     }
 
     input {
-        String g = "hello"
-        Int? f = 2
-        Int? e
-        Int c
-        Array[String]? h
-        File t
         String a
-        Pair[Int, File] i
         File b
-        Pair[String, Int] o
-        Pair[File, Int] j
+        Int c
         Array[Int]? d
-        Array[String] q
-        #@ except: DeprecatedObject
-        Object v
+        Int? e
+        Int? f = 2
+        String g = "hello"
+        Array[String]? h
+        Pair[Int, File] i
+        Pair[File, Int] j
         Map[String, Int]? k
         Map[String, Array[Int]]? l
         Map[Int, String]? m
+        Pair[String, File] n
+        Pair[String, Int] o
+        Array[String]+ p
+        Array[String] q
         Map[String, File]? r
+        Map[String, File] s
+        File t
+        mystruct u
+        #@ except: DeprecatedObject
+        Object v
         Directory w
         Directory? x
-        Map[String, File] s
-        Pair[String, File] n
-        Array[String]+ p
-        mystruct u
     }
 
     output {}

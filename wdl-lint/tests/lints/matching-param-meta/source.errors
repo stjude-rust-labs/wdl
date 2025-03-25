@@ -37,8 +37,8 @@ warning[MatchingParameterMeta]: parameter metadata in task `new_test` is out of 
    │     ^^^^^^^^^^^^^^ parameter metadata must be in the same order as inputs
    │
    = fix: order the parameter metadata as:
-     second
      first
+     second
 
 warning[MatchingParameterMeta]: parameter metadata in struct `Bar` is out of order
    ┌─ tests/lints/matching-param-meta/source.wdl:83:5

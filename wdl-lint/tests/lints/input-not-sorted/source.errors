@@ -5,8 +5,8 @@ note[InputSorting]: input not sorted
    │     ^^^^^ input section must be sorted
    │
    = fix: sort input statements as: 
-     File t
      File b
+     File t
      Directory w
      Array[String]+ p
      Array[String] q
@@ -29,6 +29,36 @@ note[InputSorting]: input not sorted
      Int? e
      Int? f = 2
      String g = "hello"
+
+warning[MatchingParameterMeta]: parameter metadata in task `bar` is out of order
+   ┌─ tests/lints/input-not-sorted/source.wdl:77:5
+   │
+77 │     parameter_meta {
+   │     ^^^^^^^^^^^^^^ parameter metadata must be in the same order as inputs
+   │
+   = fix: order the parameter metadata as:
+     g
+     f
+     e
+     c
+     h
+     t
+     a
+     i
+     b
+     o
+     j
+     d
+     q
+     k
+     l
+     m
+     r
+     w
+     x
+     s
+     n
+     p
 
 note[InputSorting]: input not sorted
     ┌─ tests/lints/input-not-sorted/source.wdl:102:5
