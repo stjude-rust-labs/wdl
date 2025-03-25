@@ -1,4 +1,4 @@
-//! A lint rule that disallows declaration names with type suffixes.
+//! A lint rule that disallows declaration names with type information.
 
 use std::collections::HashSet;
 
