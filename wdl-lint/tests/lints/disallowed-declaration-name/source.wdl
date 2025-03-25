@@ -20,20 +20,19 @@ task test_declaration_names {
         count: "OK"
     }
 
-    # Move the directive here to disable InputSorting
     #@ except: InputSorting
     input {
         # Sort the input declarations to match parameter_meta order
         File fileInput
         File gtfFile
-        File validName
-        File reference
         Array[Int] arrayData
         String stringValue
         String genome
         Boolean booleanFlag
         Float floatNumber
         Int my_int
+        File validName
+        File reference
         Int count
     }
 

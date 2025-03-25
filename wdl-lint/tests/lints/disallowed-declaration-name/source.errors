@@ -1,31 +1,31 @@
 warning[DisallowedDeclarationName]: declaration identifier 'my_int' ends with type name 'Int'
-   ┌─ tests/lints/disallowed-declaration-name/source.wdl:36:13
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:33:13
    │
-36 │         Int my_int
+33 │         Int my_int
    │             ^^^^^^
    │
    = fix: rename the identifier to not include the type name
 
 warning[DisallowedDeclarationName]: declaration identifier 'count_int' ends with type name 'Int'
-   ┌─ tests/lints/disallowed-declaration-name/source.wdl:42:9
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:41:9
    │
-42 │     Int count_int = 42
+41 │     Int count_int = 42
    │         ^^^^^^^^^
    │
    = fix: rename the identifier to not include the type name
 
 note[DisallowedOutputName]: declaration identifier starts with 'output'
-   ┌─ tests/lints/disallowed-declaration-name/source.wdl:49:14
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:48:14
    │
-49 │         File outputFile = "output.txt"
+48 │         File outputFile = "output.txt"
    │              ^^^^^^^^^^
    │
    = fix: rename the identifier to not start with 'output'
 
 warning[DisallowedDeclarationName]: declaration identifier 'result_int' ends with type name 'Int'
-   ┌─ tests/lints/disallowed-declaration-name/source.wdl:50:13
+   ┌─ tests/lints/disallowed-declaration-name/source.wdl:49:13
    │
-50 │         Int result_int = 42
+49 │         Int result_int = 42
    │             ^^^^^^^^^^
    │
    = fix: rename the identifier to not include the type name
