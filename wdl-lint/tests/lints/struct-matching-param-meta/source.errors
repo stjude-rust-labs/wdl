@@ -1,3 +1,14 @@
+note[SectionOrdering]: sections are not in order for struct `Text`
+   ┌─ tests/lints/struct-matching-param-meta/source.wdl:6:8
+   │
+ 6 │ struct Text {
+   │        ^^^^ this struct contains sections that are out of order
+   ·
+10 │     meta {
+   │     ---- this section is out of order
+   │
+   = fix: order as `meta`, `parameter_meta`, `members`
+
 warning[MatchingParameterMeta]: struct `Text` is missing a parameter metadata key for input `does_not_exist`
   ┌─ tests/lints/struct-matching-param-meta/source.wdl:8:12
   │
