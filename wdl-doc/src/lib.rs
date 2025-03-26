@@ -84,9 +84,9 @@ pub(crate) fn full_page<P: AsRef<Path>>(
 ) -> Markup {
     html! {
         (DOCTYPE)
-        html class="dark size-full" {
+        html class="dark" {
             (header(page_title, stylesheet))
-            body class="flex dark size-full dark:bg-slate-950 dark:text-white p-4" {
+            body class="flex size-full dark:bg-slate-950 dark:text-white p-4" {
                 (body)
             }
         }
