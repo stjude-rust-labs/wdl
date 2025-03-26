@@ -1587,7 +1587,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:165:5: warning[MatchingParameterMeta]: parameter metadata in task `apply_bqsr` is out of order"
+message = "gatk4.wdl:165:5: note[MatchingParameterMeta]: parameter metadata in task `apply_bqsr` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/gatk4.wdl/#L165"
 
 [[diagnostics]]
@@ -1597,7 +1597,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:228:5: warning[MatchingParameterMeta]: parameter metadata in task `haplotype_caller` is out of order"
+message = "gatk4.wdl:228:5: note[MatchingParameterMeta]: parameter metadata in task `haplotype_caller` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/gatk4.wdl/#L228"
 
 [[diagnostics]]
@@ -1607,7 +1607,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:314:5: warning[MatchingParameterMeta]: parameter metadata in task `variant_filtration` is out of order"
+message = "gatk4.wdl:314:5: note[MatchingParameterMeta]: parameter metadata in task `variant_filtration` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/gatk4.wdl/#L314"
 
 [[diagnostics]]
@@ -1642,7 +1642,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
-message = "gatk4.wdl:83:5: warning[MatchingParameterMeta]: parameter metadata in task `base_recalibrator` is out of order"
+message = "gatk4.wdl:83:5: note[MatchingParameterMeta]: parameter metadata in task `base_recalibrator` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/gatk4.wdl/#L83"
 
 [[diagnostics]]
@@ -1882,7 +1882,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
-message = "picard.wdl:926:5: warning[MatchingParameterMeta]: parameter metadata in task `scatter_interval_list` is out of order"
+message = "picard.wdl:926:5: note[MatchingParameterMeta]: parameter metadata in task `scatter_interval_list` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/picard.wdl/#L926"
 
 [[diagnostics]]
@@ -1897,7 +1897,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/picard.wdl"
-message = "picard.wdl:997:5: warning[MatchingParameterMeta]: parameter metadata in task `create_sequence_dictionary` is out of order"
+message = "picard.wdl:997:5: note[MatchingParameterMeta]: parameter metadata in task `create_sequence_dictionary` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/picard.wdl/#L997"
 
 [[diagnostics]]
@@ -1907,7 +1907,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/qualimap.wdl"
-message = "qualimap.wdl:15:5: warning[MatchingParameterMeta]: parameter metadata in task `rnaseq` is out of order"
+message = "qualimap.wdl:15:5: note[MatchingParameterMeta]: parameter metadata in task `rnaseq` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/qualimap.wdl/#L15"
 
 [[diagnostics]]
@@ -2027,7 +2027,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/star.wdl"
-message = "star.wdl:147:5: warning[MatchingParameterMeta]: parameter metadata in task `alignment` is out of order"
+message = "star.wdl:147:5: note[MatchingParameterMeta]: parameter metadata in task `alignment` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/star.wdl/#L147"
 
 [[diagnostics]]
@@ -2092,7 +2092,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/util.wdl"
-message = "util.wdl:777:5: warning[MatchingParameterMeta]: parameter metadata in task `split_fastq` is out of order"
+message = "util.wdl:777:5: note[MatchingParameterMeta]: parameter metadata in task `split_fastq` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/util.wdl/#L777"
 
 [[diagnostics]]
@@ -2102,7 +2102,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-core.wdl"
-message = "dnaseq-core.wdl:23:5: warning[MatchingParameterMeta]: parameter metadata in workflow `dnaseq_core_experimental` is out of order"
+message = "dnaseq-core.wdl:23:5: note[MatchingParameterMeta]: parameter metadata in workflow `dnaseq_core_experimental` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-core.wdl/#L23"
 
 [[diagnostics]]
@@ -2112,7 +2112,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:121:5: warning[MatchingParameterMeta]: parameter metadata in task `parse_input` is out of order"
+message = "dnaseq-standard-fastq.wdl:121:5: note[MatchingParameterMeta]: parameter metadata in task `parse_input` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L121"
 
 [[diagnostics]]
@@ -2132,7 +2132,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:21:5: warning[MatchingParameterMeta]: parameter metadata in workflow `dnaseq_standard_fastq_experimental` is out of order"
+message = "dnaseq-standard-fastq.wdl:21:5: note[MatchingParameterMeta]: parameter metadata in workflow `dnaseq_standard_fastq_experimental` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L21"
 
 [[diagnostics]]
@@ -2162,7 +2162,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/general/samtools-merge.wdl"
-message = "samtools-merge.wdl:17:5: warning[MatchingParameterMeta]: parameter metadata in workflow `samtools_merge` is out of order"
+message = "samtools-merge.wdl:17:5: note[MatchingParameterMeta]: parameter metadata in workflow `samtools_merge` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/general/samtools-merge.wdl/#L17"
 
 [[diagnostics]]
@@ -2197,12 +2197,12 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:80:5: warning[MatchingParameterMeta]: parameter metadata in workflow `quality_check_standard` is out of order"
+message = "quality-check-standard.wdl:80:5: note[MatchingParameterMeta]: parameter metadata in workflow `quality_check_standard` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L80"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/reference/qc-reference.wdl"
-message = "qc-reference.wdl:21:5: warning[MatchingParameterMeta]: parameter metadata in workflow `qc_reference` is out of order"
+message = "qc-reference.wdl:21:5: note[MatchingParameterMeta]: parameter metadata in workflow `qc_reference` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/reference/qc-reference.wdl/#L21"
 
 [[diagnostics]]
@@ -2222,7 +2222,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-core.wdl"
-message = "rnaseq-core.wdl:26:5: warning[MatchingParameterMeta]: parameter metadata in workflow `rnaseq_core` is out of order"
+message = "rnaseq-core.wdl:26:5: note[MatchingParameterMeta]: parameter metadata in workflow `rnaseq_core` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-core.wdl/#L26"
 
 [[diagnostics]]
@@ -2257,7 +2257,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
-message = "rnaseq-standard.wdl:27:5: warning[MatchingParameterMeta]: parameter metadata in workflow `rnaseq_standard` is out of order"
+message = "rnaseq-standard.wdl:27:5: note[MatchingParameterMeta]: parameter metadata in workflow `rnaseq_standard` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L27"
 
 [[diagnostics]]
@@ -2272,5 +2272,5 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
-message = "rnaseq-variant-calling.wdl:19:5: warning[MatchingParameterMeta]: parameter metadata in workflow `rnaseq_variant_calling` is out of order"
+message = "rnaseq-variant-calling.wdl:19:5: note[MatchingParameterMeta]: parameter metadata in workflow `rnaseq_variant_calling` is out of order"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-variant-calling.wdl/#L19"
