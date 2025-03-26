@@ -78,7 +78,7 @@ fn mismatched_param_order(parent: &SectionParent, span: Span, expected_order: &s
         SectionParent::Struct(s) => ("struct", s.name()),
     };
 
-    Diagnostic::warning(format!(
+    Diagnostic::note(format!(
         "parameter metadata in {context} `{parent}` is out of order",
         parent = parent.text(),
     ))

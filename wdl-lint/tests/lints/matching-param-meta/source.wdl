@@ -23,7 +23,6 @@ task t {
     }
 
     input {
-        # This should warn about missing parameter metadata
         String matching
         String does_not_exist
     }
@@ -49,9 +48,8 @@ workflow w {
     }
 
     input {
-        # This should warn about extra parameter metadata
-        String does_not_exist
         String matching
+        String does_not_exist
     }
 
     output {}
@@ -89,7 +87,8 @@ struct Bar {
     String param_b
 }
 
-# This should trigger a InputSorting diagnostic
+# This should trigger a InputSorting diagnostic,
+# but not a `MatchingParameterMeta` diagnostic
 task input_sorting_test_1 {
     meta {}
 
@@ -102,7 +101,6 @@ task input_sorting_test_1 {
     }
 
     input {
-        # This order is incorrect compared to parameter_meta (should trigger InputSorting)
         File b
         Array[String]+ p
         Array[String]+ q
@@ -115,7 +113,8 @@ task input_sorting_test_1 {
     output {}
 }
 
-# This should trigger a InputSorting diagnostic
+# This should trigger both an InputSorting diagnostic
+# as well as a `MatchingParameterMeta` diagnostic
 task input_sorting_test_2 {
     meta {}
 
