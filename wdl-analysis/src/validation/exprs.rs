@@ -5,17 +5,18 @@ use std::fmt;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 use wdl_ast::v1;
 use wdl_ast::v1::HintsKeyword;
 use wdl_ast::v1::InputKeyword;
 use wdl_ast::v1::OutputKeyword;
 use wdl_ast::version::V1;
+
+use crate::Diagnostics;
+use crate::VisitReason;
+use crate::Visitor;
 
 /// Creates a "hints scope required" diagnostic.
 fn hints_scope_required(literal: &Literal) -> Diagnostic {

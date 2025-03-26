@@ -28,8 +28,9 @@ use colored::Colorize;
 use pretty_assertions::StrComparison;
 use rayon::prelude::*;
 use wdl_analysis::Validator;
-use wdl_ast::Diagnostics;
 use wdl_ast::Document;
+
+use crate::Diagnostics;
 
 /// Finds tests for grammar validation.
 fn find_tests() -> Vec<PathBuf> {

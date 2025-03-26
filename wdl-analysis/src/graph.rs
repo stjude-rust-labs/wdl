@@ -27,6 +27,7 @@ use tracing::debug;
 use tracing::info;
 use url::Url;
 use wdl_ast::AstNode;
+use wdl_ast::Diagnostic;
 use wdl_ast::SyntaxNode;
 
 use crate::IncrementalChange;
@@ -36,34 +37,6 @@ use crate::document::Document;
 /// Represents space for a DFS search of a document graph.
 pub type DfsSpace =
     petgraph::algo::DfsSpace<NodeIndex, <StableDiGraph<DocumentGraphNode, ()> as Visitable>::Map>;
-
-/// Represents diagnostics for a document node.
-#[derive(Debug, Clone)]
-pub enum Diagnostics {
-    /// The diagnostics are from the parse.
-    Parse(Arc<wdl_ast::Diagnostics>),
-    /// The diagnostics are from validation.
-    ///
-    /// This implies there were no parse diagnostics.
-    Validation(Arc<wdl_ast::Diagnostics>),
-}
-
-impl AsRef<Arc<wdl_ast::Diagnostics>> for Diagnostics {
-    fn as_ref(&self) -> &Arc<wdl_ast::Diagnostics> {
-        match self {
-            Self::Parse(d) => d,
-            Self::Validation(d) => d,
-        }
-    }
-}
-
-impl Iterator for Diagnostics {
-    type Item = wdl_ast::Diagnostic;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        Arc::as_ref(self.as_ref()).into_iter().next().cloned()
-    }
-}
 
 /// Represents the parse state of a document graph node.
 #[derive(Debug, Clone)]
@@ -85,7 +58,7 @@ pub enum ParseState {
         /// The line index of the document.
         lines: Arc<LineIndex>,
         /// The diagnostics.
-        diagnostics: Diagnostics,
+        diagnostics: Vec<Diagnostic>,
     },
 }
 
@@ -352,11 +325,14 @@ impl DocumentGraphNode {
         );
 
         let diagnostics = if diagnostics.is_empty() {
-            Diagnostics::Validation(Arc::new(
-                validator.validate(&document).err().unwrap_or_default(),
-            ))
+            validator
+                .validate(&document)
+                .err()
+                .unwrap_or_default()
+                .into_iter()
+                .collect()
         } else {
-            Diagnostics::Parse(Arc::new(diagnostics))
+            Vec::new()
         };
 
         Ok(ParseState::Parsed {

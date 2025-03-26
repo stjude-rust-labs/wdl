@@ -284,7 +284,7 @@ where
                                         // errors, we shouldn't attempt to format the
                                         // document.
                                         if diagnostics
-                                            .clone()
+                                            .iter()
                                             .any(|d| d.severity() == Severity::Error)
                                         {
                                             return None;

@@ -29,9 +29,9 @@ use url::Url;
 use walkdir::WalkDir;
 use wdl_ast::Severity;
 use wdl_ast::SyntaxNode;
-use wdl_ast::SyntaxNodeExt;
 
 use crate::Rule;
+use crate::SyntaxNodeExt;
 use crate::UNNECESSARY_FUNCTION_CALL;
 use crate::UNUSED_CALL_RULE_ID;
 use crate::UNUSED_DECL_RULE_ID;

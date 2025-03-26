@@ -1,14 +1,15 @@
 //! Validator for WDL documents.
 
 use wdl_ast::Comment;
-use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::SupportedVersion;
 use wdl_ast::VersionStatement;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 use wdl_ast::Whitespace;
 use wdl_ast::v1;
+
+use crate::Diagnostics;
+use crate::VisitReason;
+use crate::Visitor;
 
 mod counts;
 mod env;

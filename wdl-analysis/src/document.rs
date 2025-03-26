@@ -14,7 +14,7 @@ use uuid::Uuid;
 use wdl_ast::Ast;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
-use wdl_ast::Diagnostics;
+use wdl_ast::Diagnostic;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxNode;
@@ -435,7 +435,7 @@ struct DocumentData {
     /// The structs in the document.
     structs: IndexMap<String, Struct>,
     /// The diagnostics for the document.
-    diagnostics: Diagnostics,
+    diagnostics: Vec<Diagnostic>,
 }
 
 impl DocumentData {
@@ -444,7 +444,7 @@ impl DocumentData {
         uri: Arc<Url>,
         root: Option<GreenNode>,
         version: Option<SupportedVersion>,
-        diagnostics: Diagnostics,
+        diagnostics: Vec<Diagnostic>,
     ) -> Self {
         Self {
             root,
@@ -490,7 +490,7 @@ impl Document {
                     )),
                 };
             }
-            ParseState::Parsed { diagnostics, .. } => diagnostics.as_ref().clone(),
+            ParseState::Parsed { diagnostics, .. } => diagnostics,
         };
 
         let root = node.root().expect("node should have been parsed");
@@ -503,7 +503,7 @@ impl Document {
                         node.uri().clone(),
                         Some(root.inner().green().into()),
                         None,
-                        diagnostics.into(),
+                        diagnostics,
                     )),
                 };
             }
@@ -513,7 +513,7 @@ impl Document {
             node.uri().clone(),
             Some(root.inner().green().into()),
             SupportedVersion::from_str(version.text()).ok(),
-            diagnostics.into(),
+            diagnostics,
         );
         match root.ast() {
             Ast::Unsupported => {}
@@ -638,7 +638,7 @@ impl Document {
     }
 
     /// Gets the analysis diagnostics for the document.
-    pub fn diagnostics(&self) -> &Diagnostics {
+    pub fn diagnostics(&self) -> &[Diagnostic] {
         &self.data.diagnostics
     }
 

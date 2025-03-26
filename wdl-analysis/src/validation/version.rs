@@ -3,12 +3,9 @@
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 use wdl_ast::v1;
 use wdl_ast::v1::Exponentiation;
 use wdl_ast::v1::Expr;
@@ -18,6 +15,10 @@ use wdl_ast::v1::MetaKeyword;
 use wdl_ast::v1::ParameterMetaKeyword;
 use wdl_ast::v1::RequirementsKeyword;
 use wdl_ast::version::V1;
+
+use crate::Diagnostics;
+use crate::VisitReason;
+use crate::Visitor;
 
 /// Creates an "exponentiation requirement" diagnostic.
 fn exponentiation_requirement(span: Span) -> Diagnostic {

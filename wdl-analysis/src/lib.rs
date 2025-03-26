@@ -22,16 +22,16 @@ pub mod types;
 mod validation;
 mod visitor;
 
+use std::collections::HashSet;
+
 pub use analyzer::*;
 pub use rules::*;
 pub use validation::*;
 pub use visitor::*;
-
-use wdl_ast::SyntaxToken;
+use wdl_ast::Direction;
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNode;
-use wdl_ast::Direction;
-use std::collections::HashSet;
+use wdl_ast::SyntaxToken;
 
 /// The prefix of `except` comments.
 pub const EXCEPT_COMMENT_PREFIX: &str = "#@ except:";

@@ -24,16 +24,14 @@
 use std::sync::Arc;
 
 use rowan::WalkEvent;
-use wdl_ast::SyntaxElement;
-
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
 use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNode;
-use crate::SyntaxNodeExt;
 use wdl_ast::VersionStatement;
 use wdl_ast::Whitespace;
 use wdl_ast::v1::BoundDecl;
@@ -62,6 +60,8 @@ use wdl_ast::v1::TaskHintsSection;
 use wdl_ast::v1::UnboundDecl;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::v1::WorkflowHintsSection;
+
+use crate::SyntaxNodeExt;
 
 /// Represents the reason an AST node has been visited.
 ///

@@ -17,7 +17,6 @@ use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxNode;
-use wdl_ast::SyntaxNodeExt;
 use wdl_ast::Version;
 use wdl_ast::v1::Ast;
 use wdl_ast::v1::CallStatement;
@@ -46,6 +45,7 @@ use super::TASK_VAR_NAME;
 use super::Task;
 use super::Workflow;
 use crate::DiagnosticsConfig;
+use crate::SyntaxNodeExt;
 use crate::UNUSED_CALL_RULE_ID;
 use crate::UNUSED_DECL_RULE_ID;
 use crate::UNUSED_IMPORT_RULE_ID;
@@ -260,7 +260,7 @@ fn add_namespace(
     let (uri, imported) = match resolve_import(graph, import, importer_index, importer_version) {
         Ok(resolved) => resolved,
         Err(Some(diagnostic)) => {
-            document.diagnostics.add(diagnostic);
+            document.diagnostics.push(diagnostic);
             return;
         }
         Err(None) => return,
@@ -271,7 +271,7 @@ fn add_namespace(
     let ns = match import.namespace() {
         Some((ns, span)) => match document.namespaces.get(&ns) {
             Some(prev) => {
-                document.diagnostics.add(namespace_conflict(
+                document.diagnostics.push(namespace_conflict(
                     &ns,
                     span,
                     prev.span,
@@ -306,7 +306,7 @@ fn add_namespace(
         .filter_map(|a| {
             let (from, to) = a.names();
             if !imported.data.structs.contains_key(from.text()) {
-                document.diagnostics.add(struct_not_in_document(&from));
+                document.diagnostics.push(struct_not_in_document(&from));
                 return None;
             }
 
@@ -329,13 +329,13 @@ fn add_namespace(
                 if !are_structs_equal(&a, &b) {
                     // Import conflicts with a struct defined in this document
                     if prev.namespace.is_none() {
-                        document.diagnostics.add(struct_conflicts_with_import(
+                        document.diagnostics.push(struct_conflicts_with_import(
                             aliased_name,
                             prev.span,
                             span,
                         ));
                     } else {
-                        document.diagnostics.add(imported_struct_conflict(
+                        document.diagnostics.push(imported_struct_conflict(
                             aliased_name,
                             span,
                             prev.span,
@@ -384,14 +384,14 @@ fn add_struct(document: &mut DocumentData, definition: &StructDefinition) {
             let prev_def = StructDefinition::cast(SyntaxNode::new_root(prev.node.clone()))
                 .expect("node should cast");
             if !are_structs_equal(definition, &prev_def) {
-                document.diagnostics.add(struct_conflicts_with_import(
+                document.diagnostics.push(struct_conflicts_with_import(
                     name.text(),
                     name.span(),
                     prev.span,
                 ))
             }
         } else {
-            document.diagnostics.add(name_conflict(
+            document.diagnostics.push(name_conflict(
                 name.text(),
                 Context::Struct(name.span()),
                 Context::Struct(prev.span),
@@ -406,7 +406,7 @@ fn add_struct(document: &mut DocumentData, definition: &StructDefinition) {
         let name = decl.name();
         match members.get(name.text()) {
             Some(prev_span) => {
-                document.diagnostics.add(name_conflict(
+                document.diagnostics.push(name_conflict(
                     name.text(),
                     Context::StructMember(name.span()),
                     Context::StructMember(*prev_span),
@@ -456,7 +456,7 @@ fn convert_ast_type(document: &mut DocumentData, ty: &wdl_ast::v1::Type) -> Type
     match converter.convert_type(ty) {
         Ok(ty) => ty,
         Err(diagnostic) => {
-            document.diagnostics.add(diagnostic);
+            document.diagnostics.push(diagnostic);
             Type::Union
         }
     }
@@ -532,7 +532,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut DocumentData, definition: 
     let name = definition.name();
     match document.tasks.get(name.text()) {
         Some(s) => {
-            document.diagnostics.add(name_conflict(
+            document.diagnostics.push(name_conflict(
                 name.text(),
                 Context::Task(name.span()),
                 Context::Task(s.name_span),
@@ -542,7 +542,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut DocumentData, definition: 
         _ => {
             if let Some(s) = &document.workflow {
                 if s.name == name.text() {
-                    document.diagnostics.add(name_conflict(
+                    document.diagnostics.push(name_conflict(
                         name.text(),
                         Context::Task(name.span()),
                         Context::Workflow(s.name_span),
@@ -616,7 +616,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut DocumentData, definition: 
                             }
 
                             if !decl.inner().is_rule_excepted(UNUSED_INPUT_RULE_ID) {
-                                document.diagnostics.add(
+                                document.diagnostics.push(
                                     unused_input(name.text(), name.span()).with_severity(severity),
                                 );
                             }
@@ -646,7 +646,7 @@ fn add_task(config: DiagnosticsConfig, document: &mut DocumentData, definition: 
                             .is_none()
                         && !decl.inner().is_rule_excepted(UNUSED_DECL_RULE_ID)
                     {
-                        document.diagnostics.add(
+                        document.diagnostics.push(
                             unused_declaration(name.text(), name.span()).with_severity(severity),
                         );
                     }
@@ -786,7 +786,7 @@ fn add_workflow(document: &mut DocumentData, workflow: &WorkflowDefinition) -> b
     let name = workflow.name();
     match document.tasks.get(name.text()) {
         Some(s) => {
-            document.diagnostics.add(name_conflict(
+            document.diagnostics.push(name_conflict(
                 name.text(),
                 Context::Workflow(name.span()),
                 Context::Task(s.name_span),
@@ -797,7 +797,7 @@ fn add_workflow(document: &mut DocumentData, workflow: &WorkflowDefinition) -> b
             if let Some(s) = &document.workflow {
                 document
                     .diagnostics
-                    .add(duplicate_workflow(&name, s.name_span));
+                    .push(duplicate_workflow(&name, s.name_span));
                 return false;
             }
         }
@@ -882,7 +882,7 @@ fn populate_workflow(
                         }
 
                         if !decl.inner().is_rule_excepted(UNUSED_INPUT_RULE_ID) {
-                            document.diagnostics.add(
+                            document.diagnostics.push(
                                 unused_input(name.text(), name.span()).with_severity(severity),
                             );
                         }
@@ -914,7 +914,7 @@ fn populate_workflow(
                         .is_none()
                         && !decl.inner().is_rule_excepted(UNUSED_DECL_RULE_ID)
                     {
-                        document.diagnostics.add(
+                        document.diagnostics.push(
                             unused_declaration(name.text(), name.span()).with_severity(severity),
                         );
                     }
@@ -1009,7 +1009,7 @@ fn populate_workflow(
 
                         document
                             .diagnostics
-                            .add(unused_call(name.text(), name.span()).with_severity(severity));
+                            .push(unused_call(name.text(), name.span()).with_severity(severity));
                     }
                 }
             }
@@ -1075,7 +1075,7 @@ fn add_conditional_statement(
     if !ty.is_coercible_to(&PrimitiveType::Boolean.into()) {
         document
             .diagnostics
-            .add(if_conditional_mismatch(&ty, expr.span()));
+            .push(if_conditional_mismatch(&ty, expr.span()));
     }
 }
 
@@ -1110,7 +1110,7 @@ fn add_scatter_statement(
         _ => {
             document
                 .diagnostics
-                .add(type_is_not_array(&ty, expr.span()));
+                .push(type_is_not_array(&ty, expr.span()));
             Type::Union
         }
     };
@@ -1156,7 +1156,7 @@ fn add_call_statement(
                     .unwrap_or_else(|| {
                         document
                             .diagnostics
-                            .add(unknown_call_io(&ty, &input_name, Io::Input));
+                            .push(unknown_call_io(&ty, &input_name, Io::Input));
                         Type::Union
                     });
 
@@ -1176,7 +1176,7 @@ fn add_call_statement(
                             if !matches!(expected_ty, Type::Union)
                                 && !name.ty.is_coercible_to(&expected_ty)
                             {
-                                document.diagnostics.add(call_input_type_mismatch(
+                                document.diagnostics.push(call_input_type_mismatch(
                                     &input_name,
                                     &expected_ty,
                                     &name.ty,
@@ -1186,7 +1186,7 @@ fn add_call_statement(
                         None => {
                             document
                                 .diagnostics
-                                .add(unknown_name(input_name.text(), input_name.span()));
+                                .push(unknown_name(input_name.text(), input_name.span()));
                         }
                     },
                 }
@@ -1196,7 +1196,7 @@ fn add_call_statement(
 
             for (name, input) in ty.inputs() {
                 if input.required && !seen.contains(name.as_str()) {
-                    document.diagnostics.add(missing_call_input(
+                    document.diagnostics.push(missing_call_input(
                         ty.kind(),
                         &target_name,
                         name,
@@ -1245,7 +1245,7 @@ fn resolve_call_type(
         }
 
         if namespace.is_some() {
-            document.diagnostics.add(only_one_namespace(target.span()));
+            document.diagnostics.push(only_one_namespace(target.span()));
             return None;
         }
 
@@ -1255,7 +1255,7 @@ fn resolve_call_type(
                 namespace = Some(&document.namespaces[target.text()])
             }
             None => {
-                document.diagnostics.add(unknown_namespace(&target));
+                document.diagnostics.push(unknown_namespace(&target));
                 return None;
             }
         }
@@ -1268,7 +1268,7 @@ fn resolve_call_type(
     if namespace.is_none() && name.text() == workflow_name {
         document
             .diagnostics
-            .add(recursive_workflow_call(name.text(), name.span()));
+            .push(recursive_workflow_call(name.text(), name.span()));
         return None;
     }
 
@@ -1281,7 +1281,7 @@ fn resolve_call_type(
                 workflow.outputs.clone(),
             ),
             _ => {
-                document.diagnostics.add(unknown_task_or_workflow(
+                document.diagnostics.push(unknown_task_or_workflow(
                     namespace.map(|ns| ns.span),
                     name.text(),
                     name.span(),
@@ -1420,7 +1420,7 @@ fn set_struct_types(document: &mut DocumentData) {
                     Ok(s.ty().cloned().unwrap_or(Type::Union))
                 }
                 _ => {
-                    self.document.diagnostics.add(unknown_type(
+                    self.document.diagnostics.push(unknown_type(
                         name,
                         Span::new(span.start() + self.offset, span.len()),
                     ));
@@ -1461,7 +1461,7 @@ fn set_struct_types(document: &mut DocumentData) {
                         let name = definition.name();
                         let name_span = name.span();
                         let member_span = member.name().span();
-                        document.diagnostics.add(recursive_struct(
+                        document.diagnostics.push(recursive_struct(
                             name.text(),
                             Span::new(name_span.start() + s.offset, name_span.len()),
                             Span::new(member_span.start() + s.offset, member_span.len()),
@@ -1577,7 +1577,7 @@ impl crate::types::v1::EvaluationContext for EvaluationContext<'_> {
     }
 
     fn add_diagnostic(&mut self, diagnostic: Diagnostic) {
-        self.document.diagnostics.add(diagnostic);
+        self.document.diagnostics.push(diagnostic);
     }
 }
 
@@ -1597,7 +1597,7 @@ fn type_check_expr(
     if !matches!(expected, Type::Union) && !actual.is_coercible_to(expected) {
         document
             .diagnostics
-            .add(type_mismatch(expected, expected_span, &actual, expr.span()));
+            .push(type_mismatch(expected, expected_span, &actual, expr.span()));
     }
     // Check to see if we're assigning an empty array literal to a non-empty type; we can statically
     // flag these as errors; otherwise, non-empty array constraints are checked at runtime
@@ -1605,7 +1605,7 @@ fn type_check_expr(
         if ty.is_non_empty() && expr.is_empty_array_literal() {
             document
                 .diagnostics
-                .add(non_empty_array_assignment(expected_span, expr.span()));
+                .push(non_empty_array_assignment(expected_span, expr.span()));
         }
     }
 }

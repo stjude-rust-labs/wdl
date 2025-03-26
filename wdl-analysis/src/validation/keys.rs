@@ -5,14 +5,11 @@ use std::fmt;
 
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::TokenText;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 use wdl_ast::v1::CallStatement;
 use wdl_ast::v1::Expr;
 use wdl_ast::v1::LiteralExpr;
@@ -37,6 +34,10 @@ use wdl_ast::v1::TaskHintsSection;
 use wdl_ast::v1::WORKFLOW_HINT_ALLOW_NESTED_INPUTS;
 use wdl_ast::v1::WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS;
 use wdl_ast::v1::WorkflowHintsSection;
+
+use crate::Diagnostics;
+use crate::VisitReason;
+use crate::Visitor;
 
 /// Represents context about a unique key validation error.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

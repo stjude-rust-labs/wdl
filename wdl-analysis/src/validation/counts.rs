@@ -7,15 +7,12 @@ use wdl_ast::Ast;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxNode;
 use wdl_ast::TokenText;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 use wdl_ast::v1::CommandKeyword;
 use wdl_ast::v1::CommandSection;
 use wdl_ast::v1::HintsKeyword;
@@ -36,6 +33,10 @@ use wdl_ast::v1::StructDefinition;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::v1::TaskHintsSection;
 use wdl_ast::v1::WorkflowDefinition;
+
+use crate::Diagnostics;
+use crate::VisitReason;
+use crate::Visitor;
 
 /// Represents section context of an error.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -10,7 +10,7 @@ use petgraph::graph::NodeIndex;
 use petgraph::visit::Visitable;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
-use wdl_ast::Diagnostics;
+use wdl_ast::Diagnostic;
 use wdl_ast::Ident;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
@@ -135,7 +135,7 @@ impl<N: TreeNode> TaskGraphBuilder<N> {
         mut self,
         version: SupportedVersion,
         task: &TaskDefinition<N>,
-        diagnostics: &mut Diagnostics,
+        diagnostics: &mut Vec<Diagnostic>,
     ) -> DiGraph<TaskGraphNode<N>, bool> {
         // Populate the declaration types and build a name reference graph
         let mut graph = DiGraph::default();
@@ -256,11 +256,11 @@ impl<N: TreeNode> TaskGraphBuilder<N> {
         name: Ident<N::Token>,
         node: TaskGraphNode<N>,
         graph: &mut DiGraph<TaskGraphNode<N>, bool>,
-        diagnostics: &mut Diagnostics,
+        diagnostics: &mut Vec<Diagnostic>,
     ) -> Option<NodeIndex> {
         // Check for conflicting nodes
         if let Some(existing) = self.names.get(name.text()) {
-            diagnostics.add(name_conflict(
+            diagnostics.push(name_conflict(
                 name.text(),
                 node.context().expect("node should have context").into(),
                 graph[*existing]
@@ -283,7 +283,7 @@ impl<N: TreeNode> TaskGraphBuilder<N> {
         descendants: impl Iterator<Item = NameRefExpr<N>>,
         allow_task_var: bool,
         graph: &mut DiGraph<TaskGraphNode<N>, bool>,
-        diagnostics: &mut Diagnostics,
+        diagnostics: &mut Vec<Diagnostic>,
     ) {
         // Add edges for any descendant name references
         for r in descendants {
@@ -297,7 +297,7 @@ impl<N: TreeNode> TaskGraphBuilder<N> {
                 }
                 _ => {
                     if name.text() != TASK_VAR_NAME || !allow_task_var {
-                        diagnostics.add(unknown_name(name.text(), name.span()));
+                        diagnostics.push(unknown_name(name.text(), name.span()));
                     }
                 }
             }
@@ -310,7 +310,7 @@ impl<N: TreeNode> TaskGraphBuilder<N> {
         version: SupportedVersion,
         skip: Option<usize>,
         graph: &mut DiGraph<TaskGraphNode<N>, bool>,
-        diagnostics: &mut Diagnostics,
+        diagnostics: &mut Vec<Diagnostic>,
     ) {
         // Populate edges for any nodes that reference other nodes by name
         for from in graph.node_indices().skip(skip.unwrap_or(0)) {
@@ -378,7 +378,7 @@ impl<N: TreeNode> TaskGraphBuilder<N> {
         expr: Expr<N>,
         allow_task_var: bool,
         graph: &mut DiGraph<TaskGraphNode<N>, bool>,
-        diagnostics: &mut Diagnostics,
+        diagnostics: &mut Vec<Diagnostic>,
     ) {
         for r in expr.descendants::<NameRefExpr<N>>() {
             let name = r.name();
@@ -388,7 +388,7 @@ impl<N: TreeNode> TaskGraphBuilder<N> {
                 Some(to) => {
                     // Check to see if the node is self-referential
                     if *to == from {
-                        diagnostics.add(self_referential(
+                        diagnostics.push(self_referential(
                             name.text(),
                             graph[from]
                                 .context()
@@ -401,7 +401,7 @@ impl<N: TreeNode> TaskGraphBuilder<N> {
 
                     // Check for a dependency cycle
                     if has_path_connecting(graph as &_, from, *to, Some(&mut self.space)) {
-                        diagnostics.add(task_reference_cycle(
+                        diagnostics.push(task_reference_cycle(
                             &graph[from],
                             r.span(),
                             name.text(),
@@ -417,7 +417,7 @@ impl<N: TreeNode> TaskGraphBuilder<N> {
                 }
                 _ => {
                     if name.text() != TASK_VAR_NAME || !allow_task_var {
-                        diagnostics.add(unknown_name(name.text(), name.span()));
+                        diagnostics.push(unknown_name(name.text(), name.span()));
                     }
                 }
             }
@@ -564,7 +564,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
     pub fn build(
         mut self,
         workflow: &WorkflowDefinition<N>,
-        diagnostics: &mut Diagnostics,
+        diagnostics: &mut Vec<Diagnostic>,
         input_present: impl Fn(&str) -> bool,
     ) -> DiGraph<WorkflowGraphNode<N>, ()> {
         // Populate the declaration types and build a name reference graph
@@ -649,7 +649,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
         statement: WorkflowStatement<N>,
         parent_entry_exit: Option<(NodeIndex, NodeIndex)>,
         graph: &mut DiGraph<WorkflowGraphNode<N>, ()>,
-        diagnostics: &mut Diagnostics,
+        diagnostics: &mut Vec<Diagnostic>,
     ) {
         let entry_exit = match statement {
             WorkflowStatement::Conditional(statement) => {
@@ -681,7 +681,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
                 let variable = statement.variable();
                 let pushed = match self.names.get(variable.text()) {
                     Some(existing) => {
-                        diagnostics.add(name_conflict(
+                        diagnostics.push(name_conflict(
                             variable.text(),
                             NameContext::ScatterVariable(variable.span()).into(),
                             graph[*existing]
@@ -753,7 +753,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
         name: Ident<N::Token>,
         node: WorkflowGraphNode<N>,
         graph: &mut DiGraph<WorkflowGraphNode<N>, ()>,
-        diagnostics: &mut Diagnostics,
+        diagnostics: &mut Vec<Diagnostic>,
     ) -> Option<NodeIndex> {
         // Check for a conflicting name, either from a declaration or from a scatter
         // variable
@@ -797,7 +797,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
                 ),
             };
 
-            diagnostics.add(diagnostic);
+            diagnostics.push(diagnostic);
 
             if !cont {
                 return None;
@@ -814,7 +814,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
         &mut self,
         skip: Option<usize>,
         graph: &mut DiGraph<WorkflowGraphNode<N>, ()>,
-        diagnostics: &mut Diagnostics,
+        diagnostics: &mut Vec<Diagnostic>,
         input_present: impl Fn(&str) -> bool,
     ) {
         // Populate edges for any nodes that reference other nodes by name
@@ -860,7 +860,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
                                         to,
                                         Some(&mut self.space),
                                     ) {
-                                        diagnostics.add(workflow_reference_cycle(
+                                        diagnostics.push(workflow_reference_cycle(
                                             &graph[from],
                                             name.span(),
                                             name.text(),
@@ -885,7 +885,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
                         {
                             // Check for a dependency cycle
                             if has_path_connecting(graph as &_, from, to, Some(&mut self.space)) {
-                                diagnostics.add(workflow_reference_cycle(
+                                diagnostics.push(workflow_reference_cycle(
                                     &graph[from],
                                     name.span(),
                                     name.text(),
@@ -914,7 +914,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
         from: NodeIndex,
         expr: Expr<N>,
         graph: &mut DiGraph<WorkflowGraphNode<N>, ()>,
-        diagnostics: &mut Diagnostics,
+        diagnostics: &mut Vec<Diagnostic>,
     ) {
         for r in expr.inner().descendants().filter_map(NameRefExpr::cast) {
             let name = r.name();
@@ -924,7 +924,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
                 Some(to) => {
                     // Check to see if the node is self-referential
                     if to == from {
-                        diagnostics.add(self_referential(
+                        diagnostics.push(self_referential(
                             name.text(),
                             graph[from]
                                 .context()
@@ -937,7 +937,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
 
                     // Check for a dependency cycle
                     if has_path_connecting(graph as &_, from, to, Some(&mut self.space)) {
-                        diagnostics.add(workflow_reference_cycle(
+                        diagnostics.push(workflow_reference_cycle(
                             &graph[from],
                             r.span(),
                             name.text(),
@@ -952,7 +952,7 @@ impl<N: TreeNode> WorkflowGraphBuilder<N> {
                     self.add_dependency_edge(from, to, graph);
                 }
                 _ => {
-                    diagnostics.add(unknown_name(name.text(), name.span()));
+                    diagnostics.push(unknown_name(name.text(), name.span()));
                 }
             }
         }
@@ -1158,7 +1158,7 @@ mod test {
             .next()
             .expect("document should have a workflow");
 
-        let mut diagnostics = Diagnostics::default();
+        let mut diagnostics = Vec::new();
 
         // Testing without providing inputs i.e. static analysis
         let graph = WorkflowGraphBuilder::default().build(&workflow, &mut diagnostics, |_| false);
