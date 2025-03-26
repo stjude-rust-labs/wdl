@@ -14,21 +14,10 @@ note[DescriptionMissing]: workflow `bar` is missing a description key
    │
    = fix: add a `description` key to the meta section
 
-note[SectionOrdering]: sections are not in order for struct `Baz`
-   ┌─ tests/lints/description-missing/source.wdl:27:8
-   │
-27 │ struct Baz {
-   │        ^^^ this struct contains sections that are out of order
-   ·
-30 │     meta {
-   │     ---- this section is out of order
-   │
-   = fix: order as `meta`, `parameter_meta`, `members`
-
 note[DescriptionMissing]: struct `Baz` is missing a description key
-   ┌─ tests/lints/description-missing/source.wdl:30:5
+   ┌─ tests/lints/description-missing/source.wdl:28:5
    │
-30 │     meta {
+28 │     meta {
    │     ^^^^
    │
    = fix: add a `description` key to the meta section

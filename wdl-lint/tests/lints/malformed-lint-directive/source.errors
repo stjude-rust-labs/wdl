@@ -22,17 +22,6 @@ warning[MalformedLintDirective]: expected a colon to follow a lint directive
    │
    = fix: add a colon after the lint directive
 
-note[SectionOrdering]: sections are not in order for struct `Baz`
-   ┌─ tests/lints/malformed-lint-directive/source.wdl:33:8
-   │
-33 │ struct Baz {  #@ except: this should be flagged for being inlined
-   │        ^^^ this struct contains sections that are out of order
-   ·
-36 │     meta {
-   │     ---- this section is out of order
-   │
-   = fix: order as `meta`, `parameter_meta`, `members`
-
 warning[MalformedLintDirective]: lint directive must be on its own line
    ┌─ tests/lints/malformed-lint-directive/source.wdl:33:15
    │

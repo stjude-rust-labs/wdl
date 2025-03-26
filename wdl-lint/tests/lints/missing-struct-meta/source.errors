@@ -1,14 +1,3 @@
-note[SectionOrdering]: sections are not in order for struct `Test`
-  ┌─ tests/lints/missing-struct-meta/source.wdl:5:8
-  │
-5 │ struct Test {
-  │        ^^^^ this struct contains sections that are out of order
-  ·
-8 │     parameter_meta {
-  │     -------------- this section is out of order
-  │
-  = fix: order as `meta`, `parameter_meta`, `members`
-
 note[MissingMetas]: struct `Test` is missing a `meta` section
   ┌─ tests/lints/missing-struct-meta/source.wdl:5:8
   │
