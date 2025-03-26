@@ -9,7 +9,7 @@ use super::Callback;
 use super::Function;
 use super::Signature;
 use crate::Value;
-use crate::diagnostics::invalid_regex;
+use crate::diagnostics::function_call_failed;
 
 /// Given two String parameters `input` and `pattern`, tests whether `pattern`
 /// matches `input` at least once.
@@ -26,8 +26,8 @@ fn matches(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .coerce_argument(1, PrimitiveType::String)
         .unwrap_string();
 
-    let regex =
-        Regex::new(pattern.as_str()).map_err(|e| invalid_regex(&e, context.arguments[1].span))?;
+    let regex = Regex::new(pattern.as_str())
+        .map_err(|e| function_call_failed("matches", &e, context.arguments[1].span))?;
     Ok(regex.is_match(input.as_str()).into())
 }
 
@@ -59,7 +59,8 @@ mod test {
             .unwrap_err();
         assert_eq!(
             diagnostic.message(),
-            "regex parse error:\n    ?\n    ^\nerror: repetition operator missing expression"
+            "call to function `matches` failed: regex parse error:\n    ?\n    ^\nerror: \
+             repetition operator missing expression"
         );
 
         let value = eval_v1_expr(&env, V1::Two, "matches('hello world', 'e..o')")
