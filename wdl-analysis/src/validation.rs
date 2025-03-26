@@ -63,11 +63,6 @@ impl Diagnostics {
         self.add(diagnostic);
     }
 
-    /// Returns the number of diagnostics in the collection.
-    pub fn len(&self) -> usize {
-        self.0.len()
-    }
-
     /// Extends the collection with another collection of diagnostics.
     pub fn extend(&mut self, diagnostics: Diagnostics) {
         self.0.extend(diagnostics.0);
@@ -81,34 +76,6 @@ impl Diagnostics {
     /// Sorts the diagnostics in the collection.
     pub fn sort(&mut self) {
         self.0.sort();
-    }
-
-    /// Returns the first diagnostic in the collection if it exists.
-    pub fn first(&self) -> Option<&Diagnostic> {
-        self.0.first()
-    }
-}
-
-impl FromIterator<Diagnostic> for Diagnostics {
-    fn from_iter<T: IntoIterator<Item = Diagnostic>>(iter: T) -> Self {
-        Self(iter.into_iter().collect())
-    }
-}
-
-impl Iterator for Diagnostics {
-    type Item = Diagnostic;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.0.pop()
-    }
-}
-
-impl<'a> IntoIterator for &'a Diagnostics {
-    type IntoIter = std::slice::Iter<'a, Diagnostic>;
-    type Item = &'a Diagnostic;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.iter()
     }
 }
 
@@ -154,7 +121,7 @@ impl Validator {
 
     /// Validates the given document and returns the validation errors upon
     /// failure.
-    pub fn validate(&mut self, document: &Document) -> Result<(), Diagnostics> {
+    pub fn validate(&mut self, document: &Document) -> Result<(), Vec<Diagnostic>> {
         let mut diagnostics = Diagnostics::default();
         document.visit(&mut diagnostics, self);
 
@@ -162,7 +129,7 @@ impl Validator {
             Ok(())
         } else {
             diagnostics.sort();
-            Err(diagnostics)
+            Err(diagnostics.0)
         }
     }
 }

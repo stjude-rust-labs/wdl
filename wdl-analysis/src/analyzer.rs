@@ -775,12 +775,7 @@ workflow test {
         assert_eq!(results[0].document.diagnostics().len(), 1);
         assert_eq!(results[0].document.diagnostics()[0].rule(), None);
         assert_eq!(
-            results[0]
-                .document
-                .diagnostics()
-                .first()
-                .unwrap()
-                .severity(),
+            results[0].document.diagnostics()[0].severity(),
             Severity::Error
         );
         assert_eq!(
@@ -796,12 +791,7 @@ workflow test {
         assert_eq!(results[0].document.diagnostics().len(), 1);
         assert_eq!(results[0].document.diagnostics()[0].rule(), None);
         assert_eq!(
-            results[0]
-                .document
-                .diagnostics()
-                .first()
-                .unwrap()
-                .severity(),
+            results[0].document.diagnostics()[0].severity(),
             Severity::Error
         );
         assert_eq!(
@@ -840,12 +830,7 @@ workflow test {
         assert_eq!(results[0].document.diagnostics().len(), 1);
         assert_eq!(results[0].document.diagnostics()[0].rule(), None);
         assert_eq!(
-            results[0]
-                .document
-                .diagnostics()
-                .first()
-                .unwrap()
-                .severity(),
+            results[0].document.diagnostics()[0].severity(),
             Severity::Error
         );
         assert_eq!(
@@ -917,12 +902,7 @@ workflow test {
         assert_eq!(results[0].document.diagnostics().len(), 1);
         assert_eq!(results[0].document.diagnostics()[0].rule(), None);
         assert_eq!(
-            results[0]
-                .document
-                .diagnostics()
-                .first()
-                .unwrap()
-                .severity(),
+            results[0].document.diagnostics()[0].severity(),
             Severity::Error
         );
         assert_eq!(
