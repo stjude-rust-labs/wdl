@@ -41,33 +41,37 @@ fn join_paths_simple(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .coerce_argument(1, PrimitiveType::String)
         .unwrap_string();
 
-    if let Ok(mut url) = first.parse::<Url>() {
-        if second.starts_with('/') | second.contains(":") {
-            return Err(function_call_failed(
-                FUNCTION_NAME,
-                format!("path `{second}` is not a relative path"),
-                context.arguments[1].span,
-            ));
-        }
-
-        // For consistency with `PathBuf::push`, push an empty segment so that we treat
-        // the last segment as a directory; otherwise, `Url::join` will treat it as a
-        // file.
-        if let Ok(mut segments) = url.path_segments_mut() {
-            segments.pop_if_empty();
-            segments.push("");
-        }
-
-        return url
-            .join(&second)
-            .map(|u| PrimitiveValue::new_file(u).into())
-            .map_err(|_| {
-                function_call_failed(
+    // Do not attempt to parse absolute Windows paths (and by extension, we do not
+    // support single-character schemed URLs)
+    if first.get(1..2) != Some(":") {
+        if let Ok(mut url) = first.parse::<Url>() {
+            if second.starts_with('/') | second.contains(":") {
+                return Err(function_call_failed(
                     FUNCTION_NAME,
-                    format!("path `{second}` cannot be joined with URL `{url}`"),
+                    format!("path `{second}` is not a relative path"),
                     context.arguments[1].span,
-                )
-            });
+                ));
+            }
+
+            // For consistency with `PathBuf::push`, push an empty segment so that we treat
+            // the last segment as a directory; otherwise, `Url::join` will treat it as a
+            // file.
+            if let Ok(mut segments) = url.path_segments_mut() {
+                segments.pop_if_empty();
+                segments.push("");
+            }
+
+            return url
+                .join(&second)
+                .map(|u| PrimitiveValue::new_file(u).into())
+                .map_err(|_| {
+                    function_call_failed(
+                        FUNCTION_NAME,
+                        format!("path `{second}` cannot be joined with URL `{url}`"),
+                        context.arguments[1].span,
+                    )
+                });
+        }
     }
 
     let second = Path::new(second.as_str());
@@ -137,40 +141,46 @@ fn join_paths(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         (first, array, false, context.arguments[1].span)
     };
 
-    if let Ok(mut url) = first.parse::<Url>() {
-        for (i, element) in array
-            .as_slice()
-            .iter()
-            .enumerate()
-            .skip(if skip { 1 } else { 0 })
-        {
-            let next = element.as_string().expect("element should be string");
-            if next.starts_with('/') || next.contains(":") {
-                return Err(function_call_failed(
-                    FUNCTION_NAME,
-                    format!("path `{next}` (array index {i}) is not a relative path"),
-                    array_span,
-                ));
+    // Do not attempt to parse absolute Windows paths (and by extension, we do not
+    // support single-character schemed URLs)
+    if first.get(1..2) != Some(":") {
+        if let Ok(mut url) = first.parse::<Url>() {
+            for (i, element) in array
+                .as_slice()
+                .iter()
+                .enumerate()
+                .skip(if skip { 1 } else { 0 })
+            {
+                let next = element.as_string().expect("element should be string");
+                if next.starts_with('/') || next.contains(":") {
+                    return Err(function_call_failed(
+                        FUNCTION_NAME,
+                        format!("path `{next}` (array index {i}) is not a relative path"),
+                        array_span,
+                    ));
+                }
+
+                // For consistency with `PathBuf::push`, push an empty segment so that we treat
+                // the last segment as a directory; otherwise, `Url::join` will treat it as a
+                // file.
+                if let Ok(mut segments) = url.path_segments_mut() {
+                    segments.pop_if_empty();
+                    segments.push("");
+                }
+
+                url = url.join(next).map_err(|_| {
+                    function_call_failed(
+                        FUNCTION_NAME,
+                        format!(
+                            "path `{next}` (array index {i}) cannot be joined with URL `{url}`"
+                        ),
+                        context.arguments[1].span,
+                    )
+                })?;
             }
 
-            // For consistency with `PathBuf::push`, push an empty segment so that we treat
-            // the last segment as a directory; otherwise, `Url::join` will treat it as a
-            // file.
-            if let Ok(mut segments) = url.path_segments_mut() {
-                segments.pop_if_empty();
-                segments.push("");
-            }
-
-            url = url.join(next).map_err(|_| {
-                function_call_failed(
-                    FUNCTION_NAME,
-                    format!("path `{next}` (array index {i}) cannot be joined with URL `{url}`"),
-                    context.arguments[1].span,
-                )
-            })?;
+            return Ok(PrimitiveValue::new_file(url).into());
         }
-
-        return Ok(PrimitiveValue::new_file(url).into());
     }
 
     let mut path = PathBuf::from(Arc::unwrap_or_clone(first));

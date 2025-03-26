@@ -31,16 +31,22 @@ const FUNCTION_NAME: &str = "size";
 ///
 /// This conversion supports `file://` schemed URLs.
 fn to_file_path(cwd: &Path, path: &str) -> Result<PathBuf> {
-    if let Ok(url) = path.parse::<Url>() {
-        if url.scheme() != "file" {
-            bail!("path `{path}` cannot be sized: only `file` scheme URLs are supported");
-        }
-
-        match url.to_file_path() {
-            Ok(path) => Ok(path),
-            Err(_) => {
-                bail!("path `{path}` cannot be represented as a local file path");
+    // Do not attempt to parse absolute Windows paths (and by extension, we do not
+    // support single-character schemed URLs)
+    if path.get(1..2) != Some(":") {
+        if let Ok(url) = path.parse::<Url>() {
+            if url.scheme() != "file" {
+                bail!("path `{path}` cannot be sized: only `file` scheme URLs are supported");
             }
+
+            match url.to_file_path() {
+                Ok(path) => Ok(path),
+                Err(_) => {
+                    bail!("path `{path}` cannot be represented as a local file path");
+                }
+            }
+        } else {
+            Ok(cwd.join(path))
         }
     } else {
         Ok(cwd.join(path))

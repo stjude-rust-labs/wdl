@@ -43,13 +43,17 @@ fn basename(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .coerce_argument(0, PrimitiveType::String)
         .unwrap_string();
 
-    if let Ok(url) = path.parse::<Url>() {
-        let base = url
-            .path_segments()
-            .and_then(|mut segments| segments.next_back())
-            .unwrap_or("");
+    // Do not attempt to parse absolute Windows paths (and by extension, we do not
+    // support single-character schemed URLs)
+    if path.get(1..2) != Some(":") {
+        if let Ok(url) = path.parse::<Url>() {
+            let base = url
+                .path_segments()
+                .and_then(|mut segments| segments.next_back())
+                .unwrap_or("");
 
-        return Ok(PrimitiveValue::new_string(remove_suffix(context, base)).into());
+            return Ok(PrimitiveValue::new_string(remove_suffix(context, base)).into());
+        }
     }
 
     let base = Path::new(path.as_str())
