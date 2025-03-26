@@ -373,7 +373,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
             .as_ref()
             .unwrap();
         for (message, line_no) in messages {
-            diagnostics.add(config::inner::Diagnostic::new(
+            diagnostics.push(config::inner::Diagnostic::new(
                 identifier.clone(),
                 message,
                 hash,

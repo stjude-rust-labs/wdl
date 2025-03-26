@@ -21,15 +21,11 @@
 //! visiting a V2 document; the hope is that enables some visitors to be
 //! "shared" across different WDL versions.
 
-use std::sync::Arc;
-
 use rowan::WalkEvent;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
-use wdl_ast::Diagnostic;
 use wdl_ast::Document;
 use wdl_ast::SupportedVersion;
-use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNode;
 use wdl_ast::VersionStatement;
@@ -61,7 +57,7 @@ use wdl_ast::v1::UnboundDecl;
 use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::v1::WorkflowHintsSection;
 
-use crate::SyntaxNodeExt;
+use crate::Diagnostics;
 
 /// Represents the reason an AST node has been visited.
 ///
@@ -73,100 +69,6 @@ pub enum VisitReason {
     Enter,
     /// The visit has exited the node.
     Exit,
-}
-
-/// Represents a collection of validation diagnostics.
-///
-/// Validation visitors receive a diagnostics collection during
-/// visitation of the AST.
-#[derive(Debug, Default)]
-pub struct Diagnostics(pub(crate) Vec<Diagnostic>);
-
-impl Diagnostics {
-    /// Adds a diagnostic to the collection.
-    pub fn add(&mut self, diagnostic: Diagnostic) {
-        self.0.push(diagnostic);
-    }
-
-    /// Adds a diagnostic to the collection, unless the diagnostic is for an
-    /// element that has an exception for the given rule.
-    ///
-    /// If the diagnostic does not have a rule, the diagnostic is always added.
-    pub fn exceptable_add(
-        &mut self,
-        diagnostic: Diagnostic,
-        element: SyntaxElement,
-        exceptable_nodes: &Option<&'static [SyntaxKind]>,
-    ) {
-        if let Some(rule) = diagnostic.rule() {
-            for node in element.ancestors().filter(|node| {
-                exceptable_nodes
-                    .as_ref()
-                    .is_none_or(|nodes| nodes.contains(&node.kind()))
-            }) {
-                if node.is_rule_excepted(rule) {
-                    // Rule is currently excepted, don't add the diagnostic
-                    return;
-                }
-            }
-        }
-
-        self.add(diagnostic);
-    }
-
-    /// Returns the number of diagnostics in the collection.
-    pub fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    /// Extends the collection with another collection of diagnostics.
-    pub fn extend(&mut self, diagnostics: Diagnostics) {
-        self.0.extend(diagnostics.0);
-    }
-
-    /// Returns whether the collection is empty.
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-
-    /// Sorts the diagnostics in the collection.
-    pub fn sort(&mut self) {
-        self.0.sort();
-    }
-
-    /// Returns the first diagnostic in the collection if it exists.
-    pub fn first(&self) -> Option<&Diagnostic> {
-        self.0.first()
-    }
-}
-
-impl FromIterator<Diagnostic> for Diagnostics {
-    fn from_iter<T: IntoIterator<Item = Diagnostic>>(iter: T) -> Self {
-        Self(iter.into_iter().collect())
-    }
-}
-
-impl From<Arc<Diagnostics>> for Diagnostics {
-    fn from(diagnostics: Arc<Diagnostics>) -> Self {
-        Self(diagnostics.0.clone())
-    }
-}
-
-impl Iterator for Diagnostics {
-    type Item = Diagnostic;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.0.pop()
-    }
-}
-
-impl<'a> IntoIterator for &'a Diagnostics {
-    type IntoIter = std::slice::Iter<'a, Diagnostic>;
-    type Item = &'a Diagnostic;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.iter()
-    }
 }
 
 /// A trait used to implement an AST visitor.

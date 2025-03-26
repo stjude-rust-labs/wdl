@@ -1215,7 +1215,7 @@ mod test {
         assert!(graph.contains_edge(y_input, t2), "t2 should depend on y");
 
         // Testing with providing input y i.e. runtime analysis - case for wdl_engine
-        let mut diagnostics = Diagnostics::default();
+        let mut diagnostics = Vec::new();
         let graph =
             WorkflowGraphBuilder::default().build(&workflow, &mut diagnostics, |name| name == "y");
 
