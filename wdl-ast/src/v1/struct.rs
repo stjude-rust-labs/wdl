@@ -12,7 +12,7 @@ use crate::TreeNode;
 
 /// Represents a struct definition.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct StructDefinition<N: TreeNode = SyntaxNode>(pub(crate) N);
+pub struct StructDefinition<N: TreeNode = SyntaxNode>(N);
 
 impl<N: TreeNode> StructDefinition<N> {
     /// Gets the name of the struct.

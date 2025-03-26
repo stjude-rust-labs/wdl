@@ -22,7 +22,7 @@ use crate::TreeNode;
 
 /// Represents an import statement.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ImportStatement<N: TreeNode = SyntaxNode>(pub(crate) N);
+pub struct ImportStatement<N: TreeNode = SyntaxNode>(N);
 
 impl<N: TreeNode> ImportStatement<N> {
     /// Gets the URI of the import statement.

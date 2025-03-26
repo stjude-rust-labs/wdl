@@ -717,7 +717,7 @@ impl fmt::Display for Type {
 
 /// Represents an unbound declaration.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct UnboundDecl<N: TreeNode = SyntaxNode>(pub(crate) N);
+pub struct UnboundDecl<N: TreeNode = SyntaxNode>(N);
 
 impl<N: TreeNode> UnboundDecl<N> {
     /// Gets the `env` token, if present.
@@ -758,7 +758,7 @@ impl<N: TreeNode> AstNode<N> for UnboundDecl<N> {
 
 /// Represents a bound declaration in a task or workflow definition.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct BoundDecl<N: TreeNode = SyntaxNode>(pub(crate) N);
+pub struct BoundDecl<N: TreeNode = SyntaxNode>(N);
 
 impl<N: TreeNode> BoundDecl<N> {
     /// Gets the `env` token, if present.

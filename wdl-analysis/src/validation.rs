@@ -2,7 +2,6 @@
 
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
-use wdl_ast::Document;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
@@ -13,6 +12,7 @@ use wdl_ast::v1;
 use crate::SyntaxNodeExt;
 use crate::VisitReason;
 use crate::Visitor;
+use crate::document::Document;
 
 mod counts;
 mod env;

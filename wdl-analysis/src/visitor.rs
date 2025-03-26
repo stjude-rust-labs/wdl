@@ -22,6 +22,7 @@
 //! "shared" across different WDL versions.
 
 use rowan::WalkEvent;
+use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Document;
@@ -330,7 +331,8 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, diagnostics: &mut Diagnostics
 
         match element.kind() {
             SyntaxKind::RootNode => {
-                let document = Document(element.into_node().unwrap());
+                let document = Document::cast(element.into_node().unwrap())
+                    .expect("root node should be a document");
 
                 let version = document
                     .version_statement()
@@ -342,12 +344,12 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, diagnostics: &mut Diagnostics
             SyntaxKind::VersionStatementNode => visitor.version_statement(
                 diagnostics,
                 reason,
-                &VersionStatement(element.into_node().unwrap()),
+                &VersionStatement::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::ImportStatementNode => visitor.import_statement(
                 diagnostics,
                 reason,
-                &ImportStatement(element.into_node().unwrap()),
+                &ImportStatement::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::ImportAliasNode => {
                 // Skip these nodes as they're part of an import statement

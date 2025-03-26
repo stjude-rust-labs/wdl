@@ -2330,7 +2330,7 @@ impl<N: TreeNode> StringPart<N> {
 
 /// Represents a textual part of a string.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct StringText<T: TreeToken = SyntaxToken>(pub(crate) T);
+pub struct StringText<T: TreeToken = SyntaxToken>(T);
 
 impl<T: TreeToken> StringText<T> {
     /// Unescapes the string text to the given buffer.
@@ -2410,7 +2410,7 @@ impl<T: TreeToken> AstToken<T> for StringText<T> {
 
 /// Represents a placeholder in a string or command.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Placeholder<N: TreeNode = SyntaxNode>(pub(crate) N);
+pub struct Placeholder<N: TreeNode = SyntaxNode>(N);
 
 impl<N: TreeNode> Placeholder<N> {
     /// Returns whether or not placeholder has a tilde (`~`) opening.
