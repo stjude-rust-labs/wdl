@@ -24,6 +24,9 @@ use crate::StorageUnit;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
 
+/// The name of the function defined in this file for use in diagnostics.
+const FUNCTION_NAME: &str = "size";
+
 /// Converts a string to a file path.
 ///
 /// This conversion supports `file://` schemed URLs.
@@ -63,7 +66,7 @@ fn size(context: CallContext<'_>) -> BoxFuture<'_, Result<Value, Diagnostic>> {
 
             unit.parse().map_err(|_| {
                 function_call_failed(
-                    "size",
+                    FUNCTION_NAME,
                     format!(
                         "invalid storage unit `{unit}`: supported units are `B`, `KB`, `K`, `MB`, \
                          `M`, `GB`, `G`, `TB`, `T`, `KiB`, `Ki`, `MiB`, `Mi`, `GiB`, `Gi`, `TiB`, \
@@ -81,7 +84,7 @@ fn size(context: CallContext<'_>) -> BoxFuture<'_, Result<Value, Diagnostic>> {
         let value = match context.arguments[0].value.as_string() {
             Some(s) => {
                 let path = to_file_path(context.work_dir(), s).map_err(|e| {
-                    function_call_failed("size", format!("{e:?}"), context.call_site)
+                    function_call_failed(FUNCTION_NAME, format!("{e:?}"), context.call_site)
                 })?;
                 let metadata = fs::metadata(&path)
                     .await
@@ -92,7 +95,7 @@ fn size(context: CallContext<'_>) -> BoxFuture<'_, Result<Value, Diagnostic>> {
                         )
                     })
                     .map_err(|e| {
-                        function_call_failed("size", format!("{e:?}"), context.call_site)
+                        function_call_failed(FUNCTION_NAME, format!("{e:?}"), context.call_site)
                     })?;
                 if metadata.is_dir() {
                     PrimitiveValue::Directory(s.clone()).into()
@@ -105,7 +108,7 @@ fn size(context: CallContext<'_>) -> BoxFuture<'_, Result<Value, Diagnostic>> {
 
         calculate_disk_size(&value, unit, context.work_dir())
             .await
-            .map_err(|e| function_call_failed("size", format!("{e:?}"), context.call_site))
+            .map_err(|e| function_call_failed(FUNCTION_NAME, format!("{e:?}"), context.call_site))
             .map(Into::into)
     }
     .boxed()

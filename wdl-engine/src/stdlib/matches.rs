@@ -11,6 +11,9 @@ use super::Signature;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
 
+/// The name of the function defined in this file for use in diagnostics.
+const FUNCTION_NAME: &str = "matches";
+
 /// Given two String parameters `input` and `pattern`, tests whether `pattern`
 /// matches `input` at least once.
 ///
@@ -27,7 +30,7 @@ fn matches(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .unwrap_string();
 
     let regex = Regex::new(pattern.as_str())
-        .map_err(|e| function_call_failed("matches", &e, context.arguments[1].span))?;
+        .map_err(|e| function_call_failed(FUNCTION_NAME, &e, context.arguments[1].span))?;
     Ok(regex.is_match(input.as_str()).into())
 }
 

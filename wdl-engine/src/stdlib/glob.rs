@@ -16,6 +16,9 @@ use crate::PrimitiveValue;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
 
+/// The name of the function defined in this file for use in diagnostics.
+const FUNCTION_NAME: &str = "glob";
+
 /// Returns the Bash expansion of the glob string relative to the task's
 /// execution directory, and in the same order (i.e. lexicographical).
 ///
@@ -32,7 +35,7 @@ fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     let path = if let Ok(url) = path.parse::<Url>() {
         if url.scheme() != "file" {
             return Err(function_call_failed(
-                "glob",
+                FUNCTION_NAME,
                 format!("path `{path}` cannot be globbed: only `file` scheme URLs are supported"),
                 context.call_site,
             ));
@@ -42,7 +45,7 @@ fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             Ok(path) => path,
             Err(_) => {
                 return Err(function_call_failed(
-                    "glob",
+                    FUNCTION_NAME,
                     format!("path `{path}` cannot be represented as a local file path"),
                     context.call_site,
                 ));
@@ -54,7 +57,7 @@ fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
     let path = path.to_str().ok_or_else(|| {
         function_call_failed(
-            "glob",
+            FUNCTION_NAME,
             format!(
                 "path `{path}` cannot be represented as UTF-8",
                 path = path.display()
@@ -67,12 +70,12 @@ fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     let mut elements: Vec<Value> = Vec::new();
     for path in glob::glob(path).map_err(|e| {
         function_call_failed(
-            "glob",
+            FUNCTION_NAME,
             format!("invalid glob pattern specified: {msg}", msg = e.msg),
             context.arguments[0].span,
         )
     })? {
-        let path = path.map_err(|e| function_call_failed("glob", &e, context.call_site))?;
+        let path = path.map_err(|e| function_call_failed(FUNCTION_NAME, &e, context.call_site))?;
 
         // Filter out directories (only files are returned from WDL's `glob` function)
         if path.is_dir() {
@@ -86,7 +89,7 @@ fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
                 path.to_str()
                     .ok_or_else(|| {
                         function_call_failed(
-                            "glob",
+                            FUNCTION_NAME,
                             format!(
                                 "path `{path}` cannot be represented as UTF-8",
                                 path = path.display()
@@ -100,7 +103,7 @@ fn glob(context: CallContext<'_>) -> Result<Value, Diagnostic> {
                 // Convert the path directly to a string
                 path.into_os_string().into_string().map_err(|path| {
                     function_call_failed(
-                        "glob",
+                        FUNCTION_NAME,
                         format!(
                             "path `{path}` cannot be represented as UTF-8",
                             path = Path::new(&path).display()

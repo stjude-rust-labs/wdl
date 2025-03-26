@@ -14,6 +14,9 @@ use crate::PrimitiveValue;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
 
+/// The name of the function defined in this file for use in diagnostics.
+const FUNCTION_NAME: &str = "sub";
+
 /// Given three String parameters `input`, `pattern`, and `replace`, this
 /// function replaces all non-overlapping occurrences of `pattern` in `input`
 /// with `replace`.
@@ -34,7 +37,7 @@ fn sub(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .unwrap_string();
 
     let regex = Regex::new(pattern.as_str())
-        .map_err(|e| function_call_failed("sub", &e, context.arguments[1].span))?;
+        .map_err(|e| function_call_failed(FUNCTION_NAME, &e, context.arguments[1].span))?;
     match regex.replace(input.as_str(), replacement.as_str()) {
         Cow::Borrowed(_) => {
             // No replacements, just return the input

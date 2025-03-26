@@ -17,6 +17,9 @@ use crate::PrimitiveValue;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
 
+/// The name of the function defined in this file for use in diagnostics.
+const FUNCTION_NAME: &str = "join_paths";
+
 /// Joins together two paths into an absolute path in the host
 /// filesystem.
 ///
@@ -41,7 +44,7 @@ fn join_paths_simple(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     if let Ok(mut url) = first.parse::<Url>() {
         if second.starts_with('/') | second.contains(":") {
             return Err(function_call_failed(
-                "join_paths",
+                FUNCTION_NAME,
                 format!("path `{second}` is not a relative path"),
                 context.arguments[1].span,
             ));
@@ -60,7 +63,7 @@ fn join_paths_simple(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             .map(|u| PrimitiveValue::new_file(u).into())
             .map_err(|_| {
                 function_call_failed(
-                    "join_paths",
+                    FUNCTION_NAME,
                     format!("path `{second}` cannot be joined with URL `{url}`"),
                     context.arguments[1].span,
                 )
@@ -70,7 +73,7 @@ fn join_paths_simple(context: CallContext<'_>) -> Result<Value, Diagnostic> {
     let second = Path::new(second.as_str());
     if !second.is_relative() {
         return Err(function_call_failed(
-            "join_paths",
+            FUNCTION_NAME,
             format!(
                 "path `{second}` is not a relative path",
                 second = second.display()
@@ -142,9 +145,9 @@ fn join_paths(context: CallContext<'_>) -> Result<Value, Diagnostic> {
             .skip(if skip { 1 } else { 0 })
         {
             let next = element.as_string().expect("element should be string");
-            if next.starts_with('/') || next.starts_with("//") | next.contains(":") {
+            if next.starts_with('/') || next.contains(":") {
                 return Err(function_call_failed(
-                    "join_paths",
+                    FUNCTION_NAME,
                     format!("path `{next}` (array index {i}) is not a relative path"),
                     array_span,
                 ));
@@ -160,7 +163,7 @@ fn join_paths(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
             url = url.join(next).map_err(|_| {
                 function_call_failed(
-                    "join_paths",
+                    FUNCTION_NAME,
                     format!("path `{next}` (array index {i}) cannot be joined with URL `{url}`"),
                     context.arguments[1].span,
                 )
@@ -182,7 +185,7 @@ fn join_paths(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         let p = Path::new(next.as_str());
         if !p.is_relative() {
             return Err(function_call_failed(
-                "join_paths",
+                FUNCTION_NAME,
                 format!("path `{next}` (array index {i}) is not a relative path"),
                 array_span,
             ));
@@ -293,8 +296,7 @@ mod test {
                 .unwrap_err();
             assert_eq!(
                 diagnostic.message(),
-                "path `C:\\bin\\echo` is required to be a relative path, but an absolute path was \
-                 provided"
+                "call to function `join_paths` failed: path `C:\\bin\\echo` is not a relative path"
             );
 
             let diagnostic = eval_v1_expr(

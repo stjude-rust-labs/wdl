@@ -14,6 +14,9 @@ use crate::PrimitiveValue;
 use crate::Value;
 use crate::diagnostics::function_call_failed;
 
+/// The name of the function defined in this file for use in diagnostics.
+const FUNCTION_NAME: &str = "find";
+
 /// Given two String parameters `input` and `pattern`, searches for the
 /// occurrence of `pattern` within `input` and returns the first match or `None`
 /// if there are no matches.
@@ -31,7 +34,7 @@ fn find(context: CallContext<'_>) -> Result<Value, Diagnostic> {
         .unwrap_string();
 
     let regex = Regex::new(pattern.as_str())
-        .map_err(|e| function_call_failed("find", &e, context.arguments[1].span))?;
+        .map_err(|e| function_call_failed(FUNCTION_NAME, &e, context.arguments[1].span))?;
 
     match regex.find(input.as_str()) {
         Some(m) => Ok(PrimitiveValue::new_string(m.as_str()).into()),
