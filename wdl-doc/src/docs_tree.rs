@@ -253,7 +253,7 @@ impl DocsTree {
     /// rendered. If the node does not have a page associated with it, the
     /// name of the node will be rendered. All links will be relative to the
     /// given path.
-    pub fn render_sidebar_component<P: AsRef<Path>>(&self, path: P) -> Markup {
+    pub fn render_left_sidebar<P: AsRef<Path>>(&self, path: P) -> Markup {
         fn sidebar_recurse(node: &Node, base: &Path) -> Markup {
             html! {
                 @if let Some(page) = node.page() {
@@ -280,7 +280,7 @@ impl DocsTree {
         let base = path.as_ref().parent().unwrap();
 
         html! {
-            div class="top-0 border left-0 h-full w-1/6 p-4 dark:bg-slate-900 dark:text-white" {
+            div class="top-0 border h-fit left-0 min-w-[280px] w-[280px] p-4 dark:bg-slate-900 dark:text-white overflow-x-scroll" {
                 h1 class="text-2xl text-center" { "Sidebar" }
                 p class="" { (root.name()) }
                 ul class="" {
@@ -293,6 +293,16 @@ impl DocsTree {
                         li class="px-2" { (sidebar_recurse(external, base)) }
                     }
                 }
+            }
+        }
+    }
+
+    /// Render a right sidebar component.
+    pub fn render_right_sidebar(&self) -> Markup {
+        html! {
+            div class="top-0 border h-screen sticky right-0 min-w-[240px] w-[240px] p-4 bottom-4 object-right dark:bg-red-900 dark:text-white" {
+                h1 class="text-2xl text-center" { "Sidebar" }
+                p class="" { "Right Sidebar" }
             }
         }
     }
@@ -316,7 +326,7 @@ impl DocsTree {
         let root = self.root();
         let index_path = root.path().join("index.html");
 
-        let sidebar = self.render_sidebar_component(&index_path);
+        let left_sidebar = self.render_left_sidebar(&index_path);
         let content = html! {
             div class="" {
                 h3 class="" { "Home" }
@@ -349,10 +359,11 @@ impl DocsTree {
         let html = full_page(
             "Home",
             html! {
-                (sidebar)
-                div class="p-4 items-center" {
+                (left_sidebar)
+                div class="p-4 flex" {
                     (content)
                 }
+                (self.render_right_sidebar())
             },
             self.stylesheet_relative_to(root.path()).as_deref(),
         );
@@ -376,15 +387,16 @@ impl DocsTree {
 
         let stylesheet =
             self.stylesheet_relative_to(path.parent().expect("path should have a parent"));
-        let sidebar = self.render_sidebar_component(&path);
+        let left_sidebar = self.render_left_sidebar(&path);
 
         let html = full_page(
             page.name(),
             html! {
-                (sidebar)
-                div class="p-4" {
+                (left_sidebar)
+                div class="p-4 flex" {
                     (content)
                 }
+                (self.render_right_sidebar())
             },
             stylesheet.as_deref(),
         );

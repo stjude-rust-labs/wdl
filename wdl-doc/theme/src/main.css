@@ -10,6 +10,7 @@
 /* Custom theme variables */
 @theme {
   --font-sans: "DM Sans";
+  --sidebar-width: 280px;
 }
 
 /* Scan Rust source code */
