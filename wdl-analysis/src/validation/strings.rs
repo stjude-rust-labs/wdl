@@ -3,7 +3,6 @@
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::lexer::v1::EscapeToken;
@@ -15,6 +14,7 @@ use wdl_ast::v1::PlaceholderOption;
 use crate::Diagnostics;
 use crate::VisitReason;
 use crate::Visitor;
+use crate::document::Document;
 
 /// Creates an "unknown escape sequence" diagnostic
 fn unknown_escape_sequence(sequence: &str, span: Span) -> Diagnostic {

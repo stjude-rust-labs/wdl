@@ -25,7 +25,7 @@ use rowan::WalkEvent;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
-use wdl_ast::Document;
+use wdl_ast::Document as AstDocument;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
 use wdl_ast::SyntaxNode;
@@ -59,6 +59,7 @@ use wdl_ast::v1::WorkflowDefinition;
 use wdl_ast::v1::WorkflowHintsSection;
 
 use crate::Diagnostics;
+use crate::document::Document as AnalysisDocument;
 
 /// Represents the reason an AST node has been visited.
 ///
@@ -88,7 +89,7 @@ pub trait Visitor {
         &mut self,
         diagnostics: &mut Diagnostics,
         reason: VisitReason,
-        doc: &Document,
+        doc: &AnalysisDocument,
         version: SupportedVersion,
     );
 
@@ -322,8 +323,12 @@ pub trait Visitor {
 
 /// Used to visit each descendant node of the given root in a preorder
 /// traversal.
-pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, diagnostics: &mut Diagnostics, visitor: &mut V) {
-    for event in root.preorder_with_tokens() {
+pub(crate) fn visit<V: Visitor>(
+    document: &AnalysisDocument,
+    diagnostics: &mut Diagnostics,
+    visitor: &mut V,
+) {
+    for event in document.root().inner().preorder_with_tokens() {
         let (reason, element) = match event {
             WalkEvent::Enter(node) => (VisitReason::Enter, node),
             WalkEvent::Leave(node) => (VisitReason::Exit, node),
@@ -331,10 +336,10 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, diagnostics: &mut Diagnostics
 
         match element.kind() {
             SyntaxKind::RootNode => {
-                let document = Document::cast(element.into_node().unwrap())
+                let ast_document = AstDocument::cast(element.into_node().unwrap())
                     .expect("root node should be a document");
 
-                let version = document
+                let version = ast_document
                     .version_statement()
                     .and_then(|s| s.version().text().parse::<SupportedVersion>().ok())
                     .expect("only WDL documents with supported versions can be visited");
@@ -357,27 +362,27 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, diagnostics: &mut Diagnostics
             SyntaxKind::StructDefinitionNode => visitor.struct_definition(
                 diagnostics,
                 reason,
-                &StructDefinition(element.into_node().unwrap()),
+                &StructDefinition::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::TaskDefinitionNode => visitor.task_definition(
                 diagnostics,
                 reason,
-                &TaskDefinition(element.into_node().unwrap()),
+                &TaskDefinition::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::WorkflowDefinitionNode => visitor.workflow_definition(
                 diagnostics,
                 reason,
-                &WorkflowDefinition(element.into_node().unwrap()),
+                &WorkflowDefinition::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::UnboundDeclNode => visitor.unbound_decl(
                 diagnostics,
                 reason,
-                &UnboundDecl(element.into_node().unwrap()),
+                &UnboundDecl::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::BoundDeclNode => visitor.bound_decl(
                 diagnostics,
                 reason,
-                &BoundDecl(element.into_node().unwrap()),
+                &BoundDecl::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::PrimitiveTypeNode
             | SyntaxKind::MapTypeNode
@@ -390,32 +395,32 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, diagnostics: &mut Diagnostics
             SyntaxKind::InputSectionNode => visitor.input_section(
                 diagnostics,
                 reason,
-                &InputSection(element.into_node().unwrap()),
+                &InputSection::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::OutputSectionNode => visitor.output_section(
                 diagnostics,
                 reason,
-                &OutputSection(element.into_node().unwrap()),
+                &OutputSection::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::CommandSectionNode => visitor.command_section(
                 diagnostics,
                 reason,
-                &CommandSection(element.into_node().unwrap()),
+                &CommandSection::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::RequirementsSectionNode => visitor.requirements_section(
                 diagnostics,
                 reason,
-                &RequirementsSection(element.into_node().unwrap()),
+                &RequirementsSection::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::TaskHintsSectionNode => visitor.task_hints_section(
                 diagnostics,
                 reason,
-                &TaskHintsSection(element.into_node().unwrap()),
+                &TaskHintsSection::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::WorkflowHintsSectionNode => visitor.workflow_hints_section(
                 diagnostics,
                 reason,
-                &WorkflowHintsSection(element.into_node().unwrap()),
+                &WorkflowHintsSection::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::TaskHintsItemNode | SyntaxKind::WorkflowHintsItemNode => {
                 // Skip this node as it's part of a hints section
@@ -426,37 +431,37 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, diagnostics: &mut Diagnostics
             SyntaxKind::RuntimeSectionNode => visitor.runtime_section(
                 diagnostics,
                 reason,
-                &RuntimeSection(element.into_node().unwrap()),
+                &RuntimeSection::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::RuntimeItemNode => visitor.runtime_item(
                 diagnostics,
                 reason,
-                &RuntimeItem(element.into_node().unwrap()),
+                &RuntimeItem::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::MetadataSectionNode => visitor.metadata_section(
                 diagnostics,
                 reason,
-                &MetadataSection(element.into_node().unwrap()),
+                &MetadataSection::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::ParameterMetadataSectionNode => visitor.parameter_metadata_section(
                 diagnostics,
                 reason,
-                &ParameterMetadataSection(element.into_node().unwrap()),
+                &ParameterMetadataSection::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::MetadataObjectNode => visitor.metadata_object(
                 diagnostics,
                 reason,
-                &MetadataObject(element.into_node().unwrap()),
+                &MetadataObject::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::MetadataObjectItemNode => visitor.metadata_object_item(
                 diagnostics,
                 reason,
-                &MetadataObjectItem(element.into_node().unwrap()),
+                &MetadataObjectItem::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::MetadataArrayNode => visitor.metadata_array(
                 diagnostics,
                 reason,
-                &MetadataArray(element.into_node().unwrap()),
+                &MetadataArray::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::LiteralNullNode => {
                 // Skip these nodes as they're part of a metadata section
@@ -518,7 +523,7 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, diagnostics: &mut Diagnostics
             SyntaxKind::PlaceholderNode => visitor.placeholder(
                 diagnostics,
                 reason,
-                &Placeholder(element.into_node().unwrap()),
+                &Placeholder::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::PlaceholderSepOptionNode
             | SyntaxKind::PlaceholderDefaultOptionNode
@@ -528,17 +533,17 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, diagnostics: &mut Diagnostics
             SyntaxKind::ConditionalStatementNode => visitor.conditional_statement(
                 diagnostics,
                 reason,
-                &ConditionalStatement(element.into_node().unwrap()),
+                &ConditionalStatement::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::ScatterStatementNode => visitor.scatter_statement(
                 diagnostics,
                 reason,
-                &ScatterStatement(element.into_node().unwrap()),
+                &ScatterStatement::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::CallStatementNode => visitor.call_statement(
                 diagnostics,
                 reason,
-                &CallStatement(element.into_node().unwrap()),
+                &CallStatement::cast(element.into_node().unwrap()).expect("should cast"),
             ),
             SyntaxKind::CallTargetNode
             | SyntaxKind::CallAliasNode
@@ -549,18 +554,22 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, diagnostics: &mut Diagnostics
             SyntaxKind::Abandoned | SyntaxKind::MAX => {
                 unreachable!("node should not exist in the tree")
             }
-            SyntaxKind::Whitespace if reason == VisitReason::Enter => {
-                visitor.whitespace(diagnostics, &Whitespace(element.into_token().unwrap()))
-            }
-            SyntaxKind::Comment if reason == VisitReason::Enter => {
-                visitor.comment(diagnostics, &Comment(element.into_token().unwrap()))
-            }
-            SyntaxKind::LiteralStringText if reason == VisitReason::Enter => {
-                visitor.string_text(diagnostics, &StringText(element.into_token().unwrap()))
-            }
-            SyntaxKind::LiteralCommandText if reason == VisitReason::Enter => {
-                visitor.command_text(diagnostics, &CommandText(element.into_token().unwrap()))
-            }
+            SyntaxKind::Whitespace if reason == VisitReason::Enter => visitor.whitespace(
+                diagnostics,
+                &Whitespace::cast(element.into_token().unwrap()).expect("should cast"),
+            ),
+            SyntaxKind::Comment if reason == VisitReason::Enter => visitor.comment(
+                diagnostics,
+                &Comment::cast(element.into_token().unwrap()).expect("should cast"),
+            ),
+            SyntaxKind::LiteralStringText if reason == VisitReason::Enter => visitor.string_text(
+                diagnostics,
+                &StringText::cast(element.into_token().unwrap()).expect("should cast"),
+            ),
+            SyntaxKind::LiteralCommandText if reason == VisitReason::Enter => visitor.command_text(
+                diagnostics,
+                &CommandText::cast(element.into_token().unwrap()).expect("should cast"),
+            ),
             _ => {
                 // Skip remaining tokens
             }
@@ -568,10 +577,10 @@ pub(crate) fn visit<V: Visitor>(root: &SyntaxNode, diagnostics: &mut Diagnostics
     }
 }
 
-impl Document<SyntaxNode> {
+impl AnalysisDocument {
     /// Visits the document with a pre-order traversal using the provided
     /// visitor to visit each element in the document.
     pub fn visit<V: Visitor>(&self, diagnostics: &mut Diagnostics, visitor: &mut V) {
-        visit(&self.0, diagnostics, visitor)
+        visit(&self, diagnostics, visitor)
     }
 }

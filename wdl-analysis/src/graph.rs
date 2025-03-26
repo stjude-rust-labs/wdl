@@ -31,7 +31,6 @@ use wdl_ast::Diagnostic;
 use wdl_ast::SyntaxNode;
 
 use crate::IncrementalChange;
-use crate::Validator;
 use crate::document::Document;
 
 /// Represents space for a DFS search of a document graph.
@@ -203,12 +202,7 @@ impl DocumentGraphNode {
     /// If a parse is not necessary, the current parse state is returned.
     ///
     /// Otherwise, the new parse state is returned.
-    pub fn parse(
-        &self,
-        tokio: &Handle,
-        client: &Client,
-        validator: &mut Validator,
-    ) -> Result<ParseState> {
+    pub fn parse(&self, tokio: &Handle, client: &Client) -> Result<ParseState> {
         if !self.needs_parse() {
             return Ok(self.parse_state.clone());
         }
@@ -219,7 +213,7 @@ impl DocumentGraphNode {
         }
 
         // Otherwise, fall back to a full parse.
-        self.full_parse(tokio, client, validator)
+        self.full_parse(tokio, client)
     }
 
     /// Performs an incremental parse of the document.
@@ -244,12 +238,7 @@ impl DocumentGraphNode {
     }
 
     /// Performs a full parse of the node.
-    fn full_parse(
-        &self,
-        tokio: &Handle,
-        client: &Client,
-        validator: &mut Validator,
-    ) -> Result<ParseState> {
+    fn full_parse(&self, tokio: &Handle, client: &Client) -> Result<ParseState> {
         let (version, source, lines) = match &self.change {
             None => {
                 // Fetch the source
@@ -323,17 +312,6 @@ impl DocumentGraphNode {
             uri = self.uri,
             elapsed = start.elapsed()
         );
-
-        let diagnostics = if diagnostics.is_empty() {
-            validator
-                .validate(&document)
-                .err()
-                .unwrap_or_default()
-                .into_iter()
-                .collect()
-        } else {
-            Vec::new()
-        };
 
         Ok(ParseState::Parsed {
             version,

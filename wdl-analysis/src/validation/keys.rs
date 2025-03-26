@@ -5,7 +5,6 @@ use std::fmt;
 
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Document;
 use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -38,6 +37,7 @@ use wdl_ast::v1::WorkflowHintsSection;
 use crate::Diagnostics;
 use crate::VisitReason;
 use crate::Visitor;
+use crate::document::Document;
 
 /// Represents context about a unique key validation error.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

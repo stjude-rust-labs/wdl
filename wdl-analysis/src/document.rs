@@ -537,9 +537,6 @@ impl Document {
             );
         }
 
-        // Sort the diagnostics by start
-        data.diagnostics.sort();
-
         Self {
             data: Arc::new(data),
         }
@@ -640,6 +637,14 @@ impl Document {
     /// Gets the analysis diagnostics for the document.
     pub fn diagnostics(&self) -> &[Diagnostic] {
         &self.data.diagnostics
+    }
+
+    pub fn extend_diagnostics(&mut self, diagnostics: Vec<Diagnostic>) -> Self {
+        let mut data = &mut self.data;
+        let inner = Arc::get_mut(&mut data).expect("should only have one reference");
+        inner.diagnostics.extend(diagnostics);
+        inner.diagnostics.sort();
+        Self { data: data.clone() }
     }
 
     /// Finds a scope based on a position within the document.

@@ -2,7 +2,6 @@
 
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Document;
 use wdl_ast::Ident;
 use wdl_ast::SupportedVersion;
 use wdl_ast::v1;
@@ -21,6 +20,7 @@ use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES_ALIAS;
 use crate::Diagnostics;
 use crate::VisitReason;
 use crate::Visitor;
+use crate::document::Document;
 
 /// Creates an "unsupported requirements key" diagnostic.
 fn unsupported_requirements_key(name: &Ident) -> Diagnostic {

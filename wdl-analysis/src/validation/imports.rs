@@ -2,7 +2,6 @@
 
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
-use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::v1;
@@ -11,6 +10,7 @@ use wdl_ast::v1::StringPart;
 use crate::Diagnostics;
 use crate::VisitReason;
 use crate::Visitor;
+use crate::document::Document;
 
 /// Creates an "empty import" diagnostic
 fn empty_import(span: Span) -> Diagnostic {

@@ -3,7 +3,6 @@
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::v1::Expr;
@@ -13,6 +12,7 @@ use wdl_ast::v1::Minus;
 use crate::Diagnostics;
 use crate::VisitReason;
 use crate::Visitor;
+use crate::document::Document;
 
 /// Creates an "integer not in range" diagnostic
 fn integer_not_in_range(span: Span) -> Diagnostic {

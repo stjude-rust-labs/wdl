@@ -7,7 +7,6 @@ use wdl_ast::Ast;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Document;
 use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
@@ -37,6 +36,7 @@ use wdl_ast::v1::WorkflowDefinition;
 use crate::Diagnostics;
 use crate::VisitReason;
 use crate::Visitor;
+use crate::document::Document;
 
 /// Represents section context of an error.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -262,7 +262,7 @@ impl Visitor for CountingVisitor {
         }
 
         // Ignore documents that are not supported
-        if matches!(doc.ast(), Ast::Unsupported) {
+        if matches!(doc.root().ast(), Ast::Unsupported) {
             return;
         }
 
