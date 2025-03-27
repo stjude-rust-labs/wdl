@@ -88,9 +88,7 @@ pub trait Rule: Visitor<State = Diagnostics> {
     /// common co-occurrences of issues.
     ///
     /// By default, this returns an empty list.
-    fn related_rules(&self) -> &[&'static str] {
-        &[]
-    }
+    fn related_rules(&self) -> &[&'static str];
 }
 
 /// Gets the default rule set.
