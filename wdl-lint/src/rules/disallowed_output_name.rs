@@ -82,6 +82,10 @@ impl Rule for DisallowedOutputNameRule {
             SyntaxKind::BoundDeclNode,
         ])
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["SnakeCase"]
+    }
 }
 
 impl Visitor for DisallowedOutputNameRule {

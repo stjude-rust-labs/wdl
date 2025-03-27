@@ -58,6 +58,10 @@ impl Rule for PreambleCommentAfterVersionRule {
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
         None
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["PreambleFormatting"]
+    }
 }
 
 impl Visitor for PreambleCommentAfterVersionRule {

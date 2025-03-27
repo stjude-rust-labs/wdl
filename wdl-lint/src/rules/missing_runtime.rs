@@ -56,6 +56,10 @@ impl Rule for MissingRuntimeRule {
             SyntaxKind::TaskDefinitionNode,
         ])
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["MissingRequirements"]
+    }
 }
 
 impl Visitor for MissingRuntimeRule {

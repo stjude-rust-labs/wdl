@@ -64,6 +64,10 @@ impl Rule for ImportPlacementRule {
             SyntaxKind::ImportStatementNode,
         ])
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["ImportSort", "ImportWhitespace"]
+    }
 }
 
 impl Visitor for ImportPlacementRule {

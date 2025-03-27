@@ -80,6 +80,17 @@ pub trait Rule: Visitor<State = Diagnostics> {
     ///
     /// If `None` is returned, all nodes are exceptable.
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]>;
+
+    /// Gets the ID of rules that are related to this rule.
+    ///
+    /// This can be used by tools (like `sprocket explain`) to suggest other
+    /// relevant rules to the user based on potential logical connections or
+    /// common co-occurrences of issues.
+    ///
+    /// By default, this returns an empty list.
+    fn related_rules(&self) -> Vec<&'static str> {
+        Vec::new()
+    }
 }
 
 /// Gets the default rule set.
@@ -129,23 +140,40 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::RedundantInputAssignment>::default(),
     ];
 
-    // Ensure all the rule ids are unique and pascal case
+    // Ensure all the rule ids are unique and pascal case, and related rules are
+    // valid and exist
     #[cfg(debug_assertions)]
     {
+        use std::collections::HashSet;
+
         use convert_case::Case;
         use convert_case::Casing;
-        let mut set = std::collections::HashSet::new();
+
+        let mut rule_ids = HashSet::new();
         for r in &rules {
             if r.id().to_case(Case::Pascal) != r.id() {
                 panic!("lint rule id `{id}` is not pascal case", id = r.id());
             }
 
-            if !set.insert(r.id()) {
+            if !rule_ids.insert(r.id()) {
                 panic!("duplicate rule id `{id}`", id = r.id());
             }
 
             if RESERVED_RULE_IDS.contains(&r.id()) {
                 panic!("rule id `{id}` is reserved", id = r.id());
+            }
+        }
+
+        for r in &rules {
+            for related_id in r.related_rules() {
+                if !rule_ids.contains(related_id) {
+                    panic!(
+                        "Rule `{id}` refers to a related rule `{related_id}` which does not exist \
+                         in the default rule set.",
+                        id = r.id(),
+                        related_id = related_id
+                    );
+                }
             }
         }
     }
@@ -160,23 +188,48 @@ pub fn optional_rules() -> Vec<Box<dyn Rule>> {
     // Ensure all the rule ids are unique and pascal case
     #[cfg(debug_assertions)]
     {
+        use std::collections::HashSet;
+        use std::iter::FromIterator;
+
         use convert_case::Case;
         use convert_case::Casing;
 
-        use crate::rules;
-        let mut set: std::collections::HashSet<&str> =
-            std::collections::HashSet::from_iter(rules().iter().map(|r| r.id()));
-        for r in opt_rules.iter() {
-            if r.id().to_case(Case::Pascal) != r.id() {
-                panic!("lint rule id `{id}` is not pascal case", id = r.id());
+        let default_rule_ids: HashSet<&str> = HashSet::from_iter(rules().iter().map(|r| r.id()));
+        let mut opt_rule_ids = HashSet::new();
+
+        for r in &opt_rules {
+            let id = r.id();
+            if id.to_case(Case::Pascal) != id {
+                panic!("lint rule id `{id}` is not pascal case", id = id);
             }
 
-            if !set.insert(r.id()) {
-                panic!("duplicate rule id `{id}`", id = r.id());
+            if default_rule_ids.contains(id) {
+                panic!(
+                    "optional rule id `{id}` conflicts with a default rule id",
+                    id = id
+                );
             }
 
-            if RESERVED_RULE_IDS.contains(&r.id()) {
-                panic!("rule id `{id}` is reserved", id = r.id());
+            if !opt_rule_ids.insert(id) {
+                panic!("duplicate rule id `{id}`", id = id);
+            }
+
+            if RESERVED_RULE_IDS.contains(&id) {
+                panic!("rule id `{id}` is reserved", id = id);
+            }
+        }
+
+        let all_rule_ids: HashSet<&str> = default_rule_ids.union(&opt_rule_ids).copied().collect();
+        for r in &opt_rules {
+            for related_id in r.related_rules() {
+                if !all_rule_ids.contains(related_id) {
+                    panic!(
+                        "optional rule `{id}` refers to a related rule `{related_id}` which does \
+                         not exist.",
+                        id = r.id(),
+                        related_id = related_id
+                    );
+                }
             }
         }
     }

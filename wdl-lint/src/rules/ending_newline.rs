@@ -66,6 +66,10 @@ impl Rule for EndingNewlineRule {
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
         Some(&[SyntaxKind::VersionStatementNode])
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["Whitespace"]
+    }
 }
 
 impl Visitor for EndingNewlineRule {

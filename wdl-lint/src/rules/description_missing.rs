@@ -74,6 +74,10 @@ impl Rule for DescriptionMissingRule {
             SyntaxKind::MetadataSectionNode,
         ])
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["MissingMetas"]
+    }
 }
 
 impl Visitor for DescriptionMissingRule {

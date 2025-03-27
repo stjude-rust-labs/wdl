@@ -83,6 +83,10 @@ impl Rule for DisallowedInputNameRule {
             SyntaxKind::UnboundDeclNode,
         ])
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["SnakeCase"]
+    }
 }
 
 impl Visitor for DisallowedInputNameRule {

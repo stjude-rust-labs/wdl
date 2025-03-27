@@ -97,6 +97,10 @@ impl Rule for SectionOrderingRule {
             SyntaxKind::StructDefinitionNode,
         ])
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["MissingMetas", "MissingOutput"]
+    }
 }
 
 /// Track the encountered sections.

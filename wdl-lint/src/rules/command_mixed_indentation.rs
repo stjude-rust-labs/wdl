@@ -104,6 +104,10 @@ impl Rule for CommandSectionMixedIndentationRule {
             SyntaxKind::CommandSectionNode,
         ])
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["Whitespace"]
+    }
 }
 
 impl Visitor for CommandSectionMixedIndentationRule {

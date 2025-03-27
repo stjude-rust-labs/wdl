@@ -220,6 +220,10 @@ impl Rule for InputNotSortedRule {
             SyntaxKind::InputSectionNode,
         ])
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["DisallowedInputName"]
+    }
 }
 
 impl Visitor for InputNotSortedRule {

@@ -102,6 +102,10 @@ impl Rule for MatchingParameterMetaRule {
             SyntaxKind::ParameterMetadataSectionNode,
         ])
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["MissingMetas"]
+    }
 }
 
 /// Checks for both missing and extra items in a `parameter_meta` section.

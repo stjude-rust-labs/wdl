@@ -94,6 +94,10 @@ impl Rule for VersionFormattingRule {
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
         Some(&[SyntaxKind::VersionStatementNode])
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["PreambleFormatting"]
+    }
 }
 
 impl Visitor for VersionFormattingRule {

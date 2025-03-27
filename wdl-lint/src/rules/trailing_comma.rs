@@ -79,6 +79,10 @@ impl Rule for TrailingCommaRule {
             SyntaxKind::LiteralObjectNode,
         ])
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["KeyValuePairs", "CallInputSpacing"]
+    }
 }
 
 impl Visitor for TrailingCommaRule {

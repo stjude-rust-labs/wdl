@@ -123,6 +123,10 @@ impl Rule for MissingMetasRule {
             SyntaxKind::StructDefinitionNode,
         ])
     }
+
+    fn related_rules(&self) -> Vec<&'static str> {
+        vec!["DescriptionMissing", "MatchingParameterMeta"]
+    }
 }
 
 impl Visitor for MissingMetasRule {
