@@ -86,11 +86,9 @@ impl Rule for MissingOutputRule {
         &[
             "DescriptionMissing",
             "MatchingParameterMeta",
-            "MissingMetas",
             "MissingRequirements",
             "MissingRuntime",
             "NonmatchingOutput",
-            "Todo",
         ]
     }
 }

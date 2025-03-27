@@ -85,7 +85,7 @@ impl Rule for DisallowedInputNameRule {
     }
 
     fn related_rules(&self) -> &[&'static str] {
-        &["DisallowedOutputName", "UnusedInput"]
+        &["DisallowedOutputName", "DisallowedDeclarationName"]
     }
 }
 

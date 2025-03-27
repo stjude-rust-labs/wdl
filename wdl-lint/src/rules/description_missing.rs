@@ -82,7 +82,6 @@ impl Rule for DescriptionMissingRule {
             "MissingRequirements",
             "MissingRuntime",
             "NonmatchingOutput",
-            "Todo",
         ]
     }
 }

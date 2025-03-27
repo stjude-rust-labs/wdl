@@ -344,11 +344,7 @@ impl Rule for RuntimeSectionKeysRule {
     }
 
     fn related_rules(&self) -> &[&'static str] {
-        &[
-            "DeprecatedObject",
-            "DeprecatedPlaceholderOption",
-            "MissingRequirements",
-        ]
+        &["DeprecatedObject", "DeprecatedPlaceholderOption"]
     }
 }
 

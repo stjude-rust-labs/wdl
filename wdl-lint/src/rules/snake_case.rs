@@ -148,7 +148,7 @@ impl Rule for SnakeCaseRule {
     }
 
     fn related_rules(&self) -> &[&'static str] {
-        &["PascalCase", "UnusedDeclaration"]
+        &["PascalCase"]
     }
 }
 

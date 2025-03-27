@@ -60,15 +60,7 @@ impl Rule for TodoRule {
     }
 
     fn related_rules(&self) -> &[&'static str] {
-        &[
-            "DescriptionMissing",
-            "MatchingParameterMeta",
-            "MissingMetas",
-            "MissingOutput",
-            "MissingRequirements",
-            "MissingRuntime",
-            "NonmatchingOutput",
-        ]
+        &[]
     }
 }
 

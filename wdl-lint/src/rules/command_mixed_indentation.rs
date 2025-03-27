@@ -106,7 +106,7 @@ impl Rule for CommandSectionMixedIndentationRule {
     }
 
     fn related_rules(&self) -> &[&'static str] {
-        &["NoCurlyCommands"]
+        &[]
     }
 }
 

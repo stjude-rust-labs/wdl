@@ -132,7 +132,6 @@ impl Rule for MissingMetasRule {
             "MissingRequirements",
             "MissingRuntime",
             "NonmatchingOutput",
-            "Todo",
         ]
     }
 }
