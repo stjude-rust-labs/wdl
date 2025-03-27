@@ -102,6 +102,18 @@ impl Rule for MatchingParameterMetaRule {
             SyntaxKind::ParameterMetadataSectionNode,
         ])
     }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &[
+            "DescriptionMissing",
+            "MissingMetas",
+            "MissingOutput",
+            "MissingRequirements",
+            "MissingRuntime",
+            "NonmatchingOutput",
+            "Todo",
+        ]
+    }
 }
 
 /// Checks for both missing and extra items in a `parameter_meta` section.

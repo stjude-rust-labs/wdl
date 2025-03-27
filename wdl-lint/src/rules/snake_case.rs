@@ -146,6 +146,10 @@ impl Rule for SnakeCaseRule {
             SyntaxKind::UnboundDeclNode,
         ])
     }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &["PascalCase", "UnusedDeclaration"]
+    }
 }
 
 impl Visitor for SnakeCaseRule {

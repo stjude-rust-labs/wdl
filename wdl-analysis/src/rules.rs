@@ -38,6 +38,11 @@ pub trait Rule: Send + Sync {
 
     /// Gets the severity of the rule.
     fn severity(&self) -> Severity;
+
+    /// Gets the related rules ids for this rule.
+    fn related_rules(&self) -> &'static [&'static str] {
+        &[]
+    }
 }
 
 /// Gets the list of all analysis rules.
@@ -148,6 +153,10 @@ impl Rule for UnusedInputRule {
     fn severity(&self) -> Severity {
         self.0
     }
+
+    fn related_rules(&self) -> &'static [&'static str] {
+        &["DisallowedInputName"]
+    }
 }
 
 /// Represents the unused declaration rule.
@@ -188,6 +197,10 @@ impl Rule for UnusedDeclarationRule {
 
     fn severity(&self) -> Severity {
         self.0
+    }
+
+    fn related_rules(&self) -> &'static [&'static str] {
+        &["SnakeCase"]
     }
 }
 

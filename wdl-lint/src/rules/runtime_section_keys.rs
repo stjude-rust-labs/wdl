@@ -342,6 +342,14 @@ impl Rule for RuntimeSectionKeysRule {
             SyntaxKind::RuntimeSectionNode,
         ])
     }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &[
+            "DeprecatedObject",
+            "DeprecatedPlaceholderOption",
+            "MissingRequirements",
+        ]
+    }
 }
 
 /// A utility method to parse the recommended keys from a static set of runtime

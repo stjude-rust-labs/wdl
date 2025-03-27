@@ -58,6 +58,18 @@ impl Rule for TodoRule {
     fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
         None
     }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &[
+            "DescriptionMissing",
+            "MatchingParameterMeta",
+            "MissingMetas",
+            "MissingOutput",
+            "MissingRequirements",
+            "MissingRuntime",
+            "NonmatchingOutput",
+        ]
+    }
 }
 
 impl Visitor for TodoRule {

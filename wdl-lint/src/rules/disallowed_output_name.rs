@@ -82,6 +82,10 @@ impl Rule for DisallowedOutputNameRule {
             SyntaxKind::BoundDeclNode,
         ])
     }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &["DisallowedInputName"]
+    }
 }
 
 impl Visitor for DisallowedOutputNameRule {

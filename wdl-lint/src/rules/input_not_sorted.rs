@@ -220,6 +220,10 @@ impl Rule for InputNotSortedRule {
             SyntaxKind::InputSectionNode,
         ])
     }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &["ImportSort", "SectionOrdering"]
+    }
 }
 
 impl Visitor for InputNotSortedRule {

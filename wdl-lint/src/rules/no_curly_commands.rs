@@ -60,6 +60,10 @@ impl Rule for NoCurlyCommandsRule {
             SyntaxKind::CommandSectionNode,
         ])
     }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &["CommandSectionMixedIndentation"]
+    }
 }
 
 impl Visitor for NoCurlyCommandsRule {

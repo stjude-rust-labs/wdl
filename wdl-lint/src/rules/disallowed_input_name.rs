@@ -83,6 +83,10 @@ impl Rule for DisallowedInputNameRule {
             SyntaxKind::UnboundDeclNode,
         ])
     }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &["DisallowedOutputName", "UnusedInput"]
+    }
 }
 
 impl Visitor for DisallowedInputNameRule {
