@@ -85,10 +85,6 @@ impl Rule for CallInputSpacingRule {
             SyntaxKind::WorkflowDefinitionNode,
         ])
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["TrailingComma"]
-    }
 }
 
 impl Visitor for CallInputSpacingRule {

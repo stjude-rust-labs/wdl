@@ -81,10 +81,6 @@ impl Rule for ImportWhitespaceRule {
             SyntaxKind::ImportStatementNode,
         ])
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["ImportSort"]
-    }
 }
 
 impl Visitor for ImportWhitespaceRule {

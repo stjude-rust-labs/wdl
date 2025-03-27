@@ -74,10 +74,6 @@ impl Rule for DescriptionMissingRule {
             SyntaxKind::MetadataSectionNode,
         ])
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["MissingMetas"]
-    }
 }
 
 impl Visitor for DescriptionMissingRule {

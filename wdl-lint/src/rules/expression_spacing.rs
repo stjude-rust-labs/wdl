@@ -202,10 +202,6 @@ impl Rule for ExpressionSpacingRule {
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
         None
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["LineWidth"]
-    }
 }
 
 impl Visitor for ExpressionSpacingRule {

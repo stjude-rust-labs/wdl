@@ -76,14 +76,6 @@ impl Rule for WhitespaceRule {
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
         None
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &[
-            "BlankLinesBetweenElements",
-            "EndingNewline",
-            "CommentWhitespace",
-        ]
-    }
 }
 
 impl Visitor for WhitespaceRule {

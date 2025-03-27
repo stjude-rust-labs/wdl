@@ -82,10 +82,6 @@ impl Rule for DisallowedOutputNameRule {
             SyntaxKind::BoundDeclNode,
         ])
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["SnakeCase"]
-    }
 }
 
 impl Visitor for DisallowedOutputNameRule {

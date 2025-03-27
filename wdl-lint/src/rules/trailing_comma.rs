@@ -79,10 +79,6 @@ impl Rule for TrailingCommaRule {
             SyntaxKind::LiteralObjectNode,
         ])
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["KeyValuePairs", "CallInputSpacing"]
-    }
 }
 
 impl Visitor for TrailingCommaRule {

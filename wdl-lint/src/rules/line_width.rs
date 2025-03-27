@@ -113,10 +113,6 @@ impl Rule for LineWidthRule {
     fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
         None
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["ExpressionSpacing"]
-    }
 }
 
 impl Visitor for LineWidthRule {

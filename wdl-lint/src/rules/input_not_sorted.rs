@@ -220,10 +220,6 @@ impl Rule for InputNotSortedRule {
             SyntaxKind::InputSectionNode,
         ])
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["DisallowedInputName"]
-    }
 }
 
 impl Visitor for InputNotSortedRule {

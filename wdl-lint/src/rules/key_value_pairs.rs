@@ -100,10 +100,6 @@ impl Rule for KeyValuePairsRule {
             SyntaxKind::ParameterMetadataSectionNode,
         ])
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["TrailingComma"]
-    }
 }
 
 impl Visitor for KeyValuePairsRule {

@@ -95,10 +95,6 @@ impl Rule for CommentWhitespaceRule {
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
         None
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["Whitespace"]
-    }
 }
 
 impl Visitor for CommentWhitespaceRule {

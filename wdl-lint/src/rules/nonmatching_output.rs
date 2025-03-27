@@ -137,10 +137,6 @@ impl Rule for NonmatchingOutputRule<'_> {
             SyntaxKind::WorkflowDefinitionNode,
         ])
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["MissingOutput"]
-    }
 }
 
 /// Check each output key exists in the `outputs` key within the `meta` section.

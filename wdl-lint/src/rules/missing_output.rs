@@ -81,10 +81,6 @@ impl Rule for MissingOutputRule {
             SyntaxKind::WorkflowDefinitionNode,
         ])
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["NonmatchingOutput"]
-    }
 }
 
 impl Visitor for MissingOutputRule {

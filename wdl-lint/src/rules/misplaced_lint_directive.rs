@@ -93,10 +93,6 @@ impl Rule for MisplacedLintDirectiveRule {
     fn exceptable_nodes(&self) -> Option<&'static [wdl_ast::SyntaxKind]> {
         Some(&[SyntaxKind::VersionStatementNode])
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["MalformedLintDirective"]
-    }
 }
 
 impl Visitor for MisplacedLintDirectiveRule {

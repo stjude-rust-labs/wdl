@@ -97,10 +97,6 @@ impl Rule for SectionOrderingRule {
             SyntaxKind::StructDefinitionNode,
         ])
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["MissingMetas", "MissingOutput"]
-    }
 }
 
 /// Track the encountered sections.

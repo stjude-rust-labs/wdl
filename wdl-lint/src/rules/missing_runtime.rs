@@ -56,10 +56,6 @@ impl Rule for MissingRuntimeRule {
             SyntaxKind::TaskDefinitionNode,
         ])
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["MissingRequirements"]
-    }
 }
 
 impl Visitor for MissingRuntimeRule {

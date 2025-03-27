@@ -146,10 +146,6 @@ impl Rule for SnakeCaseRule {
             SyntaxKind::UnboundDeclNode,
         ])
     }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &["DisallowedInputName", "DisallowedOutputName"]
-    }
 }
 
 impl Visitor for SnakeCaseRule {
