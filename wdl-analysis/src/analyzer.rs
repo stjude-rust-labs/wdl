@@ -438,7 +438,7 @@ pub struct Analyzer<Context> {
 
 impl<Context> Analyzer<Context>
 where
-    Context: Send + Clone + 'static,
+    Context: Send + Clone + 'static + Sync,
 {
     /// Constructs a new analyzer with the given diagnostics config.
     ///
@@ -449,8 +449,8 @@ where
     /// The analyzer must be constructed from the context of a Tokio runtime.
     pub fn new<Progress, Return>(config: DiagnosticsConfig, progress: Progress) -> Self
     where
-        Progress: Fn(Context, ProgressKind, usize, usize) -> Return + Send + 'static,
-        Return: Future<Output = ()>,
+        Progress: Fn(Context, ProgressKind, usize, usize) -> Return + Send + 'static + Sync,
+        Return: Future<Output = ()> + Sync,
     {
         Self::new_with_validator(config, progress, crate::Validator::default)
     }
@@ -470,8 +470,8 @@ where
         validator: Validator,
     ) -> Self
     where
-        Progress: Fn(Context, ProgressKind, usize, usize) -> Return + Send + 'static,
-        Return: Future<Output = ()>,
+        Progress: Fn(Context, ProgressKind, usize, usize) -> Return + Send + 'static + Sync,
+        Return: Future<Output = ()> + Sync,
         Validator: Fn() -> crate::Validator + Send + Sync + 'static,
     {
         let (tx, rx) = mpsc::unbounded_channel();
