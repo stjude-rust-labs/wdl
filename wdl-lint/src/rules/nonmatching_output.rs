@@ -138,8 +138,8 @@ impl Rule for NonmatchingOutputRule<'_> {
         ])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["MissingOutput"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["MissingOutput"]
     }
 }
 

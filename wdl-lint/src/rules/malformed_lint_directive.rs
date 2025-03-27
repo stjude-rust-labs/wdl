@@ -99,8 +99,8 @@ impl Rule for MalformedLintDirectiveRule {
         None
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["MisplacedLintDirective", "UnknownRule"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["MisplacedLintDirective", "UnknownRule"]
     }
 }
 

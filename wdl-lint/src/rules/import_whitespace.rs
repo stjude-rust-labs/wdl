@@ -82,8 +82,8 @@ impl Rule for ImportWhitespaceRule {
         ])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["ImportSort"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["ImportSort"]
     }
 }
 

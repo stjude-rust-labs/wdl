@@ -83,8 +83,8 @@ impl Rule for DisallowedOutputNameRule {
         ])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["SnakeCase"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["SnakeCase"]
     }
 }
 

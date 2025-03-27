@@ -88,8 +88,8 @@ pub trait Rule: Visitor<State = Diagnostics> {
     /// common co-occurrences of issues.
     ///
     /// By default, this returns an empty list.
-    fn related_rules(&self) -> Vec<&'static str> {
-        Vec::new()
+    fn related_rules(&self) -> &[&'static str] {
+        &[]
     }
 }
 

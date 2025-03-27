@@ -114,8 +114,8 @@ impl Rule for LineWidthRule {
         None
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["ExpressionSpacing"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["ExpressionSpacing"]
     }
 }
 

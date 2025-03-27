@@ -80,8 +80,8 @@ impl Rule for TrailingCommaRule {
         ])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["KeyValuePairs", "CallInputSpacing"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["KeyValuePairs", "CallInputSpacing"]
     }
 }
 

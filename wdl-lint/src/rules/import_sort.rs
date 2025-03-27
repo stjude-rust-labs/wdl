@@ -65,8 +65,8 @@ impl Rule for ImportSortRule {
         Some(&[SyntaxKind::VersionStatementNode])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["ImportWhitespace"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["ImportWhitespace"]
     }
 }
 

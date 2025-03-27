@@ -96,8 +96,8 @@ impl Rule for CommentWhitespaceRule {
         None
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["Whitespace"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["Whitespace"]
     }
 }
 

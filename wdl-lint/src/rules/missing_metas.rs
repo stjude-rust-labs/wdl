@@ -124,8 +124,8 @@ impl Rule for MissingMetasRule {
         ])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["DescriptionMissing", "MatchingParameterMeta"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["DescriptionMissing", "MatchingParameterMeta"]
     }
 }
 

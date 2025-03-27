@@ -147,8 +147,8 @@ impl Rule for SnakeCaseRule {
         ])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["DisallowedInputName", "DisallowedOutputName"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["DisallowedInputName", "DisallowedOutputName"]
     }
 }
 

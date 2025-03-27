@@ -343,8 +343,8 @@ impl Rule for RuntimeSectionKeysRule {
         ])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["MissingRuntime", "MissingRequirements"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["MissingRuntime", "MissingRequirements"]
     }
 }
 

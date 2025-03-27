@@ -75,8 +75,8 @@ impl Rule for DescriptionMissingRule {
         ])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["MissingMetas"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["MissingMetas"]
     }
 }
 

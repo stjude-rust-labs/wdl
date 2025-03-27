@@ -95,8 +95,8 @@ impl Rule for VersionFormattingRule {
         Some(&[SyntaxKind::VersionStatementNode])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["PreambleFormatting"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["PreambleFormatting"]
     }
 }
 

@@ -57,8 +57,8 @@ impl Rule for MissingRuntimeRule {
         ])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["MissingRequirements"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["MissingRequirements"]
     }
 }
 

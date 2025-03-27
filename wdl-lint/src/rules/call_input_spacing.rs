@@ -86,8 +86,8 @@ impl Rule for CallInputSpacingRule {
         ])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["TrailingComma"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["TrailingComma"]
     }
 }
 

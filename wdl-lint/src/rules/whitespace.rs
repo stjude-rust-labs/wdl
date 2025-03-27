@@ -77,8 +77,8 @@ impl Rule for WhitespaceRule {
         None
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec![
+    fn related_rules(&self) -> &[&'static str] {
+        &[
             "BlankLinesBetweenElements",
             "EndingNewline",
             "CommentWhitespace",

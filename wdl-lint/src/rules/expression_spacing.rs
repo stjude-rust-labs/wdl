@@ -203,8 +203,8 @@ impl Rule for ExpressionSpacingRule {
         None
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["LineWidth"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["LineWidth"]
     }
 }
 

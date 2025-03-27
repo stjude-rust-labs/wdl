@@ -94,8 +94,8 @@ impl Rule for MisplacedLintDirectiveRule {
         Some(&[SyntaxKind::VersionStatementNode])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["MalformedLintDirective"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["MalformedLintDirective"]
     }
 }
 

@@ -98,8 +98,8 @@ impl Rule for SectionOrderingRule {
         ])
     }
 
-    fn related_rules(&self) -> Vec<&'static str> {
-        vec!["MissingMetas", "MissingOutput"]
+    fn related_rules(&self) -> &[&'static str] {
+        &["MissingMetas", "MissingOutput"]
     }
 }
 
