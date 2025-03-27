@@ -143,9 +143,9 @@ pub struct AnalysisQueue<Progress, Context, Return, Validator> {
 
 impl<Progress, Context, Return, Validator> AnalysisQueue<Progress, Context, Return, Validator>
 where
-    Progress: Fn(Context, ProgressKind, usize, usize) -> Return + Send + 'static + Sync,
-    Context: Send + Clone + Sync,
-    Return: Future<Output = ()> + Sync,
+    Progress: Fn(Context, ProgressKind, usize, usize) -> Return + Send + 'static,
+    Context: Send + Clone,
+    Return: Future<Output = ()>,
     Validator: Fn() -> crate::Validator + Send + Sync + 'static,
 {
     /// Constructs a new analysis queue.
@@ -453,9 +453,8 @@ where
 
                         let graph = self.graph.clone();
                         let config = self.config;
-                        let validator = self.validator.clone();
                         Some(RayonHandle::spawn(move || {
-                            Self::analyze_node(config, graph, index, &mut (validator)())
+                            Self::analyze_node(config, graph, index, self.validator)
                         }))
                     })
                     .collect::<FuturesUnordered<_>>()

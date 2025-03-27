@@ -503,7 +503,7 @@ impl Document {
                         node.uri().clone(),
                         Some(root.inner().green().into()),
                         None,
-                        diagnostics.to_vec(),
+                        diagnostics,
                     )),
                 };
             }
@@ -513,7 +513,7 @@ impl Document {
             node.uri().clone(),
             Some(root.inner().green().into()),
             SupportedVersion::from_str(version.text()).ok(),
-            diagnostics.to_vec(),
+            diagnostics,
         );
         match root.ast() {
             Ast::Unsupported => {}
@@ -532,7 +532,8 @@ impl Document {
                 namespaces
                     .iter()
                     .filter(|(_, ns)| !ns.used && !ns.excepted)
-                    .map(|(name, ns)| unused_import(name, ns.span()).with_severity(severity)),
+                    .map(|(name, ns)| unused_import(name, ns.span()).with_severity(severity))
+                    .collect(),
             );
         }
 
@@ -638,7 +639,6 @@ impl Document {
         &self.data.diagnostics
     }
 
-    /// Extends the diagnostics for the document.
     pub fn extend_diagnostics(&mut self, diagnostics: Vec<Diagnostic>) -> Self {
         let mut data = &mut self.data;
         let inner = Arc::get_mut(&mut data).expect("should only have one reference");
