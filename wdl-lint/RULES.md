@@ -26,7 +26,7 @@ be out of sync with released packages.
 | `ImportSort`                     | Clarity, Style                | Ensures that imports are sorted lexicographically.                                                |
 | `ImportWhitespace`               | Clarity, Style, Spacing       | Ensures that there is no extraneous whitespace between or within imports.                         |
 | `InconsistentNewlines`           | Clarity, Style                | Ensures that newlines are used consistently within the file.                                      |
-| `InputSorting`                   | Style                         | Ensures that input declarations are sorted                                                        |
+| `InputSorting`                   | Style, Clarity, Sorting       | Ensures that input declarations are sorted                                                        |
 | `KeyValuePairs`                  | Style                         | Ensures that metadata objects and arrays are properly spaced.                                     |
 | `LineWidth`                      | Clarity, Spacing, Style       | Ensures that lines do not exceed a certain width.                                                 |
 | `MalformedLintDirective`         | Clarity, Correctness          | Ensures there are no malformed lint directives.                                                   |
