@@ -166,7 +166,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
             for related_id in r.related_rules() {
                 if !rule_ids.contains(related_id) {
                     // If a related rule is a reserved rule, then it's fine.
-                    if RESERVED_RULE_IDS.contains(&related_id) {
+                    if RESERVED_RULE_IDS.contains(related_id) {
                         continue;
                     }
                     panic!(
