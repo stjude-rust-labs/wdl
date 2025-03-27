@@ -40,9 +40,7 @@ pub trait Rule: Send + Sync {
     fn severity(&self) -> Severity;
 
     /// Gets the related rules ids for this rule.
-    fn related_rules(&self) -> &'static [&'static str] {
-        &[]
-    }
+    fn related_rules(&self) -> &[&'static str];
 }
 
 /// Gets the list of all analysis rules.
@@ -113,6 +111,10 @@ impl Rule for UnusedImportRule {
     fn severity(&self) -> Severity {
         self.0
     }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &[]
+    }
 }
 
 /// Represents the unused input rule.
@@ -154,7 +156,7 @@ impl Rule for UnusedInputRule {
         self.0
     }
 
-    fn related_rules(&self) -> &'static [&'static str] {
+    fn related_rules(&self) -> &[&'static str] {
         &["DisallowedInputName"]
     }
 }
@@ -199,7 +201,7 @@ impl Rule for UnusedDeclarationRule {
         self.0
     }
 
-    fn related_rules(&self) -> &'static [&'static str] {
+    fn related_rules(&self) -> &[&'static str] {
         &["SnakeCase"]
     }
 }
@@ -241,6 +243,10 @@ impl Rule for UnusedCallRule {
     fn severity(&self) -> Severity {
         self.0
     }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &[]
+    }
 }
 
 /// Represents the unnecessary call rule.
@@ -279,5 +285,9 @@ impl Rule for UnnecessaryFunctionCall {
 
     fn severity(&self) -> Severity {
         self.0
+    }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &[]
     }
 }
