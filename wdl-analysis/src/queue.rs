@@ -1,5 +1,6 @@
 //! Implements the analysis queue.
 
+use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::ops::Range;
 use std::sync::Arc;
@@ -453,8 +454,16 @@ where
 
                         let graph = self.graph.clone();
                         let config = self.config;
+                        let validator = self.validator.clone();
                         Some(RayonHandle::spawn(move || {
-                            Self::analyze_node(config, graph, index, self.validator)
+                            thread_local! {
+                                static VALIDATOR: RefCell<Option<crate::Validator>> = const { RefCell::new(None) };
+                            }
+
+                            VALIDATOR.with_borrow_mut(|v| {
+                                let validator = v.get_or_insert_with(|| validator());
+                                Self::analyze_node(config, graph, index, validator)
+                            })
                         }))
                     })
                     .collect::<FuturesUnordered<_>>()
