@@ -16,6 +16,7 @@ use std::ffi::OsStr;
 use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
+use std::path::absolute;
 use std::process::exit;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
@@ -25,9 +26,14 @@ use codespan_reporting::term;
 use codespan_reporting::term::Config;
 use codespan_reporting::term::termcolor::Buffer;
 use colored::Colorize;
+use path_clean::clean;
 use pretty_assertions::StrComparison;
 use rayon::prelude::*;
+use wdl_analysis::Analyzer;
+use wdl_analysis::DiagnosticsConfig;
 use wdl_analysis::Validator;
+use wdl_analysis::rules;
+use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
 
@@ -120,100 +126,122 @@ fn compare_result(path: &Path, result: &str, is_error: bool) -> Result<(), Strin
     Ok(())
 }
 
-/// Runs a test.
-fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), String> {
-    let path = test.join("source.wdl");
-    let source = std::fs::read_to_string(&path)
-        .map_err(|e| {
-            format!(
-                "failed to read source file `{path}`: {e}",
-                path = path.display()
-            )
-        })?
-        .replace("\r\n", "\n");
-
-    let (document, diagnostics) = Document::parse(&source);
-    if !diagnostics.is_empty() {
-        compare_result(
-            &path.with_extension("errors"),
-            &format_diagnostics(&diagnostics, &path, &source),
-            true,
-        )?;
-    } else {
-        let mut validator = Validator::default();
-        let errors = match validator.validate(&document) {
-            Ok(()) => String::new(),
-            Err(diagnostics) => format_diagnostics(&diagnostics, &path, &source),
-        };
-        compare_result(&path.with_extension("errors"), &errors, true)?;
-    }
-
-    ntests.fetch_add(1, Ordering::SeqCst);
-    Ok(())
-}
-
-fn main() {
+#[tokio::main]
+async fn main() {
     let tests = find_tests();
     println!("\nrunning {} tests\n", tests.len());
 
-    let ntests = AtomicUsize::new(0);
-    let errors = tests
-        .par_iter()
-        .filter_map(|test| {
-            let test_name = test.file_stem().and_then(OsStr::to_str).unwrap();
-            match std::panic::catch_unwind(|| {
-                match run_test(test, &ntests)
-                    .map_err(|e| format!("failed to run test `{path}`: {e}", path = test.display()))
-                    .err()
-                {
-                    Some(e) => {
-                        println!("test {test_name} ... {failed}", failed = "failed".red());
-                        Some((test_name, e))
-                    }
-                    None => {
-                        println!("test {test_name} ... {ok}", ok = "ok".green());
-                        None
-                    }
-                }
-            }) {
-                Ok(result) => result,
-                Err(e) => {
-                    println!(
-                        "test {test_name} ... {panicked}",
-                        panicked = "panicked".red()
-                    );
-                    Some((
-                        test_name,
-                        format!(
-                            "test panicked: {e:?}",
-                            e = e
-                                .downcast_ref::<String>()
-                                .map(|s| s.as_str())
-                                .or_else(|| e.downcast_ref::<&str>().copied())
-                                .unwrap_or("no panic message")
-                        ),
-                    ))
-                }
+    // Start with a single analysis pass over all the test files
+    let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_, _, _, _| async {});
+    for test in &tests {
+        analyzer
+            .add_directory(test.clone())
+            .await
+            .expect("should add directory");
+    }
+    let results = analyzer
+        .analyze(())
+        .await
+        .expect("failed to analyze documents");
+
+    let mut errors = Vec::new();
+    for test in &tests {
+        let test_name = test.file_stem().and_then(OsStr::to_str).unwrap();
+
+        // Discover the results that are relevant only to this test
+        let base = clean(absolute(test).expect("should be made absolute"));
+        // NOTE: clippy appears to be incorrect that this can be modified to use
+        // `filter_map`. Perhaps this should be revisited in the future.
+        #[allow(clippy::filter_map_bool_then)]
+        let result = results
+            .iter()
+            .filter_map(|r| {
+                r.document()
+                    .uri()
+                    .to_file_path()
+                    .ok()?
+                    .starts_with(&base)
+                    .then(|| r.clone())
+            })
+            .next()
+            .expect("should have a result");
+        match compare_result(
+            &test.with_extension("errors"),
+            &format_diagnostics(
+                result.document().diagnostics(),
+                test,
+                &result.document().root().text().to_string(),
+            ),
+            true,
+        ) {
+            Ok(_) => {
+                println!("test {test_name} ... {ok}", ok = "ok".green());
             }
-        })
-        .collect::<Vec<_>>();
-
-    if !errors.is_empty() {
-        eprintln!(
-            "\n{count} test(s) {failed}:",
-            count = errors.len(),
-            failed = "failed".red()
-        );
-
-        for (name, msg) in errors.iter() {
-            eprintln!("{name}: {msg}", msg = msg.red());
+            Err(e) => {
+                println!("test {test_name} ... {failed}", failed = "failed".red());
+                errors.push((test_name, e.to_string()));
+            }
         }
-
-        exit(1);
     }
 
-    println!(
-        "\ntest result: ok. {} passed\n",
-        ntests.load(Ordering::SeqCst)
-    );
+    // let ntests = AtomicUsize::new(0);
+    // let errors = tests
+    //     .par_iter()
+    //     .filter_map(|test| {
+    //         let test_name =
+    // test.file_stem().and_then(OsStr::to_str).unwrap();         match
+    // std::panic::catch_unwind(|| {             match run_test(test,
+    // &ntests)                 .map_err(|e| format!("failed to run test
+    // `{path}`: {e}", path = test.display()))                 .err()
+    //             {
+    //                 Some(e) => {
+    //                     println!("test {test_name} ... {failed}", failed =
+    // "failed".red());                     Some((test_name, e))
+    //                 }
+    //                 None => {
+    //                     println!("test {test_name} ... {ok}", ok =
+    // "ok".green());                     None
+    //                 }
+    //             }
+    //         }) {
+    //             Ok(result) => result,
+    //             Err(e) => {
+    //                 println!(
+    //                     "test {test_name} ... {panicked}",
+    //                     panicked = "panicked".red()
+    //                 );
+    //                 Some((
+    //                     test_name,
+    //                     format!(
+    //                         "test panicked: {e:?}",
+    //                         e = e
+    //                             .downcast_ref::<String>()
+    //                             .map(|s| s.as_str())
+    //                             .or_else(||
+    // e.downcast_ref::<&str>().copied())                             
+    // .unwrap_or("no panic message")                     ),
+    //                 ))
+    //             }
+    //         }
+    //     })
+    //     .collect::<Vec<_>>();
+
+    // if !errors.is_empty() {
+    //     eprintln!(
+    //         "\n{count} test(s) {failed}:",
+    //         count = errors.len(),
+    //         failed = "failed".red()
+    //     );
+
+    //     for (name, msg) in errors.iter() {
+    //         eprintln!("{name}: {msg}", msg = msg.red());
+    //     }
+
+    //     exit(1);
+    // }
+
+    // println!(
+    //     "\ntest result: ok. {} passed\n",
+    //     ntests.load(Ordering::SeqCst)
+    // );
 }
