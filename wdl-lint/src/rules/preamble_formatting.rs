@@ -119,7 +119,7 @@ impl Rule for PreambleFormattingRule {
         "The document preamble is defined as anything before the version declaration statement and \
          the version declaration statement itself. Only comments and whitespace are permitted \
          before the version declaration.
-         
+
          All comments in the preamble should conform to one of two special formats: lint \
          directives or preamble comments.
 
@@ -152,6 +152,10 @@ impl Rule for PreambleFormattingRule {
 
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
         Some(&[SyntaxKind::VersionStatementNode])
+    }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &[]
     }
 }
 
