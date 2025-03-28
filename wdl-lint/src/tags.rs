@@ -48,16 +48,16 @@ impl std::convert::TryFrom<&str> for Tag {
     type Error = UnknownTagError;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        match value.to_lowercase().as_str() {
-            "completeness" => Ok(Self::Completeness),
-            "naming" => Ok(Self::Naming),
-            "spacing" => Ok(Self::Spacing),
-            "style" => Ok(Self::Style),
-            "clarity" => Ok(Self::Clarity),
-            "portability" => Ok(Self::Portability),
-            "correctness" => Ok(Self::Correctness),
-            "sorting" => Ok(Self::Sorting),
-            "deprecated" => Ok(Self::Deprecated),
+        match value {
+            s if s.eq_ignore_ascii_case("completeness") => Ok(Self::Completeness),
+            s if s.eq_ignore_ascii_case("naming") => Ok(Self::Naming),
+            s if s.eq_ignore_ascii_case("spacing") => Ok(Self::Spacing),
+            s if s.eq_ignore_ascii_case("style") => Ok(Self::Style),
+            s if s.eq_ignore_ascii_case("clarity") => Ok(Self::Clarity),
+            s if s.eq_ignore_ascii_case("portability") => Ok(Self::Portability),
+            s if s.eq_ignore_ascii_case("correctness") => Ok(Self::Correctness),
+            s if s.eq_ignore_ascii_case("sorting") => Ok(Self::Sorting),
+            s if s.eq_ignore_ascii_case("deprecated") => Ok(Self::Deprecated),
             _ => Err(UnknownTagError(value.to_string())),
         }
     }
