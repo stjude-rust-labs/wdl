@@ -142,9 +142,36 @@ impl TaskManagerRequest for LocalTaskRequest {
                 bail!("task was cancelled");
             }
             status = child.wait() => {
-                let status = status.with_context(|| {
-                    format!("failed to wait for termination of task child process {id}")
-                })?;
+    let status = status.with_context(|| {
+        format!("failed to wait for termination of task child process {id}")
+    })?;
+
+    // Change ownership of work_dir recursively after task completes
+    #[cfg(unix)]
+    {
+        use std::process::Command;
+    use std::env;
+use users::{get_current_uid, get_current_gid};
+
+let user = env::var("USER").unwrap_or_else(|_| "root".to_string());
+let group = get_current_gid().to_string(); // Gets the current group ID
+
+let output = Command::new("chown")
+    .arg("-R")
+    .arg(format!("{}:{}", user, group)) // Correct replacement
+    .arg(work_dir)
+    .output()
+    .context("failed to change ownership with chown")?;
+
+
+
+        if !output.status.success() {
+            tracing::error!(
+                "chown failed: {}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+        }
+    }
 
                 #[cfg(unix)]
                 {
