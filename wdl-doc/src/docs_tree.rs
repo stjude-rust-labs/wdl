@@ -90,8 +90,13 @@ impl Node {
     }
 
     /// Get the page associated with the node.
-    pub fn page(&self) -> Option<Rc<HTMLPage>> {
-        self.page.clone()
+    pub fn page(&self) -> Option<&Rc<HTMLPage>> {
+        self.page.as_ref()
+    }
+
+    /// Get the children of the node.
+    pub fn children(&self) -> &BTreeMap<String, Node> {
+        &self.children
     }
 
     /// Gather the node and its children in a Depth First Traversal order.
@@ -236,7 +241,7 @@ impl DocsTree {
     }
 
     /// Get the page associated with a path.
-    pub fn get_page<P: AsRef<Path>>(&self, abs_path: P) -> Option<Rc<HTMLPage>> {
+    pub fn get_page<P: AsRef<Path>>(&self, abs_path: P) -> Option<&Rc<HTMLPage>> {
         self.get_node(abs_path).and_then(|node| node.page())
     }
 
@@ -248,31 +253,56 @@ impl DocsTree {
     /// rendered. If the node does not have a page associated with it, the
     /// name of the node will be rendered. All links will be relative to the
     /// given path.
-    pub fn render_sidebar_component<P: AsRef<Path>>(&self, path: P) -> Markup {
-        let root = self.root();
-        let base = path.as_ref().parent().unwrap();
-        let nodes = root.depth_first_traversal();
-
-        html! {
-            div class="top-0 left-0 h-full w-1/6 dark:bg-slate-950 dark:text-white" {
-                h1 class="text-2xl text-center" { "Sidebar" }
-                @for node in nodes {
-                    @match node.page() {
-                        Some(page) => {
-                            @match page.page_type() {
-                                PageType::Index(_) => {
-                                    p { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
-                                }
-                                _ => {
-                                    p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
-                                }
-                            }
+    pub fn render_left_sidebar<P: AsRef<Path>>(&self, path: P) -> Markup {
+        fn sidebar_recurse(node: &Node, base: &Path) -> Markup {
+            html! {
+                @if let Some(page) = node.page() {
+                    @match page.page_type() {
+                        PageType::Index(_) => {
+                            p { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
-                        None => {
-                            p class="" { (node.name()) }
+                        _ => {
+                            p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
                     }
+                } @else {
+                    p class="" { (node.name()) }
                 }
+                ul class="" {
+                    @for child in node.children().values() {
+                        li class="px-2" { (sidebar_recurse(child, base)) }
+                    }
+                }
+            }
+        }
+
+        let root = self.root();
+        let base = path.as_ref().parent().unwrap();
+
+        html! {
+            div class="top-0 border h-fit left-0 min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-white overflow-x-scroll" {
+                h1 class="text-2xl text-center" { "Sidebar" }
+                p class="" { (root.name()) }
+                ul class="" {
+                    @for node in root.children().values() {
+                        @if node.name() != "external" {
+                            li class="px-2" { (sidebar_recurse(node, base)) }
+                        }
+                    }
+                    @if let Some(external) = root.children().get("external") {
+                        li class="px-2" { (sidebar_recurse(external, base)) }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Render a right sidebar component.
+    pub fn render_right_sidebar(&self) -> Markup {
+        html! {
+            div class="top-0 border h-screen sticky right-0 min-w-[240px] w-[240px] p-4 bottom-4 object-right dark:bg-red-900 dark:text-white" {
+                h1 class="text-2xl text-center" { "Sidebar" }
+                p class="" { "Right Sidebar" }
             }
         }
     }
@@ -296,7 +326,7 @@ impl DocsTree {
         let root = self.root();
         let index_path = root.path().join("index.html");
 
-        let sidebar = self.render_sidebar_component(&index_path);
+        let left_sidebar = self.render_left_sidebar(&index_path);
         let content = html! {
             div class="" {
                 h3 class="" { "Home" }
@@ -329,8 +359,11 @@ impl DocsTree {
         let html = full_page(
             "Home",
             html! {
-                (sidebar)
-                (content)
+                (left_sidebar)
+                div class="p-4 flex grow" {
+                    (content)
+                }
+                (self.render_right_sidebar())
             },
             self.stylesheet_relative_to(root.path()).as_deref(),
         );
@@ -354,13 +387,16 @@ impl DocsTree {
 
         let stylesheet =
             self.stylesheet_relative_to(path.parent().expect("path should have a parent"));
-        let sidebar = self.render_sidebar_component(&path);
+        let left_sidebar = self.render_left_sidebar(&path);
 
         let html = full_page(
             page.name(),
             html! {
-                (sidebar)
-                (content)
+                (left_sidebar)
+                div class="p-4 flex grow" {
+                    (content)
+                }
+                (self.render_right_sidebar())
             },
             stylesheet.as_deref(),
         );

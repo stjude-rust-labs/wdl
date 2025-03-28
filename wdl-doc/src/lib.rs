@@ -31,6 +31,7 @@ use maud::Markup;
 use maud::PreEscaped;
 use maud::Render;
 use maud::html;
+use path_clean::clean;
 use pathdiff::diff_paths;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
@@ -83,9 +84,9 @@ pub(crate) fn full_page<P: AsRef<Path>>(
 ) -> Markup {
     html! {
         (DOCTYPE)
-        html class="dark size-full" {
+        html class="dark" {
             (header(page_title, stylesheet))
-            body class="flex dark size-full dark:bg-slate-950 dark:text-white" {
+            body class="flex size-full dark:bg-slate-950 dark:text-white p-4" {
                 (body)
             }
         }
@@ -109,14 +110,14 @@ impl<T: AsRef<str>> Render for Markdown<T> {
 
         // Remove the outer `<p>` tag that `pulldown_cmark` wraps single lines in
         let safe_html = if safe_html.starts_with("<p>") && safe_html.ends_with("</p>\n") {
-            let trimmed = safe_html[3..safe_html.len() - 5].to_string();
+            let trimmed = &safe_html[3..safe_html.len() - 5];
             if trimmed.contains("<p>") {
                 // If the trimmed string contains another `<p>` tag, it means
                 // that the original string was more complicated than a single-line paragraph,
                 // so we should keep the outer `<p>` tag.
                 safe_html
             } else {
-                trimmed
+                trimmed.to_string()
             }
         } else {
             safe_html
@@ -246,7 +247,7 @@ pub async fn document_workspace(
     stylesheet: Option<impl AsRef<Path>>,
     overwrite: bool,
 ) -> Result<PathBuf> {
-    let workspace_abs_path = absolute(workspace)?;
+    let workspace_abs_path = clean(absolute(workspace.as_ref())?);
     let stylesheet = stylesheet.and_then(|p| absolute(p.as_ref()).ok());
 
     if !workspace_abs_path.is_dir() {

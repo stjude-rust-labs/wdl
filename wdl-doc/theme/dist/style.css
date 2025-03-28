@@ -1,27 +1,19 @@
-/*! tailwindcss v4.0.9 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v4.0.15 | MIT License | https://tailwindcss.com */
 @layer theme, base, components, utilities;
 @layer theme {
   :root, :host {
     --font-sans: "DM Sans";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
+    --color-red-900: oklch(0.396 0.141 25.723);
+    --color-slate-900: oklch(0.208 0.042 265.755);
     --color-slate-950: oklch(0.129 0.042 264.695);
     --color-white: #fff;
     --spacing: 0.25rem;
     --text-2xl: 1.5rem;
     --text-2xl--line-height: calc(2 / 1.5);
     --default-font-family: var(--font-sans);
-    --default-font-feature-settings: var(--font-sans--font-feature-settings);
-    --default-font-variation-settings: var(
-      --font-sans--font-variation-settings
-    );
     --default-mono-font-family: var(--font-mono);
-    --default-mono-font-feature-settings: var(
-      --font-mono--font-feature-settings
-    );
-    --default-mono-font-variation-settings: var(
-      --font-mono--font-variation-settings
-    );
   }
 }
 @layer base {
@@ -35,13 +27,10 @@
     line-height: 1.5;
     -webkit-text-size-adjust: 100%;
     tab-size: 4;
-    font-family: var( --default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" );
+    font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
     font-feature-settings: var(--default-font-feature-settings, normal);
-    font-variation-settings: var( --default-font-variation-settings, normal );
+    font-variation-settings: var(--default-font-variation-settings, normal);
     -webkit-tap-highlight-color: transparent;
-  }
-  body {
-    line-height: inherit;
   }
   hr {
     height: 0;
@@ -65,9 +54,9 @@
     font-weight: bolder;
   }
   code, kbd, samp, pre {
-    font-family: var( --default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace );
-    font-feature-settings: var( --default-mono-font-feature-settings, normal );
-    font-variation-settings: var( --default-mono-font-variation-settings, normal );
+    font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+    font-feature-settings: var(--default-mono-font-feature-settings, normal);
+    font-variation-settings: var(--default-mono-font-variation-settings, normal);
     font-size: 1em;
   }
   small {
@@ -131,7 +120,11 @@
   }
   ::placeholder {
     opacity: 1;
-    color: color-mix(in oklab, currentColor 50%, transparent);
+  }
+  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {
+    ::placeholder {
+      color: color-mix(in oklab, currentColor 50%, transparent);
+    }
   }
   textarea {
     resize: vertical;
@@ -172,8 +165,17 @@
   .relative {
     position: relative !important;
   }
+  .sticky {
+    position: sticky !important;
+  }
   .top-0 {
     top: calc(var(--spacing) * 0) !important;
+  }
+  .right-0 {
+    right: calc(var(--spacing) * 0) !important;
+  }
+  .bottom-4 {
+    bottom: calc(var(--spacing) * 4) !important;
   }
   .left-0 {
     left: calc(var(--spacing) * 0) !important;
@@ -194,11 +196,26 @@
     width: 100% !important;
     height: 100% !important;
   }
-  .h-full {
-    height: 100% !important;
+  .h-fit {
+    height: fit-content !important;
   }
-  .w-1\/6 {
-    width: calc(1/6 * 100%) !important;
+  .h-screen {
+    height: 100vh !important;
+  }
+  .w-\[240px\] {
+    width: 240px !important;
+  }
+  .w-\[269px\] {
+    width: 269px !important;
+  }
+  .min-w-\[240px\] {
+    min-width: 240px !important;
+  }
+  .min-w-\[269px\] {
+    min-width: 269px !important;
+  }
+  .grow {
+    flex-grow: 1 !important;
   }
   .table-auto {
     table-layout: auto !important;
@@ -212,9 +229,21 @@
   .items-center {
     align-items: center !important;
   }
+  .overflow-x-scroll {
+    overflow-x: scroll !important;
+  }
   .border {
     border-style: var(--tw-border-style) !important;
     border-width: 1px !important;
+  }
+  .object-right {
+    object-position: right !important;
+  }
+  .p-4 {
+    padding: calc(var(--spacing) * 4) !important;
+  }
+  .px-2 {
+    padding-inline: calc(var(--spacing) * 2) !important;
   }
   .text-center {
     text-align: center !important;
@@ -226,8 +255,15 @@
     font-size: var(--text-2xl) !important;
     line-height: var(--tw-leading, var(--text-2xl--line-height)) !important;
   }
-  .filter {
-    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,) !important;
+  .dark\:bg-red-900 {
+    &:where(.dark, .dark *) {
+      background-color: var(--color-red-900) !important;
+    }
+  }
+  .dark\:bg-slate-900 {
+    &:where(.dark, .dark *) {
+      background-color: var(--color-slate-900) !important;
+    }
   }
   .dark\:bg-slate-950 {
     &:where(.dark, .dark *) {
@@ -250,13 +286,10 @@ html, :host {
   line-height: 1.5;
   -webkit-text-size-adjust: 100%;
   tab-size: 4;
-  font-family: var( --default-font-family, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' );
+  font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji');
   font-feature-settings: var(--default-font-feature-settings, normal);
   font-variation-settings: var(--default-font-variation-settings, normal);
   -webkit-tap-highlight-color: transparent;
-}
-body {
-  line-height: inherit;
 }
 hr {
   height: 0;
@@ -280,7 +313,7 @@ b, strong {
   font-weight: bolder;
 }
 code, kbd, samp, pre {
-  font-family: var( --default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace );
+  font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace);
   font-feature-settings: var(--default-mono-font-feature-settings, normal);
   font-variation-settings: var(--default-mono-font-variation-settings, normal);
   font-size: 1em;
@@ -346,7 +379,11 @@ button, input, select, optgroup, textarea, ::file-selector-button {
 }
 ::placeholder {
   opacity: 1;
-  color: color-mix(in oklab, currentColor 50%, transparent);
+}
+@supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {
+  ::placeholder {
+    color: color-mix(in oklab, currentColor 50%, transparent);
+  }
 }
 textarea {
   resize: vertical;
@@ -395,44 +432,4 @@ h4 {
   syntax: "*";
   inherits: false;
   initial-value: solid;
-}
-@property --tw-blur {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-brightness {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-contrast {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-grayscale {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-hue-rotate {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-invert {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-opacity {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-saturate {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-sepia {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-drop-shadow {
-  syntax: "*";
-  inherits: false;
 }
