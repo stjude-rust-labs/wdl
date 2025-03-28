@@ -1,8 +1,6 @@
 //! Lint rules for Workflow Description Language (WDL) documents.
 #![doc = include_str!("../RULES.md")]
 //! # Definitions
-//! 
-//! The following document defines key concepts and terminology used throughout the WDL linting rules.
 #![doc = include_str!("../DEFINITIONS.md")]
 //! # Examples
 //!

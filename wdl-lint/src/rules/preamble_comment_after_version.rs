@@ -48,7 +48,7 @@ impl Rule for PreambleCommentAfterVersionRule {
     }
 
     fn explanation(&self) -> &'static str {
-        "Preamble comments (as defined in DEFINITIONS.md) should only appear in the preamble section of a WDL document, \
+        "Preamble comments should only appear in the preamble section of a WDL document, \
          which is before the version statement. This rule ensures that double-pound comments (`##`) \
          are not used after the version statement."
     }

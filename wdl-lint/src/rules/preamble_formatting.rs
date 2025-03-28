@@ -121,7 +121,7 @@ impl Rule for PreambleFormattingRule {
          before the version declaration.
          
          All comments in the preamble should conform to one of two special formats: lint directives \
-         or preamble comments, both of which are defined in detail in the DEFINITIONS.md file.
+         or preamble comments.
 
          This rule enforces the following formatting requirements:
 
