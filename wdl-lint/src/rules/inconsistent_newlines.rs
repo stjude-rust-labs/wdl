@@ -2,13 +2,14 @@
 
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
+use wdl_analysis::Diagnostics;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
 use wdl_ast::Whitespace;
+use wdl_analysis::document::Document;
 
 use crate::Rule;
 use crate::Tag;
@@ -70,7 +71,7 @@ impl Visitor for InconsistentNewlinesRule {
         &mut self,
         diagnostics: &mut Diagnostics,
         reason: VisitReason,
-        _doc: &wdl_ast::Document,
+        _doc: &Document,
         _: SupportedVersion,
     ) {
         if reason == VisitReason::Enter {

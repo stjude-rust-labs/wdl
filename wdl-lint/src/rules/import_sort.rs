@@ -3,13 +3,13 @@
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
-use wdl_ast::Document;
+use wdl_analysis::Diagnostics;
+use wdl_analysis::document::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
 use wdl_ast::v1::ImportStatement;
 
 use crate::Rule;
@@ -82,6 +82,7 @@ impl Visitor for ImportSortRule {
 
         // Collect all import statements
         let imports: Vec<_> = doc
+            .root()
             .inner()
             .children_with_tokens()
             .filter(|n| n.kind() == SyntaxKind::ImportStatementNode)

@@ -3,16 +3,15 @@
 use std::collections::HashSet;
 
 use indexmap::IndexMap;
-// use wdl_analysis::document::Document as AnalysisDocument;
+use wdl_analysis::document::Document as AnalysisDocument;
 use wdl_ast::AstNode;
 use wdl_ast::Comment;
-use wdl_ast::Diagnostics;
-use wdl_ast::Document;
+use wdl_analysis::Diagnostics;
 use wdl_ast::SupportedVersion;
-use wdl_ast::SyntaxNodeExt;
+use wdl_analysis::SyntaxNodeExt;
 use wdl_ast::VersionStatement;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
 use wdl_ast::Whitespace;
 use wdl_ast::v1;
 
@@ -78,7 +77,7 @@ impl Visitor for Linter {
         &mut self,
         diagnostics: &mut Diagnostics,
         reason: VisitReason,
-        doc: &Document,
+        doc: &AnalysisDocument,
         version: SupportedVersion,
     ) {
         if reason == VisitReason::Enter {
@@ -86,7 +85,7 @@ impl Visitor for Linter {
             self.document_exceptions.clear();
 
             self.document_exceptions.extend(
-                doc.version_statement()
+                doc.root().version_statement()
                     .expect("document should have version statement")
                     .inner()
                     .rule_exceptions(),

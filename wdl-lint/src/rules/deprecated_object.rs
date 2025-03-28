@@ -2,14 +2,14 @@
 
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
-use wdl_ast::Document;
+use wdl_analysis::Diagnostics;
+use wdl_analysis::document::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
 use wdl_ast::v1::Type;
 
 use crate::Rule;
@@ -85,7 +85,7 @@ impl Visitor for DeprecatedObjectRule {
     fn bound_decl(
         &mut self,
         diagnostics: &mut Diagnostics,
-        reason: wdl_ast::VisitReason,
+        reason: VisitReason,
         decl: &wdl_ast::v1::BoundDecl,
     ) {
         if reason == VisitReason::Exit {
@@ -104,7 +104,7 @@ impl Visitor for DeprecatedObjectRule {
     fn unbound_decl(
         &mut self,
         diagnostics: &mut Diagnostics,
-        reason: wdl_ast::VisitReason,
+        reason: VisitReason,
         decl: &wdl_ast::v1::UnboundDecl,
     ) {
         if reason == VisitReason::Exit {

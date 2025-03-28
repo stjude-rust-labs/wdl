@@ -25,14 +25,14 @@ use wdl_analysis::types::v1::ExprTypeEvaluator;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
-use wdl_ast::Document;
+use wdl_analysis::Diagnostics;
+use wdl_analysis::document::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
 use wdl_ast::v1::CommandPart;
 use wdl_ast::v1::CommandSection;
 use wdl_ast::v1::Placeholder;
@@ -203,8 +203,11 @@ fn run_shellcheck(command: &str) -> Result<Vec<ShellCheckDiagnostic>> {
 }
 
 /// Runs ShellCheck on a command section and reports diagnostics.
-#[derive(Default, Debug, Clone, Copy)]
-pub struct ShellCheckRule;
+#[derive(Default, Debug, Clone)]
+pub struct ShellCheckRule {
+    /// The document being linted.
+    document: Option<Document>,
+}
 
 impl Rule for ShellCheckRule {
     fn id(&self) -> &'static str {
@@ -240,29 +243,24 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
     let placeholder_len: usize = placeholder.inner().text_range().len().into();
     let placeholder_len = placeholder_len.saturating_sub(3); // subtract ~{}
 
-    if let Some(ty) = ty {
-        match ty {
-            Type::Primitive(pty, _) => {
-                match pty {
-                    PrimitiveType::Integer | PrimitiveType::Float => {
-                        // return the charachter '4' repeated `placeholder_len` times
-                        // as a string
-                        return ("4".repeat(placeholder_len), true);
-                    }
-                    PrimitiveType::Boolean => {
-                        // return "false" with whitespace padding of `placeholder_len - 5`
-                        // characters
-                        return (
-                            format!("false{}", " ".repeat(placeholder_len.saturating_sub(5))),
-                            true,
-                        );
-                    }
-                    _ => {}
-                }
+    if let Some(Type::Primitive(pty, _)) = ty {
+        match pty {
+            PrimitiveType::Integer | PrimitiveType::Float => {
+                // return the charachter '4' repeated `placeholder_len` times
+                // as a string
+                return ("4".repeat(placeholder_len), true);
+            }
+            PrimitiveType::Boolean => {
+                // return "false" with whitespace padding of `placeholder_len - 5`
+                // characters
+                return (
+                    format!("false{}", " ".repeat(placeholder_len.saturating_sub(5))),
+                    true,
+                );
             }
             _ => {}
         }
-    }
+    };
 
     // don't start variable with numbers
     let mut bash_var = String::from("WDL");
@@ -364,8 +362,11 @@ fn shellcheck_lint(
         .with_fix(fix_msg)
 }
 
+/// A context for evaluating expressions in a command section.
 struct CommandContext<'a> {
+    /// The document being linted.
     document: AnalysisDocument,
+    /// The scope of the command section.
     scope: ScopeRef<'a>,
 }
 
@@ -400,6 +401,7 @@ impl EvaluationContext for CommandContext<'_> {
 }
 
 impl<'a> CommandContext<'a> {
+    /// Create a new `CommandContext`.
     fn new(document: AnalysisDocument, scope: ScopeRef<'a>) -> Self {
         Self { document, scope }
     }
@@ -531,7 +533,7 @@ impl Visitor for ShellCheckRule {
         &mut self,
         _: &mut Diagnostics,
         reason: VisitReason,
-        _: &Document,
+        document: &Document,
         _: SupportedVersion,
     ) {
         if reason == VisitReason::Exit {
@@ -539,7 +541,7 @@ impl Visitor for ShellCheckRule {
         }
 
         // Reset the visitor upon document entry
-        *self = Default::default();
+        self.document = Some(document.clone());
     }
 
     fn command_section(
@@ -584,10 +586,10 @@ impl Visitor for ShellCheckRule {
         let mut decls = gather_task_declarations(&parent_task);
 
         // Replace all placeholders in the command with dummy bash variables
+        let doc = self.document.clone().expect("should have a document");
         let mut context = CommandContext::new(
-            state.document.clone(),
-            state
-                .document
+            doc.clone(),
+            doc
                 .find_scope_by_position(section.inner().text_range().start().into())
                 .expect("should have a scope"),
         );
@@ -610,20 +612,20 @@ impl Visitor for ShellCheckRule {
         let shift_tree = FenwickTree::from_iter(shift_values);
 
         match run_shellcheck(&sanitized_command) {
-            Ok(diagnostics) => {
-                for diagnostic in diagnostics {
+            Ok(sc_diagnostics) => {
+                for sc_diagnostic in sc_diagnostics {
                     // Skip declarations that shellcheck is unaware of.
                     // ShellCheck's message always starts with the variable name
                     // that is unassigned.
                     let target_variable =
-                        diagnostic.message.split_whitespace().next().unwrap_or("");
-                    if diagnostic.code == SHELLCHECK_REFERENCED_UNASSIGNED
+                        sc_diagnostic.message.split_whitespace().next().unwrap_or("");
+                    if sc_diagnostic.code == SHELLCHECK_REFERENCED_UNASSIGNED
                         && decls.contains(target_variable)
                     {
                         continue;
                     }
                     diagnostics.exceptable_add(
-                        shellcheck_lint(&diagnostic, &sanitized_command, &line_map, &shift_tree),
+                        shellcheck_lint(&sc_diagnostic, &sanitized_command, &line_map, &shift_tree),
                         SyntaxElement::from(section.inner().clone()),
                         &self.exceptable_nodes(),
                     )

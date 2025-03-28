@@ -6,17 +6,14 @@
 //!
 //! ```rust
 //! # let source = "version 1.1\nworkflow test {}";
-//! use wdl_lint::LintVisitor;
-//! use wdl_lint::ast::Document;
-//! use wdl_lint::ast::Validator;
+//! use wdl_lint::Linter;
+//! use wdl_lint::analysis::document::Document;
+//! use wdl_lint::analysis::Validator;
 //!
-//! let (document, diagnostics) = Document::parse(source);
-//! if !diagnostics.is_empty() {
-//!     // Handle the failure to parse
-//! }
+//! 
 //!
 //! let mut validator = Validator::default();
-//! validator.add_visitor(LintVisitor::default());
+//! validator.add_visitor(Linter::default());
 //! if let Err(diagnostics) = validator.validate(&document) {
 //!     // Handle the failure to validate
 //! }
@@ -30,7 +27,7 @@
 #![warn(rustdoc::broken_intra_doc_links)]
 
 use wdl_ast::SyntaxKind;
-use wdl_ast::Visitor;
+use wdl_analysis::Visitor;
 
 pub(crate) mod fix;
 mod linter;
