@@ -45,6 +45,9 @@ pub use tags::*;
 pub use visitor::*;
 pub use wdl_ast as ast;
 
+/// The definitions of WDL concepts and terminology used in the linting rules.
+pub const DEFINITIONS: &str = include_str!("../DEFINITIONS.md");
+
 /// The reserved rule identifiers that are used by analysis.
 pub const RESERVED_RULE_IDS: &[&str] = &[
     "UnusedImport",
