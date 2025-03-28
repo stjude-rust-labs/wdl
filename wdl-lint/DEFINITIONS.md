@@ -1,7 +1,5 @@
 # Definitions
 
-This document defines key concepts and terminology used throughout the WDL linting rules.
-
 ## WDL Document Structure
 
 ### Preamble
@@ -18,10 +16,6 @@ Lint directives are special comments that begin with `#@ except:` followed by a 
 #@ except: LineWidth, CommentWhitespace
 ```
 
-Lint directives in the preamble should not have any whitespace before the comment. If lint directives are present in the preamble, they should be at the absolute beginning of the document. Multiple lint directives are permitted, but they should not be interleaved with preamble comments or blank lines.
-
-Lint directives elsewhere in the file should match the indentation of whatever they are "commenting on".
-
 ### Preamble Comments
 
 Preamble comments are special comments that begin with double pound signs (`##`). These comments are used for documentation that doesn't fit within any of the WDL-defined documentation elements (i.e., `meta` and `parameter_meta` sections). They may provide context for a collection of tasks or structs, or they may provide a high-level overview of the workflow. For example:
@@ -30,10 +24,6 @@ Preamble comments are special comments that begin with double pound signs (`##`)
 ## This workflow performs RNA-seq analysis
 ## It aligns reads and quantifies gene expression
 ```
-
-A space should follow the double pound sign if there is any text within the preamble comment. "Empty" preamble comments are permitted and should not have any whitespace following the `##`. Comments beginning with 3 or more pound signs before the version declaration are not permitted.
-
-All preamble comments should be in a single block without blank lines. Following this block, there should always be a blank line before the version statement.
 
 ## Naming Conventions
 
