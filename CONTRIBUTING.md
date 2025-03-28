@@ -105,8 +105,10 @@ Comprehensive: Try to cover as many _unique_ sets of potential diagnostics as po
 
 When deciding which rules should link to which other rules, please consider these criteria:
 
-- If diagnostic `X` is likely to co-occur with diagnostic `Y` within the same lint pass (addressing them often happens together). This means rule `X` should implement `related_rules` to include `Y`'s ID, and rule `Y` should implement it to include `X`'s ID.
-- If correcting diagnostic `X` naively (without considering other rules) is likely to result in diagnostic `Y` being emitted in a subsequent lint pass. Rule `X` should implement `related_rules` to include `Y`'s ID, but rule `Y` should _not_ link back to rule `X` in this case, as the user fixing `Y` isn't necessarily led back to the context of `X`.
+- If diagnostic `X` is likely to co-occur with diagnostic `Y` within the same lint pass (addressing them often happens together):
+    - rule `X` should implement `related_rules` to include `Y`'s ID, and rule `Y` should implement it to include `X`'s ID.
+- If correcting diagnostic `X` naively (without considering other rules) is likely to result in diagnostic `Y` being emitted in a subsequent lint pass:
+    - rule `X` should implement `related_rules` to include `Y`'s ID, but rule `Y` should _not_ link back to rule `X` in this case, as the user fixing `Y` isn't necessarily led back to the context of `X`.
 
 ## Further reading
 

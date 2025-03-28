@@ -222,7 +222,7 @@ impl Rule for InputNotSortedRule {
     }
 
     fn related_rules(&self) -> &[&'static str] {
-        &["ImportSort", "SectionOrdering"]
+        &["MatchingParameterMeta"]
     }
 }
 

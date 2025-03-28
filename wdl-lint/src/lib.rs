@@ -86,8 +86,6 @@ pub trait Rule: Visitor<State = Diagnostics> {
     /// This can be used by tools (like `sprocket explain`) to suggest other
     /// relevant rules to the user based on potential logical connections or
     /// common co-occurrences of issues.
-    ///
-    /// By default, this returns an empty list.
     fn related_rules(&self) -> &[&'static str];
 }
 
@@ -138,8 +136,8 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::RedundantInputAssignment>::default(),
     ];
 
-    // Ensure all the rule ids are unique and pascal case, and related rules are
-    // valid and exist
+    // Ensure all the rule IDs are unique and pascal case and that related rules are
+    // valid, exist and not self-referential.
     #[cfg(debug_assertions)]
     {
         use std::collections::HashSet;
@@ -194,7 +192,8 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
 pub fn optional_rules() -> Vec<Box<dyn Rule>> {
     let opt_rules: Vec<Box<dyn Rule>> = vec![Box::<rules::ShellCheckRule>::default()];
 
-    // Ensure all the rule ids are unique and pascal case
+    // Ensure all the rule IDs are unique and pascal case and that related rules are
+    // valid, exist and not self-referential.
     #[cfg(debug_assertions)]
     {
         use std::collections::HashSet;
