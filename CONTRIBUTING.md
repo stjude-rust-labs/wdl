@@ -116,6 +116,6 @@ When deciding which rules should link to which other rules, please consider thes
 * See [here](https://docs.rs/wdl/latest/wdl/grammar/type.SyntaxNode.html) for the `SyntaxNode` docs.
 * The PR which introduced `exceptable_nodes()` and `exceptable_add()` is [#162](https://github.com/stjude-rust-labs/wdl/pull/162).
 * That PR fixed issue [#135](https://github.com/stjude-rust-labs/wdl/issues/135)
-* The PR which introduced `related_rules()` is [#371](https://github.com/stjude-rust-labs/wdl/pull/371))
+* The PR which introduced `related_rules()` is [#371](https://github.com/stjude-rust-labs/wdl/pull/371)
 
 [issues]: https://github.com/stjude-rust-labs/wdl/issues
