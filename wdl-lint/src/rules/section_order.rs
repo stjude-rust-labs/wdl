@@ -52,13 +52,13 @@ fn task_section_order(span: Span, name: &str, problem_span: Span) -> Diagnostic 
         )
 }
 
-/// Create a sturct section order diagnostic.
+/// Create a struct section order diagnostic.
 fn struct_section_order(span: Span, name: &str, problem_span: Span) -> Diagnostic {
     Diagnostic::note(format!("sections are not in order for struct `{name}`"))
         .with_rule(ID)
         .with_label("this struct contains sections that are out of order", span)
         .with_label("this section is out of order", problem_span)
-        .with_fix("order as `meta`, `parameter_meta`, `members`")
+        .with_fix("order as `meta`, `parameter_meta`, members")
 }
 
 /// Detects section ordering issues.
