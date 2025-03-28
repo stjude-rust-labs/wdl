@@ -214,6 +214,9 @@
   .min-w-\[280px\] {
     min-width: 280px !important;
   }
+  .grow {
+    flex-grow: 1 !important;
+  }
   .table-auto {
     table-layout: auto !important;
   }
