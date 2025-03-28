@@ -280,7 +280,7 @@ impl DocsTree {
         let base = path.as_ref().parent().unwrap();
 
         html! {
-            div class="top-0 border h-fit left-0 min-w-[280px] w-[280px] p-4 dark:bg-slate-900 dark:text-white overflow-x-scroll" {
+            div class="top-0 border h-fit left-0 min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-white overflow-x-scroll" {
                 h1 class="text-2xl text-center" { "Sidebar" }
                 p class="" { (root.name()) }
                 ul class="" {
