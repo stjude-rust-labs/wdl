@@ -98,11 +98,9 @@ impl Rule for CommentWhitespaceRule {
 }
 
 impl Visitor for CommentWhitespaceRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -117,7 +115,7 @@ impl Visitor for CommentWhitespaceRule {
 
     fn version_statement(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &wdl_ast::VersionStatement,
     ) {
@@ -126,7 +124,7 @@ impl Visitor for CommentWhitespaceRule {
         }
     }
 
-    fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
+    fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &Comment) {
         if !self.exited_preamble {
             // Handled by `PreambleFormatting` rule
             return;
@@ -140,7 +138,7 @@ impl Visitor for CommentWhitespaceRule {
                 {
                     // Report a diagnostic if there are not two spaces before the comment delimiter
                     let span = Span::new(comment.span().start(), 1);
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         inline_preceding_whitespace(span),
                         SyntaxElement::from(comment.inner().clone()),
                         &self.exceptable_nodes(),
@@ -171,7 +169,7 @@ impl Visitor for CommentWhitespaceRule {
                         // Report a diagnostic if the comment is not indented properly
                         let span = Span::new(comment.span().start(), 1);
                         match this_indentation.len().cmp(&expected_indentation.len()) {
-                            Ordering::Greater => state.exceptable_add(
+                            Ordering::Greater => diagnostics.exceptable_add(
                                 excess_indentation(
                                     span,
                                     expected_indentation.len() / INDENT.len(),
@@ -180,7 +178,7 @@ impl Visitor for CommentWhitespaceRule {
                                 SyntaxElement::from(comment.inner().clone()),
                                 &self.exceptable_nodes(),
                             ),
-                            Ordering::Less => state.exceptable_add(
+                            Ordering::Less => diagnostics.exceptable_add(
                                 insufficient_indentation(
                                     span,
                                     expected_indentation.len() / INDENT.len(),
@@ -217,7 +215,7 @@ impl Visitor for CommentWhitespaceRule {
         let n_whitespace = comment_chars.by_ref().take_while(|c| *c == ' ').count();
 
         if comment_chars.skip(n_whitespace).count() > 0 && n_whitespace == 0 {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 following_whitespace(Span::new(comment.span().start(), n_delimiter)),
                 SyntaxElement::from(comment.inner().clone()),
                 &self.exceptable_nodes(),

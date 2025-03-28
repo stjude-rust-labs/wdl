@@ -1,5 +1,9 @@
 //! A lint rule for flagging unknown rules in lint directives.
 
+use std::collections::HashSet;
+use std::sync::LazyLock;
+
+use wdl_analysis::rules as analysis_rules;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
@@ -12,12 +16,19 @@ use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
 
-use crate::RESERVED_RULE_IDS;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
 use crate::rules::RULE_MAP;
 use crate::util::find_nearest_rule;
+
+/// A set of known analysis rules.
+static ANALYSIS_RULES: LazyLock<HashSet<String>> = LazyLock::new(|| {
+    analysis_rules()
+        .iter()
+        .map(|r| r.id().to_string())
+        .collect()
+});
 
 /// The identifier for the unknown rule rule.
 const ID: &str = "UnknownRule";
@@ -68,13 +79,11 @@ impl Rule for UnknownRule {
 }
 
 impl Visitor for UnknownRule {
-    type State = Diagnostics;
-
-    fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document, _: SupportedVersion) {
+    fn document(&mut self, _: &mut Diagnostics, _: VisitReason, _: &Document, _: SupportedVersion) {
         // This is intentionally empty, as this rule has no state.
     }
 
-    fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
+    fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &Comment) {
         if let Some(ids) = comment.text().strip_prefix(EXCEPT_COMMENT_PREFIX) {
             let start: usize = comment.span().start();
             let mut offset = EXCEPT_COMMENT_PREFIX.len();
@@ -88,11 +97,11 @@ impl Visitor for UnknownRule {
                 offset += id.len() - trimmed.len();
 
                 // Check if the rule is known
-                if !RESERVED_RULE_IDS.contains(&trimmed) && !RULE_MAP.contains_key(&trimmed) {
+                if !ANALYSIS_RULES.contains(trimmed) && !RULE_MAP.contains_key(&trimmed) {
                     // Since this rule can only be excepted in a document-wide fashion,
                     // if the rule is running we can directly add the diagnostic
                     // without checking for the exceptable nodes
-                    state.add(unknown_rule(
+                    diagnostics.add(unknown_rule(
                         trimmed,
                         Span::new(start + offset, trimmed.len()),
                     ));

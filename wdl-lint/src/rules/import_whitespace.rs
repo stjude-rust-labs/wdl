@@ -84,11 +84,9 @@ impl Rule for ImportWhitespaceRule {
 }
 
 impl Visitor for ImportWhitespaceRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -103,7 +101,7 @@ impl Visitor for ImportWhitespaceRule {
 
     fn import_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &ImportStatement,
     ) {
@@ -120,7 +118,7 @@ impl Visitor for ImportWhitespaceRule {
 
         for token in internal_whitespace {
             if token.text() != " " && token.prev_token().unwrap().kind() != SyntaxKind::Comment {
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     improper_whitespace_within_import(token.text_range().into()),
                     SyntaxElement::from(token),
                     &self.exceptable_nodes(),
@@ -140,7 +138,7 @@ impl Visitor for ImportWhitespaceRule {
                 let span: Span = token.text_range().into();
                 for (text, offset, _) in lines_with_offset(token.text()) {
                     if !text.is_empty() {
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             improper_whitespace_before_import(Span::new(
                                 span.start() + offset,
                                 span.len() - offset,
@@ -183,7 +181,7 @@ impl Visitor for ImportWhitespaceRule {
 
                 if should_warn {
                     let span = token.text_range().into();
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         blank_between_imports(span),
                         SyntaxElement::from(token.clone()),
                         &self.exceptable_nodes(),

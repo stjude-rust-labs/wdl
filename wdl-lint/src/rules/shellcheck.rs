@@ -16,6 +16,12 @@ use rowan::ast::support;
 use serde::Deserialize;
 use serde_json;
 use tracing::debug;
+use wdl_analysis::document::Document as AnalysisDocument;
+use wdl_analysis::document::ScopeRef;
+use wdl_analysis::types::PrimitiveType;
+use wdl_analysis::types::Type;
+use wdl_analysis::types::v1::EvaluationContext;
+use wdl_analysis::types::v1::ExprTypeEvaluator;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -229,18 +235,40 @@ impl Rule for ShellCheckRule {
 
 /// Convert a WDL `Placeholder` to a bash variable declaration.
 ///
-/// Returns "WDL" + <placeholder length - 6> random alphnumeric characters.
-/// The returned value is shorter than the placeholder by 3 characters so
-/// that the caller may pad with other characters as necessary
-/// depending on whether or not the variable needs to be treated as a
-/// declaration, expansion, or literal.
-fn to_bash_var(placeholder: &Placeholder) -> String {
+/// TODO
+fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
     let placeholder_len: usize = placeholder.inner().text_range().len().into();
+    let placeholder_len = placeholder_len.saturating_sub(3); // subtract ~{}
+
+    if let Some(ty) = ty {
+        match ty {
+            Type::Primitive(pty, _) => {
+                match pty {
+                    PrimitiveType::Integer | PrimitiveType::Float => {
+                        // return the charachter '4' repeated `placeholder_len` times
+                        // as a string
+                        return ("4".repeat(placeholder_len), true);
+                    }
+                    PrimitiveType::Boolean => {
+                        // return "false" with whitespace padding of `placeholder_len - 5`
+                        // characters
+                        return (
+                            format!("false{}", " ".repeat(placeholder_len.saturating_sub(5))),
+                            true,
+                        );
+                    }
+                    _ => {}
+                }
+            }
+            _ => {}
+        }
+    }
+
     // don't start variable with numbers
     let mut bash_var = String::from("WDL");
     bash_var
         .push_str(&Alphanumeric.sample_string(&mut rand::rng(), placeholder_len.saturating_sub(6)));
-    bash_var
+    (bash_var, false)
 }
 
 /// Retrieve all input and private declarations for a task.
@@ -336,18 +364,64 @@ fn shellcheck_lint(
         .with_fix(fix_msg)
 }
 
+struct CommandContext<'a> {
+    document: AnalysisDocument,
+    scope: ScopeRef<'a>,
+}
+
+impl EvaluationContext for CommandContext<'_> {
+    fn version(&self) -> SupportedVersion {
+        self.document.version().expect("document has a version")
+    }
+
+    fn resolve_name(&self, name: &str, _span: Span) -> Option<wdl_analysis::types::Type> {
+        self.scope.lookup(name).map(|n| n.ty().clone())
+    }
+
+    fn resolve_type_name(
+        &mut self,
+        name: &str,
+        _span: Span,
+    ) -> std::result::Result<wdl_analysis::types::Type, Diagnostic> {
+        Ok(self.scope.lookup(name).map(|n| n.ty().clone()).unwrap())
+    }
+
+    fn task(&self) -> Option<&wdl_analysis::document::Task> {
+        None
+    }
+
+    fn diagnostics_config(&self) -> wdl_analysis::DiagnosticsConfig {
+        wdl_analysis::DiagnosticsConfig::except_all()
+    }
+
+    fn add_diagnostic(&mut self, _diagnostic: Diagnostic) {
+        // do nothing
+    }
+}
+
+impl<'a> CommandContext<'a> {
+    fn new(document: AnalysisDocument, scope: ScopeRef<'a>) -> Self {
+        Self { document, scope }
+    }
+}
+
 /// Sanitize a [CommandSection].
 ///
 /// Removes all trailing whitespace, replaces placeholders
 /// with dummy bash variables or literals, and records declarations.
 ///
 /// If the section contains mixed indentation, returns None.
-fn sanitize_command(section: &CommandSection) -> Option<(String, HashSet<String>, usize)> {
+fn sanitize_command(
+    section: &CommandSection,
+    context: &mut CommandContext<'_>,
+) -> Option<(String, HashSet<String>, usize)> {
     let amount_stripped = section.count_whitespace()?;
     let mut sanitized_command = String::new();
     let mut decls = HashSet::new();
     let mut needs_quotes = true;
     let mut is_literal = false;
+
+    let mut evaluator = ExprTypeEvaluator::new(context);
 
     match section.strip_whitespace() {
         Some(cmd_parts) => {
@@ -363,13 +437,17 @@ fn sanitize_command(section: &CommandSection) -> Option<(String, HashSet<String>
                     needs_quotes ^= !is_properly_quoted(text, '"');
                 }
                 StrippedCommandPart::Placeholder(placeholder) => {
-                    let bash_var = to_bash_var(placeholder);
-                    // we need to save the var so we can suppress later
-                    decls.insert(bash_var.clone());
+                    let ty = evaluator.evaluate_expr(&placeholder.expr());
+                    let (bash_var, was_literal) = to_bash_var(placeholder, ty);
 
-                    if is_literal {
-                        // pad literal with three underscores to account for ~{}
-                        sanitized_command.push_str(&format!("___{bash_var}"));
+                    // we need to save the var so we can suppress later
+                    if !was_literal {
+                        decls.insert(bash_var.clone());
+                    }
+
+                    if is_literal || was_literal {
+                        // pad literal with whitespace to account for ~{}
+                        sanitized_command.push_str(&format!("{bash_var}   "));
                     } else if needs_quotes {
                         // surround with quotes for proper form
                         sanitized_command.push_str(&format!("\"${bash_var}\""));
@@ -449,11 +527,9 @@ fn calculate_span(diagnostic: &ShellCheckDiagnostic, line_map: &HashMap<usize, S
 }
 
 impl Visitor for ShellCheckRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -468,7 +544,7 @@ impl Visitor for ShellCheckRule {
 
     fn command_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &CommandSection,
     ) {
@@ -483,7 +559,7 @@ impl Visitor for ShellCheckRule {
                         "should have a
                 command keyword token",
                     );
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     Diagnostic::note("running `shellcheck` on command section")
                         .with_label(
                             "could not find `shellcheck` executable.",
@@ -508,7 +584,15 @@ impl Visitor for ShellCheckRule {
         let mut decls = gather_task_declarations(&parent_task);
 
         // Replace all placeholders in the command with dummy bash variables
-        let Some((sanitized_command, cmd_decls, amount_stripped)) = sanitize_command(section)
+        let mut context = CommandContext::new(
+            state.document.clone(),
+            state
+                .document
+                .find_scope_by_position(section.inner().text_range().start().into())
+                .expect("should have a scope"),
+        );
+        let Some((sanitized_command, cmd_decls, amount_stripped)) =
+            sanitize_command(section, &mut context)
         else {
             // This is the case where the command section contains
             // mixed indentation. We silently return and allow
@@ -538,7 +622,7 @@ impl Visitor for ShellCheckRule {
                     {
                         continue;
                     }
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         shellcheck_lint(&diagnostic, &sanitized_command, &line_map, &shift_tree),
                         SyntaxElement::from(section.inner().clone()),
                         &self.exceptable_nodes(),
@@ -548,7 +632,7 @@ impl Visitor for ShellCheckRule {
             Err(e) => {
                 let command_keyword = support::token(section.inner(), SyntaxKind::CommandKeyword)
                     .expect("should have a command keyword token");
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     Diagnostic::error("running `shellcheck` on command section")
                         .with_label(e.to_string(), command_keyword.text_range())
                         .with_rule(ID)

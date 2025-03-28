@@ -85,11 +85,9 @@ impl Rule for DisallowedOutputNameRule {
 }
 
 impl Visitor for DisallowedOutputNameRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -102,20 +100,29 @@ impl Visitor for DisallowedOutputNameRule {
         *self = Default::default();
     }
 
-    fn output_section(&mut self, _: &mut Self::State, reason: VisitReason, _: &OutputSection) {
+    fn output_section(&mut self, _: &mut Diagnostics, reason: VisitReason, _: &OutputSection) {
         self.output_section = reason == VisitReason::Enter;
     }
 
-    fn bound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &BoundDecl) {
+    fn bound_decl(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, decl: &BoundDecl) {
         if reason == VisitReason::Enter && self.output_section {
-            check_decl_name(state, &Decl::Bound(decl.clone()), &self.exceptable_nodes());
+            check_decl_name(
+                diagnostics,
+                &Decl::Bound(decl.clone()),
+                &self.exceptable_nodes(),
+            );
         }
     }
 
-    fn unbound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &UnboundDecl) {
+    fn unbound_decl(
+        &mut self,
+        diagnostics: &mut Diagnostics,
+        reason: VisitReason,
+        decl: &UnboundDecl,
+    ) {
         if reason == VisitReason::Enter && self.output_section {
             check_decl_name(
-                state,
+                diagnostics,
                 &Decl::Unbound(decl.clone()),
                 &self.exceptable_nodes(),
             );
@@ -125,7 +132,7 @@ impl Visitor for DisallowedOutputNameRule {
 
 /// Check declaration name
 fn check_decl_name(
-    state: &mut Diagnostics,
+    diagnostics: &mut Diagnostics,
     decl: &Decl,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
@@ -135,7 +142,7 @@ fn check_decl_name(
     let length = name.len();
     if length < 3 {
         // name is too short
-        state.exceptable_add(
+        diagnostics.exceptable_add(
             decl_identifier_too_short(decl.name().span()),
             SyntaxElement::from(decl.inner().clone()),
             exceptable_nodes,
@@ -152,7 +159,7 @@ fn check_decl_name(
                     if let Some(c) = name.peek() {
                         if c.is_ascii_uppercase() || c == &'_' {
                             // name starts with "out"
-                            state.exceptable_add(
+                            diagnostics.exceptable_add(
                                 decl_identifier_starts_with_out(decl.name().span()),
                                 SyntaxElement::from(decl.inner().clone()),
                                 exceptable_nodes,
@@ -161,7 +168,7 @@ fn check_decl_name(
                             let s: String = name.take(3).collect();
                             if s == "put" {
                                 // name starts with "output"
-                                state.exceptable_add(
+                                diagnostics.exceptable_add(
                                     decl_identifier_starts_with_output(decl.name().span()),
                                     SyntaxElement::from(decl.inner().clone()),
                                     exceptable_nodes,

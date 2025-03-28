@@ -61,15 +61,13 @@ impl Rule for TodoRule {
 }
 
 impl Visitor for TodoRule {
-    type State = Diagnostics;
-
-    fn document(&mut self, _: &mut Self::State, _: VisitReason, _: &Document, _: SupportedVersion) {
+    fn document(&mut self, _: &mut Diagnostics, _: VisitReason, _: &Document, _: SupportedVersion) {
         // This is intentionally empty, as this rule has no state.
     }
 
-    fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
+    fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &Comment) {
         for (offset, pattern) in comment.text().match_indices(TODO) {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 todo_comment(pattern, comment.span(), offset),
                 SyntaxElement::from(comment.inner().clone()),
                 &self.exceptable_nodes(),

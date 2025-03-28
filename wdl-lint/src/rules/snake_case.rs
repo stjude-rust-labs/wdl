@@ -149,11 +149,9 @@ impl Rule for SnakeCaseRule {
 }
 
 impl Visitor for SnakeCaseRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -168,7 +166,7 @@ impl Visitor for SnakeCaseRule {
 
     fn struct_definition(
         &mut self,
-        _state: &mut Self::State,
+        _diagnostics: &mut Diagnostics,
         reason: VisitReason,
         _def: &StructDefinition,
     ) {
@@ -184,7 +182,7 @@ impl Visitor for SnakeCaseRule {
 
     fn input_section(
         &mut self,
-        _state: &mut Self::State,
+        _diagnostics: &mut Diagnostics,
         reason: VisitReason,
         _section: &InputSection,
     ) {
@@ -200,7 +198,7 @@ impl Visitor for SnakeCaseRule {
 
     fn output_section(
         &mut self,
-        _state: &mut Self::State,
+        _diagnostics: &mut Diagnostics,
         reason: VisitReason,
         _section: &OutputSection,
     ) {
@@ -216,7 +214,7 @@ impl Visitor for SnakeCaseRule {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
@@ -229,7 +227,7 @@ impl Visitor for SnakeCaseRule {
             Context::Task,
             name.text(),
             name.span(),
-            state,
+            diagnostics,
             SyntaxElement::from(task.inner().clone()),
             &self.exceptable_nodes(),
         );
@@ -237,7 +235,7 @@ impl Visitor for SnakeCaseRule {
 
     fn workflow_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         workflow: &WorkflowDefinition,
     ) {
@@ -250,13 +248,13 @@ impl Visitor for SnakeCaseRule {
             Context::Workflow,
             name.text(),
             name.span(),
-            state,
+            diagnostics,
             SyntaxElement::from(workflow.inner().clone()),
             &self.exceptable_nodes(),
         );
     }
 
-    fn bound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &BoundDecl) {
+    fn bound_decl(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, decl: &BoundDecl) {
         if reason == VisitReason::Exit {
             return;
         }
@@ -267,13 +265,18 @@ impl Visitor for SnakeCaseRule {
             context,
             name.text(),
             name.span(),
-            state,
+            diagnostics,
             SyntaxElement::from(decl.inner().clone()),
             &self.exceptable_nodes(),
         );
     }
 
-    fn unbound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &UnboundDecl) {
+    fn unbound_decl(
+        &mut self,
+        diagnostics: &mut Diagnostics,
+        reason: VisitReason,
+        decl: &UnboundDecl,
+    ) {
         if reason == VisitReason::Exit {
             return;
         }
@@ -284,7 +287,7 @@ impl Visitor for SnakeCaseRule {
             context,
             name.text(),
             name.span(),
-            state,
+            diagnostics,
             SyntaxElement::from(decl.inner().clone()),
             &self.exceptable_nodes(),
         );

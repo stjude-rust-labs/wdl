@@ -205,11 +205,9 @@ impl Rule for ExpressionSpacingRule {
 }
 
 impl Visitor for ExpressionSpacingRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -222,7 +220,7 @@ impl Visitor for ExpressionSpacingRule {
         *self = Default::default();
     }
 
-    fn expr(&mut self, state: &mut Self::State, reason: VisitReason, expr: &Expr) {
+    fn expr(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
         if reason == VisitReason::Exit {
             return;
         }
@@ -237,7 +235,7 @@ impl Visitor for ExpressionSpacingRule {
                     .count()
                     > 0
                 {
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         prefix_whitespace(expr.span()),
                         SyntaxElement::from(expr.inner().clone()),
                         &self.exceptable_nodes(),
@@ -300,7 +298,7 @@ impl Visitor for ExpressionSpacingRule {
                         | SyntaxKind::LogicalOr => {}
                         _ => {
                             // opening parens should be preceded by whitespace
-                            state.exceptable_add(missing_preceding_whitespace(open.text_range().into()), SyntaxElement::from(expr.inner().clone()), &self.exceptable_nodes());
+                            diagnostics.exceptable_add(missing_preceding_whitespace(open.text_range().into()), SyntaxElement::from(expr.inner().clone()), &self.exceptable_nodes());
                         }
                     }
                 }
@@ -316,7 +314,7 @@ impl Visitor for ExpressionSpacingRule {
                                 .is_some_and(|t| t.kind() != SyntaxKind::Comment)
                         {
                             // opening parens should not be followed by non-newline whitespace
-                            state.exceptable_add(
+                            diagnostics.exceptable_add(
                                 disallowed_space(token.text_range().into()),
                                 SyntaxElement::from(expr.inner().clone()),
                                 &self.exceptable_nodes(),
@@ -337,7 +335,7 @@ impl Visitor for ExpressionSpacingRule {
                     {
                         // closing parenthesis should not be preceded by whitespace without a
                         // newline
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             disallowed_space(close_prev.text_range().into()),
                             SyntaxElement::from(expr.inner().clone()),
                             &self.exceptable_nodes(),
@@ -353,7 +351,7 @@ impl Visitor for ExpressionSpacingRule {
                     .find(|t| matches!(t.kind(), SyntaxKind::LogicalAnd | SyntaxKind::LogicalOr))
                     .expect("expression node should have an operator");
 
-                check_required_surrounding_ws(state, &op, &self.exceptable_nodes());
+                check_required_surrounding_ws(diagnostics, &op, &self.exceptable_nodes());
             }
             Expr::Equality(_) | Expr::Inequality(_) => {
                 // find the operator
@@ -363,7 +361,7 @@ impl Visitor for ExpressionSpacingRule {
                     .find(|t| matches!(t.kind(), SyntaxKind::Equal | SyntaxKind::NotEqual))
                     .expect("expression node should have an operator");
 
-                check_required_surrounding_ws(state, &op, &self.exceptable_nodes());
+                check_required_surrounding_ws(diagnostics, &op, &self.exceptable_nodes());
             }
             Expr::Addition(_)
             | Expr::Subtraction(_)
@@ -389,7 +387,7 @@ impl Visitor for ExpressionSpacingRule {
                     .expect("expression node should have an operator");
 
                 // Infix operators must be surrounded by whitespace
-                check_required_surrounding_ws(state, &op, &self.exceptable_nodes());
+                check_required_surrounding_ws(diagnostics, &op, &self.exceptable_nodes());
             }
             Expr::Less(_) | Expr::LessEqual(_) | Expr::Greater(_) | Expr::GreaterEqual(_) => {
                 // find the operator
@@ -407,7 +405,7 @@ impl Visitor for ExpressionSpacingRule {
                     })
                     .expect("expression node should have an operator");
 
-                check_required_surrounding_ws(state, &op, &self.exceptable_nodes());
+                check_required_surrounding_ws(diagnostics, &op, &self.exceptable_nodes());
             }
             Expr::If(_) => {
                 // find the if keyword
@@ -475,7 +473,7 @@ impl Visitor for ExpressionSpacingRule {
                         }
                     }
                     if !open_paren || !newline {
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             multiline_if_open_paren(if_keyword.text_range().into()),
                             SyntaxElement::from(expr.inner().clone()),
                             &self.exceptable_nodes(),
@@ -495,7 +493,7 @@ impl Visitor for ExpressionSpacingRule {
                             .contains('\n')
                     {
                         // then should be preceded by a newline
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             multiline_then_space(then_keyword.text_range().into()),
                             SyntaxElement::from(expr.inner().clone()),
                             &self.exceptable_nodes(),
@@ -514,7 +512,7 @@ impl Visitor for ExpressionSpacingRule {
                             .contains('\n')
                     {
                         // then should be preceded by a newline
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             multiline_else_space(else_keyword.text_range().into()),
                             SyntaxElement::from(expr.inner().clone()),
                             &self.exceptable_nodes(),
@@ -548,7 +546,7 @@ impl Visitor for ExpressionSpacingRule {
                         }
                     }
                     if !close_paren || !newline {
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             multiline_if_close_paren(else_keyword.text_range().into()),
                             SyntaxElement::from(expr.inner().clone()),
                             &self.exceptable_nodes(),
@@ -585,7 +583,7 @@ impl Visitor for ExpressionSpacingRule {
 
                 checks.iter().for_each(|f| {
                     if let Some(ws) = f {
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             disallowed_space(ws.text_range().into()),
                             SyntaxElement::from(expr.inner().clone()),
                             &self.exceptable_nodes(),
@@ -607,14 +605,14 @@ impl Visitor for ExpressionSpacingRule {
                     .filter(|t| t.kind() == SyntaxKind::Whitespace);
 
                 if let Some(ws) = before_ws {
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         disallowed_space(ws.text_range().into()),
                         SyntaxElement::from(acc.inner().clone()),
                         &self.exceptable_nodes(),
                     );
                 }
                 if let Some(ws) = after_ws {
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         disallowed_space(ws.text_range().into()),
                         SyntaxElement::from(acc.inner().clone()),
                         &self.exceptable_nodes(),
@@ -692,7 +690,7 @@ impl Visitor for ExpressionSpacingRule {
                                 }
                             }
                             if !newline {
-                                state.exceptable_add(
+                                diagnostics.exceptable_add(
                                     multiline_literal_open_newline(
                                         open_bracket.text_range().into(),
                                     ),
@@ -726,7 +724,7 @@ impl Visitor for ExpressionSpacingRule {
                                 }
                             }
                             if !newline {
-                                state.exceptable_add(
+                                diagnostics.exceptable_add(
                                     multiline_literal_close_newline(
                                         close_bracket.text_range().into(),
                                     ),
@@ -746,7 +744,7 @@ impl Visitor for ExpressionSpacingRule {
 
     fn bound_decl(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         decl: &wdl_ast::v1::BoundDecl,
     ) {
@@ -766,21 +764,21 @@ impl Visitor for ExpressionSpacingRule {
 
             if !before_ws && !after_ws {
                 // assignments must be surrounded by whitespace
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     assignment_missing_surrounding_whitespace(assign.text_range().into()),
                     SyntaxElement::from(decl.inner().clone()),
                     &self.exceptable_nodes(),
                 );
             } else if !before_ws {
                 // assignments must be preceded by whitespace
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     assignment_missing_preceding_whitespace(assign.text_range().into()),
                     SyntaxElement::from(decl.inner().clone()),
                     &self.exceptable_nodes(),
                 );
             } else if !after_ws {
                 // assignments must be followed by whitespace
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     assignment_missing_following_whitespace(assign.text_range().into()),
                     SyntaxElement::from(decl.inner().clone()),
                     &self.exceptable_nodes(),
@@ -792,7 +790,7 @@ impl Visitor for ExpressionSpacingRule {
 
 /// Checks to ensure a token is surrounded by whitespace.
 fn check_required_surrounding_ws(
-    state: &mut Diagnostics,
+    diagnostics: &mut Diagnostics,
     op: &SyntaxElement,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
@@ -801,21 +799,21 @@ fn check_required_surrounding_ws(
 
     if !before_ws && !after_ws {
         // must be surrounded by whitespace
-        state.exceptable_add(
+        diagnostics.exceptable_add(
             missing_surrounding_whitespace(op.text_range().into()),
             op.clone(),
             exceptable_nodes,
         );
     } else if !before_ws {
         // must be preceded by whitespace
-        state.exceptable_add(
+        diagnostics.exceptable_add(
             missing_preceding_whitespace(op.text_range().into()),
             op.clone(),
             exceptable_nodes,
         );
     } else if !after_ws {
         // must be followed by whitespace
-        state.exceptable_add(
+        diagnostics.exceptable_add(
             missing_following_whitespace(op.text_range().into()),
             op.clone(),
             exceptable_nodes,

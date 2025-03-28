@@ -103,11 +103,9 @@ impl Rule for KeyValuePairsRule {
 }
 
 impl Visitor for KeyValuePairsRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         version: SupportedVersion,
@@ -123,7 +121,7 @@ impl Visitor for KeyValuePairsRule {
 
     fn metadata_object(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         item: &MetadataObject,
     ) {
@@ -143,7 +141,7 @@ impl Visitor for KeyValuePairsRule {
         let parent_ws = tmp.split('\n').last().expect("should have indentation");
 
         if !item.inner().to_string().contains('\n') {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 all_on_one_line(item.span()),
                 SyntaxElement::from(item.inner().clone()),
                 &self.exceptable_nodes(),
@@ -158,7 +156,7 @@ impl Visitor for KeyValuePairsRule {
             .expect("should have an opening delimiter");
         if let Some(open_ws) = open_delim.next_sibling_or_token() {
             if open_ws.kind() != SyntaxKind::Whitespace || !open_ws.to_string().contains('\n') {
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     missing_trailing_newline(open_delim.text_range().into()),
                     SyntaxElement::from(item.inner().clone()),
                     &self.exceptable_nodes(),
@@ -180,7 +178,7 @@ impl Visitor for KeyValuePairsRule {
                     Some(next) => next.text_range().end(),
                     _ => close_delim.text_range().start(),
                 };
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     missing_trailing_newline(Span::new(s.start(), usize::from(end) - s.start())),
                     SyntaxElement::from(child.inner().clone()),
                     &self.exceptable_nodes(),
@@ -197,7 +195,7 @@ impl Visitor for KeyValuePairsRule {
                     let expected_ws = parent_ws.to_owned() + INDENT;
 
                     if ws != expected_ws {
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             incorrect_indentation(prior_ws.text_range().into(), &expected_ws, ws),
                             SyntaxElement::from(child.inner().clone()),
                             &self.exceptable_nodes(),
@@ -219,7 +217,7 @@ impl Visitor for KeyValuePairsRule {
                 let expected_ws = parent_ws.to_owned();
 
                 if ws != expected_ws {
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         incorrect_indentation(
                             Span::new(
                                 usize::from(close_delim.text_range().start()) - ws.len(),
@@ -238,7 +236,7 @@ impl Visitor for KeyValuePairsRule {
 
     fn metadata_array(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         item: &MetadataArray,
     ) {
@@ -259,7 +257,7 @@ impl Visitor for KeyValuePairsRule {
 
         // If the array is all on one line, report that
         if !item.inner().to_string().contains('\n') {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 all_on_one_line(item.span()),
                 SyntaxElement::from(item.inner().clone()),
                 &self.exceptable_nodes(),
@@ -274,7 +272,7 @@ impl Visitor for KeyValuePairsRule {
             .expect("should have an opening delimiter");
         if let Some(open_ws) = open_delim.next_sibling_or_token() {
             if open_ws.kind() != SyntaxKind::Whitespace || !open_ws.to_string().contains('\n') {
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     missing_trailing_newline(open_delim.text_range().into()),
                     SyntaxElement::from(item.inner().clone()),
                     &self.exceptable_nodes(),
@@ -296,7 +294,7 @@ impl Visitor for KeyValuePairsRule {
                     Some(next) => next.text_range().end(),
                     _ => close_delim.text_range().start(),
                 };
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     missing_trailing_newline(Span::new(s.start(), usize::from(end) - s.start())),
                     SyntaxElement::from(child.inner().clone()),
                     &self.exceptable_nodes(),
@@ -316,7 +314,7 @@ impl Visitor for KeyValuePairsRule {
                     let expected_ws = parent_ws.to_owned() + INDENT;
 
                     if ws != expected_ws {
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             incorrect_indentation(prior_ws.text_range().into(), &expected_ws, ws),
                             SyntaxElement::from(child.inner().clone()),
                             &self.exceptable_nodes(),
@@ -338,7 +336,7 @@ impl Visitor for KeyValuePairsRule {
                 let expected_ws = parent_ws.to_owned();
 
                 if ws != expected_ws {
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         incorrect_indentation(
                             Span::new(
                                 usize::from(close_delim.text_range().start()) - ws.len(),

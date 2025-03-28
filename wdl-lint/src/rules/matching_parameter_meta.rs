@@ -144,11 +144,9 @@ fn check_parameter_meta(
 }
 
 impl Visitor for MatchingParameterMetaRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         version: SupportedVersion,
@@ -164,7 +162,7 @@ impl Visitor for MatchingParameterMetaRule {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
@@ -186,7 +184,7 @@ impl Visitor for MatchingParameterMetaRule {
                         })
                     }),
                     param_meta,
-                    state,
+                    diagnostics,
                     &self.exceptable_nodes(),
                 );
             }
@@ -199,7 +197,7 @@ impl Visitor for MatchingParameterMetaRule {
 
     fn workflow_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         workflow: &WorkflowDefinition,
     ) {
@@ -221,7 +219,7 @@ impl Visitor for MatchingParameterMetaRule {
                         })
                     }),
                     param_meta,
-                    state,
+                    diagnostics,
                     &self.exceptable_nodes(),
                 );
             }
@@ -234,7 +232,7 @@ impl Visitor for MatchingParameterMetaRule {
 
     fn struct_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         def: &wdl_ast::v1::StructDefinition,
     ) {
@@ -259,7 +257,7 @@ impl Visitor for MatchingParameterMetaRule {
                         (name, span)
                     }),
                     param_meta,
-                    state,
+                    diagnostics,
                     &self.exceptable_nodes(),
                 );
             }

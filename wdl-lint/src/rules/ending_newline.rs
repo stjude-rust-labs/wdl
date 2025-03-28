@@ -69,11 +69,9 @@ impl Rule for EndingNewlineRule {
 }
 
 impl Visitor for EndingNewlineRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         doc: &Document,
         _: SupportedVersion,
@@ -111,7 +109,7 @@ impl Visitor for EndingNewlineRule {
                             // Since this rule can only be excepted in a document-wide fashion,
                             // if the rule is running we can directly add the diagnostic
                             // without checking for the exceptable nodes
-                            state.add(multiple_ending_newline(
+                            diagnostics.add(multiple_ending_newline(
                                 Span::new(start + text.len(), len - text.len() - 1),
                                 extra,
                             ));
@@ -120,14 +118,16 @@ impl Visitor for EndingNewlineRule {
                     // Since this rule can only be excepted in a document-wide fashion,
                     // if the rule is running we can directly add the diagnostic
                     // without checking for the exceptable nodes
-                    None => state.add(missing_ending_newline(Span::new(start + (len - 1), 1))),
+                    None => {
+                        diagnostics.add(missing_ending_newline(Span::new(start + (len - 1), 1)))
+                    }
                 }
             }
             Some(last) => {
                 // Since this rule can only be excepted in a document-wide fashion,
                 // if the rule is running we can directly add the diagnostic
                 // without checking for the exceptable nodes
-                state.add(missing_ending_newline(Span::new(
+                diagnostics.add(missing_ending_newline(Span::new(
                     usize::from(last.text_range().end()) - 1,
                     1,
                 )));

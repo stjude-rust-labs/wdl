@@ -84,11 +84,9 @@ fn check_name(
 }
 
 impl Visitor for PascalCaseRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -103,7 +101,7 @@ impl Visitor for PascalCaseRule {
 
     fn struct_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         def: &StructDefinition,
     ) {
@@ -115,7 +113,7 @@ impl Visitor for PascalCaseRule {
         check_name(
             name.text(),
             name.span(),
-            state,
+            diagnostics,
             SyntaxElement::from(def.inner().clone()),
             &self.exceptable_nodes(),
         );

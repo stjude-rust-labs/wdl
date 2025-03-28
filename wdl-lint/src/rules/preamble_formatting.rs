@@ -159,11 +159,9 @@ impl Rule for PreambleFormattingRule {
 }
 
 impl Visitor for PreambleFormattingRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -176,7 +174,7 @@ impl Visitor for PreambleFormattingRule {
         *self = Default::default();
     }
 
-    fn whitespace(&mut self, state: &mut Self::State, whitespace: &Whitespace) {
+    fn whitespace(&mut self, diagnostics: &mut Diagnostics, whitespace: &Whitespace) {
         // Since this rule can only be excepted in a document-wide fashion,
         // if the rule is running we can directly add the diagnostic
         // without checking for the exceptable nodes
@@ -280,7 +278,7 @@ impl Visitor for PreambleFormattingRule {
                                 }
                             }
                         }
-                        state.add(diagnostic);
+                        diagnostics.add(diagnostic);
                     }
                 } else if s != "\r\n" && s != "\n" {
                     // Don't include the newline separating the previous comment from the
@@ -293,7 +291,7 @@ impl Visitor for PreambleFormattingRule {
                         0
                     };
 
-                    state.add(leading_whitespace(Span::new(
+                    diagnostics.add(leading_whitespace(Span::new(
                         span.start() + offset,
                         span.len() - offset,
                     )));
@@ -303,12 +301,12 @@ impl Visitor for PreambleFormattingRule {
             }
             _ => {
                 // Whitespace is not allowed to start the document.
-                state.add(leading_whitespace(whitespace.span()));
+                diagnostics.add(leading_whitespace(whitespace.span()));
             }
         }
     }
 
-    fn comment(&mut self, state: &mut Self::State, comment: &Comment) {
+    fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &Comment) {
         if self.state == PreambleState::Finished {
             return;
         }
@@ -414,10 +412,10 @@ impl Visitor for PreambleFormattingRule {
         // without checking for the exceptable nodes
         match extend {
             Some(ExtendDiagnostic::LintDirective) => {
-                state.add(directive_after_preamble_comment(span));
+                diagnostics.add(directive_after_preamble_comment(span));
             }
             Some(ExtendDiagnostic::InvalidComment) => {
-                state.add(invalid_preamble_comment(span));
+                diagnostics.add(invalid_preamble_comment(span));
             }
             None => {
                 unreachable!()
@@ -427,7 +425,7 @@ impl Visitor for PreambleFormattingRule {
 
     fn version_statement(
         &mut self,
-        _state: &mut Self::State,
+        _diagnostics: &mut Diagnostics,
         reason: VisitReason,
         _stmt: &VersionStatement,
     ) {

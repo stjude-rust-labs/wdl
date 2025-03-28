@@ -355,11 +355,9 @@ fn recommended_keys<'a, 'k>(
 }
 
 impl Visitor for RuntimeSectionKeysRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: wdl_ast::VisitReason,
         _: &wdl_ast::Document,
         version: SupportedVersion,
@@ -378,7 +376,7 @@ impl Visitor for RuntimeSectionKeysRule {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         def: &TaskDefinition,
     ) {
@@ -408,7 +406,7 @@ impl Visitor for RuntimeSectionKeysRule {
                     let specification = format!("the WDL {minor_version} specification");
 
                     if !self.non_reserved_keys.is_empty() {
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             report_non_reserved_runtime_keys(
                                 &self.non_reserved_keys,
                                 runtime_span,
@@ -431,7 +429,7 @@ impl Visitor for RuntimeSectionKeysRule {
                         .collect::<Vec<_>>();
 
                     if !missing_keys.is_empty() {
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             report_missing_recommended_keys(
                                 missing_keys,
                                 runtime_span,
@@ -448,7 +446,7 @@ impl Visitor for RuntimeSectionKeysRule {
 
     fn runtime_section(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         section: &RuntimeSection,
     ) {
@@ -483,7 +481,12 @@ impl Visitor for RuntimeSectionKeysRule {
         }
     }
 
-    fn runtime_item(&mut self, state: &mut Self::State, reason: VisitReason, item: &RuntimeItem) {
+    fn runtime_item(
+        &mut self,
+        diagnostics: &mut Diagnostics,
+        reason: VisitReason,
+        item: &RuntimeItem,
+    ) {
         // NOTE: if we've already processed a `runtime` section for this task
         // and we hit this again, that means there are multiple `runtime`
         // sections in the task. In that case, validation should report that
@@ -513,7 +516,7 @@ impl Visitor for RuntimeSectionKeysRule {
                         // problem that can be encountered is if the key is
                         // deprecated.
                         if let KeyKind::Deprecated(replacement) = kind {
-                            state.exceptable_add(
+                            diagnostics.exceptable_add(
                                 deprecated_runtime_key(&key_name, replacement),
                                 SyntaxElement::from(item.inner().clone()),
                                 &self.exceptable_nodes(),

@@ -31,7 +31,7 @@ use rayon::prelude::*;
 use wdl_ast::Diagnostic;
 use wdl_ast::Document;
 use wdl_ast::Validator;
-use wdl_lint::LintVisitor;
+use wdl_lint::Linter;
 use wdl_lint::rules::ShellCheckRule;
 
 /// Finds tests for this package.
@@ -69,7 +69,7 @@ fn normalize(s: &str) -> String {
 }
 
 /// Formats diagnostics.
-fn format_diagnostics(diagnostics: &[Diagnostic], path: &Path, source: &str) -> String {
+fn format_diagnostics(diagnostics: &Diagnostics, path: &Path, source: &str) -> String {
     let file = SimpleFile::new(path.as_os_str().to_str().unwrap(), source);
     let mut buffer = Buffer::no_color();
     for diagnostic in diagnostics {
@@ -141,7 +141,7 @@ fn run_test(test: &Path, ntests: &AtomicUsize) -> Result<(), String> {
         )?;
     } else {
         let mut validator = Validator::default();
-        validator.add_visitor(LintVisitor::default());
+        validator.add_visitor(Linter::default());
         validator.add_visitor(ShellCheckRule);
         let errors = match validator.validate(&document) {
             Ok(()) => String::new(),

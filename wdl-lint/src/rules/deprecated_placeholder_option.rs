@@ -102,11 +102,9 @@ impl Rule for DeprecatedPlaceholderOptionRule {
 }
 
 impl Visitor for DeprecatedPlaceholderOptionRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         version: SupportedVersion,
@@ -124,7 +122,7 @@ impl Visitor for DeprecatedPlaceholderOptionRule {
 
     fn placeholder(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         placeholder: &Placeholder,
     ) {
@@ -151,7 +149,7 @@ impl Visitor for DeprecatedPlaceholderOptionRule {
                     deprecated_true_false_placeholder_option(option.span())
                 }
             };
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 diagnostic,
                 SyntaxElement::from(placeholder.inner().clone()),
                 &self.exceptable_nodes(),

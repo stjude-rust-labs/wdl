@@ -126,11 +126,9 @@ enum State {
 }
 
 impl Visitor for SectionOrderingRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -145,7 +143,7 @@ impl Visitor for SectionOrderingRule {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
@@ -184,7 +182,7 @@ impl Visitor for SectionOrderingRule {
                     encountered = State::Hints;
                 }
                 _ => {
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         task_section_order(
                             task.name().span(),
                             task.name().text(),
@@ -205,7 +203,7 @@ impl Visitor for SectionOrderingRule {
 
     fn workflow_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         workflow: &WorkflowDefinition,
     ) {
@@ -240,7 +238,7 @@ impl Visitor for SectionOrderingRule {
                     encountered = State::Hints;
                 }
                 _ => {
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         workflow_section_order(
                             workflow.name().span(),
                             workflow.name().text(),

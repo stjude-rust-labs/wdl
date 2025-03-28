@@ -3,39 +3,40 @@
 use std::collections::HashSet;
 use std::fmt;
 
-use crate::Ast;
-use crate::AstNode;
-use crate::AstToken;
-use crate::Diagnostic;
+use wdl_ast::Ast;
+use wdl_ast::AstNode;
+use wdl_ast::AstToken;
+use wdl_ast::Diagnostic;
+use wdl_ast::Ident;
+use wdl_ast::Span;
+use wdl_ast::SupportedVersion;
+use wdl_ast::SyntaxNode;
+use wdl_ast::TokenText;
+use wdl_ast::v1::CommandKeyword;
+use wdl_ast::v1::CommandSection;
+use wdl_ast::v1::HintsKeyword;
+use wdl_ast::v1::InputKeyword;
+use wdl_ast::v1::InputSection;
+use wdl_ast::v1::MetaKeyword;
+use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::OutputKeyword;
+use wdl_ast::v1::OutputSection;
+use wdl_ast::v1::ParameterMetaKeyword;
+use wdl_ast::v1::ParameterMetadataSection;
+use wdl_ast::v1::RequirementsKeyword;
+use wdl_ast::v1::RequirementsSection;
+use wdl_ast::v1::RuntimeKeyword;
+use wdl_ast::v1::RuntimeSection;
+use wdl_ast::v1::SectionParent;
+use wdl_ast::v1::StructDefinition;
+use wdl_ast::v1::TaskDefinition;
+use wdl_ast::v1::TaskHintsSection;
+use wdl_ast::v1::WorkflowDefinition;
+
 use crate::Diagnostics;
-use crate::Document;
-use crate::Ident;
-use crate::Span;
-use crate::SupportedVersion;
-use crate::SyntaxNode;
-use crate::TokenText;
 use crate::VisitReason;
 use crate::Visitor;
-use crate::v1::CommandKeyword;
-use crate::v1::CommandSection;
-use crate::v1::HintsKeyword;
-use crate::v1::InputKeyword;
-use crate::v1::InputSection;
-use crate::v1::MetaKeyword;
-use crate::v1::MetadataSection;
-use crate::v1::OutputKeyword;
-use crate::v1::OutputSection;
-use crate::v1::ParameterMetaKeyword;
-use crate::v1::ParameterMetadataSection;
-use crate::v1::RequirementsKeyword;
-use crate::v1::RequirementsSection;
-use crate::v1::RuntimeKeyword;
-use crate::v1::RuntimeSection;
-use crate::v1::SectionParent;
-use crate::v1::StructDefinition;
-use crate::v1::TaskDefinition;
-use crate::v1::TaskHintsSection;
-use crate::v1::WorkflowDefinition;
+use crate::document::Document;
 
 /// Represents section context of an error.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -247,11 +248,9 @@ impl CountingVisitor {
 }
 
 impl Visitor for CountingVisitor {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         doc: &Document,
         _: SupportedVersion,
@@ -263,18 +262,18 @@ impl Visitor for CountingVisitor {
         }
 
         // Ignore documents that are not supported
-        if matches!(doc.ast(), Ast::Unsupported) {
+        if matches!(doc.root().ast(), Ast::Unsupported) {
             return;
         }
 
         if !self.has_workflow && self.tasks_seen.is_empty() && !self.has_struct {
-            state.add(at_least_one_definition());
+            diagnostics.add(at_least_one_definition());
         }
     }
 
     fn workflow_definition(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &WorkflowDefinition,
     ) {
@@ -289,13 +288,13 @@ impl Visitor for CountingVisitor {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
         if reason == VisitReason::Exit {
             if !self.ignore_current && self.command.is_none() {
-                state.add(missing_command_section(task.name()));
+                diagnostics.add(missing_command_section(task.name()));
             }
 
             self.reset();
@@ -307,7 +306,7 @@ impl Visitor for CountingVisitor {
 
     fn struct_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         def: &StructDefinition,
     ) {
@@ -317,7 +316,7 @@ impl Visitor for CountingVisitor {
         }
 
         if def.members().next().is_none() {
-            state.add(empty_struct(def.name()));
+            diagnostics.add(empty_struct(def.name()));
         }
 
         self.has_struct = true;
@@ -325,7 +324,7 @@ impl Visitor for CountingVisitor {
 
     fn command_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &CommandSection,
     ) {
@@ -334,7 +333,7 @@ impl Visitor for CountingVisitor {
         }
 
         if let Some(command) = self.command {
-            state.add(duplicate_section(
+            diagnostics.add(duplicate_section(
                 section.parent(),
                 Section::Command,
                 command,
@@ -351,7 +350,7 @@ impl Visitor for CountingVisitor {
 
     fn input_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &InputSection,
     ) {
@@ -360,7 +359,7 @@ impl Visitor for CountingVisitor {
         }
 
         if let Some(input) = self.input {
-            state.add(duplicate_section(
+            diagnostics.add(duplicate_section(
                 section.parent(),
                 Section::Input,
                 input,
@@ -375,7 +374,7 @@ impl Visitor for CountingVisitor {
 
     fn output_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &OutputSection,
     ) {
@@ -384,7 +383,7 @@ impl Visitor for CountingVisitor {
         }
 
         if let Some(output) = self.output {
-            state.add(duplicate_section(
+            diagnostics.add(duplicate_section(
                 section.parent(),
                 Section::Output,
                 output,
@@ -401,7 +400,7 @@ impl Visitor for CountingVisitor {
 
     fn requirements_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &RequirementsSection,
     ) {
@@ -410,7 +409,7 @@ impl Visitor for CountingVisitor {
         }
 
         if let Some(requirements) = self.requirements {
-            state.add(duplicate_section(
+            diagnostics.add(duplicate_section(
                 section.parent(),
                 Section::Requirements,
                 requirements,
@@ -420,7 +419,7 @@ impl Visitor for CountingVisitor {
         }
 
         if let Some(runtime) = self.runtime {
-            state.add(conflicting_section(
+            diagnostics.add(conflicting_section(
                 section.parent(),
                 Section::Requirements,
                 section,
@@ -438,7 +437,7 @@ impl Visitor for CountingVisitor {
 
     fn task_hints_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &TaskHintsSection,
     ) {
@@ -447,7 +446,7 @@ impl Visitor for CountingVisitor {
         }
 
         if let Some(hints) = self.hints {
-            state.add(duplicate_section(
+            diagnostics.add(duplicate_section(
                 SectionParent::Task(section.parent()),
                 Section::Hints,
                 hints,
@@ -462,16 +461,16 @@ impl Visitor for CountingVisitor {
 
     fn workflow_hints_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
-        section: &crate::v1::WorkflowHintsSection,
+        section: &wdl_ast::v1::WorkflowHintsSection,
     ) {
         if self.ignore_current || reason == VisitReason::Exit {
             return;
         }
 
         if let Some(hints) = self.hints {
-            state.add(duplicate_section(
+            diagnostics.add(duplicate_section(
                 SectionParent::Workflow(section.parent()),
                 Section::Hints,
                 hints,
@@ -486,7 +485,7 @@ impl Visitor for CountingVisitor {
 
     fn runtime_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &RuntimeSection,
     ) {
@@ -495,7 +494,7 @@ impl Visitor for CountingVisitor {
         }
 
         if let Some(runtime) = self.runtime {
-            state.add(duplicate_section(
+            diagnostics.add(duplicate_section(
                 section.parent(),
                 Section::Runtime,
                 runtime,
@@ -505,7 +504,7 @@ impl Visitor for CountingVisitor {
         }
 
         if let Some(requirements) = self.requirements {
-            state.add(conflicting_section(
+            diagnostics.add(conflicting_section(
                 section.parent(),
                 Section::Runtime,
                 section,
@@ -523,7 +522,7 @@ impl Visitor for CountingVisitor {
 
     fn metadata_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &MetadataSection,
     ) {
@@ -532,7 +531,7 @@ impl Visitor for CountingVisitor {
         }
 
         if let Some(metadata) = self.metadata {
-            state.add(duplicate_section(
+            diagnostics.add(duplicate_section(
                 section.parent(),
                 Section::Metadata,
                 metadata,
@@ -547,7 +546,7 @@ impl Visitor for CountingVisitor {
 
     fn parameter_metadata_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &ParameterMetadataSection,
     ) {
@@ -556,7 +555,7 @@ impl Visitor for CountingVisitor {
         }
 
         if let Some(metadata) = self.param_metadata {
-            state.add(duplicate_section(
+            diagnostics.add(duplicate_section(
                 section.parent(),
                 Section::ParameterMetadata,
                 metadata,
