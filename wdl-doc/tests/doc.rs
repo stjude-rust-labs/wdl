@@ -72,8 +72,6 @@ async fn main() {
     }
 
     // Compare the generated docs with the expected output
-    // For now, check that the paths exist as expected.
-    // TODO: check HTML content.
     let mut success = true;
     for entry in fs::read_dir(docs_dir).unwrap() {
         let entry = entry.unwrap();
@@ -85,6 +83,13 @@ async fn main() {
             .join(path.strip_prefix(docs_dir).unwrap());
         if !expected_path.exists() {
             eprintln!("Expected path does not exist: {}", expected_path.display());
+            success = false;
+            continue;
+        }
+        let expected = fs::read_to_string(expected_path).unwrap();
+        let actual = fs::read_to_string(&path).unwrap();
+        if expected != actual {
+            eprintln!("Mismatch in file: {}", path.display());
             success = false;
         }
     }
