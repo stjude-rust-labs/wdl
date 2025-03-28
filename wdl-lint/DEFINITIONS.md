@@ -18,9 +18,22 @@ Lint directives are special comments that begin with `#@ except:` followed by a 
 
 ### Preamble Comments
 
-Preamble comments are special comments that begin with double pound signs (`##`). These comments are used for documentation that doesn't fit within any of the WDL-defined documentation elements (i.e., `meta` and `parameter_meta` sections). They may provide context for a collection of tasks or structs, or they may provide a high-level overview of the workflow. For example:
+Preamble comments are special comments at the start of a WDL file that begin with double pound signs (`##`). These comments are used for documentation that doesn't fit within any of the WDL-defined documentation elements (i.e., `meta` and `parameter_meta` sections). They may provide context for a collection of tasks or structs, or they may provide a high-level overview of a workflow. For example:
 
 ```wdl
 ## This workflow performs RNA-seq analysis
 ## It aligns reads and quantifies gene expression
 ```
+<<<<<<< HEAD
+=======
+
+`wdl-doc` renders these comments as markdown.
+
+## Naming Conventions
+
+### Snake Case
+Snake case is a naming convention where words are written in lowercase with underscores between them (e.g., `my_variable_name`). This is the recommended convention for tasks, workflows, and variables in WDL.
+
+### Pascal Case
+Pascal case is a naming convention where words are written without spaces and each word starts with an uppercase letter (e.g., `MyStructName`). This is the recommended convention for struct definitions in WDL. 
+>>>>>>> 87af88d (docs: update Preamble Comments section to mention wdl-doc rendering)
