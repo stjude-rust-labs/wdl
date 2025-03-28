@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added retry logic for task execution ([#320](https://github.com/stjude-rust-labs/wdl/pull/320)).
 * Added a `Config` type for specifying evaluation configuration ([#320](https://github.com/stjude-rust-labs/wdl/pull/320)).
 * Added progress callback to `WorkflowEvaluator` ([#310](https://github.com/stjude-rust-labs/wdl/pull/310)).
+* Added configuration option to write task inputs as JSON files for debugging.
 
 ### Fixed
 
