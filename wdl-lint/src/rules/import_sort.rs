@@ -66,7 +66,7 @@ impl Rule for ImportSortRule {
     }
 
     fn related_rules(&self) -> &[&'static str] {
-        &["InputSorting", "SectionOrdering"]
+        &[]
     }
 }
 

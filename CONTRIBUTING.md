@@ -80,7 +80,7 @@ There are a handful of reasons the CI may have turned red. Try the following fix
 5. consider which nodes should be "exceptable" for this rule
     - See "[How should I decide which nodes to add to `exceptable_nodes()`?](#how-should-i-decide-which-nodes-to-add-to-exceptable_nodes)" for more information on this process
 6. consider if your new rule relates to existing ones and implement the `related_rules()` method accordingly.
-    - See "[How should i decide which rules to link using related_rules()?](https://github.com/stjude-rust-labs/wdl/blob/main/CONTRIBUTING.md#how-should-i-decide-which-rules-to-link-using-related_rules)" for detailed guidance.
+    - See "[How should i decide which rules to link using related_rules()?](#how-should-i-decide-which-rules-to-link-using-related_rules)" for detailed guidance.
 7. repeat
 
 ### Can you explain how rules use `exceptable_nodes()` and `exceptable_add()`?

@@ -60,7 +60,7 @@ impl Rule for PreambleCommentAfterVersionRule {
     }
 
     fn related_rules(&self) -> &[&'static str] {
-        &[]
+        &["PreambleFormatting"]
     }
 }
 
