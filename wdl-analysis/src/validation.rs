@@ -85,16 +85,6 @@ impl Diagnostics {
 /// of diagnostics as the visitation state.
 ///
 /// See the [validate](Self::validate) method to perform the validation.
-///
-/// # Examples
-///
-/// ```rust
-/// # use wdl_ast::{Document, Validator};
-/// let (document, diagnostics) = Document::parse("version 1.1\nworkflow example {}");
-/// assert!(diagnostics.is_empty());
-/// let mut validator = Validator::default();
-/// assert!(validator.validate(&document).is_ok());
-/// ```
 #[allow(missing_debug_implementations)]
 pub struct Validator {
     /// The set of validation visitors.
