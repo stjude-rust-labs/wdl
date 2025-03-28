@@ -360,7 +360,7 @@ impl DocsTree {
             "Home",
             html! {
                 (left_sidebar)
-                div class="p-4 flex" {
+                div class="p-4 flex grow" {
                     (content)
                 }
                 (self.render_right_sidebar())
@@ -393,7 +393,7 @@ impl DocsTree {
             page.name(),
             html! {
                 (left_sidebar)
-                div class="p-4 flex" {
+                div class="p-4 flex grow" {
                     (content)
                 }
                 (self.render_right_sidebar())
