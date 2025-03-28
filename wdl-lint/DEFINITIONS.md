@@ -10,7 +10,9 @@ The document preamble is defined as anything before the version declaration stat
 
 ### Lint Directives
 
-Lint directives are special comments that begin with `#@ except:` followed by a comma-delimited list of rule IDs. These comments are used to disable specific lint rules for a section of the document. When a lint directive is encountered in the preamble, it will disable the specified rules for the entire document. For example:
+Lint directives are special comments that begin with `#@ except:` followed by a comma-delimited list of rule IDs. These comments are used to disable specific lint rules for a section of the document. When a lint directive is encountered in the preamble, it will disable the specified rules for the entire document.
+
+For example:
 
 ```wdl
 #@ except: LineWidth, CommentWhitespace
@@ -18,22 +20,12 @@ Lint directives are special comments that begin with `#@ except:` followed by a 
 
 ### Preamble Comments
 
-Preamble comments are special comments at the start of a WDL file that begin with double pound signs (`##`). These comments are used for documentation that doesn't fit within any of the WDL-defined documentation elements (i.e., `meta` and `parameter_meta` sections). They may provide context for a collection of tasks or structs, or they may provide a high-level overview of a workflow. For example:
+Preamble comments are special comments at the start of a WDL file that begin with double pound signs (`##`). These comments are used for documentation that doesn't fit within any of the WDL-defined documentation elements (i.e., `meta` and `parameter_meta` sections). They may provide context for a collection of tasks or structs, or they may provide a high-level overview of a workflow. Preamble comments can be formatted as Markdown text.
+
+For example:
 
 ```wdl
-## This workflow performs RNA-seq analysis
-## It aligns reads and quantifies gene expression
+## # FlagFilter
+##
+## A struct to represent the filtering flags used in various `samtools` commands.
 ```
-<<<<<<< HEAD
-=======
-
-`wdl-doc` renders these comments as markdown.
-
-## Naming Conventions
-
-### Snake Case
-Snake case is a naming convention where words are written in lowercase with underscores between them (e.g., `my_variable_name`). This is the recommended convention for tasks, workflows, and variables in WDL.
-
-### Pascal Case
-Pascal case is a naming convention where words are written without spaces and each word starts with an uppercase letter (e.g., `MyStructName`). This is the recommended convention for struct definitions in WDL. 
->>>>>>> 87af88d (docs: update Preamble Comments section to mention wdl-doc rendering)
