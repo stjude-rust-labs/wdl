@@ -163,6 +163,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         }
 
         for r in &rules {
+            let self_id = &r.id();
             for related_id in r.related_rules() {
                 if !rule_ids.contains(related_id) {
                     // If a related rule is a reserved rule, then it's fine.
@@ -174,6 +175,12 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
                          in the default rule set.",
                         id = r.id(),
                         related_id = related_id
+                    );
+                }
+                if related_id == self_id {
+                    panic!(
+                        "Rule `{id}` refers to itself in its related rules. This is not allowed.",
+                        id = self_id
                     );
                 }
             }
@@ -223,6 +230,7 @@ pub fn optional_rules() -> Vec<Box<dyn Rule>> {
 
         let all_rule_ids: HashSet<&str> = default_rule_ids.union(&opt_rule_ids).copied().collect();
         for r in &opt_rules {
+            let self_id = &r.id();
             for related_id in r.related_rules() {
                 if !all_rule_ids.contains(related_id) {
                     panic!(
@@ -230,6 +238,14 @@ pub fn optional_rules() -> Vec<Box<dyn Rule>> {
                          not exist.",
                         id = r.id(),
                         related_id = related_id
+                    );
+                }
+
+                if related_id == self_id {
+                    panic!(
+                        "optional rule `{id}` refers to itself in its related rules. This is not \
+                         allowed.",
+                        id = self_id
                     );
                 }
             }

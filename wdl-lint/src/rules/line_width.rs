@@ -115,7 +115,7 @@ impl Rule for LineWidthRule {
     }
 
     fn related_rules(&self) -> &[&'static str] {
-        &[]
+        &["ExpressionSpacing"]
     }
 }
 
