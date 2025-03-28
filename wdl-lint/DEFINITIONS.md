@@ -24,13 +24,3 @@ Preamble comments are special comments that begin with double pound signs (`##`)
 ## This workflow performs RNA-seq analysis
 ## It aligns reads and quantifies gene expression
 ```
-
-## Naming Conventions
-
-### Snake Case
-
-Snake case is a naming convention where words are written in lowercase with underscores between them (e.g., `my_variable_name`). This is the recommended convention for tasks, workflows, and variables in WDL.
-
-### Pascal Case
-
-Pascal case is a naming convention where words are written without spaces and each word starts with an uppercase letter (e.g., `MyStructName`). This is the recommended convention for struct definitions in WDL. 
