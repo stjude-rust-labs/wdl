@@ -234,6 +234,10 @@ impl Rule for ShellCheckRule {
             SyntaxKind::CommandSectionNode,
         ])
     }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &[]
+    }
 }
 
 /// Convert a WDL `Placeholder` to a bash variable declaration.

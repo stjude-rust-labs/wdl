@@ -32,6 +32,37 @@ pub enum Tag {
     Deprecated,
 }
 
+/// An error for when an unknown tag is encountered.
+#[derive(Debug)]
+pub struct UnknownTagError(String);
+
+impl std::fmt::Display for UnknownTagError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "unknown tag: {}", self.0)
+    }
+}
+
+impl std::error::Error for UnknownTagError {}
+
+impl std::str::FromStr for Tag {
+    type Err = UnknownTagError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            s if s.eq_ignore_ascii_case("completeness") => Ok(Self::Completeness),
+            s if s.eq_ignore_ascii_case("naming") => Ok(Self::Naming),
+            s if s.eq_ignore_ascii_case("spacing") => Ok(Self::Spacing),
+            s if s.eq_ignore_ascii_case("style") => Ok(Self::Style),
+            s if s.eq_ignore_ascii_case("clarity") => Ok(Self::Clarity),
+            s if s.eq_ignore_ascii_case("portability") => Ok(Self::Portability),
+            s if s.eq_ignore_ascii_case("correctness") => Ok(Self::Correctness),
+            s if s.eq_ignore_ascii_case("sorting") => Ok(Self::Sorting),
+            s if s.eq_ignore_ascii_case("deprecated") => Ok(Self::Deprecated),
+            _ => Err(UnknownTagError(s.to_string())),
+        }
+    }
+}
+
 impl std::fmt::Display for Tag {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

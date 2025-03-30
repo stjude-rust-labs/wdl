@@ -1,5 +1,7 @@
 //! Lint rules for Workflow Description Language (WDL) documents.
 #![doc = include_str!("../RULES.md")]
+//! # Definitions
+#![doc = include_str!("../DEFINITIONS.md")]
 //! # Examples
 //!
 //! An example of parsing a WDL document and linting it:
@@ -40,6 +42,9 @@ pub use tags::*;
 pub use wdl_analysis as analysis;
 pub use wdl_ast as ast;
 
+/// The definitions of WDL concepts and terminology used in the linting rules.
+pub const DEFINITIONS_TEXT: &str = include_str!("../DEFINITIONS.md");
+
 /// A trait implemented by lint rules.
 pub trait Rule: Visitor {
     /// The unique identifier for the lint rule.
@@ -68,6 +73,13 @@ pub trait Rule: Visitor {
     ///
     /// If `None` is returned, all nodes are exceptable.
     fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]>;
+
+    /// Gets the ID of rules that are related to this rule.
+    ///
+    /// This can be used by tools (like `sprocket explain`) to suggest other
+    /// relevant rules to the user based on potential logical connections or
+    /// common co-occurrences of issues.
+    fn related_rules(&self) -> &[&'static str];
 }
 
 /// Gets the default rule set.
@@ -118,9 +130,12 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::ShellCheckRule>::default(),
     ];
 
-    // Ensure all the rule ids are unique and pascal case
+    // Ensure all the rule IDs are unique and pascal case and that related rules are
+    // valid, exist and not self-referential.
     #[cfg(debug_assertions)]
     {
+        use std::collections::HashSet;
+
         use convert_case::Case;
         use convert_case::Casing;
         let mut lint_set = std::collections::HashSet::new();
@@ -137,6 +152,30 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
 
             if analysis_set.contains(r.id()) {
                 panic!("rule id `{id}` is in use by wdl-analysis", id = r.id());
+            }
+        }
+
+        for r in &rules {
+            let self_id = &r.id();
+            for related_id in r.related_rules() {
+                if !rule_ids.contains(related_id) {
+                    // If a related rule is a reserved rule, then it's fine.
+                    if RESERVED_RULE_IDS.contains(related_id) {
+                        continue;
+                    }
+                    panic!(
+                        "Rule `{id}` refers to a related rule `{related_id}` which does not exist \
+                         in the default rule set.",
+                        id = r.id(),
+                        related_id = related_id
+                    );
+                }
+                if related_id == self_id {
+                    panic!(
+                        "Rule `{id}` refers to itself in its related rules. This is not allowed.",
+                        id = self_id
+                    );
+                }
             }
         }
     }

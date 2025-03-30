@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Added suggestion for similar rule names when encountering unknown lint rules ([#334](https://github.com/stjude-rust-labs/wdl/pull/334)).
 * Added `DisallowedDeclarationName` rule ([#343](https://github.com/stjude-rust-labs/wdl/pull/343)).
+* Added `DEFINITIONS.md` file with centralized documentation for WDL concepts ([#195](https://github.com/stjude-rust-labs/wdl/pull/195)).
+* Added `Rule::related_rules()` for linking related lint rules ([#371](https://github.com/stjude-rust-labs/wdl/pull/371)).
+* Added `TryFrom` for Tags to convert strings to Tag enums ([#374](https://github.com/stjude-rust-labs/wdl/pull/374)).
 
 ### Changed
 
@@ -19,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Updated to Rust 2024 edition ([#353](https://github.com/stjude-rust-labs/wdl/pull/353)).
 * Relaxed `CommentWhitespace` rule so that it doesn't fire when a comment has extra spaces before it ([#314](https://github.com/stjude-rust-labs/wdl/pull/314)).
 * `fix` messages suggest the correct order of imports to the user in `ImportSort` rule ([#332](https://github.com/stjude-rust-labs/wdl/pull/332)).
+* Updated `SectionOrdering` to support ordering of `struct` definitions ([#367](https://github.com/stjude-rust-labs/wdl/pull/367)
+* Replaced `TryFrom` with `FromStr` for Tags ([#376](https://github.com/stjude-rust-labs/wdl/pull/376)).
 
 ### Fixed
 
