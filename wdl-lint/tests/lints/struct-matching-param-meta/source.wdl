@@ -5,9 +5,6 @@
 version 1.2
 
 struct Text {
-    String matching
-    String does_not_exist
-
     meta {
         description: "foo"
     }
@@ -23,4 +20,7 @@ struct Text {
         }
         extra: "this should not be here"
     }
+
+    String matching
+    String does_not_exist
 }

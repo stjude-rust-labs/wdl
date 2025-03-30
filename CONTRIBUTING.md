@@ -77,17 +77,45 @@ There are a handful of reasons the CI may have turned red. Try the following fix
 4. review `source.errors` to see if it matches our expectations
     - this isn't exactly true, but I conceptualize `source.errors` as the output if a user ran a `lint` command on `source.wdl`
     - while reviewing, ask yourself if the printed diagnostics are clear and informative
-5. repeat
+5. consider which nodes should be "exceptable" for this rule
+    - See "[How should I decide which nodes to add to `exceptable_nodes()`?](#how-should-i-decide-which-nodes-to-add-to-exceptable_nodes)" for more information on this process
+6. consider if your new rule relates to existing ones and implement the `related_rules()` method accordingly.
+    - See "[How should i decide which rules to link using related_rules()?](#how-should-i-decide-which-rules-to-link-using-related_rules)" for detailed guidance.
+7. repeat
 
 ### Can you explain how rules use `exceptable_nodes()` and `exceptable_add()`?
 
 Every lint rule has an ID which can be used in lint directives (comments beginning with `#@ except:`) to prevent them from emitting diagnostics for portions of a WDL document. Rules "excepted" during the preamble (comments which are before the version statement) will be turned off for the entire document; otherwise, lint directives will shut off a rule while processing the children of whatever node it comes before, but only if that node is in the rule's `exceptable_nodes()` list. `exceptable_add()` will check all the ancestors of `element` for nodes that match the `exceptable_nodes()` list and see if they have a lint directive disabling the current rule; if so, the diagnostic will not be added to the validation output.
 
-#### Further reading
+### How should I decide which nodes to add to `exceptable_nodes()`?
+
+Returning `None` from `exceptable_nodes()` will enable lint directives to work anywhere in the document. This should be used sparingly, and is generally not the desired behavior. The most common case for returning `None` is if the lint rule pertains to "trivia" (whitespace and comments) which are permitted to appear almost anywhere in a WDL document.
+
+_Every_ rule that returns `Some(_)` for `exceptable_nodes()` should include `SyntaxKind::VersionStatementNode` as the first entry. This is to ensure the rule can be disabled for an entire document.
+
+The other `SyntaxKind` nodes that should be returned should be _intuitive_, _minimal_, and _comprehensive_.
+
+Intuitive: users shouldn't need to know anything about the internal CST or AST structure to determine where to add a lint directive. However, we can reasonably expect users to intuit the nested structure of a WDL document. There are top level items (workflow, task, and struct definitions), and then each of those top level items has a variety of sections contained within, which in turn may have further items contained within them. Excepting a rule somewhere "higher" in the nested structure will disable the rule for everything "beneath".
+
+Minimal: We want to have as few exceptable nodes as possible for each rule, while still enabling the most intuitive locations to be excepted. If two nodes would cover the same set of potential diagnostics, _always_ prefer the more specific node. e.g. for a rule relating to `input` sections, the `InputSectionNode`, `TaskDefinitionNode`, and `WorkflowDefinitionNode` would all cover the exact same set of diagnostics (as there can be at most one input section for each task or workflow definition); so we would prefer to have `InputSectionNode` returned by `exceptable_nodes()` rather than either `TaskDefinitionNode` or `WorkflowDefinitionNode`.
+
+Comprehensive: Try to cover as many _unique_ sets of potential diagnostics as possible with the nodes returned by `exceptable_nodes()`. An individual diagnostic should be able to targeted by a lint directive, and so should any unique group of diagnostics.
+
+### How should I decide which rules to link using `related_rules()`?
+
+When deciding which rules should link to which other rules, please consider these criteria:
+
+- If diagnostic `X` is likely to co-occur with diagnostic `Y` within the same lint pass (addressing them often happens together):
+    - rule `X` should implement `related_rules` to include `Y`'s ID, and rule `Y` should implement it to include `X`'s ID.
+- If correcting diagnostic `X` naively (without considering other rules) is likely to result in diagnostic `Y` being emitted in a subsequent lint pass:
+    - rule `X` should implement `related_rules` to include `Y`'s ID, but rule `Y` should _not_ link back to rule `X` in this case, as the user fixing `Y` isn't necessarily led back to the context of `X`.
+
+## Further reading
 
 * `exceptable_add()` defined [here](https://github.com/stjude-rust-labs/wdl/blob/wdl-v0.8.0/wdl-ast/src/validation.rs#L50).
 * See [here](https://docs.rs/wdl/latest/wdl/grammar/type.SyntaxNode.html) for the `SyntaxNode` docs.
 * The PR which introduced `exceptable_nodes()` and `exceptable_add()` is [#162](https://github.com/stjude-rust-labs/wdl/pull/162).
 * That PR fixed issue [#135](https://github.com/stjude-rust-labs/wdl/issues/135)
+* The PR which introduced `related_rules()` is [#371](https://github.com/stjude-rust-labs/wdl/pull/371)
 
 [issues]: https://github.com/stjude-rust-labs/wdl/issues
