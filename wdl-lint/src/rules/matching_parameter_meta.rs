@@ -129,6 +129,7 @@ impl Rule for MatchingParameterMetaRule {
     fn related_rules(&self) -> &[&'static str] {
         &[
             "DescriptionMissing",
+            "InputSorting",
             "MissingOutput",
             "MissingRequirements",
             "MissingRuntime",
@@ -158,12 +159,14 @@ fn check_parameter_meta(
         })
         .collect();
 
-    // We only consider the intersection of the expected and actual keys
+    // We determine the intersection of expected and actual parameter names.
+    // Using these we next check for missing and extraneous parameters separately.
     let expected_order: Vec<_> = expected
         .iter()
         .map(|decl| decl.name().text().to_string())
         .filter(|name| actual_map.contains_key(name))
         .collect();
+    
     let actual_order: Vec<_> = param_meta
         .items()
         .map(|m| m.name().text().to_string())
