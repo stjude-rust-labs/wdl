@@ -1,16 +1,16 @@
 //! A lint rule to ensure a description is included in `meta` sections.
 
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
-use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::SectionParent;
 use wdl_ast::version::V1;
@@ -87,11 +87,9 @@ impl Rule for DescriptionMissingRule {
 }
 
 impl Visitor for DescriptionMissingRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         version: SupportedVersion,
@@ -107,7 +105,7 @@ impl Visitor for DescriptionMissingRule {
 
     fn struct_definition(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &wdl_ast::v1::StructDefinition,
     ) {
@@ -116,7 +114,7 @@ impl Visitor for DescriptionMissingRule {
 
     fn metadata_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &MetadataSection,
     ) {
@@ -136,7 +134,7 @@ impl Visitor for DescriptionMissingRule {
             .find(|entry| entry.name().inner().to_string() == "description");
 
         if description.is_none() {
-            state.exceptable_add(
+            diagnostics.exceptable_add(
                 description_missing(
                     section
                         .inner()

@@ -3,40 +3,41 @@
 use std::collections::HashSet;
 use std::fmt;
 
-use crate::AstToken;
-use crate::Diagnostic;
+use wdl_ast::AstToken;
+use wdl_ast::Diagnostic;
+use wdl_ast::Ident;
+use wdl_ast::Span;
+use wdl_ast::SupportedVersion;
+use wdl_ast::TokenText;
+use wdl_ast::v1::CallStatement;
+use wdl_ast::v1::Expr;
+use wdl_ast::v1::LiteralExpr;
+use wdl_ast::v1::MetadataObject;
+use wdl_ast::v1::MetadataSection;
+use wdl_ast::v1::ParameterMetadataSection;
+use wdl_ast::v1::RequirementsSection;
+use wdl_ast::v1::RuntimeSection;
+use wdl_ast::v1::TASK_HINT_LOCALIZATION_OPTIONAL;
+use wdl_ast::v1::TASK_HINT_LOCALIZATION_OPTIONAL_ALIAS;
+use wdl_ast::v1::TASK_HINT_MAX_CPU;
+use wdl_ast::v1::TASK_HINT_MAX_CPU_ALIAS;
+use wdl_ast::v1::TASK_HINT_MAX_MEMORY;
+use wdl_ast::v1::TASK_HINT_MAX_MEMORY_ALIAS;
+use wdl_ast::v1::TASK_REQUIREMENT_CONTAINER;
+use wdl_ast::v1::TASK_REQUIREMENT_CONTAINER_ALIAS;
+use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES;
+use wdl_ast::v1::TASK_REQUIREMENT_MAX_RETRIES_ALIAS;
+use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES;
+use wdl_ast::v1::TASK_REQUIREMENT_RETURN_CODES_ALIAS;
+use wdl_ast::v1::TaskHintsSection;
+use wdl_ast::v1::WORKFLOW_HINT_ALLOW_NESTED_INPUTS;
+use wdl_ast::v1::WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS;
+use wdl_ast::v1::WorkflowHintsSection;
+
 use crate::Diagnostics;
-use crate::Document;
-use crate::Ident;
-use crate::Span;
-use crate::SupportedVersion;
-use crate::TokenText;
 use crate::VisitReason;
 use crate::Visitor;
-use crate::v1::CallStatement;
-use crate::v1::Expr;
-use crate::v1::LiteralExpr;
-use crate::v1::MetadataObject;
-use crate::v1::MetadataSection;
-use crate::v1::ParameterMetadataSection;
-use crate::v1::RequirementsSection;
-use crate::v1::RuntimeSection;
-use crate::v1::TASK_HINT_LOCALIZATION_OPTIONAL;
-use crate::v1::TASK_HINT_LOCALIZATION_OPTIONAL_ALIAS;
-use crate::v1::TASK_HINT_MAX_CPU;
-use crate::v1::TASK_HINT_MAX_CPU_ALIAS;
-use crate::v1::TASK_HINT_MAX_MEMORY;
-use crate::v1::TASK_HINT_MAX_MEMORY_ALIAS;
-use crate::v1::TASK_REQUIREMENT_CONTAINER;
-use crate::v1::TASK_REQUIREMENT_CONTAINER_ALIAS;
-use crate::v1::TASK_REQUIREMENT_MAX_RETRIES;
-use crate::v1::TASK_REQUIREMENT_MAX_RETRIES_ALIAS;
-use crate::v1::TASK_REQUIREMENT_RETURN_CODES;
-use crate::v1::TASK_REQUIREMENT_RETURN_CODES_ALIAS;
-use crate::v1::TaskHintsSection;
-use crate::v1::WORKFLOW_HINT_ALLOW_NESTED_INPUTS;
-use crate::v1::WORKFLOW_HINT_ALLOW_NESTED_INPUTS_ALIAS;
-use crate::v1::WorkflowHintsSection;
+use crate::document::Document;
 
 /// Represents context about a unique key validation error.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -151,11 +152,9 @@ fn check_duplicate_keys(
 pub struct UniqueKeysVisitor(HashSet<TokenText>);
 
 impl Visitor for UniqueKeysVisitor {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -170,7 +169,7 @@ impl Visitor for UniqueKeysVisitor {
 
     fn requirements_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &RequirementsSection,
     ) {
@@ -193,13 +192,13 @@ impl Visitor for UniqueKeysVisitor {
             ],
             section.items().map(|i| i.name()),
             Context::RequirementsSection,
-            state,
+            diagnostics,
         );
     }
 
     fn task_hints_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &TaskHintsSection,
     ) {
@@ -219,13 +218,13 @@ impl Visitor for UniqueKeysVisitor {
             ],
             section.items().map(|i| i.name()),
             Context::HintsSection,
-            state,
+            diagnostics,
         );
     }
 
     fn workflow_hints_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &WorkflowHintsSection,
     ) {
@@ -241,13 +240,13 @@ impl Visitor for UniqueKeysVisitor {
             )],
             section.items().map(|i| i.name()),
             Context::HintsSection,
-            state,
+            diagnostics,
         );
     }
 
     fn runtime_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &RuntimeSection,
     ) {
@@ -260,13 +259,13 @@ impl Visitor for UniqueKeysVisitor {
             &[(TASK_REQUIREMENT_CONTAINER, TASK_REQUIREMENT_CONTAINER_ALIAS)],
             section.items().map(|i| i.name()),
             Context::RuntimeSection,
-            state,
+            diagnostics,
         );
     }
 
     fn metadata_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &MetadataSection,
     ) {
@@ -279,13 +278,13 @@ impl Visitor for UniqueKeysVisitor {
             &[],
             section.items().map(|i| i.name()),
             Context::MetadataSection,
-            state,
+            diagnostics,
         );
     }
 
     fn parameter_metadata_section(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         section: &ParameterMetadataSection,
     ) {
@@ -298,13 +297,13 @@ impl Visitor for UniqueKeysVisitor {
             &[],
             section.items().map(|i| i.name()),
             Context::ParameterMetadataSection,
-            state,
+            diagnostics,
         );
     }
 
     fn metadata_object(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         object: &MetadataObject,
     ) {
@@ -320,11 +319,11 @@ impl Visitor for UniqueKeysVisitor {
             &[],
             object.items().map(|i| i.name()),
             Context::MetadataObject,
-            state,
+            diagnostics,
         );
     }
 
-    fn expr(&mut self, state: &mut Self::State, reason: VisitReason, expr: &Expr) {
+    fn expr(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, expr: &Expr) {
         if reason == VisitReason::Exit {
             return;
         }
@@ -336,7 +335,7 @@ impl Visitor for UniqueKeysVisitor {
                     &[],
                     o.items().map(|i| i.name_value().0),
                     Context::LiteralObject,
-                    state,
+                    diagnostics,
                 );
             }
             Expr::Literal(LiteralExpr::Struct(s)) => {
@@ -345,7 +344,7 @@ impl Visitor for UniqueKeysVisitor {
                     &[],
                     s.items().map(|i| i.name_value().0),
                     Context::LiteralStruct,
-                    state,
+                    diagnostics,
                 );
             }
             _ => {}
@@ -354,7 +353,7 @@ impl Visitor for UniqueKeysVisitor {
 
     fn call_statement(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         stmt: &CallStatement,
     ) {
@@ -367,7 +366,7 @@ impl Visitor for UniqueKeysVisitor {
             &[],
             stmt.inputs().map(|i| i.name()),
             Context::CallStatement,
-            state,
+            diagnostics,
         );
     }
 }

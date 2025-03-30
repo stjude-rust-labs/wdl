@@ -48,3 +48,8 @@ workspace = true
 name = "analysis"
 required-features = ["codespan"]
 harness = false
+
+[[test]]
+name = "validation"
+required-features = ["codespan"]
+harness = false

@@ -1,13 +1,14 @@
 //! A lint rule for ensuring that newlines are consistent.
 
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 use wdl_ast::Whitespace;
 
 use crate::Rule;
@@ -70,13 +71,11 @@ impl Rule for InconsistentNewlinesRule {
 }
 
 impl Visitor for InconsistentNewlinesRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
-        _doc: &wdl_ast::Document,
+        _doc: &Document,
         _: SupportedVersion,
     ) {
         if reason == VisitReason::Enter {
@@ -90,11 +89,11 @@ impl Visitor for InconsistentNewlinesRule {
             // Since this rule can only be excepted in a document-wide fashion,
             // if the rule is running we can directly add the diagnostic
             // without checking for the exceptable nodes
-            state.add(inconsistent_newlines(self.first_inconsistent.unwrap()));
+            diagnostics.add(inconsistent_newlines(self.first_inconsistent.unwrap()));
         }
     }
 
-    fn whitespace(&mut self, _state: &mut Self::State, whitespace: &Whitespace) {
+    fn whitespace(&mut self, _diagnostics: &mut Diagnostics, whitespace: &Whitespace) {
         if let Some(pos) = whitespace.text().find("\r\n") {
             self.carriage_return += 1;
             if self.newline > 0 && self.first_inconsistent.is_none() {

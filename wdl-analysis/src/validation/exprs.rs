@@ -2,20 +2,21 @@
 
 use std::fmt;
 
-use crate::AstNode;
-use crate::AstToken;
-use crate::Diagnostic;
+use wdl_ast::AstNode;
+use wdl_ast::AstToken;
+use wdl_ast::Diagnostic;
+use wdl_ast::Span;
+use wdl_ast::SupportedVersion;
+use wdl_ast::v1;
+use wdl_ast::v1::HintsKeyword;
+use wdl_ast::v1::InputKeyword;
+use wdl_ast::v1::OutputKeyword;
+use wdl_ast::version::V1;
+
 use crate::Diagnostics;
-use crate::Document;
-use crate::Span;
-use crate::SupportedVersion;
 use crate::VisitReason;
 use crate::Visitor;
-use crate::v1;
-use crate::v1::HintsKeyword;
-use crate::v1::InputKeyword;
-use crate::v1::OutputKeyword;
-use crate::version::V1;
+use crate::document::Document;
 
 /// Creates a "hints scope required" diagnostic.
 fn hints_scope_required(literal: &Literal) -> Diagnostic {
@@ -80,11 +81,9 @@ pub struct ScopedExprVisitor {
 }
 
 impl Visitor for ScopedExprVisitor {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         version: SupportedVersion,
@@ -99,14 +98,14 @@ impl Visitor for ScopedExprVisitor {
 
     fn task_hints_section(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &v1::TaskHintsSection,
     ) {
         self.in_hints_section = reason == VisitReason::Enter;
     }
 
-    fn expr(&mut self, state: &mut Self::State, reason: VisitReason, expr: &v1::Expr) {
+    fn expr(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, expr: &v1::Expr) {
         // Only visit expressions for WDL >=1.2
         if self.version.expect("should have a version") < SupportedVersion::V1(V1::Two) {
             return;
@@ -156,11 +155,11 @@ impl Visitor for ScopedExprVisitor {
 
             if prohibited {
                 let outer = self.literals.last().expect("should have an outer literal");
-                state.add(literal_cannot_nest(&literal, outer));
+                diagnostics.add(literal_cannot_nest(&literal, outer));
             }
         } else {
             // Any use of these literals outside of a `hints` section is prohibited
-            state.add(hints_scope_required(&literal));
+            diagnostics.add(hints_scope_required(&literal));
         }
 
         self.literals.push(literal);

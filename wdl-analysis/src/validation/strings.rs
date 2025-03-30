@@ -1,20 +1,20 @@
 //! Validation of string literals in an AST.
 
-use wdl_grammar::lexer::v1::EscapeToken;
-use wdl_grammar::lexer::v1::Logos;
+use wdl_ast::AstNode;
+use wdl_ast::AstToken;
+use wdl_ast::Diagnostic;
+use wdl_ast::Span;
+use wdl_ast::SupportedVersion;
+use wdl_ast::lexer::v1::EscapeToken;
+use wdl_ast::lexer::v1::Logos;
+use wdl_ast::v1;
+use wdl_ast::v1::LiteralStringKind;
+use wdl_ast::v1::PlaceholderOption;
 
-use crate::AstNode;
-use crate::AstToken;
-use crate::Diagnostic;
 use crate::Diagnostics;
-use crate::Document;
-use crate::Span;
-use crate::SupportedVersion;
 use crate::VisitReason;
 use crate::Visitor;
-use crate::v1;
-use crate::v1::LiteralStringKind;
-use crate::v1::PlaceholderOption;
+use crate::document::Document;
 
 /// Creates an "unknown escape sequence" diagnostic
 fn unknown_escape_sequence(sequence: &str, span: Span) -> Diagnostic {
@@ -133,11 +133,9 @@ fn check_text(diagnostics: &mut Diagnostics, start: usize, text: &str) {
 pub struct LiteralTextVisitor;
 
 impl Visitor for LiteralTextVisitor {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -150,13 +148,13 @@ impl Visitor for LiteralTextVisitor {
         *self = Default::default();
     }
 
-    fn string_text(&mut self, state: &mut Self::State, text: &v1::StringText) {
+    fn string_text(&mut self, diagnostics: &mut Diagnostics, text: &v1::StringText) {
         let string: v1::LiteralString<_> = text.parent().expect("should have a parent");
         match string.kind() {
             LiteralStringKind::SingleQuoted | LiteralStringKind::DoubleQuoted => {
                 // Check the text of a normal string to ensure escape sequences are correct and
                 // characters that are required to be escaped are actually escaped.
-                check_text(state, text.span().start(), text.text());
+                check_text(diagnostics, text.span().start(), text.text());
             }
             LiteralStringKind::Multiline => {
                 // Don't check the text of multiline strings as they are treated
@@ -170,7 +168,7 @@ impl Visitor for LiteralTextVisitor {
 
     fn placeholder(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         placeholder: &v1::Placeholder,
     ) {
@@ -181,7 +179,7 @@ impl Visitor for LiteralTextVisitor {
         let mut placeholders = placeholder.children::<PlaceholderOption<_>>();
         if let Some(first) = placeholders.next() {
             for additional in placeholders {
-                state.add(multiple_placeholder_options(
+                diagnostics.add(multiple_placeholder_options(
                     first.span(),
                     additional.span(),
                 ));
