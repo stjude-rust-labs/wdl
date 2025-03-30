@@ -9,10 +9,8 @@
 //! ```rust
 //! # let source = "version 1.1\nworkflow test {}";
 //! use wdl_lint::Linter;
-//! use wdl_lint::analysis::document::Document;
 //! use wdl_lint::analysis::Validator;
-//!
-//! 
+//! use wdl_lint::analysis::document::Document;
 //!
 //! let mut validator = Validator::default();
 //! validator.add_visitor(Linter::default());
@@ -28,8 +26,8 @@
 #![warn(clippy::missing_docs_in_private_items)]
 #![warn(rustdoc::broken_intra_doc_links)]
 
-use wdl_ast::SyntaxKind;
 use wdl_analysis::Visitor;
+use wdl_ast::SyntaxKind;
 
 pub(crate) mod fix;
 mod linter;
@@ -138,9 +136,9 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
 
         use convert_case::Case;
         use convert_case::Casing;
-        let mut lint_set = std::collections::HashSet::new();
-        let analysis_set: std::collections::HashSet<&str> =
-            std::collections::HashSet::from_iter(analysis::rules().iter().map(|r| r.id()));
+        let mut lint_set = HashSet::new();
+        let analysis_set: HashSet<&str> =
+            HashSet::from_iter(analysis::rules().iter().map(|r| r.id()));
         for r in &rules {
             if r.id().to_case(Case::Pascal) != r.id() {
                 panic!("lint rule id `{id}` is not pascal case", id = r.id());
@@ -153,19 +151,19 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
             if analysis_set.contains(r.id()) {
                 panic!("rule id `{id}` is in use by wdl-analysis", id = r.id());
             }
-        }
-
-        for r in &rules {
             let self_id = &r.id();
             for related_id in r.related_rules() {
-                if !rule_ids.contains(related_id) {
-                    // If a related rule is a reserved rule, then it's fine.
-                    if RESERVED_RULE_IDS.contains(related_id) {
-                        continue;
+                if !lint_set.contains(related_id) {
+                    if analysis_set.contains(related_id) {
+                        panic!(
+                            "Rule `{id}` refers to a related rule `{related_id}` from \
+                             wdl-analysis. This is not allowed.",
+                            id = r.id(),
+                            related_id = related_id
+                        );
                     }
                     panic!(
-                        "Rule `{id}` refers to a related rule `{related_id}` which does not exist \
-                         in the default rule set.",
+                        "Rule `{id}` refers to a related rule `{related_id}` which does not exist",
                         id = r.id(),
                         related_id = related_id
                     );

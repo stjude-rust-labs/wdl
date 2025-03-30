@@ -3,18 +3,18 @@
 use std::collections::HashMap;
 use std::sync::LazyLock;
 
+use wdl_analysis::Diagnostics;
+use wdl_analysis::EXCEPT_COMMENT_PREFIX;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstToken;
 use wdl_ast::Comment;
 use wdl_ast::Diagnostic;
-use wdl_analysis::Diagnostics;
-use wdl_analysis::document::Document;
-use wdl_analysis::EXCEPT_COMMENT_PREFIX;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_analysis::VisitReason;
-use wdl_analysis::Visitor;
 
 use crate::Rule;
 use crate::Tag;

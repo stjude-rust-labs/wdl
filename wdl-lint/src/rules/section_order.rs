@@ -1,16 +1,16 @@
 //! A lint rule for section ordering.
 
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_analysis::Diagnostics;
-use wdl_analysis::document::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_analysis::VisitReason;
-use wdl_analysis::Visitor;
 use wdl_ast::v1::StructDefinition;
 use wdl_ast::v1::StructItem;
 use wdl_ast::v1::TaskDefinition;
@@ -263,7 +263,7 @@ impl Visitor for SectionOrderingRule {
 
     fn struct_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         struct_def: &StructDefinition,
     ) {
@@ -284,7 +284,7 @@ impl Visitor for SectionOrderingRule {
                     encountered = State::Decl;
                 }
                 _ => {
-                    state.exceptable_add(
+                    diagnostics.exceptable_add(
                         struct_section_order(
                             struct_def.name().span(),
                             struct_def.name().text(),

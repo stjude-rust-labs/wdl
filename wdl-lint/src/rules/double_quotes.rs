@@ -1,15 +1,15 @@
 //! A lint rule for using double quoted strings.
 
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
-use wdl_analysis::Diagnostics;
-use wdl_analysis::document::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_analysis::VisitReason;
-use wdl_analysis::Visitor;
 use wdl_ast::v1::Expr;
 use wdl_ast::v1::LiteralExpr;
 use wdl_ast::v1::LiteralStringKind;

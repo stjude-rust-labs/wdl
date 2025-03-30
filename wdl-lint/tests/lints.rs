@@ -28,9 +28,9 @@ use codespan_reporting::term::termcolor::Buffer;
 use colored::Colorize;
 use pretty_assertions::StrComparison;
 use rayon::prelude::*;
-use wdl_ast::Diagnostic;
 use wdl_analysis::Document;
 use wdl_analysis::Validator;
+use wdl_ast::Diagnostic;
 use wdl_lint::Linter;
 
 /// Finds tests for this package.

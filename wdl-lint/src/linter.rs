@@ -3,15 +3,15 @@
 use std::collections::HashSet;
 
 use indexmap::IndexMap;
+use wdl_analysis::Diagnostics;
+use wdl_analysis::SyntaxNodeExt;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
 use wdl_analysis::document::Document as AnalysisDocument;
 use wdl_ast::AstNode;
 use wdl_ast::Comment;
-use wdl_analysis::Diagnostics;
 use wdl_ast::SupportedVersion;
-use wdl_analysis::SyntaxNodeExt;
 use wdl_ast::VersionStatement;
-use wdl_analysis::VisitReason;
-use wdl_analysis::Visitor;
 use wdl_ast::Whitespace;
 use wdl_ast::v1;
 
@@ -85,7 +85,8 @@ impl Visitor for Linter {
             self.document_exceptions.clear();
 
             self.document_exceptions.extend(
-                doc.root().version_statement()
+                doc.root()
+                    .version_statement()
                     .expect("document should have version statement")
                     .inner()
                     .rule_exceptions(),

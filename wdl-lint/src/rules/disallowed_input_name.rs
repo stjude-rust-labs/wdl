@@ -1,15 +1,15 @@
 //! A lint rule that disallows redundant input names.
 
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_analysis::Diagnostics;
-use wdl_analysis::document::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_analysis::VisitReason;
-use wdl_analysis::Visitor;
 use wdl_ast::v1::BoundDecl;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::InputSection;

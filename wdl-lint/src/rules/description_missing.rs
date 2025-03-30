@@ -1,16 +1,16 @@
 //! A lint rule to ensure a description is included in `meta` sections.
 
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_analysis::Diagnostics;
-use wdl_analysis::document::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_analysis::VisitReason;
-use wdl_analysis::Visitor;
 use wdl_ast::v1::MetadataSection;
 use wdl_ast::v1::SectionParent;
 use wdl_ast::version::V1;

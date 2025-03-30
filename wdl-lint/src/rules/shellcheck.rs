@@ -16,7 +16,11 @@ use rowan::ast::support;
 use serde::Deserialize;
 use serde_json;
 use tracing::debug;
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
 use wdl_analysis::document::Document as AnalysisDocument;
+use wdl_analysis::document::Document;
 use wdl_analysis::document::ScopeRef;
 use wdl_analysis::types::PrimitiveType;
 use wdl_analysis::types::Type;
@@ -25,14 +29,10 @@ use wdl_analysis::types::v1::ExprTypeEvaluator;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_analysis::Diagnostics;
-use wdl_analysis::document::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_analysis::VisitReason;
-use wdl_analysis::Visitor;
 use wdl_ast::v1::CommandPart;
 use wdl_ast::v1::CommandSection;
 use wdl_ast::v1::Placeholder;
@@ -593,8 +593,7 @@ impl Visitor for ShellCheckRule {
         let doc = self.document.clone().expect("should have a document");
         let mut context = CommandContext::new(
             doc.clone(),
-            doc
-                .find_scope_by_position(section.inner().text_range().start().into())
+            doc.find_scope_by_position(section.inner().text_range().start().into())
                 .expect("should have a scope"),
         );
         let Some((sanitized_command, cmd_decls, amount_stripped)) =
@@ -621,8 +620,11 @@ impl Visitor for ShellCheckRule {
                     // Skip declarations that shellcheck is unaware of.
                     // ShellCheck's message always starts with the variable name
                     // that is unassigned.
-                    let target_variable =
-                        sc_diagnostic.message.split_whitespace().next().unwrap_or("");
+                    let target_variable = sc_diagnostic
+                        .message
+                        .split_whitespace()
+                        .next()
+                        .unwrap_or("");
                     if sc_diagnostic.code == SHELLCHECK_REFERENCED_UNASSIGNED
                         && decls.contains(target_variable)
                     {

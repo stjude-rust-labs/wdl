@@ -1,16 +1,16 @@
 //! A lint rule that checks the formatting of the version statement.
 
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_analysis::Diagnostics;
-use wdl_analysis::document::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
 use wdl_ast::VersionStatement;
-use wdl_analysis::VisitReason;
-use wdl_analysis::Visitor;
 use wdl_ast::Whitespace;
 
 use crate::Rule;
