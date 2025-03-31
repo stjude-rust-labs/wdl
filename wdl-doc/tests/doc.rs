@@ -98,14 +98,16 @@ async fn main() {
         let expected_contents = fs::read_to_string(&expected_file)
             .unwrap()
             .replace("\\", "/");
-        let generated_contents = fs::read_to_string(&file_name).unwrap();
-        let normalized_contents = generated_contents.replace("\r\n", "\n").replace("\\", "/");
+        let generated_contents = fs::read_to_string(&file_name)
+            .unwrap()
+            .replace("\r\n", "\n")
+            .replace("\\", "/");
 
-        if expected_contents != normalized_contents {
+        if expected_contents != generated_contents {
             println!("File contents differ: {}", expected_file.display());
             println!(
                 "Diff:\n{}",
-                StrComparison::new(&expected_contents, &normalized_contents)
+                StrComparison::new(&expected_contents, &generated_contents)
             );
             success = false;
         }
