@@ -6,31 +6,8 @@
 
 version 1.2
 
-task t {
-    meta {}
-
-    parameter_meta {
-        matching: {
-            help: "a matching parameter!",
-            foo: {
-                bar: {
-                    does_not_exist: "this should not suppress a missing input lint"
-                },
-            },
-        }
-        extra: "this should not be here"
-    }
-
-    input {
-        String matching
-        String does_not_exist
-    }
-
-    command <<<>>>
-
-    output {}
-}
-
+# This workflow has both an extraneous and missing entry
+# in the `parameter_meta` section
 workflow w {
     meta {}
 
@@ -54,8 +31,58 @@ workflow w {
     output {}
 }
 
-# Task with out-of-order parameter_meta
+# This task only has a missing entry in the `parameter_meta` section
 task foo {
+    meta {}
+
+    parameter_meta {
+        matching: {
+            help: "a matching parameter!",
+            foo: {
+                bar: {
+                    does_not_exist: "this should not suppress a missing input lint"
+                },
+            },
+        }
+    }
+
+    input {
+        String matching
+        String does_not_exist
+    }
+
+    command <<<>>>
+
+    output {}
+}
+
+# This task only has an extraneous entry in the `parameter_meta` section
+task bar {
+    meta {}
+
+    parameter_meta {
+        matching: {
+            help: "a matching parameter!",
+            foo: {
+                bar: {
+                    does_not_exist: "this should not suppress a missing input lint"
+                },
+            },
+        }
+        does_not_exist: "this should not be here"
+    }
+
+    input {
+        String matching
+    }
+
+    command <<<>>>
+
+    output {}
+}
+
+# Task with out-of-order parameter_meta
+task baz {
     meta {}
 
     parameter_meta {
