@@ -40,31 +40,31 @@ workflow foo {
     }
 
     input {
-        String a
-        File b
-        Int c
-        Array[Int]? d
-        Int? e
-        Int? f = 2
         String g = "hello"
+        Int? f = 2
+        Int? e
+        Int c
         Array[String]? h
+        File t
+        String a
         Pair[Int, File] i
+        File b
+        Pair[String, Int] o
         Pair[File, Int] j
+        Array[Int]? d
+        Array[String] q
+        #@ except: DeprecatedObject
+        Object v
         Map[String, Int]? k
         Map[String, Array[Int]]? l
         Map[Int, String]? m
-        Pair[String, File] n
-        Pair[String, Int] o
-        Array[String]+ p
-        Array[String] q
         Map[String, File]? r
-        Map[String, File] s
-        File t
-        mystruct u
-        #@ except: DeprecatedObject
-        Object v
         Directory w
         Directory? x
+        Map[String, File] s
+        Pair[String, File] n
+        Array[String]+ p
+        mystruct u
     }
 
     output {}
@@ -75,28 +75,28 @@ task bar {
     meta {}
 
     parameter_meta {
-        g: ""
-        f: ""
-        e: ""
-        c: ""
-        h: ""
-        t: ""
         a: ""
-        i: ""
         b: ""
-        o: ""
-        j: ""
+        c: ""
         d: ""
-        q: ""
+        e: ""
+        f: ""
+        g: ""
+        h: ""
+        i: ""
+        j: ""
         k: ""
         l: ""
         m: ""
+        n: ""
+        o: ""
+        p: ""
+        q: ""
         r: ""
+        s: ""
+        t: ""
         w: ""
         x: ""
-        s: ""
-        n: ""
-        p: ""
     }
 
     input {

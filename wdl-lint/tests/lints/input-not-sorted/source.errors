@@ -5,8 +5,8 @@ note[InputSorting]: input not sorted
    │     ^^^^^ input section must be sorted
    │
    = fix: sort input statements as: 
-     File b
      File t
+     File b
      Directory w
      Array[String]+ p
      Array[String] q
