@@ -88,7 +88,7 @@ fn mismatched_param_order(parent: &SectionParent, span: Span, expected_order: &s
         span,
     )
     .with_fix(format!(
-        "order the parameter metadata as:\n{}",
+        "based on the current `input` order, order the parameter metadata as:\n{}",
         expected_order
     ))
 }
