@@ -15,7 +15,6 @@ use std::path::PathBuf;
 use std::process::exit;
 
 use pretty_assertions::StrComparison;
-
 use wdl_doc::document_workspace;
 
 /// Copied from https://stackoverflow.com/a/65192210
@@ -96,13 +95,18 @@ async fn main() {
             continue;
         }
 
-        let expected_contents = fs::read_to_string(&expected_file).unwrap();
+        let expected_contents = fs::read_to_string(&expected_file)
+            .unwrap()
+            .replace("\\", "/");
         let generated_contents = fs::read_to_string(&file_name).unwrap();
-        let normalized_contents = generated_contents.replace("\r\n", "\n");
+        let normalized_contents = generated_contents.replace("\r\n", "\n").replace("\\", "/");
 
         if expected_contents != normalized_contents {
             println!("File contents differ: {}", expected_file.display());
-            println!("Diff:\n{}", StrComparison::new(&expected_contents, &normalized_contents));
+            println!(
+                "Diff:\n{}",
+                StrComparison::new(&expected_contents, &normalized_contents)
+            );
             success = false;
         }
     }
