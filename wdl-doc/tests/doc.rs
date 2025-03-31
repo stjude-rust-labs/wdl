@@ -11,6 +11,7 @@ use std::env;
 use std::fs;
 use std::io;
 use std::path::Path;
+use std::path::PathBuf;
 use std::process::exit;
 
 use wdl_doc::document_workspace;
@@ -31,7 +32,7 @@ fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> 
 }
 
 /// Recursively read every file in a directory
-fn read_dir_recursively(path: &Path) -> io::Result<Vec<String>> {
+fn read_dir_recursively(path: &Path) -> io::Result<Vec<PathBuf>> {
     let mut files = Vec::new();
     for entry in fs::read_dir(path)? {
         let entry = entry?;
@@ -39,7 +40,7 @@ fn read_dir_recursively(path: &Path) -> io::Result<Vec<String>> {
         if path.is_dir() {
             files.extend(read_dir_recursively(&path)?);
         } else {
-            files.push(path.to_string_lossy().to_string());
+            files.push(path);
         }
     }
     Ok(files)
@@ -86,7 +87,6 @@ async fn main() {
     // non-zero exit code.
     let mut success = true;
     for file_name in read_dir_recursively(&test_dir.join("docs")).unwrap() {
-        let file_name = Path::new(&file_name);
         let expected_file = docs_dir.join(file_name.strip_prefix(test_dir.join("docs")).unwrap());
         if !expected_file.exists() {
             println!("Missing file: {}", expected_file.display());
