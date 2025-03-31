@@ -166,7 +166,7 @@ fn check_parameter_meta(
         .map(|decl| decl.name().text().to_string())
         .filter(|name| actual_map.contains_key(name))
         .collect();
-    
+
     let actual_order: Vec<_> = param_meta
         .items()
         .map(|m| m.name().text().to_string())
