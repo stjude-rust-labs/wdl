@@ -30,17 +30,25 @@ fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> 
     Ok(())
 }
 
+/// Recursively read every file in a directory
+fn read_dir_recursively(path: &Path) -> io::Result<Vec<String>> {
+    let mut files = Vec::new();
+    for entry in fs::read_dir(path)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_dir() {
+            files.extend(read_dir_recursively(&path)?);
+        } else {
+            files.push(path.to_string_lossy().to_string());
+        }
+    }
+    Ok(files)
+}
+
 #[tokio::main]
 async fn main() {
-    #[cfg(not(windows))]
-    let test_dir = Path::new("tests/codebase");
-    #[cfg(not(windows))]
-    let docs_dir = Path::new("tests/output_docs");
-
-    #[cfg(windows)]
-    let test_dir = Path::new("tests\\codebase");
-    #[cfg(windows)]
-    let docs_dir = Path::new("tests\\output_docs");
+    let test_dir = Path::new("tests").join("codebase");
+    let docs_dir = Path::new("tests").join("output_docs");
 
     // If `tests/codebase/docs` exists, delete it
     if test_dir.join("docs").exists() {
@@ -62,34 +70,35 @@ async fn main() {
     // repopulating it with the generated docs (at `tests/codebase/docs/`).
     if env::var("BLESS").is_ok() {
         if docs_dir.exists() {
-            fs::remove_dir_all(docs_dir).unwrap();
+            fs::remove_dir_all(&docs_dir).unwrap();
         }
-        fs::create_dir_all(docs_dir).unwrap();
-        copy_dir_all(test_dir.join("docs"), docs_dir).unwrap();
+        fs::create_dir_all(&docs_dir).unwrap();
+        copy_dir_all(test_dir.join("docs"), &docs_dir).unwrap();
 
         println!("Blessed docs");
         exit(0);
     }
 
-    // Compare the generated docs with the expected output
+    // Compare the generated docs with the expected output.
+    // Recursively read the contents of the `tests/codebase/docs` directory
+    // and compare them with the contents of the `tests/output_docs` directory.
+    // If the contents are different, print the differences and exit with a
+    // non-zero exit code.
     let mut success = true;
-    for entry in fs::read_dir(docs_dir).unwrap() {
-        let entry = entry.unwrap();
-        let path = entry.path();
-        // Normalize the path to be relative to the `docs` directory
-        // regardless of OS path separator.
-        let expected_path = test_dir
-            .join("docs")
-            .join(path.strip_prefix(docs_dir).unwrap());
-        if !expected_path.exists() {
-            eprintln!("Expected path does not exist: {}", expected_path.display());
+    for file_name in read_dir_recursively(&test_dir.join("docs")).unwrap() {
+        let file_name = Path::new(&file_name);
+        let expected_file = docs_dir.join(file_name.strip_prefix(test_dir.join("docs")).unwrap());
+        if !expected_file.exists() {
+            println!("Missing file: {}", expected_file.display());
             success = false;
             continue;
         }
-        let expected = fs::read_to_string(expected_path).unwrap();
-        let actual = fs::read_to_string(&path).unwrap();
-        if expected != actual {
-            eprintln!("Mismatch in file: {}", path.display());
+
+        let expected_contents = fs::read_to_string(&expected_file).unwrap();
+        let generated_contents = fs::read_to_string(&file_name).unwrap();
+
+        if expected_contents != generated_contents {
+            println!("File contents differ: {}", expected_file.display());
             success = false;
         }
     }
