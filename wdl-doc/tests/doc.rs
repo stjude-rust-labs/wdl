@@ -97,6 +97,7 @@ async fn main() {
 
         let expected_contents = fs::read_to_string(&expected_file)
             .unwrap()
+            .replace("\r\n", "\n")
             .replace("\\", "/");
         let generated_contents = fs::read_to_string(&file_name)
             .unwrap()
