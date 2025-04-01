@@ -27,6 +27,7 @@ use tokio::sync::RwLock;
 use tokio::task::JoinSet;
 use tokio_util::sync::CancellationToken;
 use tracing::debug;
+use tracing::error;
 use tracing::info;
 use tracing::trace;
 use wdl_analysis::diagnostics::only_one_namespace;
@@ -789,6 +790,8 @@ impl WorkflowEvaluator {
             )
         })?;
 
+        let effective_output_dir = root_dir.to_path_buf();
+
         let state = Arc::new(State {
             config: self.config.clone(),
             backend: self.backend.clone(),
@@ -804,28 +807,71 @@ impl WorkflowEvaluator {
         });
 
         // Evaluate the root graph to completion
-        Self::evaluate_subgraph(
-            state.clone(),
-            Scopes::ROOT_INDEX,
-            subgraph,
-            max_concurrency,
-            Arc::new(id.to_string()),
-            progress,
-        )
-        .await?;
+        let evaluation_result: EvaluationResult<()> = {
+            Self::evaluate_subgraph(
+                state.clone(),
+                Scopes::ROOT_INDEX,
+                subgraph,
+                max_concurrency,
+                Arc::new(id.to_string()),
+                progress,
+            )
+            .await
+        };
 
-        // Take the output scope and return it
-        let mut outputs: Outputs = state.scopes.write().await.take(Scopes::OUTPUT_INDEX).into();
-        if let Some(section) = definition.output() {
-            let indexes: HashMap<_, _> = section
-                .declarations()
-                .enumerate()
-                .map(|(i, d)| (d.name().hashable(), i))
-                .collect();
-            outputs.sort_by(move |a, b| indexes[a].cmp(&indexes[b]))
+        let cleanup_result = match self.backend.cleanup(&effective_output_dir) {
+            Ok(cleanup_rx) => match cleanup_rx.await {
+                Ok(Ok(())) => {
+                    info!("cleanup completed successfully");
+                    Ok(())
+                }
+                Ok(Err(cleanup_err)) => {
+                    error!("cleanup failed: {}", cleanup_err);
+                    Err(cleanup_err.context("workflow backend cleanup failed"))
+                }
+                Err(_recv_err) => {
+                    error!("failed to receive cleanup result (channel closed)");
+                    Err(anyhow!("failed to receive cleanup result (channel closed)"))
+                }
+            },
+            Err(setup_err) => {
+                error!("failed to start cleanup: {}", setup_err);
+                Err(setup_err.context("failed to start cleanup"))
+            }
+        };
+        match (evaluation_result, cleanup_result) {
+            (Ok(()), Ok(())) => {
+                // Take the output scope and return it
+                let mut outputs: Outputs =
+                    state.scopes.write().await.take(Scopes::OUTPUT_INDEX).into();
+                if let Some(section) = definition.output() {
+                    let indexes: HashMap<_, _> = section
+                        .declarations()
+                        .enumerate()
+                        .map(|(i, d)| (d.name().hashable(), i))
+                        .collect();
+                    outputs.sort_by(move |a, b| indexes[a].cmp(&indexes[b]))
+                }
+                Ok(outputs)
+            }
+            (Ok(()), Err(cleanup_err)) => {
+                error!(
+                    "workflow evaluation completed successfully, but cleanup failed: {}",
+                    cleanup_err
+                );
+                Err(EvaluationError::Other(cleanup_err.context(
+                    "workflow evaluation completed successfully, but cleanup failed",
+                )))
+            }
+            (Err(eval_err), Ok(())) => {
+                info!("workflow evaluation failed but cleanup completed successfully");
+                Err(eval_err)
+            }
+            (Err(eval_err), Err(_cleanup_err)) => {
+                error!("workflow evaluation and cleanup both failed");
+                Err(eval_err)
+            }
         }
-
-        Ok(outputs)
     }
 
     /// Evaluates a subgraph to completion.

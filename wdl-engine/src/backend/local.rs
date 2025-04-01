@@ -9,6 +9,7 @@ use std::process::Stdio;
 use std::sync::Arc;
 
 use anyhow::Context;
+use anyhow::Ok;
 use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
@@ -336,5 +337,11 @@ impl TaskExecutionBackend for LocalTaskExecutionBackend {
             spawned: spawned_rx,
             completed: completed_rx,
         })
+    }
+
+    fn cleanup(&self, _output_dir: &Path) -> Result<oneshot::Receiver<Result<()>>> {
+        let (tx, rx) = oneshot::channel();
+        let _ = tx.send(Ok(()));
+        Ok(rx)
     }
 }
