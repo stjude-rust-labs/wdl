@@ -43,6 +43,9 @@ use wdl_ast::SyntaxTokenExt;
 use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
 
+/// The CSS stylesheet to use for the generated documentation.
+pub const STYLESHEET: &str = include_str!("../theme/dist/style.css");
+
 /// The directory where the generated documentation will be stored.
 ///
 /// This directory will be created in the workspace directory.
