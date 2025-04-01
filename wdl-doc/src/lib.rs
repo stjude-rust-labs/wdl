@@ -44,12 +44,59 @@ use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
 
 /// The CSS stylesheet to use for the generated documentation.
-pub const STYLESHEET: &str = include_str!("../theme/dist/style.css");
+const STYLESHEET: &str = include_str!("../theme/dist/style.css");
+/// The "sprocket" logo.
+const SPROCKET_LOGO: &[u8] = include_bytes!("../theme/assets/sprocket-logo.png");
+/// The "selected directory" icon.
+const SELECTED_DIR_ICON: &[u8] = include_bytes!("../theme/assets/selected-dir.png");
+/// The "unselected directory" icon.
+const UNSELECTED_DIR_ICON: &[u8] = include_bytes!("../theme/assets/unselected-dir.png");
+/// The "selected struct" icon.
+const SELECTED_STRUCT_ICON: &[u8] = include_bytes!("../theme/assets/selected-struct.png");
+/// The "unselected struct" icon.
+const UNSELECTED_STRUCT_ICON: &[u8] = include_bytes!("../theme/assets/unselected-struct.png");
+/// The "selected task" icon.
+const SELECTED_TASK_ICON: &[u8] = include_bytes!("../theme/assets/selected-task.png");
+/// The "unselected task" icon.
+const UNSELECTED_TASK_ICON: &[u8] = include_bytes!("../theme/assets/unselected-task.png");
+/// The "selected workflow" icon.
+const SELECTED_WORKFLOW_ICON: &[u8] = include_bytes!("../theme/assets/selected-workflow.png");
+/// The "unselected workflow" icon.
+const UNSELECTED_WORKFLOW_ICON: &[u8] = include_bytes!("../theme/assets/unselected-workflow.png");
 
 /// The directory where the generated documentation will be stored.
 ///
 /// This directory will be created in the workspace directory.
 const DOCS_DIR: &str = "docs";
+
+/// Write assets to the given root docs directory.
+fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
+    let dir = dir.as_ref();
+    let assets_dir = dir.join("assets");
+    std::fs::create_dir_all(&assets_dir)?;
+    std::fs::write(dir.join("style.css"), STYLESHEET)?;
+
+    std::fs::write(assets_dir.join("sprocket-logo.png"), SPROCKET_LOGO)?;
+    std::fs::write(assets_dir.join("selected-dir.png"), SELECTED_DIR_ICON)?;
+    std::fs::write(assets_dir.join("unselected-dir.png"), UNSELECTED_DIR_ICON)?;
+    std::fs::write(assets_dir.join("selected-struct.png"), SELECTED_STRUCT_ICON)?;
+    std::fs::write(
+        assets_dir.join("unselected-struct.png"),
+        UNSELECTED_STRUCT_ICON,
+    )?;
+    std::fs::write(assets_dir.join("selected-task.png"), SELECTED_TASK_ICON)?;
+    std::fs::write(assets_dir.join("unselected-task.png"), UNSELECTED_TASK_ICON)?;
+    std::fs::write(
+        assets_dir.join("selected-workflow.png"),
+        SELECTED_WORKFLOW_ICON,
+    )?;
+    std::fs::write(
+        assets_dir.join("unselected-workflow.png"),
+        UNSELECTED_WORKFLOW_ICON,
+    )?;
+
+    Ok(())
+}
 
 /// Links to a CSS stylesheet at the given path.
 struct Css<'a>(&'a str);
@@ -63,7 +110,7 @@ impl Render for Css<'_> {
 }
 
 /// A basic header with a `page_title` and an optional link to the stylesheet.
-pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: Option<P>) -> Markup {
+pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: P) -> Markup {
     html! {
         head {
             meta charset="utf-8";
@@ -72,19 +119,13 @@ pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: Option<P>) ->
             link rel="preconnect" href="https://fonts.googleapis.com";
             link rel="preconnect" href="https://fonts.gstatic.com" crossorigin;
             link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet";
-            @if let Some(ss) = stylesheet {
-                (Css(ss.as_ref().to_str().unwrap()))
-            }
+            (Css(stylesheet.as_ref().to_str().unwrap()))
         }
     }
 }
 
 /// A full HTML page.
-pub(crate) fn full_page<P: AsRef<Path>>(
-    page_title: &str,
-    body: Markup,
-    stylesheet: Option<P>,
-) -> Markup {
+pub(crate) fn full_page<P: AsRef<Path>>(page_title: &str, body: Markup, stylesheet: P) -> Markup {
     html! {
         (DOCTYPE)
         html class="dark" {
@@ -272,7 +313,7 @@ pub async fn document_workspace(
     let mut docs_tree = if let Some(ss) = stylesheet {
         docs_tree::DocsTree::new_with_stylesheet(docs_dir.clone(), ss)?
     } else {
-        docs_tree::DocsTree::new(docs_dir.clone())
+        docs_tree::DocsTree::new(docs_dir.clone())?
     };
 
     for result in results {
