@@ -17,7 +17,7 @@ note[MatchingParameterMeta]: parameter metadata in task `input_sorting_test_2` i
 39 │     parameter_meta {
    │     ^^^^^^^^^^^^^^ parameter metadata must be in the same order as inputs
    │
-   = fix: order the parameter metadata as:
+   = fix: based on the current `input` order, order the parameter metadata as:
      w
      p
      t

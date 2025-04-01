@@ -36,7 +36,7 @@ note[MatchingParameterMeta]: parameter metadata in task `baz` is out of order
 88 │     parameter_meta {
    │     ^^^^^^^^^^^^^^ parameter metadata must be in the same order as inputs
    │
-   = fix: order the parameter metadata as:
+   = fix: based on the current `input` order, order the parameter metadata as:
      first
      second
 
