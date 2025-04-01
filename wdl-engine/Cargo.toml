@@ -40,7 +40,9 @@ http-cache-stream-reqwest = { workspace = true }
 reqwest = { workspace = true }
 reqwest-middleware = { workspace = true }
 dirs = { workspace =  true }
-uzers = "0.12.1"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+uzers = { version = "0.12.1" , default-features = false }
 
 [dev-dependencies]
 pretty_assertions = { workspace = true }

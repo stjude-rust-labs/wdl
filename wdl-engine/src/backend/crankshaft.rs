@@ -479,8 +479,7 @@ impl TaskExecutionBackend for CrankshaftBackend {
 
         tokio::spawn(async move {
             let result = async {
-                let uid = uzers::get_current_uid();
-                let gid = uzers::get_current_gid();
+                let (uid, gid) = get_uid_gid();
                 let ownership = format!("{uid}:{gid}");
                 info!(
                     "Cleanup target: '{}', Attempting to set ownership to: {}",
@@ -600,4 +599,16 @@ impl TaskExecutionBackend for CrankshaftBackend {
         });
         Ok(rx)
     }
+}
+
+#[cfg(target_os = "linux")]
+fn get_uid_gid() -> (u32, u32) {
+    let uid = uzers::get_current_uid();
+    let gid = uzers::get_current_gid();
+    (uid, gid)
+}
+
+#[cfg(not(target_os = "linux"))]
+fn get_uid_gid() -> (u32, u32) {
+    (0, 0)
 }
