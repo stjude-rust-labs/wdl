@@ -196,11 +196,23 @@
     width: 100% !important;
     height: 100% !important;
   }
+  .h-1\/2 {
+    height: calc(1/2 * 100%) !important;
+  }
+  .h-4 {
+    height: calc(var(--spacing) * 4) !important;
+  }
   .h-fit {
     height: fit-content !important;
   }
   .h-screen {
     height: 100vh !important;
+  }
+  .w-1\/2 {
+    width: calc(1/2 * 100%) !important;
+  }
+  .w-4 {
+    width: calc(var(--spacing) * 4) !important;
   }
   .w-\[240px\] {
     width: 240px !important;
