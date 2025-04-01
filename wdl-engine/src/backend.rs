@@ -319,6 +319,9 @@ pub trait TaskExecutionBackend: Send + Sync {
         request: TaskSpawnRequest,
         token: CancellationToken,
     ) -> Result<TaskExecutionEvents>;
+
+    /// Performs cleanup operations after workflow/task evaluation completes.
+    fn cleanup(&self, output_dir: &Path) -> Result<Receiver<Result<()>>>;
 }
 
 /// A trait implemented by backend requests.

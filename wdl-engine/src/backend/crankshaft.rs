@@ -25,6 +25,7 @@ use futures::future::BoxFuture;
 use nonempty::NonEmpty;
 use tokio::sync::oneshot;
 use tokio_util::sync::CancellationToken;
+use tracing::error;
 use tracing::info;
 
 use super::TaskExecutionBackend;
@@ -252,6 +253,8 @@ impl TaskManagerRequest for CrankshaftTaskRequest {
 pub struct CrankshaftBackend {
     /// The underlying Crankshaft backend.
     inner: Arc<dyn Backend>,
+    /// The kind of backend to use.
+    kind: CrankshaftBackendKind,
     /// The default container to use for tasks.
     container: Option<String>,
     /// The default shell to use for tasks.
@@ -275,7 +278,9 @@ impl CrankshaftBackend {
         task.validate()?;
         config.validate()?;
 
-        let (inner, max_concurrency, manager, max_cpu, max_memory) = match config.default {
+        let kind = config.default.clone();
+
+        let (inner, max_concurrency, manager, max_cpu, max_memory) = match &kind {
             CrankshaftBackendKind::Docker => {
                 info!("initializing Docker backend");
 
@@ -305,6 +310,7 @@ impl CrankshaftBackend {
 
         Ok(Self {
             inner,
+            kind,
             container: task.container.clone(),
             shell: task.shell.clone().map(Into::into),
             max_concurrency,
@@ -457,5 +463,141 @@ impl TaskExecutionBackend for CrankshaftBackend {
             spawned: spawned_rx,
             completed: completed_rx,
         })
+    }
+
+    fn cleanup(&self, output_dir: &Path) -> Result<oneshot::Receiver<Result<()>>> {
+        let (tx, rx) = oneshot::channel();
+
+        if self.kind != CrankshaftBackendKind::Docker {
+            let _ = tx.send(Ok(()));
+            return Ok(rx);
+        }
+
+        let inner_backend = self.inner.clone();
+        let generator = self.generator.clone();
+        let output_path = output_dir.to_path_buf();
+
+        tokio::spawn(async move {
+            let result = async {
+                let uid = users::get_current_uid();
+                let gid = users::get_current_gid();
+                let ownership = format!("{uid}:{gid}");
+                info!(
+                    "Cleanup target: '{}', Attempting to set ownership to: {}",
+                    output_path.display(),
+                    ownership
+                );
+
+                let guest_out_dir = "/workflow_output";
+
+                if !output_path.exists() {
+                    info!("output directory does not exist, skipping cleanup");
+                    return Ok(());
+                }
+                if !output_path.is_dir() {
+                    bail!(
+                        "output directory `{path}` is not a directory",
+                        path = output_path.display()
+                    );
+                }
+
+                let output_mount = Input::builder()
+                    .path(guest_out_dir)
+                    .contents(Contents::Path(output_path.clone()))
+                    .ty(Type::Directory)
+                    // need write acces
+                    .read_only(false)
+                    .build();
+
+                let cleanup_task_name = format!(
+                    "wdl-engine-chown-cleanup-{}",
+                    generator
+                        .lock()
+                        .expect("generator should always acquire")
+                        .next()
+                        .expect("generator should never be exhausted")
+                );
+
+                let cleanup_resources = Resources::builder().cpu(0.1).ram(0.05).build();
+
+                let cleanup_task = Task::builder()
+                    .name(&cleanup_task_name)
+                    .executions(NonEmpty::new(
+                        Execution::builder()
+                            .image("alpine:latest")
+                            .program("chown")
+                            .args([
+                                "-R".to_string(),
+                                ownership.clone(),
+                                guest_out_dir.to_string(),
+                            ])
+                            .work_dir("/")
+                            .build(),
+                    ))
+                    .inputs([Arc::new(output_mount)])
+                    .resources(cleanup_resources)
+                    .build();
+
+                info!(
+                    "running cleanup task '{}' to chown '{}' to '{}'",
+                    cleanup_task_name,
+                    output_path.display(),
+                    ownership
+                );
+
+                let (spawned_tx, _) = oneshot::channel();
+                let token = CancellationToken::new();
+
+                let output_rx = inner_backend
+                    .run(cleanup_task, Some(spawned_tx), token)
+                    .map_err(|e| anyhow!("failed to submit cleanup task: {e}"))?;
+
+                match output_rx.await {
+                    Ok(outputs) => {
+                        if outputs.is_empty() {
+                            bail!(
+                                "cleanup task '{}' did not produce any outputs",
+                                cleanup_task_name
+                            );
+                        }
+                        let output = outputs.first();
+                        if output.status.success() {
+                            info!(
+                                "cleanup task '{}' completed successfully",
+                                cleanup_task_name
+                            );
+                            Ok(())
+                        } else {
+                            let stderr = String::from_utf8_lossy(&output.stderr);
+                            error!(
+                                "failed to chown output directory: '{}'. Exit status: '{}'. \
+                                 Stderr: '{}'",
+                                output_path.display(),
+                                output.status,
+                                stderr
+                            );
+                            bail!(
+                                "failed to chown output directory: '{}'",
+                                output_path.display()
+                            );
+                        }
+                    }
+                    Err(e) => {
+                        error!(
+                            "receiving result for cleanup task '{}' failed: {e}",
+                            cleanup_task_name
+                        );
+                        bail!(
+                            "receiving result for cleanup task '{}' failed: {e}",
+                            cleanup_task_name
+                        );
+                    }
+                }
+            }
+            .await;
+
+            let _ = tx.send(result);
+        });
+        Ok(rx)
     }
 }
