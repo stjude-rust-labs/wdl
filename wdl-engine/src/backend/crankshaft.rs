@@ -479,8 +479,8 @@ impl TaskExecutionBackend for CrankshaftBackend {
 
         tokio::spawn(async move {
             let result = async {
-                let uid = users::get_current_uid();
-                let gid = users::get_current_gid();
+                let uid = uzers::get_current_uid();
+                let gid = uzers::get_current_gid();
                 let ownership = format!("{uid}:{gid}");
                 info!(
                     "Cleanup target: '{}', Attempting to set ownership to: {}",
