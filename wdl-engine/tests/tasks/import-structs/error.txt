@@ -1,0 +1,5 @@
+task execution failed for task `calculate_bill` in `tests/tasks/import-structs/source.wdl` (task id `calculate_bill`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

@@ -1,0 +1,5 @@
+task execution failed for task `test_sub` in `tests/tasks/test-sub/source.wdl` (task id `test_sub`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

@@ -1,0 +1,5 @@
+task execution failed for task `nested_access` in `tests/tasks/nested-access/source.wdl` (task id `nested_access`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

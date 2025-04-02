@@ -1,0 +1,5 @@
+task execution failed for task `default_option` in `tests/tasks/default-option-task/source.wdl` (task id `default_option`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

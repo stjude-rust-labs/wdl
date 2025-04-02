@@ -1,0 +1,5 @@
+task execution failed for task `array_map_equality` in `tests/tasks/array-map-equality/source.wdl` (task id `array_map_equality`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

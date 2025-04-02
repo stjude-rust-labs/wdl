@@ -1,0 +1,5 @@
+task execution failed for task `sep_option_to_function` in `tests/tasks/seo-option-to-function/source.wdl` (task id `sep_option_to_function`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

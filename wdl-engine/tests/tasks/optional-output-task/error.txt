@@ -1,0 +1,5 @@
+task execution failed for task `optional_output` in `tests/tasks/optional-output-task/source.wdl` (task id `optional_output`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

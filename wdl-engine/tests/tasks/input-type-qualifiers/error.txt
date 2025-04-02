@@ -1,0 +1,5 @@
+task execution failed for task `input_type_quantifiers` in `tests/tasks/input-type-qualifiers/source.wdl` (task id `input_type_quantifiers`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

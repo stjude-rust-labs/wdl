@@ -1,0 +1,5 @@
+task execution failed for task `sum` in `tests/tasks/sum-task/source.wdl` (task id `sum`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

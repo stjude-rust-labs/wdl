@@ -1,0 +1,5 @@
+task execution failed for task `test_struct` in `tests/tasks/test-struct/source.wdl` (task id `test_struct`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

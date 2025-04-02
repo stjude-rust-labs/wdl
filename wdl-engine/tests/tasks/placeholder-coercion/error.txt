@@ -1,0 +1,5 @@
+task execution failed for task `placeholder_coercion` in `tests/tasks/placeholder-coercion/source.wdl` (task id `placeholder_coercion`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

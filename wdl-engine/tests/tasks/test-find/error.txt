@@ -1,0 +1,5 @@
+task execution failed for task `find_string` in `tests/tasks/test-find/source.wdl` (task id `find_string`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

@@ -1,0 +1,5 @@
+task execution failed for task `compare_optionals` in `tests/tasks/compare-optionals/source.wdl` (task id `compare_optionals`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

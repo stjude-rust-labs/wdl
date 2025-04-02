@@ -1,0 +1,5 @@
+task execution failed for task `compare_coerced` in `tests/tasks/compare-coerced/source.wdl` (task id `compare_coerced`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

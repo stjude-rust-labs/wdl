@@ -1,0 +1,5 @@
+task execution failed for task `string_to_file` in `tests/tasks/string-to-file/source.wdl` (task id `string_to_file`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

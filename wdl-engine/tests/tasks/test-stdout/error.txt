@@ -1,0 +1,5 @@
+task execution failed for task `echo_stdout` in `tests/tasks/test-stdout/source.wdl` (task id `echo_stdout`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found
