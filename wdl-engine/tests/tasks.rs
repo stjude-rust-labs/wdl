@@ -288,20 +288,18 @@ fn compare_evaluation_results(
             path = evaluated.root().command().display()
         )
     })?;
-    let stdout =
-        fs::read_to_string(evaluated.stdout().as_file().unwrap().as_str()).with_context(|| {
-            format!(
-                "failed to read task stdout file `{path}`",
-                path = evaluated.stdout().as_file().unwrap()
-            )
-        })?;
-    let stderr =
-        fs::read_to_string(evaluated.stderr().as_file().unwrap().as_str()).with_context(|| {
-            format!(
-                "failed to read task stderr file `{path}`",
-                path = evaluated.stderr().as_file().unwrap()
-            )
-        })?;
+    let stdout = fs::read_to_string(evaluated.root().stdout()).with_context(|| {
+        format!(
+            "failed to read task stdout file `{path}`",
+            path = evaluated.root().stdout().display()
+        )
+    })?;
+    let stderr = fs::read_to_string(evaluated.root().stderr()).with_context(|| {
+        format!(
+            "failed to read task stderr file `{path}`",
+            path = evaluated.root().stderr().display()
+        )
+    })?;
 
     // Strip both temp paths and test dir (input file) paths from the outputs
     let command = strip_paths(temp_dir, &command);

@@ -4,6 +4,7 @@ use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::fmt;
+use std::fs;
 use std::path::Component;
 use std::path::MAIN_SEPARATOR;
 use std::path::Path;
@@ -392,15 +393,19 @@ impl EvaluatedTask {
         }
 
         if error {
+            let stderr = fs::read_to_string(self.root.stderr()).unwrap_or_default();
+
             bail!(
-                "task process has terminated with status code {code}; see the `stdout` and \
-                 `stderr` files in execution directory `{dir}{MAIN_SEPARATOR}` for task command \
-                 output",
+                "task process has terminated with exit code {code}: see the `stdout` and `stderr` \
+                 files in execution directory `{dir}{MAIN_SEPARATOR}` for task command \
+                 output{sep}{stderr}",
                 code = self.exit_code,
-                dir = Path::new(self.stderr.as_file().unwrap().as_str())
-                    .parent()
-                    .expect("parent should exist")
-                    .display(),
+                dir = self.root().attempt_dir().display(),
+                sep = if stderr.is_empty() {
+                    ""
+                } else {
+                    "\n\ntask stderr output:\n"
+                }
             );
         }
 
