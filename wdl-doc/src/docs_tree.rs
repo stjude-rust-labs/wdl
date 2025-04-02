@@ -267,32 +267,32 @@ impl DocsTree {
             @if let Some(page) = node.page() {
                 @match page.page_type() {
                     PageType::Index(_) => {
-                        div class="flex items-center" {
+                        div class="flex items-center gap-x-1" {
                             img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
                             p class="" { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
                     },
                     PageType::Struct(_) => {
-                        div class="flex items-center" {
+                        div class="flex items-center gap-x-1" {
                             img src=(self.assets_relative_to(base).join("unselected-struct.png").to_string_lossy()) class="w-4 h-4" alt="Struct icon";
                             p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
                     },
                     PageType::Task(_) => {
-                        div class="flex items-center" {
+                        div class="flex items-center gap-x-1" {
                             img src=(self.assets_relative_to(base).join("unselected-task.png").to_string_lossy()) class="w-4 h-4" alt="Task icon";
                             p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
                     },
                     PageType::Workflow(_) => {
-                        div class="flex items-center" {
+                        div class="flex items-center gap-x-1" {
                             img src=(self.assets_relative_to(base).join("unselected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
                             p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
                     }
                 }
             } @else {
-                div class="flex items-center" {
+                div class="flex items-center gap-x-1" {
                     img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
                     p class="" { (node.name()) }
                 }
@@ -318,13 +318,29 @@ impl DocsTree {
         let base = path.as_ref().parent().unwrap();
 
         html! {
-            div class="top-0 border h-fit left-0 min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-white overflow-x-scroll" {
+            div class="top-0 border h-fit left-0 min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-white overflow-x-scroll flex flex-col gap-y-3" {
                 img src=(self.assets_relative_to(base).join("sprocket-logo.png").to_string_lossy()) class="w-1/2 h-1/2" alt="Sprocket logo";
-                div class="flex flex-row items-center" {
-                    img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
-                    p class="" { (root.name()) }
+                form class="w-full h-full rounded-md flex items-center gap-x-2 px-2" {
+                    div class="flex items-center gap-x-1 text-base" {
+                        div class="flex items-center gap-x-1" {
+                            img src=(self.assets_relative_to(base).join("list-bullet.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
+                            p { "Workflows" }
+                        }
+                        div class="flex items-center gap-x-1" {
+                            img src=(self.assets_relative_to(base).join("selected-dir.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
+                            p { "Full Directory" }
+                        }
+                    }
+                }
+                form class="w-full h-full rounded-md border border-slate-700 flex items-center gap-x-2 px-2" {
+                    img src=(self.assets_relative_to(base).join("search.png").to_string_lossy()) class="w-4 h-4" alt="Search icon";
+                    input type="text" placeholder="Search" class="w-full h-full text-slate-300";
                 }
                 ul class="" {
+                    div class="flex flex-row items-center gap-x-1" {
+                        img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
+                        p class="" { (root.name()) }
+                    }
                     @for node in root.children().values() {
                         @if node.name() != "external" {
                             li class="px-2" { (self.sidebar_recurse(node, base)) }

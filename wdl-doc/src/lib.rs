@@ -47,6 +47,10 @@ use wdl_ast::v1::DocumentItem;
 const STYLESHEET: &str = include_str!("../theme/dist/style.css");
 /// The "sprocket" logo.
 const SPROCKET_LOGO: &[u8] = include_bytes!("../theme/assets/sprocket-logo.png");
+/// The "list bullet" icon.
+const LIST_BULLET_ICON: &[u8] = include_bytes!("../theme/assets/list-bullet.png");
+/// The "search" icon.
+const SEARCH_ICON: &[u8] = include_bytes!("../theme/assets/search.png");
 /// The "selected directory" icon.
 const SELECTED_DIR_ICON: &[u8] = include_bytes!("../theme/assets/selected-dir.png");
 /// The "unselected directory" icon.
@@ -77,6 +81,8 @@ fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
     std::fs::write(dir.join("style.css"), STYLESHEET)?;
 
     std::fs::write(assets_dir.join("sprocket-logo.png"), SPROCKET_LOGO)?;
+    std::fs::write(assets_dir.join("list-bullet.png"), LIST_BULLET_ICON)?;
+    std::fs::write(assets_dir.join("search.png"), SEARCH_ICON)?;
     std::fs::write(assets_dir.join("selected-dir.png"), SELECTED_DIR_ICON)?;
     std::fs::write(assets_dir.join("unselected-dir.png"), UNSELECTED_DIR_ICON)?;
     std::fs::write(assets_dir.join("selected-struct.png"), SELECTED_STRUCT_ICON)?;
@@ -130,7 +136,7 @@ pub(crate) fn full_page<P: AsRef<Path>>(page_title: &str, body: Markup, styleshe
         (DOCTYPE)
         html class="dark" {
             (header(page_title, stylesheet))
-            body class="flex size-full dark:bg-slate-950 dark:text-white p-4" {
+            body class="flex size-full dark:bg-slate-950 dark:text-white p-4 text-lg" {
                 (body)
             }
         }
