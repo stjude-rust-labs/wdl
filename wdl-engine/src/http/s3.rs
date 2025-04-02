@@ -55,7 +55,12 @@ pub(crate) fn rewrite_url(config: &S3StorageConfig, url: &Url) -> Result<Url> {
 
 /// Applies S3 presigned signatures to the given URL.
 ///
-/// Returns `(false, _)` if the URL was for S3.
+/// Returns `(false, _)` if the URL is not for S3; the returned URL is
+/// unmodified.
+///
+/// Returns `(true, _)` if the URL is for S3. If auth was applied, the returned
+/// URL is modified to include it; otherwise the original URL is returned
+/// unmodified.
 pub(crate) fn apply_auth<'a>(config: &S3StorageConfig, url: Cow<'a, Url>) -> (bool, Cow<'a, Url>) {
     // Find the prefix of the domain
     let prefix = match url.host().and_then(|host| match host {

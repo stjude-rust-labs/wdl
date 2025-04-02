@@ -62,7 +62,6 @@ use crate::Coercible;
 use crate::EvaluationContext;
 use crate::EvaluationResult;
 use crate::Input;
-use crate::InputAccess;
 use crate::Outputs;
 use crate::PrimitiveValue;
 use crate::Scope;
@@ -1106,19 +1105,15 @@ impl TaskEvaluator {
         // Discover every input that's visible to the scope
         ScopeRef::new(&state.scopes, TASK_SCOPE_INDEX.0).for_each(|_, v| {
             v.visit_paths(false, &mut |_, value| {
-                inputs.push(Input::new(
-                    EvaluationPath::from_primitive_value(value)?,
-                    InputAccess::ReadOnly,
-                ));
+                inputs.push(Input::new(EvaluationPath::from_primitive_value(value)?));
                 Ok(())
             })
         })?;
 
         // The temp directory should always be an input
-        inputs.push(Input::new(
-            EvaluationPath::Local(state.root.temp_dir().to_path_buf()),
-            InputAccess::ReadOnly,
-        ));
+        inputs.push(Input::new(EvaluationPath::Local(
+            state.root.temp_dir().to_path_buf(),
+        )));
 
         // Localize the inputs
         self.backend
@@ -1133,22 +1128,19 @@ impl TaskEvaluator {
                         task_id = id,
                         task_name = state.task.name(),
                         document = state.document.uri().as_str(),
-                        "task input `{path}` (downloaded to `{location}`) mapped to \
-                         `{guest_path}` ({access})",
+                        "task input `{path}` (downloaded to `{location}`) mapped to `{guest_path}`",
                         path = input.path().display(),
                         location = location.display(),
                         guest_path = input.guest_path().unwrap_or(""),
-                        access = input.access
                     );
                 } else {
                     debug!(
                         task_id = id,
                         task_name = state.task.name(),
                         document = state.document.uri().as_str(),
-                        "task input `{path}` mapped to `{guest_path}` ({access})",
+                        "task input `{path}` mapped to `{guest_path}`",
                         path = input.path().display(),
                         guest_path = input.guest_path().unwrap_or(""),
-                        access = input.access
                     );
                 }
             }

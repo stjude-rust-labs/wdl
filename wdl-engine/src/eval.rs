@@ -3,7 +3,6 @@
 use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::collections::HashMap;
-use std::fmt;
 use std::fs;
 use std::path::Component;
 use std::path::MAIN_SEPARATOR;
@@ -413,24 +412,6 @@ impl EvaluatedTask {
     }
 }
 
-/// Represents the access for an input.
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
-pub enum InputAccess {
-    /// The input will be read-only.
-    ReadOnly,
-    /// The input will be read-write.
-    ReadWrite,
-}
-
-impl fmt::Display for InputAccess {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::ReadOnly => write!(f, "read-only"),
-            Self::ReadWrite => write!(f, "read-write"),
-        }
-    }
-}
-
 /// Represents a `File` or `Directory` input to a task.
 #[derive(Debug, Clone)]
 pub struct Input {
@@ -442,18 +423,15 @@ pub struct Input {
     location: Option<Location<'static>>,
     /// The guest path for the input.
     guest_path: Option<String>,
-    /// The access for the input.
-    access: InputAccess,
 }
 
 impl Input {
     /// Creates a new input with the given path and access.
-    pub fn new(path: EvaluationPath, access: InputAccess) -> Self {
+    pub fn new(path: EvaluationPath) -> Self {
         Self {
             path,
             location: None,
             guest_path: None,
-            access,
         }
     }
 
@@ -480,11 +458,6 @@ impl Input {
     /// Sets the guest path for the input.
     pub fn set_guest_path(&mut self, path: impl Into<String>) {
         self.guest_path = Some(path.into());
-    }
-
-    /// Gets the access for the input.
-    pub fn access(&self) -> InputAccess {
-        self.access
     }
 }
 
@@ -724,46 +697,22 @@ mod test {
     fn non_empty_trie_unix() {
         let mut trie = InputTrie::default();
         let inputs = [
-            Input::new("/".parse().unwrap(), InputAccess::ReadOnly),
-            Input::new("/foo/bar/foo.txt".parse().unwrap(), InputAccess::ReadOnly),
-            Input::new("/foo/bar/bar.txt".parse().unwrap(), InputAccess::ReadOnly),
-            Input::new("/foo/baz/foo.txt".parse().unwrap(), InputAccess::ReadOnly),
-            Input::new("/foo/baz/bar.txt".parse().unwrap(), InputAccess::ReadOnly),
-            Input::new("/bar/foo/foo.txt".parse().unwrap(), InputAccess::ReadOnly),
-            Input::new("/bar/foo/bar.txt".parse().unwrap(), InputAccess::ReadOnly),
-            Input::new("/baz".parse().unwrap(), InputAccess::ReadOnly),
-            Input::new(
-                "https://example.com/".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://example.com/foo/bar/foo.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://example.com/foo/bar/bar.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://example.com/foo/baz/foo.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://example.com/foo/baz/bar.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://example.com/bar/foo/foo.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://example.com/bar/foo/bar.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://foo.com/bar".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
+            Input::new("/".parse().unwrap()),
+            Input::new("/foo/bar/foo.txt".parse().unwrap()),
+            Input::new("/foo/bar/bar.txt".parse().unwrap()),
+            Input::new("/foo/baz/foo.txt".parse().unwrap()),
+            Input::new("/foo/baz/bar.txt".parse().unwrap()),
+            Input::new("/bar/foo/foo.txt".parse().unwrap()),
+            Input::new("/bar/foo/bar.txt".parse().unwrap()),
+            Input::new("/baz".parse().unwrap()),
+            Input::new("https://example.com/".parse().unwrap()),
+            Input::new("https://example.com/foo/bar/foo.txt".parse().unwrap()),
+            Input::new("https://example.com/foo/bar/bar.txt".parse().unwrap()),
+            Input::new("https://example.com/foo/baz/foo.txt".parse().unwrap()),
+            Input::new("https://example.com/foo/baz/bar.txt".parse().unwrap()),
+            Input::new("https://example.com/bar/foo/foo.txt".parse().unwrap()),
+            Input::new("https://example.com/bar/foo/bar.txt".parse().unwrap()),
+            Input::new("https://foo.com/bar".parse().unwrap()),
         ];
 
         for input in &inputs {
@@ -808,64 +757,22 @@ mod test {
     fn non_empty_trie_windows() {
         let mut trie = InputTrie::default();
         let inputs = [
-            Input::new("C:\\".parse().unwrap(), InputAccess::ReadOnly),
-            Input::new(
-                "C:\\foo\\bar\\foo.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "C:\\foo\\bar\\bar.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "C:\\foo\\baz\\foo.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "C:\\foo\\baz\\bar.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "C:\\bar\\foo\\foo.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "C:\\bar\\foo\\bar.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new("C:\\baz".parse().unwrap(), InputAccess::ReadOnly),
-            Input::new(
-                "https://example.com/".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://example.com/foo/bar/foo.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://example.com/foo/bar/bar.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://example.com/foo/baz/foo.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://example.com/foo/baz/bar.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://example.com/bar/foo/foo.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://example.com/bar/foo/bar.txt".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
-            Input::new(
-                "https://foo.com/bar".parse().unwrap(),
-                InputAccess::ReadOnly,
-            ),
+            Input::new("C:\\".parse().unwrap()),
+            Input::new("C:\\foo\\bar\\foo.txt".parse().unwrap()),
+            Input::new("C:\\foo\\bar\\bar.txt".parse().unwrap()),
+            Input::new("C:\\foo\\baz\\foo.txt".parse().unwrap()),
+            Input::new("C:\\foo\\baz\\bar.txt".parse().unwrap()),
+            Input::new("C:\\bar\\foo\\foo.txt".parse().unwrap()),
+            Input::new("C:\\bar\\foo\\bar.txt".parse().unwrap()),
+            Input::new("C:\\baz".parse().unwrap()),
+            Input::new("https://example.com/".parse().unwrap()),
+            Input::new("https://example.com/foo/bar/foo.txt".parse().unwrap()),
+            Input::new("https://example.com/foo/bar/bar.txt".parse().unwrap()),
+            Input::new("https://example.com/foo/baz/foo.txt".parse().unwrap()),
+            Input::new("https://example.com/foo/baz/bar.txt".parse().unwrap()),
+            Input::new("https://example.com/bar/foo/foo.txt".parse().unwrap()),
+            Input::new("https://example.com/bar/foo/bar.txt".parse().unwrap()),
+            Input::new("https://foo.com/bar".parse().unwrap()),
         ];
 
         for input in &inputs {

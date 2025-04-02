@@ -34,7 +34,6 @@ use super::TaskExecutionResult;
 use super::TaskManager;
 use super::TaskManagerRequest;
 use super::TaskSpawnRequest;
-use crate::InputAccess;
 use crate::InputTrie;
 use crate::ONE_GIBIBYTE;
 use crate::Value;
@@ -125,6 +124,8 @@ impl TaskManagerRequest for CrankshaftTaskRequest {
             )
         })?;
 
+        // Allocate the inputs, which will always be, at most, the number of inputs plus
+        // the working directory and command
         let mut inputs = Vec::with_capacity(self.inner.inputs().len() + 2);
         for input in self.inner.inputs().iter() {
             if let Some(guest_path) = input.guest_path() {
@@ -157,10 +158,7 @@ impl TaskManagerRequest for CrankshaftTaskRequest {
                                     }),
                             )
                             .ty(if is_dir { Type::Directory } else { Type::File })
-                            .read_only(match input.access() {
-                                InputAccess::ReadOnly => true,
-                                InputAccess::ReadWrite => false,
-                            })
+                            .read_only(true)
                             .build(),
                     ));
                 }

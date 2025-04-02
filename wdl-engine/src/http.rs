@@ -242,6 +242,8 @@ impl HttpDownloader {
     }
 
     /// Applies authentication to the given URL.
+    ///
+    /// Returns the provided URL unchanged if there was no auth to apply.
     fn apply_auth<'a>(&self, url: Cow<'a, Url>) -> Cow<'a, Url> {
         // Attempt to apply auth for Azure storage
         let (matched, url) = azure::apply_auth(&self.config.storage.azure, url);

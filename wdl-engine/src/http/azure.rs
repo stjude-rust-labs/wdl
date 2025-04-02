@@ -51,7 +51,12 @@ pub(crate) fn rewrite_url(url: &Url) -> Result<Url> {
 
 /// Applies Azure SAS token authentication to the given URL.
 ///
-/// Returns `(false, _)` if the URL is not for Azure Blob Storage.
+/// Returns `(false, _)` if the URL is not for Azure Blob Storage; the returned
+/// URL is unmodified.
+///
+/// Returns `(true, _)` if the URL is for Azure Blob Storage. If auth was
+/// applied, the returned URL is modified to include it; otherwise the original
+/// URL is returned unmodified.
 pub(crate) fn apply_auth<'a>(
     config: &AzureStorageConfig,
     url: Cow<'a, Url>,

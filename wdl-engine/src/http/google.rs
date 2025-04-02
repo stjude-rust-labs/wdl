@@ -48,7 +48,12 @@ pub(crate) fn rewrite_url(url: &Url) -> Result<Url> {
 
 /// Applies Google Cloud Storage presigned signatures to the given URL.
 ///
-/// Returns `(false, _)` if the URL is not for Google Cloud Storage.
+/// Returns `(false, _)` if the URL is not for Google Cloud Storage; the
+/// returned URL is unmodified.
+///
+/// Returns `(true, _)` if the URL is for Google Cloud Storage. If auth was
+/// applied, the returned URL is modified to include it; otherwise the original
+/// URL is returned unmodified.
 pub(crate) fn apply_auth<'a>(
     config: &GoogleStorageConfig,
     url: Cow<'a, Url>,
