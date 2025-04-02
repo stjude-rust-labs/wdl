@@ -482,7 +482,7 @@ impl TaskExecutionBackend for CrankshaftBackend {
                 let (uid, gid) = get_uid_gid();
                 let ownership = format!("{uid}:{gid}");
                 info!(
-                    "Cleanup target: '{}', Attempting to set ownership to: {}",
+                    "cleanup target: '{}', attempting to set ownership to: {}",
                     output_path.display(),
                     ownership
                 );
