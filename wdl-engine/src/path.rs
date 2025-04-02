@@ -296,11 +296,17 @@ mod test {
         let p: EvaluationPath = "foo".parse().expect("should parse");
         assert_eq!(p.unwrap_local().as_os_str(), "foo");
 
-        let p: EvaluationPath = "file:///foo/bar/baz".parse().expect("should parse");
-        assert_eq!(
-            p.unwrap_local().to_str().unwrap().replace("\\", "/"),
-            "/foo/bar/baz"
-        );
+        #[cfg(unix)]
+        {
+            let p: EvaluationPath = "file:///foo/bar/baz".parse().expect("should parse");
+            assert_eq!(p.unwrap_local().as_os_str(), "/foo/bar/baz");
+        }
+
+        #[cfg(windows)]
+        {
+            let p: EvaluationPath = "file:///C:/foo/bar/baz".parse().expect("should parse");
+            assert_eq!(p.unwrap_local().as_os_str(), "C:\\foo\\bar\\baz");
+        }
 
         let p: EvaluationPath = "https://example.com/foo/bar/baz"
             .parse()
@@ -344,14 +350,29 @@ mod test {
             "foo/quux"
         );
 
-        let p: EvaluationPath = "file:///foo/bar/baz".parse().expect("should parse");
-        assert_eq!(
-            p.join("qux/../quux")
-                .expect("should join")
-                .unwrap_local()
-                .as_os_str(),
-            "/foo/bar/baz/quux"
-        );
+        #[cfg(unix)]
+        {
+            let p: EvaluationPath = "file:///foo/bar/baz".parse().expect("should parse");
+            assert_eq!(
+                p.join("qux/../quux")
+                    .expect("should join")
+                    .unwrap_local()
+                    .as_os_str(),
+                "/foo/bar/baz/quux"
+            );
+        }
+
+        #[cfg(windows)]
+        {
+            let p: EvaluationPath = "file:///C:/foo/bar/baz".parse().expect("should parse");
+            assert_eq!(
+                p.join("qux/../quux")
+                    .expect("should join")
+                    .unwrap_local()
+                    .as_os_str(),
+                "C:\\foo\\bar\\baz\\quux"
+            );
+        }
 
         let p: EvaluationPath = "https://example.com/foo/bar/baz"
             .parse()
