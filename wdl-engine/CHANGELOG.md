@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Added
 
 * Added support for cloud storage URIs (#[367](https://github.com/stjude-rust-labs/wdl/pull/367)).
+* Added configuration option to write task inputs as JSON files for debugging ([#365](https://github.com/stjude-rust-labs/wdl/pull/365)). 
 * Added support reading of remote files from the stdlib file functions (#[364](https://github.com/stjude-rust-labs/wdl/pull/364))
 * Added support for YAML input files (.yml and .yaml) alongside JSON ([#352](https://github.com/stjude-rust-labs/wdl/pull/352)).
 * Added support for graceful cancellation of evaluation (#[327](https://github.com/stjude-rust-labs/wdl/pull/327)).
@@ -22,8 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added retry logic for task execution ([#320](https://github.com/stjude-rust-labs/wdl/pull/320)).
 * Added a `Config` type for specifying evaluation configuration ([#320](https://github.com/stjude-rust-labs/wdl/pull/320)).
 * Added progress callback to `WorkflowEvaluator` ([#310](https://github.com/stjude-rust-labs/wdl/pull/310)).
-* Added configuration option to write task inputs as JSON files for debugging.
-
 #### Fixed
 
 * Fixed support for URLs in file stdlib functions (#[369](https://github.com/stjude-rust-labs/wdl/pull/369)).
