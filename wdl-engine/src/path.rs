@@ -209,3 +209,195 @@ impl TryFrom<EvaluationPath> for String {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use pretty_assertions::assert_eq;
+
+    use super::*;
+
+    #[test]
+    fn test_file_urls() {
+        assert!(is_file_url("file:///foo/bar/baz"));
+        assert!(is_file_url("FiLe:///foo/bar/baz"));
+        assert!(is_file_url("FILE:///foo/bar/baz"));
+        assert!(!is_file_url("https://example.com/bar/baz"));
+        assert!(!is_file_url("az://foo/bar/baz"));
+    }
+
+    #[test]
+    fn test_urls() {
+        assert!(is_url("http://example.com/foo/bar/baz"));
+        assert!(is_url("HtTp://example.com/foo/bar/baz"));
+        assert!(is_url("HTTP://example.com/foo/bar/baz"));
+        assert!(is_url("https://example.com/foo/bar/baz"));
+        assert!(is_url("HtTpS://example.com/foo/bar/baz"));
+        assert!(is_url("HTTPS://example.com/foo/bar/baz"));
+        assert!(is_url("file:///foo/bar/baz"));
+        assert!(is_url("FiLe:///foo/bar/baz"));
+        assert!(is_url("FILE:///foo/bar/baz"));
+        assert!(is_url("az://foo/bar/baz"));
+        assert!(is_url("aZ://foo/bar/baz"));
+        assert!(is_url("AZ://foo/bar/baz"));
+        assert!(is_url("s3://foo/bar/baz"));
+        assert!(is_url("S3://foo/bar/baz"));
+        assert!(is_url("gs://foo/bar/baz"));
+        assert!(is_url("gS://foo/bar/baz"));
+        assert!(is_url("GS://foo/bar/baz"));
+        assert!(!is_url("foo://foo/bar/baz"));
+    }
+
+    #[test]
+    fn test_url_parsing() {
+        assert_eq!(
+            parse_url("http://example.com/foo/bar/baz")
+                .map(|u| String::from(u))
+                .as_deref(),
+            Some("http://example.com/foo/bar/baz")
+        );
+        assert_eq!(
+            parse_url("https://example.com/foo/bar/baz")
+                .map(|u| String::from(u))
+                .as_deref(),
+            Some("https://example.com/foo/bar/baz")
+        );
+        assert_eq!(
+            parse_url("file:///foo/bar/baz")
+                .map(|u| String::from(u))
+                .as_deref(),
+            Some("file:///foo/bar/baz")
+        );
+        assert_eq!(
+            parse_url("az://foo/bar/baz")
+                .map(|u| String::from(u))
+                .as_deref(),
+            Some("az://foo/bar/baz")
+        );
+        assert_eq!(
+            parse_url("s3://foo/bar/baz")
+                .map(|u| String::from(u))
+                .as_deref(),
+            Some("s3://foo/bar/baz")
+        );
+        assert_eq!(
+            parse_url("gs://foo/bar/baz")
+                .map(|u| String::from(u))
+                .as_deref(),
+            Some("gs://foo/bar/baz")
+        );
+        assert_eq!(
+            parse_url("foo://foo/bar/baz")
+                .map(|u| String::from(u))
+                .as_deref(),
+            None
+        );
+    }
+
+    #[test]
+    fn test_evaluation_path_parsing() {
+        let p: EvaluationPath = "/foo/bar/baz".parse().expect("should parse");
+        assert_eq!(p.unwrap_local().as_os_str(), "/foo/bar/baz");
+
+        let p: EvaluationPath = "foo".parse().expect("should parse");
+        assert_eq!(p.unwrap_local().as_os_str(), "foo");
+
+        let p: EvaluationPath = "file:///foo/bar/baz".parse().expect("should parse");
+        assert_eq!(p.unwrap_local().as_os_str(), "/foo/bar/baz");
+
+        let p: EvaluationPath = "https://example.com/foo/bar/baz"
+            .parse()
+            .expect("should parse");
+        assert_eq!(
+            p.unwrap_remote().as_str(),
+            "https://example.com/foo/bar/baz"
+        );
+
+        let p: EvaluationPath = "az://foo/bar/baz".parse().expect("should parse");
+        assert_eq!(p.unwrap_remote().as_str(), "az://foo/bar/baz");
+
+        let p: EvaluationPath = "s3://foo/bar/baz".parse().expect("should parse");
+        assert_eq!(p.unwrap_remote().as_str(), "s3://foo/bar/baz");
+
+        let p: EvaluationPath = "gs://foo/bar/baz".parse().expect("should parse");
+        assert_eq!(p.unwrap_remote().as_str(), "gs://foo/bar/baz");
+    }
+
+    #[test]
+    fn test_evaluation_path_join() {
+        let p: EvaluationPath = "/foo/bar/baz".parse().expect("should parse");
+        assert_eq!(
+            p.join("qux/../quux")
+                .expect("should join")
+                .unwrap_local()
+                .as_os_str(),
+            "/foo/bar/baz/quux"
+        );
+
+        let p: EvaluationPath = "foo".parse().expect("should parse");
+        assert_eq!(
+            p.join("qux/../quux")
+                .expect("should join")
+                .unwrap_local()
+                .as_os_str(),
+            "foo/quux"
+        );
+
+        let p: EvaluationPath = "file:///foo/bar/baz".parse().expect("should parse");
+        assert_eq!(
+            p.join("qux/../quux")
+                .expect("should join")
+                .unwrap_local()
+                .as_os_str(),
+            "/foo/bar/baz/quux"
+        );
+
+        let p: EvaluationPath = "https://example.com/foo/bar/baz"
+            .parse()
+            .expect("should parse");
+        assert_eq!(
+            p.join("qux/../quux")
+                .expect("should join")
+                .unwrap_remote()
+                .as_str(),
+            "https://example.com/foo/bar/quux"
+        );
+
+        let p: EvaluationPath = "https://example.com/foo/bar/baz/"
+            .parse()
+            .expect("should parse");
+        assert_eq!(
+            p.join("qux/../quux")
+                .expect("should join")
+                .unwrap_remote()
+                .as_str(),
+            "https://example.com/foo/bar/baz/quux"
+        );
+
+        let p: EvaluationPath = "az://foo/bar/baz/".parse().expect("should parse");
+        assert_eq!(
+            p.join("qux/../quux")
+                .expect("should join")
+                .unwrap_remote()
+                .as_str(),
+            "az://foo/bar/baz/quux"
+        );
+
+        let p: EvaluationPath = "s3://foo/bar/baz/".parse().expect("should parse");
+        assert_eq!(
+            p.join("qux/../quux")
+                .expect("should join")
+                .unwrap_remote()
+                .as_str(),
+            "s3://foo/bar/baz/quux"
+        );
+
+        let p: EvaluationPath = "gs://foo/bar/baz/".parse().expect("should parse");
+        assert_eq!(
+            p.join("qux/../quux")
+                .expect("should join")
+                .unwrap_remote()
+                .as_str(),
+            "gs://foo/bar/baz/quux"
+        );
+    }
+}
