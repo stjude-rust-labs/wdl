@@ -1617,6 +1617,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:314:5: note[MatchingParameterMeta]: parameter metadata in task `variant_filtration` is out of order"
+permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/gatk4.wdl/#L314"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:359:1: note[LineWidth]: line exceeds maximum width of 90"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/gatk4.wdl/#L359"
 
@@ -1649,6 +1654,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 document = "stjudecloud/workflows:/tools/gatk4.wdl"
 message = "gatk4.wdl:69:20: note[ContainerValue]: container URI uses a mutable tag"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/gatk4.wdl/#L69"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/gatk4.wdl"
+message = "gatk4.wdl:83:5: note[MatchingParameterMeta]: parameter metadata in task `base_recalibrator` is out of order"
+permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/gatk4.wdl/#L83"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
@@ -1914,6 +1924,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 document = "stjudecloud/workflows:/tools/qualimap.wdl"
 message = "qualimap.wdl:157:20: note[ContainerValue]: container URI uses a mutable tag"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/qualimap.wdl/#L157"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/tools/qualimap.wdl"
+message = "qualimap.wdl:15:5: note[MatchingParameterMeta]: parameter metadata in task `rnaseq` is out of order"
+permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/qualimap.wdl/#L15"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/qualimap.wdl"
@@ -2279,6 +2294,11 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-standard.wdl"
 message = "rnaseq-standard.wdl:47:28: note[TrailingComma]: item missing trailing comma"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-standard.wdl/#L47"
+
+[[diagnostics]]
+document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"
+message = "rnaseq-variant-calling.wdl:19:5: note[MatchingParameterMeta]: parameter metadata in workflow `rnaseq_variant_calling` is out of order"
+permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/rnaseq/rnaseq-variant-calling.wdl/#L19"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/rnaseq/rnaseq-variant-calling.wdl"

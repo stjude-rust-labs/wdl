@@ -1379,19 +1379,19 @@ fn write_task_inputs_json(task_dir: &Path, task_name: &str, inputs: &TaskInputs)
     use serde_json::Value as JsonValue;
     use serde_json::to_string_pretty;
     use tracing::info;
-    
+
     // Create a structured JSON representation
     let mut root_map = JsonMap::new();
     // Add task name metadata
     root_map.insert("task".to_string(), JsonValue::String(task_name.to_string()));
-    
+
     // Add declared inputs section
     let mut inputs_map = JsonMap::new();
     for (name, value) in inputs.iter() {
         inputs_map.insert(name.to_string(), value_to_json(value)?);
     }
     root_map.insert("inputs".to_string(), JsonValue::Object(inputs_map));
-    
+
     // Add requirements section - use common requirement names
     let mut req_map = JsonMap::new();
     let requirement_names = [
@@ -1438,11 +1438,11 @@ fn write_task_inputs_json(task_dir: &Path, task_name: &str, inputs: &TaskInputs)
     if !attempt_dir.exists() {
         std::fs::create_dir_all(&attempt_dir)?;
     }
-    
+
     // Write to the attempt directory
     let file_path = attempt_dir.join("inputs.json");
     fs::write(&file_path, json_str)?;
-    
+
     info!("Wrote task inputs to {}", file_path.display());
     Ok(())
 }
