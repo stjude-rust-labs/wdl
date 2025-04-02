@@ -15,6 +15,7 @@ use crate::full_page;
 use crate::r#struct::Struct;
 use crate::task::Task;
 use crate::workflow::Workflow;
+use crate::write_assets;
 
 /// The type of a page.
 #[derive(Debug)]
@@ -90,8 +91,13 @@ impl Node {
     }
 
     /// Get the page associated with the node.
-    pub fn page(&self) -> Option<Rc<HTMLPage>> {
-        self.page.clone()
+    pub fn page(&self) -> Option<&Rc<HTMLPage>> {
+        self.page.as_ref()
+    }
+
+    /// Get the children of the node.
+    pub fn children(&self) -> &BTreeMap<String, Node> {
+        &self.children
     }
 
     /// Gather the node and its children in a Depth First Traversal order.
@@ -118,22 +124,29 @@ pub struct DocsTree {
     ///
     /// `root.path` is the path to the docs directory and is absolute.
     root: Node,
-    /// The absolute path to the stylesheet, if it exists.
-    stylesheet: Option<PathBuf>,
+    /// The absolute path to the stylesheet.
+    stylesheet: PathBuf,
+    /// The absolute path to the assets directory.
+    assets: PathBuf,
 }
 
 impl DocsTree {
     /// Create a new docs tree.
-    pub fn new(root: impl AsRef<Path>) -> Self {
+    pub fn new(root: impl AsRef<Path>) -> anyhow::Result<Self> {
         let abs_path = absolute(root.as_ref()).unwrap();
+        write_assets(&abs_path)?;
         let node = Node::new(
             abs_path.file_name().unwrap().to_str().unwrap().to_string(),
             abs_path.clone(),
         );
-        Self {
+
+        let stylesheet = abs_path.join("style.css");
+
+        Ok(Self {
             root: node,
-            stylesheet: None,
-        }
+            stylesheet,
+            assets: abs_path.join("assets"),
+        })
     }
 
     /// Create a new docs tree with a stylesheet.
@@ -142,6 +155,7 @@ impl DocsTree {
         stylesheet: impl AsRef<Path>,
     ) -> anyhow::Result<Self> {
         let abs_path = absolute(root.as_ref()).unwrap();
+        write_assets(&abs_path)?;
         let in_stylesheet = absolute(stylesheet.as_ref())?;
         let new_stylesheet = abs_path.join("style.css");
         std::fs::copy(in_stylesheet, &new_stylesheet)?;
@@ -153,7 +167,8 @@ impl DocsTree {
 
         Ok(Self {
             root: node,
-            stylesheet: Some(new_stylesheet),
+            stylesheet: new_stylesheet,
+            assets: abs_path.join("assets"),
         })
     }
 
@@ -168,19 +183,25 @@ impl DocsTree {
     }
 
     /// Get the absolute path to the stylesheet.
-    pub fn stylesheet(&self) -> Option<&PathBuf> {
-        self.stylesheet.as_ref()
+    pub fn stylesheet(&self) -> &PathBuf {
+        &self.stylesheet
+    }
+
+    /// Get the absolute path to the assets directory.
+    pub fn assets(&self) -> &PathBuf {
+        &self.assets
     }
 
     /// Get a relative path to the stylesheet.
-    pub fn stylesheet_relative_to<P: AsRef<Path>>(&self, path: P) -> Option<PathBuf> {
-        if let Some(stylesheet) = self.stylesheet() {
-            let path = path.as_ref();
-            let stylesheet = diff_paths(stylesheet, path).unwrap();
-            Some(stylesheet)
-        } else {
-            None
-        }
+    pub fn stylesheet_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+        let path = path.as_ref();
+        diff_paths(&self.stylesheet, path).unwrap()
+    }
+
+    /// Get a relative path to the assets directory.
+    pub fn assets_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+        let path = path.as_ref();
+        diff_paths(&self.assets, path).unwrap()
     }
 
     /// Add a page to the tree.
@@ -236,11 +257,55 @@ impl DocsTree {
     }
 
     /// Get the page associated with a path.
-    pub fn get_page<P: AsRef<Path>>(&self, abs_path: P) -> Option<Rc<HTMLPage>> {
+    pub fn get_page<P: AsRef<Path>>(&self, abs_path: P) -> Option<&Rc<HTMLPage>> {
         self.get_node(abs_path).and_then(|node| node.page())
     }
 
-    /// Render a sidebar component given a path.
+    /// Helps render a sidebar component given a node and a base path.
+    fn sidebar_recurse(&self, node: &Node, base: &Path) -> Markup {
+        html! {
+            @if let Some(page) = node.page() {
+                @match page.page_type() {
+                    PageType::Index(_) => {
+                        div class="flex items-center gap-x-1" {
+                            img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
+                            p class="" { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
+                        }
+                    },
+                    PageType::Struct(_) => {
+                        div class="flex items-center gap-x-1" {
+                            img src=(self.assets_relative_to(base).join("unselected-struct.png").to_string_lossy()) class="w-4 h-4" alt="Struct icon";
+                            p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                        }
+                    },
+                    PageType::Task(_) => {
+                        div class="flex items-center gap-x-1" {
+                            img src=(self.assets_relative_to(base).join("unselected-task.png").to_string_lossy()) class="w-4 h-4" alt="Task icon";
+                            p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                        }
+                    },
+                    PageType::Workflow(_) => {
+                        div class="flex items-center gap-x-1" {
+                            img src=(self.assets_relative_to(base).join("unselected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
+                            p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                        }
+                    }
+                }
+            } @else {
+                div class="flex items-center gap-x-1" {
+                    img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
+                    p class="" { (node.name()) }
+                }
+            }
+            ul class="" {
+                @for child in node.children().values() {
+                    li class="px-2" { (self.sidebar_recurse(child, base)) }
+                }
+            }
+        }
+    }
+
+    /// Render a left sidebar component given a path.
     ///
     /// The sidebar will contain a table of contents for the docs directory.
     /// Every node in the tree will be visited in a Depth First Traversal order.
@@ -248,31 +313,53 @@ impl DocsTree {
     /// rendered. If the node does not have a page associated with it, the
     /// name of the node will be rendered. All links will be relative to the
     /// given path.
-    pub fn render_sidebar_component<P: AsRef<Path>>(&self, path: P) -> Markup {
+    pub fn render_left_sidebar<P: AsRef<Path>>(&self, path: P) -> Markup {
         let root = self.root();
         let base = path.as_ref().parent().unwrap();
-        let nodes = root.depth_first_traversal();
 
         html! {
-            div class="top-0 left-0 h-full w-1/6 dark:bg-slate-950 dark:text-white" {
-                h1 class="text-2xl text-center" { "Sidebar" }
-                @for node in nodes {
-                    @match node.page() {
-                        Some(page) => {
-                            @match page.page_type() {
-                                PageType::Index(_) => {
-                                    p { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
-                                }
-                                _ => {
-                                    p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
-                                }
-                            }
+            div class="top-0 border h-fit left-0 min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-white overflow-x-scroll flex flex-col gap-y-3" {
+                img src=(self.assets_relative_to(base).join("sprocket-logo.png").to_string_lossy()) class="w-1/2 h-1/2" alt="Sprocket logo";
+                form class="w-full h-full rounded-md flex items-center gap-x-2 px-2" {
+                    div class="flex items-center gap-x-1 text-base" {
+                        div class="flex items-center gap-x-1" {
+                            img src=(self.assets_relative_to(base).join("list-bullet.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
+                            p { "Workflows" }
                         }
-                        None => {
-                            p class="" { (node.name()) }
+                        div class="flex items-center gap-x-1" {
+                            img src=(self.assets_relative_to(base).join("selected-dir.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
+                            p { "Full Directory" }
                         }
                     }
                 }
+                form class="w-full h-full rounded-md border border-slate-700 flex items-center gap-x-2 px-2" {
+                    img src=(self.assets_relative_to(base).join("search.png").to_string_lossy()) class="w-4 h-4" alt="Search icon";
+                    input type="text" placeholder="Search" class="w-full h-full text-slate-300";
+                }
+                ul class="" {
+                    div class="flex flex-row items-center gap-x-1" {
+                        img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
+                        p class="" { (root.name()) }
+                    }
+                    @for node in root.children().values() {
+                        @if node.name() != "external" {
+                            li class="px-2" { (self.sidebar_recurse(node, base)) }
+                        }
+                    }
+                    @if let Some(external) = root.children().get("external") {
+                        li class="px-2" { (self.sidebar_recurse(external, base)) }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Render a right sidebar component.
+    pub fn render_right_sidebar(&self) -> Markup {
+        html! {
+            div class="top-0 border h-screen sticky right-0 min-w-[240px] w-[240px] p-4 bottom-4 object-right dark:bg-red-900 dark:text-white" {
+                h1 class="text-2xl text-center" { "Sidebar" }
+                p class="" { "Right Sidebar" }
             }
         }
     }
@@ -296,7 +383,7 @@ impl DocsTree {
         let root = self.root();
         let index_path = root.path().join("index.html");
 
-        let sidebar = self.render_sidebar_component(&index_path);
+        let left_sidebar = self.render_left_sidebar(&index_path);
         let content = html! {
             div class="" {
                 h3 class="" { "Home" }
@@ -329,10 +416,13 @@ impl DocsTree {
         let html = full_page(
             "Home",
             html! {
-                (sidebar)
-                (content)
+                (left_sidebar)
+                div class="p-4 flex grow" {
+                    (content)
+                }
+                (self.render_right_sidebar())
             },
-            self.stylesheet_relative_to(root.path()).as_deref(),
+            self.stylesheet_relative_to(root.path()),
         );
         std::fs::write(index_path, html.into_string())?;
         Ok(())
@@ -354,15 +444,18 @@ impl DocsTree {
 
         let stylesheet =
             self.stylesheet_relative_to(path.parent().expect("path should have a parent"));
-        let sidebar = self.render_sidebar_component(&path);
+        let left_sidebar = self.render_left_sidebar(&path);
 
         let html = full_page(
             page.name(),
             html! {
-                (sidebar)
-                (content)
+                (left_sidebar)
+                div class="p-4 flex grow" {
+                    (content)
+                }
+                (self.render_right_sidebar())
             },
-            stylesheet.as_deref(),
+            stylesheet,
         );
         std::fs::write(path, html.into_string())?;
         Ok(())
