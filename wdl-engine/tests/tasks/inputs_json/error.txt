@@ -1,5 +1,0 @@
-task execution failed for task `write_inputs_test` in `tests/tasks/inputs_json/source.wdl` (task id `write_inputs_test`)
-
-Caused by:
-    0: failed to spawn `bash`
-    1: program not found
