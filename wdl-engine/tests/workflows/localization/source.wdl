@@ -14,9 +14,9 @@ task t {
 
     command <<<
         set -euo pipefail
-        cat ~{local} > ~{relative_path}
-        cat ~{one} > one
-        cat ~{two} > two
+        cat '~{local}' > ~{relative_path}
+        cat '~{one}' > one
+        cat '~{two}' > two
     >>>
 
     output {
