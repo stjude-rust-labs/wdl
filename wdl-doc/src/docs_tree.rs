@@ -268,32 +268,32 @@ impl DocsTree {
                 @match page.page_type() {
                     PageType::Index(_) => {
                         div class="flex items-center" {
-                            img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon"
+                            img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
                             p class="" { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
                     },
                     PageType::Struct(_) => {
                         div class="flex items-center" {
-                            img src=(self.assets_relative_to(base).join("unselected-struct.png").to_string_lossy()) class="w-4 h-4" alt="Struct icon"
+                            img src=(self.assets_relative_to(base).join("unselected-struct.png").to_string_lossy()) class="w-4 h-4" alt="Struct icon";
                             p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
                     },
                     PageType::Task(_) => {
                         div class="flex items-center" {
-                            img src=(self.assets_relative_to(base).join("unselected-task.png").to_string_lossy()) class="w-4 h-4" alt="Task icon"
+                            img src=(self.assets_relative_to(base).join("unselected-task.png").to_string_lossy()) class="w-4 h-4" alt="Task icon";
                             p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
                     },
                     PageType::Workflow(_) => {
                         div class="flex items-center" {
-                            img src=(self.assets_relative_to(base).join("unselected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon"
+                            img src=(self.assets_relative_to(base).join("unselected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
                             p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
                     }
                 }
             } @else {
                 div class="flex items-center" {
-                    img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon"
+                    img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
                     p class="" { (node.name()) }
                 }
             }
@@ -305,7 +305,7 @@ impl DocsTree {
         }
     }
 
-    /// Render a sidebar component given a path.
+    /// Render a left sidebar component given a path.
     ///
     /// The sidebar will contain a table of contents for the docs directory.
     /// Every node in the tree will be visited in a Depth First Traversal order.
@@ -319,8 +319,11 @@ impl DocsTree {
 
         html! {
             div class="top-0 border h-fit left-0 min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-white overflow-x-scroll" {
-                img src=(self.assets_relative_to(base).join("sprocket-logo.png").to_string_lossy()) class="w-1/2 h-1/2" alt="Sprocket logo"
-                p class="" { (root.name()) }
+                img src=(self.assets_relative_to(base).join("sprocket-logo.png").to_string_lossy()) class="w-1/2 h-1/2" alt="Sprocket logo";
+                div class="flex flex-row items-center" {
+                    img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
+                    p class="" { (root.name()) }
+                }
                 ul class="" {
                     @for node in root.children().values() {
                         @if node.name() != "external" {
