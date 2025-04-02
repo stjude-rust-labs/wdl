@@ -1,0 +1,5 @@
+task execution failed for task `test_min` in `tests/tasks/test-min/source.wdl` (task id `test_min`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

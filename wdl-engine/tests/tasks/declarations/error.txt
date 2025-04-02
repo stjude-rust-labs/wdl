@@ -1,0 +1,5 @@
+task execution failed for task `declarations` in `tests/tasks/declarations/source.wdl` (task id `declarations`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

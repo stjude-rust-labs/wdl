@@ -1,0 +1,5 @@
+task execution failed for task `task_with_comments` in `tests/tasks/task-with-comments/source.wdl` (task id `task_with_comments`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

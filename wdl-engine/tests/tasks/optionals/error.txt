@@ -1,0 +1,5 @@
+task execution failed for task `optionals` in `tests/tasks/optionals/source.wdl` (task id `optionals`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

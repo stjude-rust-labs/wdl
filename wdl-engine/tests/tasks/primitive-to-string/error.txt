@@ -1,0 +1,5 @@
+task execution failed for task `primitive_to_string` in `tests/tasks/primitive-to-string/source.wdl` (task id `primitive_to_string`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

@@ -1,0 +1,5 @@
+task execution failed for task `test_pairs` in `tests/tasks/test-pairs/source.wdl` (task id `test_pairs`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

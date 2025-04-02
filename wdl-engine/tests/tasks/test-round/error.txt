@@ -1,0 +1,5 @@
+task execution failed for task `test_round` in `tests/tasks/test-round/source.wdl` (task id `test_round`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

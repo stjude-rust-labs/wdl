@@ -1,0 +1,5 @@
+task execution failed for task `file_sizes` in `tests/tasks/file-sizes-task/source.wdl` (task id `file_sizes`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

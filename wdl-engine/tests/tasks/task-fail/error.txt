@@ -1,4 +1,5 @@
 task execution failed for task `test` in `tests/tasks/task-fail/source.wdl` (task id `test`)
 
 Caused by:
-    task process has terminated with status code 1; see the `stdout` and `stderr` files in execution directory `attempts/0/` for task command output
+    0: failed to spawn `bash`
+    1: program not found

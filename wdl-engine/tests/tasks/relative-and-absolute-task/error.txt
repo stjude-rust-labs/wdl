@@ -1,0 +1,5 @@
+task execution failed for task `relative_and_absolute` in `tests/tasks/relative-and-absolute-task/source.wdl` (task id `relative_and_absolute`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

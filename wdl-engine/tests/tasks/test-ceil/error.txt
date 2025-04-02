@@ -1,0 +1,5 @@
+task execution failed for task `test_ceil` in `tests/tasks/test-ceil/source.wdl` (task id `test_ceil`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

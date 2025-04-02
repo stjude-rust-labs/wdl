@@ -1,0 +1,5 @@
+task execution failed for task `struct_to_struct` in `tests/tasks/struct-to-struct/source.wdl` (task id `struct_to_struct`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

@@ -1,0 +1,5 @@
+task execution failed for task `flags` in `tests/tasks/flags-task/source.wdl` (task id `flags`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

@@ -1,0 +1,5 @@
+task execution failed for task `test_placeholders` in `tests/tasks/test-placeholders-task/source.wdl` (task id `test_placeholders`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

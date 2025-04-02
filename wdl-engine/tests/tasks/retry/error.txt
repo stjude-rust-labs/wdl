@@ -1,0 +1,5 @@
+task execution failed for task `test` in `tests/tasks/retry/source.wdl` (task id `test`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

@@ -1,0 +1,5 @@
+task execution failed for task `expressions` in `tests/tasks/expressions-task/source.wdl` (task id `expressions`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

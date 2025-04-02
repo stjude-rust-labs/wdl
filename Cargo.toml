@@ -94,3 +94,9 @@ broken_intra_doc_links = "warn"
 
 [workspace.lints.clippy]
 missing_docs_in_private_items = "warn"
+
+[patch.crates-io]
+crankshaft = { git = "https://github.com/stjude-rust-labs/crankshaft", branch = "main" }
+crankshaft-engine = { git = "https://github.com/stjude-rust-labs/crankshaft", branch = "main" }
+crankshaft-config = { git = "https://github.com/stjude-rust-labs/crankshaft", branch = "main" }
+crankshaft-docker = { git = "https://github.com/stjude-rust-labs/crankshaft", branch = "main" }

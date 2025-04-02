@@ -1,0 +1,5 @@
+task execution failed for task `test_map` in `tests/tasks/test-map/source.wdl` (task id `test_map`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

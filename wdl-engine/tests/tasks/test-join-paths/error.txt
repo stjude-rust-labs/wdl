@@ -1,0 +1,5 @@
+task execution failed for task `resolve_paths_task` in `tests/tasks/test-join-paths/source.wdl` (task id `resolve_paths_task`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

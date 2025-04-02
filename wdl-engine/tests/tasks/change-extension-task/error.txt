@@ -1,0 +1,5 @@
+task execution failed for task `change_extension` in `tests/tasks/change-extension-task/source.wdl` (task id `change_extension`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found

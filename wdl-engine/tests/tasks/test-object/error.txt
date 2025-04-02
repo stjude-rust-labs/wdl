@@ -1,0 +1,5 @@
+task execution failed for task `test_object` in `tests/tasks/test-object/source.wdl` (task id `test_object`)
+
+Caused by:
+    0: failed to spawn `bash`
+    1: program not found
