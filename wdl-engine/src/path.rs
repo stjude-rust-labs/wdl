@@ -251,44 +251,36 @@ mod test {
     fn test_url_parsing() {
         assert_eq!(
             parse_url("http://example.com/foo/bar/baz")
-                .map(|u| String::from(u))
+                .map(String::from)
                 .as_deref(),
             Some("http://example.com/foo/bar/baz")
         );
         assert_eq!(
             parse_url("https://example.com/foo/bar/baz")
-                .map(|u| String::from(u))
+                .map(String::from)
                 .as_deref(),
             Some("https://example.com/foo/bar/baz")
         );
         assert_eq!(
             parse_url("file:///foo/bar/baz")
-                .map(|u| String::from(u))
+                .map(String::from)
                 .as_deref(),
             Some("file:///foo/bar/baz")
         );
         assert_eq!(
-            parse_url("az://foo/bar/baz")
-                .map(|u| String::from(u))
-                .as_deref(),
+            parse_url("az://foo/bar/baz").map(String::from).as_deref(),
             Some("az://foo/bar/baz")
         );
         assert_eq!(
-            parse_url("s3://foo/bar/baz")
-                .map(|u| String::from(u))
-                .as_deref(),
+            parse_url("s3://foo/bar/baz").map(String::from).as_deref(),
             Some("s3://foo/bar/baz")
         );
         assert_eq!(
-            parse_url("gs://foo/bar/baz")
-                .map(|u| String::from(u))
-                .as_deref(),
+            parse_url("gs://foo/bar/baz").map(String::from).as_deref(),
             Some("gs://foo/bar/baz")
         );
         assert_eq!(
-            parse_url("foo://foo/bar/baz")
-                .map(|u| String::from(u))
-                .as_deref(),
+            parse_url("foo://foo/bar/baz").map(String::from).as_deref(),
             None
         );
     }
@@ -296,13 +288,19 @@ mod test {
     #[test]
     fn test_evaluation_path_parsing() {
         let p: EvaluationPath = "/foo/bar/baz".parse().expect("should parse");
-        assert_eq!(p.unwrap_local().as_os_str(), "/foo/bar/baz");
+        assert_eq!(
+            p.unwrap_local().to_str().unwrap().replace("\\", "/"),
+            "/foo/bar/baz"
+        );
 
         let p: EvaluationPath = "foo".parse().expect("should parse");
         assert_eq!(p.unwrap_local().as_os_str(), "foo");
 
         let p: EvaluationPath = "file:///foo/bar/baz".parse().expect("should parse");
-        assert_eq!(p.unwrap_local().as_os_str(), "/foo/bar/baz");
+        assert_eq!(
+            p.unwrap_local().to_str().unwrap().replace("\\", "/"),
+            "/foo/bar/baz"
+        );
 
         let p: EvaluationPath = "https://example.com/foo/bar/baz"
             .parse()
@@ -329,7 +327,9 @@ mod test {
             p.join("qux/../quux")
                 .expect("should join")
                 .unwrap_local()
-                .as_os_str(),
+                .to_str()
+                .unwrap()
+                .replace("\\", "/"),
             "/foo/bar/baz/quux"
         );
 
@@ -338,7 +338,9 @@ mod test {
             p.join("qux/../quux")
                 .expect("should join")
                 .unwrap_local()
-                .as_os_str(),
+                .to_str()
+                .unwrap()
+                .replace("\\", "/"),
             "foo/quux"
         );
 
