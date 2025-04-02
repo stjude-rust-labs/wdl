@@ -238,6 +238,9 @@
   .flex-col {
     flex-direction: column !important;
   }
+  .flex-row {
+    flex-direction: row !important;
+  }
   .items-center {
     align-items: center !important;
   }
