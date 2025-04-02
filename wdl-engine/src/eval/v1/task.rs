@@ -632,6 +632,14 @@ impl TaskEvaluator {
             }
         }
 
+        // Write input JSON if enabled in configuration
+        if self.config.task.write_inputs {
+            if let Err(err) = write_task_inputs_json(state.root.path(), task.name(), inputs) {
+                // Log the error but continue - this is a non-critical debug feature
+                tracing::info!("Failed to write task inputs JSON: {:#}", err);
+            }
+        }
+
         // Spawn the task in a retry loop
         let mut attempt = 0;
         let (mut evaluated, mounts) = loop {
@@ -734,6 +742,17 @@ impl TaskEvaluator {
                 attempt += 1;
                 // Update the execution root for the next attempt
                 state.set_root(root, attempt)?;
+                // Write input JSON for this retry attempt if enabled
+                if self.config.task.write_inputs {
+                    if let Err(err) = write_task_inputs_json(state.root.path(), task.name(), inputs)
+                    {
+                        tracing::info!(
+                            "Failed to write task inputs JSON for retry attempt {}: {:#}",
+                            attempt,
+                            err
+                        );
+                    }
+                }
                 // Write input JSON for this retry attempt if enabled
                 if self.config.task.write_inputs {
                     if let Err(err) = write_task_inputs_json(state.root.path(), task.name(), inputs)
