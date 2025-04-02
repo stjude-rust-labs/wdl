@@ -1114,6 +1114,12 @@ impl TaskEvaluator {
             })
         })?;
 
+        // The temp directory should always be an input
+        inputs.push(Input::new(
+            EvaluationPath::Local(state.root.temp_dir().to_path_buf()),
+            InputAccess::ReadOnly,
+        ));
+
         // Localize the inputs
         self.backend
             .localize_inputs(&self.downloader, &mut inputs)

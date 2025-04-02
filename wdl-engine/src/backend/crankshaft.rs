@@ -128,34 +128,42 @@ impl TaskManagerRequest for CrankshaftTaskRequest {
         let mut inputs = Vec::with_capacity(self.inner.inputs().len() + 2);
         for input in self.inner.inputs().iter() {
             if let Some(guest_path) = input.guest_path() {
-                let is_dir =
-                    input
-                        .location()
-                        .map(|l| l.is_dir())
-                        .unwrap_or_else(|| match input.path() {
-                            EvaluationPath::Local(path) => path.is_dir(),
-                            EvaluationPath::Remote(url) => url.as_str().ends_with('/'),
-                        });
+                let (exists, is_dir) = input
+                    .location()
+                    .map(|p| {
+                        p.metadata()
+                            .map(|m| (true, m.is_dir()))
+                            .unwrap_or((false, false))
+                    })
+                    .unwrap_or_else(|| match input.path() {
+                        EvaluationPath::Local(p) => p
+                            .metadata()
+                            .map(|m| (true, m.is_dir()))
+                            .unwrap_or((false, false)),
+                        EvaluationPath::Remote(url) => (true, url.as_str().ends_with('/')),
+                    });
 
-                inputs.push(Arc::new(
-                    Input::builder()
-                        .path(guest_path)
-                        .contents(
-                            input
-                                .location()
-                                .map(|l| Contents::Path(l.to_path_buf()))
-                                .unwrap_or_else(|| match input.path() {
-                                    EvaluationPath::Local(path) => Contents::Path(path.clone()),
-                                    EvaluationPath::Remote(url) => Contents::Url(url.clone()),
-                                }),
-                        )
-                        .ty(if is_dir { Type::Directory } else { Type::File })
-                        .read_only(match input.access() {
-                            InputAccess::ReadOnly => true,
-                            InputAccess::ReadWrite => false,
-                        })
-                        .build(),
-                ));
+                if exists {
+                    inputs.push(Arc::new(
+                        Input::builder()
+                            .path(guest_path)
+                            .contents(
+                                input
+                                    .location()
+                                    .map(|l| Contents::Path(l.to_path_buf()))
+                                    .unwrap_or_else(|| match input.path() {
+                                        EvaluationPath::Local(path) => Contents::Path(path.clone()),
+                                        EvaluationPath::Remote(url) => Contents::Url(url.clone()),
+                                    }),
+                            )
+                            .ty(if is_dir { Type::Directory } else { Type::File })
+                            .read_only(match input.access() {
+                                InputAccess::ReadOnly => true,
+                                InputAccess::ReadWrite => false,
+                            })
+                            .build(),
+                    ));
+                }
             }
         }
 
