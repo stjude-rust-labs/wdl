@@ -2,8 +2,8 @@ error: call to function `read_json` failed: failed to open file `attempts/0/work
 
 Caused by:
     No such file or directory (os error 2)
-  ┌─ tests/tasks/invalid-placeholder-sep/source.wdl:6:31
+  ┌─ tests/tasks/invalid-placeholder-sep/source.wdl:9:36
   │
-6 │         String a = "~{sep=',' read_json('not-array.json')}"
-  │                               ^^^^^^^^^
+9 │         Array[String] json_array = read_json("not-array.json")
+  │                                    ^^^^^^^^^
 

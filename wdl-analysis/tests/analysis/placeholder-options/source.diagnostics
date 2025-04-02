@@ -1,0 +1,92 @@
+error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Boolean`
+   ┌─ tests/analysis/placeholder-options/source.wdl:13:28
+   │
+13 │     command <<< ~{sep=", " true} >>> # NOT OK: sep expects an array, but got Boolean
+   │                            ^^^^ this is type `Boolean`
+
+warning[UnusedDeclaration]: unused declaration `s1`
+   ┌─ tests/analysis/placeholder-options/source.wdl:19:12
+   │
+19 │     String s1 = "~{true}" 
+   │            ^^
+
+warning[UnusedDeclaration]: unused declaration `s2`
+   ┌─ tests/analysis/placeholder-options/source.wdl:22:12
+   │
+22 │     String s2 = "~{true="yes" false="no" false}"
+   │            ^^
+
+warning[UnusedDeclaration]: unused declaration `s3`
+   ┌─ tests/analysis/placeholder-options/source.wdl:25:12
+   │
+25 │     String s3 = "~{true="yes" false="no" 1}" 
+   │            ^^
+
+error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Int`
+   ┌─ tests/analysis/placeholder-options/source.wdl:25:42
+   │
+25 │     String s3 = "~{true="yes" false="no" 1}" 
+   │                                          ^ this is type `Int`
+
+warning[UnusedDeclaration]: unused declaration `s4`
+   ┌─ tests/analysis/placeholder-options/source.wdl:28:12
+   │
+28 │     String s4 = "~{sep=',' [1, 2, 3]}" 
+   │            ^^
+
+warning[UnusedDeclaration]: unused declaration `s5`
+   ┌─ tests/analysis/placeholder-options/source.wdl:31:12
+   │
+31 │     String s5 = "~{sep=',' 123}" 
+   │            ^^
+
+error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Int`
+   ┌─ tests/analysis/placeholder-options/source.wdl:31:28
+   │
+31 │     String s5 = "~{sep=',' 123}" 
+   │                            ^^^ this is type `Int`
+
+warning[UnusedDeclaration]: unused declaration `s6`
+   ┌─ tests/analysis/placeholder-options/source.wdl:34:12
+   │
+34 │     String s6 = "~{default="fallback" var?}" 
+   │            ^^
+
+error: unknown name `var`
+   ┌─ tests/analysis/placeholder-options/source.wdl:34:39
+   │
+34 │     String s6 = "~{default="fallback" var?}" 
+   │                                       ^^^
+
+error: expected `}`, but found `?`
+   ┌─ tests/analysis/placeholder-options/source.wdl:34:42
+   │
+34 │     String s6 = "~{default="fallback" var?}" 
+   │                  --                      ^ unexpected `?`
+   │                  │                        
+   │                  this placeholder start is not matched
+
+warning[UnusedDeclaration]: unused declaration `s7`
+   ┌─ tests/analysis/placeholder-options/source.wdl:37:12
+   │
+37 │     String s7 = "~{default="fallback" 123}" 
+   │            ^^
+
+error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Int`
+   ┌─ tests/analysis/placeholder-options/source.wdl:37:39
+   │
+37 │     String s7 = "~{default="fallback" 123}" 
+   │                                       ^^^ this is type `Int`
+
+warning[UnusedDeclaration]: unused declaration `s8`
+   ┌─ tests/analysis/placeholder-options/source.wdl:40:12
+   │
+40 │     String s8 = "~{[1, 2, 3]}" 
+   │            ^^
+
+error: cannot coerce type `Array[Int]+` to `String`
+   ┌─ tests/analysis/placeholder-options/source.wdl:40:20
+   │
+40 │     String s8 = "~{[1, 2, 3]}" 
+   │                    ^^^^^^^^^ this is type `Array[Int]+`
+

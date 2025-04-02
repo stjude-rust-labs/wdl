@@ -113,6 +113,11 @@ permalink = "https://github.com/ENCODE-DCC/chip-seq-pipeline2/blob/26eeda81a0540
 
 [[diagnostics]]
 document = "ENCODE-DCC/chip-seq-pipeline2:/dev/test/test_task/test_choose_ctl.wdl"
+message = "test_choose_ctl.wdl:213:36: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/ENCODE-DCC/chip-seq-pipeline2/blob/26eeda81a0540dc793fc69b0c390d232ca7ca50a/dev/test/test_task/test_choose_ctl.wdl/#L213"
+
+[[diagnostics]]
+document = "ENCODE-DCC/chip-seq-pipeline2:/dev/test/test_task/test_choose_ctl.wdl"
 message = "test_choose_ctl.wdl:3:32: warning[UnusedImport]: unused import namespace `compare_md5sum`"
 permalink = "https://github.com/ENCODE-DCC/chip-seq-pipeline2/blob/26eeda81a0540dc793fc69b0c390d232ca7ca50a/dev/test/test_task/test_choose_ctl.wdl/#L3"
 
@@ -652,9 +657,104 @@ message = "clever.wdl:28:14: warning[UnusedInput]: unused input `indexedFiteredB
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/clever.wdl/#L28"
 
 [[diagnostics]]
+document = "biowdl/tasks:/collect-columns.wdl"
+message = "collect-columns.wdl:52:62: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/collect-columns.wdl/#L52"
+
+[[diagnostics]]
+document = "biowdl/tasks:/collect-columns.wdl"
+message = "collect-columns.wdl:55:71: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/collect-columns.wdl/#L55"
+
+[[diagnostics]]
 document = "biowdl/tasks:/common.wdl"
 message = 'common.wdl:275:45: error: unknown escape sequence `\.`'
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/common.wdl/#L275"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:134:47: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L134"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:138:50: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L138"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:139:56: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L139"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:140:37: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L140"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:141:42: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L141"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:142:39: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L142"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:143:36: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L143"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:144:41: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L144"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:145:45: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L145"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:146:40: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L146"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:147:43: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L147"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:148:38: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L148"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:149:33: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L149"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:150:33: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L150"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:151:38: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L151"
+
+[[diagnostics]]
+document = "biowdl/tasks:/cutadapt.wdl"
+message = "cutadapt.wdl:152:41: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/cutadapt.wdl/#L152"
+
+[[diagnostics]]
+document = "biowdl/tasks:/deepvariant.wdl"
+message = "deepvariant.wdl:58:66: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/deepvariant.wdl/#L58"
 
 [[diagnostics]]
 document = "biowdl/tasks:/fastp.wdl"
@@ -683,6 +783,16 @@ permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0
 
 [[diagnostics]]
 document = "biowdl/tasks:/gatk.wdl"
+message = "gatk.wdl:1018:66: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[File]+?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/gatk.wdl/#L1018"
+
+[[diagnostics]]
+document = "biowdl/tasks:/gatk.wdl"
+message = "gatk.wdl:1019:75: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[File]+?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/gatk.wdl/#L1019"
+
+[[diagnostics]]
+document = "biowdl/tasks:/gatk.wdl"
 message = 'gatk.wdl:127:57: error: unknown escape sequence `\.`'
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/gatk.wdl/#L127"
 
@@ -690,6 +800,11 @@ permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0
 document = "biowdl/tasks:/gatk.wdl"
 message = 'gatk.wdl:1603:41: error: unknown escape sequence `\.`'
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/gatk.wdl/#L1603"
+
+[[diagnostics]]
+document = "biowdl/tasks:/gatk.wdl"
+message = "gatk.wdl:886:63: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[File]?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/gatk.wdl/#L886"
 
 [[diagnostics]]
 document = "biowdl/tasks:/gridss.wdl"
@@ -763,6 +878,16 @@ permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0
 
 [[diagnostics]]
 document = "biowdl/tasks:/multiqc.wdl"
+message = "multiqc.wdl:116:75: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]+?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/multiqc.wdl/#L116"
+
+[[diagnostics]]
+document = "biowdl/tasks:/multiqc.wdl"
+message = "multiqc.wdl:117:72: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]+?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/multiqc.wdl/#L117"
+
+[[diagnostics]]
+document = "biowdl/tasks:/multiqc.wdl"
 message = 'multiqc.wdl:133:45: error: unknown escape sequence `\.`'
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/multiqc.wdl/#L133"
 
@@ -770,6 +895,11 @@ permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0
 document = "biowdl/tasks:/nanopack.wdl"
 message = "nanopack.wdl:35:16: warning[UnusedInput]: unused input `title`"
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/nanopack.wdl/#L35"
+
+[[diagnostics]]
+document = "biowdl/tasks:/ncbi.wdl"
+message = "ncbi.wdl:53:44: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/ncbi.wdl/#L53"
 
 [[diagnostics]]
 document = "biowdl/tasks:/ncbi.wdl"
@@ -882,6 +1012,11 @@ message = "spades.wdl:48:15: warning[UnusedInput]: unused input `tmpDir`"
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/spades.wdl/#L48"
 
 [[diagnostics]]
+document = "biowdl/tasks:/star.wdl"
+message = "star.wdl:165:86: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/star.wdl/#L165"
+
+[[diagnostics]]
 document = "biowdl/tasks:/strelka.wdl"
 message = "strelka.wdl:114:15: warning[UnusedInput]: unused input `doNotDefineThis`"
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/strelka.wdl/#L114"
@@ -890,6 +1025,16 @@ permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0
 document = "biowdl/tasks:/strelka.wdl"
 message = "strelka.wdl:23:24: warning[UnusedImport]: unused import namespace `common`"
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/strelka.wdl/#L23"
+
+[[diagnostics]]
+document = "biowdl/tasks:/stringtie.wdl"
+message = "stringtie.wdl:49:32: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/stringtie.wdl/#L49"
+
+[[diagnostics]]
+document = "biowdl/tasks:/stringtie.wdl"
+message = "stringtie.wdl:50:32: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/stringtie.wdl/#L50"
 
 [[diagnostics]]
 document = "biowdl/tasks:/umi-tools.wdl"
@@ -908,8 +1053,33 @@ permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0
 
 [[diagnostics]]
 document = "biowdl/tasks:/unicycler.wdl"
+message = "unicycler.wdl:104:38: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/unicycler.wdl/#L104"
+
+[[diagnostics]]
+document = "biowdl/tasks:/unicycler.wdl"
 message = "unicycler.wdl:32:14: warning[UnusedInput]: unused input `verbosity`"
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/unicycler.wdl/#L32"
+
+[[diagnostics]]
+document = "biowdl/tasks:/unicycler.wdl"
+message = "unicycler.wdl:84:33: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/unicycler.wdl/#L84"
+
+[[diagnostics]]
+document = "biowdl/tasks:/unicycler.wdl"
+message = "unicycler.wdl:90:40: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/unicycler.wdl/#L90"
+
+[[diagnostics]]
+document = "biowdl/tasks:/unicycler.wdl"
+message = "unicycler.wdl:95:40: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/unicycler.wdl/#L95"
+
+[[diagnostics]]
+document = "biowdl/tasks:/unicycler.wdl"
+message = "unicycler.wdl:98:39: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/unicycler.wdl/#L98"
 
 [[diagnostics]]
 document = "biowdl/tasks:/vardict.wdl"
@@ -925,6 +1095,11 @@ permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0
 document = "biowdl/tasks:/whatshap.wdl"
 message = "whatshap.wdl:52:14: warning[UnnecessaryFunctionCall]: unnecessary call to function `defined`"
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/whatshap.wdl/#L52"
+
+[[diagnostics]]
+document = "biowdl/tasks:/whatshap.wdl"
+message = "whatshap.wdl:56:36: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/whatshap.wdl/#L56"
 
 [[diagnostics]]
 document = "broadinstitute/gatk-tool-wdls:/wdls/ApplyBQSR.wdl"
@@ -1308,7 +1483,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
-message = "BenchmarkSVs.wdl:513:52: error: cannot coerce type `Array[Int]` to `String`"
+message = "BenchmarkSVs.wdl:513:52: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[Int]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/BenchmarkSVs.wdl/#L513"
 
 [[diagnostics]]
@@ -1323,7 +1498,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
-message = "BenchmarkSVs.wdl:545:49: error: cannot coerce type `Array[String]` to `String`"
+message = "BenchmarkSVs.wdl:545:49: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[String]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/BenchmarkSVs.wdl/#L545"
 
 [[diagnostics]]
@@ -1333,7 +1508,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
-message = "BenchmarkSVs.wdl:546:51: error: cannot coerce type `Array[Int]` to `String`"
+message = "BenchmarkSVs.wdl:546:51: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[Int]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/BenchmarkSVs.wdl/#L546"
 
 [[diagnostics]]
@@ -1378,7 +1553,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/QcSVs.wdl"
-message = "QcSVs.wdl:129:49: error: cannot coerce type `Array[Int]` to `String`"
+message = "QcSVs.wdl:129:49: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[Int]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/QcSVs.wdl/#L129"
 
 [[diagnostics]]
@@ -1388,7 +1563,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/QcSVs.wdl"
-message = "QcSVs.wdl:157:52: error: cannot coerce type `Array[Int]` to `String`"
+message = "QcSVs.wdl:157:52: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[Int]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/QcSVs.wdl/#L157"
 
 [[diagnostics]]
@@ -1423,6 +1598,16 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/WittyerTasks.wdl"
+message = "WittyerTasks.wdl:33:34: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/WittyerTasks.wdl/#L33"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/WittyerTasks.wdl"
+message = "WittyerTasks.wdl:34:34: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/WittyerTasks.wdl/#L34"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/WittyerTasks.wdl"
 message = "WittyerTasks.wdl:74:14: error: conflicting output name `wittyer_config`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/WittyerTasks.wdl/#L74"
 
@@ -1453,12 +1638,22 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
+message = "BenchmarkVCFs.wdl:600:44: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkVCFs/BenchmarkVCFs.wdl/#L600"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
+message = "BenchmarkVCFs.wdl:601:45: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkVCFs/BenchmarkVCFs.wdl/#L601"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:613:36: error: a placeholder cannot have more than one option"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkVCFs/BenchmarkVCFs.wdl/#L613"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
-message = "BenchmarkVCFs.wdl:613:49: error: cannot coerce type `Array[File]` to `String`"
+message = "BenchmarkVCFs.wdl:613:49: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[File]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkVCFs/BenchmarkVCFs.wdl/#L613"
 
 [[diagnostics]]
@@ -1468,7 +1663,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
-message = "BenchmarkVCFs.wdl:621:49: error: cannot coerce type `Array[File]` to `String`"
+message = "BenchmarkVCFs.wdl:621:49: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[File]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkVCFs/BenchmarkVCFs.wdl/#L621"
 
 [[diagnostics]]
@@ -1478,7 +1673,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
-message = "BenchmarkVCFs.wdl:626:49: error: cannot coerce type `Array[File]` to `String`"
+message = "BenchmarkVCFs.wdl:626:49: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[File]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkVCFs/BenchmarkVCFs.wdl/#L626"
 
 [[diagnostics]]
@@ -1488,7 +1683,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
-message = "BenchmarkVCFs.wdl:631:49: error: cannot coerce type `Array[File]` to `String`"
+message = "BenchmarkVCFs.wdl:631:49: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[File]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkVCFs/BenchmarkVCFs.wdl/#L631"
 
 [[diagnostics]]
@@ -1660,6 +1855,16 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 document = "broadinstitute/palantir-workflows:/FunctionalEquivalence/subworkflows/PlotROC.wdl"
 message = "PlotROC.wdl:43:95: error: type mismatch: string concatenation is not supported for type `String?`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/FunctionalEquivalence/subworkflows/PlotROC.wdl/#L43"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2Imputation.wdl"
+message = "Glimpse2Imputation.wdl:174:32: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[File]?`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/GlimpseImputationPipeline/Glimpse2Imputation.wdl/#L174"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2Imputation.wdl"
+message = "Glimpse2Imputation.wdl:175:38: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[File]?`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/GlimpseImputationPipeline/Glimpse2Imputation.wdl/#L175"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/GlimpseImputationPipeline/Glimpse2ImputationAndCheckQC.wdl"
@@ -1868,6 +2073,11 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/PRS/PerformPopulationPCA.wdl"
+message = "PerformPopulationPCA.wdl:206:100: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[File]?`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/PRS/PerformPopulationPCA.wdl/#L206"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/PRS/PerformPopulationPCA.wdl"
 message = "PerformPopulationPCA.wdl:407:41: error: type mismatch: a type common to both type `File` and type `Array[File]` does not exist"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/PRS/PerformPopulationPCA.wdl/#L407"
 
@@ -1875,6 +2085,11 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 document = "broadinstitute/palantir-workflows:/PRS/ScoreBGE/ScoreBGE.wdl"
 message = "ScoreBGE.wdl:34:32: error: type mismatch: expected type `String`, but found type `String?`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/PRS/ScoreBGE/ScoreBGE.wdl/#L34"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/PRS/ScoreBGE/ScoreBGE.wdl"
+message = "ScoreBGE.wdl:77:81: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/PRS/ScoreBGE/ScoreBGE.wdl/#L77"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/PRS/ScoringPart.wdl"
@@ -1928,7 +2143,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl"
-message = "ComputeIntervalBamStats.wdl:223:50: error: cannot coerce type `Array[File]` to `String`"
+message = "ComputeIntervalBamStats.wdl:223:50: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[File]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L223"
 
 [[diagnostics]]
@@ -1938,7 +2153,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl"
-message = "ComputeIntervalBamStats.wdl:270:50: error: cannot coerce type `Array[File]` to `String`"
+message = "ComputeIntervalBamStats.wdl:270:50: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[File]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L270"
 
 [[diagnostics]]
@@ -1953,7 +2168,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
-message = "CreateIGVSession.wdl:51:50: error: cannot coerce type `Array[String]?` to `String`"
+message = "CreateIGVSession.wdl:51:50: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[String]?`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/WDLs/CreateIGVSession.wdl/#L51"
 
 [[diagnostics]]
@@ -1963,7 +2178,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
-message = "CreateIGVSession.wdl:52:50: error: cannot coerce type `Array[String]?` to `String`"
+message = "CreateIGVSession.wdl:52:50: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[String]?`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/WDLs/CreateIGVSession.wdl/#L52"
 
 [[diagnostics]]
@@ -1973,7 +2188,7 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
-message = "CreateIGVSession.wdl:53:60: error: cannot coerce type `Array[String]?` to `String`"
+message = "CreateIGVSession.wdl:53:60: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[String]?`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/WDLs/CreateIGVSession.wdl/#L53"
 
 [[diagnostics]]
@@ -2638,6 +2853,36 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 
 [[diagnostics]]
 document = "broadinstitute/warp:/projects/tasks/AdapterTasks.wdl"
+message = "AdapterTasks.wdl:312:48: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/projects/tasks/AdapterTasks.wdl/#L312"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/projects/tasks/AdapterTasks.wdl"
+message = "AdapterTasks.wdl:313:47: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/projects/tasks/AdapterTasks.wdl/#L313"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/projects/tasks/AdapterTasks.wdl"
+message = "AdapterTasks.wdl:314:39: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/projects/tasks/AdapterTasks.wdl/#L314"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/projects/tasks/AdapterTasks.wdl"
+message = "AdapterTasks.wdl:315:39: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/projects/tasks/AdapterTasks.wdl/#L315"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/projects/tasks/AdapterTasks.wdl"
+message = "AdapterTasks.wdl:316:42: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/projects/tasks/AdapterTasks.wdl/#L316"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/projects/tasks/AdapterTasks.wdl"
+message = "AdapterTasks.wdl:317:42: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/projects/tasks/AdapterTasks.wdl/#L317"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/projects/tasks/AdapterTasks.wdl"
 message = "AdapterTasks.wdl:580:13: warning[UnusedInput]: unused input `cache_invalidate`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/projects/tasks/AdapterTasks.wdl/#L580"
 
@@ -2678,7 +2923,7 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
-message = "Funcotator.wdl:163:118: error: cannot coerce type `Array[String]?` to `String`"
+message = "Funcotator.wdl:163:118: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[String]?`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Funcotator.wdl/#L163"
 
 [[diagnostics]]
@@ -2688,7 +2933,7 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
-message = "Funcotator.wdl:164:118: error: cannot coerce type `Array[String]?` to `String`"
+message = "Funcotator.wdl:164:118: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[String]?`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Funcotator.wdl/#L164"
 
 [[diagnostics]]
@@ -2698,7 +2943,7 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
-message = "Funcotator.wdl:165:121: error: cannot coerce type `Array[String]?` to `String`"
+message = "Funcotator.wdl:165:121: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[String]?`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Funcotator.wdl/#L165"
 
 [[diagnostics]]
@@ -2837,6 +3082,26 @@ message = "InternalImputationTasks.wdl:129:25: warning[UnusedInput]: unused inpu
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/InternalImputationTasks.wdl/#L129"
 
 [[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/InternalImputationTasks.wdl"
+message = "InternalImputationTasks.wdl:26:49: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/InternalImputationTasks.wdl/#L26"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/InternalImputationTasks.wdl"
+message = "InternalImputationTasks.wdl:27:56: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/InternalImputationTasks.wdl/#L27"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/InternalImputationTasks.wdl"
+message = "InternalImputationTasks.wdl:73:59: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/InternalImputationTasks.wdl/#L73"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/InternalImputationTasks.wdl"
+message = "InternalImputationTasks.wdl:76:66: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/InternalImputationTasks.wdl/#L76"
+
+[[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/InternalTasks.wdl"
 message = "InternalTasks.wdl:13:10: warning[UnusedDeclaration]: unused declaration `safe_name`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/InternalTasks.wdl/#L13"
@@ -2898,7 +3163,7 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/Qc.wdl"
-message = "Qc.wdl:434:46: error: cannot coerce type `Array[String]?` to `String`"
+message = "Qc.wdl:434:46: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[String]?`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Qc.wdl/#L434"
 
 [[diagnostics]]
@@ -2953,6 +3218,16 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl"
+message = "UltimaGenomicsWholeGenomeGermlineTasks.wdl:22:50: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L22"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl"
+message = "UltimaGenomicsWholeGenomeGermlineTasks.wdl:23:49: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L23"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl"
 message = "UltimaGenomicsWholeGenomeGermlineTasks.wdl:63:9: warning[UnusedInput]: unused input `preemptible`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/UltimaGenomicsWholeGenomeGermlineTasks.wdl/#L63"
 
@@ -3002,9 +3277,24 @@ message = "Utilities.wdl:183:10: error: type mismatch: expected type `Int` or ty
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Utilities.wdl/#L183"
 
 [[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/Utilities.wdl"
+message = "Utilities.wdl:260:48: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Utilities.wdl/#L260"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/skylab/FastqProcessing.wdl"
+message = "FastqProcessing.wdl:198:33: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[File]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/skylab/FastqProcessing.wdl/#L198"
+
+[[diagnostics]]
 document = "broadinstitute/warp:/tasks/skylab/FastqProcessing.wdl"
 message = "FastqProcessing.wdl:243:16: warning[UnusedInput]: unused input `barcode_orientation`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/skylab/FastqProcessing.wdl/#L243"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/skylab/FastqProcessing.wdl"
+message = "FastqProcessing.wdl:80:33: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[File]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/skylab/FastqProcessing.wdl/#L80"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/skylab/H5adUtils.wdl"
@@ -3048,6 +3338,26 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/skylab/StarAlign.wdl"
+message = "StarAlign.wdl:506:44: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[File]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/skylab/StarAlign.wdl/#L506"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/skylab/StarAlign.wdl"
+message = "StarAlign.wdl:507:41: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[File]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/skylab/StarAlign.wdl/#L507"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/skylab/StarAlign.wdl"
+message = "StarAlign.wdl:508:48: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[File]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/skylab/StarAlign.wdl/#L508"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/skylab/StarAlign.wdl"
+message = "StarAlign.wdl:509:44: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[File]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/skylab/StarAlign.wdl/#L509"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/skylab/StarAlign.wdl"
 message = "StarAlign.wdl:804:9: error: type mismatch: expected type `Int` or type `Float`, but found type `String`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/skylab/StarAlign.wdl/#L804"
 
@@ -3060,6 +3370,16 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 document = "broadinstitute/warp:/tasks/skylab/accessory_workflows/build_bwa_reference/bwa-mk-index.wdl"
 message = "bwa-mk-index.wdl:48:8: error: type mismatch: expected type `Int` or type `Float`, but found type `String`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/skylab/accessory_workflows/build_bwa_reference/bwa-mk-index.wdl/#L48"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/skylab/sample_fastq.14.wdl"
+message = "sample_fastq.14.wdl:88:19: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `File`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/skylab/sample_fastq.14.wdl/#L88"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/skylab/sample_fastq.14.wdl"
+message = "sample_fastq.14.wdl:89:19: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `File`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/skylab/sample_fastq.14.wdl/#L89"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tests/broad/scala_test/src/main/resources/dummy/dummyWorkflow.wdl"
@@ -3268,7 +3588,7 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 
 [[diagnostics]]
 document = "broadinstitute/warp:/verification/VerifyMetrics.wdl"
-message = "VerifyMetrics.wdl:87:117: error: cannot coerce type `Array[String]` to `String`"
+message = "VerifyMetrics.wdl:87:117: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[String]`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/verification/VerifyMetrics.wdl/#L87"
 
 [[diagnostics]]
@@ -3553,7 +3873,7 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 
 [[diagnostics]]
 document = "broadinstitute/warp:/verification/VerifyUltimaGenomicsWholeGenomeCramOnly.wdl"
-message = "VerifyUltimaGenomicsWholeGenomeCramOnly.wdl:102:115: error: cannot coerce type `Array[String]` to `String`"
+message = "VerifyUltimaGenomicsWholeGenomeCramOnly.wdl:102:115: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[String]`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/verification/VerifyUltimaGenomicsWholeGenomeCramOnly.wdl/#L102"
 
 [[diagnostics]]
@@ -3608,7 +3928,7 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 
 [[diagnostics]]
 document = "broadinstitute/warp:/verification/VerifyUltimaGenomicsWholeGenomeGermline.wdl"
-message = "VerifyUltimaGenomicsWholeGenomeGermline.wdl:187:115: error: cannot coerce type `Array[String]` to `String`"
+message = "VerifyUltimaGenomicsWholeGenomeGermline.wdl:187:115: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `Array[String]`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/verification/VerifyUltimaGenomicsWholeGenomeGermline.wdl/#L187"
 
 [[diagnostics]]
@@ -4217,6 +4537,21 @@ message = "task_snippy_variants.wdl:165:12: error: type mismatch: expected type 
 permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/9333afc9460c6f0e921551d25a88719faef1f22a/tasks/gene_typing/variant_detection/task_snippy_variants.wdl/#L165"
 
 [[diagnostics]]
+document = "theiagen/public_health_bioinformatics:/tasks/phylogenetic_inference/augur/task_augur_ancestral.wdl"
+message = "task_augur_ancestral.wdl:25:37: error: type mismatch for placeholder option `default`: expected an optional primitive type, but found `String`"
+permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/9333afc9460c6f0e921551d25a88719faef1f22a/tasks/phylogenetic_inference/augur/task_augur_ancestral.wdl/#L25"
+
+[[diagnostics]]
+document = "theiagen/public_health_bioinformatics:/tasks/phylogenetic_inference/augur/task_augur_refine.wdl"
+message = "task_augur_refine.wdl:48:53: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/9333afc9460c6f0e921551d25a88719faef1f22a/tasks/phylogenetic_inference/augur/task_augur_refine.wdl/#L48"
+
+[[diagnostics]]
+document = "theiagen/public_health_bioinformatics:/tasks/phylogenetic_inference/task_pirate.wdl"
+message = "task_pirate.wdl:33:29: error: type mismatch for placeholder option `true/false`: expected type `Boolean`, but found `Boolean?`"
+permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/9333afc9460c6f0e921551d25a88719faef1f22a/tasks/phylogenetic_inference/task_pirate.wdl/#L33"
+
+[[diagnostics]]
 document = "theiagen/public_health_bioinformatics:/tasks/quality_control/advanced_metrics/task_gambittools.wdl"
 message = "task_gambittools.wdl:67:12: error: type mismatch: expected type `Int` or type `Float`, but found type `String`"
 permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/9333afc9460c6f0e921551d25a88719faef1f22a/tasks/quality_control/advanced_metrics/task_gambittools.wdl/#L67"
@@ -4302,6 +4637,11 @@ message = "task_midas.wdl:77:44: error: type mismatch: expected type `Float`, bu
 permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/9333afc9460c6f0e921551d25a88719faef1f22a/tasks/taxon_id/contamination/task_midas.wdl/#L77"
 
 [[diagnostics]]
+document = "theiagen/public_health_bioinformatics:/tasks/taxon_id/freyja/task_freyja_plot.wdl"
+message = "task_freyja_plot.wdl:29:38: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/9333afc9460c6f0e921551d25a88719faef1f22a/tasks/taxon_id/freyja/task_freyja_plot.wdl/#L29"
+
+[[diagnostics]]
 document = "theiagen/public_health_bioinformatics:/tasks/taxon_id/task_gambit.wdl"
 message = "task_gambit.wdl:164:10: error: type mismatch: expected type `Int` or type `Float`, but found type `String`"
 permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/9333afc9460c6f0e921551d25a88719faef1f22a/tasks/taxon_id/task_gambit.wdl/#L164"
@@ -4310,6 +4650,16 @@ permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/9333a
 document = "theiagen/public_health_bioinformatics:/tasks/utilities/data_handling/task_parse_mapping.wdl"
 message = "task_parse_mapping.wdl:133:20: error: type mismatch: expected type `Int`, but found type `String`"
 permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/9333afc9460c6f0e921551d25a88719faef1f22a/tasks/utilities/data_handling/task_parse_mapping.wdl/#L133"
+
+[[diagnostics]]
+document = "theiagen/public_health_bioinformatics:/tasks/utilities/data_handling/task_summarize_data.wdl"
+message = "task_summarize_data.wdl:61:62: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/9333afc9460c6f0e921551d25a88719faef1f22a/tasks/utilities/data_handling/task_summarize_data.wdl/#L61"
+
+[[diagnostics]]
+document = "theiagen/public_health_bioinformatics:/tasks/utilities/data_handling/task_summarize_data.wdl"
+message = "task_summarize_data.wdl:63:62: error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/theiagen/public_health_bioinformatics/blob/9333afc9460c6f0e921551d25a88719faef1f22a/tasks/utilities/data_handling/task_summarize_data.wdl/#L63"
 
 [[diagnostics]]
 document = "theiagen/public_health_bioinformatics:/tasks/utilities/submission/task_broad_ncbi_tools.wdl"

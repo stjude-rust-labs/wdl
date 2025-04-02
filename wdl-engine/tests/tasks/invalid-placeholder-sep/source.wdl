@@ -1,8 +1,12 @@
 version 1.2
 
 task test {
-    command<<<>>>
+    command {
+        echo "Running test..."
+    }
+
     output {
-        String a = "~{sep=',' read_json('not-array.json')}"
+        Array[String] json_array = read_json("not-array.json")
+        String a = "~{sep=', ' json_array}" # This might still be incorrect
     }
 }

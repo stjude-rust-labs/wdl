@@ -1,7 +1,4 @@
-error: call to function `read_string` failed: failed to read file `attempts/0/work/my/path/to/something.txt`
-
-Caused by:
-    Permission denied (os error 13)
+error: call to function `read_string` failed: failed to read file `attempts/0/work/my/path/to/something.txt`: Permission denied (os error 13)
    ┌─ tests/tasks/relative-and-absolute-task/source.wdl:10:24
    │
 10 │     String something = read_string("my/path/to/something.txt")
