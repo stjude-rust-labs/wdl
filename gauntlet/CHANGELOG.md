@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-### `gauntlet`
-
 #### Added
 
 * `--shellcheck` flag to run shellcheck lints in arena mode ([#264](https://github.com/stjude-rust-labs/wdl/pull/264))

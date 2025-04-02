@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-### `wdl-format`
-
 ## 0.5.0 - 04-01-2025
 
 #### Changed
