@@ -1334,49 +1334,54 @@ impl TaskEvaluator {
                     _ => unreachable!("only file and directory values should be visited"),
                 };
 
-                // It's a file scheme'd URL, treat it as an absolute guest path
-                let guest = if path::is_file_url(path) {
-                    path::parse_url(path)
-                        .and_then(|u| u.to_file_path().ok())
-                        .ok_or_else(|| anyhow!("guest path `{path}` is not a valid file URI"))?
-                } else if path::is_url(path) {
-                    // Treat other URLs as if they exist
-                    // TODO: should probably issue a HEAD request to verify
-                    return Ok(true);
-                } else {
-                    // Otherwise, treat as relative to the guest working directory
-                    guest_work_dir.join(path.as_str())
-                };
+                // If the path isn't already within the host root, perform translation
+                if !Path::new(path.as_str()).starts_with(state.root.path()) {
+                    // It's a file scheme'd URL, treat it as an absolute guest path
+                    let guest = if path::is_file_url(path) {
+                        path::parse_url(path)
+                            .and_then(|u| u.to_file_path().ok())
+                            .ok_or_else(|| anyhow!("guest path `{path}` is not a valid file URI"))?
+                    } else if path::is_url(path) {
+                        // Treat other URLs as if they exist
+                        // TODO: should probably issue a HEAD request to verify
+                        return Ok(true);
+                    } else {
+                        // Otherwise, treat as relative to the guest working directory
+                        guest_work_dir.join(path.as_str())
+                    };
 
-                // If the path is inside of the working directory, join with the task's working
-                // directory
-                let host = if let Ok(stripped) = guest.strip_prefix(guest_work_dir) {
-                    Cow::Owned(
-                        evaluated.work_dir.join(
-                            stripped
-                                .to_str()
-                                .with_context(|| format!("output path `{path}` is not UTF-8"))?,
-                        )?,
-                    )
-                } else {
-                    inputs
-                        .iter()
-                        .filter_map(|i| Some((i.path(), guest.strip_prefix(i.guest_path()?).ok()?)))
-                        .min_by(|(_, a), (_, b)| a.as_os_str().len().cmp(&b.as_os_str().len()))
-                        .and_then(|(path, stripped)| {
-                            if stripped.as_os_str().is_empty() {
-                                return Some(Cow::Borrowed(path));
-                            }
+                    // If the path is inside of the working directory, join with the task's working
+                    // directory
+                    let host = if let Ok(stripped) = guest.strip_prefix(guest_work_dir) {
+                        Cow::Owned(
+                            evaluated.work_dir.join(
+                                stripped.to_str().with_context(|| {
+                                    format!("output path `{path}` is not UTF-8")
+                                })?,
+                            )?,
+                        )
+                    } else {
+                        inputs
+                            .iter()
+                            .filter_map(|i| {
+                                Some((i.path(), guest.strip_prefix(i.guest_path()?).ok()?))
+                            })
+                            .min_by(|(_, a), (_, b)| a.as_os_str().len().cmp(&b.as_os_str().len()))
+                            .and_then(|(path, stripped)| {
+                                if stripped.as_os_str().is_empty() {
+                                    return Some(Cow::Borrowed(path));
+                                }
 
-                            Some(Cow::Owned(path.join(stripped.to_str()?).ok()?))
-                        })
-                        .ok_or_else(|| {
-                            anyhow!("guest path `{path}` is not within a container mount")
-                        })?
-                };
+                                Some(Cow::Owned(path.join(stripped.to_str()?).ok()?))
+                            })
+                            .ok_or_else(|| {
+                                anyhow!("guest path `{path}` is not within a container mount")
+                            })?
+                    };
 
-                // Update the value to the host path
-                *Arc::make_mut(path) = host.into_owned().try_into()?;
+                    // Update the value to the host path
+                    *Arc::make_mut(path) = host.into_owned().try_into()?;
+                }
 
                 // Finally, ensure the value exists
                 value.ensure_path_exists(optional)
