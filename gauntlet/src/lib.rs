@@ -134,7 +134,8 @@ pub struct Args {
 }
 
 /// Normalizes diagnostic message text to handle platform-specific differences.
-/// This ensures the same diagnostic message on different platforms is treated as identical.
+/// This ensures the same diagnostic message on different platforms is treated
+/// as identical.
 pub fn normalize_diagnostic(s: &str) -> String {
     let s = s.replace('\\', "/").replace("\r\n", "\n");
 
@@ -275,7 +276,7 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                         .context("diagnostic should be UTF-8")?
                         .trim()
                         .to_string();
-                    
+
                     // Normalize the diagnostic message to handle platform-specific differences
                     let message = normalize_diagnostic(&message);
 
@@ -308,7 +309,8 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                         .iter()
                         .map_while(|d| {
                             if d.document() == &document_identifier {
-                                // Normalize the diagnostic message from config to handle platform-specific differences
+                                // Normalize the diagnostic message from config to handle
+                                // platform-specific differences
                                 Some(normalize_diagnostic(d.message()))
                             } else {
                                 None
