@@ -144,7 +144,7 @@ pub fn normalize_diagnostic(s: &str) -> String {
         "The system cannot find the file specified. (os error 2)",
         "No such file or directory (os error 2)",
     );
-    
+
     // Also handle Windows "path not found" error
     s.replace(
         "The system cannot find the path specified. (os error 3)",
