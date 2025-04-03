@@ -3,7 +3,6 @@
 use std::cmp::Ordering;
 use std::fmt::Write;
 use std::iter::once;
-use std::path::Path;
 use std::sync::Arc;
 
 use futures::FutureExt;
@@ -20,6 +19,7 @@ use wdl_analysis::diagnostics::cannot_index;
 use wdl_analysis::diagnostics::comparison_mismatch;
 use wdl_analysis::diagnostics::if_conditional_mismatch;
 use wdl_analysis::diagnostics::index_type_mismatch;
+use wdl_analysis::diagnostics::invalid_placeholder_option;
 use wdl_analysis::diagnostics::logical_and_mismatch;
 use wdl_analysis::diagnostics::logical_not_mismatch;
 use wdl_analysis::diagnostics::logical_or_mismatch;
@@ -316,6 +316,31 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
             buffer: &mut String,
         ) -> Result<(), Diagnostic> {
             let expr = placeholder.expr();
+            let value = evaluator.evaluate_expr(&expr).await?;
+
+            // Validate the placeholder option
+            if let Some(option) = placeholder.option() {
+                let ty = value.ty();
+                let valid = match option {
+                    PlaceholderOption::Sep(_) => {
+                        ty == Type::None
+                            || matches!(&ty,
+                        Type::Compound(CompoundType::Array(array_ty), _)
+                        if matches!(array_ty.element_type(), Type::Primitive(_, false)))
+                    }
+                    PlaceholderOption::Default(_) => {
+                        matches!(ty, Type::Primitive(..) | Type::None)
+                    }
+                    PlaceholderOption::TrueFalse(_) => {
+                        matches!(ty, Type::Primitive(PrimitiveType::Boolean, _) | Type::None)
+                    }
+                };
+
+                if !valid {
+                    return Err(invalid_placeholder_option(&ty, expr.span(), &option));
+                }
+            }
+
             match evaluator.evaluate_expr(&expr).await? {
                 Value::None => {
                     if let Some(o) = placeholder.option().as_ref().and_then(|o| o.as_default()) {
@@ -356,7 +381,7 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
                 }
                 Value::Primitive(PrimitiveValue::File(path))
                 | Value::Primitive(PrimitiveValue::Directory(path)) => {
-                    match evaluator.context.translate_path(Path::new(path.as_str())) {
+                    match evaluator.context.translate_path(&path) {
                         Some(path) => write!(buffer, "{path}", path = path.display()).unwrap(),
                         _ => {
                             write!(buffer, "{path}").unwrap();
@@ -1442,6 +1467,7 @@ pub(crate) mod test {
     use crate::eval::Scope;
     use crate::http::Downloader;
     use crate::http::Location;
+    use crate::path::EvaluationPath;
 
     /// Represents a test environment.
     pub struct TestEnv {
@@ -1451,6 +1477,8 @@ pub(crate) mod test {
         structs: HashMap<&'static str, Type>,
         /// The working directory.
         work_dir: TempDir,
+        /// The working directory path.
+        work_dir_path: EvaluationPath,
         /// The current directory.
         temp_dir: TempDir,
     }
@@ -1468,8 +1496,8 @@ pub(crate) mod test {
             self.structs.insert(name, ty.into());
         }
 
-        pub fn work_dir(&self) -> &Path {
-            self.work_dir.path()
+        pub fn work_dir(&self) -> Option<&EvaluationPath> {
+            Some(&self.work_dir_path)
         }
 
         pub fn temp_dir(&self) -> &Path {
@@ -1477,17 +1505,21 @@ pub(crate) mod test {
         }
 
         pub fn write_file(&self, name: &str, bytes: impl AsRef<[u8]>) {
-            fs::write(self.work_dir().join(name), bytes).expect("failed to create temp file");
+            fs::write(self.work_dir.path().join(name), bytes).expect("failed to create temp file");
         }
     }
 
     impl Default for TestEnv {
         fn default() -> Self {
+            let work_dir = TempDir::new().expect("failed to create work directory");
+            let work_dir_path = EvaluationPath::Local(work_dir.path().to_path_buf());
+
             Self {
                 scopes: vec![Scope::default()],
                 structs: Default::default(),
                 temp_dir: TempDir::new().expect("failed to create temp directory"),
-                work_dir: TempDir::new().expect("failed to create work directory"),
+                work_dir,
+                work_dir_path,
             }
         }
     }
@@ -1495,29 +1527,25 @@ pub(crate) mod test {
     impl Downloader for TestEnv {
         fn download<'a, 'b, 'c>(
             &'a self,
-            url: &'b str,
-        ) -> BoxFuture<'c, Result<Option<crate::http::Location>, Arc<anyhow::Error>>>
+            url: &'b Url,
+        ) -> BoxFuture<'c, Result<crate::http::Location<'static>, Arc<anyhow::Error>>>
         where
             'a: 'c,
             'b: 'c,
             Self: 'c,
         {
             async {
-                let url: Url = match url.parse() {
-                    Ok(url) => url,
-                    Err(_) => return Ok(None),
-                };
-
                 // For tests, redirect requests to example.com to files relative to the work dir
                 if url.authority() == "example.com" {
-                    return Ok(Some(Location::Path(
+                    return Ok(Location::Path(
                         self.work_dir
                             .path()
-                            .join(url.path().strip_prefix('/').unwrap_or(url.path())),
-                    )));
+                            .join(url.path().strip_prefix('/').unwrap_or(url.path()))
+                            .into(),
+                    ));
                 }
 
-                Ok(None)
+                panic!("expected test to use example.com URL");
             }
             .boxed()
         }
@@ -1578,7 +1606,7 @@ pub(crate) mod test {
                 .ok_or_else(|| unknown_type(name, span))
         }
 
-        fn work_dir(&self) -> &Path {
+        fn work_dir(&self) -> Option<&EvaluationPath> {
             self.env.work_dir()
         }
 
@@ -1598,7 +1626,7 @@ pub(crate) mod test {
             None
         }
 
-        fn translate_path(&self, _path: &Path) -> Option<Cow<'_, Path>> {
+        fn translate_path(&self, _path: &str) -> Option<Cow<'_, Path>> {
             None
         }
 
