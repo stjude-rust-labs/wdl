@@ -1168,9 +1168,14 @@ fn add_call_statement(
                             .expect("document version must be read by now");
 
                         // Skip type checking if expr is None and document version is at least 1.2
-                        if !(matches!(expr, Expr::Literal(LiteralExpr::None(_)))
-                            && document_version >= SupportedVersion::V1(V1::Two))
-                        {
+                        let should_type_check = match expr {
+                            Expr::Literal(LiteralExpr::None(_)) if document_version >= SupportedVersion::V1(V1::Two) => {
+                                false
+                            }
+                            _ => true,
+                        };
+
+                        if should_type_check {
                             type_check_expr(
                                 config,
                                 document,

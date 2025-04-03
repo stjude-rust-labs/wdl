@@ -1709,10 +1709,8 @@ impl WorkflowEvaluator {
     ) -> EvaluationResult<String> {
         let scopes = state.scopes.read().await;
         for input in stmt.inputs() {
-            let expr = input.expr();
-
             let name = input.name();
-            let value = match expr {
+            let value = match input.expr() {
                 Some(expr) => {
                     let mut evaluator = ExprEvaluator::new(WorkflowEvaluationContext::new(
                         &state.document,
