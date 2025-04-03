@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Added
 
 * Implemented remote file localization for task execution (#[386](https://github.com/stjude-rust-labs/wdl/pull/386)).
+* Added `chown` workaround to `docker backend` after task execution ([#379](https://github.com/stjude-rust-labs/wdl/pull/379)).
 
 #### Fixed
 
@@ -30,7 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added retry logic for task execution ([#320](https://github.com/stjude-rust-labs/wdl/pull/320)).
 * Added a `Config` type for specifying evaluation configuration ([#320](https://github.com/stjude-rust-labs/wdl/pull/320)).
 * Added progress callback to `WorkflowEvaluator` ([#310](https://github.com/stjude-rust-labs/wdl/pull/310)).
-* Added `chown` workaround to `docker backend` after task execution ([#379](https://github.com/stjude-rust-labs/wdl/pull/379)).
 
 #### Fixed
 
