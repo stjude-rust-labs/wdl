@@ -1,12 +1,13 @@
+## This is a test of an invalid sep placeholder option at runtime
 version 1.2
 
 task test {
     command {
-        echo "Running test..."
+        echo '1' > not-array.json
     }
 
     output {
-        Array[String] json_array = read_json("not-array.json")
-        String a = "~{sep=', ' json_array}" # This might still be incorrect
+        # This should fail at runtime as the file does not contain an array
+        String out = "~{sep=', ' read_json("not-array.json")}"
     }
 }

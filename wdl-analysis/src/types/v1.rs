@@ -88,15 +88,16 @@ use super::Type;
 use super::TypeNameResolver;
 use crate::DiagnosticsConfig;
 use crate::UNNECESSARY_FUNCTION_CALL;
-use crate::diagnostics;
 use crate::diagnostics::Io;
 use crate::diagnostics::ambiguous_argument;
 use crate::diagnostics::argument_type_mismatch;
 use crate::diagnostics::cannot_access;
+use crate::diagnostics::cannot_coerce_to_string;
 use crate::diagnostics::cannot_index;
 use crate::diagnostics::comparison_mismatch;
 use crate::diagnostics::if_conditional_mismatch;
 use crate::diagnostics::index_type_mismatch;
+use crate::diagnostics::invalid_placeholder_option;
 use crate::diagnostics::logical_and_mismatch;
 use crate::diagnostics::logical_not_mismatch;
 use crate::diagnostics::logical_or_mismatch;
@@ -663,32 +664,37 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         if let Some(ty) = self.evaluate_expr(&expr) {
             if let Some(option) = placeholder.option() {
                 let valid = match option {
-                    PlaceholderOption::Sep(_) => matches!(ty,
-                        Type::Compound(CompoundType::Array(ref element_type), false)
-                        if matches!(element_type.element_type(), Type::Primitive(_, false) | Type::Union)),
-                    PlaceholderOption::Default(_) => {
-                        matches!(ty, Type::Primitive(_, true) | Type::Union | Type::None)
+                    PlaceholderOption::Sep(_) => {
+                        ty == Type::Union
+                            || ty == Type::None
+                            || matches!(&ty,
+                        Type::Compound(CompoundType::Array(array_ty), _)
+                        if matches!(array_ty.element_type(), Type::Primitive(_, false) | Type::Union))
                     }
-                    PlaceholderOption::TrueFalse(_) => matches!(
-                        ty,
-                        Type::Primitive(PrimitiveType::Boolean, false) | Type::Union
-                    ),
+                    PlaceholderOption::Default(_) => {
+                        matches!(ty, Type::Primitive(..) | Type::Union | Type::None)
+                    }
+                    PlaceholderOption::TrueFalse(_) => {
+                        matches!(
+                            ty,
+                            Type::Primitive(PrimitiveType::Boolean, _) | Type::Union | Type::None
+                        )
+                    }
                 };
 
                 if !valid {
-                    self.context
-                        .add_diagnostic(diagnostics::invalid_placeholder_option(
-                            &ty,
-                            expr.span(),
-                            Some(option.clone()),
-                        ));
+                    self.context.add_diagnostic(invalid_placeholder_option(
+                        &ty,
+                        expr.span(),
+                        &option,
+                    ));
                 }
             } else {
                 match ty {
                     Type::Primitive(..) | Type::Union | Type::None => {}
                     _ => {
                         self.context
-                            .add_diagnostic(diagnostics::cannot_coerce_to_string(&ty, expr.span()));
+                            .add_diagnostic(cannot_coerce_to_string(&ty, expr.span()));
                     }
                 }
             }

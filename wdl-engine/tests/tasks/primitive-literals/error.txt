@@ -1,6 +1,0 @@
-error: failed to evaluate output `x` for task `write_file_task`: file `attempts/0/work/testdir/hello.txt` does not exist
-   ┌─ tests/tasks/primitive-literals/source.wdl:14:10
-   │
-14 │     File x = "testdir/hello.txt"
-   │          ^
-

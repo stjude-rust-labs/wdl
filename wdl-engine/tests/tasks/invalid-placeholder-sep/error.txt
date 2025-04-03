@@ -1,9 +1,6 @@
-error: call to function `read_json` failed: failed to open file `attempts/0/work/not-array.json`
-
-Caused by:
-    No such file or directory (os error 2)
-  ┌─ tests/tasks/invalid-placeholder-sep/source.wdl:9:36
-  │
-9 │         Array[String] json_array = read_json("not-array.json")
-  │                                    ^^^^^^^^^
+error: type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any primitive type, but found `Int`
+   ┌─ tests/tasks/invalid-placeholder-sep/source.wdl:11:34
+   │
+11 │         String out = "~{sep=', ' read_json("not-array.json")}"
+   │                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^ this is type `Int`
 

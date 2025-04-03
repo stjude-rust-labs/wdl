@@ -7,6 +7,7 @@ use wdl_ast::Diagnostic;
 use wdl_ast::Ident;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
+use wdl_ast::TreeNode;
 use wdl_ast::TreeToken;
 use wdl_ast::Version;
 use wdl_ast::v1::PlaceholderOption;
@@ -769,25 +770,24 @@ pub fn unnecessary_function_call(
 
 /// Generates a diagnostic error message when a placeholder option has a type
 /// mismatch.
-pub fn invalid_placeholder_option<N: wdl_ast::TreeNode>(
+pub fn invalid_placeholder_option<N: TreeNode>(
     ty: &Type,
     span: Span,
-    option: Option<PlaceholderOption<N>>,
+    option: &PlaceholderOption<N>,
 ) -> Diagnostic {
     let message = match option {
-        Some(PlaceholderOption::Sep(_)) => format!(
+        PlaceholderOption::Sep(_) => format!(
             "type mismatch for placeholder option `sep`: expected type `Array[P]` where P: any \
              primitive type, but found `{ty}`"
         ),
-        Some(PlaceholderOption::Default(_)) => format!(
-            "type mismatch for placeholder option `default`: expected an optional primitive type, \
-             but found `{ty}`"
+        PlaceholderOption::Default(_) => format!(
+            "type mismatch for placeholder option `default`: expected any primitive type, but \
+             found `{ty}`"
         ),
-        Some(PlaceholderOption::TrueFalse(_)) => format!(
+        PlaceholderOption::TrueFalse(_) => format!(
             "type mismatch for placeholder option `true/false`: expected type `Boolean`, but \
              found `{ty}`"
         ),
-        None => format!("cannot coerce type `{ty}` to `String`"),
     };
 
     Diagnostic::error(message).with_label(format!("this is type `{ty}`"), span)

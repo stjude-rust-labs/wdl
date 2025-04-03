@@ -6,14 +6,6 @@ warning[MissingRequirements]: task `bad` is missing a `requirements` section
   │
   = fix: add a `requirements` section
 
-note[ShellCheck]: running `shellcheck` on command section
-  ┌─ tests/lints/missing-requirements-block/source.wdl:8:5
-  │
-8 │     command <<<>>>
-  │     ^^^^^^^ could not find `shellcheck` executable.
-  │
-  = fix: install shellcheck (https://www.shellcheck.net) or disable this lint.
-
 note[MissingRequirements]: task `deprecated_runtime` contains a deprecated `runtime` section
    ┌─ tests/lints/missing-requirements-block/source.wdl:32:5
    │
