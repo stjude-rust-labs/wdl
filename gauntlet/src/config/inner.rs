@@ -12,6 +12,7 @@ use serde_with::serde_as;
 use crate::document;
 use crate::repository;
 use crate::repository::RawHash;
+use crate::normalize_diagnostic;
 
 /// Represents a diagnostic reported for a document.
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, PartialOrd, Ord)]
@@ -45,7 +46,7 @@ impl Diagnostic {
         };
         Self {
             document,
-            message,
+            message: normalize_diagnostic(&message),
             permalink: url,
         }
     }

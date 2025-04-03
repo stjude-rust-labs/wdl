@@ -133,6 +133,18 @@ pub struct Args {
     pub shellcheck: bool,
 }
 
+/// Normalizes diagnostic message text to handle platform-specific differences.
+/// This ensures the same diagnostic message on different platforms is treated as identical.
+pub fn normalize_diagnostic(s: &str) -> String {
+    let s = s.replace('\\', "/").replace("\r\n", "\n");
+
+    // Handle OS-specific error messages
+    s.replace(
+        "The system cannot find the file specified. (os error 2)",
+        "No such file or directory (os error 2)",
+    )
+}
+
 /// Main function for this subcommand.
 pub async fn gauntlet(args: Args) -> Result<()> {
     let mut config = match args.no_config {
@@ -263,6 +275,9 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                         .context("diagnostic should be UTF-8")?
                         .trim()
                         .to_string();
+                    
+                    // Normalize the diagnostic message to handle platform-specific differences
+                    let message = normalize_diagnostic(&message);
 
                     if !actual.insert((message.clone(), line_no)) {
                         panic!(
@@ -293,7 +308,8 @@ pub async fn gauntlet(args: Args) -> Result<()> {
                         .iter()
                         .map_while(|d| {
                             if d.document() == &document_identifier {
-                                Some(d.message().to_string())
+                                // Normalize the diagnostic message from config to handle platform-specific differences
+                                Some(normalize_diagnostic(d.message()))
                             } else {
                                 None
                             }
@@ -412,4 +428,32 @@ pub async fn gauntlet(args: Args) -> Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_normalize_diagnostic() {
+        // Test Windows-style path normalization
+        let windows_path = "Failed to import 'C:\\Users\\test\\file.wdl'";
+        let unix_path = "Failed to import 'C:/Users/test/file.wdl'";
+        assert_eq!(normalize_diagnostic(windows_path), unix_path);
+
+        // Test line ending normalization
+        let windows_line_ending = "Error message\r\nSecond line";
+        let unix_line_ending = "Error message\nSecond line";
+        assert_eq!(normalize_diagnostic(windows_line_ending), unix_line_ending);
+
+        // Test OS-specific error message normalization
+        let windows_error = "The system cannot find the file specified. (os error 2)";
+        let unix_error = "No such file or directory (os error 2)";
+        assert_eq!(normalize_diagnostic(windows_error), unix_error);
+
+        // Test that Unix style messages are left unchanged
+        assert_eq!(normalize_diagnostic(unix_path), unix_path);
+        assert_eq!(normalize_diagnostic(unix_line_ending), unix_line_ending);
+        assert_eq!(normalize_diagnostic(unix_error), unix_error);
+    }
 }
