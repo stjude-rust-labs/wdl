@@ -140,8 +140,14 @@ pub fn normalize_diagnostic(s: &str) -> String {
     let s = s.replace('\\', "/").replace("\r\n", "\n");
 
     // Handle OS-specific error messages
-    s.replace(
+    let s = s.replace(
         "The system cannot find the file specified. (os error 2)",
+        "No such file or directory (os error 2)",
+    );
+    
+    // Also handle Windows "path not found" error
+    s.replace(
+        "The system cannot find the path specified. (os error 3)",
         "No such file or directory (os error 2)",
     )
 }
@@ -449,9 +455,11 @@ mod tests {
         assert_eq!(normalize_diagnostic(windows_line_ending), unix_line_ending);
 
         // Test OS-specific error message normalization
-        let windows_error = "The system cannot find the file specified. (os error 2)";
+        let windows_file_error = "The system cannot find the file specified. (os error 2)";
+        let windows_path_error = "The system cannot find the path specified. (os error 3)";
         let unix_error = "No such file or directory (os error 2)";
-        assert_eq!(normalize_diagnostic(windows_error), unix_error);
+        assert_eq!(normalize_diagnostic(windows_file_error), unix_error);
+        assert_eq!(normalize_diagnostic(windows_path_error), unix_error);
 
         // Test that Unix style messages are left unchanged
         assert_eq!(normalize_diagnostic(unix_path), unix_path);
