@@ -265,7 +265,13 @@ impl Server {
                             token.update(&client, message, percentage).await
                         }
                     },
-                    move || Validator::default(),
+                    move || {
+                        let mut validator = Validator::default();
+                        if lint {
+                            validator.add_visitor(Linter::default());
+                        }
+                        validator
+                    },
                 ),
                 client_support: Default::default(),
                 folders: Default::default(),
