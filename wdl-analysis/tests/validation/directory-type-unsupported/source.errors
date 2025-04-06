@@ -4,3 +4,9 @@ error: use of the `Directory` type requires WDL version 1.2
 6 │     Directory x = "foo"
   │     ^^^^^^^^^
 
+warning[UnusedDeclaration]: unused declaration `x`
+  ┌─ tests/validation/directory-type-unsupported/source.wdl:6:15
+  │
+6 │     Directory x = "foo"
+  │               ^
+

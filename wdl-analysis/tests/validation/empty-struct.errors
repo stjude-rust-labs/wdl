@@ -1,6 +1,0 @@
-error: struct `Test` must have at least one declared member
-  ┌─ tests/validation/empty-struct:5:8
-  │
-5 │ struct Test {
-  │        ^^^^ this struct cannot be empty
-

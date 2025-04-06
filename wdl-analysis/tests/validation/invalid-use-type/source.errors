@@ -6,6 +6,14 @@ error: environment variable modifier can only be used on primitive types
    │         │    
    │         declaration is an environment variable due to this modifier
 
+error: type mismatch: expected type `Boolean`, but found type `String`
+   ┌─ tests/validation/invalid-use-type/source.wdl:23:21
+   │
+23 │     env Boolean m = ""
+   │                 -   ^^ this is type `String`
+   │                 │    
+   │                 this expects type `Boolean`
+
 error: environment variable modifier can only be used on primitive types
    ┌─ tests/validation/invalid-use-type/source.wdl:26:9
    │
@@ -13,4 +21,12 @@ error: environment variable modifier can only be used on primitive types
    │     --- ^^^^^^^^^^^^^ type `Array[String]` cannot be used as an environment variable
    │     │    
    │     declaration is an environment variable due to this modifier
+
+error: type mismatch: expected type `Array[String]`, but found type `Array[Int]+`
+   ┌─ tests/validation/invalid-use-type/source.wdl:26:27
+   │
+26 │     env Array[String] n = [1, 2, 3]
+   │                       -   ^^^^^^^^^ this is type `Array[Int]+`
+   │                       │    
+   │                       this expects type `Array[String]`
 

@@ -1,6 +1,0 @@
-warning[UnusedDeclaration]: unused declaration `ok`
-  ┌─ tests/validation/multiline-strings:7:12
-  │
-7 │     String ok = <<<
-  │            ^^
-

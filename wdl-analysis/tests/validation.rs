@@ -10,6 +10,7 @@
 //! The `source.errors` file may be automatically generated or updated by
 //! setting the `BLESS` environment variable when running this test.
 
+use core::error;
 use std::collections::HashSet;
 use std::env;
 use std::ffi::OsStr;
@@ -150,6 +151,8 @@ async fn main() {
 
         // Discover the results that are relevant only to this test
         let base = clean(absolute(test).expect("should be made absolute"));
+        let source_path = test.join("source.wdl");
+        let errors_path = test.join("source.errors");
         // NOTE: clippy appears to be incorrect that this can be modified to use
         // `filter_map`. Perhaps this should be revisited in the future.
         #[allow(clippy::filter_map_bool_then)]
@@ -166,10 +169,10 @@ async fn main() {
             .next()
             .expect("should have a result");
         match compare_result(
-            &test.with_extension("errors"),
+            &errors_path,
             &format_diagnostics(
                 result.document().diagnostics(),
-                test,
+                &source_path,
                 &result.document().root().text().to_string(),
             ),
             true,

@@ -1,8 +1,20 @@
+warning[UnusedInput]: unused input `a`
+  ┌─ tests/validation/env-vars-unsupported/source.wdl:7:16
+  │
+7 │         String a
+  │                ^
+
 error: use of environment variable declarations requires WDL version 1.2
   ┌─ tests/validation/env-vars-unsupported/source.wdl:8:9
   │
 8 │         env String b
   │         ^^^
+
+warning[UnusedDeclaration]: unused declaration `c`
+   ┌─ tests/validation/env-vars-unsupported/source.wdl:11:12
+   │
+11 │     String c = ""
+   │            ^
 
 error: use of environment variable declarations requires WDL version 1.2
    ┌─ tests/validation/env-vars-unsupported/source.wdl:12:5

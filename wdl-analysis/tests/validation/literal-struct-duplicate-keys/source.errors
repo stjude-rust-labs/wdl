@@ -1,3 +1,21 @@
+error: unknown type name `Foo`
+  ┌─ tests/validation/literal-struct-duplicate-keys/source.wdl:6:5
+  │
+6 │     Foo foo = Foo {
+  │     ^^^
+
+warning[UnusedDeclaration]: unused declaration `foo`
+  ┌─ tests/validation/literal-struct-duplicate-keys/source.wdl:6:9
+  │
+6 │     Foo foo = Foo {
+  │         ^^^
+
+error: unknown type name `Foo`
+  ┌─ tests/validation/literal-struct-duplicate-keys/source.wdl:6:15
+  │
+6 │     Foo foo = Foo {
+  │               ^^^
+
 error: duplicate key `foo` in literal struct
    ┌─ tests/validation/literal-struct-duplicate-keys/source.wdl:11:9
    │

@@ -1,6 +1,0 @@
-error: task `test` is missing a command section
-  ┌─ tests/validation/missing-command-section:5:6
-  │
-5 │ task test {
-  │      ^^^^ this task must have a command section
-
