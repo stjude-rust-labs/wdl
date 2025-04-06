@@ -28,8 +28,10 @@ url = { workspace = true }
 
 [dev-dependencies]
 codespan-reporting = { workspace = true }
+path-clean = { workspace = true }
 pretty_assertions = { workspace = true }
 rayon = { workspace = true }
+tokio = { workspace = true }
 colored = { workspace = true }
 
 [features]
