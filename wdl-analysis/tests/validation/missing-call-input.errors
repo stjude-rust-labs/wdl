@@ -1,9 +1,3 @@
-error: unknown name `bar`
-  ┌─ tests/validation/missing-call-input:7:22
-  │
-7 │     call foo { foo = bar }
-  │                      ^^^
-
 error: unknown task or workflow `foo`
   ┌─ tests/validation/missing-call-input:7:10
   │
@@ -15,4 +9,10 @@ warning[UnusedCall]: unused call `foo`
   │
 7 │     call foo { foo = bar }
   │          ^^^
+
+error: unknown name `bar`
+  ┌─ tests/validation/missing-call-input:7:22
+  │
+7 │     call foo { foo = bar }
+  │                      ^^^
 

@@ -1,4 +1,15 @@
 error: conflicting struct name `Foo`
+   ┌─ tests/analysis/conflicting-struct-names/source.wdl:8:8
+   │
+ 8 │ struct Foo {
+   │        ^^^ this name conflicts with an imported struct
+   ·
+28 │ import "bar.wdl" alias Baz as Foo
+   │                               --- the import that introduced the struct is here
+   │
+   = fix: either rename the struct or use an `alias` clause on the import with a different name
+
+error: conflicting struct name `Foo`
    ┌─ tests/analysis/conflicting-struct-names/source.wdl:16:8
    │
  8 │ struct Foo {
@@ -24,17 +35,6 @@ error: conflicting struct name `Baz`
    ·
 24 │ struct Baz {
    │        ^^^ this name conflicts with an imported struct
-   │
-   = fix: either rename the struct or use an `alias` clause on the import with a different name
-
-error: conflicting struct name `Foo`
-   ┌─ tests/analysis/conflicting-struct-names/source.wdl:8:8
-   │
- 8 │ struct Foo {
-   │        ^^^ this name conflicts with an imported struct
-   ·
-28 │ import "bar.wdl" alias Baz as Foo
-   │                               --- the import that introduced the struct is here
    │
    = fix: either rename the struct or use an `alias` clause on the import with a different name
 

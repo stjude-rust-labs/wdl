@@ -1,12 +1,3 @@
-error: conflicting declaration name `x`
-   ┌─ tests/analysis/conflicting-decl-names/source.wdl:20:9
-   │
- 8 │         Int x
-   │             - the input with the conflicting name is here
-   ·
-20 │     Int x = y
-   │         ^ this declaration conflicts with a previously used name
-
 error: conflicting output name `x`
    ┌─ tests/analysis/conflicting-decl-names/source.wdl:14:16
    │
@@ -23,6 +14,33 @@ error: conflicting output name `y`
    │             - the input with the conflicting name is here
    ·
 15 │         String y = "y"
+   │                ^ this output conflicts with a previously used name
+
+error: conflicting declaration name `x`
+   ┌─ tests/analysis/conflicting-decl-names/source.wdl:20:9
+   │
+ 8 │         Int x
+   │             - the input with the conflicting name is here
+   ·
+20 │     Int x = y
+   │         ^ this declaration conflicts with a previously used name
+
+error: conflicting output name `x`
+   ┌─ tests/analysis/conflicting-decl-names/source.wdl:33:16
+   │
+27 │         Int x
+   │             - the input with the conflicting name is here
+   ·
+33 │         String x = "x"
+   │                ^ this output conflicts with a previously used name
+
+error: conflicting output name `y`
+   ┌─ tests/analysis/conflicting-decl-names/source.wdl:34:16
+   │
+28 │         Int y = 0
+   │             - the input with the conflicting name is here
+   ·
+34 │         String y = "y"
    │                ^ this output conflicts with a previously used name
 
 error: conflicting declaration name `x`
@@ -87,22 +105,4 @@ error: conflicting declaration name `nested`
    ·
 65 │         Int nested = 0
    │             ^^^^^^ this declaration conflicts with a previously used name
-
-error: conflicting output name `x`
-   ┌─ tests/analysis/conflicting-decl-names/source.wdl:33:16
-   │
-27 │         Int x
-   │             - the input with the conflicting name is here
-   ·
-33 │         String x = "x"
-   │                ^ this output conflicts with a previously used name
-
-error: conflicting output name `y`
-   ┌─ tests/analysis/conflicting-decl-names/source.wdl:34:16
-   │
-28 │         Int y = 0
-   │             - the input with the conflicting name is here
-   ·
-34 │         String y = "y"
-   │                ^ this output conflicts with a previously used name
 

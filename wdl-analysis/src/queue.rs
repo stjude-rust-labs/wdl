@@ -683,11 +683,14 @@ where
 
         if document.version().is_none() {
             // TODO error
+            document.extend_diagnostics(vec![]);
             return (index, document);
         }
 
         if let Err(new_diagnostics) = validator.validate(&document) {
             document.extend_diagnostics(new_diagnostics);
+        } else {
+            document.extend_diagnostics(vec![]);
         }
 
         info!(
