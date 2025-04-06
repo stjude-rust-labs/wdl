@@ -681,17 +681,12 @@ where
         let graph = graph.read();
         let mut document = Document::from_graph_node(config, &graph, index);
 
-        if document.version().is_none() {
-            // TODO error
-            document.extend_diagnostics(vec![]);
-            return (index, document);
+        if document.version().is_some() {
+            if let Err(new_diagnostics) = validator.validate(&document) {
+                document.extend_diagnostics(new_diagnostics);
+            }
         }
-
-        if let Err(new_diagnostics) = validator.validate(&document) {
-            document.extend_diagnostics(new_diagnostics);
-        } else {
-            document.extend_diagnostics(vec![]);
-        }
+        document.sort_diagnostics();
 
         info!(
             "analysis of `{uri}` completed in {elapsed:?}",

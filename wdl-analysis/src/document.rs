@@ -649,12 +649,19 @@ impl Document {
         &self.data.diagnostics
     }
 
+    /// Sorts the diagnostics for the document.
+    pub fn sort_diagnostics(&mut self) -> Self {
+        let data = &mut self.data;
+        let inner = Arc::get_mut(data).expect("should only have one reference");
+        inner.diagnostics.sort();
+        Self { data: data.clone() }
+    }
+
     /// Extends the diagnostics for the document.
     pub fn extend_diagnostics(&mut self, diagnostics: Vec<Diagnostic>) -> Self {
         let data = &mut self.data;
         let inner = Arc::get_mut(data).expect("should only have one reference");
         inner.diagnostics.extend(diagnostics);
-        inner.diagnostics.sort();
         Self { data: data.clone() }
     }
 
