@@ -10,7 +10,6 @@
 //! The `source.errors` file may be automatically generated or updated by
 //! setting the `BLESS` environment variable when running this test.
 
-use core::error;
 use std::collections::HashSet;
 use std::env;
 use std::ffi::OsStr;
@@ -18,9 +17,6 @@ use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 use std::path::absolute;
-use std::process::exit;
-use std::sync::atomic::AtomicUsize;
-use std::sync::atomic::Ordering;
 
 use codespan_reporting::files::SimpleFile;
 use codespan_reporting::term;
@@ -29,14 +25,11 @@ use codespan_reporting::term::termcolor::Buffer;
 use colored::Colorize;
 use path_clean::clean;
 use pretty_assertions::StrComparison;
-use rayon::prelude::*;
 use wdl_analysis::Analyzer;
 use wdl_analysis::DiagnosticsConfig;
-use wdl_analysis::Validator;
 use wdl_analysis::rules;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
-use wdl_ast::Document;
 
 /// Finds tests for grammar validation.
 fn find_tests() -> Vec<PathBuf> {
@@ -186,65 +179,4 @@ async fn main() {
             }
         }
     }
-
-    // let ntests = AtomicUsize::new(0);
-    // let errors = tests
-    //     .par_iter()
-    //     .filter_map(|test| {
-    //         let test_name =
-    // test.file_stem().and_then(OsStr::to_str).unwrap();         match
-    // std::panic::catch_unwind(|| {             match run_test(test,
-    // &ntests)                 .map_err(|e| format!("failed to run test
-    // `{path}`: {e}", path = test.display()))                 .err()
-    //             {
-    //                 Some(e) => {
-    //                     println!("test {test_name} ... {failed}", failed =
-    // "failed".red());                     Some((test_name, e))
-    //                 }
-    //                 None => {
-    //                     println!("test {test_name} ... {ok}", ok =
-    // "ok".green());                     None
-    //                 }
-    //             }
-    //         }) {
-    //             Ok(result) => result,
-    //             Err(e) => {
-    //                 println!(
-    //                     "test {test_name} ... {panicked}",
-    //                     panicked = "panicked".red()
-    //                 );
-    //                 Some((
-    //                     test_name,
-    //                     format!(
-    //                         "test panicked: {e:?}",
-    //                         e = e
-    //                             .downcast_ref::<String>()
-    //                             .map(|s| s.as_str())
-    //                             .or_else(||
-    // e.downcast_ref::<&str>().copied())
-    // .unwrap_or("no panic message")                     ),
-    //                 ))
-    //             }
-    //         }
-    //     })
-    //     .collect::<Vec<_>>();
-
-    // if !errors.is_empty() {
-    //     eprintln!(
-    //         "\n{count} test(s) {failed}:",
-    //         count = errors.len(),
-    //         failed = "failed".red()
-    //     );
-
-    //     for (name, msg) in errors.iter() {
-    //         eprintln!("{name}: {msg}", msg = msg.red());
-    //     }
-
-    //     exit(1);
-    // }
-
-    // println!(
-    //     "\ntest result: ok. {} passed\n",
-    //     ntests.load(Ordering::SeqCst)
-    // );
 }
