@@ -31,7 +31,7 @@ jobs:
             # Check if the PR is still open
             if [ $(gh api /repos/stjude-rust-labs/wdl/pulls/$number --jq '.state') != "open" ]; then
               continue
-             fi
+            fi
             gh issue comment $number --body "This PR has been awaiting action for \
             more than 10 days with no response. Because of this inactivity, the PR \
             is being closed. If you continue working on the PR, please comment here \
