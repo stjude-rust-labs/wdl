@@ -1,4 +1,5 @@
-//! A lint rule for checking mixed indentation in command text and throughout the document.
+//! A lint rule for checking mixed indentation in command text and throughout
+//! the document.
 
 use std::fmt;
 
@@ -109,7 +110,8 @@ impl Rule for CommandSectionMixedIndentationRule {
     }
 
     fn description(&self) -> &'static str {
-        "Ensures that lines within the document and especially within command sections do not mix spaces and tabs."
+        "Ensures that lines within the document and especially within command sections do not mix \
+         spaces and tabs."
     }
 
     fn explanation(&self) -> &'static str {
@@ -147,13 +149,13 @@ impl Visitor for CommandSectionMixedIndentationRule {
         _: SupportedVersion,
     ) {
         if reason == VisitReason::Exit {
-            // When exiting the document, check if we found mixed indentation 
+            // When exiting the document, check if we found mixed indentation
             // throughout the document (outside command sections)
             if self.document_mixed_found && self.document_mixed_span.is_some() {
                 // Always emit the mixed indentation note for document-level issues
                 state.add(mixed_document_indentation(
-                    self.document_mixed_span.unwrap(), 
-                    self.document_indent_kind.unwrap()
+                    self.document_mixed_span.unwrap(),
+                    self.document_indent_kind.unwrap(),
                 ));
             }
             return;
@@ -162,13 +164,13 @@ impl Visitor for CommandSectionMixedIndentationRule {
         // Reset the visitor upon document entry
         *self = Default::default();
     }
-    
+
     fn whitespace(&mut self, _state: &mut Self::State, whitespace: &wdl_ast::Whitespace) {
         // Skip if we're inside a command section (handled separately)
         if self.in_command_section {
             return;
         }
-        
+
         // Check whitespace nodes for mixed indentation when not in a command section
         // even if we already found mixed indentation elsewhere
         let text = whitespace.text();
@@ -184,7 +186,7 @@ impl Visitor for CommandSectionMixedIndentationRule {
         match reason {
             VisitReason::Enter => {
                 self.in_command_section = true;
-                
+
                 let mut kind = None;
                 let mut mixed_span = None;
                 let mut skip_next_line = false;
@@ -206,10 +208,13 @@ impl Visitor for CommandSectionMixedIndentationRule {
                                             let current = IndentationKind::from(*b);
                                             let kind = kind.get_or_insert(current);
                                             if current != *kind {
-                                                // Mixed indentation, store the span of the first mixed
+                                                // Mixed indentation, store the span of the first
+                                                // mixed
                                                 // character
-                                                mixed_span =
-                                                    Some(Span::new(text.span().start() + start + i, 1));
+                                                mixed_span = Some(Span::new(
+                                                    text.span().start() + start + i,
+                                                    1,
+                                                ));
                                                 break 'outer;
                                             }
                                         }
@@ -227,16 +232,15 @@ impl Visitor for CommandSectionMixedIndentationRule {
                 }
 
                 if let Some(span) = mixed_span {
-                    let command_keyword = support::token(section.inner(), SyntaxKind::CommandKeyword)
-                        .expect("should have a command keyword token");
+                    let command_keyword =
+                        support::token(section.inner(), SyntaxKind::CommandKeyword)
+                            .expect("should have a command keyword token");
 
-                    state.add(
-                        mixed_command_indentation(
-                            command_keyword.text_range().into(),
-                            span,
-                            kind.expect("an indentation kind should be present"),
-                        )
-                    );
+                    state.add(mixed_command_indentation(
+                        command_keyword.text_range().into(),
+                        span,
+                        kind.expect("an indentation kind should be present"),
+                    ));
                 }
             }
             VisitReason::Exit => {
@@ -251,40 +255,44 @@ impl CommandSectionMixedIndentationRule {
     fn check_document_text(&mut self, text: &str, span: Span) {
         for (line, start, _) in lines_with_offset(text) {
             let mut line_indent_kind = None;
-            
+
             for (i, b) in line.as_bytes().iter().enumerate() {
                 match b {
                     b' ' | b'\t' => {
                         let current = IndentationKind::from(*b);
-                        
+
                         // Set document indentation kind if not yet set
                         if self.document_indent_kind.is_none() {
                             self.document_indent_kind = Some(current);
                         }
-                        
+
                         // Set line indentation kind if not yet set
                         let line_kind = line_indent_kind.get_or_insert(current);
-                        
+
                         // Check if this line's indentation matches the document's
                         if let Some(doc_kind) = self.document_indent_kind {
                             if current != doc_kind {
                                 self.document_mixed_found = true;
                                 // Only store the first mixed indentation span if not already found
                                 if self.document_mixed_span.is_none() {
-                                    self.document_mixed_span = Some(Span::new(span.start() + start + i, 1));
+                                    self.document_mixed_span =
+                                        Some(Span::new(span.start() + start + i, 1));
                                 }
-                                // Continue checking other lines instead of returning early
+                                // Continue checking other lines instead of
+                                // returning early
                             }
                         }
-                        
+
                         // Check if this line's indentation is consistent
                         if current != *line_kind {
                             self.document_mixed_found = true;
                             // Only store the first mixed indentation span if not already found
                             if self.document_mixed_span.is_none() {
-                                self.document_mixed_span = Some(Span::new(span.start() + start + i, 1));
+                                self.document_mixed_span =
+                                    Some(Span::new(span.start() + start + i, 1));
                             }
-                            // Continue checking other lines instead of returning early
+                            // Continue checking other lines instead of
+                            // returning early
                         }
                     }
                     _ => break,
