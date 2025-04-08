@@ -1,0 +1,47 @@
+warning[NonmatchingOutput]: `outputs` key missing in `meta` section for the task `test1`
+   ┌─ tests/lints/mixed-indentation/source.wdl:9:5
+   │
+9 │     meta {}
+   │     ^^^^
+   │
+  = fix: add an `outputs` key to `meta` section describing the outputs
+
+note[MixedIndentation]: mixed indentation throughout document
+   ┌─ tests/lints/mixed-indentation/source.wdl:20:1
+   │
+20 │     output {
+   │ ^^^^ indented with spaces until this tab
+   │
+  = fix: use either tabs or spaces exclusively for indentation throughout the document
+
+warning[NonmatchingOutput]: `outputs` key missing in `meta` section for the task `test2`
+   ┌─ tests/lints/mixed-indentation/source.wdl:28:2
+   │
+28 │     meta {}
+   │     ^^^^
+   │
+  = fix: add an `outputs` key to `meta` section describing the outputs
+
+warning[NoCurlyCommands]: task `test2` uses curly braces in command section
+   ┌─ tests/lints/mixed-indentation/source.wdl:32:2
+   │
+32 │     command {
+   │     ^^^^^^^ this command section uses curly braces
+   │
+  = fix: instead of curly braces, use heredoc syntax (<<<>>>>) for command sections
+
+note[MissingMetas]: workflow `mixed_indentation` is missing a `meta` section
+   ┌─ tests/lints/mixed-indentation/source.wdl:46:10
+   │
+46 │ workflow mixed_indentation {
+   │          ^^^^^^^^^^^^^^^^^ this workflow is missing a `meta` section
+   │
+  = fix: add the missing section
+
+warning[MissingOutput]: workflow `mixed_indentation` is missing an output section
+   ┌─ tests/lints/mixed-indentation/source.wdl:46:10
+   │
+46 │ workflow mixed_indentation {
+   │          ^^^^^^^^^^^^^^^^^ this workflow is missing an output section
+   │
+  = fix: add an output section to the workflow to enable call-caching 
