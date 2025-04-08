@@ -1,5 +1,6 @@
 //! Type conversion helpers for a V1 AST.
 
+use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Write;
 use std::sync::Arc;
@@ -532,6 +533,14 @@ pub struct ExprTypeEvaluator<'a, C> {
     /// If the count is non-zero, special evaluation behavior is enabled for
     /// string interpolation.
     placeholders: usize,
+
+    /// A cache of regexes that have been evaluated.
+    ///
+    /// This is used to avoid re-evaluating the same regex multiple times.
+    ///
+    /// The key is the regex string and the value is either an error or
+    /// `Ok(())`.
+    regex_cache: HashMap<String, Result<(), String>>,
 }
 
 impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
@@ -540,6 +549,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         Self {
             context,
             placeholders: 0,
+            regex_cache: HashMap::new(),
         }
     }
 
@@ -1452,12 +1462,21 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                                 expr.arguments().nth(1).unwrap()
                             {
                                 if let Some(value) = pattern_literal.text() {
-                                    if let Err(e) = regex::Regex::new(value.text()) {
+                                    let pattern = value.text().to_string();
+                                    let result = self
+                                        .regex_cache
+                                        .entry(pattern.clone())
+                                        .or_insert_with(|| {
+                                            regex::Regex::new(&pattern)
+                                                .map(|_| ())
+                                                .map_err(|e| e.to_string())
+                                        });
+                                    if let Err(e) = result {
                                         self.context.add_diagnostic(invalid_regex_pattern(
                                             target.text(),
                                             value.text(),
                                             &e.to_string(),
-                                            arg_spans[1],
+                                            pattern_literal.span(),
                                         ));
                                     }
                                 }
@@ -1520,7 +1539,6 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                                         .map(|e| e.span())
                                         .expect("should have span"),
                                 ));
-                            } else {
                             }
                         }
                         Err(FunctionBindError::Ambiguous { first, second }) => {
@@ -1555,7 +1573,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     }
                 }
 
-                Some(f.realize_unconstrained_return_type(&arguments))
+                Some(f.realize_unconstrained_return_type(arguments))
             }
             None => {
                 self.context
