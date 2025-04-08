@@ -22,6 +22,14 @@ note[ImportWhitespace]: improper whitespace in import statement
   │
   = fix: replace the extraneous whitespace with a single space
 
+note[CommandSectionMixedIndentation]: mixed indentation throughout document
+  ┌─ tests/lints/within-import-whitespace/source.wdl:10:7
+  │
+10 │ import  "baz"  # BAD (tab literal)
+  │       ^^ indented with spaces until this tab
+  │
+  = fix: use either tabs or spaces exclusively for indentation throughout the document
+
 note[ImportWhitespace]: improper whitespace in import statement
    ┌─ tests/lints/within-import-whitespace/source.wdl:10:7
    │
