@@ -1432,26 +1432,13 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
             Some(f) => {
                 // Evaluate the argument expressions
                 let mut count = 0;
-                let mut arguments_vec = Vec::with_capacity(expr.arguments().count());
-                let mut arguments_node = Vec::with_capacity(expr.arguments().count());
-
                 let mut arguments = [const { Type::Union }; MAX_PARAMETERS];
+                let mut arg_spans = Vec::with_capacity(expr.arguments().count());
+
                 for arg in expr.arguments() {
-                    arguments_node.push(arg.clone());
+                    arg_spans.push(arg.span());
                     if count < MAX_PARAMETERS {
-                        if let Some(ty) = self.evaluate_expr(&arg) {
-                            arguments[count] = ty.clone();
-                            arguments_vec.push(ty);
-                        } else {
-                            arguments[count] = Type::Union;
-                            arguments_vec.push(Type::Union);
-                        }
-                    } else {
-                        if let Some(ty) = self.evaluate_expr(&arg) {
-                            arguments_vec.push(ty);
-                        } else {
-                            arguments_vec.push(Type::Union);
-                        }
+                        arguments[count] = self.evaluate_expr(&arg).unwrap_or(Type::Union);
                     }
 
                     count += 1;
@@ -1460,22 +1447,19 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 match target.text() {
                     "find" | "matches" | "sub" => {
                         // above function expect the pattern as 2nd argument
-                        if arguments_node.len() >= 2 {
+                        if count >= 2 {
                             if let Expr::Literal(LiteralExpr::String(pattern_literal)) =
-                                &arguments_node[1]
+                                expr.arguments().nth(1).unwrap()
                             {
-                                match pattern_literal.text() {
-                                    Some(value) => {
-                                        if let Err(e) = regex::Regex::new(&value.text()) {
-                                            self.context.add_diagnostic(invalid_regex_pattern(
-                                                target.text(),
-                                                &value.text(),
-                                                &e,
-                                                pattern_literal.span(),
-                                            ));
-                                        }
+                                if let Some(value) = pattern_literal.text() {
+                                    if let Err(e) = regex::Regex::new(value.text()) {
+                                        self.context.add_diagnostic(invalid_regex_pattern(
+                                            target.text(),
+                                            value.text(),
+                                            &e.to_string(),
+                                            arg_spans[1],
+                                        ));
                                     }
-                                    None => {}
                                 }
                             }
                         }
@@ -1484,10 +1468,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 }
 
                 let arguments = &arguments[..count.min(MAX_PARAMETERS)];
-                if count <= MAX_PARAMETERS
-                    || f.param_min_max(self.context.version())
-                        .map_or(true, |(_, max)| count <= max)
-                {
+                if count <= MAX_PARAMETERS {
                     match f.bind(self.context.version(), arguments) {
                         Ok(binding) => {
                             if let Some(severity) =
@@ -1529,11 +1510,11 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                             ));
                         }
                         Err(FunctionBindError::ArgumentTypeMismatch { index, expected }) => {
-                            if index < arguments_vec.len() {
+                            if index < arguments.len() {
                                 self.context.add_diagnostic(argument_type_mismatch(
                                     target.text(),
                                     &expected,
-                                    &arguments_vec[index],
+                                    &arguments[index],
                                     expr.arguments()
                                         .nth(index)
                                         .map(|e| e.span())
@@ -1574,7 +1555,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     }
                 }
 
-                Some(f.realize_unconstrained_return_type(&arguments_vec))
+                Some(f.realize_unconstrained_return_type(&arguments))
             }
             None => {
                 self.context
