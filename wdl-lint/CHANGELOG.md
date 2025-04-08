@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+#### Changed
+
+* Improved `CommandSectionMixedIndentation` rule to always emit notes for document-level mixed indentation and warnings for command sections ([#XXX](https://github.com/stjude-rust-labs/wdl/pull/XXX)).
+
 ## 0.10.0 - 04-01-2025
 
 #### Added

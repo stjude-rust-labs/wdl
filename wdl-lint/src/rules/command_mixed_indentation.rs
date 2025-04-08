@@ -10,7 +10,6 @@ use wdl_ast::Diagnostics;
 use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
-use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
@@ -164,7 +163,7 @@ impl Visitor for CommandSectionMixedIndentationRule {
         *self = Default::default();
     }
     
-    fn whitespace(&mut self, state: &mut Self::State, whitespace: &wdl_ast::Whitespace) {
+    fn whitespace(&mut self, _state: &mut Self::State, whitespace: &wdl_ast::Whitespace) {
         // Skip if we're inside a command section (handled separately)
         if self.in_command_section {
             return;
