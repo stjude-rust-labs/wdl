@@ -98,6 +98,7 @@ use crate::diagnostics::comparison_mismatch;
 use crate::diagnostics::if_conditional_mismatch;
 use crate::diagnostics::index_type_mismatch;
 use crate::diagnostics::invalid_placeholder_option;
+use crate::diagnostics::invalid_regex_pattern;
 use crate::diagnostics::logical_and_mismatch;
 use crate::diagnostics::logical_not_mismatch;
 use crate::diagnostics::logical_or_mismatch;
@@ -1431,17 +1432,62 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
             Some(f) => {
                 // Evaluate the argument expressions
                 let mut count = 0;
+                let mut arguments_vec = Vec::with_capacity(expr.arguments().count());
+                let mut arguments_node = Vec::with_capacity(expr.arguments().count());
+
                 let mut arguments = [const { Type::Union }; MAX_PARAMETERS];
                 for arg in expr.arguments() {
+                    arguments_node.push(arg.clone());
                     if count < MAX_PARAMETERS {
-                        arguments[count] = self.evaluate_expr(&arg)?;
+                        if let Some(ty) = self.evaluate_expr(&arg) {
+                            arguments[count] = ty.clone();
+                            arguments_vec.push(ty);
+                        } else {
+                            arguments[count] = Type::Union;
+                            arguments_vec.push(Type::Union);
+                        }
+                    } else {
+                        if let Some(ty) = self.evaluate_expr(&arg) {
+                            arguments_vec.push(ty);
+                        } else {
+                            arguments_vec.push(Type::Union);
+                        }
                     }
 
                     count += 1;
                 }
 
+                match target.text() {
+                    "find" | "matches" | "sub" => {
+                        // above function expect the pattern as 2nd argument
+                        if arguments_node.len() >= 2 {
+                            if let Expr::Literal(LiteralExpr::String(pattern_literal)) =
+                                &arguments_node[1]
+                            {
+                                match pattern_literal.text() {
+                                    Some(value) => {
+                                        if let Err(e) = regex::Regex::new(&value.text()) {
+                                            self.context.add_diagnostic(invalid_regex_pattern(
+                                                target.text(),
+                                                &value.text(),
+                                                &e,
+                                                pattern_literal.span(),
+                                            ));
+                                        }
+                                    }
+                                    None => {}
+                                }
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+
                 let arguments = &arguments[..count.min(MAX_PARAMETERS)];
-                if count <= MAX_PARAMETERS {
+                if count <= MAX_PARAMETERS
+                    || f.param_min_max(self.context.version())
+                        .map_or(true, |(_, max)| count <= max)
+                {
                     match f.bind(self.context.version(), arguments) {
                         Ok(binding) => {
                             if let Some(severity) =
@@ -1478,20 +1524,23 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                                 target.text(),
                                 target.span(),
                                 maximum,
-                                arguments.len(),
+                                count,
                                 expr.arguments().skip(maximum).map(|e| e.span()),
                             ));
                         }
                         Err(FunctionBindError::ArgumentTypeMismatch { index, expected }) => {
-                            self.context.add_diagnostic(argument_type_mismatch(
-                                target.text(),
-                                &expected,
-                                &arguments[index],
-                                expr.arguments()
-                                    .nth(index)
-                                    .map(|e| e.span())
-                                    .expect("should have span"),
-                            ));
+                            if index < arguments_vec.len() {
+                                self.context.add_diagnostic(argument_type_mismatch(
+                                    target.text(),
+                                    &expected,
+                                    &arguments_vec[index],
+                                    expr.arguments()
+                                        .nth(index)
+                                        .map(|e| e.span())
+                                        .expect("should have span"),
+                                ));
+                            } else {
+                            }
                         }
                         Err(FunctionBindError::Ambiguous { first, second }) => {
                             self.context.add_diagnostic(ambiguous_argument(
@@ -1525,7 +1574,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     }
                 }
 
-                Some(f.realize_unconstrained_return_type(arguments))
+                Some(f.realize_unconstrained_return_type(&arguments_vec))
             }
             None => {
                 self.context

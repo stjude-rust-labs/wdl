@@ -792,3 +792,16 @@ pub fn invalid_placeholder_option<N: TreeNode>(
 
     Diagnostic::error(message).with_label(format!("this is type `{ty}`"), span)
 }
+
+/// Creates an invalid regex pattern diagnostic.
+pub fn invalid_regex_pattern(
+    function_name: &str,
+    pattern: &str,
+    error: &regex::Error,
+    span: Span,
+) -> Diagnostic {
+    Diagnostic::error(format!(
+        "invalid regex pattern \"{pattern}\" for function `{function_name}`: {error}"
+    ))
+    .with_label("this pattern is not a valid regular expression", span)
+}
