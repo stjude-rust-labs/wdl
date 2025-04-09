@@ -1691,11 +1691,11 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         severity: Severity,
     ) {
         let (label, span, fix) = match target.text() {
-            "select_first" => {
-                let ty = &arguments[0]
-                    .as_array()
-                    .expect("type should be an array")
-                    .element_type;
+            "select_first" if arguments.len() >= 1 => {
+                let Some(array_ty) = arguments[0].as_array() else {
+                    return;
+                };
+                let ty = &array_ty.element_type;
                 if ty.is_optional() {
                     return;
                 }
@@ -1706,11 +1706,11 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     "replace the function call with the array's first element",
                 )
             }
-            "select_all" => {
-                let ty = &arguments[0]
-                    .as_array()
-                    .expect("type should be an array")
-                    .element_type;
+            "select_all" if arguments.len() >= 1 => {
+                let Some(array_ty) = arguments[0].as_array() else {
+                    return;
+                };
+                let ty = &array_ty.element_type;
                 if ty.is_optional() {
                     return;
                 }
@@ -1721,7 +1721,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     "replace the function call with the array itself",
                 )
             }
-            "defined" => {
+            "defined" if arguments.len() >= 1 => {
                 if arguments[0].is_optional() {
                     return;
                 }
