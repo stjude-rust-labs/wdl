@@ -6,12 +6,12 @@ note[ImportSort]: imports are not sorted lexicographically
   │
   = fix: sort the imports lexicographically:
     import  "bar"
-    import	"baz"
+    import     "baz"
     import "chuk"        as something
     import  # BAD (comment within statement)
     "corge" as grault
     import "foo" as foo
-    import "lorem" as 	ipsum
+    import "lorem" as  ipsum
     import   "qux"  alias   jabber    as    quux
 
 note[ImportWhitespace]: improper whitespace in import statement
@@ -21,14 +21,6 @@ note[ImportWhitespace]: improper whitespace in import statement
   │       ^^ this should be a singular space (` `)
   │
   = fix: replace the extraneous whitespace with a single space
-
-note[CommandSectionMixedIndentation]: mixed indentation throughout document
-  ┌─ tests/lints/within-import-whitespace/source.wdl:10:7
-  │
-10 │ import  "baz"  # BAD (tab literal)
-  │       ^^ indented with spaces until this tab
-  │
-  = fix: use either tabs or spaces exclusively for indentation throughout the document
 
 note[ImportWhitespace]: improper whitespace in import statement
    ┌─ tests/lints/within-import-whitespace/source.wdl:10:7
