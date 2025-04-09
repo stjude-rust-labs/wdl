@@ -190,7 +190,8 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
 
 /// Gets the optional rule set.
 pub fn optional_rules() -> Vec<Box<dyn Rule>> {
-    // No optional rules for now since ShellCheckRule is already in the default rules
+    // No optional rules for now since ShellCheckRule is already in the default
+    // rules
     let opt_rules: Vec<Box<dyn Rule>> = vec![];
 
     // Ensure all the rule IDs are unique and pascal case and that related rules are
