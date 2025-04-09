@@ -1,9 +1,8 @@
-//! A lint rule for checking mixed indentation in command text and throughout
-//! the document.
+// A lint rule for checking mixed indentation in command text and throughout
+// the document.
 
 use std::fmt;
 
-use rowan::ast::support;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -14,16 +13,15 @@ use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxKind;
 use wdl_ast::VisitReason;
 use wdl_ast::Visitor;
-use wdl_ast::v1::CommandPart;
 use wdl_ast::v1::CommandSection;
 
 use crate::Rule;
-use crate::Tag;
-use crate::TagSet;
+use crate::tags::Tag;
+use crate::tags::TagSet;
 use crate::util::lines_with_offset;
 
 /// The identifier for the command section mixed indentation rule.
-const ID: &str = "CommandSectionMixedIndentation";
+const ID: &str = "MixedIndentation";
 
 /// Represents the indentation kind.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -53,27 +51,6 @@ impl From<u8> for IndentationKind {
     }
 }
 
-/// Creates a "mixed indentation within command" warning diagnostic.
-fn mixed_command_indentation(command: Span, span: Span, kind: IndentationKind) -> Diagnostic {
-    Diagnostic::warning("mixed indentation within a command")
-        .with_rule(ID)
-        .with_label(
-            format!(
-                "indented with {kind} until this {anti}",
-                anti = match kind {
-                    IndentationKind::Spaces => "tab",
-                    IndentationKind::Tabs => "space",
-                }
-            ),
-            span,
-        )
-        .with_label(
-            "this command section uses both tabs and spaces in leading whitespace",
-            command,
-        )
-        .with_fix("use either tabs or spaces exclusively for indentation")
-}
-
 /// Creates a "mixed indentation in document" note diagnostic.
 fn mixed_document_indentation(span: Span, kind: IndentationKind) -> Diagnostic {
     Diagnostic::note("mixed indentation throughout document")
@@ -92,32 +69,76 @@ fn mixed_document_indentation(span: Span, kind: IndentationKind) -> Diagnostic {
 }
 
 /// Detects mixed indentation in a command section and throughout the document.
-#[derive(Default, Debug, Clone, Copy)]
-pub struct MixedIndentationRule;
+#[derive(Default, Debug, Clone)]
+pub struct MixedIndentationRule {
+    /// The visitor that does the actual work.
+    visitor: MixedIndentationVisitor,
+}
+
+impl Visitor for MixedIndentationRule {
+    type State = Diagnostics;
+
+    fn document(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        document: &Document,
+        version: SupportedVersion,
+    ) {
+        self.visitor.document(state, reason, document, version);
+    }
+
+    fn whitespace(&mut self, state: &mut Self::State, whitespace: &wdl_ast::Whitespace) {
+        self.visitor.whitespace(state, whitespace);
+    }
+
+    fn command_section(
+        &mut self,
+        state: &mut Self::State,
+        reason: VisitReason,
+        section: &CommandSection,
+    ) {
+        self.visitor.command_section(state, reason, section);
+    }
+}
 
 impl Rule for MixedIndentationRule {
-    fn name(&self) -> &'static str {
-        "MixedIndentation"
+    fn id(&self) -> &'static str {
+        ID
     }
 
     fn description(&self) -> &'static str {
         "Ensures consistent indentation throughout the document and command sections"
     }
 
-    fn tags(&self) -> &[&'static str] {
-        &["clarity", "correctness", "spacing"]
+    fn explanation(&self) -> &'static str {
+        "Whitespace in indentation should be consistent throughout a document. Do not mix tabs and \
+         spaces for indentation as this can lead to inconsistent rendering across platforms and \
+         editors. Command sections should especially use consistent indentation to ensure proper \
+         script execution."
     }
 
-    fn visitor(&self) -> Box<dyn Visitor> {
-        Box::new(MixedIndentationVisitor::default())
+    fn tags(&self) -> TagSet {
+        TagSet::new(&[Tag::Clarity, Tag::Correctness, Tag::Spacing])
+    }
+
+    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
+        None
+    }
+
+    fn related_rules(&self) -> &[&'static str] {
+        &["Whitespace"]
     }
 }
 
-#[derive(Default)]
+/// A visitor that checks for mixed indentation in a document.
+#[derive(Default, Debug, Clone)]
 struct MixedIndentationVisitor {
+    /// Whether or not we're currently in a command section.
     in_command_section: bool,
+    /// The indentation kind found for the document, if mixed indentation was
+    /// detected.
     document_indentation_kind: Option<IndentationKind>,
-    command_indentation_kind: Option<IndentationKind>,
 }
 
 impl Visitor for MixedIndentationVisitor {
@@ -131,14 +152,11 @@ impl Visitor for MixedIndentationVisitor {
         _: SupportedVersion,
     ) {
         if reason == VisitReason::Exit {
-            // When exiting the document, check if we found mixed indentation
-            // throughout the document (outside command sections)
-            if self.document_indentation_kind.is_some() {
-                // Always emit the mixed indentation note for document-level issues
-                state.add(mixed_document_indentation(
-                    Span::new(0, 0),
-                    self.document_indentation_kind.unwrap(),
-                ));
+            // Only emit a diagnostic if mixed indentation was actually found
+            if let Some(kind) = self.document_indentation_kind {
+                // Check if we've found mixed indentation (kind is set when we detect a
+                // mismatch)
+                state.add(mixed_document_indentation(Span::new(0, 0), kind));
             }
             return;
         }
@@ -178,75 +196,83 @@ impl Visitor for MixedIndentationVisitor {
         // Check for mixed indentation in command section
         let mut has_spaces = false;
         let mut has_tabs = false;
-        let mut line_number = section.span().start().line_number();
 
-        for line in section.text().lines() {
-            if line.is_empty() {
-                line_number += 1;
-                continue;
+        if let Some(text) = section.text() {
+            for line in text.text().lines() {
+                if line.is_empty() {
+                    continue;
+                }
+
+                let leading_whitespace = line
+                    .chars()
+                    .take_while(|c| c.is_whitespace())
+                    .collect::<String>();
+
+                if leading_whitespace.contains(' ') {
+                    has_spaces = true;
+                }
+                if leading_whitespace.contains('\t') {
+                    has_tabs = true;
+                }
+
+                if has_spaces && has_tabs {
+                    let diagnostic = Diagnostic::warning("mixed indentation in command section")
+                        .with_rule(ID)
+                        .with_highlight(section.span())
+                        .with_fix(
+                            "use either tabs or spaces exclusively for indentation in command \
+                             sections",
+                        );
+                    state.add(diagnostic);
+                    break;
+                }
             }
-
-            let leading_whitespace = line
-                .chars()
-                .take_while(|c| c.is_whitespace())
-                .collect::<String>();
-
-            if leading_whitespace.contains(' ') {
-                has_spaces = true;
-            }
-            if leading_whitespace.contains('\t') {
-                has_tabs = true;
-            }
-
-            if has_spaces && has_tabs {
-                state.add(
-                    section.span(),
-                    "mixed indentation in command section",
-                    "use either tabs or spaces exclusively for indentation in command sections",
-                    Severity::Warning,
-                );
-                break;
-            }
-
-            line_number += 1;
         }
     }
 }
 
 impl MixedIndentationVisitor {
     /// Check document text for mixed indentation
-    fn check_document_text(&mut self, text: &str, span: Span) {
-        for (line, start, _) in lines_with_offset(text) {
+    fn check_document_text(&mut self, text: &str, _span: Span) {
+        let mut doc_indent_kind = self.document_indentation_kind;
+        for (line, _start, _) in lines_with_offset(text) {
             let mut line_indent_kind = None;
 
-            for (i, b) in line.as_bytes().iter().enumerate() {
+            for b in line.as_bytes().iter() {
                 match b {
                     b' ' | b'\t' => {
                         let current = IndentationKind::from(*b);
 
-                        // Set document indentation kind if not yet set
-                        if self.document_indentation_kind.is_none() {
-                            self.document_indentation_kind = Some(current);
-                        }
-
                         // Set line indentation kind if not yet set
                         let line_kind = line_indent_kind.get_or_insert(current);
 
-                        // Check if this line's indentation matches the document's
-                        if let Some(doc_kind) = self.document_indentation_kind {
-                            if current != doc_kind {
-                                self.document_indentation_kind = Some(current);
-                            }
+                        // Check if this line's indentation is consistent within itself
+                        if current != *line_kind {
+                            // Found mixed indentation within a line
+                            self.document_indentation_kind = Some(current);
+                            return;
                         }
 
-                        // Check if this line's indentation is consistent
-                        if current != *line_kind {
-                            self.document_indentation_kind = Some(current);
+                        // If document indentation kind is not set, set it to the current line's
+                        // kind
+                        if doc_indent_kind.is_none() {
+                            doc_indent_kind = Some(current);
+                        }
+                        // Check if this line's indentation differs from the document's
+                        else if let Some(doc_kind) = doc_indent_kind {
+                            if current != doc_kind {
+                                // Found mixed indentation between lines
+                                self.document_indentation_kind = Some(current);
+                                return;
+                            }
                         }
                     }
                     _ => break,
                 }
             }
         }
+        // Only update document_indentation_kind if we found mixed indentation
+        // If we reach this point, no mixed indentation was found
+        self.document_indentation_kind = None;
     }
 }
