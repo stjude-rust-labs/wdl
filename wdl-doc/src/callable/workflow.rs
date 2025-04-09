@@ -99,7 +99,7 @@ impl Workflow {
     /// Render the workflow as HTML.
     pub fn render(&self) -> Markup {
         html! {
-            div class="table-auto border-collapse" {
+            div class="tflex flex-col flex-none items-left text-left" {
                 h1 { @if let Some(name) = self.name_override() { (name) } @else { (self.name) } }
                 @if let Some(category) = self.category() {
                     h2 { "Category: " (category) }
