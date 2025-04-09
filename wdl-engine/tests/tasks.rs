@@ -43,6 +43,7 @@ use futures::stream;
 use path_clean::clean;
 use pretty_assertions::StrComparison;
 use regex::Regex;
+use serde_json;
 use serde_json::to_string_pretty;
 use tempfile::TempDir;
 use tokio_util::sync::CancellationToken;
@@ -230,9 +231,11 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
         .ok_or_else(|| anyhow!("document does not contain a task named `{name}`"))?;
     inputs.join_paths(task, &test_dir)?;
 
+    let dir = TempDir::new().context("failed to create temporary directory")?;
+
     for config in configs() {
         let evaluator = TaskEvaluator::new(config, CancellationToken::new()).await?;
-        let dir = TempDir::new().context("failed to create temporary directory")?;
+
         match evaluator
             .evaluate(result.document(), task, &inputs, dir.path(), |_| async {})
             .await
@@ -273,7 +276,65 @@ async fn run_test(test: &Path, result: AnalysisResult) -> Result<()> {
         }
     }
 
+    let test_name = test.file_stem().and_then(OsStr::to_str).unwrap();
+    verify_special_tests(test_name, dir.path())?;
+
     Ok(())
+}
+
+fn verify_special_tests(test_name: &str, task_dir: &Path) -> Result<()> {
+    match test_name {
+        "inputs_json" => {
+            let attempt_dir = task_dir.join("write_inputs_test").join("attempt-1");
+
+            // Check if inputs.json exists
+            let inputs_json = attempt_dir.join("inputs.json");
+            if !inputs_json.exists() {
+                bail!(
+                    "inputs.json file was not created in {}",
+                    attempt_dir.display()
+                );
+            }
+
+            // Read the file and verify it contains the expected data
+            let content = fs::read_to_string(&inputs_json)?;
+            let json: serde_json::Value = serde_json::from_str(&content)?;
+
+            // Check basic structure
+            if !json.is_object() {
+                bail!("inputs.json content is not a JSON object");
+            }
+
+            // Check task name
+            if json.get("task").and_then(|v| v.as_str()) != Some("write_inputs_test") {
+                bail!("inputs.json doesn't have the correct task name");
+            }
+
+            // Check inputs section
+            let inputs = json
+                .get("inputs")
+                .ok_or_else(|| anyhow::anyhow!("inputs section missing"))?;
+
+            // Check specific input values
+            let message = inputs.get("message").and_then(|v| v.as_str());
+            if message != Some("testing inputs json") {
+                bail!("inputs.json has incorrect 'message' value: {:?}", message);
+            }
+
+            let number = inputs.get("number").and_then(|v| v.as_i64());
+            if number != Some(100) {
+                bail!("inputs.json has incorrect 'number' value: {:?}", number);
+            }
+
+            let flag = inputs.get("flag").and_then(|v| v.as_bool());
+            if flag != Some(false) {
+                bail!("inputs.json has incorrect 'flag' value: {:?}", flag);
+            }
+
+            Ok(())
+        }
+        _ => Ok(()),
+    }
 }
 
 /// Compares the evaluation output files against the baselines.

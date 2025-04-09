@@ -630,7 +630,16 @@ impl TaskEvaluator {
             "evaluating task"
         );
 
+        // Write input JSON immediately after state initialization
         let mut state = State::new(root, document, task)?;
+
+        // Write the inputs.json file immediately, before any execution
+        if self.config.task.write_inputs {
+            if let Err(err) = write_task_inputs_json(state.root.path(), task.name(), inputs) {
+                tracing::warn!("Failed to write task inputs JSON: {:#}", err);
+            }
+        }
+
         let nodes = toposort(&graph, None).expect("graph should be acyclic");
         let mut current = 0;
         while current < nodes.len() {
@@ -662,6 +671,22 @@ impl TaskEvaluator {
 
         let env = Arc::new(mem::take(&mut state.env));
 
+        // Write input JSON if enabled in configuration
+        if self.config.task.write_inputs {
+            if let Err(err) = write_task_inputs_json(state.root.path(), task.name(), inputs) {
+                // Log the error but continue - this is a non-critical debug feature
+                tracing::info!("Failed to write task inputs JSON: {:#}", err);
+            }
+        }
+
+        // Write input JSON if enabled in configuration
+        if self.config.task.write_inputs {
+            if let Err(err) = write_task_inputs_json(state.root.path(), task.name(), inputs) {
+                // Log the error but continue - this is a non-critical debug feature
+                tracing::info!("Failed to write task inputs JSON: {:#}", err);
+            }
+        }
+
         // Spawn the task in a retry loop
         let mut attempt = 0;
         let (mut evaluated, mounts) = loop {
@@ -669,7 +694,7 @@ impl TaskEvaluator {
                 command,
                 requirements,
                 hints,
-                inputs,
+                inputs: section_inputs,
             } = self
                 .evaluate_sections(id, &mut state, &definition, inputs, attempt)
                 .await?;
@@ -698,7 +723,7 @@ impl TaskEvaluator {
                 requirements.clone(),
                 hints.clone(),
                 env.clone(),
-                inputs.clone(),
+                section_inputs.clone(),
             );
 
             let events = self
@@ -752,7 +777,6 @@ impl TaskEvaluator {
                 })?);
                 task.set_return_code(evaluated.exit_code);
             }
-
             if let Err(e) = evaluated.handle_exit(&requirements) {
                 if attempt >= max_retries {
                     return Err(e
@@ -763,12 +787,31 @@ impl TaskEvaluator {
                         ))
                         .into());
                 }
-
                 attempt += 1;
-
                 // Update the execution root for the next attempt
                 state.set_root(root, attempt)?;
-
+                // Write input JSON for this retry attempt if enabled
+                if self.config.task.write_inputs {
+                    if let Err(err) = write_task_inputs_json(state.root.path(), task.name(), inputs)
+                    {
+                        tracing::info!(
+                            "Failed to write task inputs JSON for retry attempt {}: {:#}",
+                            attempt,
+                            err
+                        );
+                    }
+                }
+                // Write input JSON for this retry attempt if enabled
+                if self.config.task.write_inputs {
+                    if let Err(err) = write_task_inputs_json(state.root.path(), task.name(), inputs)
+                    {
+                        tracing::info!(
+                            "Failed to write task inputs JSON for retry attempt {}: {:#}",
+                            attempt,
+                            err
+                        );
+                    }
+                }
                 info!(
                     "retrying execution of task `{name}` (retry {attempt})",
                     name = state.task.name()
@@ -776,8 +819,13 @@ impl TaskEvaluator {
                 continue;
             }
 
-            break (evaluated, inputs);
+            break (evaluated, section_inputs);
         };
+
+        // After task inputs are processed but before command execution
+        if self.config.task.write_inputs {
+            write_task_inputs_json(state.root.path(), task.name(), inputs)?;
+        }
 
         // Evaluate the remaining inputs (unused), and decls, and outputs
         for index in &nodes[current..] {
@@ -796,7 +844,6 @@ impl TaskEvaluator {
                 }
             }
         }
-
         // Take the output scope and return it
         let mut outputs: Outputs = mem::take(&mut state.scopes[OUTPUT_SCOPE_INDEX.0]).into();
         drop(state);
@@ -1403,5 +1450,123 @@ impl TaskEvaluator {
 
         state.scopes[OUTPUT_SCOPE_INDEX.0].insert(name.text(), value);
         Ok(())
+    }
+}
+
+/// Writes the task inputs to a JSON file in the task attempt directory.
+fn write_task_inputs_json(task_dir: &Path, task_name: &str, inputs: &TaskInputs) -> Result<()> {
+    use std::fs;
+
+    use serde_json::Map as JsonMap;
+    use serde_json::Value as JsonValue;
+    use serde_json::to_string_pretty;
+    use tracing::info;
+
+    // Create a structured JSON representation
+    let mut root_map = JsonMap::new();
+    // Add task name metadata
+    root_map.insert("task".to_string(), JsonValue::String(task_name.to_string()));
+
+    // Add declared inputs section
+    let mut inputs_map = JsonMap::new();
+    for (name, value) in inputs.iter() {
+        inputs_map.insert(name.to_string(), value_to_json(value)?);
+    }
+    root_map.insert("inputs".to_string(), JsonValue::Object(inputs_map));
+
+    // Add requirements section - use common requirement names
+    let mut req_map = JsonMap::new();
+    let requirement_names = [
+        "cpu",
+        "memory",
+        "disks",
+        "container",
+        "docker",
+        "maxRetries",
+        "gpu",
+        "preemptible",
+    ];
+    for name in &requirement_names {
+        if let Some(value) = inputs.requirement(name) {
+            req_map.insert(name.to_string(), value_to_json(value)?);
+        }
+    }
+    root_map.insert("requirements".to_string(), JsonValue::Object(req_map));
+
+    // Add hints section - use common hint names
+    let mut hints_map = JsonMap::new();
+    let hint_names = [
+        "cpu_limit",
+        "memory_limit",
+        "maxCpu",
+        "maxMemory",
+        "singularity",
+        "priority",
+        "backend",
+    ];
+    for name in &hint_names {
+        if let Some(value) = inputs.hint(name) {
+            hints_map.insert(name.to_string(), value_to_json(value)?);
+        }
+    }
+    root_map.insert("hints".to_string(), JsonValue::Object(hints_map));
+
+    // Write to file
+    let json_str = to_string_pretty(&JsonValue::Object(root_map))?;
+
+    // Create task/attempt directory structure
+    let task_dir = task_dir.join(task_name);
+    let attempt_dir = task_dir.join("attempt-1");
+    if !attempt_dir.exists() {
+        std::fs::create_dir_all(&attempt_dir)?;
+    }
+
+    // Write to the attempt directory
+    let file_path = attempt_dir.join("inputs.json");
+    fs::write(&file_path, json_str)?;
+
+    info!("Wrote task inputs to {}", file_path.display());
+    Ok(())
+}
+
+/// Helper function to convert WDL Value to JSON Value
+fn value_to_json(value: &Value) -> Result<serde_json::Value> {
+    use serde_json::Map as JsonMap;
+    use serde_json::Value as JsonValue;
+
+    if value.is_none() {
+        Ok(JsonValue::Null)
+    } else if let Some(b) = value.as_boolean() {
+        Ok(JsonValue::Bool(b))
+    } else if let Some(i) = value.as_integer() {
+        Ok(JsonValue::Number((i).into()))
+    } else if let Some(f) = value.as_float() {
+        let n = serde_json::Number::from_f64(f)
+            .ok_or_else(|| anyhow!("could not convert float to JSON"))?;
+        Ok(JsonValue::Number(n))
+    } else if let Some(s) = value.as_string() {
+        Ok(JsonValue::String(s.to_string()))
+    } else if let Some(f) = value.as_file() {
+        Ok(JsonValue::String(f.to_string()))
+    } else if let Some(d) = value.as_directory() {
+        Ok(JsonValue::String(d.to_string()))
+    } else if let Some(arr) = value.as_array() {
+        let mut json_arr = Vec::new();
+        for item in arr.as_slice() {
+            json_arr.push(value_to_json(item)?);
+        }
+        Ok(JsonValue::Array(json_arr))
+    } else if let Some(map) = value.as_map() {
+        let mut json_map = JsonMap::new();
+        for (k, v) in map.iter() {
+            let key_str = match k {
+                Some(primitive) => primitive.to_string(),
+                None => "null".to_string(),
+            };
+            json_map.insert(key_str, value_to_json(v)?);
+        }
+        Ok(JsonValue::Object(json_map))
+    } else {
+        Err(anyhow!("unsupported value type"))
     }
 }

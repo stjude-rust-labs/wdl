@@ -308,6 +308,13 @@ pub struct TaskConfig {
     /// not be portable to other execution engines.</div>
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub shell: Option<String>,
+
+    /// Whether to write input JSON files for debugging.
+    ///
+    /// When enabled, an inputs.json file will be written to each task attempt
+    /// directory containing the full set of inputs provided to the task.
+    #[serde(default, skip_serializing_if = "is_default")]
+    pub write_inputs: bool,
 }
 
 impl TaskConfig {
