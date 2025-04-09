@@ -2,6 +2,8 @@
 
 mod blank_lines_between_elements;
 mod call_input_spacing;
+/// Rules for detecting mixed indentation (spaces and tabs) in WDL command
+/// sections and documents.
 mod command_mixed_indentation;
 mod comment_whitespace;
 mod container_value;

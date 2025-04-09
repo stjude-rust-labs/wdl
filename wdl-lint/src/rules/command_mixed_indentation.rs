@@ -16,8 +16,8 @@ use wdl_ast::Visitor;
 use wdl_ast::v1::CommandSection;
 
 use crate::Rule;
-use crate::tags::Tag;
-use crate::tags::TagSet;
+use crate::Tag;
+use crate::TagSet;
 use crate::util::lines_with_offset;
 
 /// The identifier for the mixed indentation rule.
@@ -237,14 +237,17 @@ impl Visitor for MixedIndentationVisitor {
                 if found_mixed_indentation {
                     if let Some(position) = mixed_position {
                         // Calculate absolute position for this line
-                        let line_start = text_str.lines()
+                        let line_start = text_str
+                            .lines()
                             .take(line_number)
                             .map(|l| l.len() + 1) // +1 for the newline
-                            .sum::<usize>() 
-                            - line.len() - 1; // Adjust to start of current line
-                        
-                        let mixed_span = Span::new(line_start + position, line_start + position + 1);
-                        
+                            .sum::<usize>()
+                            - line.len()
+                            - 1; // Adjust to start of current line
+
+                        let mixed_span =
+                            Span::new(line_start + position, line_start + position + 1);
+
                         // Get the kind that was first used (and then changed)
                         let first_kind = current_indent_kind.unwrap();
                         let changed_to = if first_kind == IndentationKind::Spaces {
@@ -256,17 +259,16 @@ impl Visitor for MixedIndentationVisitor {
                         let diagnostic = Diagnostic::warning("mixed indentation within a command")
                             .with_rule(MIXED_INDENTATION_RULE_ID)
                             .with_label(
-                                format!(
-                                    "indented with {first_kind} until this {changed_to}",
-                                ),
+                                format!("indented with {first_kind} until this {changed_to}",),
                                 mixed_span,
                             )
-                            .with_secondary_label(
-                                "this command section uses both tabs and spaces in leading whitespace",
-                                section.keyword_span(),
+                            .with_label(
+                                "this command section uses both tabs and spaces in leading \
+                                 whitespace",
+                                section.span(), // Use the entire section's span
                             )
                             .with_fix("use either tabs or spaces exclusively for indentation");
-                        
+
                         state.add(diagnostic);
                         break;
                     }
