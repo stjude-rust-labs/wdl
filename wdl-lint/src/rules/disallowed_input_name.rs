@@ -1,15 +1,15 @@
 //! A lint rule that disallows redundant input names.
 
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
-use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 use wdl_ast::v1::BoundDecl;
 use wdl_ast::v1::Decl;
 use wdl_ast::v1::InputSection;
@@ -90,11 +90,9 @@ impl Rule for DisallowedInputNameRule {
 }
 
 impl Visitor for DisallowedInputNameRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -107,20 +105,29 @@ impl Visitor for DisallowedInputNameRule {
         *self = Default::default();
     }
 
-    fn input_section(&mut self, _: &mut Self::State, reason: VisitReason, _: &InputSection) {
+    fn input_section(&mut self, _: &mut Diagnostics, reason: VisitReason, _: &InputSection) {
         self.input_section = reason == VisitReason::Enter;
     }
 
-    fn bound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &BoundDecl) {
+    fn bound_decl(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, decl: &BoundDecl) {
         if reason == VisitReason::Enter && self.input_section {
-            check_decl_name(state, &Decl::Bound(decl.clone()), &self.exceptable_nodes());
+            check_decl_name(
+                diagnostics,
+                &Decl::Bound(decl.clone()),
+                &self.exceptable_nodes(),
+            );
         }
     }
 
-    fn unbound_decl(&mut self, state: &mut Self::State, reason: VisitReason, decl: &UnboundDecl) {
+    fn unbound_decl(
+        &mut self,
+        diagnostics: &mut Diagnostics,
+        reason: VisitReason,
+        decl: &UnboundDecl,
+    ) {
         if reason == VisitReason::Enter && self.input_section {
             check_decl_name(
-                state,
+                diagnostics,
                 &Decl::Unbound(decl.clone()),
                 &self.exceptable_nodes(),
             );
@@ -130,7 +137,7 @@ impl Visitor for DisallowedInputNameRule {
 
 /// Check declaration name
 fn check_decl_name(
-    state: &mut Diagnostics,
+    diagnostics: &mut Diagnostics,
     decl: &Decl,
     exceptable_nodes: &Option<&'static [SyntaxKind]>,
 ) {
@@ -140,7 +147,7 @@ fn check_decl_name(
     let length = name.len();
     if length < 3 {
         // name is too short
-        state.exceptable_add(
+        diagnostics.exceptable_add(
             decl_identifier_too_short(decl.name().span()),
             SyntaxElement::from(decl.inner().clone()),
             exceptable_nodes,
@@ -155,7 +162,7 @@ fn check_decl_name(
                 if let Some(c) = name.peek() {
                     if c.is_ascii_uppercase() || c == &'_' {
                         // name starts with "in"
-                        state.exceptable_add(
+                        diagnostics.exceptable_add(
                             decl_identifier_starts_with_in(decl.name().span()),
                             SyntaxElement::from(decl.inner().clone()),
                             exceptable_nodes,
@@ -164,7 +171,7 @@ fn check_decl_name(
                         let s: String = name.take(3).collect();
                         if s == "put" {
                             // name starts with "input"
-                            state.exceptable_add(
+                            diagnostics.exceptable_add(
                                 decl_identifier_starts_with_input(decl.name().span()),
                                 SyntaxElement::from(decl.inner().clone()),
                                 exceptable_nodes,

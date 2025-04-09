@@ -3,17 +3,17 @@
 use convert_case::Boundary;
 use convert_case::Case;
 use convert_case::Converter;
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
-use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 use wdl_ast::v1::StructDefinition;
 
 use crate::Rule;
@@ -88,11 +88,9 @@ fn check_name(
 }
 
 impl Visitor for PascalCaseRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         _: SupportedVersion,
@@ -107,7 +105,7 @@ impl Visitor for PascalCaseRule {
 
     fn struct_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         def: &StructDefinition,
     ) {
@@ -119,7 +117,7 @@ impl Visitor for PascalCaseRule {
         check_name(
             name.text(),
             name.span(),
-            state,
+            diagnostics,
             SyntaxElement::from(def.inner().clone()),
             &self.exceptable_nodes(),
         );

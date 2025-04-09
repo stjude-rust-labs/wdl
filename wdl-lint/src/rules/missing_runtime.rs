@@ -1,16 +1,16 @@
 //! A lint rule for missing `runtime` sections.
 
+use wdl_analysis::Diagnostics;
+use wdl_analysis::VisitReason;
+use wdl_analysis::Visitor;
+use wdl_analysis::document::Document;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
-use wdl_ast::Diagnostics;
-use wdl_ast::Document;
 use wdl_ast::Span;
 use wdl_ast::SupportedVersion;
 use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
-use wdl_ast::VisitReason;
-use wdl_ast::Visitor;
 use wdl_ast::v1::TaskDefinition;
 use wdl_ast::version::V1;
 
@@ -69,11 +69,9 @@ impl Rule for MissingRuntimeRule {
 }
 
 impl Visitor for MissingRuntimeRule {
-    type State = Diagnostics;
-
     fn document(
         &mut self,
-        _: &mut Self::State,
+        _: &mut Diagnostics,
         reason: VisitReason,
         _: &Document,
         version: SupportedVersion,
@@ -88,7 +86,7 @@ impl Visitor for MissingRuntimeRule {
 
     fn task_definition(
         &mut self,
-        state: &mut Self::State,
+        diagnostics: &mut Diagnostics,
         reason: VisitReason,
         task: &TaskDefinition,
     ) {
@@ -101,7 +99,7 @@ impl Visitor for MissingRuntimeRule {
         if let SupportedVersion::V1(minor_version) = self.0.expect("version should exist here") {
             if minor_version <= V1::One && task.runtime().is_none() {
                 let name = task.name();
-                state.exceptable_add(
+                diagnostics.exceptable_add(
                     missing_runtime_section(name.text(), name.span()),
                     SyntaxElement::from(task.inner().clone()),
                     &self.exceptable_nodes(),
