@@ -1443,10 +1443,10 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 // Evaluate the argument expressions
                 let mut count = 0;
                 let mut arguments = [const { Type::Union }; MAX_PARAMETERS];
-                let mut arg_spans = Vec::with_capacity(expr.arguments().count());
+                let mut arguments_node = Vec::with_capacity(expr.arguments().count());
 
                 for arg in expr.arguments() {
-                    arg_spans.push(arg.span());
+                    arguments_node.push(arg.clone());
                     if count < MAX_PARAMETERS {
                         arguments[count] = self.evaluate_expr(&arg).unwrap_or(Type::Union);
                     }
@@ -1457,9 +1457,9 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 match target.text() {
                     "find" | "matches" | "sub" => {
                         // above function expect the pattern as 2nd argument
-                        if count >= 2 {
+                        if arguments_node.len() >= 2 {
                             if let Expr::Literal(LiteralExpr::String(pattern_literal)) =
-                                expr.arguments().nth(1).unwrap()
+                                &arguments_node[1]
                             {
                                 if let Some(value) = pattern_literal.text() {
                                     let pattern = value.text().to_string();
