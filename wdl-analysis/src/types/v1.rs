@@ -1691,7 +1691,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         severity: Severity,
     ) {
         let (label, span, fix) = match target.text() {
-            "select_first" if arguments.len() >= 1 => {
+            "select_first" if !arguments.is_empty() => {
                 let Some(array_ty) = arguments[0].as_array() else {
                     return;
                 };
@@ -1706,7 +1706,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     "replace the function call with the array's first element",
                 )
             }
-            "select_all" if arguments.len() >= 1 => {
+            "select_all" if !arguments.is_empty() => {
                 let Some(array_ty) = arguments[0].as_array() else {
                     return;
                 };
@@ -1721,7 +1721,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     "replace the function call with the array itself",
                 )
             }
-            "defined" if arguments.len() >= 1 => {
+            "defined" if !arguments.is_empty() => {
                 if arguments[0].is_optional() {
                     return;
                 }
