@@ -21,7 +21,7 @@ use crate::TagSet;
 use crate::util::lines_with_offset;
 
 /// The identifier for the mixed indentation rule.
-pub const MIXED_INDENTATION_RULE_ID: &str = "MixedIndentation";
+const ID: &str = "MixedIndentation";
 
 /// Type alias for backward compatibility
 pub type CommandSectionMixedIndentationRule = MixedIndentationRule;
@@ -57,7 +57,7 @@ impl From<u8> for IndentationKind {
 /// Creates a "mixed indentation in document" note diagnostic.
 fn mixed_document_indentation(span: Span, kind: IndentationKind) -> Diagnostic {
     Diagnostic::note("mixed indentation throughout document")
-        .with_rule(MIXED_INDENTATION_RULE_ID)
+        .with_rule(ID)
         .with_label(
             format!(
                 "indented with {kind} until this {anti}",
@@ -107,7 +107,7 @@ impl Visitor for MixedIndentationRule {
 
 impl Rule for MixedIndentationRule {
     fn id(&self) -> &'static str {
-        MIXED_INDENTATION_RULE_ID
+        ID
     }
 
     fn description(&self) -> &'static str {
@@ -260,7 +260,7 @@ impl Visitor for MixedIndentationVisitor {
                         };
 
                         let diagnostic = Diagnostic::warning("mixed indentation within a command")
-                            .with_rule(MIXED_INDENTATION_RULE_ID)
+                            .with_rule(ID)
                             .with_label(
                                 format!("indented with {first_kind} until this {changed_to}",),
                                 mixed_span,
