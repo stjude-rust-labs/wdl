@@ -539,8 +539,8 @@ pub struct ExprTypeEvaluator<'a, C> {
     /// This is used to avoid re-evaluating the same regex multiple times.
     ///
     /// The key is the regex string and the value is either an error or
-    /// `Ok(())`.
-    regex_cache: HashMap<String, Result<(), String>>,
+    /// a compied regex.
+    regex_cache: HashMap<String, Result<regex::Regex, String>>,
 }
 
 impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
@@ -1467,9 +1467,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                                         .regex_cache
                                         .entry(pattern.clone())
                                         .or_insert_with(|| {
-                                            regex::Regex::new(&pattern)
-                                                .map(|_| ())
-                                                .map_err(|e| e.to_string())
+                                            regex::Regex::new(&pattern).map_err(|e| e.to_string())
                                         });
                                     if let Err(e) = result {
                                         self.context.add_diagnostic(invalid_regex_pattern(
