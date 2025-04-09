@@ -299,7 +299,7 @@ impl DocsTree {
             }
             ul class="" {
                 @for child in node.children().values() {
-                    li class="px-2" { (self.sidebar_recurse(child, base)) }
+                    li class="px-2 border-l border-gray-500 ml-2" { (self.sidebar_recurse(child, base)) }
                 }
             }
         }
@@ -318,10 +318,14 @@ impl DocsTree {
         let base = path.as_ref().parent().unwrap();
 
         html! {
-            div class="top-0 border h-fit left-0 min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-white overflow-x-scroll flex flex-col gap-y-3" {
+            div class="top-0 h-full left-0 min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-white overflow-auto overflow-x-scroll flex flex-col gap-y-3" {
                 img src=(self.assets_relative_to(base).join("sprocket-logo.png").to_string_lossy()) class="w-1/2 h-1/2" alt="Sprocket logo";
+                form class="w-full h-full rounded-md border border-slate-700 flex items-center gap-x-2 px-2" {
+                    img src=(self.assets_relative_to(base).join("search.png").to_string_lossy()) class="w-4 h-4" alt="Search icon";
+                    input type="text" placeholder="Search" class="w-full h-full text-slate-300";
+                }
                 form class="w-full h-full rounded-md flex items-center gap-x-2 px-2" {
-                    div class="flex items-center gap-x-1 text-base" {
+                    div class="flex items-center gap-x-1" {
                         div class="flex items-center gap-x-1" {
                             img src=(self.assets_relative_to(base).join("list-bullet.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Workflows" }
@@ -332,10 +336,6 @@ impl DocsTree {
                         }
                     }
                 }
-                form class="w-full h-full rounded-md border border-slate-700 flex items-center gap-x-2 px-2" {
-                    img src=(self.assets_relative_to(base).join("search.png").to_string_lossy()) class="w-4 h-4" alt="Search icon";
-                    input type="text" placeholder="Search" class="w-full h-full text-slate-300";
-                }
                 ul class="" {
                     div class="flex flex-row items-center gap-x-1" {
                         img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
@@ -343,11 +343,11 @@ impl DocsTree {
                     }
                     @for node in root.children().values() {
                         @if node.name() != "external" {
-                            li class="px-2" { (self.sidebar_recurse(node, base)) }
+                            li class="px-2 border-l border-gray-500 ml-2" { (self.sidebar_recurse(node, base)) }
                         }
                     }
                     @if let Some(external) = root.children().get("external") {
-                        li class="px-2" { (self.sidebar_recurse(external, base)) }
+                        li class="px-2 border-l border-gray-500 ml-2" { (self.sidebar_recurse(external, base)) }
                     }
                 }
             }
@@ -357,7 +357,7 @@ impl DocsTree {
     /// Render a right sidebar component.
     pub fn render_right_sidebar(&self) -> Markup {
         html! {
-            div class="top-0 border h-screen sticky right-0 min-w-[240px] w-[240px] p-4 bottom-4 object-right dark:bg-red-900 dark:text-white" {
+            div class="top-0 h-screen overflow-auto sticky right-0 min-w-[240px] w-[240px] p-4 bottom-4 object-right dark:bg-red-900 dark:text-white" {
                 h1 class="text-2xl text-center" { "Sidebar" }
                 p class="" { "Right Sidebar" }
             }
@@ -416,11 +416,13 @@ impl DocsTree {
         let html = full_page(
             "Home",
             html! {
-                (left_sidebar)
-                div class="p-4 flex grow" {
-                    (content)
+                div class="overflow-auto flex flex-row flex-grow" {
+                    (left_sidebar)
+                    div class="p-4 flex grow flex-wrap overflow-auto overflow-y-scroll" {
+                        (content)
+                    }
+                    (self.render_right_sidebar())
                 }
-                (self.render_right_sidebar())
             },
             self.stylesheet_relative_to(root.path()),
         );
@@ -449,11 +451,13 @@ impl DocsTree {
         let html = full_page(
             page.name(),
             html! {
-                (left_sidebar)
-                div class="p-4 flex grow" {
-                    (content)
+                div class="overflow-auto flex flex-row flex-grow" {
+                    (left_sidebar)
+                    div class="p-4 flex grow sticky overflow-auto" {
+                        (content)
+                    }
+                    (self.render_right_sidebar())
                 }
-                (self.render_right_sidebar())
             },
             stylesheet,
         );

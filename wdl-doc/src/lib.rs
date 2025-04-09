@@ -136,7 +136,7 @@ pub(crate) fn full_page<P: AsRef<Path>>(page_title: &str, body: Markup, styleshe
         (DOCTYPE)
         html class="dark" {
             (header(page_title, stylesheet))
-            body class="flex size-full dark:bg-slate-950 dark:text-white p-4 text-lg" {
+            body class="flex size-full table-auto border-collapse dark:bg-slate-950 dark:text-white text-base" {
                 (body)
             }
         }
@@ -243,11 +243,11 @@ impl Document {
     /// Render the document as HTML.
     pub fn render(&self) -> Markup {
         html! {
-            div {
+            div class="flex flex-col flex-none items-left text-left" {
                 h1 { (self.name()) }
                 h3 { "WDL Version: " (self.version()) }
                 div { (self.preamble()) }
-                div class="flex flex-col items-center text-left"  {
+                div class="flex flex-col items-center"  {
                     h2 { "Table of Contents" }
                     table class="border" {
                         thead class="border" { tr {
