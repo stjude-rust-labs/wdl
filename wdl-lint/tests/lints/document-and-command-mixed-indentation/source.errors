@@ -6,23 +6,29 @@ warning[NonmatchingOutput]: `outputs` key missing in `meta` section for the task
    │
    = fix: add an `outputs` key to `meta` section describing the outputs
 
-warning[MixedIndentation]: mixed indentation in command section
-   ┌─ tests/lints/document-and-command-mixed-indentation/source.wdl:13:5
+warning[MixedIndentation]: mixed indentation within a command
+   ┌─ tests/lints/document-and-command-mixed-indentation/source.wdl:16:1
    │
-13 │ ╭     command <<<
-14 │ │         # This command section has mixed indentation
-15 │ │         echo "Hello World"
-16 │ │         echo "This line has tabs"
-17 │ │         echo "This line has spaces"
-18 │ │     >>>
-   │ ╰───────^
+13 │     command <<<
+   │     ------- this command section uses both tabs and spaces in leading whitespace
+   ·
+16 │ 		echo "This line has tabs"
+   │ ^^^^ indented with spaces until this tab
    │
-   = fix: use either tabs or spaces exclusively for indentation in command sections
+   = fix: use either tabs or spaces exclusively for indentation
+
+note[MixedIndentation]: mixed indentation throughout document
+   ┌─ tests/lints/document-and-command-mixed-indentation/source.wdl:20:1
+   │
+20 │ 	output {
+   │ ^^^^ indented with spaces until this tab
+   │
+   = fix: use either tabs or spaces exclusively for indentation throughout the document
 
 warning[NonmatchingOutput]: `outputs` key missing in `meta` section for the task `test2`
    ┌─ tests/lints/document-and-command-mixed-indentation/source.wdl:28:2
    │
-28 │     meta {}
+28 │ 	meta {}
    │     ^^^^
    │
    = fix: add an `outputs` key to `meta` section describing the outputs
@@ -30,23 +36,21 @@ warning[NonmatchingOutput]: `outputs` key missing in `meta` section for the task
 warning[NoCurlyCommands]: task `test2` uses curly braces in command section
    ┌─ tests/lints/document-and-command-mixed-indentation/source.wdl:32:2
    │
-32 │     command {
+32 │ 	command {
    │     ^^^^^^^ this command section uses curly braces
    │
    = fix: instead of curly braces, use heredoc syntax (<<<>>>>) for command sections
 
-warning[MixedIndentation]: mixed indentation in command section
-   ┌─ tests/lints/document-and-command-mixed-indentation/source.wdl:32:2
+warning[MixedIndentation]: mixed indentation within a command
+   ┌─ tests/lints/document-and-command-mixed-indentation/source.wdl:34:1
    │
-32 │ ╭     command {
-33 │ │         # This command section also has mixed indentation
-34 │ │         echo "This line has spaces"
-35 │ │         echo "This line has tabs"
-36 │ │         echo "Another line with spaces"
-37 │ │     }
-   │ ╰─────^
+32 │ 	command {
+   │     ------- this command section uses both tabs and spaces in leading whitespace
+33 │ 		# This command section also has mixed indentation
+34 │         echo "This line has spaces"
+   │ ^ indented with tabs until this space
    │
-   = fix: use either tabs or spaces exclusively for indentation in command sections
+   = fix: use either tabs or spaces exclusively for indentation
 
 note[MissingMetas]: workflow `mixed_indentation` is missing a `meta` section
    ┌─ tests/lints/document-and-command-mixed-indentation/source.wdl:46:10
