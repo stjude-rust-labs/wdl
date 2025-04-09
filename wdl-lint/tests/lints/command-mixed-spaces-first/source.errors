@@ -1,22 +1,22 @@
-warning[MixedIndentation]: mixed indentation in command section
-   ┌─ tests/lints/command-mixed-spaces-first/source.wdl:12:5
+warning[MixedIndentation]: mixed indentation within a command
+   ┌─ tests/lints/command-mixed-spaces-first/source.wdl:13:1
    │
-12 │ ╭     command <<<
-13 │ │         this line is prefixed with spaces
-14 │ │         this line is prefixed with ~{"tabs"}
-15 │ │     >>>
-   │ ╰───────^
+12 │     command <<<
+   │     ------- this command section uses both tabs and spaces in leading whitespace
+13 │         this line is prefixed with spaces
+14 │ 		this line is prefixed with ~{"tabs"}
+   │ ^ indented with tabs until this space
    │
-   = fix: use either tabs or spaces exclusively for indentation in command sections
+   = fix: use either tabs or spaces exclusively for indentation
 
-warning[MixedIndentation]: mixed indentation in command section
-   ┌─ tests/lints/command-mixed-spaces-first/source.wdl:28:5
+warning[MixedIndentation]: mixed indentation within a command
+   ┌─ tests/lints/command-mixed-spaces-first/source.wdl:29:1
    │
-28 │ ╭     command {
-29 │ │         this line is prefixed with spaces
-30 │ │         this line is prefixed with ~{"tabs"}
-31 │ │     }
-   │ ╰─────^
+28 │     command {
+   │     ------- this command section uses both tabs and spaces in leading whitespace
+29 │         this line is prefixed with spaces
+30 │ 		this line is prefixed with ~{"tabs"}
+   │ ^ indented with tabs until this space
    │
-   = fix: use either tabs or spaces exclusively for indentation in command sections
+   = fix: use either tabs or spaces exclusively for indentation
 

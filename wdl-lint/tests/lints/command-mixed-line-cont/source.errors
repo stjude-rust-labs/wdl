@@ -3,7 +3,7 @@ warning[MixedIndentation]: mixed indentation within a command
    │
 12 │     command <<<
    │     ------- this command section uses both tabs and spaces in leading whitespace
-13 │         this line has a continuation /
+13 │         this line has a continuation \
 14 │            and should be a warning
    │  ^^^ indented with spaces until this tab
    │
@@ -14,7 +14,7 @@ warning[MixedIndentation]: mixed indentation within a command
    │
 28 │     command {
    │     ------- this command section uses both tabs and spaces in leading whitespace
-29 │         this line has a continuation /
+29 │         this line has a continuation \
 30 │            and should be a warning
    │  ^^^ indented with spaces until this tab
    │

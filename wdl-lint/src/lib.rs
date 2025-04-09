@@ -97,48 +97,43 @@ pub trait Rule: Visitor<State = Diagnostics> {
 /// Gets the default rule set.
 pub fn rules() -> Vec<Box<dyn Rule>> {
     let rules: Vec<Box<dyn Rule>> = vec![
-        Box::<rules::DoubleQuotesRule>::default(),
-        Box::<rules::NoCurlyCommandsRule>::default(),
-        Box::<rules::SnakeCaseRule>::default(),
-        Box::<rules::MissingRuntimeRule>::default(),
-        Box::<rules::EndingNewlineRule>::default(),
-        Box::<rules::PreambleFormattingRule>::default(),
-        Box::<rules::MatchingParameterMetaRule>::default(),
         Box::<rules::WhitespaceRule>::default(),
-        Box::<rules::MixedIndentationRule>::default(),
-        Box::<rules::ImportPlacementRule>::default(),
-        Box::<rules::PascalCaseRule>::default(),
-        Box::<rules::ImportWhitespaceRule>::default(),
-        Box::<rules::MissingMetasRule>::default(),
-        Box::<rules::MissingOutputRule>::default(),
-        Box::<rules::ImportSortRule>::default(),
-        Box::<rules::InputNotSortedRule>::default(),
         Box::<rules::LineWidthRule>::default(),
-        Box::<rules::InconsistentNewlinesRule>::default(),
-        Box::<rules::CallInputSpacingRule>::default(),
-        Box::<rules::SectionOrderingRule>::default(),
-        Box::<rules::DeprecatedObjectRule>::default(),
-        Box::<rules::DescriptionMissingRule>::default(),
-        Box::<rules::DeprecatedPlaceholderOptionRule>::default(),
-        Box::<rules::RuntimeSectionKeysRule>::default(),
-        Box::<rules::TodoRule>::default(),
-        Box::<rules::NonmatchingOutputRule<'_>>::default(),
+        Box::<rules::PreambleFormattingRule>::default(),
+        Box::<rules::EndingNewlineRule>::default(),
         Box::<rules::CommentWhitespaceRule>::default(),
-        Box::<rules::TrailingCommaRule>::default(),
         Box::<rules::BlankLinesBetweenElementsRule>::default(),
-        Box::<rules::KeyValuePairsRule>::default(),
         Box::<rules::ExpressionSpacingRule>::default(),
+        Box::<rules::CallInputSpacingRule>::default(),
+        Box::<rules::TodoRule>::default(),
+        Box::<rules::DisallowedDeclarationNameRule>::default(),
         Box::<rules::DisallowedInputNameRule>::default(),
         Box::<rules::DisallowedOutputNameRule>::default(),
-        Box::<rules::DisallowedDeclarationNameRule>::default(),
-        Box::<rules::ContainerValue>::default(),
-        Box::<rules::MissingRequirementsRule>::default(),
-        Box::<rules::UnknownRule>::default(),
-        Box::<rules::MisplacedLintDirectiveRule>::default(),
+        Box::<rules::RuntimeSectionKeysRule>::default(),
+        Box::<rules::PascalCaseRule>::default(),
+        Box::<rules::SnakeCaseRule>::default(),
         Box::<rules::VersionFormattingRule>::default(),
-        Box::<rules::PreambleCommentAfterVersionRule>::default(),
-        Box::<rules::MalformedLintDirectiveRule>::default(),
+        Box::<rules::DescriptionMissingRule>::default(),
+        Box::<rules::MissingOutputRule>::default(),
+        Box::<rules::MissingRuntimeRule>::default(),
+        Box::<rules::NonmatchingOutputRule<'_>>::default(),
+        Box::<rules::NoCurlyCommandsRule>::default(),
+        Box::<rules::ImportSortRule>::default(),
+        Box::<rules::SectionOrderingRule>::default(),
+        Box::<rules::CommandSectionMixedIndentationRule>::default(),
+        Box::<rules::DeprecatedPlaceholderOptionRule>::default(),
+        Box::<rules::DeprecatedObjectRule>::default(),
+        Box::<rules::MissingMetasRule>::default(),
+        Box::<rules::MatchingParameterMetaRule>::default(),
+        Box::<rules::KeyValuePairsRule>::default(),
+        Box::<rules::ImportWhitespaceRule>::default(),
+        Box::<rules::DoubleQuotesRule>::default(),
         Box::<rules::RedundantInputAssignment>::default(),
+        Box::<rules::InputNotSortedRule>::default(),
+        Box::<rules::ShellCheckRule>::default(),
+        Box::<rules::MissingRequirementsRule>::default(),
+        Box::<rules::ContainerValue>::default(),
+        Box::<rules::TrailingCommaRule>::default(),
     ];
 
     // Ensure all the rule IDs are unique and pascal case and that related rules are
@@ -195,7 +190,8 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
 
 /// Gets the optional rule set.
 pub fn optional_rules() -> Vec<Box<dyn Rule>> {
-    let opt_rules: Vec<Box<dyn Rule>> = vec![Box::<rules::ShellCheckRule>::default()];
+    // No optional rules for now since ShellCheckRule is already in the default rules
+    let opt_rules: Vec<Box<dyn Rule>> = vec![];
 
     // Ensure all the rule IDs are unique and pascal case and that related rules are
     // valid, exist and not self-referential.
