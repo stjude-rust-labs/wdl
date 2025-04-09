@@ -23,6 +23,9 @@ use crate::util::lines_with_offset;
 /// The identifier for the mixed indentation rule.
 pub const MIXED_INDENTATION_RULE_ID: &str = "MixedIndentation";
 
+/// Type alias for backward compatibility
+pub type CommandSectionMixedIndentationRule = MixedIndentationRule;
+
 /// Represents the indentation kind.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 enum IndentationKind {
