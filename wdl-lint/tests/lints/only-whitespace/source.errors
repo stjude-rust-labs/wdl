@@ -26,14 +26,6 @@ note[Whitespace]: line contains only whitespace
    ┌─ tests/lints/only-whitespace/source.wdl:10:1
    │
 10 │     
-   │ ^^^^
-   │
-   = fix: remove the whitespace
-
-note[CommandSectionMixedIndentation]: mixed indentation throughout document
-   ┌─ tests/lints/only-whitespace/source.wdl:10:1
-   │
-10 │     
    │ ^^^^ indented with spaces until this tab
    │
    = fix: use either tabs or spaces exclusively for indentation throughout the document
