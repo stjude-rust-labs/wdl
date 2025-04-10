@@ -60,7 +60,7 @@ impl Rule for MissingRuntimeRule {
     fn related_rules(&self) -> &[&'static str] {
         &[
             "MetaDescription",
-            "MatchingParameterMeta",
+            "ParameterMetaMatched",
             "MissingMetas",
             "MissingOutput",
             "NonmatchingOutput",

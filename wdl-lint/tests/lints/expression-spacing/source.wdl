@@ -1,4 +1,4 @@
-#@ except: InputSorted, MatchingParameterMeta, NonmatchingOutput, RuntimeSectionKeys
+#@ except: InputSorted, ParameterMetaMatched, NonmatchingOutput, RuntimeSectionKeys
 #@ except: Whitespace
 
 version 1.1

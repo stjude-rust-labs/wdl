@@ -77,7 +77,7 @@ impl Rule for MetaDescriptionRule {
 
     fn related_rules(&self) -> &[&'static str] {
         &[
-            "MatchingParameterMeta",
+            "ParameterMetaMatched",
             "MissingOutput",
             "MissingRequirements",
             "MissingRuntime",

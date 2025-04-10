@@ -222,7 +222,7 @@ impl Rule for InputSortedRule {
     }
 
     fn related_rules(&self) -> &[&'static str] {
-        &["MatchingParameterMeta"]
+        &["ParameterMetaMatched"]
     }
 }
 

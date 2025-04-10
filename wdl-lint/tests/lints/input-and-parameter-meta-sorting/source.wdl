@@ -6,7 +6,7 @@
 version 1.2
 
 # This should trigger a InputSorted diagnostic,
-# but not a `MatchingParameterMeta` diagnostic
+# but not a `ParameterMetaMatched` diagnostic
 task input_sorting_test_1 {
     meta {}
 
@@ -32,7 +32,7 @@ task input_sorting_test_1 {
 }
 
 # This should trigger both an InputSorted diagnostic
-# as well as a `MatchingParameterMeta` diagnostic
+# as well as a `ParameterMetaMatched` diagnostic
 task input_sorting_test_2 {
     meta {}
 
