@@ -80,7 +80,7 @@ impl Rule for MetaDescriptionRule {
             "ParameterMetaMatched",
             "OutputSection",
             "RequirementsSection",
-            "MissingRuntime",
+            "RuntimeSection",
             "NonmatchingOutput",
         ]
     }

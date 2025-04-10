@@ -130,7 +130,7 @@ impl Rule for MetaSectionsRule {
             "ParameterMetaMatched",
             "OutputSection",
             "RequirementsSection",
-            "MissingRuntime",
+            "RuntimeSection",
             "NonmatchingOutput",
         ]
     }

@@ -100,7 +100,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::DoubleQuotesRule>::default(),
         Box::<rules::NoCurlyCommandsRule>::default(),
         Box::<rules::SnakeCaseRule>::default(),
-        Box::<rules::MissingRuntimeRule>::default(),
+        Box::<rules::RuntimeSectionRule>::default(),
         Box::<rules::EndingNewlineRule>::default(),
         Box::<rules::PreambleFormattingRule>::default(),
         Box::<rules::ParameterMetaMatchedRule>::default(),

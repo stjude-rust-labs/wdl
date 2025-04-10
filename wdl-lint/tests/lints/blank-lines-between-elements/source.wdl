@@ -56,7 +56,7 @@ workflow foo {
 
     }
 }
-#@ except: MetaSections, MissingRuntime
+#@ except: MetaSections, RuntimeSection
 task bar {
 
     meta {

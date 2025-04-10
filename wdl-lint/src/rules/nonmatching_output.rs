@@ -144,7 +144,7 @@ impl Rule for NonmatchingOutputRule<'_> {
             "ParameterMetaMatched",
             "OutputSection",
             "RequirementsSection",
-            "MissingRuntime",
+            "RuntimeSection",
         ]
     }
 }

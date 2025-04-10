@@ -35,7 +35,7 @@ be out of sync with released packages.
 | `MetaSections`                   | Clarity, Completeness         | Ensures that tasks and workflows have the required `meta` and `parameter_meta` sections.                                 |
 | `OutputSection`                  | Completeness, Portability     | Ensures that tasks and workflows have an `output` section.                                                        |
 | `RequirementsSection`            | Completeness, Portability     | Ensures that >=v1.2 tasks have a requirements section.                                            |
-| `MissingRuntime`                 | Completeness, Portability     | Ensures that tasks have a runtime section.                                                        |
+| `RuntimeSection`                 | Completeness, Portability     | Ensures that tasks have a runtime section.                                                        |
 | `NoCurlyCommands`                | Clarity                       | Ensures that tasks use heredoc syntax in command sections.                                        |
 | `NonmatchingOutput`              | Completeness                  | Ensures that each output field is documented in the meta section under `meta.outputs`.            |
 | `PascalCase`                     | Clarity, Naming, Style        | Ensures that structs are defined with PascalCase names.                                           |
