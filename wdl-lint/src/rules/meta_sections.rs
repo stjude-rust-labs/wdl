@@ -128,7 +128,7 @@ impl Rule for MetaSectionsRule {
         &[
             "MetaDescription",
             "ParameterMetaMatched",
-            "MissingOutput",
+            "OutputSection",
             "MissingRequirements",
             "MissingRuntime",
             "NonmatchingOutput",

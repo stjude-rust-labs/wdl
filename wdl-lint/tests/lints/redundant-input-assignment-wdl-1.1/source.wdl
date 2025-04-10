@@ -1,5 +1,5 @@
 #@ except: MetaDescription, MissingRequirements
-#@ except: RuntimeSectionKeys, MissingOutput, MetaSections
+#@ except: RuntimeSectionKeys, OutputSection, MetaSections
 
 version 1.1
 

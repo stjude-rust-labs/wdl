@@ -33,7 +33,7 @@ be out of sync with released packages.
 | `ParameterMetaMatched`          | Completeness, Sorting         | Ensures that inputs have a matching entry in a `parameter_meta` section.                          |
 | `LintDirectiveValid`         | Clarity, Correctness          | Ensures lint directives are placed correctly to have the intended effect.                                                   |
 | `MetaSections`                   | Clarity, Completeness         | Ensures that tasks and workflows have the required `meta` and `parameter_meta` sections.                                 |
-| `MissingOutput`                  | Completeness, Portability     | Ensures that tasks have an output section.                                                        |
+| `OutputSection`                  | Completeness, Portability     | Ensures that tasks and workflows have an `output` section.                                                        |
 | `MissingRequirements`            | Completeness, Portability     | Ensures that >=v1.2 tasks have a requirements section.                                            |
 | `MissingRuntime`                 | Completeness, Portability     | Ensures that tasks have a runtime section.                                                        |
 | `NoCurlyCommands`                | Clarity                       | Ensures that tasks use heredoc syntax in command sections.                                        |

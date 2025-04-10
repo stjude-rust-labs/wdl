@@ -24,7 +24,7 @@ struct Ok {         # OK
     Int NotOk       # NOT OK
 }
 
-#@ except: MetaSections,MissingOutput,Whitespace
+#@ except: MetaSections,OutputSection,Whitespace
 workflow test {
     String bad = 'bad string'   # NOT OK
     String good =

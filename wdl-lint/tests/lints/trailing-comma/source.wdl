@@ -1,5 +1,5 @@
 #@ except: DeprecatedObject, MetaDescription, InputSorted
-#@ except: ParameterMetaMatched, MetaSections, MissingOutput, MissingRequirements
+#@ except: ParameterMetaMatched, MetaSections, OutputSection, MissingRequirements
 
 version 1.2
 

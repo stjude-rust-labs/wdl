@@ -76,7 +76,7 @@ impl Rule for MissingRequirementsRule {
             "MetaDescription",
             "ParameterMetaMatched",
             "MetaSections",
-            "MissingOutput",
+            "OutputSection",
             "NonmatchingOutput",
         ]
     }
