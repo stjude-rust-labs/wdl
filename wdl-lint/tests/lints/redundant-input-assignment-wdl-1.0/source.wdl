@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, MissingRequirements
+#@ except: MetaDescription, MissingRequirements
 #@ except: RuntimeSectionKeys, MissingOutput, MissingMetas
 
 version 1.0

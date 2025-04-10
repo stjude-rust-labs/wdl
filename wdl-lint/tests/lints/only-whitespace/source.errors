@@ -61,10 +61,10 @@ note[Whitespace]: line contains trailing whitespace
    = fix: remove the trailing whitespace
 
 note[Whitespace]: line contains trailing whitespace
-   ┌─ tests/lints/only-whitespace/source.wdl:18:34
+   ┌─ tests/lints/only-whitespace/source.wdl:18:31
    │
-18 │     #@ except: DescriptionMissing        
-   │                                  ^^^^^^^^
+18 │     #@ except: MetaDescription        
+   │                               ^^^^^^^^
    │
    = fix: remove the trailing whitespace
 

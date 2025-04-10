@@ -73,7 +73,7 @@ impl Rule for MissingRequirementsRule {
     fn related_rules(&self) -> &[&'static str] {
         &[
             "RuntimeSectionKeys",
-            "DescriptionMissing",
+            "MetaDescription",
             "MatchingParameterMeta",
             "MissingMetas",
             "MissingOutput",

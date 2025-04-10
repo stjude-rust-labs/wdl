@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, ContainerUri
+#@ except: MetaDescription, ContainerUri
 
 version 1.1
 

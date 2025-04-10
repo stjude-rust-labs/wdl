@@ -128,7 +128,7 @@ impl Rule for MatchingParameterMetaRule {
 
     fn related_rules(&self) -> &[&'static str] {
         &[
-            "DescriptionMissing",
+            "MetaDescription",
             "InputSorting",
             "MissingOutput",
             "MissingRequirements",

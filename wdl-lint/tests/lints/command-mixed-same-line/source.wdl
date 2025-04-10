@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, RuntimeSectionKeys
+#@ except: MetaDescription, RuntimeSectionKeys
 
 ## This is a test of having mixed indentation on the same line in command sections.
 

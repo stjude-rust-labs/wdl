@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, DisallowedOutputName, MissingRuntime
+#@ except: MetaDescription, DisallowedOutputName, MissingRuntime
 
 version 1.1
 

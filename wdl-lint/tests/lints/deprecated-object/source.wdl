@@ -4,7 +4,7 @@ version 1.1
 
 #@ except: MissingMetas, NonmatchingOutput, DisallowedDeclarationName
 workflow test {
-    #@ except: DescriptionMissing
+    #@ except: MetaDescription
     meta {}
 
     input {

@@ -1,4 +1,4 @@
-#@ except: DeprecatedObject, DescriptionMissing, InputSorting
+#@ except: DeprecatedObject, MetaDescription, InputSorting
 #@ except: MatchingParameterMeta, MissingMetas, MissingOutput, MissingRequirements
 
 version 1.2

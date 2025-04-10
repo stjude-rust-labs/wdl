@@ -84,7 +84,7 @@ impl Rule for MissingOutputRule {
 
     fn related_rules(&self) -> &[&'static str] {
         &[
-            "DescriptionMissing",
+            "MetaDescription",
             "MatchingParameterMeta",
             "MissingRequirements",
             "MissingRuntime",

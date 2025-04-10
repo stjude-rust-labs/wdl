@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, RuntimeSectionKeys
+#@ except: MetaDescription, RuntimeSectionKeys
 
 ## This is a test of the `DeprecatedPlaceholder` lint.
 

@@ -1,4 +1,4 @@
-#@ except: CommentWhitespace, DescriptionMissing, MissingRuntime, UnknownRule, LineWidth, PreambleCommentAfterVersion
+#@ except: CommentWhitespace, MetaDescription, MissingRuntime, UnknownRule, LineWidth, PreambleCommentAfterVersion
 
 ## This is a test of the `MalformedLintDirective` rule
 

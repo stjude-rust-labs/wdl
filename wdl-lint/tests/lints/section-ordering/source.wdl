@@ -1,4 +1,4 @@
-#@ except: MissingRequirements, DescriptionMissing, MissingRuntime, MissingOutput
+#@ except: MissingRequirements, MetaDescription, MissingRuntime, MissingOutput
 #@ except: ElementSpacing
 
 version 1.2

@@ -118,7 +118,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::CallInputSpacingRule>::default(),
         Box::<rules::SectionOrderingRule>::default(),
         Box::<rules::DeprecatedObjectRule>::default(),
-        Box::<rules::DescriptionMissingRule>::default(),
+        Box::<rules::MetaDescriptionRule>::default(),
         Box::<rules::DeprecatedPlaceholderRule>::default(),
         Box::<rules::RuntimeSectionKeysRule>::default(),
         Box::<rules::TodoRule>::default(),

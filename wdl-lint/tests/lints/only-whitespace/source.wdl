@@ -15,7 +15,7 @@ version 1.1
 
 workflow test {    
     # lines above and below have trailing whitespace
-    #@ except: DescriptionMissing        
+    #@ except: MetaDescription        
     meta {}
     
     parameter_meta {}

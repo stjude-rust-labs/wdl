@@ -5,7 +5,7 @@ version 1.0
 # None of these lints should trigger as the version is WDL v1.0 (prior to
 # placeholder options being deprecated).
 task a_task {
-    #@ except: DescriptionMissing
+    #@ except: MetaDescription
     meta {}
 
     String bad_sep_option = "~{sep="," numbers}"

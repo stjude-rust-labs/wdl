@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, RuntimeSectionKeys
+#@ except: MetaDescription, RuntimeSectionKeys
 
 version 1.1
 

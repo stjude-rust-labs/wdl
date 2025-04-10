@@ -126,7 +126,7 @@ impl Rule for MissingMetasRule {
 
     fn related_rules(&self) -> &[&'static str] {
         &[
-            "DescriptionMissing",
+            "MetaDescription",
             "MatchingParameterMeta",
             "MissingOutput",
             "MissingRequirements",

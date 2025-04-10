@@ -10,7 +10,7 @@ version 1.2
 
 #@ except: MissingMetas, NonmatchingOutput
 workflow foo {# test in-line comment without preceding whitespace
-    #@ except: DescriptionMissing
+    #@ except: MetaDescription
     meta {# this is a problematic comment
     }
 

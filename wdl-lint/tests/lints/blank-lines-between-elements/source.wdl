@@ -11,7 +11,7 @@ import "qux"  # following whitespace duplication is caught be Whitespace rule
 workflow foo {
 
     # This is OK (but the prior line is not).
-    #@ except: DescriptionMissing
+    #@ except: MetaDescription
     meta {
     }
     # above is ok but the next won't be
@@ -85,7 +85,7 @@ task bar {
 }
 
 task bax {
-    #@ except: DescriptionMissing
+    #@ except: MetaDescription
     meta {}
 
     parameter_meta {}

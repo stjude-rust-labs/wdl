@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, Todo, MissingRequirements
+#@ except: MetaDescription, Todo, MissingRequirements
 
 ## This is a test of the `ContainerUri` lint.
 

@@ -140,7 +140,7 @@ impl Rule for NonmatchingOutputRule<'_> {
 
     fn related_rules(&self) -> &[&'static str] {
         &[
-            "DescriptionMissing",
+            "MetaDescription",
             "MatchingParameterMeta",
             "MissingOutput",
             "MissingRequirements",

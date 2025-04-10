@@ -4,7 +4,7 @@
 version 1.1
 
 task foo {
-    #@ except: DescriptionMissing
+    #@ except: MetaDescription
     meta {}
 
     parameter_meta{}

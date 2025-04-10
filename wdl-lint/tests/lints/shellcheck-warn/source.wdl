@@ -1,4 +1,4 @@
-#@ except: DescriptionMissing, RuntimeSectionKeys, MatchingParameterMeta, NoCurlyCommands
+#@ except: MetaDescription, RuntimeSectionKeys, MatchingParameterMeta, NoCurlyCommands
 
 ## This is a test of having shellcheck warnings
 
