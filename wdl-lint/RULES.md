@@ -31,7 +31,7 @@ be out of sync with released packages.
 | `LineWidth`                      | Clarity, Spacing, Style       | Ensures that lines do not exceed a certain width.                                                 |
 | `LintDirectiveFormatted`         | Clarity, Correctness          | Ensures lint directives are correctly formatted.                                                   |
 | `ParameterMetaMatched`          | Completeness, Sorting         | Ensures that inputs have a matching entry in a `parameter_meta` section.                          |
-| `MisplacedLintDirective`         | Clarity, Correctness          | Ensures there are no misplaced lint directives.                                                   |
+| `LintDirectiveValid`         | Clarity, Correctness          | Ensures lint directives are placed correctly to have the intended effect.                                                   |
 | `MissingMetas`                   | Clarity, Completeness         | Ensures that tasks have both a meta and a parameter_meta section.                                 |
 | `MissingOutput`                  | Completeness, Portability     | Ensures that tasks have an output section.                                                        |
 | `MissingRequirements`            | Completeness, Portability     | Ensures that >=v1.2 tasks have a requirements section.                                            |

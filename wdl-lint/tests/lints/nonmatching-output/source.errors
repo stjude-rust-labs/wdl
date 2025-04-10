@@ -68,7 +68,7 @@ warning[NonmatchingOutput]: output `v` is missing from `meta.outputs` section in
    │
    = fix: add a description of output `v` to documentation in `meta.outputs`
 
-note[MisplacedLintDirective]: lint directive `NonmatchingOutput` has no effect above metadata object item
+note[LintDirectiveValid]: lint directive `NonmatchingOutput` has no effect above metadata object item
     ┌─ tests/lints/nonmatching-output/source.wdl:113:24
     │
 113 │             #@ except: NonmatchingOutput
