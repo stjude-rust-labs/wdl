@@ -186,8 +186,8 @@ impl Visitor for PreambleFormattedRule {
             return;
         }
 
-        // If the next sibling is the version statement, let the VersionStatementFormatted rule
-        // handle this particular whitespace
+        // If the next sibling is the version statement, let the
+        // VersionStatementFormatted rule handle this particular whitespace
         if whitespace
             .inner()
             .next_sibling_or_token()
