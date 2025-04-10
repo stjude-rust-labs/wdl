@@ -21,6 +21,7 @@ jobs:
       - name: Add assignee
         run: |
           # Get the PR author
+          # Skip if the author is a bot
           author=$(gh pr view $PR_NUMBER --json author --jq 'select(.author.is_bot == false) | .author.login')
           # Check if the author is not empty
           if [ -n "$author" ]; then
