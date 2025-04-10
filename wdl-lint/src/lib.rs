@@ -130,7 +130,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::ExpressionSpacingRule>::default(),
         Box::<rules::DisallowedInputNameRule>::default(),
         Box::<rules::DisallowedOutputNameRule>::default(),
-        Box::<rules::DisallowedDeclarationNameRule>::default(),
+        Box::<rules::DeclarationNameRule>::default(),
         Box::<rules::ContainerUri>::default(),
         Box::<rules::MissingRequirementsRule>::default(),
         Box::<rules::UnknownRule>::default(),
