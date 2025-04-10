@@ -1,4 +1,4 @@
-#@ except: MetaDescription, DisallowedInputName, RuntimeSectionKeys
+#@ except: MetaDescription, InputName, RuntimeSectionKeys
 
 version 1.1
 

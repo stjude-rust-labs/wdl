@@ -9,7 +9,7 @@ task foo {
 
     parameter_meta{}
 
-    #@ except: DisallowedInputName
+    #@ except: InputName
     input {
         Int a=- 1
         Int w = 1

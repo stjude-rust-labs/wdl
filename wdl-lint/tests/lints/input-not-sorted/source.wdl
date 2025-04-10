@@ -1,4 +1,4 @@
-#@ except: MetaDescription, DisallowedInputName, MissingRequirements
+#@ except: MetaDescription, InputName, MissingRequirements
 #@ except: MatchingParameterMeta
 
 version 1.2

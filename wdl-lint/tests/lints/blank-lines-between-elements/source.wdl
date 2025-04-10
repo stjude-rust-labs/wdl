@@ -1,4 +1,4 @@
-#@ except: InputSorting, DisallowedInputName, DisallowedOutputName
+#@ except: InputSorting, InputName, DisallowedOutputName
 
 version 1.1
 

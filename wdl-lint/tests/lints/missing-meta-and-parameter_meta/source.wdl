@@ -3,7 +3,7 @@
 version 1.0
 
 workflow test {
-    #@ except: DisallowedInputName
+    #@ except: InputName
     input {
         File input_file
     }

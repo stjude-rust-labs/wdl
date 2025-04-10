@@ -1,4 +1,4 @@
-#@ except: MetaDescription, DisallowedInputName, MissingRequirements
+#@ except: MetaDescription, InputName, MissingRequirements
 
 ## This is a test for checking for missing and extraneous entries
 ## in a `parameter_meta` section specifically in structs , and for ensuring
