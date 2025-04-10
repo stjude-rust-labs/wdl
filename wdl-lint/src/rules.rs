@@ -41,7 +41,7 @@ mod snake_case;
 mod todo_comment;
 mod trailing_comma;
 mod known_rules;
-mod version_formatting;
+mod version_statement_formatted;
 mod whitespace;
 
 pub use element_spacing::*;
@@ -85,5 +85,5 @@ pub use snake_case::*;
 pub use todo_comment::*;
 pub use trailing_comma::*;
 pub use known_rules::*;
-pub use version_formatting::*;
+pub use version_statement_formatted::*;
 pub use whitespace::*;

@@ -135,7 +135,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::RequirementsSectionRule>::default(),
         Box::<rules::KnownRules>::default(),
         Box::<rules::LintDirectiveValidRule>::default(),
-        Box::<rules::VersionFormattingRule>::default(),
+        Box::<rules::VersionStatementFormattedRule>::default(),
         Box::<rules::PreambleCommentPlacementRule>::default(),
         Box::<rules::LintDirectiveFormattedRule>::default(),
         Box::<rules::ConciseInput>::default(),

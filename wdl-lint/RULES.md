@@ -49,5 +49,5 @@ be out of sync with released packages.
 | `TodoComment`                           | Completeness                  | Ensures that `TODO` statements are flagged for followup.                                          |
 | `TrailingComma`                  | Style                         | Ensures that lists and objects in meta have a trailing comma.                                     |
 | `KnownRules`                    | Clarity                       | Ensures only known rules are used in lint directives.                                    |
-| `VersionFormatting`              | Style                         | Ensures correct formatting of the version statement                                               |
+| `VersionStatementFormatted`              | Style                         | Ensures the `version` statement is correctly formatted.                                              |
 | `Whitespace`                     | Spacing, Style                | Ensures that a document does not contain undesired whitespace.                                    |

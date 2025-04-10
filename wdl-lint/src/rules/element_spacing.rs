@@ -587,7 +587,7 @@ fn check_prior_spacing(
                 if first || !element_spacing_required {
                     // first element cannot have a blank line before it.
                     // Whitespace following the version statement is handled by the
-                    // `VersionFormatting` rule.
+                    // `VersionStatementFormatted` rule.
                     if count > 1
                         && prior
                             .prev_sibling_or_token()
