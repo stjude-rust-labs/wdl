@@ -77,7 +77,7 @@ impl Rule for RequirementsSectionRule {
             "ParameterMetaMatched",
             "MetaSections",
             "OutputSection",
-            "NonmatchingOutput",
+            "MatchingOutputMeta",
         ]
     }
 }

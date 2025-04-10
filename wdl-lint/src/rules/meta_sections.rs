@@ -131,7 +131,7 @@ impl Rule for MetaSectionsRule {
             "OutputSection",
             "RequirementsSection",
             "RuntimeSection",
-            "NonmatchingOutput",
+            "MatchingOutputMeta",
         ]
     }
 }

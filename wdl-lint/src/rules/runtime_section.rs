@@ -63,7 +63,7 @@ impl Rule for RuntimeSectionRule {
             "ParameterMetaMatched",
             "MetaSections",
             "OutputSection",
-            "NonmatchingOutput",
+            "MatchingOutputMeta",
         ]
     }
 }

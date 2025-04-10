@@ -122,7 +122,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::DeprecatedPlaceholderRule>::default(),
         Box::<rules::RuntimeSectionKeysRule>::default(),
         Box::<rules::TodoRule>::default(),
-        Box::<rules::NonmatchingOutputRule<'_>>::default(),
+        Box::<rules::MatchingOutputMetaRule<'_>>::default(),
         Box::<rules::CommentWhitespaceRule>::default(),
         Box::<rules::TrailingCommaRule>::default(),
         Box::<rules::ElementSpacingRule>::default(),

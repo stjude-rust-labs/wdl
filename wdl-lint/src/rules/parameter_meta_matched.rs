@@ -133,7 +133,7 @@ impl Rule for ParameterMetaMatchedRule {
             "OutputSection",
             "RequirementsSection",
             "RuntimeSection",
-            "NonmatchingOutput",
+            "MatchingOutputMeta",
         ]
     }
 }

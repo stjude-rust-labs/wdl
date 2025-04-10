@@ -81,7 +81,7 @@ impl Rule for MetaDescriptionRule {
             "OutputSection",
             "RequirementsSection",
             "RuntimeSection",
-            "NonmatchingOutput",
+            "MatchingOutputMeta",
         ]
     }
 }

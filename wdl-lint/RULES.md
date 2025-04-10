@@ -37,7 +37,7 @@ be out of sync with released packages.
 | `RequirementsSection`            | Completeness, Portability     | Ensures that >=v1.2 tasks have a requirements section.                                            |
 | `RuntimeSection`                 | Completeness, Portability     | Ensures that tasks have a runtime section.                                                        |
 | `HereDocCommands`                | Clarity                       | Ensures that tasks use heredoc syntax in command sections.                                        |
-| `NonmatchingOutput`              | Completeness                  | Ensures that each output field is documented in the meta section under `meta.outputs`.            |
+| `MatchingOutputMeta`              | Completeness                  | Ensures that each output field is documented in the meta section under `meta.outputs`.            |
 | `PascalCase`                     | Clarity, Naming, Style        | Ensures that structs are defined with PascalCase names.                                           |
 | `PreambleCommentAfterVersion`    | Clarity                       | Ensures that documents have correct comments in the preamble.                                     |
 | `PreambleFormatting`             | Clarity, Spacing, Style       | Ensures that documents have correct whitespace in the preamble.                                   |
