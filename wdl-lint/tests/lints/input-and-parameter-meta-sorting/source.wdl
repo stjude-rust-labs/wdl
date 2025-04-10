@@ -1,4 +1,4 @@
-#@ except: MetaDescription, InputName, MissingRequirements
+#@ except: MetaDescription, InputName, RequirementsSection
 
 ## This is a test related to the `InputSorted` and `MatchingParamMeta`
 ## diagnostic, specifically, it tests how they interact with each other.

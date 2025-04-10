@@ -131,7 +131,7 @@ impl Rule for ParameterMetaMatchedRule {
             "MetaDescription",
             "InputSorted",
             "OutputSection",
-            "MissingRequirements",
+            "RequirementsSection",
             "MissingRuntime",
             "NonmatchingOutput",
         ]

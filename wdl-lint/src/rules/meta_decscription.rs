@@ -79,7 +79,7 @@ impl Rule for MetaDescriptionRule {
         &[
             "ParameterMetaMatched",
             "OutputSection",
-            "MissingRequirements",
+            "RequirementsSection",
             "MissingRuntime",
             "NonmatchingOutput",
         ]

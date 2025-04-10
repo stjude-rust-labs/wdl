@@ -34,7 +34,7 @@ be out of sync with released packages.
 | `LintDirectiveValid`         | Clarity, Correctness          | Ensures lint directives are placed correctly to have the intended effect.                                                   |
 | `MetaSections`                   | Clarity, Completeness         | Ensures that tasks and workflows have the required `meta` and `parameter_meta` sections.                                 |
 | `OutputSection`                  | Completeness, Portability     | Ensures that tasks and workflows have an `output` section.                                                        |
-| `MissingRequirements`            | Completeness, Portability     | Ensures that >=v1.2 tasks have a requirements section.                                            |
+| `RequirementsSection`            | Completeness, Portability     | Ensures that >=v1.2 tasks have a requirements section.                                            |
 | `MissingRuntime`                 | Completeness, Portability     | Ensures that tasks have a runtime section.                                                        |
 | `NoCurlyCommands`                | Clarity                       | Ensures that tasks use heredoc syntax in command sections.                                        |
 | `NonmatchingOutput`              | Completeness                  | Ensures that each output field is documented in the meta section under `meta.outputs`.            |

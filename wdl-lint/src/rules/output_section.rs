@@ -86,7 +86,7 @@ impl Rule for OutputSectionRule {
         &[
             "MetaDescription",
             "ParameterMetaMatched",
-            "MissingRequirements",
+            "RequirementsSection",
             "MissingRuntime",
             "NonmatchingOutput",
         ]

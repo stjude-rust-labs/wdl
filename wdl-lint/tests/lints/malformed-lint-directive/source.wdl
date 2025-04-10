@@ -6,7 +6,7 @@ version 1.2
 
 #@ stop: This should be flagged for using 'stop' instead of 'except'
 
-#@ except: MissingRequirements
+#@ except: RequirementsSection
 task foo {
     #@except: this should be flagged for missing a space
     meta {

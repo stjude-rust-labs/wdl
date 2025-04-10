@@ -1,4 +1,4 @@
-#@ except: ParameterMetaMatched, MissingRequirements
+#@ except: ParameterMetaMatched, RequirementsSection
 
 version 1.2
 

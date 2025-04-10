@@ -143,7 +143,7 @@ impl Rule for NonmatchingOutputRule<'_> {
             "MetaDescription",
             "ParameterMetaMatched",
             "OutputSection",
-            "MissingRequirements",
+            "RequirementsSection",
             "MissingRuntime",
         ]
     }
