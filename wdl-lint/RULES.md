@@ -39,7 +39,7 @@ be out of sync with released packages.
 | `HereDocCommands`                | Clarity                       | Ensures that tasks use heredoc syntax in command sections.                                        |
 | `MatchingOutputMeta`              | Completeness                  | Ensures that each output field is documented in the meta section under `meta.outputs`.            |
 | `PascalCase`                     | Clarity, Naming, Style        | Ensures that structs are defined with PascalCase names.                                           |
-| `PreambleCommentAfterVersion`    | Clarity                       | Ensures that documents have correct comments in the preamble.                                     |
+| `PreambleCommentPlacement`    | Clarity                       | Ensures that documents have correct comments in the preamble.                                     |
 | `PreambleFormatting`             | Clarity, Spacing, Style       | Ensures that documents have correct whitespace in the preamble.                                   |
 | `RedundantInputAssignment`       | Style                         | Ensures that redundant input assignments are shortened                                            |
 | `RuntimeSectionKeys`             | Completeness, Deprecated      | Ensures that runtime sections have the appropriate keys.                                          |
