@@ -169,7 +169,7 @@ note[ElementSpacing]: missing blank line
    │  
 58 │   }
    │ ╭─^
-59 │ │ #@ except: MissingMetas, MissingRuntime
+59 │ │ #@ except: MetaSections, MissingRuntime
    │ ╰^
    │  
    = fix: add a blank line

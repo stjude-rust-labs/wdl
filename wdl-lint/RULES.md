@@ -32,7 +32,7 @@ be out of sync with released packages.
 | `LintDirectiveFormatted`         | Clarity, Correctness          | Ensures lint directives are correctly formatted.                                                   |
 | `ParameterMetaMatched`          | Completeness, Sorting         | Ensures that inputs have a matching entry in a `parameter_meta` section.                          |
 | `LintDirectiveValid`         | Clarity, Correctness          | Ensures lint directives are placed correctly to have the intended effect.                                                   |
-| `MissingMetas`                   | Clarity, Completeness         | Ensures that tasks have both a meta and a parameter_meta section.                                 |
+| `MetaSections`                   | Clarity, Completeness         | Ensures that tasks and workflows have the required `meta` and `parameter_meta` sections.                                 |
 | `MissingOutput`                  | Completeness, Portability     | Ensures that tasks have an output section.                                                        |
 | `MissingRequirements`            | Completeness, Portability     | Ensures that >=v1.2 tasks have a requirements section.                                            |
 | `MissingRuntime`                 | Completeness, Portability     | Ensures that tasks have a runtime section.                                                        |

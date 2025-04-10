@@ -4,5 +4,5 @@
 
 version 1.1
 
-#@ except: MissingMetas,MissingOutput
+#@ except: MetaSections,MissingOutput
 workflow foo {}

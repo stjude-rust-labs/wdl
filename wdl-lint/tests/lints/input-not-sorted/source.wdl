@@ -3,7 +3,7 @@
 
 version 1.2
 
-#@ except: MissingMetas
+#@ except: MetaSections
 struct Mystruct {
     String a
     Int b

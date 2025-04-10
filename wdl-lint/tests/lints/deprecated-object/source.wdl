@@ -2,7 +2,7 @@
 
 version 1.1
 
-#@ except: MissingMetas, NonmatchingOutput, DeclarationName
+#@ except: MetaSections, NonmatchingOutput, DeclarationName
 workflow test {
     #@ except: MetaDescription
     meta {}

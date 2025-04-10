@@ -75,7 +75,7 @@ impl Rule for MissingRequirementsRule {
             "RuntimeSectionKeys",
             "MetaDescription",
             "ParameterMetaMatched",
-            "MissingMetas",
+            "MetaSections",
             "MissingOutput",
             "NonmatchingOutput",
         ]

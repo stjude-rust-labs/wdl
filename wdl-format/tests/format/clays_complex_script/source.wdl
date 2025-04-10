@@ -6,7 +6,7 @@
 ## part of preamble
 version 1.2
 
-#@ except: MissingMetas
+#@ except: MetaSections
 struct AStruct {
    String member
 }

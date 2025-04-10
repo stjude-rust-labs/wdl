@@ -251,7 +251,7 @@ impl Visitor for ParameterMetaMatchedRule {
             }
             None => {
                 // If there is no parameter_meta section, then let the
-                // MissingMetas rule handle it
+                // MetaSections rule handle it
             }
         }
     }
@@ -284,7 +284,7 @@ impl Visitor for ParameterMetaMatchedRule {
             }
             None => {
                 // If there is no parameter_meta section, then let the
-                // MissingMetas rule handle it
+                // MetaSections rule handle it
             }
         }
     }
@@ -318,7 +318,7 @@ impl Visitor for ParameterMetaMatchedRule {
             }
             None => {
                 // If there is no parameter_meta section, then let the
-                // MissingMetas rule handle it
+                // MetaSections rule handle it
             }
         }
     }

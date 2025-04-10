@@ -8,7 +8,7 @@ version 1.2
 # a good comment
 # a comment with trailing whitespace          
 
-#@ except: MissingMetas, NonmatchingOutput
+#@ except: MetaSections, NonmatchingOutput
 workflow foo {# test in-line comment without preceding whitespace
     #@ except: MetaDescription
     meta {# this is a problematic comment

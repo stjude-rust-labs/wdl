@@ -109,7 +109,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::ImportPlacementRule>::default(),
         Box::<rules::PascalCaseRule>::default(),
         Box::<rules::ImportWhitespaceRule>::default(),
-        Box::<rules::MissingMetasRule>::default(),
+        Box::<rules::MetaSectionsRule>::default(),
         Box::<rules::MissingOutputRule>::default(),
         Box::<rules::ImportSortedRule>::default(),
         Box::<rules::InputSortedRule>::default(),

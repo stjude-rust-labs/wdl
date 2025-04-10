@@ -61,7 +61,7 @@ impl Rule for MissingRuntimeRule {
         &[
             "MetaDescription",
             "ParameterMetaMatched",
-            "MissingMetas",
+            "MetaSections",
             "MissingOutput",
             "NonmatchingOutput",
         ]
