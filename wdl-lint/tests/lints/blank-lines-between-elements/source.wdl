@@ -97,7 +97,7 @@ task bax {
 
     output {}
 
-    #@ except: ContainerValue
+    #@ except: ContainerUri
     runtime {
 
         disks: "50 GB"

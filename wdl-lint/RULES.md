@@ -12,7 +12,7 @@ be out of sync with released packages.
 | `CallInputSpacing`               | Clarity, Spacing, Style       | Ensures proper spacing for call inputs                                                            |
 | `CommandSectionIndentation` | Clarity, Correctness, Spacing | Ensures consistent indentation (no mixed spaces/tabs) within command sections.                                   |
 | `CommentWhitespace`              | Spacing                       | Ensures that comments are properly spaced.                                                        |
-| `ContainerValue`                 | Clarity, Portability          | Ensures that the value for `container` keys in `runtime`/`requirements` sections are well-formed. |
+| `ContainerUri`                 | Clarity, Portability          | Ensures that the value for `container` keys in `runtime`/`requirements` sections are well-formed. |
 | `DeprecatedObject`               | Deprecated                    | Ensures that the deprecated `Object` construct is not used.                                       |
 | `DeprecatedPlaceholderOption`    | Deprecated                    | Ensures that the deprecated placeholder options construct is not used.                            |
 | `DescriptionMissing`             | Completeness                  | Ensures that each meta section has a description key.                                             |
