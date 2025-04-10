@@ -1,11 +1,11 @@
 #@ except: MetaDescription, InputName, MissingRequirements
 
-## This is a test related to the `InputSorting` and `MatchingParamMeta`
+## This is a test related to the `InputSorted` and `MatchingParamMeta`
 ## diagnostic, specifically, it tests how they interact with each other.
 
 version 1.2
 
-# This should trigger a InputSorting diagnostic,
+# This should trigger a InputSorted diagnostic,
 # but not a `MatchingParameterMeta` diagnostic
 task input_sorting_test_1 {
     meta {}
@@ -31,7 +31,7 @@ task input_sorting_test_1 {
     output {}
 }
 
-# This should trigger both an InputSorting diagnostic
+# This should trigger both an InputSorted diagnostic
 # as well as a `MatchingParameterMeta` diagnostic
 task input_sorting_test_2 {
     meta {}

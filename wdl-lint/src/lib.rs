@@ -112,7 +112,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::MissingMetasRule>::default(),
         Box::<rules::MissingOutputRule>::default(),
         Box::<rules::ImportSortedRule>::default(),
-        Box::<rules::InputNotSortedRule>::default(),
+        Box::<rules::InputSortedRule>::default(),
         Box::<rules::LineWidthRule>::default(),
         Box::<rules::ConsistentNewlinesRule>::default(),
         Box::<rules::CallInputSpacingRule>::default(),
