@@ -137,7 +137,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::MisplacedLintDirectiveRule>::default(),
         Box::<rules::VersionFormattingRule>::default(),
         Box::<rules::PreambleCommentAfterVersionRule>::default(),
-        Box::<rules::MalformedLintDirectiveRule>::default(),
+        Box::<rules::LintDirectiveFormattedRule>::default(),
         Box::<rules::RedundantInputAssignment>::default(),
     ];
 

@@ -1,6 +1,6 @@
 #@ except: CommentWhitespace, MetaDescription, MissingRuntime, UnknownRule, LineWidth, PreambleCommentAfterVersion
 
-## This is a test of the `MalformedLintDirective` rule
+## This is a test of the `LintDirectiveFormatted` rule
 
 version 1.2
 

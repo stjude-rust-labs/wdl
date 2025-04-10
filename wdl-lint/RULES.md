@@ -29,7 +29,7 @@ be out of sync with released packages.
 | `InputSorted`                   | Clarity, Sorting, Style       | Ensures that input declarations are sorted                                                        |
 | `KeyValuePairs`                  | Style                         | Ensures that metadata objects and arrays are properly spaced.                                     |
 | `LineWidth`                      | Clarity, Spacing, Style       | Ensures that lines do not exceed a certain width.                                                 |
-| `MalformedLintDirective`         | Clarity, Correctness          | Ensures there are no malformed lint directives.                                                   |
+| `LintDirectiveFormatted`         | Clarity, Correctness          | Ensures lint directives are correctly formatted.                                                   |
 | `MatchingParameterMeta`          | Completeness, Sorting         | Ensures that inputs have a matching entry in a `parameter_meta` section.                          |
 | `MisplacedLintDirective`         | Clarity, Correctness          | Ensures there are no misplaced lint directives.                                                   |
 | `MissingMetas`                   | Clarity, Completeness         | Ensures that tasks have both a meta and a parameter_meta section.                                 |
