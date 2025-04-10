@@ -98,7 +98,7 @@ pub trait Rule: Visitor<State = Diagnostics> {
 pub fn rules() -> Vec<Box<dyn Rule>> {
     let rules: Vec<Box<dyn Rule>> = vec![
         Box::<rules::DoubleQuotesRule>::default(),
-        Box::<rules::NoCurlyCommandsRule>::default(),
+        Box::<rules::HereDocCommandsRule>::default(),
         Box::<rules::SnakeCaseRule>::default(),
         Box::<rules::RuntimeSectionRule>::default(),
         Box::<rules::EndingNewlineRule>::default(),

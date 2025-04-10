@@ -1,6 +1,6 @@
 #@ except: MetaDescription, RuntimeSectionKeys
 
-## This is a test of the `NoCurlyCommands` lint
+## This is a test of the `HereDocCommands` lint
 
 version 1.1
 

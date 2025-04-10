@@ -23,7 +23,7 @@ task test2 {
 
     parameter_meta {}
 
-    #@ except: NoCurlyCommands
+    #@ except: HereDocCommands
     command {
     		this line starts with spaces and ends with tabs
     }

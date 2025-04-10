@@ -1,4 +1,4 @@
-#@ except: MetaDescription, RuntimeSectionKeys, ParameterMetaMatched, NoCurlyCommands
+#@ except: MetaDescription, RuntimeSectionKeys, ParameterMetaMatched, HereDocCommands
 
 ## This is a test of having shellcheck style lints
 

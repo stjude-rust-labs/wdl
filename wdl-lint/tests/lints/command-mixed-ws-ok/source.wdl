@@ -28,7 +28,7 @@ task test2 {
 
     parameter_meta {}
 
-    #@ except: NoCurlyCommands
+    #@ except: HereDocCommands
     command {
         this line is ${(
 		    if true
