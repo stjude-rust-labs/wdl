@@ -61,7 +61,7 @@ impl Rule for PreambleCommentPlacementRule {
     }
 
     fn related_rules(&self) -> &[&'static str] {
-        &["PreambleFormatting"]
+        &["PreambleFormatted"]
     }
 }
 

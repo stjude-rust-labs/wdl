@@ -102,7 +102,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::SnakeCaseRule>::default(),
         Box::<rules::RuntimeSectionRule>::default(),
         Box::<rules::EndingNewlineRule>::default(),
-        Box::<rules::PreambleFormattingRule>::default(),
+        Box::<rules::PreambleFormattedRule>::default(),
         Box::<rules::ParameterMetaMatchedRule>::default(),
         Box::<rules::WhitespaceRule>::default(),
         Box::<rules::CommandSectionIndentationRule>::default(),

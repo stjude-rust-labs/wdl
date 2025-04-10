@@ -1,4 +1,4 @@
-note[PreambleFormatting]: unnecessary whitespace in document preamble
+note[PreambleFormatted]: unnecessary whitespace in document preamble
   ┌─ tests/lints/preamble-ws/source.wdl:1:1
   │
 1 │     #@ except: MetaDescription
@@ -6,7 +6,7 @@ note[PreambleFormatting]: unnecessary whitespace in document preamble
   │
   = fix: remove the leading whitespace
 
-note[PreambleFormatting]: expected exactly one blank line between lint directives and preamble comments
+note[PreambleFormatted]: expected exactly one blank line between lint directives and preamble comments
   ┌─ tests/lints/preamble-ws/source.wdl:1:31
   │  
 1 │       #@ except: MetaDescription

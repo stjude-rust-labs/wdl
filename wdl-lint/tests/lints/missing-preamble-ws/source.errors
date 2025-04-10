@@ -1,4 +1,4 @@
-note[PreambleFormatting]: expected exactly one blank line between lint directives and preamble comments
+note[PreambleFormatted]: expected exactly one blank line between lint directives and preamble comments
   ┌─ tests/lints/missing-preamble-ws/source.wdl:1:27
   │  
 1 │   #@ except: MetaDescription

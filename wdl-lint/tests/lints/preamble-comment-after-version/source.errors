@@ -1,4 +1,4 @@
-note[PreambleFormatting]: unnecessary whitespace in document preamble
+note[PreambleFormatted]: unnecessary whitespace in document preamble
   ┌─ tests/lints/preamble-comment-after-version/source.wdl:2:1
   │
 2 │        ## Bad leading whitespace!

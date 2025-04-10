@@ -40,7 +40,7 @@ be out of sync with released packages.
 | `MatchingOutputMeta`              | Completeness                  | Ensures that each output field is documented in the meta section under `meta.outputs`.            |
 | `PascalCase`                     | Clarity, Naming, Style        | Ensures that structs are defined with PascalCase names.                                           |
 | `PreambleCommentPlacement`    | Clarity                       | Ensures that documents have correct comments in the preamble.                                     |
-| `PreambleFormatting`             | Clarity, Spacing, Style       | Ensures that documents have correct whitespace in the preamble.                                   |
+| `PreambleFormatted`             | Clarity, Spacing, Style       | Ensures that documents have correct whitespace in the preamble.                                   |
 | `RedundantInputAssignment`       | Style                         | Ensures that redundant input assignments are shortened                                            |
 | `RuntimeSectionKeys`             | Completeness, Deprecated      | Ensures that runtime sections have the appropriate keys.                                          |
 | `SectionOrdering`                | Sorting, Style                | Ensures that sections within tasks and workflows are sorted.                                      |
