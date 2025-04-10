@@ -17,8 +17,8 @@ be out of sync with released packages.
 | `DeprecatedPlaceholder`    | Deprecated                    | Ensures that the deprecated placeholder options construct is not used.                            |
 | `MetaDescription`             | Completeness                  | Ensures the `meta` section contains a `description` key.
 | `DeclarationName`      | Naming                        | Ensures declaration names do not redundantly include their type name.                             |
-| `InputName`            | Naming                        | ensures input names are meaningful (e.g., not generic like 'input', 'in', or too short).                                                          |
 | `DisallowedOutputName`           | Naming                        | Ensures that output names are meaningful.                                                         |
+| `InputName`            | Naming                        | Ensures input names are meaningful (e.g., not generic like 'input', 'in', or too short).                                                          |
 | `DoubleQuotes`                   | Clarity, Style                | Ensures that strings are defined using double quotes.                                             |
 | `EndingNewline`                  | Spacing, Style                | Ensures that documents end with a single newline character.                                       |
 | `ExpressionSpacing`              | Spacing                       | Ensures that expressions are properly spaced.                                                     |
