@@ -1,8 +1,8 @@
 note[Whitespace]: line contains trailing whitespace
-  ┌─ tests/lints/trailing-comment-whitespace/source.wdl:1:37
+  ┌─ tests/lints/trailing-comment-whitespace/source.wdl:1:26
   │
-1 │ #@ except: BlankLinesBetweenElements       
-  │                                     ^^^^^^^
+1 │ #@ except: ElementSpacing       
+  │                          ^^^^^^^
   │
   = fix: remove the trailing whitespace
 

@@ -1,4 +1,4 @@
-#@ except: BlankLinesBetweenElements, DescriptionMissing
+#@ except: ElementSpacing, DescriptionMissing
 
 ## This is a test of a missing EOF newline lint
 

@@ -8,7 +8,7 @@ be out of sync with released packages.
 
 | Name                             | Tags                          | Description                                                                                       |
 |:---------------------------------|:------------------------------|:--------------------------------------------------------------------------------------------------|
-| `BlankLinesBetweenElements`      | Spacing                       | Ensures proper blank space between elements                                                       |
+| `ElementSpacing`      | Spacing                       | Ensures proper blank space between elements                                                       |
 | `CallInputSpacing`               | Clarity, Spacing, Style       | Ensures proper spacing for call inputs                                                            |
 | `CommandSectionMixedIndentation` | Clarity, Correctness, Spacing | Ensures that lines within a command do not mix spaces and tabs.                                   |
 | `CommentWhitespace`              | Spacing                       | Ensures that comments are properly spaced.                                                        |

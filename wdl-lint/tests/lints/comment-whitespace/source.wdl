@@ -1,4 +1,4 @@
-#@ except: ExpressionSpacing, BlankLinesBetweenElements
+#@ except: ExpressionSpacing, ElementSpacing
 
 version 1.2
 

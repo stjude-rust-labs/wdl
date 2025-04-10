@@ -1,4 +1,4 @@
-#@ except: BlankLinesBetweenElements       
+#@ except: ElementSpacing       
 
 ## The above lint directive has trailing whitespace
 ## This is a preamble comment with whitespace trailing 
