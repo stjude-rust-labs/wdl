@@ -2,6 +2,7 @@
 
 mod blank_lines_between_elements;
 mod call_input_spacing;
+#[doc = "Module for detecting mixed indentation in command sections and documents."]
 mod command_mixed_indentation;
 mod comment_whitespace;
 mod container_value;

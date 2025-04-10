@@ -1,11 +1,3 @@
-warning[NonmatchingOutput]: `outputs` key missing in `meta` section for the task `test1`
-   ┌─ tests/lints/document-mixed-indentation/source.wdl:9:5
-   │
-9 │     meta {}
-   │     ^^^^
-   │
-   = fix: add an `outputs` key to `meta` section describing the outputs
-
 note[MixedIndentation]: mixed indentation throughout document
    ┌─ tests/lints/document-mixed-indentation/source.wdl:16:1
    │
@@ -13,5 +5,3 @@ note[MixedIndentation]: mixed indentation throughout document
    │ ^ indented with tabs until this space
    │
    = fix: use either tabs or spaces exclusively for indentation throughout the document
-
-warning[NonmatchingOutput]: `outputs`
