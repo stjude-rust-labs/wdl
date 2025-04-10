@@ -1,6 +1,5 @@
 //! Type conversion helpers for a V1 AST.
 
-use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Write;
 use std::sync::Arc;
@@ -533,14 +532,6 @@ pub struct ExprTypeEvaluator<'a, C> {
     /// If the count is non-zero, special evaluation behavior is enabled for
     /// string interpolation.
     placeholders: usize,
-
-    /// A cache of regexes that have been evaluated.
-    ///
-    /// This is used to avoid re-evaluating the same regex multiple times.
-    ///
-    /// The key is the regex string and the value is either an error or
-    /// a compied regex.
-    regex_cache: HashMap<String, Result<regex::Regex, String>>,
 }
 
 impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
@@ -549,7 +540,6 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         Self {
             context,
             placeholders: 0,
-            regex_cache: HashMap::new(),
         }
     }
 
@@ -1443,10 +1433,8 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 // Evaluate the argument expressions
                 let mut count = 0;
                 let mut arguments = [const { Type::Union }; MAX_PARAMETERS];
-                let mut arguments_node = Vec::with_capacity(expr.arguments().count());
 
                 for arg in expr.arguments() {
-                    arguments_node.push(arg.clone());
                     if count < MAX_PARAMETERS {
                         arguments[count] = self.evaluate_expr(&arg).unwrap_or(Type::Union);
                     }
@@ -1457,23 +1445,17 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 match target.text() {
                     "find" | "matches" | "sub" => {
                         // above function expect the pattern as 2nd argument
-                        if arguments_node.len() >= 2 {
+                        if let Some(pattern_arg_expr) = expr.arguments().nth(1) {
                             if let Expr::Literal(LiteralExpr::String(pattern_literal)) =
-                                &arguments_node[1]
+                                &pattern_arg_expr
                             {
                                 if let Some(value) = pattern_literal.text() {
                                     let pattern = value.text().to_string();
-                                    let result = self
-                                        .regex_cache
-                                        .entry(pattern.clone())
-                                        .or_insert_with(|| {
-                                            regex::Regex::new(&pattern).map_err(|e| e.to_string())
-                                        });
-                                    if let Err(e) = result {
+                                    if let Err(e) = regex::Regex::new(&pattern) {
                                         self.context.add_diagnostic(invalid_regex_pattern(
                                             target.text(),
                                             value.text(),
-                                            &e.to_string(),
+                                            &e,
                                             pattern_literal.span(),
                                         ));
                                     }
@@ -1527,17 +1509,15 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                             ));
                         }
                         Err(FunctionBindError::ArgumentTypeMismatch { index, expected }) => {
-                            if index < arguments.len() {
-                                self.context.add_diagnostic(argument_type_mismatch(
-                                    target.text(),
-                                    &expected,
-                                    &arguments[index],
-                                    expr.arguments()
-                                        .nth(index)
-                                        .map(|e| e.span())
-                                        .expect("should have span"),
-                                ));
-                            }
+                            self.context.add_diagnostic(argument_type_mismatch(
+                                target.text(),
+                                &expected,
+                                &arguments[index],
+                                expr.arguments()
+                                    .nth(index)
+                                    .map(|e| e.span())
+                                    .expect("should have span"),
+                            ));
                         }
                         Err(FunctionBindError::Ambiguous { first, second }) => {
                             self.context.add_diagnostic(ambiguous_argument(
@@ -1689,11 +1669,12 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         severity: Severity,
     ) {
         let (label, span, fix) = match target.text() {
-            "select_first" if !arguments.is_empty() => {
-                let Some(array_ty) = arguments[0].as_array() else {
-                    return;
-                };
-                let ty = &array_ty.element_type;
+            "select_first" => {
+                let ty = arguments[0]
+                    .as_array()
+                    .expect("type should be an array")
+                    .element_type();
+
                 if ty.is_optional() {
                     return;
                 }
@@ -1704,11 +1685,12 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     "replace the function call with the array's first element",
                 )
             }
-            "select_all" if !arguments.is_empty() => {
-                let Some(array_ty) = arguments[0].as_array() else {
-                    return;
-                };
-                let ty = &array_ty.element_type;
+            "select_all" => {
+                let ty = arguments[0]
+                    .as_array()
+                    .expect("type should be an array")
+                    .element_type();
+
                 if ty.is_optional() {
                     return;
                 }
@@ -1719,7 +1701,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                     "replace the function call with the array itself",
                 )
             }
-            "defined" if !arguments.is_empty() => {
+            "defined" => {
                 if arguments[0].is_optional() {
                     return;
                 }
