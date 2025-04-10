@@ -23,7 +23,7 @@ be out of sync with released packages.
 | `EndingNewline`                  | Spacing, Style                | Ensures that documents end with a single newline character.                                       |
 | `ExpressionSpacing`              | Spacing                       | Ensures that expressions are properly spaced.                                                     |
 | `ImportPlacement`                | Clarity, Sorting              | Ensures that imports are placed between the version statement and any document items.             |
-| `ImportSort`                     | Clarity, Style                | Ensures that imports are sorted lexicographically.                                                |
+| `ImportSorted`                     | Clarity, Style                | Ensures that imports are sorted lexicographically.                                                |
 | `ImportWhitespace`               | Clarity, Spacing, Style       | Ensures that there is no extraneous whitespace between or within imports.                         |
 | `InconsistentNewlines`           | Clarity, Style                | Ensures that newlines are used consistently within the file.                                      |
 | `InputSorting`                   | Clarity, Sorting, Style       | Ensures that input declarations are sorted                                                        |
