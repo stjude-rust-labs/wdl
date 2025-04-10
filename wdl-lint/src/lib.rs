@@ -138,7 +138,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::VersionFormattingRule>::default(),
         Box::<rules::PreambleCommentPlacementRule>::default(),
         Box::<rules::LintDirectiveFormattedRule>::default(),
-        Box::<rules::RedundantInputAssignment>::default(),
+        Box::<rules::ConciseInput>::default(),
     ];
 
     // Ensure all the rule IDs are unique and pascal case and that related rules are

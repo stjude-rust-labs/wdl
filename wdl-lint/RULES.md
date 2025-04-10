@@ -41,7 +41,7 @@ be out of sync with released packages.
 | `PascalCase`                     | Clarity, Naming, Style        | Ensures that structs are defined with PascalCase names.                                           |
 | `PreambleCommentPlacement`    | Clarity                       | Ensures that documents have correct comments in the preamble.                                     |
 | `PreambleFormatted`             | Clarity, Spacing, Style       | Ensures that documents have correct whitespace in the preamble.                                   |
-| `RedundantInputAssignment`       | Style                         | Ensures that redundant input assignments are shortened                                            |
+| `ConciseInput`       | Style                         | Ensures that redundant input assignments are shortened                                            |
 | `RuntimeSectionKeys`             | Completeness, Deprecated      | Ensures that runtime sections have the appropriate keys.                                          |
 | `SectionOrdering`                | Sorting, Style                | Ensures that sections within tasks and workflows are sorted.                                      |
 | `ShellCheck`                     | Correctness, Portability      | (BETA) Ensures that command sections are free of shellcheck diagnostics.                          |
