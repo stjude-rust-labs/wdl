@@ -27,7 +27,7 @@ be out of sync with released packages.
 | `ImportWhitespace`          | Clarity, Spacing, Style       | Ensures that there is no extraneous whitespace between or within imports.                         |
 | `ConsistentNewlines`        | Clarity, Style                | Ensures that newlines are used consistently within the file.                                      |
 | `InputSorted`               | Clarity, Sorting, Style       | Ensures that input declarations are sorted                                                        |
-| `KeyValuePairs`             | Style                         | Ensures that metadata objects and arrays are properly spaced.                                     |
+| `MetaKeyValueFormatting`    | Style                         | Ensures that metadata objects and arrays are properly spaced.                                     |
 | `LineWidth`                 | Clarity, Spacing, Style       | Ensures that lines do not exceed a certain width.                                                 |
 | `LintDirectiveFormatted`    | Clarity, Correctness          | Ensures lint directives are correctly formatted.                                                  |
 | `ParameterMetaMatched`      | Completeness, Sorting         | Ensures that inputs have a matching entry in a `parameter_meta` section.                          |

@@ -126,7 +126,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::CommentWhitespaceRule>::default(),
         Box::<rules::TrailingCommaRule>::default(),
         Box::<rules::ElementSpacingRule>::default(),
-        Box::<rules::KeyValuePairsRule>::default(),
+        Box::<rules::MetaKeyValueFormattingRule>::default(),
         Box::<rules::ExpressionSpacingRule>::default(),
         Box::<rules::InputNameRule>::default(),
         Box::<rules::OutputNameRule>::default(),
