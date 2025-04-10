@@ -1,0 +1,64 @@
+name: toml-check
+
+on:
+  push:
+    branches:
+        - '!main'
+  pull_request:
+
+env:
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+    toml-check:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.10'
+        - uses: actions/checkout@v4
+          with:
+            path: "base"
+            ref: ${{ github.base_ref }}
+        - uses: actions/checkout@v4
+          with:
+            path: "branch"
+        - name: Check Arena TOML
+          id: arena
+          run: |
+            {
+              echo 'arena<<EOF'
+              python3 branch/.github/compare_toml.py base/Arena.toml branch/Arena.toml | sed 's/`/\\\`/g'
+              echo 'EOF'
+            } >> $GITHUB_OUTPUT
+        - name: Check Gauntlet TOML
+          id: gauntlet
+          run: |
+            {
+              echo 'gauntlet<<EOF'
+              python3 branch/.github/compare_toml.py base/Gauntlet.toml branch/Gauntlet.toml | sed 's/`/\\\`/g'
+              echo 'EOF'
+            } >> $GITHUB_OUTPUT
+        - name: Write Arena results to comment
+          uses: actions/github-script@v7
+          with:
+            script: |
+                github.rest.issues.createComment({
+                    issue_number: context.issue.number,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    body: `${{ steps.arena.outputs.arena }}`
+                })
+        - name: Write Gauntlet results to comment
+          uses: actions/github-script@v7
+          with:
+            script: |
+                github.rest.issues.createComment({
+                    issue_number: context.issue.number,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    body: `${{ steps.gauntlet.outputs.gauntlet }}`
+                })
+            
+        
