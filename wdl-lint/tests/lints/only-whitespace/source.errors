@@ -1,8 +1,8 @@
 note[PreambleFormatted]: expected exactly one blank line between lint directives and preamble comments
-  ┌─ tests/lints/only-whitespace/source.wdl:1:28
+  ┌─ tests/lints/only-whitespace/source.wdl:1:27
   │  
-1 │   #@ except: Foo, UnknownRule
-  │ ╭───────────────────────────^
+1 │   #@ except: Foo, KnownRules
+  │ ╭──────────────────────────^
 2 │ │      
   │ │ -----
 3 │ │ ## The above line has extra whitespace

@@ -40,7 +40,7 @@ mod shellcheck;
 mod snake_case;
 mod todo_comment;
 mod trailing_comma;
-mod unknown_rule;
+mod known_rules;
 mod version_formatting;
 mod whitespace;
 
@@ -84,6 +84,6 @@ pub use shellcheck::*;
 pub use snake_case::*;
 pub use todo_comment::*;
 pub use trailing_comma::*;
-pub use unknown_rule::*;
+pub use known_rules::*;
 pub use version_formatting::*;
 pub use whitespace::*;

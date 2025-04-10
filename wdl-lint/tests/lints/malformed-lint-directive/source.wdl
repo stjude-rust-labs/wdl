@@ -1,4 +1,4 @@
-#@ except: CommentWhitespace, MetaDescription, RuntimeSection, UnknownRule, LineWidth, PreambleCommentPlacement
+#@ except: CommentWhitespace, MetaDescription, RuntimeSection, KnownRules, LineWidth, PreambleCommentPlacement
 
 ## This is a test of the `LintDirectiveFormatted` rule
 

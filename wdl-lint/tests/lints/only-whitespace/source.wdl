@@ -1,4 +1,4 @@
-#@ except: Foo, UnknownRule
+#@ except: Foo, KnownRules
      
 ## The above line has extra whitespace
 ## This is a test of lines that only contain whitespace

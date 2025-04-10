@@ -48,6 +48,6 @@ be out of sync with released packages.
 | `SnakeCase`                      | Clarity, Naming, Style        | Ensures that tasks, workflows, and variables are defined with snake_case names.                   |
 | `TodoComment`                           | Completeness                  | Ensures that `TODO` statements are flagged for followup.                                          |
 | `TrailingComma`                  | Style                         | Ensures that lists and objects in meta have a trailing comma.                                     |
-| `UnknownRule`                    | Clarity                       | Ensures there are no unknown rules present in lint directives.                                    |
+| `KnownRules`                    | Clarity                       | Ensures only known rules are used in lint directives.                                    |
 | `VersionFormatting`              | Style                         | Ensures correct formatting of the version statement                                               |
 | `Whitespace`                     | Spacing, Style                | Ensures that a document does not contain undesired whitespace.                                    |
