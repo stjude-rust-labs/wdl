@@ -6,7 +6,7 @@ warning[NonmatchingOutput]: `outputs` key missing in `meta` section for the task
    │
    = fix: add an `outputs` key to `meta` section describing the outputs
 
-warning[MixedIndentation]: mixed indentation throughout document
+note[MixedIndentation]: mixed indentation throughout document
    ┌─ tests/lints/document-mixed-indentation/source.wdl:16:1
    │
 16 │ 	output {
