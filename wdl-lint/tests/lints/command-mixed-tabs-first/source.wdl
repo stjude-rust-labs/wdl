@@ -1,4 +1,4 @@
-#@ except: MetaDescription, RuntimeSectionKeys
+#@ except: MetaDescription, ExpectedRuntimeKeys
 
 ## This is a test of having tabs before spaces in command sections.
 

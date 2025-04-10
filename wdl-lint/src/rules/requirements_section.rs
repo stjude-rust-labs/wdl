@@ -72,7 +72,7 @@ impl Rule for RequirementsSectionRule {
 
     fn related_rules(&self) -> &[&'static str] {
         &[
-            "RuntimeSectionKeys",
+            "ExpectedRuntimeKeys",
             "MetaDescription",
             "ParameterMetaMatched",
             "MetaSections",

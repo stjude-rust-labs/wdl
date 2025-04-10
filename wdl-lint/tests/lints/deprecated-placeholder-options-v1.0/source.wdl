@@ -20,6 +20,6 @@ task a_task {
 
     output {}
 
-    #@ except: RuntimeSectionKeys
+    #@ except: ExpectedRuntimeKeys
     runtime {}
 }

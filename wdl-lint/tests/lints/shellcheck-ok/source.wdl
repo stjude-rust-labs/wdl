@@ -1,4 +1,4 @@
-#@ except: MetaDescription, RuntimeSectionKeys, ParameterMetaMatched, HereDocCommands
+#@ except: MetaDescription, ExpectedRuntimeKeys, ParameterMetaMatched, HereDocCommands
 
 ## This is a test of having no shellcheck lints
 

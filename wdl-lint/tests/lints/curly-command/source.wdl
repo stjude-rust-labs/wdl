@@ -1,4 +1,4 @@
-#@ except: MetaDescription, RuntimeSectionKeys
+#@ except: MetaDescription, ExpectedRuntimeKeys
 
 ## This is a test of the `HereDocCommands` lint
 

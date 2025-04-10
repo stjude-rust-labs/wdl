@@ -19,7 +19,7 @@ task a_task_with_excepted_runtime {
 
     output {}
 
-    #@ except: RuntimeSectionKeys
+    #@ except: ExpectedRuntimeKeys
     runtime {}  # Errors should be ignored
 }
 

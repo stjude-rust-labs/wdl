@@ -29,7 +29,7 @@ task a_task_with_excepted_engine_hints {
 
     output {}
 
-    #@ except: RuntimeSectionKeys, ContainerUri
+    #@ except: ExpectedRuntimeKeys, ContainerUri
     runtime {
         container: "ubuntu"
         cpu: 1
