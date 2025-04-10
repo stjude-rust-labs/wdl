@@ -46,7 +46,7 @@ impl Rule for TodoCommentRule {
 
     fn explanation(&self) -> &'static str {
         "When writing WDL, future tasks are often marked as `TODO`. This indicates that the \
-         implementor intended to go back to the code and handle the todo item. TodoComment items \
+         implementor intended to go back to the code and handle the todo item. TODO items \
          should not be long-term fixtures within code and, as such, they are flagged to ensure \
          none are forgotten."
     }

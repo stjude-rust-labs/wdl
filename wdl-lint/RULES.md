@@ -25,7 +25,7 @@ be out of sync with released packages.
 | `ImportPlacement`           | Clarity, Sorting              | Ensures that imports are placed between the version statement and any document items.               |
 | `ImportSorted`              | Clarity, Style                | Ensures that imports are sorted lexicographically.                                                  |
 | `ImportWhitespace`          | Clarity, Spacing, Style       | Ensures that there is no extraneous whitespace between or within imports.                           |
-| `ConsistentNewlines`        | Clarity, Style                | Ensures that newlines are used consistently within the file.                                        |
+| `ConsistentNewlines`        | Clarity, Style                | Ensures that `\n` or `\r\n` newlines are used consistently within the file.                         |
 | `InputSorted`               | Clarity, Sorting, Style       | Ensures that input declarations are sorted                                                          |
 | `MetaKeyValueFormatting`    | Style                         | Ensures that metadata objects and arrays are properly spaced.                                       |
 | `LineWidth`                 | Clarity, Spacing, Style       | Ensures that lines do not exceed a certain width.                                                   |
@@ -35,7 +35,7 @@ be out of sync with released packages.
 | `MetaSections`              | Clarity, Completeness         | Ensures that tasks and workflows have the required `meta` and `parameter_meta` sections.            |
 | `OutputSection`             | Completeness, Portability     | Ensures that tasks and workflows have an `output` section.                                          |
 | `RequirementsSection`       | Completeness, Portability     | Ensures that >=v1.2 tasks have a requirements section.                                              |
-| `RuntimeSection`            | Completeness, Portability     | Ensures that tasks have a runtime section.                                                          |
+| `RuntimeSection`            | Completeness, Portability     | Ensures that <v1.2 tasks have a runtime section.                                                    |
 | `HereDocCommands`           | Clarity                       | Ensures that tasks use heredoc syntax in command sections.                                          |
 | `MatchingOutputMeta`        | Completeness                  | Ensures that each output field is documented in the meta section under `meta.outputs`.              |
 | `PascalCase`                | Clarity, Naming, Style        | Ensures that structs are defined with PascalCase names.                                             |
