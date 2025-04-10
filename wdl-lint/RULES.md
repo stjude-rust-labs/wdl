@@ -46,7 +46,7 @@ be out of sync with released packages.
 | `SectionOrdering`                | Sorting, Style                | Ensures that sections within tasks and workflows are sorted.                                      |
 | `ShellCheck`                     | Correctness, Portability      | (BETA) Ensures that command sections are free of shellcheck diagnostics.                          |
 | `SnakeCase`                      | Clarity, Naming, Style        | Ensures that tasks, workflows, and variables are defined with snake_case names.                   |
-| `Todo`                           | Completeness                  | Ensures that `TODO` statements are flagged for followup.                                          |
+| `TodoComment`                           | Completeness                  | Ensures that `TODO` statements are flagged for followup.                                          |
 | `TrailingComma`                  | Style                         | Ensures that lists and objects in meta have a trailing comma.                                     |
 | `UnknownRule`                    | Clarity                       | Ensures there are no unknown rules present in lint directives.                                    |
 | `VersionFormatting`              | Style                         | Ensures correct formatting of the version statement                                               |
