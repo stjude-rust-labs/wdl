@@ -1,7 +1,7 @@
 #@ except: DescriptionMissing, RuntimeSectionKeys
 
 ## This is a test of having mixed indentation inside of a placeholder.
-## This should not cause a warning for the `CommandSectionMixedIndentation` rule.
+## This should not cause a warning for the `CommandSectionIndentation` rule.
 
 version 1.1
 

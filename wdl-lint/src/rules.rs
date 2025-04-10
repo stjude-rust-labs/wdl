@@ -2,7 +2,7 @@
 
 mod element_spacing;
 mod call_input_spacing;
-mod command_mixed_indentation;
+mod command_section_indentation;
 mod comment_whitespace;
 mod container_value;
 mod deprecated_object;
@@ -46,7 +46,7 @@ mod whitespace;
 
 pub use element_spacing::*;
 pub use call_input_spacing::*;
-pub use command_mixed_indentation::*;
+pub use command_section_indentation::*;
 pub use comment_whitespace::*;
 pub use container_value::*;
 pub use deprecated_object::*;

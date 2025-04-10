@@ -105,7 +105,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::PreambleFormattingRule>::default(),
         Box::<rules::MatchingParameterMetaRule>::default(),
         Box::<rules::WhitespaceRule>::default(),
-        Box::<rules::CommandSectionMixedIndentationRule>::default(),
+        Box::<rules::CommandSectionIndentationRule>::default(),
         Box::<rules::ImportPlacementRule>::default(),
         Box::<rules::PascalCaseRule>::default(),
         Box::<rules::ImportWhitespaceRule>::default(),

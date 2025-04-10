@@ -10,7 +10,7 @@ be out of sync with released packages.
 |:---------------------------------|:------------------------------|:--------------------------------------------------------------------------------------------------|
 | `ElementSpacing`      | Spacing                       | Ensures proper blank space between elements                                                       |
 | `CallInputSpacing`               | Clarity, Spacing, Style       | Ensures proper spacing for call inputs                                                            |
-| `CommandSectionMixedIndentation` | Clarity, Correctness, Spacing | Ensures that lines within a command do not mix spaces and tabs.                                   |
+| `CommandSectionIndentation` | Clarity, Correctness, Spacing | Ensures consistent indentation (no mixed spaces/tabs) within command sections.                                   |
 | `CommentWhitespace`              | Spacing                       | Ensures that comments are properly spaced.                                                        |
 | `ContainerValue`                 | Clarity, Portability          | Ensures that the value for `container` keys in `runtime`/`requirements` sections are well-formed. |
 | `DeprecatedObject`               | Deprecated                    | Ensures that the deprecated `Object` construct is not used.                                       |
