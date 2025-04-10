@@ -99,7 +99,7 @@ impl Rule for ContainerUri {
     }
 
     fn description(&self) -> &'static str {
-        "Ensures that values for the `container` key within `runtime`/`requirements` sections are \
+        "Ensures that the value for the `container` key in `runtime`/`requirements` sections is \
          well-formed."
     }
 
