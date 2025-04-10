@@ -14,7 +14,7 @@ be out of sync with released packages.
 | `CommentWhitespace`              | Spacing                       | Ensures that comments are properly spaced.                                                        |
 | `ContainerUri`                 | Clarity, Portability          | Ensures that the value for `container` keys in `runtime`/`requirements` sections are well-formed. |
 | `DeprecatedObject`               | Deprecated                    | Ensures that the deprecated `Object` construct is not used.                                       |
-| `DeprecatedPlaceholderOption`    | Deprecated                    | Ensures that the deprecated placeholder options construct is not used.                            |
+| `DeprecatedPlaceholder`    | Deprecated                    | Ensures that the deprecated placeholder options construct is not used.                            |
 | `DescriptionMissing`             | Completeness                  | Ensures that each meta section has a description key.                                             |
 | `DisallowedDeclarationName`      | Naming                        | Ensures that declaration names do not contain their type information.                             |
 | `DisallowedInputName`            | Naming                        | Ensures that input names are meaningful.                                                          |

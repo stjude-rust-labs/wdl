@@ -119,7 +119,7 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
         Box::<rules::SectionOrderingRule>::default(),
         Box::<rules::DeprecatedObjectRule>::default(),
         Box::<rules::DescriptionMissingRule>::default(),
-        Box::<rules::DeprecatedPlaceholderOptionRule>::default(),
+        Box::<rules::DeprecatedPlaceholderRule>::default(),
         Box::<rules::RuntimeSectionKeysRule>::default(),
         Box::<rules::TodoRule>::default(),
         Box::<rules::NonmatchingOutputRule<'_>>::default(),
