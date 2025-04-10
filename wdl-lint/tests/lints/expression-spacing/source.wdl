@@ -152,7 +152,7 @@ task foo {
 
     command <<< >>>
 
-    #@ except: DisallowedOutputName
+    #@ except: OutputName
     output {
         Boolean b = ! a
     }

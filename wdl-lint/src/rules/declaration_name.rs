@@ -67,7 +67,7 @@ impl Rule for DeclarationNameRule {
     }
 
     fn related_rules(&self) -> &[&'static str] {
-        &["InputName", "DisallowedOutputName"]
+        &["InputName", "OutputName"]
     }
 }
 

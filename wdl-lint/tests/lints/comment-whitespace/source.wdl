@@ -21,7 +21,7 @@ workflow foo {# test in-line comment without preceding whitespace
         String foo = "bar"       # too much space for an inline comment
     }
 
-    #@ except: DisallowedOutputName
+    #@ except: OutputName
     output {  # a fine comment
               # what about this one?
 
