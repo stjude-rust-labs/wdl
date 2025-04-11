@@ -41,6 +41,9 @@ reqwest = { workspace = true }
 reqwest-middleware = { workspace = true }
 dirs = { workspace =  true }
 
+[target.'cfg(target_os = "linux")'.dependencies]
+uzers = { version = "0.12.1" , default-features = false }
+
 [dev-dependencies]
 pretty_assertions = { workspace = true }
 codespan-reporting = { workspace = true }
