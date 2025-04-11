@@ -1445,20 +1445,18 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
                 match target.text() {
                     "find" | "matches" | "sub" => {
                         // above function expect the pattern as 2nd argument
-                        if let Some(pattern_arg_expr) = expr.arguments().nth(1) {
-                            if let Expr::Literal(LiteralExpr::String(pattern_literal)) =
-                                &pattern_arg_expr
-                            {
-                                if let Some(value) = pattern_literal.text() {
-                                    let pattern = value.text().to_string();
-                                    if let Err(e) = regex::Regex::new(&pattern) {
-                                        self.context.add_diagnostic(invalid_regex_pattern(
-                                            target.text(),
-                                            value.text(),
-                                            &e,
-                                            pattern_literal.span(),
-                                        ));
-                                    }
+                        if let Some(Expr::Literal(LiteralExpr::String(pattern_literal))) =
+                            expr.arguments().nth(1)
+                        {
+                            if let Some(value) = pattern_literal.text() {
+                                let pattern = value.text().to_string();
+                                if let Err(e) = regex::Regex::new(&pattern) {
+                                    self.context.add_diagnostic(invalid_regex_pattern(
+                                        target.text(),
+                                        value.text(),
+                                        &e,
+                                        pattern_literal.span(),
+                                    ));
                                 }
                             }
                         }
