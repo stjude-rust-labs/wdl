@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Changed
 
+* Renamed `CommandSectionIndentation` rule to `MixedIndentation` rule ([#201](https://github.com/stjude-rust-labs/wdl/issues/201)).
 * Renamed lint rules to be more consistent ([#408](https://github.com/stjude-rust-labs/wdl/pull/408)).
 
 ## 0.10.0 - 04-01-2025
