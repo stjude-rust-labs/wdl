@@ -59,7 +59,7 @@ impl Rule for InputNameRule {
     }
 
     fn description(&self) -> &'static str {
-        "Ensures input names are meaningful (e.g., not generic like 'input', 'in', or too short)."
+        "Ensures input names are meaningful (e.g. not generic like 'input', 'in', or too short)."
     }
 
     fn explanation(&self) -> &'static str {

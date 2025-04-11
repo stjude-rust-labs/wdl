@@ -59,8 +59,7 @@ impl Rule for OutputNameRule {
     }
 
     fn description(&self) -> &'static str {
-        "Ensures output names are meaningful (e.g., not generic like 'output', 'out', or too \
-         short)."
+        "Ensures output names are meaningful (e.g. not generic like 'output', 'out', or too short)."
     }
 
     fn explanation(&self) -> &'static str {
