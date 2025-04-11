@@ -1,4 +1,5 @@
-//! A lint rule for checking mixed indentation in command text.
+//! A lint rule for checking mixed indentation in command text and throughout
+//! the document.
 
 use std::fmt;
 
@@ -53,8 +54,8 @@ impl From<u8> for IndentationKind {
     }
 }
 
-/// Creates a "mixed indentation" diagnostic.
-fn mixed_indentation(command: Span, span: Span, kind: IndentationKind) -> Diagnostic {
+/// Creates a "mixed indentation" warning diagnostic for command sections.
+fn mixed_indentation_warning(command: Span, span: Span, kind: IndentationKind) -> Diagnostic {
     Diagnostic::warning("mixed indentation within a command")
         .with_rule(ID)
         .with_label(
@@ -74,9 +75,33 @@ fn mixed_indentation(command: Span, span: Span, kind: IndentationKind) -> Diagno
         .with_fix("use either tabs or spaces exclusively for indentation")
 }
 
-/// Detects mixed indentation in a command section.
-#[derive(Default, Debug, Clone, Copy)]
-pub struct MixedIndentationRule;
+/// Creates a "mixed indentation" note diagnostic for document text.
+fn mixed_indentation_note(span: Span, kind: IndentationKind) -> Diagnostic {
+    Diagnostic::note("mixed indentation in document")
+        .with_rule(ID)
+        .with_label(
+            format!(
+                "indented with {kind} until this {anti}",
+                anti = match kind {
+                    IndentationKind::Spaces => "tab",
+                    IndentationKind::Tabs => "space",
+                }
+            ),
+            span,
+        )
+        .with_fix("use either tabs or spaces exclusively for indentation")
+}
+
+/// Detects mixed indentation in a command section and throughout the document.
+#[derive(Default, Debug, Clone)]
+pub struct MixedIndentationRule {
+    /// The text of the current document being processed
+    document_text: Option<String>,
+
+    /// Tracks command sections that have been checked to avoid duplicate
+    /// diagnostics
+    command_section_spans: Vec<Span>,
+}
 
 impl Rule for MixedIndentationRule {
     fn id(&self) -> &'static str {
@@ -84,13 +109,14 @@ impl Rule for MixedIndentationRule {
     }
 
     fn description(&self) -> &'static str {
-        "Ensures consistent indentation (no mixed spaces/tabs) within command sections."
+        "Ensures that lines within a document do not mix spaces and tabs."
     }
 
     fn explanation(&self) -> &'static str {
-        "Mixing indentation (tab and space) characters within the command line causes leading \
-         whitespace stripping to be skipped. Commands may be whitespace sensitive, and skipping \
-         the whitespace stripping step may cause unexpected behavior."
+        "Mixing indentation (tab and space) characters within command sections causes leading \
+         whitespace stripping to be skipped, which may cause unexpected behavior. In general, \
+         mixing tabs and spaces throughout a document reduces readability and can lead to \
+         inconsistent rendering depending on editor settings."
     }
 
     fn tags(&self) -> TagSet {
@@ -115,9 +141,9 @@ impl Visitor for MixedIndentationRule {
 
     fn document(
         &mut self,
-        _: &mut Self::State,
+        state: &mut Self::State,
         reason: VisitReason,
-        _: &Document,
+        doc: &Document,
         _: SupportedVersion,
     ) {
         if reason == VisitReason::Exit {
@@ -126,6 +152,51 @@ impl Visitor for MixedIndentationRule {
 
         // Reset the visitor upon document entry
         *self = Default::default();
+
+        // Store the document text for later use
+        self.document_text = Some(doc.text().to_string());
+
+        // Check the entire document for mixed indentation
+        if let Some(ref text) = self.document_text {
+            let mut kind = None;
+            let mut mixed_span = None;
+
+            'outer: for (line, start, _) in lines_with_offset(text) {
+                // Check each line's leading whitespace
+                for (i, b) in line.as_bytes().iter().enumerate() {
+                    match b {
+                        b' ' | b'\t' => {
+                            let current = IndentationKind::from(*b);
+                            let kind = kind.get_or_insert(current);
+                            if current != *kind {
+                                // Mixed indentation, store the span of the first mixed character
+                                mixed_span = Some(Span::new(start + i, 1));
+                                break 'outer;
+                            }
+                        }
+                        _ => break,
+                    }
+                }
+            }
+
+            // If mixed indentation was found, add a note diagnostic
+            // Command sections will be handled separately with warning diagnostics
+            if let Some(span) = mixed_span {
+                // Check if this span is within a command section we've already handled
+                let in_command_section = self.command_section_spans.iter().any(|cmd_span| {
+                    span.start() >= cmd_span.start()
+                        && span.start() < cmd_span.start() + cmd_span.len()
+                });
+
+                // Only add a note diagnostic if not in a command section
+                if !in_command_section {
+                    state.add(mixed_indentation_note(
+                        span,
+                        kind.expect("an indentation kind should be present"),
+                    ));
+                }
+            }
+        }
     }
 
     fn command_section(
@@ -137,6 +208,13 @@ impl Visitor for MixedIndentationRule {
         if reason == VisitReason::Exit {
             return;
         }
+
+        let command_keyword = support::token(section.inner(), SyntaxKind::CommandKeyword)
+            .expect("should have a command keyword token");
+
+        // Store the command section span to avoid duplicate diagnostics
+        let command_span = command_keyword.text_range().into();
+        self.command_section_spans.push(command_span);
 
         let mut kind = None;
         let mut mixed_span = None;
@@ -180,12 +258,9 @@ impl Visitor for MixedIndentationRule {
         }
 
         if let Some(span) = mixed_span {
-            let command_keyword = support::token(section.inner(), SyntaxKind::CommandKeyword)
-                .expect("should have a command keyword token");
-
             state.exceptable_add(
-                mixed_indentation(
-                    command_keyword.text_range().into(),
+                mixed_indentation_warning(
+                    command_span,
                     span,
                     kind.expect("an indentation kind should be present"),
                 ),
