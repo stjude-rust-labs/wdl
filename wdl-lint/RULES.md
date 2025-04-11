@@ -9,7 +9,7 @@ be out of sync with released packages.
 | Name                        | Tags                          | Description                                                                                         |
 | :-------------------------- | :---------------------------- | :-------------------------------------------------------------------------------------------------- |
 | `CallInputSpacing`          | Clarity, Spacing, Style       | Ensures proper spacing for call inputs                                                              |
-| `MixedIndentation`          | Clarity, Correctness, Spacing | Ensures that lines within a document do not mix spaces and tabs. Command sections emit warnings, while other sections emit notes. |
+| `MixedIndentation` | Clarity, Correctness, Spacing | Ensures consistent indentation (no mixed spaces/tabs) within command sections.                      |
 | `CommentWhitespace`         | Spacing                       | Ensures that comments are properly spaced.                                                          |
 | `ConciseInput`              | Style                         | Ensures concise input assignments are used (implicit binding when available).                       |
 | `ConsistentNewlines`        | Clarity, Style                | Ensures that `\n` or `\r\n` newlines are used consistently within the file.                         |
