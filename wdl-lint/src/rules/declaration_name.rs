@@ -19,6 +19,9 @@ use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
 
+/// The identifier for the declaration name rule.
+const ID: &str = "DeclarationName";
+
 /// A rule that identifies declaration names that include their type names.
 #[derive(Debug, Default)]
 pub struct DeclarationNameRule;
@@ -29,14 +32,14 @@ fn decl_identifier_with_type(span: Span, decl_name: &str, type_name: &str) -> Di
     Diagnostic::note(format!(
         "declaration identifier '{decl_name}' contains type name '{type_name}'",
     ))
-    .with_rule("DeclarationName")
+    .with_rule(ID)
     .with_highlight(span)
     .with_fix("rename the identifier to not include the type name")
 }
 
 impl Rule for DeclarationNameRule {
     fn id(&self) -> &'static str {
-        "DeclarationName"
+        ID
     }
 
     fn description(&self) -> &'static str {
