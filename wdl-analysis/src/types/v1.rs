@@ -1670,39 +1670,35 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
     ) {
         let (label, span, fix) = match target.text() {
             "select_first" => {
-                let ty = arguments[0]
-                    .as_array()
-                    .expect("type should be an array")
-                    .element_type();
-
-                if ty.is_optional() {
+                if let Some(ty) = arguments[0].as_array().map(|a| a.element_type()) {
+                    if ty.is_optional() {
+                        return;
+                    }
+                    (
+                        format!("array element type `{ty}` is not optional"),
+                        spans.next().expect("should have span"),
+                        "replace the function call with the array's first element",
+                    )
+                } else {
                     return;
                 }
-
-                (
-                    format!("array element type `{ty}` is not optional"),
-                    spans.next().expect("should have span"),
-                    "replace the function call with the array's first element",
-                )
             }
             "select_all" => {
-                let ty = arguments[0]
-                    .as_array()
-                    .expect("type should be an array")
-                    .element_type();
-
-                if ty.is_optional() {
+                if let Some(ty) = arguments[0].as_array().map(|a| a.element_type()) {
+                    if ty.is_optional() || ty.is_union() {
+                        return;
+                    }
+                    (
+                        format!("array element type `{ty}` is not optional"),
+                        spans.next().expect("should have span"),
+                        "replace the function call with the array itself",
+                    )
+                } else {
                     return;
                 }
-
-                (
-                    format!("array element type `{ty}` is not optional"),
-                    spans.next().expect("should have span"),
-                    "replace the function call with the array itself",
-                )
             }
             "defined" => {
-                if arguments[0].is_optional() {
+                if arguments[0].is_optional() || arguments[0].is_union() {
                     return;
                 }
 
