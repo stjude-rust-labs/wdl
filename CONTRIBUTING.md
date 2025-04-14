@@ -8,11 +8,35 @@ Community contributions rock and we are psyched you're reading this document!
 - Feature requests are welcome and go [here](https://github.com/stjude-rust-labs/wdl/discussions/categories/feature-requests)
 - Lint rule proposals go [here](https://github.com/stjude-rust-labs/wdl/discussions/categories/rule-proposals)
 
-## FAQs
+## How can I start contributing?
 
-### How do I start contributing?
+### I don't want to write code, can I still contribute?
+
+Sure!
+
+You can always open a [discussion](https://github.com/stjude-rust-labs/wdl/discussions/categories/rule-proposals) with a proposal for a new lint rule or other enhancement as well contributing to any open discussions. Ensure that you provide a clear and concise title and description of the desired addition. For lint rules in particular, WDL examples and/or links to the relevant portion of the WDL spec are extremely useful.
+
+We also welcome bug reports. If you discover a flaw in our codebase, please review the list of open issues to ensure that it is not a duplicate. Please also attempt to debug the issue locally and ensure that it is not a configuration issue. Once you have done both, please file a new issue providing the relevant information in the issue. Please provide the exact steps to reproduce the problem, specific example(s) that demonstrate the steps, and the behavior you observe as well as the behavior you expected to observe. Screenshots and/or GIFs are welcome ways to provide additional information to maintainers.
+
+We also appreciate feedback on our documentation. Feel free to look over any of our `*.md` files and note any issues you find. You can also explore our lint rule documentation by [installing `sprocket`](https://stjude-rust-labs.github.io/sprocket/installation.html) and reading the output of `sprocket explain`. (n.b.: we hope to replace `sprocket explain` with a website where each rule will have a dedicated page, but that has not been realized yet)
+
+### Your first code contribution
 
 We encourage you to reach out to the core team prior to writing up a pull request. This is to ensure there isn't any wasted effort or duplication of work caused by miscommunication. You can get in touch with us via the [issues][issues] or hop over to the [discussions](https://github.com/stjude-rust-labs/wdl/discussions). We are also active on the [openwdl Slack workspace](https://openwdl.slack.com). (Discussion about this repo best belongs in the #sprocket channel 😃)
+
+We encourage contributors to comment on open issues that they intend to work on to help avoid duplication of effort. However, we will not assign issues to external contributors. If two PRs are received for the same issue, no guarantees are made as to which will be accepted and merged.
+
+### Review Policy
+
+Our pull request template has an extensive checklist that must be completed prior to review. Our policy is that any PRs submitted with an incomplete checklist will not be reviewed. Part of this checklist includes ensuring that our CI checks pass. Additional guidance for satisfying the CI checks can be found in this document.
+
+Note that the maintainers reserve the right to close any submission without review for any reason.
+
+## FAQs
+
+### Artificial Intelligence (AI)
+
+We do not welcome AI contributions from external contributors. Any submissions deemed to be AI-generated from external contributors will be closed without review.
 
 ### How do I set up Rust?
 
@@ -25,14 +49,6 @@ Most of this team uses VScode with the `rust-analyzer` extension but that prefer
 ### What's a good first issue?
 
 We will try to keep a handful of [issues][issues] marked `good first issue` open and ready for new contributors.
-
-### I don't want to write code, can I still contribute?
-
-Sure!
-
-You can always open a [discussion](https://github.com/stjude-rust-labs/wdl/discussions/categories/rule-proposals) with a proposal for a new lint rule or contribute to any open discussions.
-
-We also appreciate feedback on our documentation. Feel free to look over any of our `*.md` files and note any issues you find. You can also explore our lint rule documentation by [installing `sprocket`](https://stjude-rust-labs.github.io/sprocket/installation.html) and reading the output of `sprocket explain`. (n.b.: we hope to replace `sprocket explain` with a website where each rule will have a dedicated page, but that has not been realized yet)
 
 ### What's the difference between `error`, `warning`, and `note`?
 
