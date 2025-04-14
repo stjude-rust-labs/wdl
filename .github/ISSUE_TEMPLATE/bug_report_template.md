@@ -10,15 +10,17 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+If applicable, please include steps to reproduce the issue.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
+
+**Terminal Output**
+Please copy and paste the command used, logs generated, and the error produced in the markdown block below. This can also be attached to to the issue as a file.
+
+```bash
+Replace with terminal output
+```
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
