@@ -22,7 +22,7 @@ We also appreciate feedback on our documentation. Feel free to look over any of 
 
 ### Your first code contribution
 
-We encourage you to reach out to the core team prior to writing up a pull request. This is to ensure there isn't any wasted effort or duplication of work caused by miscommunication. You can get in touch with us via the [issues][issues] or hop over to the [discussions](https://github.com/stjude-rust-labs/wdl/discussions). We are also active on the [openwdl Slack workspace](https://openwdl.slack.com). (Discussion about this repo best belongs in the #sprocket channel 😃)
+We encourage you to reach out to the core team prior to writing up a pull request. **This is to ensure there isn't any wasted effort or duplication of work caused by miscommunication. Failure to do so may result in the rejection of the pull request.** You can get in touch with us via the [issues][issues] or hop over to the [discussions](https://github.com/stjude-rust-labs/wdl/discussions). We are also active on the [openwdl Slack workspace](https://openwdl.slack.com). (Discussion about this repo best belongs in the #sprocket channel 😃)
 
 We encourage contributors to comment on open issues that they intend to work on to help avoid duplication of effort. However, we will not assign issues to external contributors. If two PRs are received for the same issue, no guarantees are made as to which will be accepted and merged.
 
