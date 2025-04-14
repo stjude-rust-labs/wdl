@@ -18,6 +18,7 @@ jobs:
     env:
       PR_NUMBER: ${{ github.event.number }}
     steps:
+      - uses: actions/checkout@v4
       - name: Add assignee
         run: |
           # Get the PR author
