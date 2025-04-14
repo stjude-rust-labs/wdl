@@ -29,7 +29,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Environment (please complete the following information):**
  - OS: [e.g. iOS]
- - Version: [e.g. 22]
+ - Version: [e.g. `wdl-v0.10.0`]
  - Shell: [e.g. bash]
  - Toolchain version: [e.g. output of `rustc --version`]
 
