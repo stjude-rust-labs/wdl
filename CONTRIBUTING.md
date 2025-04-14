@@ -28,7 +28,7 @@ We encourage contributors to comment on open issues that they intend to work on 
 
 ### Review Policy
 
-Our pull request template has an extensive checklist that must be completed prior to review. Our policy is that any PRs submitted with an incomplete checklist will not be reviewed. Part of this checklist includes ensuring that our CI checks pass. Additional guidance for satisfying the CI checks can be found in this document.
+Our pull request template has an extensive checklist that must be completed prior to review. Our policy is that any PRs submitted with an incomplete checklist will not be reviewed. Part of this checklist includes ensuring that our CI checks pass. Additional guidance for satisfying the CI checks can be [found below](#the-ci-has-turned-red-how-do-i-make-it-green-again-ci-green).
 
 Note that the maintainers reserve the right to close any submission without review for any reason.
 
