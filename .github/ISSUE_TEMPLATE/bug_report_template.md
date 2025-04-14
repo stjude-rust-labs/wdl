@@ -12,6 +12,8 @@ A clear and concise description of what the bug is.
 
 If applicable, please include steps to reproduce the issue.
 
+Make sure to add **all the information needed to understand the bug** so that someone can help. If the info is missing we'll add the 'Needs more information' label and close the issue until there is enough information.
+
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
@@ -25,10 +27,11 @@ Replace with terminal output
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
+**Environment (please complete the following information):**
  - OS: [e.g. iOS]
- - Version [e.g. 22] 
- - Environment [e.g. bash]
+ - Version: [e.g. 22]
+ - Shell: [e.g. bash]
+ - Toolchain version: [e.g. output of `rustc --version`]
 
 **Additional context**
 Add any other context about the problem here.
