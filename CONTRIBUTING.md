@@ -24,7 +24,9 @@ We also appreciate feedback on our documentation. Feel free to look over any of 
 
 We encourage you to reach out to the core team prior to writing up a pull request. **This is to ensure there isn't any wasted effort or duplication of work caused by miscommunication. Failure to do so may result in the rejection of the pull request.** You can get in touch with us via the [issues][issues] or hop over to the [discussions](https://github.com/stjude-rust-labs/wdl/discussions). We are also active on the [openwdl Slack workspace](https://openwdl.slack.com). (Discussion about this repo best belongs in the #sprocket channel 😃)
 
-We encourage contributors to comment on open issues that they intend to work on to help avoid duplication of effort. However, we will not assign issues to external contributors. If two PRs are received for the same issue, no guarantees are made as to which will be accepted and merged.
+We encourage contributors to comment on open issues that they intend to work on to help avoid duplication of effort. If multiple individuals are interested in solving the same issue, we recommend reaching out to one another to gauge if there is potential for a collaboration.
+
+That being said, we will not assign issues to external contributors, and commenting on an issue does not guarantee exclusive rights to work on that issue. If multiple PRs are received for the same issue, the PR that (a) most thoroughly addresses the problem being solved and (b) has the best implementation by judgement of the St. Jude Rust Labs team will be accepted in favor of the other submitted PRs.
 
 ### Review Policy
 
