@@ -16,7 +16,7 @@ Sure!
 
 You can always open a [discussion](https://github.com/stjude-rust-labs/wdl/discussions/categories/rule-proposals) with a proposal for a new lint rule or other enhancement as well contributing to any open discussions. Ensure that you provide a clear and concise title and description of the desired addition. For lint rules in particular, WDL examples and/or links to the relevant portion of the WDL spec are extremely useful.
 
-We also welcome bug reports. If you discover a flaw in our codebase, please review the list of open issues to ensure that it is not a duplicate. Please also attempt to debug the issue locally and ensure that it is not a configuration issue. Once you have done both, please file a new issue providing the relevant information in the issue. Please provide the exact steps to reproduce the problem, specific example(s) that demonstrate the steps, and the behavior you observe as well as the behavior you expected to observe. Screenshots and/or GIFs are welcome ways to provide additional information to maintainers.
+We also welcome bug reports. If you discover a flaw in our codebase, please review the list of open issues to ensure that it is not a duplicate. Please also attempt to debug the issue locally and ensure that it is not a configuration issue. Once you have done both, please file a new issue providing the relevant information in the issue. Please provide the exact steps to reproduce the problem, specific example(s) that demonstrate the steps, and the behavior you observe as well as the behavior you expected to observe. For terminal-based use cases, a copy and paste of the command and error log (please use markdown formatting appropriately) is preferred. For interactive use cases (such as the VSCode extension), screenshots and/or GIFs are welcome ways to provide additional information to maintainers.
 
 We also appreciate feedback on our documentation. Feel free to look over any of our `*.md` files and note any issues you find. You can also explore our lint rule documentation by [installing `sprocket`](https://stjude-rust-labs.github.io/sprocket/installation.html) and reading the output of `sprocket explain`. (n.b.: we hope to replace `sprocket explain` with a website where each rule will have a dedicated page, but that has not been realized yet)
 
@@ -34,7 +34,7 @@ Note that the maintainers reserve the right to close any submission without revi
 
 ## FAQs
 
-### Artificial Intelligence (AI)
+### Can I use Artificial Intelligence (AI)?
 
 We do not welcome AI contributions from external contributors. Any submissions deemed to be AI-generated from external contributors will be closed without review.
 
