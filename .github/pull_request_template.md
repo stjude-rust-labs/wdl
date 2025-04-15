@@ -54,9 +54,12 @@ _Describe the problem or feature in addition to a link to the issues._
 Before submitting this PR, please make sure:
 
 For external contributors:
+
 - [ ] You have read the [CONTRIBUTING](https://github.com/stjude-rust-labs/wdl/blob/main/CONTRIBUTING.md) guide in its entirety.
 - [ ] You have not used AI on any parts of this pull request.
+
 For all contributors:
+
 - [ ] You have added a few sentences describing the PR here.
 - [ ] Your code builds clean without any errors or warnings.
 - [ ] You have added tests (when appropriate).
