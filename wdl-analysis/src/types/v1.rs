@@ -1669,7 +1669,7 @@ impl<'a, C: EvaluationContext> ExprTypeEvaluator<'a, C> {
         let (label, span, fix) = match target.text() {
             "select_first" => {
                 if let Some(ty) = arguments[0].as_array().map(|a| a.element_type()) {
-                    if ty.is_optional() {
+                    if ty.is_optional() || ty.is_union() {
                         return;
                     }
                     (
