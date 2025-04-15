@@ -13,9 +13,9 @@ _Describe the rules you have implemented and link to any relevant issues._
 
 Before submitting this PR, please make sure:
 
+For external contributors:
 - [ ] You have read the CONTRIBUTING guide in its entirety.
 - [ ] You have not used AI on any parts of this pull request.
-      (This only applies to external contributors.)
 - [ ] You have added a few sentences describing the PR here.
 - [ ] Your code builds clean without any errors or warnings.
 - [ ] You have added an entry to the relevant `CHANGELOG.md` (see
