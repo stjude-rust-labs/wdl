@@ -10,8 +10,6 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
-If applicable, please include steps to reproduce the issue.
-
 Make sure to add **all the information needed to understand the bug** so that someone can help. If the info is missing we'll add the 'Needs more information' label and close the issue until there is enough information.
 
 **Expected behavior**
