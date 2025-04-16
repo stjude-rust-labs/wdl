@@ -115,6 +115,28 @@ use crate::stdlib::STDLIB;
 use crate::tree::SyntaxNode;
 use crate::tree::SyntaxToken;
 
+/// Helper for writing primitive values to a string buffer.
+///
+/// This function accounts for path translation for `File` and
+/// `Directory` values.
+pub fn write_primitive(
+    context: &dyn EvaluationContext,
+    value: &PrimitiveValue,
+    buffer: &mut String,
+) {
+    match value {
+        PrimitiveValue::File(path) | PrimitiveValue::Directory(path) => {
+            match context.translate_path(path) {
+                Some(path) => write!(buffer, "{path}", path = path.display()).unwrap(),
+                None => {
+                    write!(buffer, "{path}").unwrap();
+                }
+            }
+        }
+        _ => write!(buffer, "{v}", v = value.raw()).unwrap(),
+    }
+}
+
 /// Represents a WDL V1 expression evaluator.
 #[derive(Debug)]
 pub struct ExprEvaluator<C> {
@@ -309,28 +331,6 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         placeholder: &'a Placeholder<SyntaxNode>,
         buffer: &'a mut String,
     ) -> BoxFuture<'a, Result<(), Diagnostic>> {
-        /// Helper for writing primitive values to the buffer.
-        ///
-        /// This function accounts for path translation for `File` and
-        /// `Directory` values.
-        fn write_primitive<C: EvaluationContext>(
-            context: &C,
-            value: &PrimitiveValue,
-            buffer: &mut String,
-        ) {
-            match value {
-                PrimitiveValue::File(path) | PrimitiveValue::Directory(path) => {
-                    match context.translate_path(path) {
-                        Some(path) => write!(buffer, "{path}", path = path.display()).unwrap(),
-                        None => {
-                            write!(buffer, "{path}").unwrap();
-                        }
-                    }
-                }
-                _ => write!(buffer, "{v}", v = value.raw()).unwrap(),
-            }
-        }
-
         /// The actual implementation for evaluating placeholders
         async fn imp<C: EvaluationContext>(
             evaluator: &mut ExprEvaluator<C>,

@@ -1,7 +1,5 @@
 //! Implements the `sep` function from the WDL standard library.
 
-use std::fmt::Write;
-
 use wdl_analysis::types::PrimitiveType;
 use wdl_ast::Diagnostic;
 
@@ -11,6 +9,7 @@ use super::Function;
 use super::Signature;
 use crate::PrimitiveValue;
 use crate::Value;
+use crate::v1::write_primitive;
 
 /// Concatenates the elements of an array together into a string with the given
 /// separator between consecutive elements.
@@ -47,9 +46,7 @@ fn sep(context: CallContext<'_>) -> Result<Value, Diagnostic> {
 
             match v {
                 Value::None => {}
-                Value::Primitive(v) => {
-                    write!(&mut s, "{v}", v = v.raw()).expect("failed to write to a string")
-                }
+                Value::Primitive(v) => write_primitive(context.context, v, &mut s),
                 _ => panic!("expected an array of primitive values"),
             }
 

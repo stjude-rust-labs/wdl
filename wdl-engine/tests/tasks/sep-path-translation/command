@@ -1,0 +1,8 @@
+set -euo pipefail
+# Test for the sep option
+echo 'ok!'
+# Test for the sep function
+echo 'ok!'
+cat 'a.txt'
+cat 'b.txt'
+cat 'c.txt'
