@@ -372,7 +372,7 @@ impl DocsTree {
                             p { "Workflows" }
                         }
                         div class="flex items-center gap-x-1 border-b dark:text-slate-50" {
-                            img src=(self.assets_relative_to(base).join("selected-dir.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
+                            img src=(self.assets_relative_to(base).join("folder.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Full Directory" }
                         }
                     }

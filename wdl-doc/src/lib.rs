@@ -49,6 +49,8 @@ const STYLESHEET: &str = include_str!("../theme/dist/style.css");
 const SPROCKET_LOGO: &[u8] = include_bytes!("../theme/assets/sprocket-logo.png");
 /// The "list bullet" icon.
 const LIST_BULLET_ICON: &[u8] = include_bytes!("../theme/assets/list-bullet.png");
+/// The "folder" icon.
+const FOLDER_ICON: &[u8] = include_bytes!("../theme/assets/folder.png");
 /// The "search" icon.
 const SEARCH_ICON: &[u8] = include_bytes!("../theme/assets/search.png");
 /// The "selected directory" icon.
@@ -82,6 +84,7 @@ fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
 
     std::fs::write(assets_dir.join("sprocket-logo.png"), SPROCKET_LOGO)?;
     std::fs::write(assets_dir.join("list-bullet.png"), LIST_BULLET_ICON)?;
+    std::fs::write(assets_dir.join("folder.png"), FOLDER_ICON)?;
     std::fs::write(assets_dir.join("search.png"), SEARCH_ICON)?;
     std::fs::write(assets_dir.join("selected-dir.png"), SELECTED_DIR_ICON)?;
     std::fs::write(assets_dir.join("unselected-dir.png"), UNSELECTED_DIR_ICON)?;
