@@ -274,6 +274,9 @@
   .gap-y-3 {
     row-gap: calc(var(--spacing) * 3) !important;
   }
+  .gap-y-6 {
+    row-gap: calc(var(--spacing) * 6) !important;
+  }
   .overflow-y-scroll {
     overflow-y: scroll !important;
   }
@@ -303,9 +306,6 @@
   }
   .px-2 {
     padding-inline: calc(var(--spacing) * 2) !important;
-  }
-  .py-8 {
-    padding-block: calc(var(--spacing) * 8) !important;
   }
   .text-center {
     text-align: center !important;

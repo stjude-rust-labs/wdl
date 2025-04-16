@@ -243,11 +243,11 @@ impl Document {
     /// Render the document as HTML.
     pub fn render(&self) -> Markup {
         html! {
-            div class="flex flex-col" {
+            div class="flex flex-col gap-y-6" {
                 h1 { (self.name()) }
                 h3 { "WDL Version: " (self.version()) }
                 div { (self.preamble()) }
-                div class="flex flex-col items-center"  {
+                div class="flex flex-col gap-y-6" {
                     h2 { "Table of Contents" }
                     table class="border" {
                         thead class="border" { tr {
