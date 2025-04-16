@@ -267,27 +267,27 @@ impl DocsTree {
             @if let Some(page) = node.page() {
                 @match page.page_type() {
                     PageType::Index(_) => {
-                        div class="flex items-center gap-x-1" {
+                        div class="flex items-center gap-x-1 hover:text-slate-300" {
                             img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
                             p class="" { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
                     },
                     PageType::Struct(_) => {
-                        div class="flex items-center gap-x-1" {
+                        div class="flex items-center gap-x-1 hover:text-slate-300" {
                             img src=(self.assets_relative_to(base).join("unselected-struct.png").to_string_lossy()) class="w-4 h-4" alt="Struct icon";
-                            p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                            p class="" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
                     },
                     PageType::Task(_) => {
-                        div class="flex items-center gap-x-1" {
+                        div class="flex items-center gap-x-1 hover:text-slate-300" {
                             img src=(self.assets_relative_to(base).join("unselected-task.png").to_string_lossy()) class="w-4 h-4" alt="Task icon";
-                            p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                            p class="" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
                     },
                     PageType::Workflow(_) => {
-                        div class="flex items-center gap-x-1" {
+                        div class="flex items-center gap-x-1 hover:text-slate-300" {
                             img src=(self.assets_relative_to(base).join("unselected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
-                            p { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                            p class="" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
                         }
                     }
                 }
@@ -318,19 +318,19 @@ impl DocsTree {
         let base = path.as_ref().parent().unwrap();
 
         html! {
-            div class="top-0 left-0 h-screen min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-white overflow-y-scroll flex flex-col gap-y-3" {
-                img src=(self.assets_relative_to(base).join("sprocket-logo.png").to_string_lossy()) class="w-1/2 h-1/2" alt="Sprocket logo";
-                form class="w-full h-full rounded-md border border-slate-700 flex items-center gap-x-2 px-2" {
+            div class="flex flex-col gap-y-3 top-0 left-0 h-screen min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-slate-400 overflow-y-scroll" {
+                img src=(self.assets_relative_to(base).join("sprocket-logo.png").to_string_lossy()) class="w-1/2 h-1/2 mb-4" alt="Sprocket logo";
+                form class="flex items-center gap-x-2 w-full h-full rounded-md border border-slate-700 px-2 mb-4" {
                     img src=(self.assets_relative_to(base).join("search.png").to_string_lossy()) class="w-4 h-4" alt="Search icon";
                     input type="text" placeholder="Search" class="w-full h-full text-slate-300";
                 }
                 form class="w-full h-full rounded-md flex items-center gap-x-2 px-2" {
                     div class="flex items-center gap-x-1" {
-                        div class="flex items-center gap-x-1" {
+                        div class="flex items-center gap-x-1 border-b dark:text-slate-400 hover:text-slate-300" {
                             img src=(self.assets_relative_to(base).join("list-bullet.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Workflows" }
                         }
-                        div class="flex items-center gap-x-1" {
+                        div class="flex items-center gap-x-1 border-b dark:text-slate-50" {
                             img src=(self.assets_relative_to(base).join("selected-dir.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Full Directory" }
                         }
@@ -420,7 +420,7 @@ impl DocsTree {
                     div class="flex top-0 left-0 sticky" {
                         (left_sidebar)
                     }
-                    div class="p-4 flex grow" {
+                    div class="flex grow p-4" {
                         (content)
                     }
                     div class="flex top-0 right-0 sticky" {
@@ -459,7 +459,7 @@ impl DocsTree {
                     div class="flex top-0 left-0 sticky" {
                         (left_sidebar)
                     }
-                    div class="p-4 flex grow" {
+                    div class="flex grow p-4" {
                         (content)
                     }
                     div class="flex top-0 right-0 sticky" {

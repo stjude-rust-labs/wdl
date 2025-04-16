@@ -7,7 +7,9 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
     --color-red-900: oklch(39.6% 0.141 25.723);
+    --color-slate-50: oklch(98.4% 0.003 247.858);
     --color-slate-300: oklch(86.9% 0.022 252.894);
+    --color-slate-400: oklch(70.4% 0.04 256.788);
     --color-slate-700: oklch(37.2% 0.044 257.287);
     --color-slate-900: oklch(20.8% 0.042 265.755);
     --color-slate-950: oklch(12.9% 0.042 264.695);
@@ -187,6 +189,9 @@
   .left-0 {
     left: calc(var(--spacing) * 0) !important;
   }
+  .mb-4 {
+    margin-bottom: calc(var(--spacing) * 4) !important;
+  }
   .ml-2 {
     margin-left: calc(var(--spacing) * 2) !important;
   }
@@ -279,6 +284,10 @@
     border-style: var(--tw-border-style) !important;
     border-width: 1px !important;
   }
+  .border-b {
+    border-bottom-style: var(--tw-border-style) !important;
+    border-bottom-width: 1px !important;
+  }
   .border-l {
     border-left-style: var(--tw-border-style) !important;
     border-left-width: 1px !important;
@@ -295,6 +304,9 @@
   .px-2 {
     padding-inline: calc(var(--spacing) * 2) !important;
   }
+  .py-8 {
+    padding-block: calc(var(--spacing) * 8) !important;
+  }
   .text-center {
     text-align: center !important;
   }
@@ -309,6 +321,13 @@
   .text-slate-300 {
     color: var(--color-slate-300) !important;
   }
+  .hover\:text-slate-300 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-slate-300) !important;
+      }
+    }
+  }
   .dark\:bg-red-900 {
     &:where(.dark, .dark *) {
       background-color: var(--color-red-900) !important;
@@ -322,6 +341,16 @@
   .dark\:bg-slate-950 {
     &:where(.dark, .dark *) {
       background-color: var(--color-slate-950) !important;
+    }
+  }
+  .dark\:text-slate-50 {
+    &:where(.dark, .dark *) {
+      color: var(--color-slate-50) !important;
+    }
+  }
+  .dark\:text-slate-400 {
+    &:where(.dark, .dark *) {
+      color: var(--color-slate-400) !important;
     }
   }
   .dark\:text-white {
