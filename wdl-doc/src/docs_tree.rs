@@ -318,7 +318,7 @@ impl DocsTree {
         let base = path.as_ref().parent().unwrap();
 
         html! {
-            div class="top-0 left-0 h-full min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-white overflow-y-scroll flex flex-col gap-y-3" {
+            div class="top-0 left-0 h-screen min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-white overflow-y-scroll flex flex-col gap-y-3" {
                 img src=(self.assets_relative_to(base).join("sprocket-logo.png").to_string_lossy()) class="w-1/2 h-1/2" alt="Sprocket logo";
                 form class="w-full h-full rounded-md border border-slate-700 flex items-center gap-x-2 px-2" {
                     img src=(self.assets_relative_to(base).join("search.png").to_string_lossy()) class="w-4 h-4" alt="Search icon";
@@ -417,7 +417,9 @@ impl DocsTree {
             "Home",
             html! {
                 div class="flex flex-row items-start" {
-                    (left_sidebar)
+                    div class="flex top-0 left-0 sticky" {
+                        (left_sidebar)
+                    }
                     div class="p-4 flex grow" {
                         (content)
                     }
@@ -454,7 +456,9 @@ impl DocsTree {
             page.name(),
             html! {
                 div class="flex flex-row items-start" {
-                    (left_sidebar)
+                    div class="flex top-0 left-0 sticky" {
+                        (left_sidebar)
+                    }
                     div class="p-4 flex grow" {
                         (content)
                     }
