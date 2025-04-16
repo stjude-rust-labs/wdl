@@ -204,6 +204,12 @@ impl DocsTree {
         diff_paths(&self.assets, path).unwrap()
     }
 
+    /// Get a relative path to the root index page.
+    pub fn root_index_relative_to<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+        let path = path.as_ref();
+        diff_paths(self.root.path().join("index.html"), path).unwrap()
+    }
+
     /// Add a page to the tree.
     pub fn add_page<P: Into<PathBuf>>(&mut self, abs_path: P, page: Rc<HTMLPage>) {
         let root = self.root_mut();
@@ -337,9 +343,9 @@ impl DocsTree {
                     }
                 }
                 ul class="" {
-                    div class="flex flex-row items-center gap-x-1" {
-                        img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
-                        p class="" { (root.name()) }
+                    div class="flex flex-row items-center gap-x-1 dark:text-slate-50" {
+                        img src=(self.assets_relative_to(base).join("selected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
+                        p class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
                     }
                     @for node in root.children().values() {
                         @if node.name() != "external" {
