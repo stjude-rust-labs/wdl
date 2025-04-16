@@ -318,7 +318,7 @@ impl DocsTree {
         let base = path.as_ref().parent().unwrap();
 
         html! {
-            div class="top-0 h-full left-0 min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-white overflow-auto overflow-x-scroll flex flex-col gap-y-3" {
+            div class="top-0 left-0 h-full min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-white overflow-y-scroll flex flex-col gap-y-3" {
                 img src=(self.assets_relative_to(base).join("sprocket-logo.png").to_string_lossy()) class="w-1/2 h-1/2" alt="Sprocket logo";
                 form class="w-full h-full rounded-md border border-slate-700 flex items-center gap-x-2 px-2" {
                     img src=(self.assets_relative_to(base).join("search.png").to_string_lossy()) class="w-4 h-4" alt="Search icon";
@@ -357,7 +357,7 @@ impl DocsTree {
     /// Render a right sidebar component.
     pub fn render_right_sidebar(&self) -> Markup {
         html! {
-            div class="top-0 h-screen overflow-auto sticky right-0 min-w-[240px] w-[240px] p-4 bottom-4 object-right dark:bg-red-900 dark:text-white" {
+            div class="top-0 right-0 h-screen min-w-[240px] w-[240px] p-4 dark:bg-red-900 dark:text-white" {
                 h1 class="text-2xl text-center" { "Sidebar" }
                 p class="" { "Right Sidebar" }
             }
@@ -416,12 +416,14 @@ impl DocsTree {
         let html = full_page(
             "Home",
             html! {
-                div class="overflow-auto flex flex-row flex-grow" {
+                div class="flex flex-row items-start" {
                     (left_sidebar)
-                    div class="p-4 flex grow flex-wrap overflow-auto overflow-y-scroll" {
+                    div class="p-4 flex grow" {
                         (content)
                     }
-                    (self.render_right_sidebar())
+                    div class="flex top-0 right-0 sticky" {
+                        (self.render_right_sidebar())
+                    }
                 }
             },
             self.stylesheet_relative_to(root.path()),
@@ -451,12 +453,14 @@ impl DocsTree {
         let html = full_page(
             page.name(),
             html! {
-                div class="overflow-auto flex flex-row flex-grow" {
+                div class="flex flex-row items-start" {
                     (left_sidebar)
-                    div class="p-4 flex grow sticky overflow-auto" {
+                    div class="p-4 flex grow" {
                         (content)
                     }
-                    (self.render_right_sidebar())
+                    div class="flex top-0 right-0 sticky" {
+                        (self.render_right_sidebar())
+                    }
                 }
             },
             stylesheet,

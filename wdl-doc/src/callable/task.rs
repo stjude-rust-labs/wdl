@@ -117,7 +117,7 @@ impl Task {
     /// Render the task as HTML.
     pub fn render(&self) -> Markup {
         html! {
-            div class="flex flex-col flex-none items-left text-left" {
+            div class="flex flex-col" {
                 h1 { (self.name()) }
                 (self.description())
                 (self.render_meta())
