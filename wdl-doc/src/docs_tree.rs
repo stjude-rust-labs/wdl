@@ -85,7 +85,7 @@ impl Node {
         &self.name
     }
 
-    /// Get the path of the node.
+    /// Get the absolute path of the node.
     pub fn path(&self) -> &PathBuf {
         &self.path
     }
@@ -273,34 +273,69 @@ impl DocsTree {
             @if let Some(page) = node.page() {
                 @match page.page_type() {
                     PageType::Index(_) => {
-                        div class="flex items-center gap-x-1 hover:text-slate-300" {
-                            img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
-                            p class="" { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
+                        @if base.starts_with(node.path()) {
+                            div class="flex items-center gap-x-1 dark:text-slate-50" {
+                                img src=(self.assets_relative_to(base).join("selected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
+                                p class="" { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
+                            }
+                        } @else {
+                            div class="flex items-center gap-x-1 hover:text-slate-300" {
+                                img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
+                                p class="" { a href=(diff_paths(node.path().join("index.html"), base).unwrap().to_string_lossy()) { (page.name()) } }
+                            }
                         }
                     },
                     PageType::Struct(_) => {
-                        div class="flex items-center gap-x-1 hover:text-slate-300" {
-                            img src=(self.assets_relative_to(base).join("unselected-struct.png").to_string_lossy()) class="w-4 h-4" alt="Struct icon";
-                            p class="" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                        @if base.starts_with(node.path().parent().unwrap()) {
+                            div class="flex items-center gap-x-1 dark:text-slate-50" {
+                                img src=(self.assets_relative_to(base).join("selected-struct.png").to_string_lossy()) class="w-4 h-4" alt="Struct icon";
+                                p class="" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                            }
+                        } @else {
+                            div class="flex items-center gap-x-1 hover:text-slate-300" {
+                                img src=(self.assets_relative_to(base).join("unselected-struct.png").to_string_lossy()) class="w-4 h-4" alt="Struct icon";
+                                p class="" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                            }
                         }
                     },
                     PageType::Task(_) => {
-                        div class="flex items-center gap-x-1 hover:text-slate-300" {
-                            img src=(self.assets_relative_to(base).join("unselected-task.png").to_string_lossy()) class="w-4 h-4" alt="Task icon";
-                            p class="" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                        @if base.starts_with(node.path().parent().unwrap()) {
+                            div class="flex items-center gap-x-1 dark:text-slate-50" {
+                                img src=(self.assets_relative_to(base).join("selected-task.png").to_string_lossy()) class="w-4 h-4" alt="Task icon";
+                                p class="" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                            }
+                        } @else {
+                            div class="flex items-center gap-x-1 hover:text-slate-300" {
+                                img src=(self.assets_relative_to(base).join("unselected-task.png").to_string_lossy()) class="w-4 h-4" alt="Task icon";
+                                p class="" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                            }
                         }
                     },
                     PageType::Workflow(_) => {
-                        div class="flex items-center gap-x-1 hover:text-slate-300" {
-                            img src=(self.assets_relative_to(base).join("unselected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
-                            p class="" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                        @if base.starts_with(node.path().parent().unwrap()) {
+                            div class="flex items-center gap-x-1 dark:text-slate-50" {
+                                img src=(self.assets_relative_to(base).join("selected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
+                                p class="" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                            }
+                        } @else {
+                            div class="flex items-center gap-x-1 hover:text-slate-300" {
+                                img src=(self.assets_relative_to(base).join("unselected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
+                                p class="" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (page.name()) } }
+                            }
                         }
                     }
                 }
             } @else {
-                div class="flex items-center gap-x-1" {
-                    img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
-                    p class="" { (node.name()) }
+                @if base.starts_with(node.path()) {
+                    div class="flex items-center gap-x-1 dark:text-slate-50" {
+                        img src=(self.assets_relative_to(base).join("selected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
+                        p class="" { (node.name()) }
+                    }
+                } @else {
+                    div class="flex items-center gap-x-1" {
+                        img src=(self.assets_relative_to(base).join("unselected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
+                        p class="" { (node.name()) }
+                    }
                 }
             }
             ul class="" {
