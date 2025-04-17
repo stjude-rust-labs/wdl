@@ -31,6 +31,7 @@ use maud::Markup;
 use maud::PreEscaped;
 use maud::Render;
 use maud::html;
+use path_clean::clean;
 use pathdiff::diff_paths;
 use pulldown_cmark::Options;
 use pulldown_cmark::Parser;
@@ -42,10 +43,69 @@ use wdl_ast::SyntaxTokenExt;
 use wdl_ast::VersionStatement;
 use wdl_ast::v1::DocumentItem;
 
+/// The CSS stylesheet to use for the generated documentation.
+const STYLESHEET: &str = include_str!("../theme/dist/style.css");
+/// The "sprocket" logo.
+const SPROCKET_LOGO: &[u8] = include_bytes!("../theme/assets/sprocket-logo.png");
+/// The "list bullet" icon.
+const LIST_BULLET_ICON: &[u8] = include_bytes!("../theme/assets/list-bullet.png");
+/// The "folder" icon.
+const FOLDER_ICON: &[u8] = include_bytes!("../theme/assets/folder.png");
+/// The "search" icon.
+const SEARCH_ICON: &[u8] = include_bytes!("../theme/assets/search.png");
+/// The "selected directory" icon.
+const SELECTED_DIR_ICON: &[u8] = include_bytes!("../theme/assets/selected-dir.png");
+/// The "unselected directory" icon.
+const UNSELECTED_DIR_ICON: &[u8] = include_bytes!("../theme/assets/unselected-dir.png");
+/// The "selected struct" icon.
+const SELECTED_STRUCT_ICON: &[u8] = include_bytes!("../theme/assets/selected-struct.png");
+/// The "unselected struct" icon.
+const UNSELECTED_STRUCT_ICON: &[u8] = include_bytes!("../theme/assets/unselected-struct.png");
+/// The "selected task" icon.
+const SELECTED_TASK_ICON: &[u8] = include_bytes!("../theme/assets/selected-task.png");
+/// The "unselected task" icon.
+const UNSELECTED_TASK_ICON: &[u8] = include_bytes!("../theme/assets/unselected-task.png");
+/// The "selected workflow" icon.
+const SELECTED_WORKFLOW_ICON: &[u8] = include_bytes!("../theme/assets/selected-workflow.png");
+/// The "unselected workflow" icon.
+const UNSELECTED_WORKFLOW_ICON: &[u8] = include_bytes!("../theme/assets/unselected-workflow.png");
+
 /// The directory where the generated documentation will be stored.
 ///
 /// This directory will be created in the workspace directory.
 const DOCS_DIR: &str = "docs";
+
+/// Write assets to the given root docs directory.
+fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
+    let dir = dir.as_ref();
+    let assets_dir = dir.join("assets");
+    std::fs::create_dir_all(&assets_dir)?;
+    std::fs::write(dir.join("style.css"), STYLESHEET)?;
+
+    std::fs::write(assets_dir.join("sprocket-logo.png"), SPROCKET_LOGO)?;
+    std::fs::write(assets_dir.join("list-bullet.png"), LIST_BULLET_ICON)?;
+    std::fs::write(assets_dir.join("folder.png"), FOLDER_ICON)?;
+    std::fs::write(assets_dir.join("search.png"), SEARCH_ICON)?;
+    std::fs::write(assets_dir.join("selected-dir.png"), SELECTED_DIR_ICON)?;
+    std::fs::write(assets_dir.join("unselected-dir.png"), UNSELECTED_DIR_ICON)?;
+    std::fs::write(assets_dir.join("selected-struct.png"), SELECTED_STRUCT_ICON)?;
+    std::fs::write(
+        assets_dir.join("unselected-struct.png"),
+        UNSELECTED_STRUCT_ICON,
+    )?;
+    std::fs::write(assets_dir.join("selected-task.png"), SELECTED_TASK_ICON)?;
+    std::fs::write(assets_dir.join("unselected-task.png"), UNSELECTED_TASK_ICON)?;
+    std::fs::write(
+        assets_dir.join("selected-workflow.png"),
+        SELECTED_WORKFLOW_ICON,
+    )?;
+    std::fs::write(
+        assets_dir.join("unselected-workflow.png"),
+        UNSELECTED_WORKFLOW_ICON,
+    )?;
+
+    Ok(())
+}
 
 /// Links to a CSS stylesheet at the given path.
 struct Css<'a>(&'a str);
@@ -59,7 +119,7 @@ impl Render for Css<'_> {
 }
 
 /// A basic header with a `page_title` and an optional link to the stylesheet.
-pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: Option<P>) -> Markup {
+pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: P) -> Markup {
     html! {
         head {
             meta charset="utf-8";
@@ -68,24 +128,18 @@ pub(crate) fn header<P: AsRef<Path>>(page_title: &str, stylesheet: Option<P>) ->
             link rel="preconnect" href="https://fonts.googleapis.com";
             link rel="preconnect" href="https://fonts.gstatic.com" crossorigin;
             link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet";
-            @if let Some(ss) = stylesheet {
-                (Css(ss.as_ref().to_str().unwrap()))
-            }
+            (Css(stylesheet.as_ref().to_str().unwrap()))
         }
     }
 }
 
 /// A full HTML page.
-pub(crate) fn full_page<P: AsRef<Path>>(
-    page_title: &str,
-    body: Markup,
-    stylesheet: Option<P>,
-) -> Markup {
+pub(crate) fn full_page<P: AsRef<Path>>(page_title: &str, body: Markup, stylesheet: P) -> Markup {
     html! {
         (DOCTYPE)
-        html class="dark size-full" {
+        html class="dark" {
             (header(page_title, stylesheet))
-            body class="flex dark size-full dark:bg-slate-950 dark:text-white" {
+            body class="size-full table-auto border-collapse dark:bg-slate-950 dark:text-white text-base" {
                 (body)
             }
         }
@@ -109,14 +163,14 @@ impl<T: AsRef<str>> Render for Markdown<T> {
 
         // Remove the outer `<p>` tag that `pulldown_cmark` wraps single lines in
         let safe_html = if safe_html.starts_with("<p>") && safe_html.ends_with("</p>\n") {
-            let trimmed = safe_html[3..safe_html.len() - 5].to_string();
+            let trimmed = &safe_html[3..safe_html.len() - 5];
             if trimmed.contains("<p>") {
                 // If the trimmed string contains another `<p>` tag, it means
                 // that the original string was more complicated than a single-line paragraph,
                 // so we should keep the outer `<p>` tag.
                 safe_html
             } else {
-                trimmed
+                trimmed.to_string()
             }
         } else {
             safe_html
@@ -192,11 +246,11 @@ impl Document {
     /// Render the document as HTML.
     pub fn render(&self) -> Markup {
         html! {
-            div {
+            div class="flex flex-col gap-y-6" {
                 h1 { (self.name()) }
                 h3 { "WDL Version: " (self.version()) }
                 div { (self.preamble()) }
-                div class="flex flex-col items-center text-left"  {
+                div class="flex flex-col gap-y-6" {
                     h2 { "Table of Contents" }
                     table class="border" {
                         thead class="border" { tr {
@@ -246,7 +300,7 @@ pub async fn document_workspace(
     stylesheet: Option<impl AsRef<Path>>,
     overwrite: bool,
 ) -> Result<PathBuf> {
-    let workspace_abs_path = absolute(workspace)?;
+    let workspace_abs_path = clean(absolute(workspace.as_ref())?);
     let stylesheet = stylesheet.and_then(|p| absolute(p.as_ref()).ok());
 
     if !workspace_abs_path.is_dir() {
@@ -268,7 +322,7 @@ pub async fn document_workspace(
     let mut docs_tree = if let Some(ss) = stylesheet {
         docs_tree::DocsTree::new_with_stylesheet(docs_dir.clone(), ss)?
     } else {
-        docs_tree::DocsTree::new(docs_dir.clone())
+        docs_tree::DocsTree::new(docs_dir.clone())?
     };
 
     for result in results {
