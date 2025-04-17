@@ -25,7 +25,6 @@ use futures::future::BoxFuture;
 use nonempty::NonEmpty;
 use tokio::sync::oneshot;
 use tokio_util::sync::CancellationToken;
-use tracing::error;
 use tracing::info;
 
 use super::TaskExecutionBackend;
@@ -68,12 +67,15 @@ const GUEST_WORK_DIR: &str = "/mnt/work";
 const GUEST_COMMAND_PATH: &str = "/mnt/command";
 
 /// The guest path for the output directory.
+#[cfg(unix)]
 const GUEST_OUT_DIR: &str = "/workflow_output";
 
 /// Amount of CPU to reserve for the cleanup task.
+#[cfg(unix)]
 const CLEANUP_CPU: f64 = 0.1;
 
 /// Amount of memory to reserve for the cleanup task.
+#[cfg(unix)]
 const CLEANUP_MEMORY: f64 = 0.05;
 
 /// Represents a crankshaft task request.
@@ -501,14 +503,13 @@ impl TaskExecutionBackend for CrankshaftBackend {
             return None;
         }
 
-        let inner_backend = self.inner.clone();
-        let generator = self.generator.clone();
-        let output_path = output_dir.to_path_buf();
-
-        Some(
-            async move {
-                #[cfg(unix)]
-                {
+        #[cfg(unix)]
+        {
+            let inner_backend = self.inner.clone();
+            let generator = self.generator.clone();
+            let output_path = output_dir.to_path_buf();
+            Some(
+                async move {
                     let result = async {
                         let (uid, gid) = unsafe { (libc::getuid(), libc::getgid()) };
                         let ownership = format!("{uid}:{gid}");
@@ -599,7 +600,7 @@ impl TaskExecutionBackend for CrankshaftBackend {
                                     Ok(())
                                 } else {
                                     let stderr = String::from_utf8_lossy(&output.stderr);
-                                    error!(
+                                    tracing::error!(
                                         "failed to chown output directory: '{}'. Exit status: \
                                          '{}'. Stderr: '{}'",
                                         output_path.display(),
@@ -613,7 +614,7 @@ impl TaskExecutionBackend for CrankshaftBackend {
                                 }
                             }
                             Err(e) => {
-                                error!(
+                                tracing::error!(
                                     "receiving result for cleanup task '{}' failed: {e}",
                                     cleanup_task_name
                                 );
@@ -627,16 +628,19 @@ impl TaskExecutionBackend for CrankshaftBackend {
                     .await;
 
                     if let Err(e) = result {
-                        error!("cleanup task failed: {e:#}");
+                        tracing::error!("cleanup task failed: {e:#}");
                     }
                 }
+                .boxed(),
+            )
+        }
 
-                #[cfg(not(unix))]
-                {
-                    info!("cleanup task is not supported on this platform");
-                }
-            }
-            .boxed(),
-        )
+        #[cfg(not(unix))]
+        {
+            let _ = token;
+            info!("cleanup task is not supported on this platform");
+
+            None
+        }
     }
 }
