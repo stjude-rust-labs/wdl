@@ -195,6 +195,9 @@
   .ml-2 {
     margin-left: calc(var(--spacing) * 2) !important;
   }
+  .ml-4 {
+    margin-left: calc(var(--spacing) * 4) !important;
+  }
   .block {
     display: block !important;
   }
@@ -232,11 +235,11 @@
   .w-\[240px\] {
     width: 240px !important;
   }
-  .w-\[269px\] {
-    width: 269px !important;
-  }
   .w-full {
     width: 100% !important;
+  }
+  .max-w-1\/6 {
+    max-width: calc(1/6 * 100%) !important;
   }
   .min-w-\[240px\] {
     min-width: 240px !important;
@@ -252,6 +255,9 @@
   }
   .border-collapse {
     border-collapse: collapse !important;
+  }
+  .resize-x {
+    resize: horizontal !important;
   }
   .flex-col {
     flex-direction: column !important;
@@ -277,8 +283,11 @@
   .gap-y-6 {
     row-gap: calc(var(--spacing) * 6) !important;
   }
-  .overflow-y-scroll {
-    overflow-y: scroll !important;
+  .overflow-x-clip {
+    overflow-x: clip !important;
+  }
+  .overflow-y-auto {
+    overflow-y: auto !important;
   }
   .rounded-md {
     border-radius: var(--radius-md) !important;
@@ -317,6 +326,12 @@
   .text-base {
     font-size: var(--text-base) !important;
     line-height: var(--tw-leading, var(--text-base--line-height)) !important;
+  }
+  .text-nowrap {
+    text-wrap: nowrap !important;
+  }
+  .text-ellipsis {
+    text-overflow: ellipsis !important;
   }
   .text-slate-300 {
     color: var(--color-slate-300) !important;
