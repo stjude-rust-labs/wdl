@@ -326,8 +326,8 @@ pub trait TaskExecutionBackend: Send + Sync {
     /// Returns `None` if no cleanup is required.
     fn cleanup<'a, 'b, 'c>(
         &'a self,
-        output_dir: &'b Path,
-        token: CancellationToken,
+        _output_dir: &'b Path,
+        _token: CancellationToken,
     ) -> Option<BoxFuture<'c, ()>>
     where
         'a: 'c,

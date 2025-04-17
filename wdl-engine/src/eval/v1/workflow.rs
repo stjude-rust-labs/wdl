@@ -27,7 +27,6 @@ use tokio::sync::RwLock;
 use tokio::task::JoinSet;
 use tokio_util::sync::CancellationToken;
 use tracing::debug;
-use tracing::error;
 use tracing::info;
 use tracing::trace;
 use wdl_analysis::diagnostics::only_one_namespace;
