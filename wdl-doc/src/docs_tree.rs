@@ -359,19 +359,19 @@ impl DocsTree {
         let base = path.as_ref().parent().unwrap();
 
         html! {
-            div class="flex flex-col gap-y-3 top-0 left-0 h-screen min-w-[269px] w-[269px] p-4 dark:bg-slate-900 dark:text-slate-400 overflow-y-scroll" {
+            div class="flex flex-col gap-y-3 top-0 left-0 h-screen min-w-[269px] text-ellipsis text-nowrap p-4 dark:bg-slate-900 dark:text-slate-400 overflow-y-auto overflow-x-clip" {
                 img src=(self.assets_relative_to(base).join("sprocket-logo.png").to_string_lossy()) class="w-1/2 h-1/2 mb-4" alt="Sprocket logo";
                 form class="flex items-center gap-x-2 w-full h-full rounded-md border border-slate-700 px-2 mb-4" {
                     img src=(self.assets_relative_to(base).join("search.png").to_string_lossy()) class="w-4 h-4" alt="Search icon";
                     input type="text" placeholder="Search" class="w-full h-full text-slate-300";
                 }
-                form class="w-full h-full rounded-md flex items-center gap-x-2 px-2" {
-                    div class="flex items-center gap-x-1" {
-                        div class="flex items-center gap-x-1 border-b dark:text-slate-400 hover:text-slate-300" {
+                div class="w-full h-full rounded-md flex items-center gap-x-2 px-2" {
+                    div class="flex grow items-center gap-x-1" {
+                        div class="flex grow items-center gap-x-1 border-b dark:text-slate-400 hover:text-slate-300" {
                             img src=(self.assets_relative_to(base).join("list-bullet.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Workflows" }
                         }
-                        div class="flex items-center gap-x-1 border-b dark:text-slate-50" {
+                        div class="flex grow items-center gap-x-1 border-b dark:text-slate-50" {
                             img src=(self.assets_relative_to(base).join("folder.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Full Directory" }
                         }
@@ -458,10 +458,10 @@ impl DocsTree {
             "Home",
             html! {
                 div class="flex flex-row items-start" {
-                    div class="flex top-0 left-0 sticky" {
+                    div class="flex sticky top-0 resize-x max-w-1/6" {
                         (left_sidebar)
                     }
-                    div class="flex grow p-4" {
+                    div class="flex grow resize-x p-4 ml-4" {
                         (content)
                     }
                     div class="flex top-0 right-0 sticky" {
@@ -497,10 +497,10 @@ impl DocsTree {
             page.name(),
             html! {
                 div class="flex flex-row items-start" {
-                    div class="flex top-0 left-0 sticky" {
+                    div class="flex sticky top-0 resize-x max-w-1/6" {
                         (left_sidebar)
                     }
-                    div class="flex grow p-4" {
+                    div class="flex grow resize-x p-4 ml-4" {
                         (content)
                     }
                     div class="flex top-0 right-0 sticky" {
