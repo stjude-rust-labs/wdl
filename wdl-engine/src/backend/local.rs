@@ -338,10 +338,4 @@ impl TaskExecutionBackend for LocalTaskExecutionBackend {
             completed: completed_rx,
         })
     }
-
-    fn cleanup(&self, _output_dir: &Path) -> Result<oneshot::Receiver<Result<()>>> {
-        let (tx, rx) = oneshot::channel();
-        let _ = tx.send(Ok(()));
-        Ok(rx)
-    }
 }

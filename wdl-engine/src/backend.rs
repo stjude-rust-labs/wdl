@@ -320,8 +320,22 @@ pub trait TaskExecutionBackend: Send + Sync {
         token: CancellationToken,
     ) -> Result<TaskExecutionEvents>;
 
-    /// Performs cleanup operations after workflow/task evaluation completes.
-    fn cleanup(&self, output_dir: &Path) -> Result<Receiver<Result<()>>>;
+    /// Performs cleanup operations after top-level workflow or task evaluation
+    /// completes.
+    ///
+    /// Returns `None` if no cleanup is required.
+    fn cleanup<'a, 'b, 'c>(
+        &'a self,
+        output_dir: &'b Path,
+        token: CancellationToken,
+    ) -> Option<BoxFuture<'c, ()>>
+    where
+        'a: 'c,
+        'b: 'c,
+        Self: 'c,
+    {
+        None
+    }
 }
 
 /// A trait implemented by backend requests.
