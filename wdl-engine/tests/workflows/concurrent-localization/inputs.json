@@ -1,0 +1,13 @@
+{
+  "test.remote1": "https://jsonplaceholder.typicode.com/todos/1",
+  "test.remote2": "https://jsonplaceholder.typicode.com/todos/2",
+  "test.remote3": "https://jsonplaceholder.typicode.com/todos/3",
+  "test.remote4": "https://jsonplaceholder.typicode.com/todos/4",
+  "test.remote5": "https://jsonplaceholder.typicode.com/todos/5",
+  "test.remote6": "https://jsonplaceholder.typicode.com/todos/6",
+  "test.remote7": "https://jsonplaceholder.typicode.com/todos/7",
+  "test.remote8": "https://jsonplaceholder.typicode.com/todos/8",
+  "test.remote9": "https://jsonplaceholder.typicode.com/todos/9",
+  "test.remote10": "https://jsonplaceholder.typicode.com/todos/10",
+  "test.local_file": "local.txt"
+}
