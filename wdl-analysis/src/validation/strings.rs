@@ -136,7 +136,10 @@ impl Visitor for LiteralTextVisitor {
     }
 
     fn string_text(&mut self, diagnostics: &mut Diagnostics, text: &v1::StringText) {
-        let string: v1::LiteralString<_> = text.parent().expect("should have a parent");
+        let string: v1::LiteralString<_> = match text.parent() {
+            Some(s) => s,
+            None => return, // We are in an unanalyzed string.
+        };
         match string.kind() {
             LiteralStringKind::SingleQuoted | LiteralStringKind::DoubleQuoted => {
                 // Check the text of a normal string to ensure escape sequences are correct and
