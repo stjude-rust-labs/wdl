@@ -24,8 +24,10 @@ use futures::FutureExt;
 use futures::future::BoxFuture;
 use nonempty::NonEmpty;
 use tokio::sync::oneshot;
+use tokio::task::JoinSet;
 use tokio_util::sync::CancellationToken;
 use tracing::info;
+use url::Url;
 
 use super::TaskExecutionBackend;
 use super::TaskExecutionConstraints;
@@ -397,18 +399,17 @@ impl TaskExecutionBackend for CrankshaftBackend {
         Some(Path::new(GUEST_WORK_DIR))
     }
 
-    fn localize_inputs<'a, 'b, 'c, 'd>(
+    fn localize_inputs<'a, 'b, 'c>(
         &'a self,
-        downloader: &'b dyn Downloader,
+        downloader: Arc<dyn Downloader>,
         inputs: &'c mut [crate::eval::Input],
-    ) -> BoxFuture<'d, Result<()>>
+    ) -> BoxFuture<'c, Result<()>>
     where
-        'a: 'd,
-        'b: 'd,
-        'c: 'd,
-        Self: 'd,
+        'a: 'c,
+        'b: 'c,
+        Self: 'c,
     {
-        async {
+        async move {
             // Construct a trie for mapping input guest paths
             let mut trie = InputTrie::default();
             for input in inputs.iter() {
@@ -416,22 +417,61 @@ impl TaskExecutionBackend for CrankshaftBackend {
             }
 
             for (index, guest_path) in trie.calculate_guest_paths(GUEST_INPUTS_DIR)? {
-                inputs[index].set_guest_path(guest_path);
+                if let Some(input) = inputs.get_mut(index) {
+                    input.set_guest_path(guest_path);
+                } else {
+                    return Err(anyhow!("invalid index {} returned from trie", index));
+                }
             }
 
             // Localize all inputs
             // TODO: only do this for local task execution
-            for input in inputs {
-                // TODO: parallelize the downloads
-                let location = match input.path() {
-                    EvaluationPath::Local(path) => Location::Path(path.into()),
-                    EvaluationPath::Remote(url) => downloader
-                        .download(url)
-                        .await
-                        .map_err(|e| anyhow!("failed to localize `{url}`: {e:?}"))?,
-                };
+            let mut download_futs = JoinSet::new();
 
-                input.set_location(location.into_owned());
+            let urls_to_download: Vec<(usize, Url)> = inputs
+                .iter()
+                .enumerate()
+                .filter_map(|(idx, input)| match input.path() {
+                    EvaluationPath::Remote(url) => Some((idx, url.clone())),
+                    _ => None,
+                })
+                .collect();
+
+            for (idx, url) in urls_to_download {
+                let downloader_clone = downloader.clone();
+                download_futs.spawn(async move {
+                    let location_result = downloader_clone.download(&url).await;
+
+                    match location_result {
+                        Ok(location) => Ok((idx, location.into_owned())),
+                        Err(e) => Err(anyhow!("failed to localize `{url}`: {e:?}")),
+                    }
+                });
+            }
+
+            for input in inputs.iter_mut() {
+                if let EvaluationPath::Local(path) = input.path() {
+                    input.set_location(Location::Path(path.clone().into()));
+                }
+            }
+
+            while let Some(result) = download_futs.join_next().await {
+                match result {
+                    Ok(Ok((idx, location))) => {
+                        inputs
+                            .get_mut(idx)
+                            .expect("index from should be valid")
+                            .set_location(location);
+                    }
+                    Ok(Err(e)) => {
+                        download_futs.abort_all();
+                        return Err(e);
+                    }
+                    Err(e) => {
+                        download_futs.abort_all();
+                        return Err(anyhow!("download task failed: {e:?}"));
+                    }
+                }
             }
 
             Ok(())

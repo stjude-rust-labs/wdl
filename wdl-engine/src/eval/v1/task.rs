@@ -1117,7 +1117,7 @@ impl TaskEvaluator {
 
         // Localize the inputs
         self.backend
-            .localize_inputs(&self.downloader, &mut inputs)
+            .localize_inputs(Arc::new(self.downloader.clone()), &mut inputs)
             .await
             .map_err(|e| task_localization_failed(e, state.task.name(), state.task.name_span()))?;
 

@@ -18,8 +18,10 @@ use futures::future::BoxFuture;
 use tokio::process::Command;
 use tokio::select;
 use tokio::sync::oneshot;
+use tokio::task::JoinSet;
 use tokio_util::sync::CancellationToken;
 use tracing::info;
+use url::Url;
 
 use super::TaskExecutionBackend;
 use super::TaskExecutionConstraints;
@@ -269,39 +271,79 @@ impl TaskExecutionBackend for LocalTaskExecutionBackend {
         None
     }
 
-    fn localize_inputs<'a, 'b, 'c, 'd>(
+    fn localize_inputs<'a, 'b, 'c>(
         &'a self,
-        downloader: &'b dyn Downloader,
+        downloader: Arc<dyn Downloader>,
         inputs: &'c mut [Input],
-    ) -> BoxFuture<'d, Result<()>>
+    ) -> BoxFuture<'c, Result<()>>
     where
-        'a: 'd,
-        'b: 'd,
-        'c: 'd,
-        Self: 'd,
+        'a: 'c,
+        'b: 'c,
+        Self: 'c,
     {
-        async {
-            for input in inputs {
-                // TODO: parallelize the downloads
-                let location = match input.path() {
-                    EvaluationPath::Local(path) => Location::Path(path.into()),
-                    EvaluationPath::Remote(url) => downloader
-                        .download(url)
-                        .await
-                        .map_err(|e| anyhow!("failed to localize `{url}`: {e:?}"))?,
-                };
+        async move {
+            let mut download_futs = JoinSet::new();
 
-                let guest_path = location
-                    .to_str()
-                    .with_context(|| {
-                        format!("path `{path}` is not UTF-8", path = location.display())
-                    })?
-                    .to_string();
+            let urls_to_download: Vec<(usize, Url)> = inputs
+                .iter()
+                .enumerate()
+                .filter_map(|(idx, input)| match input.path() {
+                    EvaluationPath::Remote(url) => Some((idx, url.clone())),
+                    _ => None,
+                })
+                .collect();
 
-                // Set the guest path to the download location for path translation
-                let location = location.into_owned();
-                input.set_guest_path(guest_path);
-                input.set_location(location);
+            for (index, url) in urls_to_download {
+                let downloader_clone = downloader.clone();
+                download_futs.spawn(async move {
+                    let location_result = downloader_clone.download(&url).await;
+                    match location_result {
+                        Ok(location) => Ok::<_, anyhow::Error>((index, location.into_owned())),
+                        Err(e) => Err(anyhow!("failed to localize `{url}`: {e:?}")),
+                    }
+                });
+            }
+
+            for input in inputs.iter_mut() {
+                if let EvaluationPath::Local(path) = input.path() {
+                    let location = Location::Path(path.clone().into());
+                    let guest_path = location
+                        .to_str()
+                        .with_context(|| {
+                            format!("path `{path}` is not UTF-8", path = path.display())
+                        })?
+                        .to_string();
+                    input.set_location(location.into_owned());
+                    input.set_guest_path(guest_path);
+                }
+            }
+
+            while let Some(result) = download_futs.join_next().await {
+                match result {
+                    Ok(Ok((idx, location))) => {
+                        let guest_path = location
+                            .to_str()
+                            .with_context(|| {
+                                format!(
+                                    "downloaded path `{path}` is not UTF-8",
+                                    path = location.display()
+                                )
+                            })?
+                            .to_string();
+
+                        let input = inputs.get_mut(idx).expect("index should be valid");
+                        input.set_location(location);
+                        input.set_guest_path(guest_path);
+                    }
+                    Ok(Err(e)) => {
+                        download_futs.abort_all();
+                        return Err(e);
+                    }
+                    Err(e) => {
+                        download_futs.abort_all();
+                        return Err(anyhow!("download task panicked: {e}"));
+                    }
+                }
             }
 
             Ok(())

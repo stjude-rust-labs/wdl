@@ -28,11 +28,13 @@ use tokio::fs;
 use tokio::io::AsyncWriteExt;
 use tokio::io::BufWriter;
 use tokio::sync::Notify;
+use tokio::sync::Semaphore;
 use tracing::debug;
 use tracing::info;
 use url::Url;
 
 use crate::config::Config;
+use crate::config::DEFAULT_MAX_CONCURRENT_DOWNLOADS;
 
 mod azure;
 mod google;
@@ -121,6 +123,8 @@ pub struct HttpDownloader {
     cache: Arc<Cache<DefaultCacheStorage>>,
     /// Stores the status of downloads by URL.
     downloads: Arc<Mutex<HashMap<Url, Status>>>,
+    /// Limits the number of concurrent downloads.
+    semaphore: Arc<Semaphore>,
 }
 
 impl HttpDownloader {
@@ -141,6 +145,13 @@ impl HttpDownloader {
 
         let cache = Arc::new(Cache::new(DefaultCacheStorage::new(cache_dir)));
 
+        let max_downloads = config
+            .http
+            .max_concurrent_downloads
+            .unwrap_or(DEFAULT_MAX_CONCURRENT_DOWNLOADS) as usize;
+
+        info!("maximum concurrent downloads set to {max_downloads}");
+
         Ok(Self {
             config,
             client: ClientBuilder::new(Client::new())
@@ -148,6 +159,7 @@ impl HttpDownloader {
                 .build(),
             cache,
             downloads: Default::default(),
+            semaphore: Arc::new(Semaphore::new(max_downloads)),
         })
     }
 
@@ -338,6 +350,13 @@ impl Downloader for HttpDownloader {
                 continue;
             }
 
+            let permit = self
+                .semaphore
+                .clone()
+                .acquire_owned()
+                .await
+                .expect("semaphore should not be closed");
+
             // Perform the download
             let res = self.get(&url).await.map_err(Arc::from);
             let notify = {
@@ -351,6 +370,7 @@ impl Downloader for HttpDownloader {
                 }
             };
 
+            drop(permit);
             notify.notify_waiters();
             res
         }
