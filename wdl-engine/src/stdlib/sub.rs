@@ -96,5 +96,10 @@ mod test {
             .await
             .unwrap();
         assert_eq!(value.unwrap_string().as_str(), "hello Bob");
+
+        let value = eval_v1_expr(&env, V1::Two, "sub('hello there world', ' ', '_')")
+            .await
+            .unwrap();
+        assert_eq!(value.unwrap_string().as_str(), "hello_there_world");
     }
 }
