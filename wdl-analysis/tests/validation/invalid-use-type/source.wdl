@@ -20,10 +20,10 @@ task test {
     env Int j = 1
     env File k = ""
     env Directory l = ""
-    env Boolean m = ""
+    env Boolean m = true
 
     # NOT OK
-    env Array[String] n = [1, 2, 3]
+    env Array[Int] n = [1, 2, 3]
 
     command <<<>>>
 }

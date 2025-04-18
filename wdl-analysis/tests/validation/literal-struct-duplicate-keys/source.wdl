@@ -13,3 +13,9 @@ workflow test {
         foo: "dup",
     }
 }
+
+struct Foo {
+    String foo
+    String bar
+    String baz
+}

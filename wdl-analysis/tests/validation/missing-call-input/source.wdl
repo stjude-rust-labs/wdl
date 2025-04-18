@@ -4,5 +4,14 @@
 version 1.2
 
 workflow test {
+    String bar = "bar"
     call foo { foo = bar }
+}
+
+task foo {
+    input {
+        String foo
+    }
+
+    command <<<>>>
 }
