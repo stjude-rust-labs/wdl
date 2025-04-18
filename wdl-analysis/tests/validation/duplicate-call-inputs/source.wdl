@@ -9,3 +9,10 @@ workflow wf {
             x = 2
     }
 }
+
+task a {
+    input {
+        Int x
+    }
+    command <<<>>>
+}

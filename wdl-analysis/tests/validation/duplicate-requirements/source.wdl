@@ -13,16 +13,3 @@ task t {
 
     command <<<>>>
 }
-
-# This duplicate task should be ignored.
-task t {
-    requirements {
-
-    }
-
-    requirements {
-
-    }
-
-    command <<<>>>
-}

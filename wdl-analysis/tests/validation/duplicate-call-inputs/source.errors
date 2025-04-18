@@ -1,9 +1,3 @@
-error: unknown task or workflow `a`
-  ┌─ tests/validation/duplicate-call-inputs/source.wdl:6:10
-  │
-6 │     call a {
-  │          ^
-
 error: duplicate call input `x` in call statement
   ┌─ tests/validation/duplicate-call-inputs/source.wdl:9:13
   │

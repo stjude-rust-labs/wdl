@@ -3,6 +3,7 @@
 version 1.2
 
 task test {
+  String foo = "foo"
   String a = "~{default="foo" foo}"
   String b = "${default="foo" sep="," foo}"
   String b = "${default="foo" sep="," true="a" false="b" foo}"

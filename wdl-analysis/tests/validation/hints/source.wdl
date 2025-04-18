@@ -4,6 +4,10 @@
 version 1.2
 
 task foo {
+    input {
+        String a
+    }
+
     command <<<>>>
 
     hints {

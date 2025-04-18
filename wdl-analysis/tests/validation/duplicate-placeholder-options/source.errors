@@ -1,86 +1,56 @@
-error: unknown name `foo`
-  ┌─ tests/validation/duplicate-placeholder-options/source.wdl:6:31
-  │
-6 │   String a = "~{default="foo" foo}"
-  │                               ^^^
-
-error: a placeholder cannot have more than one option
-  ┌─ tests/validation/duplicate-placeholder-options/source.wdl:7:31
-  │
-7 │   String b = "${default="foo" sep="," foo}"
-  │                 ------------- ^^^^^^^ duplicate placeholder option is here
-  │                 │              
-  │                 first placeholder option is here
-
-error: unknown name `foo`
-  ┌─ tests/validation/duplicate-placeholder-options/source.wdl:7:39
-  │
-7 │   String b = "${default="foo" sep="," foo}"
-  │                                       ^^^
-
-error: conflicting declaration name `b`
-  ┌─ tests/validation/duplicate-placeholder-options/source.wdl:8:10
-  │
-7 │   String b = "${default="foo" sep="," foo}"
-  │          - the declaration with the conflicting name is here
-8 │   String b = "${default="foo" sep="," true="a" false="b" foo}"
-  │          ^ this declaration conflicts with a previously used name
-
 error: a placeholder cannot have more than one option
   ┌─ tests/validation/duplicate-placeholder-options/source.wdl:8:31
   │
-8 │   String b = "${default="foo" sep="," true="a" false="b" foo}"
+8 │   String b = "${default="foo" sep="," foo}"
+  │                 ------------- ^^^^^^^ duplicate placeholder option is here
+  │                 │              
+  │                 first placeholder option is here
+
+error: conflicting declaration name `b`
+  ┌─ tests/validation/duplicate-placeholder-options/source.wdl:9:10
+  │
+8 │   String b = "${default="foo" sep="," foo}"
+  │          - the declaration with the conflicting name is here
+9 │   String b = "${default="foo" sep="," true="a" false="b" foo}"
+  │          ^ this declaration conflicts with a previously used name
+
+error: a placeholder cannot have more than one option
+  ┌─ tests/validation/duplicate-placeholder-options/source.wdl:9:31
+  │
+9 │   String b = "${default="foo" sep="," true="a" false="b" foo}"
   │                 ------------- ^^^^^^^ duplicate placeholder option is here
   │                 │              
   │                 first placeholder option is here
 
 error: a placeholder cannot have more than one option
-  ┌─ tests/validation/duplicate-placeholder-options/source.wdl:8:39
+  ┌─ tests/validation/duplicate-placeholder-options/source.wdl:9:39
   │
-8 │   String b = "${default="foo" sep="," true="a" false="b" foo}"
+9 │   String b = "${default="foo" sep="," true="a" false="b" foo}"
   │                 -------------         ^^^^^^^^^^^^^^^^^^ duplicate placeholder option is here
   │                 │                      
   │                 first placeholder option is here
 
-error: unknown name `foo`
-   ┌─ tests/validation/duplicate-placeholder-options/source.wdl:11:21
-   │
-11 │     ~{default="foo" foo}"
-   │                     ^^^
-
-error: a placeholder cannot have more than one option
-   ┌─ tests/validation/duplicate-placeholder-options/source.wdl:12:21
-   │
-12 │     ~{default="foo" sep="," foo}
-   │       ------------- ^^^^^^^ duplicate placeholder option is here
-   │       │              
-   │       first placeholder option is here
-
-error: unknown name `foo`
-   ┌─ tests/validation/duplicate-placeholder-options/source.wdl:12:29
-   │
-12 │     ~{default="foo" sep="," foo}
-   │                             ^^^
-
 error: a placeholder cannot have more than one option
    ┌─ tests/validation/duplicate-placeholder-options/source.wdl:13:21
    │
-13 │     ~{default="foo" sep="," true="a" false="b" foo}
+13 │     ~{default="foo" sep="," foo}
    │       ------------- ^^^^^^^ duplicate placeholder option is here
    │       │              
    │       first placeholder option is here
 
 error: a placeholder cannot have more than one option
-   ┌─ tests/validation/duplicate-placeholder-options/source.wdl:13:29
+   ┌─ tests/validation/duplicate-placeholder-options/source.wdl:14:21
    │
-13 │     ~{default="foo" sep="," true="a" false="b" foo}
+14 │     ~{default="foo" sep="," true="a" false="b" foo}
+   │       ------------- ^^^^^^^ duplicate placeholder option is here
+   │       │              
+   │       first placeholder option is here
+
+error: a placeholder cannot have more than one option
+   ┌─ tests/validation/duplicate-placeholder-options/source.wdl:14:29
+   │
+14 │     ~{default="foo" sep="," true="a" false="b" foo}
    │       -------------         ^^^^^^^^^^^^^^^^^^ duplicate placeholder option is here
    │       │                      
    │       first placeholder option is here
-
-error: unknown name `foo`
-   ┌─ tests/validation/duplicate-placeholder-options/source.wdl:13:48
-   │
-13 │     ~{default="foo" sep="," true="a" false="b" foo}
-   │                                                ^^^
 
