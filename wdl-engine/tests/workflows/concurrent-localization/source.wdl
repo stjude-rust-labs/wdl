@@ -12,6 +12,16 @@ task t {
         File remote8
         File remote9
         File remote10
+        File remote11
+        File remote12
+        File remote13
+        File remote14
+        File remote15
+        File remote16
+        File remote17
+        File remote18
+        File remote19
+        File remote20
         File local_file
     }
 
@@ -29,6 +39,16 @@ task t {
         cat '~{remote8}' > remote8
         cat '~{remote9}' > remote9
         cat '~{remote10}' > remote10
+        cat '~{remote11}' > remote11
+        cat '~{remote12}' > remote12
+        cat '~{remote13}' > remote13
+        cat '~{remote14}' > remote14
+        cat '~{remote15}' > remote15
+        cat '~{remote16}' > remote16
+        cat '~{remote17}' > remote17
+        cat '~{remote18}' > remote18
+        cat '~{remote19}' > remote19
+        cat '~{remote20}' > remote20
         cat '~{local_file}' > ~{relative_path}
     >>>
 
@@ -43,6 +63,16 @@ task t {
         File out8 = "remote8"
         File out9 = "remote9"
         File out10 = "remote10"
+        File out11 = "remote11"
+        File out12 = "remote12"
+        File out13 = "remote13"
+        File out14 = "remote14"
+        File out15 = "remote15"
+        File out16 = "remote16"
+        File out17 = "remote17"
+        File out18 = "remote18"
+        File out19 = "remote19"
+        File out20 = "remote20"
         File relative_out = relative_path
     }
 }
@@ -59,6 +89,16 @@ workflow test {
         File remote8
         File remote9
         File remote10
+        File remote11
+        File remote12
+        File remote13
+        File remote14
+        File remote15
+        File remote16
+        File remote17
+        File remote18
+        File remote19
+        File remote20
         File local_file
     }
 
@@ -73,6 +113,16 @@ workflow test {
         remote8,
         remote9,
         remote10,
+        remote11,
+        remote12,
+        remote13,
+        remote14,
+        remote15,
+        remote16,
+        remote17,
+        remote18,
+        remote19,
+        remote20,
         local_file,
     }
 
@@ -87,6 +137,16 @@ workflow test {
         Object out8 = read_json(t.out8)
         Object out9 = read_json(t.out9)
         Object out10 = read_json(t.out10)
+        Object out11 = read_json(t.out11)
+        Object out12 = read_json(t.out12)
+        Object out13 = read_json(t.out13)
+        Object out14 = read_json(t.out14)
+        Object out15 = read_json(t.out15)
+        Object out16 = read_json(t.out16)
+        Object out17 = read_json(t.out17)
+        Object out18 = read_json(t.out18)
+        Object out19 = read_json(t.out19)
+        Object out20 = read_json(t.out20)
         String relative_out = read_string(t.relative_out)
     }
 }

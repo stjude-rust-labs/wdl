@@ -9,5 +9,15 @@
   "test.remote8": "https://jsonplaceholder.typicode.com/todos/8",
   "test.remote9": "https://jsonplaceholder.typicode.com/todos/9",
   "test.remote10": "https://jsonplaceholder.typicode.com/todos/10",
+  "test.remote11": "https://jsonplaceholder.typicode.com/todos/11",
+  "test.remote12": "https://jsonplaceholder.typicode.com/todos/12",
+  "test.remote13": "https://jsonplaceholder.typicode.com/todos/13",
+  "test.remote14": "https://jsonplaceholder.typicode.com/todos/14",
+  "test.remote15": "https://jsonplaceholder.typicode.com/todos/15",
+  "test.remote16": "https://jsonplaceholder.typicode.com/todos/16",
+  "test.remote17": "https://jsonplaceholder.typicode.com/todos/17",
+  "test.remote18": "https://jsonplaceholder.typicode.com/todos/18",
+  "test.remote19": "https://jsonplaceholder.typicode.com/todos/19",
+  "test.remote20": "https://jsonplaceholder.typicode.com/todos/20",
   "test.local_file": "local.txt"
 }
