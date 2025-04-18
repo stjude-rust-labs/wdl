@@ -27,6 +27,7 @@ jobs:
           # Check if the author is not empty
           if [ -n "$author" ]; then
             # Add the author as an assignee
+            echo "adding $author as author of PR #$PR_NUMBER"
             gh api /repos/${{ github.repository }}/issues/$PR_NUMBER/assignees \
               --method POST \
               -H "Accept: application/vnd.github+json" \
@@ -45,6 +46,7 @@ jobs:
           do
             # gh pr edit $PR_NUMBER --add-reviewer $reviewers
             # Adding a duplicate reviewer returns an error hence "|| true"
+            echo "adding $reviewer to PR #$PR_NUMBER"
             gh api /repos/${{ github.repository }}/pulls/$PR_NUMBER/requested_reviewers \
               --method POST \
               -H "Accept: application/vnd.github+json" \
