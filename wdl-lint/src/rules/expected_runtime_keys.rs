@@ -43,6 +43,7 @@ use wdl_ast::version::V1;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
+use crate::util::serialize_oxford_comma;
 
 /// The identifier for the runtime section rule.
 const ID: &str = "ExpectedRuntimeKeys";
@@ -125,46 +126,6 @@ fn keys_v1_1() -> &'static HashMap<&'static str, KeyKind> {
         keys.insert(TASK_HINT_OUTPUTS, KeyKind::ReservedHint);
         keys
     })
-}
-
-// TODO move to util
-/// Serializes a list of items using the Oxford comma.
-fn serialize_oxford_comma<T: std::fmt::Display>(items: &[T]) -> Option<String> {
-    let len = items.len();
-
-    match len {
-        0 => None,
-        // SAFETY: we just checked to ensure that exactly one element exists in
-        // the `items` Vec, so this should always unwrap.
-        1 => Some(items.iter().next().unwrap().to_string()),
-        2 => {
-            let mut items = items.iter();
-
-            Some(format!(
-                "{a} and {b}",
-                // SAFETY: we just checked to ensure that exactly two elements
-                // exist in the `items` Vec, so the first and second elements
-                // will always be present.
-                a = items.next().unwrap(),
-                b = items.next().unwrap()
-            ))
-        }
-        _ => {
-            let mut result = String::new();
-
-            for item in items.iter().take(len - 1) {
-                if !result.is_empty() {
-                    result.push_str(", ")
-                }
-
-                result.push_str(&item.to_string());
-            }
-
-            result.push_str(", and ");
-            result.push_str(&items[len - 1].to_string());
-            Some(result)
-        }
-    }
 }
 
 /// Creates a "deprecated runtime key" diagnostic.
@@ -538,27 +499,5 @@ impl Visitor for ExpectedRuntimeKeysRule {
         }
 
         self.encountered_keys.push(key_name);
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::rules::expected_runtime_keys::serialize_oxford_comma;
-
-    #[test]
-    fn test_itemize_oxford_comma() {
-        assert_eq!(serialize_oxford_comma(&Vec::<String>::default()), None);
-        assert_eq!(
-            serialize_oxford_comma(&["hello"]),
-            Some(String::from("hello"))
-        );
-        assert_eq!(
-            serialize_oxford_comma(&["hello", "world"]),
-            Some(String::from("hello and world"))
-        );
-        assert_eq!(
-            serialize_oxford_comma(&["hello", "there", "world"]),
-            Some(String::from("hello, there, and world"))
-        );
     }
 }
