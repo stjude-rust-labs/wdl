@@ -711,6 +711,12 @@ where
     }
 }
 
+impl Default for Analyzer<()> {
+    fn default() -> Self {
+        Self::new(DiagnosticsConfig::default(), |_, _, _, _| async {})
+    }
+}
+
 impl<C> Drop for Analyzer<C> {
     fn drop(&mut self) {
         unsafe { ManuallyDrop::drop(&mut self.sender) };
