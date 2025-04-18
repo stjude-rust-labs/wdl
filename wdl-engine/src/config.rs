@@ -17,6 +17,12 @@ use crate::convert_unit_string;
 use crate::crankshaft::CrankshaftBackend;
 use crate::local::LocalTaskExecutionBackend;
 
+/// Helper function to check if a value equals its default value.
+/// Used with serde to skip serializing default values.
+fn is_default<T: Default + PartialEq>(value: &T) -> bool {
+    *value == T::default()
+}
+
 /// The inclusive maximum number of task retries the engine supports.
 pub const MAX_RETRIES: u64 = 100;
 
@@ -308,6 +314,13 @@ pub struct TaskConfig {
     /// not be portable to other execution engines.</div>
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub shell: Option<String>,
+
+    /// Whether to write input JSON files for debugging.
+    ///
+    /// When enabled, an inputs.json file will be written to each task attempt
+    /// directory containing the full set of inputs provided to the task.
+    #[serde(default, skip_serializing_if = "is_default")]
+    pub write_inputs: bool,
 }
 
 impl TaskConfig {
