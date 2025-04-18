@@ -638,6 +638,7 @@ impl TaskExecutionBackend for CrankshaftBackend {
         #[cfg(not(unix))]
         {
             let _ = token;
+            let _ = output_dir;
             info!("cleanup task is not supported on this platform");
 
             None
