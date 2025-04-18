@@ -1,9 +1,3 @@
-warning[UnusedDeclaration]: unused declaration `o`
-  ┌─ tests/validation/literal-object-duplicate-keys/source.wdl:6:12
-  │
-6 │     Object o = object {
-  │            ^
-
 error: duplicate key `foo` in literal object
    ┌─ tests/validation/literal-object-duplicate-keys/source.wdl:11:9
    │

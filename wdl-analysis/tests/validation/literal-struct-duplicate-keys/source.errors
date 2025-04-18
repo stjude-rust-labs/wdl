@@ -4,12 +4,6 @@ error: unknown type name `Foo`
 6 │     Foo foo = Foo {
   │     ^^^
 
-warning[UnusedDeclaration]: unused declaration `foo`
-  ┌─ tests/validation/literal-struct-duplicate-keys/source.wdl:6:9
-  │
-6 │     Foo foo = Foo {
-  │         ^^^
-
 error: unknown type name `Foo`
   ┌─ tests/validation/literal-struct-duplicate-keys/source.wdl:6:15
   │

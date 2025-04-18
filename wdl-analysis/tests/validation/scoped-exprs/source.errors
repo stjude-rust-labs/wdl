@@ -22,35 +22,17 @@ error: task `ok` does not have an output named `baz`
 35 │             baz.bar.qux: hints {
    │             ^^^
 
-warning[UnusedDeclaration]: unused declaration `a`
-   ┌─ tests/validation/scoped-exprs/source.wdl:47:9
-   │
-47 │     Int a = hints {
-   │         ^
-
 error: `hints` literals can only be used within a hints section
    ┌─ tests/validation/scoped-exprs/source.wdl:47:13
    │
 47 │     Int a = hints {
    │             ^^^^^
 
-warning[UnusedDeclaration]: unused declaration `b`
-   ┌─ tests/validation/scoped-exprs/source.wdl:51:9
-   │
-51 │     Int b = input {
-   │         ^
-
 error: `input` literals can only be used within a hints section
    ┌─ tests/validation/scoped-exprs/source.wdl:51:13
    │
 51 │     Int b = input {
    │             ^^^^^
-
-warning[UnusedDeclaration]: unused declaration `c`
-   ┌─ tests/validation/scoped-exprs/source.wdl:55:9
-   │
-55 │     Int c = output {
-   │         ^
 
 error: `output` literals can only be used within a hints section
    ┌─ tests/validation/scoped-exprs/source.wdl:55:13

@@ -126,7 +126,7 @@ async fn main() {
     println!("\nrunning {} tests\n", tests.len());
 
     // Start with a single analysis pass over all the test files
-    let analyzer = Analyzer::new(DiagnosticsConfig::new(rules()), |_, _, _, _| async {});
+    let analyzer = Analyzer::new(DiagnosticsConfig::except_all(), |_, _, _, _| async {});
     for test in &tests {
         analyzer
             .add_directory(test.clone())
