@@ -1547,23 +1547,8 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:197:30: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L197"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:212:14: note[ShellCheck]: Quote this to prevent word splitting."
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L212"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:220:42: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L220"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:222:34: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L222"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
@@ -1572,18 +1557,8 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:246:42: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L246"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:254:14: note[ShellCheck]: Quote this to prevent word splitting."
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L254"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:262:42: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L262"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
@@ -1592,18 +1567,8 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:278:42: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L278"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:286:14: note[ShellCheck]: Quote this to prevent word splitting."
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L286"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:294:42: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L294"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
@@ -1612,18 +1577,8 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:310:42: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L310"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:318:14: note[ShellCheck]: Quote this to prevent word splitting."
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L318"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:326:42: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L326"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
@@ -1632,18 +1587,8 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:342:42: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L342"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:350:14: note[ShellCheck]: Quote this to prevent word splitting."
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L350"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:358:42: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L358"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
@@ -1652,28 +1597,8 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:368:22: note[ShellCheck]: Argument to -z is always false due to literal strings."
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L368"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:374:42: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L374"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:376:40: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L376"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:382:14: note[ShellCheck]: Quote this to prevent word splitting."
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L382"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:390:42: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L390"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
@@ -1682,18 +1607,8 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:406:42: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L406"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
 message = "read_group.wdl:414:14: note[ShellCheck]: Quote this to prevent word splitting."
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L414"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/data_structures/read_group.wdl"
-message = "read_group.wdl:422:42: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/data_structures/read_group.wdl/#L422"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/data_structures/read_group.wdl"
@@ -2437,17 +2352,7 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
-message = "htseq.wdl:113:16: note[ShellCheck]: Make sure not to read and write the same file in the same pipeline."
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/htseq.wdl/#L113"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:115:16: note[ShellCheck]: Double quote to prevent globbing and word splitting."
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/htseq.wdl/#L115"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/htseq.wdl"
-message = "htseq.wdl:115:16: note[ShellCheck]: Make sure not to read and write the same file in the same pipeline."
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/htseq.wdl/#L115"
 
 [[diagnostics]]
@@ -2488,11 +2393,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 [[diagnostics]]
 document = "stjudecloud/workflows:/tools/htseq.wdl"
 message = "htseq.wdl:127:16: note[ShellCheck]: Double quote to prevent globbing and word splitting."
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/htseq.wdl/#L127"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/tools/htseq.wdl"
-message = "htseq.wdl:127:16: note[ShellCheck]: Make sure not to read and write the same file in the same pipeline."
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/tools/htseq.wdl/#L127"
 
 [[diagnostics]]
@@ -4707,16 +4607,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:146:36: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L146"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
-message = "dnaseq-standard-fastq.wdl:147:36: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L147"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/dnaseq/dnaseq-standard-fastq.wdl"
 message = "dnaseq-standard-fastq.wdl:162:20: note[ContainerUri]: container URI uses a mutable tag"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/dnaseq/dnaseq-standard-fastq.wdl/#L162"
 
@@ -4869,16 +4759,6 @@ permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06
 document = "stjudecloud/workflows:/workflows/methylation/methylation-preprocess.wdl"
 message = "methylation-preprocess.wdl:56:20: note[ContainerUri]: container URI uses a mutable tag"
 permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/methylation/methylation-preprocess.wdl/#L56"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:537:39: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L537"
-
-[[diagnostics]]
-document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"
-message = "quality-check-standard.wdl:541:41: note[ShellCheck]: This expression is constant. Did you forget the $ on a variable?"
-permalink = "https://github.com/stjudecloud/workflows/blob/8377299f9d171af316f06570eedcd12e39600d72/workflows/qc/quality-check-standard.wdl/#L541"
 
 [[diagnostics]]
 document = "stjudecloud/workflows:/workflows/qc/quality-check-standard.wdl"

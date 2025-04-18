@@ -51,12 +51,15 @@ use crate::util::program_exists;
 /// The shellcheck executable
 const SHELLCHECK_BIN: &str = "shellcheck";
 
+// TODO 2043, 2050, 2157 should be enabled and only suppressed
+// when it's a placeholder substitution.
 /// Shellcheck lints that we want to suppress.
-/// These two lints always co-occur with a more
-/// informative message.
 const SHELLCHECK_SUPPRESS: &[&str] = &[
     "1009", // the mentioned parser error was in... (unhelpful commentary)
     "1072", // Unexpected eof (unhelpful commentary)
+    "2043", // This loop will only ever run once for a constant value (caused by substitution)
+    "2050", // This expression is constant (caused by substitution)
+    "2157", // Argument to -n is always true due to literal strings (caused by substitution)
 ];
 
 /// Shellcheck lints that we want to keep,
@@ -382,15 +385,11 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
     if let Some(Type::Primitive(pty, _)) = ty {
         match pty {
             PrimitiveType::Integer | PrimitiveType::Float => {
-                // return the charachter '4' repeated `placeholder_len` times
-                // as a string
                 return ("4".repeat(placeholder_len), true);
             }
             PrimitiveType::Boolean => {
-                // return "false" with whitespace padding of `placeholder_len - 5`
-                // characters
                 return (
-                    format!("false{}", " ".repeat(placeholder_len.saturating_sub(5))),
+                    format!("true{}", " ".repeat(placeholder_len.saturating_sub(4))),
                     true,
                 );
             }
@@ -402,7 +401,6 @@ fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
     let mut bash_var = String::from("WDL");
     bash_var
         .push_str(&Alphanumeric.sample_string(&mut rand::rng(), placeholder_len.saturating_sub(3)));
-    let bash_var = "a".repeat(placeholder_len);
     (bash_var, false)
 }
 
