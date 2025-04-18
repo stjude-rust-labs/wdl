@@ -1,24 +1,8 @@
-note[DeprecatedPlaceholder]: use of the deprecated `sep` placeholder option
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:10:32
-   │
-10 │     String bad_sep_option = "~{sep="," numbers}"
-   │                                ^^^^^^^
-   │
-   = fix: replace the `sep` placeholder option with a call to the `sep()` standard library function
-
 error: unknown name `numbers`
    ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:10:40
    │
 10 │     String bad_sep_option = "~{sep="," numbers}"
    │                                        ^^^^^^^
-
-note[DeprecatedPlaceholder]: use of the deprecated `true`/`false` placeholder option
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:11:39
-   │
-11 │     String bad_true_false_option = "~{true="--enable-foo" false="" allow_foo}"
-   │                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │
-   = fix: replace the `true`/`false` placeholder option with an `if`/`else` expression
 
 error: unknown name `allow_foo`
    ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:11:68
@@ -26,38 +10,11 @@ error: unknown name `allow_foo`
 11 │     String bad_true_false_option = "~{true="--enable-foo" false="" allow_foo}"
    │                                                                    ^^^^^^^^^
 
-note[DeprecatedPlaceholder]: use of the deprecated `default` placeholder option
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:12:36
-   │
-12 │     String bad_default_option = "~{default="false" bar}"
-   │                                    ^^^^^^^^^^^^^^^
-   │
-   = fix: replace the `default` placeholder option with a call to the `select_first()` standard library function
-
 error: unknown name `bar`
    ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:12:52
    │
 12 │     String bad_default_option = "~{default="false" bar}"
    │                                                    ^^^
-
-note[ShellCheck]: Double quote to prevent globbing and word splitting.
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:15:26
-   │
-15 │         python script.py ~{sep=" " numbers}
-   │                          ^^^^^^^^^^^^^^^^^^
-   │                          │
-   │                          SC2086[info]: Double quote to prevent globbing and word splitting.
-   │                          more info: https://www.shellcheck.net/wiki/SC2086
-   │
-   = fix: address the diagnostic as recommended in the message
-
-note[DeprecatedPlaceholder]: use of the deprecated `sep` placeholder option
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:15:28
-   │
-15 │         python script.py ~{sep=" " numbers}
-   │                            ^^^^^^^
-   │
-   = fix: replace the `sep` placeholder option with a call to the `sep()` standard library function
 
 error: unknown name `numbers`
    ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:15:36
@@ -65,49 +22,11 @@ error: unknown name `numbers`
 15 │         python script.py ~{sep=" " numbers}
    │                                    ^^^^^^^
 
-note[ShellCheck]: Double quote to prevent globbing and word splitting.
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:16:25
-   │
-16 │         example-command ~{true="--enable-foo" false="" allow_foo}
-   │                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │                         │
-   │                         SC2086[info]: Double quote to prevent globbing and word splitting.
-   │                         more info: https://www.shellcheck.net/wiki/SC2086
-   │
-   = fix: address the diagnostic as recommended in the message
-
-note[DeprecatedPlaceholder]: use of the deprecated `true`/`false` placeholder option
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:16:27
-   │
-16 │         example-command ~{true="--enable-foo" false="" allow_foo}
-   │                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │
-   = fix: replace the `true`/`false` placeholder option with an `if`/`else` expression
-
 error: unknown name `allow_foo`
    ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:16:56
    │
 16 │         example-command ~{true="--enable-foo" false="" allow_foo}
    │                                                        ^^^^^^^^^
-
-note[ShellCheck]: Double quote to prevent globbing and word splitting.
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:17:25
-   │
-17 │         another-command ~{default="foobar" bar}
-   │                         ^^^^^^^^^^^^^^^^^^^^^^^
-   │                         │
-   │                         SC2086[info]: Double quote to prevent globbing and word splitting.
-   │                         more info: https://www.shellcheck.net/wiki/SC2086
-   │
-   = fix: address the diagnostic as recommended in the message
-
-note[DeprecatedPlaceholder]: use of the deprecated `default` placeholder option
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:17:27
-   │
-17 │         another-command ~{default="foobar" bar}
-   │                           ^^^^^^^^^^^^^^^^
-   │
-   = fix: replace the `default` placeholder option with a call to the `select_first()` standard library function
 
 error: unknown name `bar`
    ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:17:44
@@ -133,33 +52,11 @@ error: unknown name `bar`
 30 │     String good_default_option = "~{select_first([bar, "false"])}"
    │                                                   ^^^
 
-note[ShellCheck]: Double quote to prevent globbing and word splitting.
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:33:26
-   │
-33 │         python script.py ~{sep(" ", numbers)}
-   │                          ^^^^^^^^^^^^^^^^^^^^
-   │                          │
-   │                          SC2086[info]: Double quote to prevent globbing and word splitting.
-   │                          more info: https://www.shellcheck.net/wiki/SC2086
-   │
-   = fix: address the diagnostic as recommended in the message
-
 error: unknown name `numbers`
    ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:33:37
    │
 33 │         python script.py ~{sep(" ", numbers)}
    │                                     ^^^^^^^
-
-note[ShellCheck]: Double quote to prevent globbing and word splitting.
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:34:25
-   │
-34 │         example-command ~{if allow_foo then "--enable-foo" else ""}
-   │                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │                         │
-   │                         SC2086[info]: Double quote to prevent globbing and word splitting.
-   │                         more info: https://www.shellcheck.net/wiki/SC2086
-   │
-   = fix: address the diagnostic as recommended in the message
 
 error: unknown name `allow_foo`
    ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:34:30
@@ -167,33 +64,11 @@ error: unknown name `allow_foo`
 34 │         example-command ~{if allow_foo then "--enable-foo" else ""}
    │                              ^^^^^^^^^
 
-note[ShellCheck]: Double quote to prevent globbing and word splitting.
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:35:25
-   │
-35 │         another-command ~{select_first([bar, "foobar"])}
-   │                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │                         │
-   │                         SC2086[info]: Double quote to prevent globbing and word splitting.
-   │                         more info: https://www.shellcheck.net/wiki/SC2086
-   │
-   = fix: address the diagnostic as recommended in the message
-
 error: unknown name `bar`
    ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:35:41
    │
 35 │         another-command ~{select_first([bar, "foobar"])}
    │                                         ^^^
-
-note[ShellCheck]: Double quote to prevent globbing and word splitting.
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:37:25
-   │
-37 │         another-command ~{if defined(bar) then bar else "foobar"}
-   │                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │                         │
-   │                         SC2086[info]: Double quote to prevent globbing and word splitting.
-   │                         more info: https://www.shellcheck.net/wiki/SC2086
-   │
-   = fix: address the diagnostic as recommended in the message
 
 error: unknown name `bar`
    ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:37:38
@@ -225,50 +100,17 @@ error: unknown name `bar`
 51 │     String bad_default_option = "~{default="false" bar}"
    │                                                    ^^^
 
-note[ShellCheck]: Double quote to prevent globbing and word splitting.
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:54:26
-   │
-54 │         python script.py ~{sep=" " numbers}
-   │                          ^^^^^^^^^^^^^^^^^^
-   │                          │
-   │                          SC2086[info]: Double quote to prevent globbing and word splitting.
-   │                          more info: https://www.shellcheck.net/wiki/SC2086
-   │
-   = fix: address the diagnostic as recommended in the message
-
 error: unknown name `numbers`
    ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:54:36
    │
 54 │         python script.py ~{sep=" " numbers}
    │                                    ^^^^^^^
 
-note[ShellCheck]: Double quote to prevent globbing and word splitting.
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:55:25
-   │
-55 │         example-command ~{true="--enable-foo" false="" allow_foo}
-   │                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │                         │
-   │                         SC2086[info]: Double quote to prevent globbing and word splitting.
-   │                         more info: https://www.shellcheck.net/wiki/SC2086
-   │
-   = fix: address the diagnostic as recommended in the message
-
 error: unknown name `allow_foo`
    ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:55:56
    │
 55 │         example-command ~{true="--enable-foo" false="" allow_foo}
    │                                                        ^^^^^^^^^
-
-note[ShellCheck]: Double quote to prevent globbing and word splitting.
-   ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:56:25
-   │
-56 │         another-command ~{default="foobar" bar}
-   │                         ^^^^^^^^^^^^^^^^^^^^^^^
-   │                         │
-   │                         SC2086[info]: Double quote to prevent globbing and word splitting.
-   │                         more info: https://www.shellcheck.net/wiki/SC2086
-   │
-   = fix: address the diagnostic as recommended in the message
 
 error: unknown name `bar`
    ┌─ tests/lints/deprecated-placeholder-options-v1.1/source.wdl:56:44

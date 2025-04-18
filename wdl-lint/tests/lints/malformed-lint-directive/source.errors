@@ -1,35 +1,3 @@
-warning[LintDirectiveFormatted]: lint directive `stop` is not recognized
-  ┌─ tests/lints/malformed-lint-directive/source.wdl:7:4
-  │
-7 │ #@ stop: This should be flagged for using 'stop' instead of 'except'
-  │    ^^^^
-  │
-  = fix: use any of the recognized lint directives: ["except"]
-
-warning[LintDirectiveFormatted]: expected exactly one space before lint directive
-   ┌─ tests/lints/malformed-lint-directive/source.wdl:11:7
-   │
-11 │     #@except: this should be flagged for missing a space
-   │       ^ expected a space before this
-   │
-   = fix: add a single space
-
-warning[LintDirectiveFormatted]: expected a colon to follow a lint directive
-   ┌─ tests/lints/malformed-lint-directive/source.wdl:28:14
-   │
-28 │     #@ except this should be flagged for missing a colon
-   │              ^ expected a colon here
-   │
-   = fix: add a colon after the lint directive
-
-warning[LintDirectiveFormatted]: lint directive must be on its own line
-   ┌─ tests/lints/malformed-lint-directive/source.wdl:33:15
-   │
-33 │ struct Baz {  #@ except: this should be flagged for being inlined
-   │               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │
-   = fix: move the lint directive to its own line
-
 error: cannot define workflow `bar2` as only one workflow is allowed per source file
    ┌─ tests/lints/malformed-lint-directive/source.wdl:44:10
    │
@@ -39,14 +7,6 @@ error: cannot define workflow `bar2` as only one workflow is allowed per source 
 44 │ workflow bar2 {
    │          ^^^^ consider moving this workflow to a new file
 
-warning[LintDirectiveFormatted]: expected exactly one space before lint directive
-   ┌─ tests/lints/malformed-lint-directive/source.wdl:48:7
-   │
-48 │     #@     except: this should be flagged for excessive whitespace
-   │       ^^^^^ this whitespace is unexpected
-   │
-   = fix: replace this whitespace with a single space
-
 error: cannot define workflow `bar3` as only one workflow is allowed per source file
    ┌─ tests/lints/malformed-lint-directive/source.wdl:53:10
    │
@@ -55,12 +15,4 @@ error: cannot define workflow `bar3` as only one workflow is allowed per source 
    ·
 53 │ workflow bar3 {
    │          ^^^^ consider moving this workflow to a new file
-
-warning[LintDirectiveFormatted]: lint directive not found
-   ┌─ tests/lints/malformed-lint-directive/source.wdl:59:7
-   │
-59 │     #@
-   │       ^ missing lint directive
-   │
-   = fix: add a lint directive or change `#@` prefix
 

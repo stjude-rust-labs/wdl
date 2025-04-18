@@ -681,7 +681,7 @@ where
         let graph = graph.read();
         let mut document = Document::from_graph_node(config, &graph, index);
 
-        if document.version().is_some() {
+        if document.version().is_some() && document.diagnostics().is_empty() {
             if let Err(new_diagnostics) = validator.validate(&document) {
                 document.extend_diagnostics(new_diagnostics);
             }

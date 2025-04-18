@@ -4,47 +4,17 @@ error: failed to import `bar.wdl`: No such file or directory (os error 2)
 5 │ import "bar.wdl"  # OK
   │        ^^^^^^^^^
 
-note[ImportWhitespace]: blank lines are not allowed between imports
-  ┌─ tests/lints/between-import-whitespace/source.wdl:5:23
-  │  
-5 │   import "bar.wdl"  # OK
-  │ ╭──────────────────────^
-6 │ │ 
-7 │ │ import "baz.wdl"  # BAD
-  │ ╰^
-  │  
-  = fix: remove blank lines between imports
-
 error: failed to import `baz.wdl`: No such file or directory (os error 2)
   ┌─ tests/lints/between-import-whitespace/source.wdl:7:8
   │
 7 │ import "baz.wdl"  # BAD
   │        ^^^^^^^^^
 
-note[ImportWhitespace]: improper whitespace before import statement
-  ┌─ tests/lints/between-import-whitespace/source.wdl:8:1
-  │
-8 │     import "foo.wdl"  # BAD
-  │ ^^^^ extraneous whitespace should not be here
-  │
-  = fix: remove the extraneous whitespace
-
 error: failed to import `foo.wdl`: No such file or directory (os error 2)
   ┌─ tests/lints/between-import-whitespace/source.wdl:8:12
   │
 8 │     import "foo.wdl"  # BAD
   │            ^^^^^^^^^
-
-note[ImportWhitespace]: blank lines are not allowed between imports
-   ┌─ tests/lints/between-import-whitespace/source.wdl:8:28
-   │  
- 8 │       import "foo.wdl"  # BAD
-   │ ╭───────────────────────────^
- 9 │ │ 
-10 │ │ import "huh.wdl"  # BAD
-   │ ╰^
-   │  
-   = fix: remove blank lines between imports
 
 error: failed to import `huh.wdl`: No such file or directory (os error 2)
    ┌─ tests/lints/between-import-whitespace/source.wdl:10:8
@@ -58,45 +28,11 @@ error: failed to import `vom.wdl`: No such file or directory (os error 2)
 12 │ import "vom.wdl"  # OK
    │        ^^^^^^^^^
 
-note[ImportWhitespace]: blank lines are not allowed between imports
-   ┌─ tests/lints/between-import-whitespace/source.wdl:12:23
-   │  
-12 │   import "vom.wdl"  # OK
-   │ ╭──────────────────────^
-13 │ │ 
-14 │ │ # a comment and a blank is still BAD
-   │ ╰^
-   │  
-   = fix: remove blank lines between imports
-
-note[ImportWhitespace]: blank lines are not allowed between imports
-   ┌─ tests/lints/between-import-whitespace/source.wdl:14:37
-   │  
-14 │   # a comment and a blank is still BAD
-   │ ╭────────────────────────────────────^
-15 │ │ 
-16 │ │ import "wah.wdl"  # BAD
-   │ ╰^
-   │  
-   = fix: remove blank lines between imports
-
 error: failed to import `wah.wdl`: No such file or directory (os error 2)
    ┌─ tests/lints/between-import-whitespace/source.wdl:16:8
    │
 16 │ import "wah.wdl"  # BAD
    │        ^^^^^^^^^
-
-note[Whitespace]: more than one blank line in a row
-   ┌─ tests/lints/between-import-whitespace/source.wdl:16:24
-   │  
-16 │   import "wah.wdl"  # BAD
-   │ ╭───────────────────────^
-17 │ │ 
-18 │ │ 
-19 │ │ import "zam.wdl"  # 2 blanks will be caught be a _different_ check
-   │ ╰^
-   │  
-   = fix: remove the extra blank lines
 
 error: failed to import `zam.wdl`: No such file or directory (os error 2)
    ┌─ tests/lints/between-import-whitespace/source.wdl:19:8

@@ -16,50 +16,17 @@ error: unknown name `bar`
 13 │     String bad_default_option = "~{default="false" bar}"
    │                                                    ^^^
 
-note[ShellCheck]: Double quote to prevent globbing and word splitting.
-   ┌─ tests/lints/deprecated-placeholder-options-v1.0/source.wdl:16:26
-   │
-16 │         python script.py ~{sep=" " numbers}
-   │                          ^^^^^^^^^^^^^^^^^^
-   │                          │
-   │                          SC2086[info]: Double quote to prevent globbing and word splitting.
-   │                          more info: https://www.shellcheck.net/wiki/SC2086
-   │
-   = fix: address the diagnostic as recommended in the message
-
 error: unknown name `numbers`
    ┌─ tests/lints/deprecated-placeholder-options-v1.0/source.wdl:16:36
    │
 16 │         python script.py ~{sep=" " numbers}
    │                                    ^^^^^^^
 
-note[ShellCheck]: Double quote to prevent globbing and word splitting.
-   ┌─ tests/lints/deprecated-placeholder-options-v1.0/source.wdl:17:25
-   │
-17 │         example-command ~{true="--enable-foo" false="" allow_foo}
-   │                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   │                         │
-   │                         SC2086[info]: Double quote to prevent globbing and word splitting.
-   │                         more info: https://www.shellcheck.net/wiki/SC2086
-   │
-   = fix: address the diagnostic as recommended in the message
-
 error: unknown name `allow_foo`
    ┌─ tests/lints/deprecated-placeholder-options-v1.0/source.wdl:17:56
    │
 17 │         example-command ~{true="--enable-foo" false="" allow_foo}
    │                                                        ^^^^^^^^^
-
-note[ShellCheck]: Double quote to prevent globbing and word splitting.
-   ┌─ tests/lints/deprecated-placeholder-options-v1.0/source.wdl:18:25
-   │
-18 │         another-command ~{default="foobar" bar}
-   │                         ^^^^^^^^^^^^^^^^^^^^^^^
-   │                         │
-   │                         SC2086[info]: Double quote to prevent globbing and word splitting.
-   │                         more info: https://www.shellcheck.net/wiki/SC2086
-   │
-   = fix: address the diagnostic as recommended in the message
 
 error: unknown name `bar`
    ┌─ tests/lints/deprecated-placeholder-options-v1.0/source.wdl:18:44

@@ -1,12 +1,3 @@
-error: task `t` contains a duplicate input section
-   ┌─ tests/validation/duplicate-input/source.wdl:10:5
-   │
- 6 │     input {
-   │     ----- first input section is defined here
-   ·
-10 │     input {
-   │     ^^^^^ this input section is a duplicate
-
 error: conflicting task name `t`
    ┌─ tests/validation/duplicate-input/source.wdl:18:6
    │
@@ -15,13 +6,4 @@ error: conflicting task name `t`
    ·
 18 │ task t {
    │      ^ this task conflicts with a previously used name
-
-error: workflow `w` contains a duplicate input section
-   ┌─ tests/validation/duplicate-input/source.wdl:35:5
-   │
-31 │     input {
-   │     ----- first input section is defined here
-   ·
-35 │     input {
-   │     ^^^^^ this input section is a duplicate
 

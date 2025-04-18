@@ -8,14 +8,6 @@ error: conflicting import namespace `foo`
   │
   = fix: add an `as` clause to the import to specify a namespace
 
-error: import namespace is not a valid WDL identifier
-  ┌─ tests/analysis/conflicting-imports/source.wdl:8:8
-  │
-8 │ import "bad-file-name.wdl"                          # Bad name
-  │        ^^^^^^^^^^^^^^^^^^^ a namespace cannot be derived from this import path
-  │
-  = fix: add an `as` clause to the import to specify a namespace
-
 error: conflicting import namespace `baz`
    ┌─ tests/analysis/conflicting-imports/source.wdl:12:21
    │

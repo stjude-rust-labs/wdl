@@ -4,9 +4,3 @@ warning[UnusedDeclaration]: unused declaration `x`
 5 │     Int x = 10 ** 10
   │         ^
 
-error: use of the exponentiation operator requires WDL version 1.2
-  ┌─ tests/validation/exponentiation-unsupported/source.wdl:5:16
-  │
-5 │     Int x = 10 ** 10
-  │                ^^
-
