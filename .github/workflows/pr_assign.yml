@@ -27,7 +27,11 @@ jobs:
           # Check if the author is not empty
           if [ -n "$author" ]; then
             # Add the author as an assignee
-            gh pr edit $PR_NUMBER --add-assignee "$author"
+            gh api /repos/${{ github.repository }}/issues/$PR_NUMBER/assignees \
+              --method POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -f assignees[]="$author" || true
           else
             echo "No valid author found."
           fi
