@@ -681,10 +681,13 @@ where
         let graph = graph.read();
         let mut document = Document::from_graph_node(config, &graph, index);
 
-        if document.version().is_some() && document.diagnostics().is_empty() {
-            if let Err(new_diagnostics) = validator.validate(&document) {
-                document.extend_diagnostics(new_diagnostics);
+        match &graph.get(index).parse_state() {
+            ParseState::Parsed { diagnostics, .. } if diagnostics.is_empty() => {
+                if let Err(new_diagnostics) = validator.validate(&document) {
+                    document.extend_diagnostics(new_diagnostics);
+                }
             }
+            _ => {}
         }
         document.sort_diagnostics();
 

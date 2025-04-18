@@ -1,3 +1,27 @@
+error: unsupported requirements key `unsupported`
+   ┌─ tests/analysis/requirements-section/source.wdl:17:9
+   │
+17 │         unsupported: false
+   │         ^^^^^^^^^^^
+
+error: unsupported requirements key `unsupported`
+   ┌─ tests/analysis/requirements-section/source.wdl:33:9
+   │
+33 │         unsupported: false
+   │         ^^^^^^^^^^^
+
+error: unsupported requirements key `unsupported`
+   ┌─ tests/analysis/requirements-section/source.wdl:44:9
+   │
+44 │         unsupported: false
+   │         ^^^^^^^^^^^
+
+error: unsupported requirements key `unsupported`
+   ┌─ tests/analysis/requirements-section/source.wdl:54:9
+   │
+54 │         unsupported: false
+   │         ^^^^^^^^^^^
+
 error: type mismatch: expected type `String` or type `Array[String]`, but found type `Boolean`
    ┌─ tests/analysis/requirements-section/source.wdl:62:20
    │

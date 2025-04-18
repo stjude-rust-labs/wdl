@@ -578,6 +578,11 @@ permalink = "https://github.com/aws-samples/amazon-omics-tutorials/blob/c624acf2
 
 [[diagnostics]]
 document = "biowdl/tasks:/bcftools.wdl"
+message = "bcftools.wdl:114:75: error: unknown escape sequence `/_`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/bcftools.wdl/#L114"
+
+[[diagnostics]]
+document = "biowdl/tasks:/bcftools.wdl"
 message = "bcftools.wdl:49:13: warning[UnusedInput]: unused input `threads`"
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/bcftools.wdl/#L49"
 
@@ -773,13 +778,83 @@ permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0
 
 [[diagnostics]]
 document = "biowdl/tasks:/picard.wdl"
+message = "picard.wdl:1021:48: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/picard.wdl/#L1021"
+
+[[diagnostics]]
+document = "biowdl/tasks:/picard.wdl"
+message = "picard.wdl:1191:48: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/picard.wdl/#L1191"
+
+[[diagnostics]]
+document = "biowdl/tasks:/picard.wdl"
+message = "picard.wdl:643:51: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/picard.wdl/#L643"
+
+[[diagnostics]]
+document = "biowdl/tasks:/picard.wdl"
 message = "picard.wdl:753:27: error: type mismatch: expected type `String`, but found type `Int`"
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/picard.wdl/#L753"
+
+[[diagnostics]]
+document = "biowdl/tasks:/picard.wdl"
+message = "picard.wdl:785:51: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/picard.wdl/#L785"
+
+[[diagnostics]]
+document = "biowdl/tasks:/picard.wdl"
+message = "picard.wdl:900:46: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/picard.wdl/#L900"
+
+[[diagnostics]]
+document = "biowdl/tasks:/picard.wdl"
+message = "picard.wdl:901:46: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/picard.wdl/#L901"
+
+[[diagnostics]]
+document = "biowdl/tasks:/picard.wdl"
+message = "picard.wdl:902:49: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/picard.wdl/#L902"
+
+[[diagnostics]]
+document = "biowdl/tasks:/sambamba.wdl"
+message = "sambamba.wdl:145:49: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/sambamba.wdl/#L145"
 
 [[diagnostics]]
 document = "biowdl/tasks:/sambamba.wdl"
 message = "sambamba.wdl:157:31: warning[UnnecessaryFunctionCall]: unnecessary call to function `select_first`"
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/sambamba.wdl/#L157"
+
+[[diagnostics]]
+document = "biowdl/tasks:/sambamba.wdl"
+message = "sambamba.wdl:157:60: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/sambamba.wdl/#L157"
+
+[[diagnostics]]
+document = "biowdl/tasks:/sambamba.wdl"
+message = "sambamba.wdl:91:44: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/sambamba.wdl/#L91"
+
+[[diagnostics]]
+document = "biowdl/tasks:/samtools.wdl"
+message = "samtools.wdl:238:53: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/samtools.wdl/#L238"
+
+[[diagnostics]]
+document = "biowdl/tasks:/samtools.wdl"
+message = "samtools.wdl:326:44: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/samtools.wdl/#L326"
+
+[[diagnostics]]
+document = "biowdl/tasks:/samtools.wdl"
+message = "samtools.wdl:414:44: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/samtools.wdl/#L414"
+
+[[diagnostics]]
+document = "biowdl/tasks:/samtools.wdl"
+message = "samtools.wdl:458:49: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/samtools.wdl/#L458"
 
 [[diagnostics]]
 document = "biowdl/tasks:/samtools.wdl"
@@ -788,8 +863,18 @@ permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0
 
 [[diagnostics]]
 document = "biowdl/tasks:/samtools.wdl"
+message = "samtools.wdl:470:60: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/samtools.wdl/#L470"
+
+[[diagnostics]]
+document = "biowdl/tasks:/samtools.wdl"
 message = "samtools.wdl:72:16: warning[UnusedInput]: unused input `javaXmx`"
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/samtools.wdl/#L72"
+
+[[diagnostics]]
+document = "biowdl/tasks:/samtools.wdl"
+message = "samtools.wdl:80:42: error: unknown escape sequence `/.`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/samtools.wdl/#L80"
 
 [[diagnostics]]
 document = "biowdl/tasks:/spades.wdl"
@@ -814,6 +899,11 @@ permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0
 [[diagnostics]]
 document = "biowdl/tasks:/umi.wdl"
 message = "umi.wdl:39:31: warning[UnnecessaryFunctionCall]: unnecessary call to function `select_first`"
+permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/umi.wdl/#L39"
+
+[[diagnostics]]
+document = "biowdl/tasks:/umi.wdl"
+message = "umi.wdl:39:60: error: unknown escape sequence `/.`"
 permalink = "https://github.com/biowdl/tasks/blob/3243a8c3e94fe284e0f5577166c7b0fd38c51f6c/umi.wdl/#L39"
 
 [[diagnostics]]
@@ -1213,6 +1303,11 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
+message = "BenchmarkSVs.wdl:513:43: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/BenchmarkSVs.wdl/#L513"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:513:52: error: type mismatch for placeholder option `default`: expected any primitive type, but found `Array[Int]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/BenchmarkSVs.wdl/#L513"
 
@@ -1223,8 +1318,18 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
+message = "BenchmarkSVs.wdl:545:36: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/BenchmarkSVs.wdl/#L545"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
 message = "BenchmarkSVs.wdl:545:49: error: type mismatch for placeholder option `default`: expected any primitive type, but found `Array[String]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/BenchmarkSVs.wdl/#L545"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
+message = "BenchmarkSVs.wdl:546:42: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/BenchmarkSVs.wdl/#L546"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/BenchmarkSVs.wdl"
@@ -1268,8 +1373,18 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/QcSVs.wdl"
+message = "QcSVs.wdl:129:40: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/QcSVs.wdl/#L129"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/QcSVs.wdl"
 message = "QcSVs.wdl:129:49: error: type mismatch for placeholder option `default`: expected any primitive type, but found `Array[Int]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/QcSVs.wdl/#L129"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkSVs/QcSVs.wdl"
+message = "QcSVs.wdl:157:43: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkSVs/QcSVs.wdl/#L157"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkSVs/QcSVs.wdl"
@@ -1338,8 +1453,18 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
+message = "BenchmarkVCFs.wdl:613:36: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkVCFs/BenchmarkVCFs.wdl/#L613"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:613:49: error: type mismatch for placeholder option `default`: expected any primitive type, but found `Array[File]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkVCFs/BenchmarkVCFs.wdl/#L613"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
+message = "BenchmarkVCFs.wdl:621:36: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkVCFs/BenchmarkVCFs.wdl/#L621"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
@@ -1348,8 +1473,18 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
+message = "BenchmarkVCFs.wdl:626:36: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkVCFs/BenchmarkVCFs.wdl/#L626"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
 message = "BenchmarkVCFs.wdl:626:49: error: type mismatch for placeholder option `default`: expected any primitive type, but found `Array[File]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkVCFs/BenchmarkVCFs.wdl/#L626"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
+message = "BenchmarkVCFs.wdl:631:36: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/BenchmarkVCFs/BenchmarkVCFs.wdl/#L631"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/BenchmarkVCFs/BenchmarkVCFs.wdl"
@@ -1788,8 +1923,18 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl"
+message = "ComputeIntervalBamStats.wdl:223:37: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L223"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl"
 message = "ComputeIntervalBamStats.wdl:223:50: error: type mismatch for placeholder option `default`: expected any primitive type, but found `Array[File]`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L223"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl"
+message = "ComputeIntervalBamStats.wdl:270:37: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl/#L270"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/IntervalFiles/ComputeIntervalBamStats.wdl"
@@ -1803,13 +1948,28 @@ permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
+message = "CreateIGVSession.wdl:51:36: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/WDLs/CreateIGVSession.wdl/#L51"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
 message = "CreateIGVSession.wdl:51:50: error: type mismatch for placeholder option `default`: expected any primitive type, but found `Array[String]?`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/WDLs/CreateIGVSession.wdl/#L51"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
+message = "CreateIGVSession.wdl:52:36: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/WDLs/CreateIGVSession.wdl/#L52"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
 message = "CreateIGVSession.wdl:52:50: error: type mismatch for placeholder option `default`: expected any primitive type, but found `Array[String]?`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/WDLs/CreateIGVSession.wdl/#L52"
+
+[[diagnostics]]
+document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
+message = "CreateIGVSession.wdl:53:46: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/WDLs/CreateIGVSession.wdl/#L53"
 
 [[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/CreateIGVSession.wdl"
@@ -2523,12 +2683,27 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
+message = "Funcotator.wdl:163:92: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Funcotator.wdl/#L163"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
 message = "Funcotator.wdl:164:118: error: type mismatch for placeholder option `default`: expected any primitive type, but found `Array[String]?`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Funcotator.wdl/#L164"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
+message = "Funcotator.wdl:164:89: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Funcotator.wdl/#L164"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
 message = "Funcotator.wdl:165:121: error: type mismatch for placeholder option `default`: expected any primitive type, but found `Array[String]?`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Funcotator.wdl/#L165"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/Funcotator.wdl"
+message = "Funcotator.wdl:165:91: error: a placeholder cannot have more than one option"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Funcotator.wdl/#L165"
 
 [[diagnostics]]
@@ -2718,8 +2893,18 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/Qc.wdl"
+message = "Qc.wdl:434:31: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Qc.wdl/#L434"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/Qc.wdl"
 message = "Qc.wdl:434:46: error: type mismatch for placeholder option `default`: expected any primitive type, but found `Array[String]?`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Qc.wdl/#L434"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/tasks/broad/Qc.wdl"
+message = "Qc.wdl:436:46: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/tasks/broad/Qc.wdl/#L436"
 
 [[diagnostics]]
 document = "broadinstitute/warp:/tasks/broad/Qc.wdl"
@@ -3097,6 +3282,11 @@ message = "VerifyMetrics.wdl:87:117: error: type mismatch for placeholder option
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/verification/VerifyMetrics.wdl/#L87"
 
 [[diagnostics]]
+document = "broadinstitute/warp:/verification/VerifyMetrics.wdl"
+message = "VerifyMetrics.wdl:87:89: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/verification/VerifyMetrics.wdl/#L87"
+
+[[diagnostics]]
 document = "broadinstitute/warp:/verification/VerifyMultiSampleArrays.wdl"
 message = "VerifyMultiSampleArrays.wdl:25:14: warning[UnusedInput]: unused input `done`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/verification/VerifyMultiSampleArrays.wdl/#L25"
@@ -3378,6 +3568,11 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 
 [[diagnostics]]
 document = "broadinstitute/warp:/verification/VerifyUltimaGenomicsWholeGenomeCramOnly.wdl"
+message = "VerifyUltimaGenomicsWholeGenomeCramOnly.wdl:102:87: error: a placeholder cannot have more than one option"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/verification/VerifyUltimaGenomicsWholeGenomeCramOnly.wdl/#L102"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/verification/VerifyUltimaGenomicsWholeGenomeCramOnly.wdl"
 message = "VerifyUltimaGenomicsWholeGenomeCramOnly.wdl:17:14: warning[UnusedInput]: unused input `done`"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/verification/VerifyUltimaGenomicsWholeGenomeCramOnly.wdl/#L17"
 
@@ -3424,6 +3619,11 @@ permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953
 [[diagnostics]]
 document = "broadinstitute/warp:/verification/VerifyUltimaGenomicsWholeGenomeGermline.wdl"
 message = "VerifyUltimaGenomicsWholeGenomeGermline.wdl:187:115: error: type mismatch for placeholder option `default`: expected any primitive type, but found `Array[String]`"
+permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/verification/VerifyUltimaGenomicsWholeGenomeGermline.wdl/#L187"
+
+[[diagnostics]]
+document = "broadinstitute/warp:/verification/VerifyUltimaGenomicsWholeGenomeGermline.wdl"
+message = "VerifyUltimaGenomicsWholeGenomeGermline.wdl:187:87: error: a placeholder cannot have more than one option"
 permalink = "https://github.com/broadinstitute/warp/blob/16affa2fbda7455569e1953ef34d8ded1521890f/verification/VerifyUltimaGenomicsWholeGenomeGermline.wdl/#L187"
 
 [[diagnostics]]

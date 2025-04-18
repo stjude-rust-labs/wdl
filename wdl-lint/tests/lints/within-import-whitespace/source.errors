@@ -1,14 +1,46 @@
+note[ImportSorted]: imports are not sorted lexicographically
+  ┌─ tests/lints/within-import-whitespace/source.wdl:8:1
+  │
+8 │ import "foo" as foo  # OK
+  │ ^^^^^^ imports must be sorted
+  │
+  = fix: sort the imports lexicographically:
+    import  "bar"
+    import	"baz"
+    import "chuk"        as something
+    import  # BAD (comment within statement)
+    "corge" as grault
+    import "foo" as foo
+    import "lorem" as 	ipsum
+    import   "qux"  alias   jabber    as    quux
+
 error: failed to import `foo`: No such file or directory (os error 2)
   ┌─ tests/lints/within-import-whitespace/source.wdl:8:8
   │
 8 │ import "foo" as foo  # OK
   │        ^^^^^
 
+note[ImportWhitespace]: improper whitespace in import statement
+  ┌─ tests/lints/within-import-whitespace/source.wdl:9:7
+  │
+9 │ import  "bar"  # BAD (2 spaces)
+  │       ^^ this should be a singular space (` `)
+  │
+  = fix: replace the extraneous whitespace with a single space
+
 error: failed to import `bar`: No such file or directory (os error 2)
   ┌─ tests/lints/within-import-whitespace/source.wdl:9:9
   │
 9 │ import  "bar"  # BAD (2 spaces)
   │         ^^^^^
+
+note[ImportWhitespace]: improper whitespace in import statement
+   ┌─ tests/lints/within-import-whitespace/source.wdl:10:7
+   │
+10 │ import  "baz"  # BAD (tab literal)
+   │       ^^ this should be a singular space (` `)
+   │
+   = fix: replace the extraneous whitespace with a single space
 
 error: failed to import `baz`: No such file or directory (os error 2)
    ┌─ tests/lints/within-import-whitespace/source.wdl:10:8
@@ -22,17 +54,65 @@ error: failed to import `chuk`: No such file or directory (os error 2)
 11 │ import "chuk"        as something  # BAD (many spaces)
    │        ^^^^^^
 
+note[ImportWhitespace]: improper whitespace in import statement
+   ┌─ tests/lints/within-import-whitespace/source.wdl:11:14
+   │
+11 │ import "chuk"        as something  # BAD (many spaces)
+   │              ^^^^^^^^ this should be a singular space (` `)
+   │
+   = fix: replace the extraneous whitespace with a single space
+
 error: failed to import `lorem`: No such file or directory (os error 2)
    ┌─ tests/lints/within-import-whitespace/source.wdl:12:8
    │
 12 │ import "lorem" as   ipsum  # BAD (space and tab)
    │        ^^^^^^^
 
+note[ImportWhitespace]: improper whitespace in import statement
+   ┌─ tests/lints/within-import-whitespace/source.wdl:12:18
+   │
+12 │ import "lorem" as   ipsum  # BAD (space and tab)
+   │                  ^^^ this should be a singular space (` `)
+   │
+   = fix: replace the extraneous whitespace with a single space
+
+note[ImportWhitespace]: improper whitespace in import statement
+   ┌─ tests/lints/within-import-whitespace/source.wdl:13:7
+   │
+13 │ import   "qux"  alias   jabber    as    quux  # really BAD
+   │       ^^^ this should be a singular space (` `)
+   │
+   = fix: replace the extraneous whitespace with a single space
+
 error: failed to import `qux`: No such file or directory (os error 2)
    ┌─ tests/lints/within-import-whitespace/source.wdl:13:10
    │
 13 │ import   "qux"  alias   jabber    as    quux  # really BAD
    │          ^^^^^
+
+note[ImportWhitespace]: improper whitespace in import statement
+   ┌─ tests/lints/within-import-whitespace/source.wdl:13:15
+   │
+13 │ import   "qux"  alias   jabber    as    quux  # really BAD
+   │               ^^ this should be a singular space (` `)
+   │
+   = fix: replace the extraneous whitespace with a single space
+
+note[ImportWhitespace]: improper whitespace in import statement
+   ┌─ tests/lints/within-import-whitespace/source.wdl:14:7
+   │
+14 │ import  # BAD (comment within statement)
+   │       ^^ this should be a singular space (` `)
+   │
+   = fix: replace the extraneous whitespace with a single space
+
+note[ImportSorted]: comments are not allowed within an import statement
+   ┌─ tests/lints/within-import-whitespace/source.wdl:14:9
+   │
+14 │ import  # BAD (comment within statement)
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │
+   = fix: remove the comment from the import statement
 
 error: failed to import `corge`: No such file or directory (os error 2)
    ┌─ tests/lints/within-import-whitespace/source.wdl:15:1

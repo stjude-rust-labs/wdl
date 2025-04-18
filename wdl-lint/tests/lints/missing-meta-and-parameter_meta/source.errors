@@ -1,3 +1,11 @@
+note[MetaSections]: workflow `test` is missing both `meta` and `parameter_meta` sections
+  ┌─ tests/lints/missing-meta-and-parameter_meta/source.wdl:5:10
+  │
+5 │ workflow test {
+  │          ^^^^ this workflow is missing both `meta` and `parameter_meta` sections
+  │
+  = fix: add both the `meta` and `parameter_meta` sections
+
 error: unknown task or workflow `test_task`
    ┌─ tests/lints/missing-meta-and-parameter_meta/source.wdl:11:10
    │

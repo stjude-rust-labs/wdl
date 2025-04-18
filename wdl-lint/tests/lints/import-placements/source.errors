@@ -16,11 +16,27 @@ error: failed to import `foo.wdl`: No such file or directory (os error 2)
 7 │ import "foo.wdl"  # OK
   │        ^^^^^^^^^
 
+warning[ImportPlacement]: misplaced import
+   ┌─ tests/lints/import-placements/source.wdl:16:1
+   │
+16 │ import "jam.wdl"  # BAD
+   │ ^^^^^^^^^^^^^^^^
+   │
+   = fix: move this import so that it comes after the version statement but before any document items
+
 error: failed to import `jam.wdl`: No such file or directory (os error 2)
    ┌─ tests/lints/import-placements/source.wdl:16:8
    │
 16 │ import "jam.wdl"  # BAD
    │        ^^^^^^^^^
+
+warning[ImportPlacement]: misplaced import
+   ┌─ tests/lints/import-placements/source.wdl:17:1
+   │
+17 │ import "qux.wdl"  # BAD
+   │ ^^^^^^^^^^^^^^^^
+   │
+   = fix: move this import so that it comes after the version statement but before any document items
 
 error: failed to import `qux.wdl`: No such file or directory (os error 2)
    ┌─ tests/lints/import-placements/source.wdl:17:8
