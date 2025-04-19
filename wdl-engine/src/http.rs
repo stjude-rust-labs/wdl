@@ -391,6 +391,13 @@ impl Downloader for HttpDownloader {
                         let delay_secs =
                             INITIAL_RETRY_DELAY.as_secs_f64() * 2.0f64.powi(attempt as i32);
                         let delay = Duration::from_secs_f64(delay_secs);
+                        info!(
+                            "backing off for {:.2}s before retry attempt {}/{} for `{url}`",
+                            delay_secs,
+                            attempt + 1,
+                            MAX_DOWNLOAD_ATTEMPTS,
+                            url = url
+                        );
 
                         drop(permit);
                         sleep(delay).await;

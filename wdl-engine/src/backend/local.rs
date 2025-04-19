@@ -38,6 +38,7 @@ use crate::config::LocalBackendConfig;
 use crate::config::TaskConfig;
 use crate::convert_unit_string;
 use crate::http::Downloader;
+use crate::http::HttpDownloader;
 use crate::http::Location;
 use crate::path::EvaluationPath;
 use crate::v1::cpu;
@@ -271,7 +272,7 @@ impl TaskExecutionBackend for LocalTaskExecutionBackend {
 
     fn localize_inputs<'a, 'b, 'c>(
         &'a self,
-        downloader: Arc<dyn Downloader>,
+        downloader: HttpDownloader,
         inputs: &'c mut [Input],
     ) -> BoxFuture<'c, Result<()>>
     where

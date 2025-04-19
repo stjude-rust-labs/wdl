@@ -44,6 +44,7 @@ use crate::config::CrankshaftBackendKind;
 use crate::config::DEFAULT_TASK_SHELL;
 use crate::config::TaskConfig;
 use crate::http::Downloader;
+use crate::http::HttpDownloader;
 use crate::http::Location;
 use crate::path::EvaluationPath;
 use crate::v1::container;
@@ -400,7 +401,7 @@ impl TaskExecutionBackend for CrankshaftBackend {
 
     fn localize_inputs<'a, 'b, 'c>(
         &'a self,
-        downloader: Arc<dyn Downloader>,
+        downloader: HttpDownloader,
         inputs: &'c mut [crate::eval::Input],
     ) -> BoxFuture<'c, Result<()>>
     where
