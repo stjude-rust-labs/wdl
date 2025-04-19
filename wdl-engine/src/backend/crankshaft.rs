@@ -457,9 +457,12 @@ impl TaskExecutionBackend for CrankshaftBackend {
                             .expect("index from should be valid")
                             .set_location(location);
                     }
-                    Ok(Err(e)) => bail!(e), // Futures are aborted when the JoinSet is dropped
+                    Ok(Err(e)) => {
+                        // Futures are aborted when the `JoinSet` is dropped.
+                        bail!(e)
+                    }
                     Err(e) => {
-                        // Futures are aborted when the JoinSet is dropped
+                        // Futures are aborted when the `JoinSet` is dropped.
                         bail!("download task failed: {e:?}")
                     }
                 }
