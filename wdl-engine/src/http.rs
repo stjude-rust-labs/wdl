@@ -355,11 +355,10 @@ impl Downloader for HttpDownloader {
                 }
             }
 
-            let mut last_error: Option<Arc<Error>> = None;
-            let mut result: Result<Location<'static>, Arc<Error>> =
-                Err(Arc::new(anyhow!("download never attempted")));
+            let mut attempt_counter = 0;
+            let result = 'retry_loop: loop {
+                let attempt = attempt_counter;
 
-            for attempt in 0..MAX_DOWNLOAD_ATTEMPTS {
                 let permit = self
                     .semaphore
                     .acquire()
@@ -368,17 +367,21 @@ impl Downloader for HttpDownloader {
 
                 match self.get(&url).await {
                     Ok(location) => {
-                        result = Ok(location);
-                        break; // permit is dropped here
+                        break 'retry_loop Ok(location);
                     }
                     Err(e) => {
-                        last_error = Some(Arc::new(e));
+                        let current_error = Arc::new(e.context(format!(
+                            "download attempt {} failed for `{url}`",
+                            attempt + 1
+                        )));
+
                         // if it was the last attempt, return the error
                         if attempt == MAX_DOWNLOAD_ATTEMPTS - 1 {
-                            result = Err(last_error.clone().unwrap_or_else(|| {
-                                Arc::new(anyhow!("unknown download error after max attempts"))
-                            }));
-                            break;
+                            info!(
+                                "download failed after {} attempts for `{url}`: {}",
+                                MAX_DOWNLOAD_ATTEMPTS, current_error
+                            );
+                            break 'retry_loop Err(current_error);
                         }
 
                         // backoff and retry
@@ -395,16 +398,14 @@ impl Downloader for HttpDownloader {
 
                         drop(permit);
                         sleep(delay).await;
+
+                        attempt_counter += 1;
+                        // permit will be re-acquired at the start of the next
+                        // iteration
                     }
                 }
                 // permit is implicitly dropped here
-            }
-
-            if last_error.is_some() && result.is_ok() {
-                result = Err(last_error.unwrap());
-            } else if result.is_err() && last_error.is_none() {
-                result = Err(Arc::new(anyhow!("download failed with unknown error")));
-            }
+            };
 
             let notify = {
                 let mut downloads = self.downloads.lock().expect("failed to lock downloads");
