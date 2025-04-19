@@ -6,10 +6,10 @@ use std::fs;
 use std::fs::File;
 use std::path::Path;
 use std::process::Stdio;
+use std::result::Result::Ok;
 use std::sync::Arc;
 
 use anyhow::Context;
-use anyhow::Ok;
 use anyhow::Result;
 use anyhow::anyhow;
 use anyhow::bail;
@@ -298,8 +298,8 @@ impl TaskExecutionBackend for LocalTaskExecutionBackend {
                 download_futs.spawn(async move {
                     let location_result = downloader_clone.download(&url).await;
                     match location_result {
-                        Ok(location) => Ok::<_, anyhow::Error>((index, location.into_owned())),
-                        Err(e) => Err(anyhow!("failed to localize `{url}`: {e:?}")),
+                        Ok(location) => Ok((index, location.into_owned())),
+                        Err(e) => bail!("failed to localize `{url}`: {e:?}"),
                     }
                 });
             }
@@ -337,11 +337,11 @@ impl TaskExecutionBackend for LocalTaskExecutionBackend {
                     }
                     Ok(Err(e)) => {
                         download_futs.abort_all();
-                        return Err(e);
+                        bail!(e);
                     }
                     Err(e) => {
                         download_futs.abort_all();
-                        return Err(anyhow!("download task panicked: {e}"));
+                        bail!("download task panicked: {e}");
                     }
                 }
             }

@@ -420,7 +420,7 @@ impl TaskExecutionBackend for CrankshaftBackend {
                 if let Some(input) = inputs.get_mut(index) {
                     input.set_guest_path(guest_path);
                 } else {
-                    return Err(anyhow!("invalid index {} returned from trie", index));
+                    bail!("invalid index {} returned from trie", index);
                 }
             }
 
@@ -444,7 +444,7 @@ impl TaskExecutionBackend for CrankshaftBackend {
 
                     match location_result {
                         Ok(location) => Ok((idx, location.into_owned())),
-                        Err(e) => Err(anyhow!("failed to localize `{url}`: {e:?}")),
+                        Err(e) => bail!("failed to localize `{url}`: {e:?}"),
                     }
                 });
             }
@@ -465,11 +465,11 @@ impl TaskExecutionBackend for CrankshaftBackend {
                     }
                     Ok(Err(e)) => {
                         download_futs.abort_all();
-                        return Err(e);
+                        bail!(e);
                     }
                     Err(e) => {
                         download_futs.abort_all();
-                        return Err(anyhow!("download task failed: {e:?}"));
+                        bail!("download task failed: {e:?}");
                     }
                 }
             }
