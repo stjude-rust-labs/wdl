@@ -352,8 +352,7 @@ impl Downloader for HttpDownloader {
 
             let permit = self
                 .semaphore
-                .clone()
-                .acquire_owned()
+                .acquire()
                 .await
                 .expect("semaphore should not be closed");
 
