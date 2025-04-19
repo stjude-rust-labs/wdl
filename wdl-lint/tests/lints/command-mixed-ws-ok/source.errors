@@ -1,0 +1,8 @@
+note[MixedIndentation]: mixed indentation in document
+   ┌─ tests/lints/command-mixed-ws-ok/source.wdl:15:1
+   │
+15 │             if true
+   │ ^^^^ indented with spaces until this tab
+   │
+   = fix: use either tabs or spaces exclusively for indentation
+
