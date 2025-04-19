@@ -65,6 +65,7 @@ task bad {
     output {
         String g = "foo"
         String h = "bar"
+        String i = "baz"
     }
 
     command <<<>>>
@@ -132,7 +133,7 @@ task bad {
 
                 },
             },
-            c: output {
+            i: output {
 
             }
         }
