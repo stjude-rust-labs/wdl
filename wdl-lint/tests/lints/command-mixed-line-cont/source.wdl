@@ -10,7 +10,7 @@ task test1 {
     parameter_meta {}
 
     command <<<
-        this line has a continuation \
+        this line has a continuation /
  		   and should be a warning
     >>>
 
@@ -26,7 +26,7 @@ task test2 {
 
     #@ except: HereDocCommands
     command {
-        this line has a continuation \
+        this line has a continuation /
  		   and should be a warning
     }
 
