@@ -1,3 +1,9 @@
+error: failed to import `baz`: No such file or directory (os error 2)
+  ┌─ tests/lints/blank-lines-between-elements/source.wdl:5:8
+  │
+5 │ import "baz"  # following whitespace will be caught by ImportWhitespace rule
+  │        ^^^^^
+
 note[ImportWhitespace]: blank lines are not allowed between imports
   ┌─ tests/lints/blank-lines-between-elements/source.wdl:5:77
   │  
@@ -8,6 +14,12 @@ note[ImportWhitespace]: blank lines are not allowed between imports
   │ ╰^
   │  
   = fix: remove blank lines between imports
+
+error: failed to import `qux`: No such file or directory (os error 2)
+  ┌─ tests/lints/blank-lines-between-elements/source.wdl:7:8
+  │
+7 │ import "qux"  # following whitespace duplication is caught be Whitespace rule
+  │        ^^^^^
 
 note[Whitespace]: more than one blank line in a row
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:7:78
@@ -95,6 +107,17 @@ note[ElementSpacing]: extra blank line(s) found
    │  
    = fix: remove extra blank line(s)
 
+error: conflicting call name `bar`
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:30:14
+   │
+26 │         call bar { input: s = i }
+   │              --- the call with the conflicting name is here
+   ·
+30 │         call bar { input: s = "world" }
+   │              ^^^ this call name conflicts with a previously used name
+   │
+   = fix: add an `as` clause to the call to specify a different name
+
 note[ElementSpacing]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:30:40
    │  
@@ -129,6 +152,17 @@ note[Whitespace]: more than one blank line in a row
    │ ╰────^
    │  
    = fix: remove the extra blank lines
+
+error: conflicting call name `bar`
+   ┌─ tests/lints/blank-lines-between-elements/source.wdl:42:10
+   │
+26 │         call bar { input: s = i }
+   │              --- the call with the conflicting name is here
+   ·
+42 │     call bar { input:
+   │          ^^^ this call name conflicts with a previously used name
+   │
+   = fix: add an `as` clause to the call to specify a different name
 
 note[ElementSpacing]: extra blank line(s) found
    ┌─ tests/lints/blank-lines-between-elements/source.wdl:43:10

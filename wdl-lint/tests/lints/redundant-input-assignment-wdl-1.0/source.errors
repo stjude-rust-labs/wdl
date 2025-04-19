@@ -1,0 +1,6 @@
+error: unknown task or workflow `bar`
+   ┌─ tests/lints/redundant-input-assignment-wdl-1.0/source.wdl:14:10
+   │
+14 │     call bar { input:
+   │          ^^^
+

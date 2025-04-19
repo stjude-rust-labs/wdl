@@ -1,0 +1,30 @@
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
+   ┌─ tests/lints/command-mixed-ws-ok/source.wdl:14:22
+   │    
+14 │             this line is ~{(
+   │ ╭────────────────────────^
+   │ │ ╭──────────────────────'
+15 │ │ │             if true
+16 │ │ │             then "split across multiple lines with mixed indentation"
+17 │ │ │             else "by a placeholder"
+18 │ │ │         )} but is all one literal line in the command text
+   │ ╰─│──────────^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │   ╰──────────' more info: https://www.shellcheck.net/wiki/SC2086
+   │    
+   = fix: address the diagnostic as recommended in the message
+
+note[ShellCheck]: Double quote to prevent globbing and word splitting.
+   ┌─ tests/lints/command-mixed-ws-ok/source.wdl:33:22
+   │    
+33 │             this line is ${(
+   │ ╭────────────────────────^
+   │ │ ╭──────────────────────'
+34 │ │ │             if true
+35 │ │ │             then "split across multiple lines with mixed indentation"
+36 │ │ │             else "by a placeholder"
+37 │ │ │         )} but is all one literal line in the command text
+   │ ╰─│──────────^ SC2086[info]: Double quote to prevent globbing and word splitting.
+   │   ╰──────────' more info: https://www.shellcheck.net/wiki/SC2086
+   │    
+   = fix: address the diagnostic as recommended in the message
+

@@ -10,3 +10,27 @@ note[ImportSorted]: imports are not sorted lexicographically
     import "C"
     import "D"
 
+error: failed to import `A`: No such file or directory (os error 2)
+  ┌─ tests/lints/import-sorting/source.wdl:7:8
+  │
+7 │ import "A"
+  │        ^^^
+
+error: failed to import `B`: No such file or directory (os error 2)
+  ┌─ tests/lints/import-sorting/source.wdl:8:8
+  │
+8 │ import "B"
+  │        ^^^
+
+error: failed to import `D`: No such file or directory (os error 2)
+  ┌─ tests/lints/import-sorting/source.wdl:9:8
+  │
+9 │ import "D"
+  │        ^^^
+
+error: failed to import `C`: No such file or directory (os error 2)
+   ┌─ tests/lints/import-sorting/source.wdl:10:8
+   │
+10 │ import "C"
+   │        ^^^
+

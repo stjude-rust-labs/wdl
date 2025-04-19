@@ -14,6 +14,12 @@ note[ImportSorted]: imports are not sorted lexicographically
     import "lorem" as 	ipsum
     import   "qux"  alias   jabber    as    quux
 
+error: failed to import `foo`: No such file or directory (os error 2)
+  ┌─ tests/lints/within-import-whitespace/source.wdl:8:8
+  │
+8 │ import "foo" as foo  # OK
+  │        ^^^^^
+
 note[ImportWhitespace]: improper whitespace in import statement
   ┌─ tests/lints/within-import-whitespace/source.wdl:9:7
   │
@@ -21,6 +27,12 @@ note[ImportWhitespace]: improper whitespace in import statement
   │       ^^ this should be a singular space (` `)
   │
   = fix: replace the extraneous whitespace with a single space
+
+error: failed to import `bar`: No such file or directory (os error 2)
+  ┌─ tests/lints/within-import-whitespace/source.wdl:9:9
+  │
+9 │ import  "bar"  # BAD (2 spaces)
+  │         ^^^^^
 
 note[ImportWhitespace]: improper whitespace in import statement
    ┌─ tests/lints/within-import-whitespace/source.wdl:10:7
@@ -30,6 +42,18 @@ note[ImportWhitespace]: improper whitespace in import statement
    │
    = fix: replace the extraneous whitespace with a single space
 
+error: failed to import `baz`: No such file or directory (os error 2)
+   ┌─ tests/lints/within-import-whitespace/source.wdl:10:8
+   │
+10 │ import  "baz"  # BAD (tab literal)
+   │         ^^^^^
+
+error: failed to import `chuk`: No such file or directory (os error 2)
+   ┌─ tests/lints/within-import-whitespace/source.wdl:11:8
+   │
+11 │ import "chuk"        as something  # BAD (many spaces)
+   │        ^^^^^^
+
 note[ImportWhitespace]: improper whitespace in import statement
    ┌─ tests/lints/within-import-whitespace/source.wdl:11:14
    │
@@ -37,6 +61,12 @@ note[ImportWhitespace]: improper whitespace in import statement
    │              ^^^^^^^^ this should be a singular space (` `)
    │
    = fix: replace the extraneous whitespace with a single space
+
+error: failed to import `lorem`: No such file or directory (os error 2)
+   ┌─ tests/lints/within-import-whitespace/source.wdl:12:8
+   │
+12 │ import "lorem" as   ipsum  # BAD (space and tab)
+   │        ^^^^^^^
 
 note[ImportWhitespace]: improper whitespace in import statement
    ┌─ tests/lints/within-import-whitespace/source.wdl:12:18
@@ -53,6 +83,12 @@ note[ImportWhitespace]: improper whitespace in import statement
    │       ^^^ this should be a singular space (` `)
    │
    = fix: replace the extraneous whitespace with a single space
+
+error: failed to import `qux`: No such file or directory (os error 2)
+   ┌─ tests/lints/within-import-whitespace/source.wdl:13:10
+   │
+13 │ import   "qux"  alias   jabber    as    quux  # really BAD
+   │          ^^^^^
 
 note[ImportWhitespace]: improper whitespace in import statement
    ┌─ tests/lints/within-import-whitespace/source.wdl:13:15
@@ -77,4 +113,10 @@ note[ImportSorted]: comments are not allowed within an import statement
    │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    │
    = fix: remove the comment from the import statement
+
+error: failed to import `corge`: No such file or directory (os error 2)
+   ┌─ tests/lints/within-import-whitespace/source.wdl:15:1
+   │
+15 │ "corge" as grault  # BAD (newline)
+   │ ^^^^^^^
 

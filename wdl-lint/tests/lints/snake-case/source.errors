@@ -14,6 +14,18 @@ warning[SnakeCase]: private declaration name `badPrivateDecl` is not snake_case
   │
   = fix: replace `badPrivateDecl` with `bad_private_decl`
 
+warning: missing required call input `BadInput` for task `BadTask`
+  ┌─ tests/lints/snake-case/source.wdl:9:10
+  │
+9 │     call BadTask
+  │          ^^^^^^^
+
+warning: missing required call input `good_input` for task `good_task`
+   ┌─ tests/lints/snake-case/source.wdl:10:10
+   │
+10 │     call good_task
+   │          ^^^^^^^^^
+
 warning[SnakeCase]: task name `BadTask` is not snake_case
    ┌─ tests/lints/snake-case/source.wdl:15:6
    │

@@ -30,6 +30,15 @@ warning[LintDirectiveFormatted]: lint directive must be on its own line
    │
    = fix: move the lint directive to its own line
 
+error: cannot define workflow `bar2` as only one workflow is allowed per source file
+   ┌─ tests/lints/malformed-lint-directive/source.wdl:44:10
+   │
+24 │ workflow bar {
+   │          --- first workflow is defined here
+   ·
+44 │ workflow bar2 {
+   │          ^^^^ consider moving this workflow to a new file
+
 warning[LintDirectiveFormatted]: expected exactly one space before lint directive
    ┌─ tests/lints/malformed-lint-directive/source.wdl:48:7
    │
@@ -37,6 +46,15 @@ warning[LintDirectiveFormatted]: expected exactly one space before lint directiv
    │       ^^^^^ this whitespace is unexpected
    │
    = fix: replace this whitespace with a single space
+
+error: cannot define workflow `bar3` as only one workflow is allowed per source file
+   ┌─ tests/lints/malformed-lint-directive/source.wdl:53:10
+   │
+24 │ workflow bar {
+   │          --- first workflow is defined here
+   ·
+53 │ workflow bar3 {
+   │          ^^^^ consider moving this workflow to a new file
 
 warning[LintDirectiveFormatted]: lint directive not found
    ┌─ tests/lints/malformed-lint-directive/source.wdl:59:7

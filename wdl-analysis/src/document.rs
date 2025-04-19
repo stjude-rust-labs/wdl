@@ -1,7 +1,6 @@
 //! Representation of analyzed WDL documents.
 
 use std::borrow::Cow;
-use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::path::Path;
 use std::str::FromStr;
@@ -501,9 +500,7 @@ impl Document {
                     )),
                 };
             }
-            ParseState::Parsed { diagnostics, .. } => {
-                Vec::from_iter(diagnostics.as_ref().iter().cloned())
-            }
+            ParseState::Parsed { diagnostics, .. } => diagnostics,
         };
 
         let root = node.root().expect("node should have been parsed");
@@ -516,7 +513,7 @@ impl Document {
                         node.uri().clone(),
                         Some(root.inner().green().into()),
                         None,
-                        diagnostics,
+                        diagnostics.to_vec(),
                     )),
                 };
             }
@@ -526,7 +523,7 @@ impl Document {
             node.uri().clone(),
             Some(root.inner().green().into()),
             SupportedVersion::from_str(version.text()).ok(),
-            diagnostics,
+            diagnostics.to_vec(),
         );
         match root.ast() {
             Ast::Unsupported => {}
@@ -548,15 +545,6 @@ impl Document {
                     .map(|(name, ns)| unused_import(name, ns.span()).with_severity(severity)),
             );
         }
-
-        // Sort the diagnostics by start
-        data.diagnostics
-            .sort_by(|a, b| match (a.labels().next(), b.labels().next()) {
-                (None, None) => Ordering::Equal,
-                (None, Some(_)) => Ordering::Less,
-                (Some(_), None) => Ordering::Greater,
-                (Some(a), Some(b)) => a.span().start().cmp(&b.span().start()),
-            });
 
         Self {
             data: Arc::new(data),
@@ -658,6 +646,22 @@ impl Document {
     /// Gets the analysis diagnostics for the document.
     pub fn diagnostics(&self) -> &[Diagnostic] {
         &self.data.diagnostics
+    }
+
+    /// Sorts the diagnostics for the document.
+    pub fn sort_diagnostics(&mut self) -> Self {
+        let data = &mut self.data;
+        let inner = Arc::get_mut(data).expect("should only have one reference");
+        inner.diagnostics.sort();
+        Self { data: data.clone() }
+    }
+
+    /// Extends the diagnostics for the document.
+    pub fn extend_diagnostics(&mut self, diagnostics: Vec<Diagnostic>) -> Self {
+        let data = &mut self.data;
+        let inner = Arc::get_mut(data).expect("should only have one reference");
+        inner.diagnostics.extend(diagnostics);
+        Self { data: data.clone() }
     }
 
     /// Finds a scope based on a position within the document.
