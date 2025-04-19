@@ -537,5 +537,26 @@ mod test {
         assert!(config.validate().unwrap_err().to_string().starts_with(
             "configuration value `backend.local.memory` cannot exceed the total memory of the host"
         ));
+
+        let mut config = Config::default();
+        config.http.max_concurrent_downloads = Some(0);
+        assert_eq!(
+            config.validate().unwrap_err().to_string(),
+            "configuration value `http.max_concurrent_downloads` cannot be zero"
+        );
+
+        let mut config = Config::default();
+        config.http.max_concurrent_downloads = Some(5);
+        assert!(
+            config.validate().is_ok(),
+            "should pass for valid configuration"
+        );
+
+        let mut config_default = Config::default();
+        config_default.http.max_concurrent_downloads = None;
+        assert!(
+            config_default.validate().is_ok(),
+            "should pass for default (None)"
+        );
     }
 }
