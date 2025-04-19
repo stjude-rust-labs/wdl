@@ -16,7 +16,6 @@ use anyhow::bail;
 use futures::FutureExt;
 use futures::StreamExt;
 use futures::future::BoxFuture;
-use futures::future::Either;
 use http_cache_stream_reqwest::Cache;
 use http_cache_stream_reqwest::CacheStorage;
 use http_cache_stream_reqwest::storage::DefaultCacheStorage;
@@ -321,17 +320,17 @@ impl Downloader for HttpDownloader {
             // This loop exists so that all requests to download the same URL will block
             // waiting for a notification that the download has completed.
             // When the notification is received, the lookup into the downloads is retried
-            let mut retried_wait = false;
+            let mut waited = false;
             loop {
                 let status_check_result = {
                     let mut downloads = self.downloads.lock().expect("failed to lock downloads");
                     match downloads.get(&url) {
                         Some(Status::Downloading(notify)) => {
                             assert!(
-                                !retried_wait,
+                                !waited,
                                 "file should not be downloading again after a notification"
                             );
-                            Either::Left(notify.clone())
+                            Some(notify.clone())
                         }
                         Some(Status::Downloaded(r)) => {
                             return r.clone();
@@ -342,19 +341,14 @@ impl Downloader for HttpDownloader {
                                 url.clone().into_owned(),
                                 Status::Downloading(Arc::new(Notify::new())),
                             );
-                            Either::Right(())
+                            None
                         }
                     }
                 };
-                // Scope to ensure the mutex guard is not visible to the await point
-                let notify_to_await = match status_check_result {
-                    Either::Left(notify) => Some(notify),
-                    Either::Right(()) => None,
-                };
 
-                if let Some(notify) = notify_to_await {
+                if let Some(notify) = status_check_result {
                     notify.notified().await;
-                    retried_wait = true;
+                    waited = true;
                     continue;
                 } else {
                     break;
