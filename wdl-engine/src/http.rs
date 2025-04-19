@@ -16,6 +16,7 @@ use anyhow::bail;
 use futures::FutureExt;
 use futures::StreamExt;
 use futures::future::BoxFuture;
+use futures::future::Either;
 use http_cache_stream_reqwest::Cache;
 use http_cache_stream_reqwest::CacheStorage;
 use http_cache_stream_reqwest::storage::DefaultCacheStorage;
@@ -29,6 +30,8 @@ use tokio::io::AsyncWriteExt;
 use tokio::io::BufWriter;
 use tokio::sync::Notify;
 use tokio::sync::Semaphore;
+use tokio::time::Duration;
+use tokio::time::sleep;
 use tracing::debug;
 use tracing::info;
 use url::Url;
@@ -43,6 +46,12 @@ mod s3;
 /// The default cache subdirectory that is appended to the system cache
 /// directory.
 const DEFAULT_CACHE_SUBDIR: &str = "wdl";
+
+/// Maximum number of download attempts
+const MAX_DOWNLOAD_ATTEMPTS: u32 = 3;
+/// Initial delay before the first retry.
+const INITIAL_RETRY_DELAY: Duration = Duration::from_secs(1);
+
 /// A trait implemented by types responsible for downloading remote files over
 /// HTTP for evaluation.
 pub trait Downloader: Send + Sync {
@@ -312,66 +321,104 @@ impl Downloader for HttpDownloader {
             // This loop exists so that all requests to download the same URL will block
             // waiting for a notification that the download has completed.
             // When the notification is received, the lookup into the downloads is retried
-            let mut retried = false;
+            let mut retried_wait = false;
             loop {
-                // Scope to ensure the mutex guard is not visible to the await point
-                let notify = {
+                let status_check_result = {
                     let mut downloads = self.downloads.lock().expect("failed to lock downloads");
                     match downloads.get(&url) {
                         Some(Status::Downloading(notify)) => {
                             assert!(
-                                !retried,
+                                !retried_wait,
                                 "file should not be downloading again after a notification"
                             );
-
-                            notify.clone()
+                            Either::Left(notify.clone())
                         }
                         Some(Status::Downloaded(r)) => {
                             return r.clone();
                         }
                         None => {
-                            assert!(
-                                !retried,
-                                "file should not be downloaded again after a notification"
-                            );
-
-                            // Insert an entry and break out of the loop to download
+                            // not downloading, not downloaded. mark for retry/download
                             downloads.insert(
                                 url.clone().into_owned(),
-                                Status::Downloading(Arc::default()),
+                                Status::Downloading(Arc::new(Notify::new())),
                             );
-                            break;
+                            Either::Right(())
                         }
                     }
                 };
+                // Scope to ensure the mutex guard is not visible to the await point
+                let notify_to_await = match status_check_result {
+                    Either::Left(notify) => Some(notify),
+                    Either::Right(()) => None,
+                };
 
-                notify.notified().await;
-                retried = true;
-                continue;
+                if let Some(notify) = notify_to_await {
+                    notify.notified().await;
+                    retried_wait = true;
+                    continue;
+                } else {
+                    break;
+                }
             }
 
-            let permit = self
-                .semaphore
-                .acquire()
-                .await
-                .expect("semaphore should not be closed");
+            let mut last_error: Option<Arc<Error>> = None;
+            let mut result: Result<Location<'static>, Arc<Error>> =
+                Err(Arc::new(anyhow!("download never attempted")));
 
-            // Perform the download
-            let res = self.get(&url).await.map_err(Arc::from);
+            for attempt in 0..MAX_DOWNLOAD_ATTEMPTS {
+                let permit = self
+                    .semaphore
+                    .acquire()
+                    .await
+                    .expect("semaphore should not be closed");
+
+                match self.get(&url).await {
+                    Ok(location) => {
+                        result = Ok(location);
+                        break; // permit is dropped here
+                    }
+                    Err(e) => {
+                        last_error = Some(Arc::new(e));
+                        // if it was the last attempt, return the error
+                        if attempt == MAX_DOWNLOAD_ATTEMPTS - 1 {
+                            result = Err(last_error.clone().unwrap_or_else(|| {
+                                Arc::new(anyhow!("unknown download error after max attempts"))
+                            }));
+                            break;
+                        }
+
+                        // backoff and retry
+                        let delay_secs =
+                            INITIAL_RETRY_DELAY.as_secs_f64() * 2.0f64.powi(attempt as i32);
+                        let delay = Duration::from_secs_f64(delay_secs);
+
+                        drop(permit);
+                        sleep(delay).await;
+                    }
+                }
+                // permit is implicitly dropped here
+            }
+
+            if last_error.is_some() && result.is_ok() {
+                result = Err(last_error.unwrap());
+            } else if result.is_err() && last_error.is_none() {
+                result = Err(Arc::new(anyhow!("download failed with unknown error")));
+            }
+
             let notify = {
                 let mut downloads = self.downloads.lock().expect("failed to lock downloads");
-                match std::mem::replace(
-                    downloads.get_mut(&url).expect("should have status"),
-                    Status::Downloaded(res.clone()),
-                ) {
-                    Status::Downloading(notify) => notify,
-                    _ => panic!("file should be downloading"),
+                match downloads.insert(url.clone().into_owned(), Status::Downloaded(result.clone()))
+                {
+                    Some(Status::Downloading(notify)) => notify,
+                    _ => panic!(
+                        "expected to find a downloading status for `{url}`",
+                        url = url
+                    ),
                 }
             };
 
-            drop(permit);
             notify.notify_waiters();
-            res
+            result
         }
         .boxed()
     }
