@@ -3,7 +3,6 @@
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
-use std::path::absolute;
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -508,7 +507,7 @@ impl TaskExecutionBackend for CrankshaftBackend {
         {
             let inner_backend = self.inner.clone();
             let generator = self.generator.clone();
-            let output_path = absolute(output_dir).expect("failed to get absolute path");
+            let output_path = std::path::absolute(output_dir).expect("failed to get absolute path");
             Some(
                 async move {
                     let result = async {
