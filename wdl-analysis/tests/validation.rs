@@ -27,7 +27,6 @@ use path_clean::clean;
 use pretty_assertions::StrComparison;
 use wdl_analysis::Analyzer;
 use wdl_analysis::DiagnosticsConfig;
-use wdl_analysis::rules;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 
@@ -144,20 +143,20 @@ async fn main() {
 
         // Discover the results that are relevant only to this test
         let base = clean(absolute(test).expect("should be made absolute"));
-        let source_path = test.join("source.wdl");
-        let errors_path = test.join("source.errors");
+        let source_path = base.join("source.wdl");
+        let errors_path = base.join("source.errors");
         // NOTE: clippy appears to be incorrect that this can be modified to use
         // `filter_map`. Perhaps this should be revisited in the future.
         #[allow(clippy::filter_map_bool_then)]
         let result = results
             .iter()
             .filter_map(|r| {
-                r.document()
-                    .uri()
-                    .to_file_path()
-                    .ok()?
-                    .starts_with(&base)
-                    .then(|| r.clone())
+                let p = r.document().uri().to_file_path().ok()?;
+                if p == source_path {
+                    Some(r.clone())
+                } else {
+                    None
+                }
             })
             .next()
             .expect("should have a result");
@@ -165,7 +164,7 @@ async fn main() {
             &errors_path,
             &format_diagnostics(
                 result.document().diagnostics(),
-                &source_path,
+                &test.as_path().join("source.wdl"),
                 &result.document().root().text().to_string(),
             ),
             true,
