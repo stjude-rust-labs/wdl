@@ -11,7 +11,6 @@ use std::sync::Arc;
 
 use anyhow::Context;
 use anyhow::Result;
-use anyhow::anyhow;
 use anyhow::bail;
 use futures::FutureExt;
 use futures::future::BoxFuture;
@@ -21,7 +20,6 @@ use tokio::sync::oneshot;
 use tokio::task::JoinSet;
 use tokio_util::sync::CancellationToken;
 use tracing::info;
-use url::Url;
 
 use super::TaskExecutionBackend;
 use super::TaskExecutionConstraints;
@@ -284,37 +282,31 @@ impl TaskExecutionBackend for LocalTaskExecutionBackend {
         async move {
             let mut download_futs = JoinSet::new();
 
-            let urls_to_download: Vec<(usize, Url)> = inputs
-                .iter()
-                .enumerate()
-                .filter_map(|(idx, input)| match input.path() {
-                    EvaluationPath::Remote(url) => Some((idx, url.clone())),
-                    _ => None,
-                })
-                .collect();
-
-            for (index, url) in urls_to_download {
-                let downloader_clone = downloader.clone();
-                download_futs.spawn(async move {
-                    let location_result = downloader_clone.download(&url).await;
-                    match location_result {
-                        Ok(location) => Ok((index, location.into_owned())),
-                        Err(e) => bail!("failed to localize `{url}`: {e:?}"),
+            for (idx, input) in inputs.iter_mut().enumerate() {
+                match input.path() {
+                    EvaluationPath::Local(path) => {
+                        let location = Location::Path(path.clone().into());
+                        let guest_path = location
+                            .to_str()
+                            .with_context(|| {
+                                format!("path `{path}` is not UTF-8", path = path.display())
+                            })?
+                            .to_string();
+                        input.set_location(location.into_owned());
+                        input.set_guest_path(guest_path);
                     }
-                });
-            }
+                    EvaluationPath::Remote(url) => {
+                        let downloader = downloader.clone();
+                        let url = url.clone();
+                        download_futs.spawn(async move {
+                            let location_result = downloader.download(&url).await;
 
-            for input in inputs.iter_mut() {
-                if let EvaluationPath::Local(path) = input.path() {
-                    let location = Location::Path(path.clone().into());
-                    let guest_path = location
-                        .to_str()
-                        .with_context(|| {
-                            format!("path `{path}` is not UTF-8", path = path.display())
-                        })?
-                        .to_string();
-                    input.set_location(location.into_owned());
-                    input.set_guest_path(guest_path);
+                            match location_result {
+                                Ok(location) => Ok((idx, location.into_owned())),
+                                Err(e) => bail!("failed to localize `{url}`: {e:?}"),
+                            }
+                        });
+                    }
                 }
             }
 

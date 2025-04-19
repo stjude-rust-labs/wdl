@@ -27,7 +27,6 @@ use tokio::sync::oneshot;
 use tokio::task::JoinSet;
 use tokio_util::sync::CancellationToken;
 use tracing::info;
-use url::Url;
 
 use super::TaskExecutionBackend;
 use super::TaskExecutionConstraints;
@@ -428,30 +427,23 @@ impl TaskExecutionBackend for CrankshaftBackend {
             // TODO: only do this for local task execution
             let mut download_futs = JoinSet::new();
 
-            let urls_to_download: Vec<(usize, Url)> = inputs
-                .iter()
-                .enumerate()
-                .filter_map(|(idx, input)| match input.path() {
-                    EvaluationPath::Remote(url) => Some((idx, url.clone())),
-                    _ => None,
-                })
-                .collect();
-
-            for (idx, url) in urls_to_download {
-                let downloader_clone = downloader.clone();
-                download_futs.spawn(async move {
-                    let location_result = downloader_clone.download(&url).await;
-
-                    match location_result {
-                        Ok(location) => Ok((idx, location.into_owned())),
-                        Err(e) => bail!("failed to localize `{url}`: {e:?}"),
+            for (idx, input) in inputs.iter_mut().enumerate() {
+                match input.path() {
+                    EvaluationPath::Local(path) => {
+                        input.set_location(Location::Path(path.clone().into()));
                     }
-                });
-            }
+                    EvaluationPath::Remote(url) => {
+                        let downloader = downloader.clone();
+                        let url = url.clone();
+                        download_futs.spawn(async move {
+                            let location_result = downloader.download(&url).await;
 
-            for input in inputs.iter_mut() {
-                if let EvaluationPath::Local(path) = input.path() {
-                    input.set_location(Location::Path(path.clone().into()));
+                            match location_result {
+                                Ok(location) => Ok((idx, location.into_owned())),
+                                Err(e) => bail!("failed to localize `{url}`: {e:?}"),
+                            }
+                        });
+                    }
                 }
             }
 
@@ -463,13 +455,8 @@ impl TaskExecutionBackend for CrankshaftBackend {
                             .expect("index from should be valid")
                             .set_location(location);
                     }
-                    Ok(Err(e)) => {
-                        // futures are aborted when the JoinSet is dropped
-                        bail!(e);
-                    }
-                    Err(e) => {
-                        bail!("download task failed: {e:?}");
-                    }
+                    Ok(Err(e)) => bail!(e), // futures are aborted when the JoinSet is dropped
+                    Err(e) => bail!("download task failed: {e:?}"),
                 }
             }
 
