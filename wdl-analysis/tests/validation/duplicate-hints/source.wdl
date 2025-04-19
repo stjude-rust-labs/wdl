@@ -14,19 +14,6 @@ task t {
     command <<<>>>
 }
 
-# This duplicate task should be ignored.
-task t {
-    hints {
-
-    }
-
-    hints {
-
-    }
-
-    command <<<>>>
-}
-
 workflow w {
     hints {
 

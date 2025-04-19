@@ -3,6 +3,17 @@
 version 1.2
 
 task ok {
+    input {
+        String foo
+        String bar
+        BazBarQux baz
+    }
+
+    output {
+        String foo2 = "foo"
+        BazBarQux baz2 = baz
+    }
+
     command <<<>>>
 
     hints {
@@ -27,12 +38,12 @@ task ok {
         c: "foo"
         d: 1
         outputs: output {
-            foo: hints {
+            foo2: hints {
                 a: "a",
                 b: "b",
                 c: "c",
             },
-            baz.bar.qux: hints {
+            baz2.bar.qux: hints {
                 foo: "foo",
                 bar: "bar",
                 baz: "baz",
@@ -42,17 +53,31 @@ task ok {
 }
 
 task bad {
+    input {
+        String a
+        String b
+        String c
+        String ok
+        String bad
+        String inputs
+    }
+
+    output {
+        String g = "foo"
+        String h = "bar"
+    }
+
     command <<<>>>
 
-    Int a = hints {
+    Int d = hints {
         foo: "bar"
     }
 
-    Int b = input {
+    Int e = input {
         foo: "bar"
     }
 
-    Int c = output {
+    Int f = output {
         foo: "bar"
     }
 
@@ -93,10 +118,10 @@ task bad {
             }
         }
         outputs: output {
-            a: input {
+            g: input {
 
             },
-            b: hints {
+            h: hints {
                 a: input {
 
                 },
@@ -112,4 +137,12 @@ task bad {
             }
         }
     }
+}
+
+struct BazBarQux {
+    BarQux bar
+}
+
+struct BarQux {
+    String qux
 }
