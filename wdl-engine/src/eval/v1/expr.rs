@@ -143,6 +143,11 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
         }
     }
 
+    /// Gets the context associated with the evaluator.
+    pub fn context(&self) -> &C {
+        &self.context
+    }
+
     /// Evaluates the given expression.
     pub fn evaluate_expr<'a>(
         &'a mut self,
@@ -370,25 +375,12 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
                                 );
                             }
                         }
-                        None => {
-                            if v {
-                                buffer.push_str("true");
-                            } else {
-                                buffer.push_str("false");
-                            }
-                        }
+                        None => write!(buffer, "{v}").unwrap(),
                     }
                 }
-                Value::Primitive(PrimitiveValue::File(path))
-                | Value::Primitive(PrimitiveValue::Directory(path)) => {
-                    match evaluator.context.translate_path(&path) {
-                        Some(path) => write!(buffer, "{path}", path = path.display()).unwrap(),
-                        _ => {
-                            write!(buffer, "{path}").unwrap();
-                        }
-                    }
+                Value::Primitive(v) => {
+                    write!(buffer, "{v}", v = v.raw(Some(&evaluator.context))).unwrap()
                 }
-                Value::Primitive(v) => write!(buffer, "{v}", v = v.raw()).unwrap(),
                 Value::Compound(CompoundValue::Array(v))
                     if matches!(placeholder.option(), Some(PlaceholderOption::Sep(_)))
                         && v.as_slice()
@@ -409,7 +401,9 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
 
                         match e {
                             Value::None => {}
-                            Value::Primitive(v) => write!(buffer, "{v}", v = v.raw()).unwrap(),
+                            Value::Primitive(v) => {
+                                write!(buffer, "{v}", v = v.raw(Some(&evaluator.context))).unwrap()
+                            }
                             _ => {
                                 return Err(cannot_coerce_to_string(&v.ty(), expr.span()));
                             }
@@ -1229,15 +1223,24 @@ impl<C: EvaluationContext> ExprEvaluator<C> {
                     && !matches!(right, PrimitiveValue::Boolean(_)) =>
             {
                 Some(
-                    PrimitiveValue::new_string(format!("{left}{right}", right = right.raw()))
-                        .into(),
+                    PrimitiveValue::new_string(format!(
+                        "{left}{right}",
+                        right = right.raw(Some(&self.context))
+                    ))
+                    .into(),
                 )
             }
             (Value::Primitive(left), Value::Primitive(PrimitiveValue::String(right)))
                 if op == NumericOperator::Addition
                     && !matches!(left, PrimitiveValue::Boolean(_)) =>
             {
-                Some(PrimitiveValue::new_string(format!("{left}{right}", left = left.raw())).into())
+                Some(
+                    PrimitiveValue::new_string(format!(
+                        "{left}{right}",
+                        left = left.raw(Some(&self.context))
+                    ))
+                    .into(),
+                )
             }
             (Value::Primitive(PrimitiveValue::String(_)), Value::None)
             | (Value::None, Value::Primitive(PrimitiveValue::String(_)))

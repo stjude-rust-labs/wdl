@@ -13,9 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Fixed
 
+* Fix `sub` replacement of multiple instances (#[426](https://github.com/stjude-rust-labs/wdl/pull/426)).
+* Fix path translation in more expressions (#[422](https://github.com/stjude-rust-labs/wdl/pull/422)).
+* The `sep` placeholder option was not performing guest path translation (#[417](https://github.com/stjude-rust-labs/wdl/pull/417)).
 * Placeholder options are now type checked at runtime ([#345](https://github.com/stjude-rust-labs/wdl/pull/345)).
 * Whether or not a task manager state represents unlimited resources is now correctly calculated ([#397](https://github.com/stjude-rust-labs/wdl/pull/397)).
 * Fixed environment variable values are not using guest paths for Docker backend ([#398](https://github.com/stjude-rust-labs/wdl/pull/398)).
+* Ensure output files created by Docker tasks running as root have correct host user permissions ([#379](https://github.com/stjude-rust-labs/wdl/pull/379)).
 
 ## 0.2.0 - 04-01-2025
 
