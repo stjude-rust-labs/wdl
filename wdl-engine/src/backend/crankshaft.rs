@@ -399,15 +399,16 @@ impl TaskExecutionBackend for CrankshaftBackend {
         Some(Path::new(GUEST_WORK_DIR))
     }
 
-    fn localize_inputs<'a, 'b, 'c>(
+    fn localize_inputs<'a, 'b, 'c, 'd>(
         &'a self,
-        downloader: HttpDownloader,
+        downloader: &'b HttpDownloader,
         inputs: &'c mut [crate::eval::Input],
-    ) -> BoxFuture<'c, Result<()>>
+    ) -> BoxFuture<'d, Result<()>>
     where
-        'a: 'c,
-        'b: 'c,
-        Self: 'c,
+        'a: 'd,
+        'b: 'd,
+        'c: 'd,
+        Self: 'd,
     {
         async move {
             // Construct a trie for mapping input guest paths

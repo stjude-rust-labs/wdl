@@ -270,15 +270,16 @@ impl TaskExecutionBackend for LocalTaskExecutionBackend {
         None
     }
 
-    fn localize_inputs<'a, 'b, 'c>(
+    fn localize_inputs<'a, 'b, 'c, 'd>(
         &'a self,
-        downloader: HttpDownloader,
+        downloader: &'b HttpDownloader,
         inputs: &'c mut [Input],
-    ) -> BoxFuture<'c, Result<()>>
+    ) -> BoxFuture<'d, Result<()>>
     where
-        'a: 'c,
-        'b: 'c,
-        Self: 'c,
+        'a: 'd,
+        'b: 'd,
+        'c: 'd,
+        Self: 'd,
     {
         async move {
             let mut download_futs = JoinSet::new();

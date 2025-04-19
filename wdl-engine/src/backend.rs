@@ -300,16 +300,16 @@ pub trait TaskExecutionBackend: Send + Sync {
     ///
     /// This may involve downloading remote inputs to the host and updating the
     /// input's guest paths.
-    fn localize_inputs<'a, 'b, 'c>(
+    fn localize_inputs<'a, 'b, 'c, 'd>(
         &'a self,
-        downloader: HttpDownloader,
-        inputs: &'b mut [Input],
-    ) -> BoxFuture<'c, Result<()>>
+        downloader: &'b HttpDownloader,
+        inputs: &'c mut [Input],
+    ) -> BoxFuture<'d, Result<()>>
     where
-        'a: 'c,
-        'b: 'c,
-        Self: 'c;
-
+        'a: 'd,
+        'b: 'd,
+        'c: 'd,
+        Self: 'd;
     /// Spawns a task with the execution backend.
     ///
     /// Returns the task execution event receives upon success.
