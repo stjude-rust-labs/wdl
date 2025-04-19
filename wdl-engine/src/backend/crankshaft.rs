@@ -464,11 +464,10 @@ impl TaskExecutionBackend for CrankshaftBackend {
                             .set_location(location);
                     }
                     Ok(Err(e)) => {
-                        download_futs.abort_all();
+                        // futures are aborted when the JoinSet is dropped
                         bail!(e);
                     }
                     Err(e) => {
-                        download_futs.abort_all();
                         bail!("download task failed: {e:?}");
                     }
                 }
