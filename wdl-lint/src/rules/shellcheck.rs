@@ -378,8 +378,8 @@ impl<'a> CommandContext<'a> {
 
 /// Convert a WDL placeholder to a bash variable or literal.
 ///
-/// The boolean returned indicates whether the placeholder was replaced with a literal (true)
-/// or a bash variable (false).
+/// The boolean returned indicates whether the placeholder was replaced with a
+/// literal (true) or a bash variable (false).
 /// If the placeholder is an integer, float, or boolean,
 /// it is replaced with a literal value.
 /// Otherwise, it is replaced with a bash variable.
