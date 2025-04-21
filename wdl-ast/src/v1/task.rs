@@ -828,12 +828,11 @@ impl<N: TreeNode> CommandSection<N> {
         let mut min_leading_tabs = usize::MAX;
         let mut parsing_leading_whitespace = false; // init to false so that the first line is skipped
 
+        let mut leading_spaces = 0;
+        let mut leading_tabs = 0;
         for part in self.parts() {
             match part {
                 CommandPart::Text(text) => {
-                    let mut leading_spaces = 0;
-                    let mut leading_tabs = 0;
-
                     for c in text.text().chars() {
                         match c {
                             ' ' if parsing_leading_whitespace => {
@@ -869,7 +868,20 @@ impl<N: TreeNode> CommandSection<N> {
                     // The last line is intentionally skipped.
                 }
                 CommandPart::Placeholder(_) => {
-                    parsing_leading_whitespace = false;
+                    if parsing_leading_whitespace {
+                        parsing_leading_whitespace = false;
+                        if leading_spaces == 0 && leading_tabs == 0 {
+                            min_leading_spaces = 0;
+                            min_leading_tabs = 0;
+                            continue;
+                        }
+                        if leading_spaces < min_leading_spaces && leading_spaces > 0 {
+                            min_leading_spaces = leading_spaces;
+                        }
+                        if leading_tabs < min_leading_tabs && leading_tabs > 0 {
+                            min_leading_tabs = leading_tabs;
+                        }
+                    }
                 }
             }
         }
@@ -1943,6 +1955,79 @@ then name
             _ => panic!("expected text"),
         };
         assert_eq!(text, "!\"");
+    }
+
+    #[test]
+    fn whitespace_stripping_when_interpolation_starts_line() {
+        let (document, diagnostics) = Document::parse(
+            r#"
+version 1.2
+
+task test {
+    input {
+      Int placeholder
+    }
+
+    command <<<
+            # other weird whitspace
+      ~{placeholder} "$trailing_pholder" ~{placeholder}
+      ~{placeholder} somecommand.py "$leading_pholder"
+    >>>
+}
+"#,
+        );
+
+        assert!(diagnostics.is_empty());
+        let ast = document.ast();
+        let ast = ast.as_v1().expect("should be a V1 AST");
+        let tasks: Vec<_> = ast.tasks().collect();
+        assert_eq!(tasks.len(), 1);
+
+        let command = tasks[0].command().expect("should have a command section");
+
+        let stripped = command.strip_whitespace().unwrap();
+        assert_eq!(stripped.len(), 7);
+        let text = match &stripped[0] {
+            StrippedCommandPart::Text(text) => text,
+            _ => panic!("expected text"),
+        };
+        assert_eq!(text, "      # other weird whitspace\n");
+
+        let _placeholder = match &stripped[1] {
+            StrippedCommandPart::Placeholder(p) => p,
+            _ => panic!("expected placeholder"),
+        };
+        // not testing anything with the placeholder, just making sure it's there
+
+        let text = match &stripped[2] {
+            StrippedCommandPart::Text(text) => text,
+            _ => panic!("expected text"),
+        };
+        assert_eq!(text, " \"$trailing_pholder\" ");
+
+        let _placeholder = match &stripped[3] {
+            StrippedCommandPart::Placeholder(p) => p,
+            _ => panic!("expected placeholder"),
+        };
+        // not testing anything with the placeholder, just making sure it's there
+
+        let text = match &stripped[4] {
+            StrippedCommandPart::Text(text) => text,
+            _ => panic!("expected text"),
+        };
+        assert_eq!(text, "\n");
+
+        let _placeholder = match &stripped[5] {
+            StrippedCommandPart::Placeholder(p) => p,
+            _ => panic!("expected placeholder"),
+        };
+        // not testing anything with the placeholder, just making sure it's there
+
+        let text = match &stripped[6] {
+            StrippedCommandPart::Text(text) => text,
+            _ => panic!("expected text"),
+        };
+        assert_eq!(text, " somecommand.py \"$leading_pholder\"");
     }
 
     #[test]

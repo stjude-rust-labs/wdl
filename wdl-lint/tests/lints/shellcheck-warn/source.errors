@@ -54,26 +54,25 @@ note[ShellCheck]: leading_pholder is referenced but not assigned.
    = fix: address the diagnostic as recommended in the message
 
 note[ShellCheck]: trailing_pholder is referenced but not assigned.
-   ┌─ tests/lints/shellcheck-warn/source.wdl:76:29
+   ┌─ tests/lints/shellcheck-warn/source.wdl:76:23
    │
 76 │       ~{placeholder} "$trailing_pholder" ~{placeholder}
-   │                             ^^^^^^^^^^^^^^^^^
-   │                             │
-   │                             SC2154[warning]: trailing_pholder is referenced but not assigned.
-   │                             more info: https://www.shellcheck.net/wiki/SC2154
+   │                       ^^^^^^^^^^^^^^^^^
+   │                       │
+   │                       SC2154[warning]: trailing_pholder is referenced but not assigned.
+   │                       more info: https://www.shellcheck.net/wiki/SC2154
    │
    = fix: address the diagnostic as recommended in the message
 
 note[ShellCheck]: leading_pholder is referenced but not assigned.
-   ┌─ tests/lints/shellcheck-warn/source.wdl:77:44
-   │    
-77 │           ~{placeholder} somecommand.py "$leading_pholder"
-   │ ╭──────────────────────────────────────────────^
-   │ │ ╭────────────────────────────────────────────'
-78 │ │ │     >>>
-   │ ╰─│────^ SC2154[warning]: leading_pholder is referenced but not assigned.
-   │   ╰────' more info: https://www.shellcheck.net/wiki/SC2154
-   │    
+   ┌─ tests/lints/shellcheck-warn/source.wdl:77:38
+   │
+77 │       ~{placeholder} somecommand.py "$leading_pholder"
+   │                                      ^^^^^^^^^^^^^^^^
+   │                                      │
+   │                                      SC2154[warning]: leading_pholder is referenced but not assigned.
+   │                                      more info: https://www.shellcheck.net/wiki/SC2154
+   │
    = fix: address the diagnostic as recommended in the message
 
 note[ShellCheck]: firstlinelint is referenced but not assigned.

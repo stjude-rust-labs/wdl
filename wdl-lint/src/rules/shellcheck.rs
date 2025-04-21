@@ -376,9 +376,13 @@ impl<'a> CommandContext<'a> {
     }
 }
 
-/// Convert a WDL `Placeholder` to a bash variable declaration.
+/// Convert a WDL placeholder to a bash variable or literal.
 ///
-/// TODO
+/// The boolean returned indicates whether the placeholder was replaced with a literal (true)
+/// or a bash variable (false).
+/// If the placeholder is an integer, float, or boolean,
+/// it is replaced with a literal value.
+/// Otherwise, it is replaced with a bash variable.
 fn to_bash_var(placeholder: &Placeholder, ty: Option<Type>) -> (String, bool) {
     let placeholder_len: usize = placeholder.inner().text_range().len().into();
 
