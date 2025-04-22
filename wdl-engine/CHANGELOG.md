@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed environment variable values are not using guest paths for Docker backend ([#398](https://github.com/stjude-rust-labs/wdl/pull/398)).
 * Ensure output files created by Docker tasks running as root have correct host user permissions ([#379](https://github.com/stjude-rust-labs/wdl/pull/379)).
 
+#### Changed
+
+* Evaluation errors now contain a "backtrace" containing call locations (#[432](https://github.com/stjude-rust-labs/wdl/pull/432)).
+
 ## 0.2.0 - 04-01-2025
 
 #### Added
