@@ -66,7 +66,7 @@ fn find_tests() -> Vec<PathBuf> {
     }
 
     let mut tests: Vec<PathBuf> = Vec::new();
-    for entry in Path::new("tests/workflows").read_dir().unwrap() {
+    for entry in Path::new("tests").join("workflows").read_dir().unwrap() {
         let entry = entry.expect("failed to read directory");
         let path = entry.path();
         if !path.is_dir()
