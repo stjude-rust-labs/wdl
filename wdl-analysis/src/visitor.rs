@@ -579,11 +579,3 @@ pub(crate) fn visit<V: Visitor>(
         }
     }
 }
-
-impl AnalysisDocument {
-    /// Visits the document with a pre-order traversal using the provided
-    /// visitor to visit each element in the document.
-    pub fn visit<V: Visitor>(&self, diagnostics: &mut Diagnostics, visitor: &mut V) {
-        visit(self, diagnostics, visitor)
-    }
-}

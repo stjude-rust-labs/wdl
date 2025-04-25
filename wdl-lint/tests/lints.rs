@@ -147,21 +147,16 @@ async fn main() {
         let source_path = base.join("source.wdl");
         let errors_path = base.join("source.errors");
 
-        // NOTE: clippy appears to be incorrect that this can be modified to use
-        // `filter_map`. Perhaps this should be revisited in the future.
-        #[allow(clippy::filter_map_bool_then)]
         let result = results
             .iter()
-            .filter_map(|r| {
-                let p = r.document().uri().to_file_path().ok()?;
-                if p == source_path {
-                    Some(r.clone())
+            .find_map(|result| {
+                if result.document().uri().to_file_path().unwrap() == source_path {
+                    Some(result.clone())
                 } else {
                     None
                 }
             })
-            .next()
-            .expect("should have a result");
+            .expect("failed to find test result");
         match compare_result(
             &errors_path,
             &format_diagnostics(

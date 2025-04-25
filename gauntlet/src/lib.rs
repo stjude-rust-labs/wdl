@@ -126,10 +126,6 @@ pub struct Args {
     /// Additional information is logged in the console.
     #[arg(short, long)]
     pub verbose: bool,
-
-    /// Enable shellcheck lints.
-    #[arg(long, action, requires = "arena")]
-    pub shellcheck: bool,
 }
 
 /// Normalizes diagnostic message text to handle platform-specific differences.

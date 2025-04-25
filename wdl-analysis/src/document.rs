@@ -765,4 +765,10 @@ impl Document {
 
         false
     }
+
+    /// Visits the document with a pre-order traversal using the provided
+    /// visitor to visit each element in the document.
+    pub fn visit<V: crate::Visitor>(&self, diagnostics: &mut crate::Diagnostics, visitor: &mut V) {
+        crate::visit(self, diagnostics, visitor)
+    }
 }
