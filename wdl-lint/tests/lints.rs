@@ -178,4 +178,20 @@ async fn main() {
             }
         }
     }
+
+    if !errors.is_empty() {
+        eprintln!(
+            "\n{count} test(s) {failed}:",
+            count = errors.len(),
+            failed = "failed".red()
+        );
+
+        for msg in errors.iter() {
+            eprintln!("{msg}", msg = msg.red());
+        }
+
+        std::process::exit(1);
+    }
+
+    println!("\ntest result: ok. {count} passed\n", count = tests.len());
 }

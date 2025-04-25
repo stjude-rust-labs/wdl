@@ -273,7 +273,7 @@ impl TreeNode for SyntaxNode {
 impl SyntaxNodeExt for SyntaxNode {
     fn except_comments(&self) -> impl Iterator<Item = wdl_ast::SyntaxToken> + '_ {
         // For engine evaluation, we don't except comments
-        None.into_iter()
+        std::iter::empty()
     }
 
     fn is_rule_excepted(&self, _: &str) -> bool {
