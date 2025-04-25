@@ -208,7 +208,7 @@ impl Rule for ExpressionSpacingRule {
 
 impl Visitor for ExpressionSpacingRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn expr(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, expr: &Expr) {

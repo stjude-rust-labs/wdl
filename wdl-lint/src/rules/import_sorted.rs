@@ -72,7 +72,7 @@ impl Rule for ImportSortedRule {
 
 impl Visitor for ImportSortedRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn document(

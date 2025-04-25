@@ -81,8 +81,7 @@ impl Diagnostics {
 
 /// Implements an AST validator.
 ///
-/// A validator operates on a set of AST visitors, providing a collection
-/// of diagnostics as the visitation state.
+/// A validator operates on a set of AST visitors.
 ///
 /// See the [validate](Self::validate) method to perform the validation.
 #[allow(missing_debug_implementations)]

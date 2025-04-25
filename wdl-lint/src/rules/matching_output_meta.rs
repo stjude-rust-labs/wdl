@@ -242,7 +242,16 @@ fn handle_meta_outputs_and_reset(
 
 impl Visitor for MatchingOutputMetaRule<'_> {
     fn reset(&mut self) {
-        *self = Self::default();
+        self.current_meta_span = None;
+        self.in_meta = false;
+        self.current_meta_outputs_span = None;
+        self.current_output_span = None;
+        self.in_output = false;
+        self.meta_outputs_keys.clear();
+        self.output_keys.clear();
+        self.name = None;
+        self.ty = None;
+        self.prior_objects.clear();
     }
 
     fn workflow_definition(

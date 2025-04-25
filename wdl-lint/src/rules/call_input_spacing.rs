@@ -91,7 +91,7 @@ impl Rule for CallInputSpacingRule {
 
 impl Visitor for CallInputSpacingRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn call_statement(

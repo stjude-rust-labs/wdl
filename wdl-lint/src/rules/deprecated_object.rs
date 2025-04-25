@@ -70,7 +70,7 @@ impl Rule for DeprecatedObjectRule {
 
 impl Visitor for DeprecatedObjectRule {
     fn reset(&mut self) {
-        // No state to reset.
+        *self = Self;
     }
 
     fn bound_decl(

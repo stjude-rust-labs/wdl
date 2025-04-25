@@ -87,7 +87,7 @@ impl Rule for ImportWhitespaceRule {
 
 impl Visitor for ImportWhitespaceRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn import_statement(

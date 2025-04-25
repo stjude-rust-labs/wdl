@@ -145,7 +145,7 @@ impl Rule for ContainerUriRule {
 
 impl Visitor for ContainerUriRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn runtime_section(

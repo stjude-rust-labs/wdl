@@ -66,7 +66,7 @@ impl Rule for HereDocCommandsRule {
 
 impl Visitor for HereDocCommandsRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn command_section(

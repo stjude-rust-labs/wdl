@@ -70,7 +70,7 @@ impl Rule for DoubleQuotesRule {
 
 impl Visitor for DoubleQuotesRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn expr(&mut self, diagnostics: &mut Diagnostics, reason: VisitReason, expr: &Expr) {

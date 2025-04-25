@@ -110,7 +110,7 @@ impl Rule for CommandSectionIndentationRule {
 
 impl Visitor for CommandSectionIndentationRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn command_section(

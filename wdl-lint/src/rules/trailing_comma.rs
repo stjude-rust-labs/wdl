@@ -85,7 +85,7 @@ impl Rule for TrailingCommaRule {
 
 impl Visitor for TrailingCommaRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn metadata_object(

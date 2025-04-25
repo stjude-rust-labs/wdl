@@ -100,7 +100,7 @@ impl Rule for VersionStatementFormattedRule {
 
 impl Visitor for VersionStatementFormattedRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn version_statement(

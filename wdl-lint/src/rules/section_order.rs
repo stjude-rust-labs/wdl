@@ -129,7 +129,7 @@ enum State {
 
 impl Visitor for SectionOrderingRule {
     fn reset(&mut self) {
-        // No state to reset.
+        *self = Self;
     }
 
     fn task_definition(

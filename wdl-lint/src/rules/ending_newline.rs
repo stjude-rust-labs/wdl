@@ -73,7 +73,7 @@ impl Rule for EndingNewlineRule {
 
 impl Visitor for EndingNewlineRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn document(

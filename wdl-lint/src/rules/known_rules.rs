@@ -81,7 +81,7 @@ impl Rule for KnownRulesRule {
 
 impl Visitor for KnownRulesRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &Comment) {

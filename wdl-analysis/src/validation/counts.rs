@@ -249,7 +249,10 @@ impl CountingVisitor {
 
 impl Visitor for CountingVisitor {
     fn reset(&mut self) {
-        *self = Default::default();
+        self.tasks_seen.clear();
+        self.soft_reset();
+        self.has_workflow = false;
+        self.has_struct = false;
     }
 
     fn document(

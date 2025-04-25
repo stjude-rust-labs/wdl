@@ -151,7 +151,7 @@ pub struct UniqueKeysVisitor(HashSet<TokenText>);
 
 impl Visitor for UniqueKeysVisitor {
     fn reset(&mut self) {
-        *self = Default::default();
+        self.0.clear();
     }
 
     fn requirements_section(

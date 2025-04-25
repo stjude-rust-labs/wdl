@@ -63,7 +63,7 @@ impl Rule for TodoCommentRule {
 
 impl Visitor for TodoCommentRule {
     fn reset(&mut self) {
-        // No state to reset.
+        *self = Self;
     }
 
     fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &Comment) {

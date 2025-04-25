@@ -87,7 +87,7 @@ fn check_name(
 
 impl Visitor for PascalCaseRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn struct_definition(

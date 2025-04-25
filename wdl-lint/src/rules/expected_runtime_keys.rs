@@ -323,7 +323,11 @@ fn recommended_keys<'a, 'k>(
 
 impl Visitor for ExpectedRuntimeKeysRule {
     fn reset(&mut self) {
-        *self = Default::default();
+        self.version = None;
+        self.runtime_span = None;
+        self.runtime_processed_for_task = false;
+        self.encountered_keys.clear();
+        self.non_reserved_keys.clear();
     }
 
     fn document(

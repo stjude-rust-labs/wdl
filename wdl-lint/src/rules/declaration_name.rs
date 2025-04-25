@@ -74,7 +74,7 @@ impl Rule for DeclarationNameRule {
 
 impl Visitor for DeclarationNameRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn bound_decl(&mut self, state: &mut Diagnostics, reason: VisitReason, decl: &BoundDecl) {

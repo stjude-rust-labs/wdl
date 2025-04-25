@@ -82,7 +82,9 @@ pub struct ScopedExprVisitor {
 
 impl Visitor for ScopedExprVisitor {
     fn reset(&mut self) {
-        *self = Default::default();
+        self.version = None;
+        self.in_hints_section = false;
+        self.literals.clear();
     }
 
     fn document(

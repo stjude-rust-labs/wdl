@@ -93,7 +93,7 @@ impl Rule for LintDirectiveValidRule {
 
 impl Visitor for LintDirectiveValidRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn comment(&mut self, diagnostics: &mut Diagnostics, comment: &Comment) {

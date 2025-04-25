@@ -226,7 +226,7 @@ impl Rule for InputSortedRule {
 
 impl Visitor for InputSortedRule {
     fn reset(&mut self) {
-        // No state to reset
+        *self = Self;
     }
 
     fn input_section(
