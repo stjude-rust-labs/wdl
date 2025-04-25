@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Changed
 
-* `util::is_properly_quoted` is now `util::is__quote_balanced` ([#341](https://github.com/stjude-rust-labs/wdl/pull/341)).
+* `util::is_properly_quoted` is now `util::is_quote_balanced` ([#341](https://github.com/stjude-rust-labs/wdl/pull/341)).
 * `ShellCheck` is now based on type analysis and is no longer in "beta" ([#341](https://github.com/stjude-rust-labs/wdl/pull/341)).
 * `ShellCheck` has been made part of the default lint rule set ([#341](https://github.com/stjude-rust-labs/wdl/pull/341)).
     * This removes the `optional_rule()` function.

@@ -56,7 +56,7 @@ pub enum ParseState {
         root: GreenNode,
         /// The line index of the document.
         lines: Arc<LineIndex>,
-        /// The diagnostics.
+        /// The diagnostics from the parse.
         diagnostics: Vec<Diagnostic>,
     },
 }

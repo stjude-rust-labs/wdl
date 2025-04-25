@@ -650,6 +650,10 @@ impl Document {
     }
 
     /// Sorts the diagnostics for the document.
+    ///
+    /// # Panics
+    ///
+    /// Panics if there is more than one reference to the document.
     pub fn sort_diagnostics(&mut self) -> Self {
         let data = &mut self.data;
         let inner = Arc::get_mut(data).expect("should only have one reference");
@@ -658,6 +662,10 @@ impl Document {
     }
 
     /// Extends the diagnostics for the document.
+    ///
+    /// # Panics
+    ///
+    /// Panics if there is more than one reference to the document.
     pub fn extend_diagnostics(&mut self, diagnostics: Vec<Diagnostic>) -> Self {
         let data = &mut self.data;
         let inner = Arc::get_mut(data).expect("should only have one reference");
