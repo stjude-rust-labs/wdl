@@ -6,7 +6,7 @@
 //!
 //! ```rust
 //! use wdl_analysis::analyzer::Analyzer;
-//! 
+//!
 //! let analyzer = Analyzer::default();
 //! // Add a docuement to the analyzer
 //! // analyzer.add_document("file:///path/to/file.wdl").await.unwrap();
