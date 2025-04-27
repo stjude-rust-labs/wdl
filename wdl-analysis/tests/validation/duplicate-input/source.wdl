@@ -14,6 +14,19 @@ task t {
     command <<<>>>
 }
 
+# A duplicate task should trigger a single error and then be ignored.
+task t {
+    input {
+
+    }
+
+    input {
+
+    }
+
+    command <<<>>>
+}
+
 workflow w {
     input {
 

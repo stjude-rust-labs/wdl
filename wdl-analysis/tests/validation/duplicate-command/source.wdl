@@ -6,3 +6,9 @@ task test {
     command <<<>>>
     command <<<>>>
 }
+
+# A duplicate task should trigger a single error and then be ignored.
+task test {
+    command <<<>>>
+    command <<<>>>
+}
