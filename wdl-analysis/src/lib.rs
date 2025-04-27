@@ -1,6 +1,21 @@
 //! Analysis of Workflow Description Language (WDL) documents.
 //!
 //! An analyzer can be used to implement the [Language Server Protocol (LSP)](https://microsoft.github.io/language-server-protocol/).
+//!
+//! # Examples
+//!
+//! ```rust
+//! use wdl_analysis::analyzer::Analyzer;
+//! 
+//! let analyzer = Analyzer::default();
+//! // Add a docuement to the analyzer
+//! // analyzer.add_document("file:///path/to/file.wdl").await.unwrap();
+//! let results = analyzer.analyze(()).await.unwrap();
+//! // Process the results
+//! for result in results {
+//!     // Do something
+//! }
+//! ```
 #![doc = include_str!("../RULES.md")]
 #![warn(missing_docs)]
 #![warn(rust_2018_idioms)]
