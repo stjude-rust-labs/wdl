@@ -4,16 +4,23 @@
 //!
 //! # Examples
 //!
-//! ```rust
-//! use wdl_analysis::analyzer::Analyzer;
+//! ```no_run
+//! use url::Url;
+//! use wdl_analysis::Analyzer;
 //!
-//! let analyzer = Analyzer::default();
-//! // Add a docuement to the analyzer
-//! // analyzer.add_document("file:///path/to/file.wdl").await.unwrap();
-//! let results = analyzer.analyze(()).await.unwrap();
-//! // Process the results
-//! for result in results {
-//!     // Do something
+//! #[tokio::main]
+//! async fn main() {
+//!     let analyzer = Analyzer::default();
+//!     // Add a docuement to the analyzer
+//!     analyzer
+//!         .add_document(Url::parse("file:///path/to/file.wdl").unwrap())
+//!         .await
+//!         .unwrap();
+//!     let results = analyzer.analyze(()).await.unwrap();
+//!     // Process the results
+//!     for result in results {
+//!         // Do something
+//!     }
 //! }
 //! ```
 #![doc = include_str!("../RULES.md")]
