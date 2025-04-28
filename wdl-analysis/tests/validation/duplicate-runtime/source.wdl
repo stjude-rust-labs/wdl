@@ -13,3 +13,16 @@ task t {
 
     command <<<>>>
 }
+
+# A duplicate task should trigger a single error and then be ignored.
+task t {
+    runtime {
+
+    }
+
+    runtime {
+
+    }
+
+    command <<<>>>
+}
