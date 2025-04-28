@@ -3,11 +3,15 @@
 use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::ops::Range;
+use std::panic;
+use std::panic::AssertUnwindSafe;
+use std::panic::Location;
 use std::sync::Arc;
 use std::time::Instant;
 
 use anyhow::Context;
 use anyhow::Result;
+use anyhow::anyhow;
 use futures::Future;
 use futures::StreamExt;
 use futures::stream::FuturesUnordered;
@@ -20,6 +24,7 @@ use tokio::runtime::Handle;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tokio::sync::oneshot;
 use tracing::debug;
+use tracing::error;
 use tracing::info;
 use url::Url;
 use wdl_ast::Ast;
@@ -460,10 +465,37 @@ where
                                 static VALIDATOR: RefCell<Option<crate::Validator>> = const { RefCell::new(None) };
                             }
 
-                            VALIDATOR.with_borrow_mut(|v| {
-                                let validator = v.get_or_insert_with(|| validator());
-                                Self::analyze_node(config, graph, index, validator)
-                            })
+                            let result = panic::catch_unwind(AssertUnwindSafe(|| {
+                                VALIDATOR.with_borrow_mut(|v| {
+                                    let validator = v.get_or_insert_with(|| validator());
+                                    Self::analyze_node(config, graph.clone(), index, validator)
+                                })
+                            }));
+
+                            match result {
+                                Ok((_, document)) => {
+                                    let mut graph = graph.write();
+                                    let node = graph.get_mut(index);
+                                    node.analysis_completed(document);
+                                    (index, Ok(()))
+                                }
+                                Err(payload) => {
+                                    let mut graph = graph.write();
+                                    let uri = graph.get(index).uri().clone();
+                                    let error = Arc::new(anyhow!(
+                                        "analysis panicked for {uri}: {msg}",
+                                        msg = format_panic_payload(&payload)
+                                    ));
+                                    error!(
+                                        "caught panic during analysis of {uri}: {error}",
+                                    );
+
+                                    let node = graph.get_mut(index);
+                                    node.analysis_failed(error.clone());
+
+                                    (index, Err(error))
+                                }
+                            }
                         }))
                     })
                     .collect::<FuturesUnordered<_>>()
@@ -476,11 +508,9 @@ where
                     Cancelable::Canceled => return Cancelable::Canceled,
                 };
 
-            let mut graph = self.graph.write();
-            results.extend(analyzed.into_iter().filter_map(|(index, document)| {
-                let node = graph.get_mut(index);
-                node.analysis_completed(document);
-
+            let graph = self.graph.write();
+            results.extend(analyzed.into_iter().filter_map(|(index, _)| {
+                // the node state was already updated withing Rayon task.
                 if graph.include_result(index) {
                     Some(AnalysisResult::new(graph.get(index)))
                 } else {
@@ -698,5 +728,18 @@ where
         );
 
         (index, document)
+    }
+}
+
+/// Formats the panic payload for display.
+pub(crate) fn format_panic_payload(payload: &Box<dyn std::any::Any + Send>) -> String {
+    if let Some(s) = payload.downcast_ref::<&str>() {
+        s.to_string()
+    } else if let Some(s) = payload.downcast_ref::<String>() {
+        s.clone()
+    } else if let Some(loc) = payload.downcast_ref::<&Location<'static>>() {
+        format!("panic occurred at {}", loc)
+    } else {
+        "unknown panic payload".to_string()
     }
 }
