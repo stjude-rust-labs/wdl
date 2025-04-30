@@ -14,6 +14,7 @@ use crate::VisitReason;
 use crate::Visitor;
 use crate::document::Document;
 
+mod commands;
 mod counts;
 mod env;
 mod exprs;
@@ -139,6 +140,7 @@ impl Default for Validator {
                 Box::<exprs::ScopedExprVisitor>::default(),
                 Box::<imports::ImportsVisitor>::default(),
                 Box::<env::EnvVisitor>::default(),
+                Box::<commands::CommandVisitor>::default(),
             ],
         }
     }

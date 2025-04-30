@@ -8,6 +8,7 @@ be out of sync with released packages.
 
 | Name                    | Description                                                                                               |
 |:------------------------|:----------------------------------------------------------------------------------------------------------|
+| MixedIndentation        | Ensures consistent indentation (no mixed spaces/tabs) within command sections.                            |
 | UnnecessaryFunctionCall | Ensures that function calls are necessary.                                                                |
 | UnusedCall              | Ensures that outputs of a call statement are used in the declaring workflow.                              |
 | UnusedDeclaration       | Ensures that private declarations in tasks or workspaces are used within the declaring task or workspace. |

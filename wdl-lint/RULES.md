@@ -9,8 +9,8 @@ be out of sync with released packages.
 | Name                        | Tags                          | Description                                                                                         |
 | :-------------------------- | :---------------------------- | :-------------------------------------------------------------------------------------------------- |
 | `CallInputSpacing`          | Clarity, Spacing, Style       | Ensures proper spacing for call inputs                                                              |
-| `CommandSectionIndentation` | Clarity, Correctness, Spacing | Ensures consistent indentation (no mixed spaces/tabs) within command sections.                      |
-| `CommentWhitespace`         | Spacing                       | Ensures that comments are properly spaced.                                                          |
+| `DocumentMixedIndentation`  | Clarity, Correctness, Spacing | Ensures consistent indentation (no mixed spaces/tabs) throughout the document, excluding command sections. |
+| `CommentWhitespace`         | Clarity, Spacing, Style       | Ensures that comments are properly spaced.                                                          |
 | `ConciseInput`              | Style                         | Ensures concise input assignments are used (implicit binding when available).                       |
 | `ConsistentNewlines`        | Clarity, Style                | Ensures that `\n` or `\r\n` newlines are used consistently within the file.                         |
 | `ContainerUri`              | Clarity, Portability          | Ensures that the value for the `container` key in `runtime`/`requirements` sections is well-formed. |

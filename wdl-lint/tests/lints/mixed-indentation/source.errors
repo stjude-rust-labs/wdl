@@ -1,0 +1,149 @@
+note[PreambleFormatted]: preamble comments must start with `##` and have at least one space between the `##` and the comment text
+  ┌─ tests/lints/mixed-indentation/source.wdl:1:1
+  │
+1 │ # This is a test for mixed indentation in the document.
+  │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │
+  = fix: either move this comment out of the preamble or change it to a preamble comment (i.e. a comment that starts with `##`)
+
+note[MetaSections]: workflow `test_workflow` is missing both `meta` and `parameter_meta` sections
+  ┌─ tests/lints/mixed-indentation/source.wdl:5:10
+  │
+5 │ workflow test_workflow {
+  │          ^^^^^^^^^^^^^ this workflow is missing both `meta` and `parameter_meta` sections
+  │
+  = fix: add both the `meta` and `parameter_meta` sections
+
+note[Whitespace]: line contains only whitespace
+  ┌─ tests/lints/mixed-indentation/source.wdl:9:1
+  │
+9 │     
+  │ ^^^^
+  │
+  = fix: remove the whitespace
+
+note[DocumentMixedIndentation]: mixed indentation in document
+  ┌─ tests/lints/mixed-indentation/source.wdl:9:1
+  │
+9 │     
+  │ ^^^^ indented with spaces until this tab
+  │
+  = fix: convert all tab indentation to spaces throughout the document
+
+note[CommentWhitespace]: comment not sufficiently indented
+   ┌─ tests/lints/mixed-indentation/source.wdl:10:2
+   │
+10 │     # This line is indented with tabs
+   │     ^
+   │
+   = fix: this comment has 0 levels of indentation. It should have 1 levels of indentation.
+
+note[Whitespace]: line contains only whitespace
+   ┌─ tests/lints/mixed-indentation/source.wdl:11:1
+   │
+11 │     
+   │ ^^^^
+   │
+   = fix: remove the whitespace
+
+note[CallInputSpacing]: call input not properly spaced
+   ┌─ tests/lints/mixed-indentation/source.wdl:12:21
+   │  
+12 │       call echo_task {
+   │ ╭────────────────────^
+13 │ │         input:
+   │ ╰────────^
+   │  
+   = fix: change this whitespace to a single space
+
+note[ConciseInput]: redundant input assignment
+   ┌─ tests/lints/mixed-indentation/source.wdl:14:13
+   │
+14 │             message = message
+   │             ^^^^^^^^^^^^^^^^^
+   │
+   = fix: can be shortened to `message`
+
+note[Whitespace]: line contains only whitespace
+   ┌─ tests/lints/mixed-indentation/source.wdl:16:1
+   │
+16 │     
+   │ ^^^^
+   │
+   = fix: remove the whitespace
+
+note[CommentWhitespace]: comment not sufficiently indented
+   ┌─ tests/lints/mixed-indentation/source.wdl:17:2
+   │
+17 │     # Another line with tab indentation
+   │     ^
+   │
+   = fix: this comment has 0 levels of indentation. It should have 1 levels of indentation.
+
+note[Whitespace]: line contains only whitespace
+   ┌─ tests/lints/mixed-indentation/source.wdl:18:1
+   │
+18 │     
+   │ ^^^^
+   │
+   = fix: remove the whitespace
+
+warning[RuntimeSection]: task `echo_task` is missing a `runtime` section
+   ┌─ tests/lints/mixed-indentation/source.wdl:24:6
+   │
+24 │ task echo_task {
+   │      ^^^^^^^^^ this task is missing a `runtime` section
+   │
+   = fix: add a `runtime` section
+
+note[MetaSections]: task `echo_task` is missing both `meta` and `parameter_meta` sections
+   ┌─ tests/lints/mixed-indentation/source.wdl:24:6
+   │
+24 │ task echo_task {
+   │      ^^^^^^^^^ this task is missing both `meta` and `parameter_meta` sections
+   │
+   = fix: add both the `meta` and `parameter_meta` sections
+
+note[Whitespace]: line contains only whitespace
+   ┌─ tests/lints/mixed-indentation/source.wdl:28:1
+   │
+28 │     
+   │ ^^^^
+   │
+   = fix: remove the whitespace
+
+note[ShellCheck]: message is referenced but not assigned.
+   ┌─ tests/lints/mixed-indentation/source.wdl:30:15
+   │
+30 │         echo "${message}"
+   │               ^^^^^^^^^^
+   │               │
+   │               SC2154[warning]: message is referenced but not assigned.
+   │               more info: https://www.shellcheck.net/wiki/SC2154
+   │
+   = fix: address the diagnostic as recommended in the message
+
+note[Whitespace]: line contains only whitespace
+   ┌─ tests/lints/mixed-indentation/source.wdl:32:1
+   │
+32 │     
+   │ ^^^^
+   │
+   = fix: remove the whitespace
+
+note[Whitespace]: line contains trailing whitespace
+   ┌─ tests/lints/mixed-indentation/source.wdl:36:2
+   │
+36 │ } 
+   │  ^
+   │
+   = fix: remove the trailing whitespace
+
+note[EndingNewline]: missing newline at the end of the file
+   ┌─ tests/lints/mixed-indentation/source.wdl:36:2
+   │
+36 │ } 
+   │  ^ expected a newline to follow this
+   │
+   = fix: add a newline at the end of the file
+

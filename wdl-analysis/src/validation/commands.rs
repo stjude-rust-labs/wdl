@@ -1,27 +1,21 @@
-//! A lint rule for checking mixed indentation in command text.
+//! Validation for command sections.
 
 use std::fmt;
 
 use rowan::ast::support;
-use wdl_analysis::Diagnostics;
-use wdl_analysis::VisitReason;
-use wdl_analysis::Visitor;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
 use wdl_ast::Span;
-use wdl_ast::SyntaxElement;
 use wdl_ast::SyntaxKind;
 use wdl_ast::v1::CommandPart;
 use wdl_ast::v1::CommandSection;
 
-use crate::Rule;
-use crate::Tag;
-use crate::TagSet;
+use crate::Diagnostics;
+use crate::MIXED_INDENTATION_RULE_ID;
+use crate::VisitReason;
+use crate::Visitor;
 use crate::util::lines_with_offset;
-
-/// The identifier for the command section mixed indentation rule.
-const ID: &str = "CommandSectionIndentation";
 
 /// Represents the indentation kind.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -54,7 +48,7 @@ impl From<u8> for IndentationKind {
 /// Creates a "mixed indentation" diagnostic.
 fn mixed_indentation(command: Span, span: Span, kind: IndentationKind) -> Diagnostic {
     Diagnostic::warning("mixed indentation within a command")
-        .with_rule(ID)
+        .with_rule(MIXED_INDENTATION_RULE_ID)
         .with_label(
             format!(
                 "indented with {kind} until this {anti}",
@@ -74,55 +68,15 @@ fn mixed_indentation(command: Span, span: Span, kind: IndentationKind) -> Diagno
 
 /// Detects mixed indentation in a command section.
 #[derive(Default, Debug, Clone, Copy)]
-pub struct CommandSectionIndentationRule;
+pub struct CommandVisitor;
 
-impl Rule for CommandSectionIndentationRule {
-    fn id(&self) -> &'static str {
-        ID
-    }
-
-    fn description(&self) -> &'static str {
-        "Ensures consistent indentation (no mixed spaces/tabs) within command sections."
-    }
-
-    fn explanation(&self) -> &'static str {
-        "Mixing indentation (tab and space) characters within the command line causes leading \
-         whitespace stripping to be skipped. Commands may be whitespace sensitive, and skipping \
-         the whitespace stripping step may cause unexpected behavior."
-    }
-
-    fn tags(&self) -> TagSet {
-        TagSet::new(&[Tag::Correctness, Tag::Spacing, Tag::Clarity])
-    }
-
-    fn exceptable_nodes(&self) -> Option<&'static [SyntaxKind]> {
-        Some(&[
-            SyntaxKind::VersionStatementNode,
-            SyntaxKind::TaskDefinitionNode,
-            SyntaxKind::CommandSectionNode,
-        ])
-    }
-
-    fn related_rules(&self) -> &[&'static str] {
-        &[]
-    }
-}
-
-impl Visitor for CommandSectionIndentationRule {
-    fn reset(&mut self) {
-        *self = Self;
-    }
-
-    fn command_section(
-        &mut self,
+impl CommandVisitor {
+    /// Check command section for mixed indentation
+    pub fn check_command_indentation(
+        &self,
         diagnostics: &mut Diagnostics,
-        reason: VisitReason,
         section: &CommandSection,
     ) {
-        if reason == VisitReason::Exit {
-            return;
-        }
-
         let mut kind = None;
         let mut mixed_span = None;
         let mut skip_next_line = false;
@@ -168,15 +122,30 @@ impl Visitor for CommandSectionIndentationRule {
             let command_keyword = support::token(section.inner(), SyntaxKind::CommandKeyword)
                 .expect("should have a command keyword token");
 
-            diagnostics.exceptable_add(
-                mixed_indentation(
-                    command_keyword.text_range().into(),
-                    span,
-                    kind.expect("an indentation kind should be present"),
-                ),
-                SyntaxElement::from(section.inner().clone()),
-                &self.exceptable_nodes(),
-            );
+            diagnostics.add(mixed_indentation(
+                command_keyword.text_range().into(),
+                span,
+                kind.expect("an indentation kind should be present"),
+            ));
         }
+    }
+}
+
+impl Visitor for CommandVisitor {
+    fn reset(&mut self) {
+        *self = Self;
+    }
+
+    fn command_section(
+        &mut self,
+        diagnostics: &mut Diagnostics,
+        reason: VisitReason,
+        section: &CommandSection,
+    ) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+
+        self.check_command_indentation(diagnostics, section);
     }
 }

@@ -30,6 +30,14 @@ note[Whitespace]: line contains only whitespace
    │
    = fix: remove the whitespace
 
+note[DocumentMixedIndentation]: mixed indentation in document
+   ┌─ tests/lints/only-whitespace/source.wdl:10:1
+   │
+10 │     
+   │ ^^^^ indented with spaces until this tab
+   │
+   = fix: convert all tab indentation to spaces throughout the document
+
 note[Whitespace]: more than one blank line in a row
    ┌─ tests/lints/only-whitespace/source.wdl:11:45
    │  

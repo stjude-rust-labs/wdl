@@ -1,0 +1,8 @@
+note[DocumentMixedIndentation]: mixed indentation in document
+   ┌─ tests/lints/command-mixed-ws-ok/source.wdl:15:1
+   │
+15 │             if true
+   │ ^^^^ indented with spaces until this tab
+   │
+   = fix: convert all tab indentation to spaces throughout the document
+

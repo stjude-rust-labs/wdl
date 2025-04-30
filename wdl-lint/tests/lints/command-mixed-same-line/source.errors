@@ -1,4 +1,12 @@
-warning[CommandSectionIndentation]: mixed indentation within a command
+note[DocumentMixedIndentation]: mixed indentation in document
+   ┌─ tests/lints/command-mixed-same-line/source.wdl:13:1
+   │
+13 │             this line starts with tabs and ends with spaces
+   │ ^^^^ indented with spaces until this tab
+   │
+   = fix: convert all tab indentation to spaces throughout the document
+
+warning[MixedIndentation]: mixed indentation within a command
    ┌─ tests/lints/command-mixed-same-line/source.wdl:13:3
    │
 12 │     command <<<
@@ -8,7 +16,7 @@ warning[CommandSectionIndentation]: mixed indentation within a command
    │
    = fix: use either tabs or spaces exclusively for indentation
 
-warning[CommandSectionIndentation]: mixed indentation within a command
+warning[MixedIndentation]: mixed indentation within a command
    ┌─ tests/lints/command-mixed-same-line/source.wdl:28:5
    │
 27 │     command {

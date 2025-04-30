@@ -41,6 +41,7 @@ mod rayon;
 mod rules;
 pub mod stdlib;
 pub mod types;
+mod util;
 mod validation;
 mod visitor;
 
@@ -48,6 +49,7 @@ use std::collections::HashSet;
 
 pub use analyzer::*;
 pub use rules::*;
+pub use util::*;
 pub use validation::*;
 pub use visitor::*;
 use wdl_ast::Direction;

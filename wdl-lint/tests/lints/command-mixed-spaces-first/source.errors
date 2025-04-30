@@ -1,4 +1,12 @@
-warning[CommandSectionIndentation]: mixed indentation within a command
+note[DocumentMixedIndentation]: mixed indentation in document
+   ┌─ tests/lints/command-mixed-spaces-first/source.wdl:14:1
+   │
+14 │         this line is prefixed with ~{"tabs"}
+   │ ^^^^ indented with spaces until this tab
+   │
+   = fix: convert all tab indentation to spaces throughout the document
+
+warning[MixedIndentation]: mixed indentation within a command
    ┌─ tests/lints/command-mixed-spaces-first/source.wdl:14:1
    │
 12 │     command <<<
@@ -9,7 +17,7 @@ warning[CommandSectionIndentation]: mixed indentation within a command
    │
    = fix: use either tabs or spaces exclusively for indentation
 
-warning[CommandSectionIndentation]: mixed indentation within a command
+warning[MixedIndentation]: mixed indentation within a command
    ┌─ tests/lints/command-mixed-spaces-first/source.wdl:30:1
    │
 28 │     command {

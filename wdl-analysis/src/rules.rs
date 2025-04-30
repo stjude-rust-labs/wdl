@@ -2,6 +2,9 @@
 
 use wdl_ast::Severity;
 
+/// The rule identifier for command mixed indentation warnings.
+pub const MIXED_INDENTATION_RULE_ID: &str = "MixedIndentation";
+
 /// The rule identifier for unused import warnings.
 pub const UNUSED_IMPORT_RULE_ID: &str = "UnusedImport";
 
@@ -43,6 +46,7 @@ pub trait Rule: Send + Sync {
 /// Gets the list of all analysis rules.
 pub fn rules() -> Vec<Box<dyn Rule>> {
     let rules: Vec<Box<dyn Rule>> = vec![
+        Box::<MixedIndentationRule>::default(),
         Box::<UnusedImportRule>::default(),
         Box::<UnusedInputRule>::default(),
         Box::<UnusedDeclarationRule>::default(),
@@ -68,6 +72,47 @@ pub fn rules() -> Vec<Box<dyn Rule>> {
     }
 
     rules
+}
+
+/// Represents the command mixed indentation rule.
+#[derive(Debug, Clone, Copy)]
+pub struct MixedIndentationRule(Severity);
+
+impl MixedIndentationRule {
+    /// Creates a new command mixed indentation rule.
+    pub fn new() -> Self {
+        Self(Severity::Warning)
+    }
+}
+
+impl Default for MixedIndentationRule {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Rule for MixedIndentationRule {
+    fn id(&self) -> &'static str {
+        MIXED_INDENTATION_RULE_ID
+    }
+
+    fn description(&self) -> &'static str {
+        "Ensures consistent indentation (no mixed spaces/tabs) within command sections."
+    }
+
+    fn explanation(&self) -> &'static str {
+        "Mixing indentation (tab and space) characters within the command line causes leading \
+         whitespace stripping to be skipped. Commands may be whitespace sensitive, and skipping \
+         the whitespace stripping step may cause unexpected behavior."
+    }
+
+    fn deny(&mut self) {
+        self.0 = Severity::Error;
+    }
+
+    fn severity(&self) -> Severity {
+        self.0
+    }
 }
 
 /// Represents the unused import rule.

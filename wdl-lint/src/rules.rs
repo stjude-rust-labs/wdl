@@ -1,7 +1,6 @@
 //! Module for the lint rules.
 
 mod call_input_spacing;
-mod command_section_indentation;
 mod comment_whitespace;
 mod concise_input;
 mod consistent_newlines;
@@ -28,6 +27,7 @@ mod matching_output_meta;
 mod meta_decscription;
 mod meta_key_value_formatting;
 mod meta_sections;
+mod mixed_indentation;
 mod output_name;
 mod output_section;
 mod parameter_meta_matched;
@@ -45,7 +45,6 @@ mod version_statement_formatted;
 mod whitespace;
 
 pub use call_input_spacing::*;
-pub use command_section_indentation::*;
 pub use comment_whitespace::*;
 pub use concise_input::*;
 pub use consistent_newlines::*;
@@ -72,6 +71,7 @@ pub use matching_output_meta::*;
 pub use meta_decscription::*;
 pub use meta_key_value_formatting::*;
 pub use meta_sections::*;
+pub use mixed_indentation::*;
 pub use output_name::*;
 pub use output_section::*;
 pub use parameter_meta_matched::*;

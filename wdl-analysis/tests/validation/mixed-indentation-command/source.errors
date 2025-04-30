@@ -1,0 +1,11 @@
+warning[MixedIndentation]: mixed indentation within a command
+  ┌─ tests/validation/mixed-indentation-command/source.wdl:9:1
+  │
+6 │     command <<<
+  │     ------- this command section uses both tabs and spaces in leading whitespace
+  ·
+9 │         echo "This line has mixed indentation"
+  │ ^^^^ indented with spaces until this tab
+  │
+  = fix: use either tabs or spaces exclusively for indentation
+
