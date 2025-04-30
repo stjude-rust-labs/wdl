@@ -1977,6 +1977,11 @@ message = "CreateIGVSession.wdl:53:60: error: type mismatch for placeholder opti
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/WDLs/CreateIGVSession.wdl/#L53"
 
 [[diagnostics]]
+document = "broadinstitute/palantir-workflows:/Utilities/WDLs/Dipcall.wdl"
+message = "Dipcall.wdl:147:1: warning[MixedIndentation]: mixed indentation within a command"
+permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/WDLs/Dipcall.wdl/#L147"
+
+[[diagnostics]]
 document = "broadinstitute/palantir-workflows:/Utilities/WDLs/DownsampleAndCollectCoverage.wdl"
 message = "DownsampleAndCollectCoverage.wdl:173:91: error: type mismatch: expected type `Float?`, but found type `String?`"
 permalink = "https://github.com/broadinstitute/palantir-workflows/blob/b450ca0b7d9a35945618235de4a2a64f34de880d/Utilities/WDLs/DownsampleAndCollectCoverage.wdl/#L173"
@@ -3873,8 +3878,23 @@ permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6a
 
 [[diagnostics]]
 document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
+message = "run.wdl:347:1: warning[MixedIndentation]: mixed indentation within a command"
+permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L347"
+
+[[diagnostics]]
+document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
 message = "run.wdl:440:16: warning[UnusedInput]: unused input `prefix`"
 permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L440"
+
+[[diagnostics]]
+document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
+message = "run.wdl:449:1: warning[MixedIndentation]: mixed indentation within a command"
+permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L449"
+
+[[diagnostics]]
+document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
+message = "run.wdl:494:1: warning[MixedIndentation]: mixed indentation within a command"
+permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L494"
 
 [[diagnostics]]
 document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
@@ -3888,13 +3908,43 @@ permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6a
 
 [[diagnostics]]
 document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
+message = "run.wdl:598:1: warning[MixedIndentation]: mixed indentation within a command"
+permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L598"
+
+[[diagnostics]]
+document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
+message = "run.wdl:634:1: warning[MixedIndentation]: mixed indentation within a command"
+permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L634"
+
+[[diagnostics]]
+document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
 message = "run.wdl:69:33: error: type mismatch: expected type `String`, but found type `Boolean`"
 permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L69"
 
 [[diagnostics]]
 document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
+message = "run.wdl:705:1: warning[MixedIndentation]: mixed indentation within a command"
+permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L705"
+
+[[diagnostics]]
+document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
+message = "run.wdl:745:1: warning[MixedIndentation]: mixed indentation within a command"
+permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L745"
+
+[[diagnostics]]
+document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
+message = "run.wdl:778:1: warning[MixedIndentation]: mixed indentation within a command"
+permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L778"
+
+[[diagnostics]]
+document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
 message = "run.wdl:794:16: warning[UnusedInput]: unused input `prefix`"
 permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L794"
+
+[[diagnostics]]
+document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
+message = "run.wdl:807:1: warning[MixedIndentation]: mixed indentation within a command"
+permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L807"
 
 [[diagnostics]]
 document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
@@ -3915,6 +3965,11 @@ permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6a
 document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
 message = "run.wdl:877:13: warning[UnusedInput]: unused input `threads`"
 permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L877"
+
+[[diagnostics]]
+document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
+message = "run.wdl:913:1: warning[MixedIndentation]: mixed indentation within a command"
+permalink = "https://github.com/chanzuckerberg/czid-workflows/blob/8d57beab9fd6ab640826af0fdc6bff9b22d95163/workflows/consensus-genome/run.wdl/#L913"
 
 [[diagnostics]]
 document = "chanzuckerberg/czid-workflows:/workflows/consensus-genome/run.wdl"
