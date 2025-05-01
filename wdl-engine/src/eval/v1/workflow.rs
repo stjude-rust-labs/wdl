@@ -85,7 +85,10 @@ use crate::path::EvaluationPath;
 use crate::tree::SyntaxNode;
 use crate::tree::SyntaxToken;
 use crate::v1::ExprEvaluator;
+use crate::v1::INPUTS_FILE;
+use crate::v1::OUTPUTS_FILE;
 use crate::v1::TaskEvaluator;
+use crate::v1::write_json_file;
 
 /// Helper for formatting a workflow or task identifier for a call statement.
 fn format_id(namespace: Option<&str>, target: &str, alias: &str, scatter_index: &str) -> String {
@@ -776,6 +779,9 @@ impl WorkflowEvaluator {
             )
         })?;
 
+        // Write the inputs to the workflow's root directory
+        write_json_file(root_dir.join(INPUTS_FILE), &inputs)?;
+
         let calls_dir = root_dir.join("calls");
         fs::create_dir_all(&calls_dir).with_context(|| {
             format!(
@@ -827,6 +833,9 @@ impl WorkflowEvaluator {
                 .collect();
             outputs.sort_by(move |a, b| indexes[a].cmp(&indexes[b]))
         }
+
+        // Write the outputs to the workflow's root directory
+        write_json_file(root_dir.join(OUTPUTS_FILE), &outputs)?;
         Ok(outputs)
     }
 

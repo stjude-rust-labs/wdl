@@ -10,6 +10,7 @@ use anyhow::Context;
 use anyhow::Result;
 use anyhow::bail;
 use indexmap::IndexMap;
+use serde::Serialize;
 use serde_json::Value as JsonValue;
 use serde_yaml_ng::Value as YamlValue;
 use wdl_analysis::document::Document;
@@ -299,6 +300,16 @@ where
             requirements: Default::default(),
             hints: Default::default(),
         }
+    }
+}
+
+impl Serialize for TaskInputs {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        // Only serialize the input values
+        self.inputs.serialize(serializer)
     }
 }
 
@@ -607,6 +618,17 @@ where
                 .collect(),
             calls: Default::default(),
         }
+    }
+}
+
+impl Serialize for WorkflowInputs {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        // Note: for serializing, only serialize the direct inputs, not the nested
+        // inputs
+        self.inputs.serialize(serializer)
     }
 }
 
