@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Changed
 
-* Refactored `crankshaft` backend to the `docker` backend ()
+* Refactored `crankshaft` backend to the `docker` backend ([#436](https://github.com/stjude-rust-labs/wdl/pull/436)).
 * Evaluation errors now contain a "backtrace" containing call locations ([#432](https://github.com/stjude-rust-labs/wdl/pull/432)).
 * Changed origin path resolution in inputs to accommodate incremental command line parsing ([#430](https://github.com/stjude-rust-labs/wdl/pull/430)).
 
