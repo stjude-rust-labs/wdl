@@ -30,7 +30,7 @@ use crate::Value;
 /// Helper for replacing input paths with a path derived from joining the
 /// specified path with the input path.
 fn join_paths<'a>(
-    inputs: &mut HashMap<String, Value>,
+    inputs: &mut IndexMap<String, Value>,
     path: impl Fn(&str) -> Result<&'a Path>,
     ty: impl Fn(&str) -> Option<Type>,
 ) -> Result<()> {
@@ -68,7 +68,7 @@ fn join_paths<'a>(
 #[derive(Default, Debug, Clone)]
 pub struct TaskInputs {
     /// The task input values.
-    inputs: HashMap<String, Value>,
+    inputs: IndexMap<String, Value>,
     /// The overridden requirements section values.
     requirements: HashMap<String, Value>,
     /// The overridden hints section values.
@@ -317,7 +317,7 @@ impl Serialize for TaskInputs {
 #[derive(Default, Debug, Clone)]
 pub struct WorkflowInputs {
     /// The workflow input values.
-    inputs: HashMap<String, Value>,
+    inputs: IndexMap<String, Value>,
     /// The nested call inputs.
     calls: HashMap<String, Inputs>,
 }
