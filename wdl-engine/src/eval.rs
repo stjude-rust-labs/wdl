@@ -865,22 +865,40 @@ mod test {
     fn non_empty_trie_windows() {
         let mut trie = InputTrie::default();
         let inputs = [
-            Input::new("C:\\".parse().unwrap()),
-            Input::new("C:\\foo\\bar\\foo.txt".parse().unwrap()),
-            Input::new("C:\\foo\\bar\\bar.txt".parse().unwrap()),
-            Input::new("C:\\foo\\baz\\foo.txt".parse().unwrap()),
-            Input::new("C:\\foo\\baz\\bar.txt".parse().unwrap()),
-            Input::new("C:\\bar\\foo\\foo.txt".parse().unwrap()),
-            Input::new("C:\\bar\\foo\\bar.txt".parse().unwrap()),
-            Input::new("C:\\baz".parse().unwrap()),
-            Input::new("https://example.com/".parse().unwrap()),
-            Input::new("https://example.com/foo/bar/foo.txt".parse().unwrap()),
-            Input::new("https://example.com/foo/bar/bar.txt".parse().unwrap()),
-            Input::new("https://example.com/foo/baz/foo.txt".parse().unwrap()),
-            Input::new("https://example.com/foo/baz/bar.txt".parse().unwrap()),
-            Input::new("https://example.com/bar/foo/foo.txt".parse().unwrap()),
-            Input::new("https://example.com/bar/foo/bar.txt".parse().unwrap()),
-            Input::new("https://foo.com/bar".parse().unwrap()),
+            Input::new(InputKind::Directory, "C:\\".parse().unwrap()),
+            Input::new(InputKind::File, "C:\\foo\\bar\\foo.txt".parse().unwrap()),
+            Input::new(InputKind::File, "C:\\foo\\bar\\bar.txt".parse().unwrap()),
+            Input::new(InputKind::File, "C:\\foo\\baz\\foo.txt".parse().unwrap()),
+            Input::new(InputKind::File, "C:\\foo\\baz\\bar.txt".parse().unwrap()),
+            Input::new(InputKind::File, "C:\\bar\\foo\\foo.txt".parse().unwrap()),
+            Input::new(InputKind::File, "C:\\bar\\foo\\bar.txt".parse().unwrap()),
+            Input::new(InputKind::Directory, "C:\\baz".parse().unwrap()),
+            Input::new(InputKind::File, "https://example.com/".parse().unwrap()),
+            Input::new(
+                InputKind::File,
+                "https://example.com/foo/bar/foo.txt".parse().unwrap(),
+            ),
+            Input::new(
+                InputKind::File,
+                "https://example.com/foo/bar/bar.txt".parse().unwrap(),
+            ),
+            Input::new(
+                InputKind::File,
+                "https://example.com/foo/baz/foo.txt".parse().unwrap(),
+            ),
+            Input::new(
+                InputKind::File,
+                "https://example.com/foo/baz/bar.txt".parse().unwrap(),
+            ),
+            Input::new(
+                InputKind::File,
+                "https://example.com/bar/foo/foo.txt".parse().unwrap(),
+            ),
+            Input::new(
+                InputKind::File,
+                "https://example.com/bar/foo/bar.txt".parse().unwrap(),
+            ),
+            Input::new(InputKind::File, "https://foo.com/bar".parse().unwrap()),
         ];
 
         for input in &inputs {
