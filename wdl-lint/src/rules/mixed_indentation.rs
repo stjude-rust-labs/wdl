@@ -186,14 +186,4 @@ impl Visitor for MixedIndentationRule {
             diagnostics.add(mixed_indentation(span, first_style.unwrap()));
         }
     }
-
-    // Skip command sections as they are handled by wdl-analysis CommandVisitor
-    fn command_section(
-        &mut self,
-        _diagnostics: &mut Diagnostics,
-        _reason: VisitReason,
-        _section: &wdl_ast::v1::CommandSection,
-    ) {
-        // Skip command sections as they are handled by wdl-analysis
-    }
 }
