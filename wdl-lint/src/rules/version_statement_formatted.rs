@@ -3,6 +3,7 @@
 use wdl_analysis::Diagnostics;
 use wdl_analysis::VisitReason;
 use wdl_analysis::Visitor;
+use wdl_analysis::lines_with_offset;
 use wdl_ast::AstNode;
 use wdl_ast::AstToken;
 use wdl_ast::Diagnostic;
@@ -14,7 +15,6 @@ use wdl_ast::Whitespace;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
-use crate::util::lines_with_offset;
 
 /// The ID of the rule.
 const ID: &str = "VersionStatementFormatted";

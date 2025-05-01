@@ -30,7 +30,7 @@ note[Whitespace]: line contains only whitespace
    │
    = fix: remove the whitespace
 
-note[DocumentMixedIndentation]: mixed indentation in document
+note[MixedIndentation]: mixed indentation in document
    ┌─ tests/lints/only-whitespace/source.wdl:10:1
    │
 10 │     

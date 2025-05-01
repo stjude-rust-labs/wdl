@@ -1,4 +1,4 @@
-note[DocumentMixedIndentation]: mixed indentation in document
+note[MixedIndentation]: mixed indentation in document
    ┌─ tests/lints/command-mixed-same-line/source.wdl:13:1
    │
 13 │             this line starts with tabs and ends with spaces

@@ -35,7 +35,10 @@ pub(crate) mod util;
 pub use linter::*;
 pub use tags::*;
 pub use util::find_nearest_rule;
+pub use util::is_quote_balanced;
+pub use util::program_exists;
 pub use wdl_analysis as analysis;
+pub use wdl_analysis::lines_with_offset;
 pub use wdl_ast as ast;
 
 /// The definitions of WDL concepts and terminology used in the linting rules.

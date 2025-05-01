@@ -3,6 +3,7 @@
 use wdl_analysis::Diagnostics;
 use wdl_analysis::VisitReason;
 use wdl_analysis::Visitor;
+use wdl_analysis::lines_with_offset;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Span;
@@ -13,7 +14,6 @@ use wdl_ast::v1::ImportStatement;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
-use crate::util::lines_with_offset;
 
 /// The identifier for the import whitespace rule.
 const ID: &str = "ImportWhitespace";

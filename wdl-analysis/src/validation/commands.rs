@@ -12,10 +12,10 @@ use wdl_ast::v1::CommandPart;
 use wdl_ast::v1::CommandSection;
 
 use crate::Diagnostics;
-use crate::MIXED_INDENTATION_RULE_ID;
+use crate::COMMAND_MIXED_INDENTATION_RULE_ID;
 use crate::VisitReason;
 use crate::Visitor;
-use crate::util::lines_with_offset;
+use crate::lines_with_offset;
 
 /// Represents the indentation kind.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -48,7 +48,7 @@ impl From<u8> for IndentationKind {
 /// Creates a "mixed indentation" diagnostic.
 fn mixed_indentation(command: Span, span: Span, kind: IndentationKind) -> Diagnostic {
     Diagnostic::warning("mixed indentation within a command")
-        .with_rule(MIXED_INDENTATION_RULE_ID)
+        .with_rule(COMMAND_MIXED_INDENTATION_RULE_ID)
         .with_label(
             format!(
                 "indented with {kind} until this {anti}",
@@ -70,13 +70,21 @@ fn mixed_indentation(command: Span, span: Span, kind: IndentationKind) -> Diagno
 #[derive(Default, Debug, Clone, Copy)]
 pub struct CommandVisitor;
 
-impl CommandVisitor {
-    /// Check command section for mixed indentation
-    pub fn check_command_indentation(
-        &self,
+impl Visitor for CommandVisitor {
+    fn reset(&mut self) {
+        *self = Self;
+    }
+
+    fn command_section(
+        &mut self,
         diagnostics: &mut Diagnostics,
+        reason: VisitReason,
         section: &CommandSection,
     ) {
+        if reason == VisitReason::Exit {
+            return;
+        }
+
         let mut kind = None;
         let mut mixed_span = None;
         let mut skip_next_line = false;
@@ -128,24 +136,5 @@ impl CommandVisitor {
                 kind.expect("an indentation kind should be present"),
             ));
         }
-    }
-}
-
-impl Visitor for CommandVisitor {
-    fn reset(&mut self) {
-        *self = Self;
-    }
-
-    fn command_section(
-        &mut self,
-        diagnostics: &mut Diagnostics,
-        reason: VisitReason,
-        section: &CommandSection,
-    ) {
-        if reason == VisitReason::Exit {
-            return;
-        }
-
-        self.check_command_indentation(diagnostics, section);
     }
 }

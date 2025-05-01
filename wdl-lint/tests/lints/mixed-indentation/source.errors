@@ -22,7 +22,7 @@ note[Whitespace]: line contains only whitespace
   │
   = fix: remove the whitespace
 
-note[DocumentMixedIndentation]: mixed indentation in document
+note[MixedIndentation]: mixed indentation in document
   ┌─ tests/lints/mixed-indentation/source.wdl:9:1
   │
 9 │     

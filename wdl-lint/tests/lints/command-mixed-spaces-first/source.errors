@@ -1,4 +1,4 @@
-note[DocumentMixedIndentation]: mixed indentation in document
+note[MixedIndentation]: mixed indentation in document
    ┌─ tests/lints/command-mixed-spaces-first/source.wdl:14:1
    │
 14 │         this line is prefixed with ~{"tabs"}

@@ -6,6 +6,7 @@ use wdl_analysis::Diagnostics;
 use wdl_analysis::VisitReason;
 use wdl_analysis::Visitor;
 use wdl_analysis::document::Document;
+use wdl_analysis::lines_with_offset;
 use wdl_ast::AstNode;
 use wdl_ast::Diagnostic;
 use wdl_ast::Span;
@@ -15,10 +16,9 @@ use wdl_ast::SyntaxKind;
 use crate::Rule;
 use crate::Tag;
 use crate::TagSet;
-use crate::util::lines_with_offset;
 
 /// The identifier for the mixed indentation rule.
-const ID: &str = "DocumentMixedIndentation";
+const ID: &str = "MixedIndentation";
 
 /// Represents the indentation kind.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -50,14 +50,14 @@ impl fmt::Display for IndentationKind {
 
 /// Creates a "mixed indentation" diagnostic.
 fn mixed_indentation(span: Span, kind: IndentationKind) -> Diagnostic {
-    let _anti_kind = match kind {
+    let anti_kind = match kind {
         IndentationKind::Spaces => IndentationKind::Tabs,
         IndentationKind::Tabs => IndentationKind::Spaces,
     };
 
     let fix_message = match kind {
-        IndentationKind::Spaces => "convert all tab indentation to spaces throughout the document",
-        IndentationKind::Tabs => "convert all space indentation to tabs throughout the document",
+        IndentationKind::Spaces => "use spaces consistently throughout the document",
+        IndentationKind::Tabs => "use tabs consistently throughout the document",
     };
 
     Diagnostic::note("mixed indentation in document")
@@ -88,7 +88,7 @@ impl Rule for MixedIndentationRule {
 
     fn description(&self) -> &'static str {
         "Ensures consistent indentation (no mixed spaces/tabs) throughout the document, excluding \
-         command sections."
+         command sections which are handled by the analysis `CommandMixedIndentation` rule."
     }
 
     fn explanation(&self) -> &'static str {
@@ -129,23 +129,26 @@ impl Visitor for MixedIndentationRule {
         let mut mixed_span = None;
         let text = doc.root().inner().text().to_string();
 
-        // Count indentation types to determine predominant style
-        let mut space_count = 0;
-        let mut tab_count = 0;
+        // Collect all command section spans to avoid firing for them
+        let command_spans: Vec<Span> = doc
+            .root()
+            .inner()
+            .descendants()
+            .filter(|node| node.kind() == SyntaxKind::CommandSectionNode)
+            .map(|node| node.text_range().into())
+            .collect();
 
-        // First pass: detect mixed indentation and count styles
+        // First pass: detect mixed indentation
         for (line, start, _) in lines_with_offset(&text) {
             let mut line_indent_kind = None;
 
-            for b in line.as_bytes() {
+            for (i, b) in line.as_bytes().iter().enumerate() {
                 match b {
                     b' ' => {
-                        space_count += 1;
                         let current = IndentationKind::Spaces;
                         line_indent_kind = line_indent_kind.or(Some(current));
                     }
                     b'\t' => {
-                        tab_count += 1;
                         let current = IndentationKind::Tabs;
                         line_indent_kind = line_indent_kind.or(Some(current));
                     }
@@ -157,7 +160,20 @@ impl Visitor for MixedIndentationRule {
                 if let Some(first) = first_style {
                     if first != line_kind && mixed_span.is_none() {
                         // Found mixed indentation, remember position
-                        mixed_span = Some(Span::new(start, 1));
+                        let potential_span = Span::new(start, 1);
+                        
+                        // Check if this span is within any command section
+                        let is_in_command = command_spans.iter().any(|cmd_span| {
+                            potential_span.start() >= cmd_span.start() && 
+                            potential_span.start() + potential_span.len() <= cmd_span.start() + cmd_span.len()
+                        });
+                        
+                        // Only store the span if not in a command section
+                        if !is_in_command {
+                            mixed_span = Some(potential_span);
+                        }
+                        
+                        break; // Exit once we find the first valid instance
                     }
                 } else {
                     // Remember first indentation style encountered
@@ -167,14 +183,7 @@ impl Visitor for MixedIndentationRule {
         }
 
         if let Some(span) = mixed_span {
-            // Choose the predominant style based on counts
-            let predominant_kind = if space_count >= tab_count {
-                IndentationKind::Spaces
-            } else {
-                IndentationKind::Tabs
-            };
-
-            diagnostics.add(mixed_indentation(span, predominant_kind));
+            diagnostics.add(mixed_indentation(span, first_style.unwrap()));
         }
     }
 
