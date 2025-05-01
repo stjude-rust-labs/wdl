@@ -5,7 +5,6 @@ use std::marker::PhantomData;
 use std::ops::Range;
 use std::panic;
 use std::panic::AssertUnwindSafe;
-use std::panic::Location;
 use std::sync::Arc;
 use std::time::Instant;
 
@@ -472,27 +471,22 @@ where
                                 })
                             }));
 
+                            let mut graph = graph.write();
+                            let node = graph.get_mut(index);
                             match result {
                                 Ok((_, document)) => {
-                                    let mut graph = graph.write();
-                                    let node = graph.get_mut(index);
                                     node.analysis_completed(document);
                                     (index, Ok(()))
                                 }
                                 Err(payload) => {
-                                    let mut graph = graph.write();
-                                    let uri = graph.get(index).uri().clone();
                                     let error = Arc::new(anyhow!(
                                         "analysis panicked for {uri}: {msg}",
+                                        uri = node.uri(),
                                         msg = format_panic_payload(&payload)
                                     ));
-                                    error!(
-                                        "caught panic during analysis of {uri}: {error}",
-                                    );
+                                    error!("{error}");
 
-                                    let node = graph.get_mut(index);
                                     node.analysis_failed(error.clone());
-
                                     (index, Err(error))
                                 }
                             }
@@ -510,7 +504,7 @@ where
 
             let graph = self.graph.write();
             results.extend(analyzed.into_iter().filter_map(|(index, _)| {
-                // the node state was already updated withing Rayon task.
+                // the node state was already updated within the Rayon task.
                 if graph.include_result(index) {
                     Some(AnalysisResult::new(graph.get(index)))
                 } else {
@@ -737,8 +731,6 @@ pub(crate) fn format_panic_payload(payload: &Box<dyn std::any::Any + Send>) -> S
         s.to_string()
     } else if let Some(s) = payload.downcast_ref::<String>() {
         s.clone()
-    } else if let Some(loc) = payload.downcast_ref::<&Location<'static>>() {
-        format!("panic occurred at {}", loc)
     } else {
         "unknown panic payload".to_string()
     }
