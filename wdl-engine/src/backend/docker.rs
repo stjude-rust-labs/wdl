@@ -237,7 +237,7 @@ impl TaskManagerRequest for DockerTaskRequest {
             .await
             .map_err(|e| anyhow!("{e:#}"))?;
 
-        assert_eq!(statuses.len(), 1, "there should only be one output");
+        assert_eq!(statuses.len(), 1, "there should only be one exit status");
         let status = statuses.first();
 
         Ok(TaskExecutionResult {
