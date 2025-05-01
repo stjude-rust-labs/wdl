@@ -3,7 +3,7 @@
 use wdl_ast::Severity;
 
 /// The rule identifier for command mixed indentation warnings.
-pub const MIXED_INDENTATION_RULE_ID: &str = "MixedIndentation";
+pub const COMMAND_MIXED_INDENTATION_RULE_ID: &str = "CommandMixedIndentation";
 
 /// The rule identifier for unused import warnings.
 pub const UNUSED_IMPORT_RULE_ID: &str = "UnusedImport";
