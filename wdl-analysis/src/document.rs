@@ -481,7 +481,7 @@ pub struct Document {
 }
 
 impl Document {
-    /// Creates a new analyzed document from a URI.
+    /// Creates a new default document from a URI.
     pub(crate) fn default_from_uri(uri: Arc<Url>) -> Self {
         Self {
             data: Arc::new(DocumentData::new(uri, None, None, Default::default())),
