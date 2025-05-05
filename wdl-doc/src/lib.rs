@@ -311,7 +311,7 @@ pub async fn document_workspace(
         return Err(anyhow!("Workspace is not a directory"));
     }
 
-    let docs_dir = output_dir.as_ref();
+    let docs_dir = clean(absolute(output_dir.as_ref())?);
     if !docs_dir.exists() {
         std::fs::create_dir(&docs_dir)?;
     }
@@ -321,9 +321,9 @@ pub async fn document_workspace(
     let results = analyzer.analyze(()).await?;
 
     let mut docs_tree = if let Some(ss) = stylesheet {
-        docs_tree::DocsTree::new_with_stylesheet(docs_dir, ss)?
+        docs_tree::DocsTree::new_with_stylesheet(&docs_dir, ss)?
     } else {
-        docs_tree::DocsTree::new(docs_dir)?
+        docs_tree::DocsTree::new(&docs_dir)?
     };
 
     for result in results {
