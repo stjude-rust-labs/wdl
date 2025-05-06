@@ -391,7 +391,7 @@ impl DocsTree {
                 .to_string()
                 .replace("-", "_")
                 .replace(".", "_")
-                .replace("/", "_")
+                .replace(std::path::MAIN_SEPARATOR_STR, "_")
         }
 
         struct JsNode {
