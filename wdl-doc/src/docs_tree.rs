@@ -571,6 +571,7 @@ impl DocsTree {
                     if (this.search === '') {{
                         return [];
                     }}
+                    this.show_workflows = false;
                     return this.nodes.filter(node => node.search_name.toLowerCase().includes(this.search.toLowerCase()));
                 }},
                 get shownNodes() {{
