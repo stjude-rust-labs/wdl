@@ -564,7 +564,7 @@ impl DocsTree {
         let data = format!(
             r#"{{
                 show_workflows: $persist(true).using(sessionStorage),
-                search: '',
+                search: $persist('').using(sessionStorage),
                 chevron: '{}',
                 nodes: [{}],
                 get searchedNodes() {{
