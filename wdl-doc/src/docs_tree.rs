@@ -563,7 +563,7 @@ impl DocsTree {
 
         let data = format!(
             r#"{{
-                show_workflows: $persist(true).using(sessionStorage),
+                showWorkflows: $persist(true).using(sessionStorage),
                 search: $persist('').using(sessionStorage),
                 chevron: '{}',
                 nodes: [{}],
@@ -571,7 +571,7 @@ impl DocsTree {
                     if (this.search === '') {{
                         return [];
                     }}
-                    this.show_workflows = false;
+                    this.showWorkflows = false;
                     return this.nodes.filter(node => node.search_name.toLowerCase().includes(this.search.toLowerCase()));
                 }},
                 get shownNodes() {{
@@ -644,16 +644,16 @@ impl DocsTree {
                 }
                 div x-cloak class="w-full h-full rounded-md flex flex-col gap-2 pl-2" {
                     div class="flex items-center gap-x-1 pr-4" {
-                        div x-on:click="show_workflows = true; search = ''" class="flex grow items-center gap-x-1 border-b" x-bind:class="! show_workflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
+                        div x-on:click="showWorkflows = true; search = ''" class="flex grow items-center gap-x-1 border-b" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
                             img src=(self.assets_relative_to(base).join("list-bullet.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Workflows" }
                         }
-                        div x-on:click="show_workflows = false" class="flex grow items-center gap-x-1 border-b" x-bind:class="show_workflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
+                        div x-on:click="showWorkflows = false" class="flex grow items-center gap-x-1 border-b" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
                             img src=(self.assets_relative_to(base).join("folder.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Full Directory" }
                         }
                     }
-                    ul x-cloak x-show="! show_workflows || search != ''" class="" {
+                    ul x-cloak x-show="! showWorkflows || search != ''" class="" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
                             img x-show="search === ''" src=(self.assets_relative_to(base).join("selected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
                             p x-show="search === ''" class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
@@ -674,7 +674,7 @@ impl DocsTree {
                             }
                         }
                     }
-                    ul x-cloak x-show="show_workflows && search === ''" class="" {
+                    ul x-cloak x-show="showWorkflows && search === ''" class="" {
                         (self.sidebar_workflows_view(path))
                     }
                 }
