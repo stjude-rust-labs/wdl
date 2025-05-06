@@ -74,7 +74,6 @@ const CATEGORY_ICON: &[u8] = include_bytes!("../theme/assets/category.png");
 /// The "chevron-down" icon.
 const CHEVRON_DOWN_ICON: &[u8] = include_bytes!("../theme/assets/chevron-down.png");
 
-
 /// Write assets to the given root docs directory.
 fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
     let dir = dir.as_ref();
