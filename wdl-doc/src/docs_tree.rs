@@ -642,9 +642,9 @@ impl DocsTree {
                     img src=(self.assets_relative_to(base).join("search.png").to_string_lossy()) class="w-4 h-4" alt="Search icon";
                     input id="searchbox" x-model="search" type="text" placeholder="Search..." class="w-full h-full text-slate-300";
                 }
-                div class="w-full h-full rounded-md flex flex-col gap-2 pl-2" {
+                div x-cloak class="w-full h-full rounded-md flex flex-col gap-2 pl-2" {
                     div class="flex items-center gap-x-1 pr-4" {
-                        div x-on:click="show_workflows = true" class="flex grow items-center gap-x-1 border-b" x-bind:class="! show_workflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
+                        div x-on:click="show_workflows = true; search = ''" class="flex grow items-center gap-x-1 border-b" x-bind:class="! show_workflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
                             img src=(self.assets_relative_to(base).join("list-bullet.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Workflows" }
                         }
@@ -653,7 +653,7 @@ impl DocsTree {
                             p { "Full Directory" }
                         }
                     }
-                    ul x-show="! show_workflows || search != ''" class="" {
+                    ul x-cloak x-show="! show_workflows || search != ''" class="" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
                             img x-show="search === ''" src=(self.assets_relative_to(base).join("selected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
                             p x-show="search === ''" class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
@@ -674,7 +674,7 @@ impl DocsTree {
                             }
                         }
                     }
-                    ul x-show="show_workflows && search === ''" class="" {
+                    ul x-cloak x-show="show_workflows && search === ''" class="" {
                         (self.sidebar_workflows_view(path))
                     }
                 }
@@ -784,7 +784,7 @@ impl DocsTree {
             page.name(),
             html! {
                 div class="flex flex-row items-start" {
-                    div class="flex sticky top-0 max-w-1/7" {
+                    div class="flex-none sticky top-0 w-1/7 max-w-1/7" {
                         (left_sidebar)
                     }
                     div class="flex grow p-4 ml-4" {
