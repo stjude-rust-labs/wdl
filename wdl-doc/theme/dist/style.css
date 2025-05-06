@@ -226,6 +226,9 @@
   .h-screen {
     height: 100vh !important;
   }
+  .w-1\/7 {
+    width: calc(1/7 * 100%) !important;
+  }
   .w-2\/3 {
     width: calc(2/3 * 100%) !important;
   }
