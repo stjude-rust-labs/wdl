@@ -1,6 +1,6 @@
-<!DOCTYPE html><html class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>get_read_groups</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"><script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script><link rel="stylesheet" type="text/css" href="../../style.css"></head><body class="size-full table-auto border-collapse dark:bg-slate-950 dark:text-white text-base"><div class="flex flex-row items-start"><div class="flex sticky top-0 max-w-1/7"><div x-data="{
+<!DOCTYPE html><html class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>get_read_groups</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"><script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script><link rel="stylesheet" type="text/css" href="../../style.css"></head><body class="size-full table-auto border-collapse dark:bg-slate-950 dark:text-white text-base"><div class="flex flex-row items-start"><div class="flex-none sticky top-0 w-1/7 max-w-1/7"><div x-data="{
                 show_workflows: $persist(true).using(sessionStorage),
-                search: '',
+                search: $persist('').using(sessionStorage),
                 chevron: '../../assets/chevron-down.png',
                 nodes: [{
                         key: 'data_structures',
@@ -13,7 +13,7 @@
                     }, {
                         key: 'data_structures_flag_filter',
                         display_name: 'flag_filter',
-                        search_name: 'data_structures/flag_filter',
+                        search_name: 'flag_filter',
                         img: '../../assets/unselected-dir.png',
                         href: '../flag_filter/index.html',
                         selected: false,
@@ -21,7 +21,7 @@
                     }, {
                         key: 'data_structures_flag_filter_FlagFilter_struct_html',
                         display_name: 'FlagFilter',
-                        search_name: 'data_structures/flag_filter/FlagFilter-struct.html',
+                        search_name: 'FlagFilter-struct.html',
                         img: '../../assets/unselected-struct.png',
                         href: '../flag_filter/FlagFilter-struct.html',
                         selected: false,
@@ -29,7 +29,7 @@
                     }, {
                         key: 'data_structures_flag_filter_validate_flag_filter_workflow_html',
                         display_name: 'validate_flag_filter',
-                        search_name: 'data_structures/flag_filter/validate_flag_filter-workflow.html',
+                        search_name: 'validate_flag_filter-workflow.html',
                         img: '../../assets/unselected-workflow.png',
                         href: '../flag_filter/validate_flag_filter-workflow.html',
                         selected: false,
@@ -37,7 +37,7 @@
                     }, {
                         key: 'data_structures_flag_filter_validate_string_is_12bit_oct_dec_or_hex_task_html',
                         display_name: 'validate_string_is_12bit_oct_dec_or_hex',
-                        search_name: 'data_structures/flag_filter/validate_string_is_12bit_oct_dec_or_hex-task.html',
+                        search_name: 'validate_string_is_12bit_oct_dec_or_hex-task.html',
                         img: '../../assets/unselected-task.png',
                         href: '../flag_filter/validate_string_is_12bit_oct_dec_or_hex-task.html',
                         selected: false,
@@ -45,7 +45,7 @@
                     }, {
                         key: 'data_structures_read_group',
                         display_name: 'read_group',
-                        search_name: 'data_structures/read_group',
+                        search_name: 'read_group',
                         img: '../../assets/selected-dir.png',
                         href: 'index.html',
                         selected: true,
@@ -53,7 +53,7 @@
                     }, {
                         key: 'data_structures_read_group_ReadGroup_struct_html',
                         display_name: 'ReadGroup',
-                        search_name: 'data_structures/read_group/ReadGroup-struct.html',
+                        search_name: 'ReadGroup-struct.html',
                         img: '../../assets/unselected-struct.png',
                         href: 'ReadGroup-struct.html',
                         selected: false,
@@ -61,7 +61,7 @@
                     }, {
                         key: 'data_structures_read_group_get_read_groups_task_html',
                         display_name: 'get_read_groups',
-                        search_name: 'data_structures/read_group/get_read_groups-task.html',
+                        search_name: 'get_read_groups-task.html',
                         img: '../../assets/selected-task.png',
                         href: 'get_read_groups-task.html',
                         selected: true,
@@ -69,7 +69,7 @@
                     }, {
                         key: 'data_structures_read_group_read_group_to_string_task_html',
                         display_name: 'read_group_to_string',
-                        search_name: 'data_structures/read_group/read_group_to_string-task.html',
+                        search_name: 'read_group_to_string-task.html',
                         img: '../../assets/unselected-task.png',
                         href: 'read_group_to_string-task.html',
                         selected: false,
@@ -77,7 +77,7 @@
                     }, {
                         key: 'data_structures_read_group_validate_read_group_task_html',
                         display_name: 'validate_read_group',
-                        search_name: 'data_structures/read_group/validate_read_group-task.html',
+                        search_name: 'validate_read_group-task.html',
                         img: '../../assets/unselected-task.png',
                         href: 'validate_read_group-task.html',
                         selected: false,
@@ -87,6 +87,7 @@
                     if (this.search === '') {
                         return [];
                     }
+                    this.show_workflows = false;
                     return this.nodes.filter(node =&gt; node.search_name.toLowerCase().includes(this.search.toLowerCase()));
                 },
                 get shownNodes() {
@@ -128,4 +129,4 @@
                         this.showChildrenCache[n.key] = true;
                     });
                 }
-            }" class="flex flex-col gap-y-3 top-0 left-0 h-screen min-w-[269px] text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400 overflow-y-auto overflow-x-clip"><img src="../../assets/sprocket-logo.png" class="w-1/2 h-md mb-4" alt="Sprocket logo"><form id="searchbar" class="flex items-center gap-x-2 w-9/10 h-md rounded-md border border-slate-700 px-2 mb-4"><img src="../../assets/search.png" class="w-4 h-4" alt="Search icon"><input id="searchbox" x-model="search" type="text" placeholder="Search..." class="w-full h-full text-slate-300"></form><div class="w-full h-full rounded-md flex flex-col gap-2 pl-2"><div class="flex items-center gap-x-1 pr-4"><div x-on:click="show_workflows = true" class="flex grow items-center gap-x-1 border-b" x-bind:class="! show_workflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'"><img src="../../assets/list-bullet.png" class="w-4 h-4" alt="List icon"><p>Workflows</p></div><div x-on:click="show_workflows = false" class="flex grow items-center gap-x-1 border-b" x-bind:class="show_workflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'"><img src="../../assets/folder.png" class="w-4 h-4" alt="List icon"><p>Full Directory</p></div></div><ul x-show="! show_workflows || search != ''" class=""><li class="flex flex-row items-center gap-x-1 text-slate-50"><img x-show="search === ''" src="../../assets/selected-dir.png" class="w-4 h-4" alt="Directory icon"><p x-show="search === ''" class=""><a href="../../index.html">docs</a></p></li><template x-for="node in shownNodes"><li class="flex flex-row items-center gap-x-1"><template x-for="i in Array.from({ length: node.nest_level })"><div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-500 mr-2"></div></template><img x-show="showSelfCache[node.key]" x-on:click="toggleChildren(node.key)" x-data="{ hover: false }" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" x-bind:src="hover &amp;&amp; (children(node.key).length &gt; 0) ? chevron : node.img" class="w-4 h-4" alt="Node icon"><p x-show="showSelfCache[node.key]" class="truncate" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-300'"><a x-bind:href="node.href" x-text="node.display_name"></a></p></li></template><template x-for="node in searchedNodes"><li class="flex flex-row items-center gap-x-1"><img x-bind:src="node.img" class="w-4 h-4" alt="Node icon"><p class="truncate" x-bind:class="node.selected ? 'text-slate-50' : 'hover:text-slate-300'"><a x-bind:href="node.href" x-text="node.display_name"></a></p></li></template></ul><ul x-show="show_workflows &amp;&amp; search === ''" class=""><li class="px-2"><div class="flex items-center gap-x-1 text-slate-50"><img src="../../assets/category.png" class="w-4 h-4" alt="Category icon"><p class="truncate">Other</p></div><ul class=""><li class="px-2 border-l border-gray-500 ml-2"><div class="flex items-center gap-x-1"><img src="../../assets/unselected-workflow.png" class="w-4 h-4" alt="Workflow icon"><p class="truncate hover:text-slate-300"><a href="../flag_filter/validate_flag_filter-workflow.html">validate_flag_filter</a></p></div></li></ul></li></ul></div></div></div><div class="flex grow p-4 ml-4"><div class="flex flex-col gap-y-6"><h1>get_read_groups</h1>Gets read group information from a BAM file and writes it out as JSON which is converted to a WDL struct.<h2>Inputs</h2><h3>Required Inputs</h3><table class="border"><thead class="border"><tr><th>Name</th><th>Type</th><th>Description</th><th>Additional Meta</th></tr></thead><tbody class="border"><tr class="border"><td class="border">bam</td><td class="border"><code>File</code></td><td class="border">Input BAM format file to get read groups from</td><td class="border"></td></tr></tbody></table><h3>Other Inputs</h3><table class="border"><thead class="border"><tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th><th>Additional Meta</th></tr></thead><tbody class="border"><tr class="border"><td class="border">modify_disk_size_gb</td><td class="border"><code>Int</code></td><td class="border"><code>0</code></td><td class="border">Add to or subtract from dynamic disk space allocation. Default disk size is determined by the size of the inputs. Specified in GB.</td><td class="border"></td></tr></tbody></table><h2>Outputs</h2><table><thead class="border"><tr><th>Name</th><th>Type</th><th>Expression</th><th>Description</th><th>Additional Meta</th></tr></thead><tbody class="border"><tr class="border"><td class="border">read_groups</td><td class="border"><code>Array[ReadGroup]</code></td><td class="border"><code>read_json(&quot;read_groups.json&quot;)</code></td><td class="border">An array of ReadGroup structs containing read group information.</td><td class="border"></td></tr></tbody></table><h2>Default Runtime Attributes</h2><table class="border"><thead class="border"><tr><th>Attribute</th><th>Value</th></tr></thead><tbody class="border"><tr class="border"><td class="border"><code>memory</code></td><td class="border"><code>&quot;4 GB&quot;</code></td></tr><tr class="border"><td class="border"><code>disks</code></td><td class="border"><code>&quot;~{disk_size_gb} GB&quot;</code></td></tr><tr class="border"><td class="border"><code>container</code></td><td class="border"><code>&quot;quay.io/biocontainers/pysam:0.22.0--py38h15b938a_1&quot;</code></td></tr><tr class="border"><td class="border"><code>maxRetries</code></td><td class="border"><code>1</code></td></tr></tbody></table></div></div><div class="flex top-0 right-0 sticky"><div class="top-0 right-0 h-screen min-w-[240px] w-[240px] p-4 bg-red-900 text-white"><h1 class="text-2xl text-center">Sidebar</h1><p class="">Right Sidebar</p></div></div></div></body></html>
+            }" class="flex flex-col gap-y-3 top-0 left-0 h-screen min-w-[269px] text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400 overflow-y-scroll overflow-x-clip"><img src="../../assets/sprocket-logo.png" class="self-center w-2/3 flex-none mb-4" alt="Sprocket logo"><form id="searchbar" class="flex items-center gap-x-2 w-9/10 h-md rounded-md border border-slate-700 px-2 mb-4"><img src="../../assets/search.png" class="w-4 h-4" alt="Search icon"><input id="searchbox" x-model="search" type="text" placeholder="Search..." class="w-full h-full text-slate-300"></form><div x-cloak class="w-full h-full rounded-md flex flex-col gap-2 pl-2"><div class="flex items-center gap-x-1 pr-4"><div x-on:click="show_workflows = true; search = ''" class="flex grow items-center gap-x-1 border-b" x-bind:class="! show_workflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'"><img src="../../assets/list-bullet.png" class="w-4 h-4" alt="List icon"><p>Workflows</p></div><div x-on:click="show_workflows = false" class="flex grow items-center gap-x-1 border-b" x-bind:class="show_workflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'"><img src="../../assets/folder.png" class="w-4 h-4" alt="List icon"><p>Full Directory</p></div></div><ul x-cloak x-show="! show_workflows || search != ''" class=""><li class="flex flex-row items-center gap-x-1 text-slate-50"><img x-show="search === ''" src="../../assets/selected-dir.png" class="w-4 h-4" alt="Directory icon"><p x-show="search === ''" class=""><a href="../../index.html">docs</a></p></li><template x-for="node in shownNodes"><li class="flex flex-row items-center gap-x-1"><template x-for="i in Array.from({ length: node.nest_level })"><div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-500 mr-2"></div></template><img x-show="showSelfCache[node.key]" x-on:click="toggleChildren(node.key)" x-data="{ hover: false }" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" x-bind:src="hover &amp;&amp; (children(node.key).length &gt; 0) ? chevron : node.img" class="w-4 h-4" alt="Node icon"><p x-show="showSelfCache[node.key]" class="truncate" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-300'"><a x-bind:href="node.href" x-text="node.display_name"></a></p></li></template><template x-for="node in searchedNodes"><li class="flex flex-row items-center gap-x-1"><img x-bind:src="node.img" class="w-4 h-4" alt="Node icon"><p class="truncate" x-bind:class="node.selected ? 'text-slate-50' : 'hover:text-slate-300'"><a x-bind:href="node.href" x-text="node.display_name"></a></p></li></template></ul><ul x-cloak x-show="show_workflows &amp;&amp; search === ''" class=""><li class="px-2"><div class="flex items-center gap-x-1 text-slate-50"><img src="../../assets/category.png" class="w-4 h-4" alt="Category icon"><p class="truncate">Other</p></div><ul class=""><li class="px-2 border-l border-gray-500 ml-2"><div class="flex items-center gap-x-1"><img src="../../assets/unselected-workflow.png" class="w-4 h-4" alt="Workflow icon"><p class="truncate hover:text-slate-300"><a href="../flag_filter/validate_flag_filter-workflow.html">validate_flag_filter</a></p></div></li></ul></li></ul></div></div></div><div class="flex grow p-4 ml-4"><div class="flex flex-col gap-y-6"><h1>get_read_groups</h1>Gets read group information from a BAM file and writes it out as JSON which is converted to a WDL struct.<h2>Inputs</h2><h3>Required Inputs</h3><table class="border"><thead class="border"><tr><th>Name</th><th>Type</th><th>Description</th><th>Additional Meta</th></tr></thead><tbody class="border"><tr class="border"><td class="border">bam</td><td class="border"><code>File</code></td><td class="border">Input BAM format file to get read groups from</td><td class="border"></td></tr></tbody></table><h3>Other Inputs</h3><table class="border"><thead class="border"><tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th><th>Additional Meta</th></tr></thead><tbody class="border"><tr class="border"><td class="border">modify_disk_size_gb</td><td class="border"><code>Int</code></td><td class="border"><code>0</code></td><td class="border">Add to or subtract from dynamic disk space allocation. Default disk size is determined by the size of the inputs. Specified in GB.</td><td class="border"></td></tr></tbody></table><h2>Outputs</h2><table><thead class="border"><tr><th>Name</th><th>Type</th><th>Expression</th><th>Description</th><th>Additional Meta</th></tr></thead><tbody class="border"><tr class="border"><td class="border">read_groups</td><td class="border"><code>Array[ReadGroup]</code></td><td class="border"><code>read_json(&quot;read_groups.json&quot;)</code></td><td class="border">An array of ReadGroup structs containing read group information.</td><td class="border"></td></tr></tbody></table><h2>Default Runtime Attributes</h2><table class="border"><thead class="border"><tr><th>Attribute</th><th>Value</th></tr></thead><tbody class="border"><tr class="border"><td class="border"><code>memory</code></td><td class="border"><code>&quot;4 GB&quot;</code></td></tr><tr class="border"><td class="border"><code>disks</code></td><td class="border"><code>&quot;~{disk_size_gb} GB&quot;</code></td></tr><tr class="border"><td class="border"><code>container</code></td><td class="border"><code>&quot;quay.io/biocontainers/pysam:0.22.0--py38h15b938a_1&quot;</code></td></tr><tr class="border"><td class="border"><code>maxRetries</code></td><td class="border"><code>1</code></td></tr></tbody></table></div></div><div class="flex top-0 right-0 sticky"><div class="top-0 right-0 h-screen min-w-[240px] w-[240px] p-4 bg-red-900 text-white"><h1 class="text-2xl text-center">Sidebar</h1><p class="">Right Sidebar</p></div></div></div></body></html>
