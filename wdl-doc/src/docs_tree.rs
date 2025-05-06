@@ -344,25 +344,25 @@ impl DocsTree {
         let workflows_by_category = self.get_workflows_by_category();
         html! {
             @for (category, workflows) in workflows_by_category {
-                li class="px-2" {
-                    div class="flex items-center gap-x-1 text-slate-50" {
+                li class="" {
+                    div class="flex items-center gap-x-1 h-6 text-slate-50" {
                         img src=(self.assets_relative_to(base).join("category.png").to_string_lossy()) class="w-4 h-4" alt="Category icon";
                         p class="truncate" { (category) }
                     }
                     ul class="" {
                         @for node in workflows {
-                            li class="px-2 border-l border-gray-500 ml-2" {
+                            li class="flex flex-row items-center gap-x-1" {
                                 @if let Some(page) = node.page() {
                                     @match page.page_type() {
                                         PageType::Workflow(wf) => {
-                                            div class="flex items-center gap-x-1" {
-                                                @if destination.starts_with(node.path()) {
-                                                    img src=(self.assets_relative_to(base).join("selected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
-                                                    p class="truncate text-slate-50" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
-                                                } @else {
-                                                    img src=(self.assets_relative_to(base).join("unselected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
-                                                    p class="truncate hover:text-slate-300" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
-                                                }
+                                            div class="w-px h-6 mr-2" {}
+                                            div class="w-px h-6 border rounded-none border-gray-500 mr-2" {}
+                                            @if destination.starts_with(node.path()) {
+                                                img src=(self.assets_relative_to(base).join("selected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
+                                                p class="truncate text-slate-50" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
+                                            } @else {
+                                                img src=(self.assets_relative_to(base).join("unselected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
+                                                p class="truncate hover:text-slate-300" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
                                             }
                                         }
                                         _ => {
