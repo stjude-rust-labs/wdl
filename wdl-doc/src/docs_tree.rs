@@ -346,7 +346,7 @@ impl DocsTree {
             @for (category, workflows) in workflows_by_category {
                 li class="" {
                     div class="flex items-center gap-x-1 h-6 text-slate-50" {
-                        img src=(self.assets_relative_to(base).join("category.png").to_string_lossy()) class="w-4 h-4" alt="Category icon";
+                        img src=(self.assets_relative_to(base).join("category-selected.svg").to_string_lossy()) class="w-4 h-4" alt="Category icon";
                         p class="truncate" { (category) }
                     }
                     ul class="" {
@@ -358,10 +358,10 @@ impl DocsTree {
                                             div class="w-px h-6 mr-2" {}
                                             div class="w-px h-6 border rounded-none border-gray-500 mr-2" {}
                                             @if destination.starts_with(node.path()) {
-                                                img src=(self.assets_relative_to(base).join("selected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
+                                                img src=(self.assets_relative_to(base).join("workflow-selected.svg").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
                                                 p class="truncate text-slate-50" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
                                             } @else {
-                                                img src=(self.assets_relative_to(base).join("unselected-workflow.png").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
+                                                img src=(self.assets_relative_to(base).join("workflow-unselected.svg").to_string_lossy()) class="w-4 h-4" alt="Workflow icon";
                                                 p class="truncate hover:text-slate-300" { a href=(diff_paths(node.path(), base).unwrap().to_string_lossy()) { (wf.pretty_name()) } }
                                             }
                                         }
@@ -479,36 +479,36 @@ impl DocsTree {
                         PageType::Task(_) => self
                             .assets_relative_to(base)
                             .join(if selected {
-                                "selected-task.png"
+                                "task-selected.svg"
                             } else {
-                                "unselected-task.png"
+                                "task-unselected.svg"
                             })
                             .to_string_lossy()
                             .to_string(),
                         PageType::Struct(_) => self
                             .assets_relative_to(base)
                             .join(if selected {
-                                "selected-struct.png"
+                                "struct-selected.svg"
                             } else {
-                                "unselected-struct.png"
+                                "struct-unselected.svg"
                             })
                             .to_string_lossy()
                             .to_string(),
                         PageType::Workflow(_) => self
                             .assets_relative_to(base)
                             .join(if selected {
-                                "selected-workflow.png"
+                                "workflow-selected.svg"
                             } else {
-                                "unselected-workflow.png"
+                                "workflow-unselected.svg"
                             })
                             .to_string_lossy()
                             .to_string(),
                         PageType::Index(_) => self
                             .assets_relative_to(base)
                             .join(if selected {
-                                "selected-dir.png"
+                                "dir-selected.svg"
                             } else {
-                                "unselected-dir.png"
+                                "dir-unselected.svg"
                             })
                             .to_string_lossy()
                             .to_string(),
@@ -516,9 +516,9 @@ impl DocsTree {
                     None => self
                         .assets_relative_to(base)
                         .join(if selected {
-                            "selected-dir.png"
+                            "dir-selected.svg"
                         } else {
-                            "unselected-dir.png"
+                            "dir-unselected.svg"
                         })
                         .to_string_lossy()
                         .to_string(),
@@ -615,7 +615,7 @@ impl DocsTree {
                 }}
             }}"#,
             self.assets_relative_to(base)
-                .join("chevron-down.png")
+                .join("chevron-down.svg")
                 .to_string_lossy(),
             all_nodes
                 .iter()
@@ -636,26 +636,28 @@ impl DocsTree {
         );
 
         html! {
-            div x-data=(data) class="flex flex-col gap-y-3 top-0 left-0 h-screen min-w-[269px] text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400 overflow-y-scroll overflow-x-clip" {
-                img src=(self.assets_relative_to(base).join("sprocket-logo.png").to_string_lossy()) class="self-center w-2/3 flex-none mb-4" alt="Sprocket logo";
-                form id="searchbar" class="flex items-center gap-x-2 w-9/10 h-md rounded-md border border-slate-700 px-2 mb-4" {
-                    img src=(self.assets_relative_to(base).join("search.png").to_string_lossy()) class="w-4 h-4" alt="Search icon";
-                    input id="searchbox" x-model="search" type="text" placeholder="Search..." class="w-full h-full text-slate-300";
+            div x-data=(data) class="flex flex-col h-full w-full gap-y-3 text-nowrap pt-4 pl-4 bg-slate-900 text-slate-400 overflow-y-scroll overflow-x-clip" {
+                img src=(self.assets_relative_to(base).join("sprocket-logo.svg").to_string_lossy()) class="w-2/3 flex-none mb-4" alt="Sprocket logo";
+                form id="searchbar" class="flex-none items-center gap-x-2 w-9/10 h-[40px] rounded-md border border-slate-700 mb-4" {
+                    div class="flex flex-row items-center h-full w-full" {
+                        img src=(self.assets_relative_to(base).join("search.svg").to_string_lossy()) class="flex size-8" alt="Search icon";
+                        input id="searchbox" x-model="search" type="text" placeholder="Search..." class="flex h-full w-full text-slate-300";
+                    }
                 }
                 div x-cloak class="w-full h-full rounded-md flex flex-col gap-2 pl-2" {
                     div class="flex items-center gap-x-1 pr-4" {
                         div x-on:click="showWorkflows = true; search = ''" class="flex grow items-center gap-x-1 border-b" x-bind:class="! showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
-                            img src=(self.assets_relative_to(base).join("list-bullet.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
+                            img src=(self.assets_relative_to(base).join("list-bullet-selected.svg").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Workflows" }
                         }
                         div x-on:click="showWorkflows = false" class="flex grow items-center gap-x-1 border-b" x-bind:class="showWorkflows ? 'text-slate-400 hover:text-slate-300' : 'text-slate-50'" {
-                            img src=(self.assets_relative_to(base).join("folder.png").to_string_lossy()) class="w-4 h-4" alt="List icon";
+                            img src=(self.assets_relative_to(base).join("folder-selected.svg").to_string_lossy()) class="w-4 h-4" alt="List icon";
                             p { "Full Directory" }
                         }
                     }
                     ul x-cloak x-show="! showWorkflows || search != ''" class="" {
                         li class="flex flex-row items-center gap-x-1 text-slate-50" {
-                            img x-show="search === ''" src=(self.assets_relative_to(base).join("selected-dir.png").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
+                            img x-show="search === ''" src=(self.assets_relative_to(base).join("dir-selected.svg").to_string_lossy()) class="w-4 h-4" alt="Directory icon";
                             p x-show="search === ''" class="" { a href=(self.root_index_relative_to(base).to_string_lossy()) { (root.name()) } }
                         }
                         template x-for="node in shownNodes" {
@@ -664,14 +666,20 @@ impl DocsTree {
                                     div x-show="showSelfCache[node.key]" class="w-px h-6 border rounded-none border-gray-500 mr-2" {}
                                 }
                                 img x-show="showSelfCache[node.key]" x-on:click="toggleChildren(node.key)" x-data="{ hover: false }" x-on:mouseenter="hover = true" x-on:mouseleave="hover = false" x-bind:src="hover && (children(node.key).length > 0) ? chevron : node.img" class="w-4 h-4" alt="Node icon";
-                                p x-show="showSelfCache[node.key]" class="truncate" x-bind:class="node.selected ? 'text-slate-50' : (node.search_name === '') ? '' : 'hover:text-slate-300'" { a x-bind:href="node.href" x-text="node.display_name" {} }
+                                p x-show="showSelfCache[node.key]" class="truncate" x-bind:class="node.selected ? 'text-slate-50 bg-slate-800' : (node.search_name === '') ? '' : 'hover:text-slate-50 hover:bg-slate-700'" { a x-bind:href="node.href" x-text="node.display_name" {} }
                             }
                         }
                         template x-for="node in searchedNodes" {
                             li class="flex flex-row items-center gap-x-1" {
                                 img x-bind:src="node.img" class="w-4 h-4" alt="Node icon";
-                                p class="truncate" x-bind:class="node.selected ? 'text-slate-50' : 'hover:text-slate-300'" { a x-bind:href="node.href" x-text="node.display_name" {} }
+                                p class="truncate" x-bind:class="node.selected ? 'text-slate-50 bg-slate-800' : 'hover:text-slate-50 hover:bg-slate-700'" { a x-bind:href="node.href" x-text="node.display_name" {} }
                             }
+                        }
+                        li class="flex place-content-center pr-8" {
+                            img x-show="search !== '' && searchedNodes.length === 0" src=(self.assets_relative_to(base).join("search.svg").to_string_lossy()) class="size-8" alt="Search icon";
+                        }
+                        li class="flex place-content-center pr-8" {
+                            p x-show="search !== '' && searchedNodes.length === 0" class="" { "No results found for \"" b class="text-slate-50" x-text="search" {} "\"" }
                         }
                     }
                     ul x-cloak x-show="showWorkflows && search === ''" class="" {
@@ -685,7 +693,7 @@ impl DocsTree {
     /// Render a right sidebar component.
     pub fn render_right_sidebar(&self) -> Markup {
         html! {
-            div class="top-0 right-0 h-screen min-w-[240px] w-[240px] p-4 bg-red-900 text-white" {
+            div class="p-4 h-full w-full bg-red-900 text-white" {
                 h1 class="text-2xl text-center" { "Sidebar" }
                 p class="" { "Right Sidebar" }
             }
@@ -745,13 +753,13 @@ impl DocsTree {
             "Home",
             html! {
                 div class="flex flex-row items-start" {
-                    div class="flex sticky top-0 max-w-1/7" {
+                    div class="flex-none top-0 h-screen min-w-[269px] max-w-[269px] sticky" {
                         (left_sidebar)
                     }
                     div class="flex grow p-4 ml-4" {
                         (content)
                     }
-                    div class="flex top-0 right-0 sticky" {
+                    div class="flex-none top-0 right-0 h-screen min-w-[269px] max-w-[269px] sticky" {
                         (self.render_right_sidebar())
                     }
                 }
@@ -784,13 +792,13 @@ impl DocsTree {
             page.name(),
             html! {
                 div class="flex flex-row items-start" {
-                    div class="flex-none sticky top-0 w-1/7 max-w-1/7" {
+                    div class="flex-none top-0 h-screen min-w-[269px] max-w-[269px] sticky" {
                         (left_sidebar)
                     }
                     div class="flex grow p-4 ml-4" {
                         (content)
                     }
-                    div class="flex top-0 right-0 sticky" {
+                    div class="flex-none top-0 right-0 h-screen min-w-[269px] max-w-[269px] sticky" {
                         (self.render_right_sidebar())
                     }
                 }
