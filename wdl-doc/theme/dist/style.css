@@ -11,6 +11,7 @@
     --color-slate-300: oklch(86.9% 0.022 252.894);
     --color-slate-400: oklch(70.4% 0.04 256.788);
     --color-slate-700: oklch(37.2% 0.044 257.287);
+    --color-slate-800: oklch(27.9% 0.041 260.031);
     --color-slate-900: oklch(20.8% 0.042 265.755);
     --color-slate-950: oklch(12.9% 0.042 264.695);
     --color-gray-500: oklch(55.1% 0.027 264.364);
@@ -186,9 +187,6 @@
   .right-0 {
     right: calc(var(--spacing) * 0) !important;
   }
-  .left-0 {
-    left: calc(var(--spacing) * 0) !important;
-  }
   .mr-2 {
     margin-right: calc(var(--spacing) * 2) !important;
   }
@@ -207,6 +205,10 @@
   .table {
     display: table !important;
   }
+  .size-8 {
+    width: calc(var(--spacing) * 8) !important;
+    height: calc(var(--spacing) * 8) !important;
+  }
   .size-full {
     width: 100% !important;
     height: 100% !important;
@@ -217,14 +219,14 @@
   .h-6 {
     height: calc(var(--spacing) * 6) !important;
   }
+  .h-\[40px\] {
+    height: 40px !important;
+  }
   .h-full {
     height: 100% !important;
   }
   .h-screen {
     height: 100vh !important;
-  }
-  .w-1\/7 {
-    width: calc(1/7 * 100%) !important;
   }
   .w-2\/3 {
     width: calc(2/3 * 100%) !important;
@@ -235,20 +237,14 @@
   .w-9\/10 {
     width: calc(9/10 * 100%) !important;
   }
-  .w-\[240px\] {
-    width: 240px !important;
-  }
   .w-full {
     width: 100% !important;
   }
   .w-px {
     width: 1px !important;
   }
-  .max-w-1\/7 {
-    max-width: calc(1/7 * 100%) !important;
-  }
-  .min-w-\[240px\] {
-    min-width: 240px !important;
+  .max-w-\[269px\] {
+    max-width: 269px !important;
   }
   .min-w-\[269px\] {
     min-width: 269px !important;
@@ -271,6 +267,9 @@
   .flex-row {
     flex-direction: row !important;
   }
+  .place-content-center {
+    place-content: center !important;
+  }
   .items-center {
     align-items: center !important;
   }
@@ -291,9 +290,6 @@
   }
   .gap-y-6 {
     row-gap: calc(var(--spacing) * 6) !important;
-  }
-  .self-center {
-    align-self: center !important;
   }
   .truncate {
     overflow: hidden !important;
@@ -329,20 +325,23 @@
   .bg-red-900 {
     background-color: var(--color-red-900) !important;
   }
+  .bg-slate-800 {
+    background-color: var(--color-slate-800) !important;
+  }
   .bg-slate-900 {
     background-color: var(--color-slate-900) !important;
   }
   .p-4 {
     padding: calc(var(--spacing) * 4) !important;
   }
-  .px-2 {
-    padding-inline: calc(var(--spacing) * 2) !important;
-  }
   .pt-4 {
     padding-top: calc(var(--spacing) * 4) !important;
   }
   .pr-4 {
     padding-right: calc(var(--spacing) * 4) !important;
+  }
+  .pr-8 {
+    padding-right: calc(var(--spacing) * 8) !important;
   }
   .pl-2 {
     padding-left: calc(var(--spacing) * 2) !important;
@@ -375,6 +374,20 @@
   }
   .text-white {
     color: var(--color-white) !important;
+  }
+  .hover\:bg-slate-700 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-slate-700) !important;
+      }
+    }
+  }
+  .hover\:text-slate-50 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-slate-50) !important;
+      }
+    }
   }
   .hover\:text-slate-300 {
     &:hover {
