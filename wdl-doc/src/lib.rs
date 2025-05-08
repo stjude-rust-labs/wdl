@@ -58,6 +58,14 @@ fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
         include_bytes!("../theme/assets/sprocket-logo.svg"),
     )?;
     std::fs::write(
+        assets_dir.join("search.svg"),
+        include_bytes!("../theme/assets/search.svg"),
+    )?;
+    std::fs::write(
+        assets_dir.join("chevron-down.svg"),
+        include_bytes!("../theme/assets/chevron-down.svg"),
+    )?;
+    std::fs::write(
         assets_dir.join("category-selected.svg"),
         include_bytes!("../theme/assets/category-selected.svg"),
     )?;
@@ -76,10 +84,6 @@ fn write_assets<P: AsRef<Path>>(dir: P) -> Result<()> {
     std::fs::write(
         assets_dir.join("folder-unselected.svg"),
         include_bytes!("../theme/assets/folder-unselected.svg"),
-    )?;
-    std::fs::write(
-        assets_dir.join("search.svg"),
-        include_bytes!("../theme/assets/search.svg"),
     )?;
     std::fs::write(
         assets_dir.join("dir-selected.svg"),
